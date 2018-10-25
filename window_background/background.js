@@ -124,6 +124,15 @@ var topDecks = {};
 //var coursesToSubmit = {};
 var decks = [];
 
+var gold = 0;
+var gems = 0;
+var vault = 0;
+var wcTrack = 0;
+var wcCommon = 0;
+var wcUncommon = 0;
+var wcRare = 0;
+var wcMythic = 0;
+
 var updateAvailable = false;
 var updateState = -1;
 var updateProgress = -1;
@@ -194,12 +203,39 @@ ipc.on('login', function (event, arg) {
     }
 });
 
+window.onerror = (msg, url, line, col, err) => {
+    var error = {
+        msg: err.msg,
+        stack: err.stack,
+        line: line,
+        col: col
+    }
+    error.id = sha1(error.msg + playerId);
+    httpSendError(error);
+}
+
+process.on('uncaughtException', function(err){
+    var error = {
+        msg: err,
+        stack: "uncaughtException",
+        line: 0,
+        col: 0
+    }
+    console.log("ERROR: ", error);
+    error.id = sha1(error.msg + playerId);
+    httpSendError(error);
+})
+
+//
+ipc.on('error', function (event, err) {
+    err.id = sha1(err.msg + playerId);
+    httpSendError(err);
+});
 
 //
 ipc.on('request_draft_link', function (event, obj) {
     httpDraftShareLink(obj.id, obj.expire);
 });
-
 
 //
 ipc.on('windowBounds', function (event, obj) {
@@ -295,21 +331,6 @@ function calculateRankWins() {
 	history.rankwinrates = rankwinrates;
 }
 
-// ** FOR REMOVAL ** 
-ipc.on('set_economy', function (event, arg) {
-    goldHistory = store.get("gold_history");
-    gemsHistory = store.get("gems_history");
-    wilcardsHistory = store.get("wildcards_history");
-
-    goldHistory = fix_history(goldHistory);
-    gemsHistory = fix_history(gemsHistory);
-    wilcardsHistory = fix_history(wilcardsHistory);
-
-    //var economy = {gold: goldHistory, gems: gemsHistory, wildcards: wilcardsHistory, open: true};    
-    //ipc_send("set_economy", economy);
-});
-
-
 ipc.on('request_explore', function (event, arg) {
     if (playerUsername == '') {
         ipc_send("offline", 1);
@@ -325,8 +346,17 @@ ipc.on('request_explore', function (event, arg) {
     }
 });
 
-ipc.on('request_economy', function (event, arg) {
-    ipc_send("set_economy", JSON.stringify(economy));
+ipc.on('request_economy', function (event, arg) { 
+    var ec = economy;
+    ec.gold = gold;
+    ec.gems = gems;
+    ec.vault = vault;
+    ec.wcTrack = wcTrack;
+    ec.wcCommon = wcCommon;
+    ec.wcUncommon = wcUncommon;
+    ec.wcRare = wcRare;
+    ec.wcMythic = wcMythic;
+    ipc_send("set_economy", JSON.stringify(ec));
 });
 
 ipc.on('request_course', function (event, arg) {
@@ -424,14 +454,6 @@ function loadPlayerConfig(playerId) {
     deck_changes_index = entireConfig["deck_changes_index"];
     deck_changes = entireConfig["deck_changes"];
 
-    // ** FOR REMOVAL **
-    goldHistory = entireConfig["gold_history"];
-    gemsHistory = entireConfig["gems_history"];
-    wilcardsHistory = entireConfig["wildcards_history"];
-    //var economy = {gold: goldHistory, gems: gemsHistory, wildcards: wilcardsHistory, open: false};
-    //ipc_send("set_economy", economy);
-    //
-
     var settings = store.get("settings");
     updateSettings(settings, true);
     requestHistorySend(0);
@@ -464,41 +486,6 @@ function updateSettings(_settings, relay) {
     if (relay) {
 	    ipc_send("set_settings", _settings);
     }
-}
-
-// ** FOR REMOVAL ** 
-function fix_history(_history) {
-    var mode = 0;
-    if (mode == 0) {
-        for (let ii = 1; ii < _history.length; ii++) {
-            let dataPrev = _history[ii-1]; let data = _history[ii];
-            let da = new Date(data.date);
-            if (da < Date.now()) {
-                let diff = (data.date - dataPrev.date) / (1000*60*60*24);
-                for (let i = 0; i<diff; i++) {
-                    _history.splice(ii, 0, {date: dataPrev.date + (1000*60*60*24*i), value: dataPrev.value}); ii++;
-                }
-            }
-        }
-        
-        for (let ii = 1; ii < _history.length; ii++) {
-            let dataPrev = _history[ii-1]; let data = _history[ii];
-            let da = new Date(data.date);
-            if (da < Date.now()) {
-                let db = new Date(dataPrev.date);
-                if (da.toDateString() == db.toDateString()) {
-                    _history.splice(ii-1, 1); ii-=1;
-                }
-            }
-        }
-    }
-
-    for (let ii = 0; ii < _history.length-14; ii++) {
-        _history.splice(ii, 1);
-        ii-=1;
-    }
-    
-    return _history;
 }
 
 //
@@ -1021,58 +1008,15 @@ function processLogData(data) {
             var logTime = parseWotcTime(str);
         }
 
-        var gold = json.gold;
-        var gems = json.gems;
-        var wcCommon = json.wcCommon;
-        var wcUncommon = json.wcUncommon;
-        var wcRare = json.wcRare;
-        var wcMythic = json.wcMythic;
+        gold = json.gold;
+        gems = json.gems;
+        vault = json.vaultProgress;
+        wcTrack = json.wcTrackPosition;
+        wcCommon = json.wcCommon;
+        wcUncommon = json.wcUncommon;
+        wcRare = json.wcRare;
+        wcMythic = json.wcMythic;
 
-        goldHistory = store.get("gold_history");
-        var lastDate  = 0;
-        var lastValue = -1;
-        goldHistory.forEach(function(data, index) {
-            if (data.date > lastDate) {
-                lastDate = data.date;
-                lastValue = data.value;
-            }
-
-        });
-        if (gold != lastValue && lastDate < logTime.getTime()) {
-            goldHistory.push({date: logTime.getTime(), value: gold});
-            store.set("gold_history", goldHistory);
-        }
-
-        gemsHistory = store.get("gems_history");
-        var lastDate  = 0;
-        var lastValue = -1;
-        gemsHistory.forEach(function(data) {
-            if (data.date > lastDate) {
-                lastDate = data.date;
-                lastValue = data.value;
-            }
-        });
-        if (gems != lastValue && lastDate < logTime.getTime()) {
-            gemsHistory.push({date: logTime.getTime(), value: gems});
-            store.set("gems_history", gemsHistory);
-        }
-
-        wilcardsHistory = store.get("wildcards_history");
-        var lastDate  = 0;
-        var lastValue = -1;
-        wilcardsHistory.forEach(function(data) {
-            if (data.date > lastDate) {
-                lastDate = data.date;
-                lastValue = data.value;
-            }
-        });
-        if (lastDate < logTime.getTime()) {
-            if (wcCommon != lastValue.wcCommon || wcUncommon != lastValue.wcUncommon || wcRare != lastValue.wcRare || wcMythic != lastValue.wcMythic) {
-                var newValue = {wcCommon: wcCommon, wcUncommon: wcUncommon, wcRare: wcRare, wcMythic: wcMythic};
-                wilcardsHistory.push({date: logTime.getTime(), value: newValue});
-                store.set("wildcards_history", wilcardsHistory);
-            }
-        }
         return;
     }
 
@@ -1449,7 +1393,15 @@ function gre_to_client(data) {
                                         var aff = obj.affectorId;
                                         var pn = oppName;
                                         if (gameObjs[aff] != undefined) {
-                                            console.log(getNameBySeat(gameObjs[aff].controllerSeatId)+" cast "+card.name, gameObjs[aff]);
+                                            if (gameObjs[aff].type == "GameObjectType_Ability") {
+                                                src = gameObjs[aff].objectSourceGrpId;
+                                                //ipc_send("ipc_log", cardsDb.get(src).name+"'s ability");
+                                                //console.log(cardsDb.get(src).name+"'s ability", gameObjs[aff]);
+                                            }
+                                            else {
+                                                //ipc_send("ipc_log", gameObjs[aff].controllerSeatId)+" cast "+card.name);
+                                                //console.log(getNameBySeat(gameObjs[aff].controllerSeatId)+" cast "+card.name, gameObjs[aff]);
+                                            }
                                         }
                                     }
                                 }
@@ -2072,9 +2024,11 @@ function httpBasic() {
                 } catch (e) {
                     console.error(e.message);
                 }
+                /*
                 if (_headers.token != "") {
                     callback();
                 }
+                */
                 removeFromHttp(_headers.reqId);
                 if (debugNet) {
                     var str = ""; httpAsync.forEach( function(h) { str += h.reqId+", "; });
@@ -2150,6 +2104,12 @@ function httpSetEconomy(change) {
     var _id = makeId(6);
     change = JSON.stringify(change);
     httpAsync.push({'reqId': _id, 'method': 'set_economy', 'uid': playerId, 'change': change});
+}
+
+function httpSendError(error) {
+    var _id = makeId(6);
+    error = JSON.stringify(error);
+    httpAsync.push({'reqId': _id, 'method': 'send_error', 'uid': playerId, 'error': error});
 }
 
 function httpDeleteData(courseId) {

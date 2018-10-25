@@ -77,6 +77,11 @@ app.on('ready', () => {
                 console.log("IPC LOG: ", arg);
                 break;
 
+            case 'ipc_error':
+                console.log("IPC ERROR: ", arg);
+                background.webContents.send("error", arg);
+                break;
+
             // to renderer
             case 'set_draft_link':
                 mainWindow.webContents.send("set_draft_link", arg);

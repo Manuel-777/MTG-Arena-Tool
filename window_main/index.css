@@ -414,17 +414,24 @@ span i {
     color: #FAE5D2;
 }
 
+.list_economy_top {
+    justify-content: center;
+}
+
 .list_economy {
     cursor: pointer;
     padding-left: 16px;
     height: 64px;
+    opacity: 0.66;
     display: flex;
     justify-content: space-between;
     background-color: rgba(0, 0, 0, 0);
-    -webkit-transition: background-color .2s ease-in;
+    -webkit-transition: all .2s ease-out;
 }
 
 .list_economy:hover {
+    opacity: 1;
+    padding-left: 48px;
     background-color: rgba(0, 0, 0, 0.25);
 }
 

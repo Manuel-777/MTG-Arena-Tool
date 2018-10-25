@@ -40,12 +40,6 @@ var rankOffset = 0;
 var rankTitle = "";
 var userName = ""
 
-// ** FOR REMOVAL **
-var goldHistory = null;
-var gemsHistory = null;
-var wildcardHistory = null;
-//
-
 const chartjs = require('chart.js');
 const Database = require('../shared/database.js');
 const cardsDb = new Database();
@@ -65,13 +59,25 @@ ipc_send = function (method, arg) {
 //	ipc_send('renderer_state', 1);
 //}
 
-window.onerror = (err) => {
-    ipc_send("ipc_log", "Error: "+err);
+window.onerror = (msg, url, line, col, err) => {
+	var error = {
+		msg: err.msg,
+		stack: err.stack,
+		line: line,
+		col: col
+	}
+    ipc_send("ipc_error", error);
+	console.log("Error: ", error);
 }
 
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', function(err){
     ipc_send("ipc_log", "Exception: "+err);
 })
+
+process.on('warning', (warning) => {
+	ipc_send("ipc_log", "Warning: "+warning.message);
+	ipc_send("ipc_log", "> "+warning.stack);
+});;
 
 //
 ipc.on('auth', function (event, arg) {
@@ -350,19 +356,6 @@ ipc.on('force_open_about', function (event, arg) {
 	force_open_about();
 });
 
-// ** FOR REMOVAL **
-/*
-ipc.on('set_economy', function (event, arg) {
-	goldHistory = arg.gold;
-	gemsHistory = arg.gems;
-	wildcardHistory = arg.wildcards;
-	open = arg.open;
-	if (open) {
-		open_economy();
-	}
-});
-*/
-
 //
 ipc.on('init_login', function (event, arg) {
 	$('.authenticate').show();
@@ -527,7 +520,6 @@ function isArenaRunning() {
 
 $(document).ready(function() {
 	//document.getElementById("rememberme").checked = false;
-
 	$(".signup_link").click(function() {
 		shell.openExternal('https://mtgatool.com/signup/');
 	});
@@ -598,7 +590,6 @@ $(document).ready(function() {
 			if ($(this).hasClass("it4")) {
 				sidebarActive = 4;
 				ipc_send('request_economy', 1);
-				//open_economy_ipc();
 			}
 			if ($(this).hasClass("it5")) {
 				sidebarActive = 5;
@@ -614,11 +605,6 @@ $(document).ready(function() {
 		}
 	});
 });
-
-// ** FOR REMOVAL **
-function open_economy_ipc() {
-	ipc_send('renderer_get_economy', 1);
-}
 
 var daysago = 0;
 var dayList = [];
@@ -643,7 +629,7 @@ function setEconomy(loadMore) {
 		dayList = [];
 		dayList[0] = new economyDay();
 		economyHistory.changes.sort(compare_economy); 
-		
+
 		for (var n = 0; n < economyHistory.changes.length; n++) {
 			var economy_id = economyHistory.changes[n];
 			var change = economyHistory[economy_id];
@@ -673,6 +659,40 @@ function setEconomy(loadMore) {
 
 		var d = document.createElement("div");
 		d.classList.add("list_fill");
+
+		let div = document.createElement("div");
+		div.classList.add("list_economy_top");
+		div.classList.add("flex_item");
+
+		let icgo = document.createElement("div");
+		icgo.classList.add("economy_gold_med");
+		icgo.title = "Gold";
+
+		let icge = document.createElement("div");
+		icge.classList.add("economy_gems_med");
+		icge.style.marginLeft = "24px";
+		icge.title = "Gems";
+
+		let tx = document.createElement("div");
+		tx.style.lineHeight = "64px";
+		tx.classList.add("economy_sub");
+
+		div.appendChild(icgo);
+		let ntx = tx.cloneNode(true);
+		ntx.innerHTML = economyHistory.gold;
+		div.appendChild(ntx);
+
+		div.appendChild(icge);
+		ntx = tx.cloneNode(true);
+		ntx.innerHTML = economyHistory.gems;
+		div.appendChild(ntx);
+
+		ntx = tx.cloneNode(true);
+		ntx.innerHTML = "Vault: "+economyHistory.vault;
+		ntx.style.marginLeft = "32px";
+		div.appendChild(ntx);
+
+		mainDiv.appendChild(div);
 		mainDiv.appendChild(d);
 
 		loadEconomy = 0;
@@ -1387,6 +1407,7 @@ function setHistory(loadMore) {
 			if (match.opponent == undefined) continue;
 			if (match.opponent.userid.indexOf("Familiar") !== -1) continue;
 		}
+		if (match.type == "Event")	continue;
 		//console.log("Load match: ", match_id, match);
 		//console.log("Match: ", loadHistory, match.type, match);
 
@@ -1493,7 +1514,7 @@ function setHistory(loadMore) {
 				flr.appendChild(d);
 			}
 		}
-		else {
+		else if (match.type == "draft") {
 			var tileGrpid = setsList[match.set].tile;
 
 			var tile = document.createElement("div");
@@ -2655,7 +2676,6 @@ function open_draft(id, tileGrpid, set) {
 	});
 }
 
-// ** FOR REMOVAL ** 
 function open_match(id) {
 	$("#ux_1").html('');
 	var match = matchesHistory[id];
@@ -4037,17 +4057,19 @@ function sort_history() {
 
 		if (mid != null && match != undefined) {
 			if (match.type != "draft") {
-				if (match.playerDeck.mainDeck == undefined) {
-					match.playerDeck = JSON.parse('{"deckTileId":67003,"description":null,"format":"Standard","colors":[],"id":"00000000-0000-0000-0000-000000000000","isValid":false,"lastUpdated":"2018-05-31T00:06:29.7456958","lockedForEdit":false,"lockedForUse":false,"mainDeck":[],"name":"Undefined","resourceId":"00000000-0000-0000-0000-000000000000","sideboard":[]}');
+				try {
+					if (match.playerDeck.mainDeck == undefined) {
+						match.playerDeck = JSON.parse('{"deckTileId":67003,"description":null,"format":"Standard","colors":[],"id":"00000000-0000-0000-0000-000000000000","isValid":false,"lastUpdated":"2018-05-31T00:06:29.7456958","lockedForEdit":false,"lockedForUse":false,"mainDeck":[],"name":"Undefined","resourceId":"00000000-0000-0000-0000-000000000000","sideboard":[]}');
+					}
+					else {
+						match.playerDeck.colors = get_deck_colors(match.playerDeck);
+					}
+					match.playerDeck.mainDeck.sort(compare_cards);
+					match.oppDeck.colors = get_deck_colors(match.oppDeck);
+					match.oppDeck.mainDeck.sort(compare_cards);
+				} catch (e) {
+					console.log(match);
 				}
-				else {
-					match.playerDeck.colors = get_deck_colors(match.playerDeck);
-				}
-
-				match.playerDeck.mainDeck.sort(compare_cards);
-
-				match.oppDeck.colors = get_deck_colors(match.oppDeck);
-				match.oppDeck.mainDeck.sort(compare_cards);
 			}
 		}
 	});
