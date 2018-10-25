@@ -14,7 +14,7 @@ An MTG Arena deck tracker and collection manager.
 	- Export decklists
 - Collection browser
 	- Filter cards by set
-	- Show newly aquired cards
+	- Show newly acquired cards
 	- Sort by set, name and cmc
 	- Advanced card filtering and search
 	- Show cards unowned
