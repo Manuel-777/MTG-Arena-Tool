@@ -2047,8 +2047,8 @@ function forceDeckUpdate() {
                             if (card.id == gameObjs[key].grpId) {
                                 //console.log(gameObjs[key].instanceId, cardsDb.get(gameObjs[key].grpId).name, zones[gameObjs[key].zoneId].type);
                                 if (card.quantity > 0) {
-			            card.quantity -= 1;
-				}
+                                    card.quantity -= 1;
+                                }
                             }
                         });
                     }
