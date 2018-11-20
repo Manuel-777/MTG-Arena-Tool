@@ -545,6 +545,10 @@ if (process.platform === 'win32') {
 else {
     // Path for Wine, could change depending on installation method
     var logUri = process.env.HOME+'/.wine/drive_c/user/'+process.env.USER+'/AppData/LocalLow/Wizards of the Coast/MTGA/output_log.txt';
+    // Fall back to using log file from the current directory if default logUri does not exist but one from CWD does.
+    if (!fs.existsSync(logUri) && fs.existsSync('output_log.txt')) {
+        logUri = 'output_log.txt';
+    }
 }
 console.log(logUri);
 
