@@ -15,6 +15,20 @@ global
 */
 const electron = require("electron");
 const { webFrame, remote } = require("electron");
+
+const { openNewGitHubIssue, debugInfo } = require("electron-util");
+const unhandled = require("electron-unhandled");
+unhandled({
+  showDialog: true,
+  reportButton: error => {
+    openNewGitHubIssue({
+      user: "Manuel-777",
+      repo: "MTG-Arena-Tool",
+      body: `\`\`\`\n${error.stack}\n\`\`\`\n\n---\n\n${debugInfo()}`
+    });
+  }
+});
+
 const fs = require("fs");
 const ipc = electron.ipcRenderer;
 

@@ -17,6 +17,19 @@ app.setAppUserModelId("com.github.manuel777.mtgatool");
 
 const { autoUpdater } = require("electron-updater");
 
+const { openNewGitHubIssue, debugInfo } = require("electron-util");
+const unhandled = require("electron-unhandled");
+unhandled({
+  showDialog: true,
+  reportButton: error => {
+    openNewGitHubIssue({
+      user: "Manuel-777",
+      repo: "MTG-Arena-Tool",
+      body: `\`\`\`\n${error.stack}\n\`\`\`\n\n---\n\n${debugInfo()}`
+    });
+  }
+});
+
 // Adds debug features like hotkeys for triggering dev tools and reload
 require("electron-debug")({ showDevTools: false });
 console.log(process.platform);
