@@ -144,7 +144,7 @@ function open_history_tab(loadMore) {
       select.append('<option value="All">All</option>');
     }
 
-    if (filterEvent != "All Draft") {
+    if (filterEvent != "All Draft Modes") {
       select.append('<option value="All Draft Modes">All Draft Modes</option>');
     }
 
