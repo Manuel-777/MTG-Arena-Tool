@@ -39,7 +39,8 @@ function filterMatch(match) {
   return (
     filterEvent == "All" ||
     match.eventId == filterEvent ||
-    (filterEvent == "All Draft Modes" && isDraftMatch(match))
+    (filterEvent == "All Draft Modes" && isDraftMatch(match)) ||
+    (filterEvent == "Draft Replays" && match.type == "draft")
   );
 }
 
@@ -146,6 +147,10 @@ function open_history_tab(loadMore) {
 
     if (filterEvent != "All Draft Modes") {
       select.append('<option value="All Draft Modes">All Draft Modes</option>');
+    }
+
+    if (filterEvent != "Draft Replays") {
+      select.append('<option value="Draft Replays">Draft Replays</option>');
     }
 
     eventsList.forEach(evId => {
