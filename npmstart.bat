@@ -1,0 +1,2 @@
+echo before
+npm start
