@@ -901,13 +901,25 @@ $(document).ready(function() {
   );
 });
 
-class htmlProto extends HTMLElement {
+class LogAbility extends HTMLElement {
+  constructor() {
+    super();
+  }
+}
+
+class LogCard extends HTMLElement {
   constructor() {
     super();
   }
 }
 
 function addLogProtos() {
-  document.registerElement("log-card", htmlProto);
-  document.registerElement("log-ability", htmlProto);
+  const logCardElement = window.customElements.get("log-card");
+  if (!logCardElement) {
+    window.customElements.define("log-card", LogCard, { extends: "span" });
+  }
+  const logAbilityElement = window.customElements.get("log-ability");
+  if (!logAbilityElement) {
+    window.customElements.define("log-ability", LogAbility, { extends: "span" });
+  }
 }
