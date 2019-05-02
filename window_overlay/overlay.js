@@ -916,10 +916,10 @@ class LogCard extends HTMLElement {
 function addLogProtos() {
   const logCardElement = window.customElements.get("log-card");
   if (!logCardElement) {
-    window.customElements.define("log-card", LogCard, { extends: "span" });
+    window.customElements.define("log-card", LogCard);
   }
   const logAbilityElement = window.customElements.get("log-ability");
   if (!logAbilityElement) {
-    window.customElements.define("log-ability", LogAbility, { extends: "span" });
+    window.customElements.define("log-ability", LogAbility);
   }
 }
