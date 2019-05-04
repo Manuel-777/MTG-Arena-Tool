@@ -145,7 +145,8 @@ function open_history_tab(loadMore) {
     actuallyLoaded - begin < filteredSampleSize;
     loadHistory++
   ) {
-    var match_id = matchesHistory.matches[loadHistory];
+    const revIndex = matchesHistory.matches.length - loadHistory - 1;
+    var match_id = matchesHistory.matches[revIndex];
     var match = matchesHistory[match_id];
 
     //console.log("match: ", match_id, match);
@@ -848,7 +849,7 @@ function sort_history() {
   });
 }
 
-function compare_matches(a, b) {
+function compare_matches(b, a) {
   if (a == undefined) return -1;
   if (b == undefined) return 1;
 
