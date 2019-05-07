@@ -294,8 +294,8 @@ ipc.on("save_app_settings", function(event, arg) {
     rstore.set("token", "");
   }
 
-  loadSettings(updated);
-  rstore.set("settings", updated);
+  const newSettings = loadSettings(updated);
+  rstore.set("settings", newSettings);
   ipc_send("hide_loading");
 });
 
@@ -389,8 +389,8 @@ ipc.on("overlayBounds", function(event, obj) {
 //
 ipc.on("save_user_settings", function(event, settings) {
   ipc_send("show_loading");
-  loadSettings(settings);
-  store.set("settings", settings);
+  const newSettings = loadSettings(settings);
+  store.set("settings", newSettings);
   ipc_send("hide_loading");
 });
 
@@ -940,6 +940,7 @@ function loadSettings(dirtySettings = {}) {
   }
 
   ipc_send("set_settings", _settings);
+  return _settings;
 }
 
 //
