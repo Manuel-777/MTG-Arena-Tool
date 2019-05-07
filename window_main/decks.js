@@ -1,7 +1,6 @@
 /*
 global
   Aggregator,
-  allMatches,
 	cardsDb,
   createDivision,
 	decks,
@@ -36,6 +35,7 @@ function open_decks_tab() {
     var mainDiv = document.getElementById("ux_0");
     mainDiv.classList.add("flex_item");
     mainDiv.innerHTML = "";
+    const allMatches = new Aggregator();
 
     const wrap_r = createDivision(["wrapper_column", "sidebar_column_l"]);
     wrap_r.style.width = sidebarSize+"px";
