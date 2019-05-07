@@ -96,7 +96,6 @@ let ipc = electron.ipcRenderer;
 let decks = null;
 let changes = null;
 let matchesHistory = [];
-let allMatches = null;
 let eventsHistory = [];
 
 let explore = null;
@@ -360,9 +359,6 @@ ipc.on("set_decks", function(event, arg) {
   if (arg != null) {
     delete arg.index;
     decks = Object.values(arg);
-    if (matchesHistory.length) {
-      allMatches = new Aggregator();
-    }
   }
   open_decks_tab();
 });
@@ -383,9 +379,6 @@ ipc.on("set_history", function(event, arg) {
   if (arg != null) {
     try {
       matchesHistory = JSON.parse(arg);
-      if (decks) {
-        allMatches = new Aggregator();
-      }
     } catch (e) {
       console.log("Error parsing JSON:", arg);
       return false;
@@ -399,9 +392,6 @@ ipc.on("set_history", function(event, arg) {
 ipc.on("set_history_data", function(event, arg) {
   if (arg != null) {
     matchesHistory = JSON.parse(arg);
-    if (decks) {
-      allMatches = new Aggregator();
-    }
   }
 });
 
