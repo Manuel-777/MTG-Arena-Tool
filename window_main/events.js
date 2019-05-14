@@ -50,7 +50,14 @@ function openEventsTab(_filters) {
     "events_top",
     selected => openEventsTab(selected),
     filters,
-    allMatches.trackEvents
+    allMatches.trackEvents,
+    [],
+    [],
+    false,
+    [],
+    false,
+    null,
+    true
   );
 
   const eventsTopFilter = filterPanel.render();
@@ -88,7 +95,7 @@ function renderData(container, index) {
   if (
     course === undefined ||
     course.CourseDeck === undefined ||
-    course.archived
+    (course.archived && !filters.showArchived)
   ) {
     return 0;
   }
@@ -101,7 +108,18 @@ function renderData(container, index) {
 
   var tileGrpid = course.CourseDeck.deckTileId;
 
-  let listItem = new ListItem(tileGrpid, course.id, expandEvent, archiveEvent);
+  let archiveCallback = archiveEvent;
+  if (course.archived) {
+    archiveCallback = unarchiveEvent;
+  }
+
+  const listItem = new ListItem(
+    tileGrpid,
+    course.id,
+    expandEvent,
+    archiveCallback,
+    course.archived
+  );
   listItem.divideLeft();
   listItem.divideRight();
   attachEventData(listItem, course);
@@ -191,6 +209,14 @@ function attachEventData(listItem, course) {
 
 function archiveEvent(id) {
   ipc_send("archive_course", id);
+  eventsHistory[id].archived = true;
+  openEventsTab();
+}
+
+function unarchiveEvent(id) {
+  ipc_send("unarchive_course", id);
+  eventsHistory[id].archived = false;
+  openEventsTab();
 }
 
 // Given the data of a match will return a data row to be

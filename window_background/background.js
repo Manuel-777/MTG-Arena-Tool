@@ -4,6 +4,7 @@ global
   compare_archetypes,
   Deck,
   eventsToFormat,
+  getDeck,
   stripTags,
   windowBackground,
   windowRenderer,
@@ -62,7 +63,7 @@ if (!remote.app.isPackaged) {
 }
 
 const path = require("path");
-const Store = require("../store.js");
+const Store = require("electron-store");
 const fs = require("fs");
 const sha1 = require("js-sha1");
 const ipc = electron.ipcRenderer;
@@ -143,17 +144,17 @@ const defaultCfg = {
 };
 
 var rstore = new Store({
-  configName: "remember",
+  name: "remember",
   defaults: rememberCfg
 });
 
 var store = new Store({
-  configName: "default",
+  name: "default",
   defaults: defaultCfg
 });
 
 var settingsStore = new Store({
-  configName: "settings",
+  name: "settings",
   defaults: settingsCfg
 });
 
@@ -404,26 +405,33 @@ ipc.on("delete_data", function() {
 });
 
 //
-ipc.on("delete_deck", function(event, arg) {
+ipc.on("archive_deck", function(event, arg) {
   ipc_send("show_loading");
-  var i = decks.index.indexOf(arg);
-  if (i > -1) {
-    decks.index.splice(i, 1);
-    delete decks[arg];
-    store.set("decks_index", decks.index);
-    store.delete("decks." + arg);
-  }
-  // If we do it imediately it looks awful
-  setTimeout(() => {
-    ipc_send("set_decks", JSON.stringify(decks));
-    ipc_send("hide_loading");
-  }, 200);
+  decks[arg].archived = true;
+  store.set("decks." + arg, decks[arg]);
+  ipc_send("hide_loading");
+});
+
+//
+ipc.on("unarchive_deck", function(event, arg) {
+  ipc_send("show_loading");
+  decks[arg].archived = false;
+  store.set("decks." + arg, decks[arg]);
+  ipc_send("hide_loading");
 });
 
 //
 ipc.on("archive_course", function(event, arg) {
   ipc_send("show_loading");
   events[arg].archived = true;
+  store.set(arg, events[arg]);
+  ipc_send("hide_loading");
+});
+
+//
+ipc.on("unarchive_course", function(event, arg) {
+  ipc_send("show_loading");
+  events[arg].archived = false;
   store.set(arg, events[arg]);
   ipc_send("hide_loading");
 });
@@ -707,7 +715,7 @@ function sendEconomy() {
 function loadPlayerConfig(playerId, serverData = undefined) {
   ipc_send("ipc_log", "Load player ID: " + playerId);
   store = new Store({
-    configName: playerId,
+    name: playerId,
     defaults: defaultCfg
   });
 

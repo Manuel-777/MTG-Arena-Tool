@@ -12,7 +12,6 @@
     "jquery": true
   },
   "rules": {
-    "prettier/prettier": "warn",
     "allowEmptyCatch": true,
     "no-cond-assign": 0,
     "no-console": "off",

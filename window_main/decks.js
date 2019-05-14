@@ -9,6 +9,7 @@ global
   formatPercent,
   get_deck_missing,
   getBoosterCountEstimate,
+  getDeck,
   getReadableFormat,
   hideLoadingBars,
   getWinrateClass,
@@ -98,6 +99,10 @@ function openDecksTab() {
       allMatches.events,
       tags,
       [],
+      true,
+      [],
+      false,
+      null,
       true
     );
     const decks_top_filter = filterPanel.render();
@@ -116,11 +121,16 @@ function openDecksTab() {
       let tileGrpid = deck.deckTileId;
       let listItem;
       if (deck.custom) {
+        let archiveCallback = archiveDeck;
+        if (deck.archived) {
+          archiveCallback = unarchiveDeck;
+        }
         listItem = new ListItem(
           tileGrpid,
           deck.id,
           openDeckCallback,
-          deleteDeckCallback
+          archiveCallback,
+          deck.archived
         );
       } else {
         listItem = new ListItem(tileGrpid, deck.id, openDeckCallback);
@@ -239,8 +249,16 @@ function openDeckCallback(id) {
   $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
 }
 
-function deleteDeckCallback(id) {
-  ipc_send("delete_deck", id);
+function archiveDeck(id) {
+  ipc_send("archive_deck", id);
+  getDeck(id).archived = true;
+  openDecksTab();
+}
+
+function unarchiveDeck(id) {
+  ipc_send("unarchive_deck", id);
+  getDeck(id).archived = false;
+  openDecksTab();
 }
 
 function createTag(tag, div, showClose = true) {

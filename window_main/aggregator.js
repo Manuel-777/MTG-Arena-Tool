@@ -1,8 +1,10 @@
 "use strict";
 /*
 globals
-  compare_decks,
+  compare_colors,
+  compare_winrates,
   doesDeckStillExist,
+  get_deck_colors,
   getDeck,
   getReadableEvent,
   getRecentDeckName,
@@ -10,7 +12,7 @@ globals
   orderedColorCodes,
   orderedColorCodesCommon,
   rankedEvents,
-  season_starts,
+  season_starts
 */
 
 // Default filter values
@@ -64,7 +66,7 @@ class Aggregator {
   static getDefaultColorFilter() {
     const colorFilters = {};
     orderedColorCodesCommon.forEach(code => (colorFilters[code] = false));
-    return {...colorFilters};
+    return { ...colorFilters };
   }
 
   static getDefaultFilters() {
@@ -138,7 +140,9 @@ class Aggregator {
     // Normalize deck colors into matching data format
     let deckColorCodes = Aggregator.getDefaultColorFilter();
     if (deck.colors instanceof Array) {
-      deck.colors.forEach(i => (deckColorCodes[orderedColorCodes[i - 1]] = true));
+      deck.colors.forEach(
+        i => (deckColorCodes[orderedColorCodes[i - 1]] = true)
+      );
     } else if (deck.colors instanceof Object) {
       deckColorCodes = deck.colors;
     }
@@ -152,33 +156,38 @@ class Aggregator {
   }
 
   filterDeck(deck) {
-    const { tag, colors, deckId, onlyCurrentDecks, showArchived } = this.filters;
+    const {
+      tag,
+      colors,
+      deckId,
+      onlyCurrentDecks,
+      showArchived
+    } = this.filters;
     if (!deck) return deckId === DEFAULT_DECK;
-    if (!showArchived && deck.archived && deck.archived) return false;
     const passesDeckFilter = deckId === DEFAULT_DECK || deckId === deck.id;
     if (!passesDeckFilter) return false;
+
+    const currentDeck = getDeck(deck.id);
+    const passesArchiveFilter =
+      !onlyCurrentDecks ||
+      (currentDeck && (showArchived || !currentDeck.archived));
+    if (!passesArchiveFilter) return false;
 
     const deckTags = [deck.format];
     if (deck.tags) {
       deckTags.push(...deck.tags);
     }
-    const currentDeck = getDeck(deck.id);
     if (currentDeck) {
       deckTags.push(currentDeck.format);
       if (currentDeck.tags) {
         deckTags.push(...currentDeck.tags);
       }
     }
-    const passesTagFilter =
-      tag === DEFAULT_TAG || deckTags.includes(tag);
+    const passesTagFilter = tag === DEFAULT_TAG || deckTags.includes(tag);
     if (!passesTagFilter) return false;
 
     const passesColorFilter = this._filterDeckByColors(deck, colors);
     if (!passesColorFilter) return false;
-
-    if (onlyCurrentDecks) {
-      return doesDeckStillExist(deck.id);
-    }
 
     return true;
   }
@@ -187,7 +196,8 @@ class Aggregator {
     const { eventId } = this.filters;
     return (
       (eventId === DEFAULT_EVENT && _eventId !== "AIBotMatch") ||
-      (eventId === ALL_EVENT_TRACKS && !SINGLE_MATCH_EVENTS.includes(_eventId)) ||
+      (eventId === ALL_EVENT_TRACKS &&
+        !SINGLE_MATCH_EVENTS.includes(_eventId)) ||
       (eventId === RANKED_CONST && CONSTRUCTED_EVENTS.includes(_eventId)) ||
       (eventId === RANKED_DRAFT && rankedEvents.includes(_eventId)) ||
       eventId === _eventId
@@ -208,7 +218,10 @@ class Aggregator {
     const passesPlayerDeckFilter = this.filterDeck(match.playerDeck);
     if (!passesPlayerDeckFilter) return false;
 
-    const passesOppDeckFilter = this._filterDeckByColors(match.oppDeck, oppColors);
+    const passesOppDeckFilter = this._filterDeckByColors(
+      match.oppDeck,
+      oppColors
+    );
     if (!passesOppDeckFilter) return false;
 
     const matchTags = match.tags || ["Unknown"];
@@ -240,7 +253,7 @@ class Aggregator {
     let wins = 0;
     let loss = 0;
     let playWins = 0;
-	  let playLoss = 0;
+    let playLoss = 0;
     let drawWins = 0;
     let drawLoss = 0;
     let winrate = 0;
@@ -252,7 +265,7 @@ class Aggregator {
         let eventIsMoreRecent = true;
         if (match.eventId in eventLastPlayed) {
           eventIsMoreRecent = match.date > eventLastPlayed[match.eventId];
-        } 
+        }
         if (eventIsMoreRecent) {
           eventLastPlayed[match.eventId] = match.date;
         }
@@ -273,12 +286,13 @@ class Aggregator {
         duration += match.duration;
       }
       if (match.player && match.opponent) {
-        const computeDeckWinrate = match.playerDeck && doesDeckStillExist(match.playerDeck.id);
+        const computeDeckWinrate =
+          match.playerDeck && doesDeckStillExist(match.playerDeck.id);
         let lastEdit, dId;
         if (computeDeckWinrate) {
           const currentDeck = getDeck(match.playerDeck.id);
           lastEdit = currentDeck.lastUpdated;
-          dId = match.playerDeck.id
+          dId = match.playerDeck.id;
           if (!(dId in deckWinrates)) {
             deckWinrates[dId] = { wins: 0, losses: 0, winrate: 0 };
           }
@@ -289,9 +303,9 @@ class Aggregator {
         if (match.player.win > match.opponent.win) {
           wins++;
           if (match.onThePlay) {
-          	let onThePlay = match.onThePlay == match.player.seat ? true : false;
-          	if (onThePlay) playWins++;
-          	else drawWins++;
+            let onThePlay = match.onThePlay == match.player.seat ? true : false;
+            if (onThePlay) playWins++;
+            else drawWins++;
           }
           if (computeDeckWinrate) {
             deckWinrates[dId].wins++;
@@ -303,9 +317,9 @@ class Aggregator {
         if (match.player.win < match.opponent.win) {
           loss++;
           if (match.onThePlay) {
-          	let onThePlay = match.onThePlay == match.player.seat ? true : false;
-          	if (onThePlay) playLoss++;
-          	else drawLoss++;
+            let onThePlay = match.onThePlay == match.player.seat ? true : false;
+            if (onThePlay) playLoss++;
+            else drawLoss++;
           }
           if (computeDeckWinrate) {
             deckWinrates[dId].losses++;
@@ -376,7 +390,7 @@ class Aggregator {
       playWins: playWins,
       playLosses: playLoss,
       drawWins: drawWins,
-      drawLosses: drawLoss,
+      drawLosses: drawLoss
     };
     const finishStats = stats => {
       const wins = stats.wins;
@@ -433,7 +447,7 @@ class Aggregator {
   }
 
   compareDecks(a, b) {
-    const dateMax = (a, b) => (a > b) ? a : b;
+    const dateMax = (a, b) => (a > b ? a : b);
     const aDate = dateMax(this.deckLastPlayed[a.id], a.lastUpdated);
     const bDate = dateMax(this.deckLastPlayed[b.id], b.lastUpdated);
     if (aDate && bDate && aDate !== bDate) {
@@ -486,7 +500,9 @@ class Aggregator {
     return [
       ALL_EVENT_TRACKS,
       RANKED_DRAFT,
-      ...this._eventIds.filter(eventId => !SINGLE_MATCH_EVENTS.includes(eventId))
+      ...this._eventIds.filter(
+        eventId => !SINGLE_MATCH_EVENTS.includes(eventId)
+      )
     ];
   }
 

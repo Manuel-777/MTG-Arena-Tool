@@ -48,7 +48,7 @@ class FilterPanel {
     this.showManaFilter = showManaFilter || false;
     this.archs = archs || [];
     this.showOppManaFilter = showOppManaFilter || false;
-    this.archCounts = archCounts;
+    this.archCounts = archCounts || {};
     this.showArchivedFilter = showArchivedFilter || false;
     this.getTagString = this.getTagString.bind(this);
     this.getDeckString = this.getDeckString.bind(this);
@@ -98,9 +98,10 @@ class FilterPanel {
           }"></div>`;
         });
       }
+      if (deck.archived) {
+        deckName += "<small><i> (archived)</i></small>";
+      }
       deckName += `<div class="flex_item">${colorsString}</div>`;
-    } else if (deck.archived) {
-      deckName += "<small><i> (archived)</i></small>";
     } else {
       deckName += "<small><i> (deleted)</i></small>";
     }

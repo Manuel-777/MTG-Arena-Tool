@@ -13,10 +13,10 @@ const {
 const path = require("path");
 const fs = require("fs");
 const { autoUpdater } = require("electron-updater");
-const Store = require("./store.js");
+const Store = require("electron-store");
 
 var rememberStore = new Store({
-  configName: "remember",
+  name: "remember",
   defaults: {}
 });
 

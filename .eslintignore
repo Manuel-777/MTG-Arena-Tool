@@ -4,4 +4,3 @@ sounds/*
 fonts/*
 window_background/messages_pb.js
 window_background/arena-log-decoder/__tests__/*
-window_main/conic-gradient.js

@@ -16,6 +16,7 @@ global
   setsList,
   windowBackground,
   windowOverlay,
+  $
 */
 const electron = require("electron");
 const { webFrame, remote } = require("electron");
@@ -38,6 +39,7 @@ if (!remote.app.isPackaged) {
 const fs = require("fs");
 const ipc = electron.ipcRenderer;
 const striptags = require("striptags");
+window.$ = window.jQuery = require("jquery");
 
 let matchBeginTime = Date.now();
 let priorityTimers = [];
