@@ -30,7 +30,9 @@
   "main": "main.js",
   "build": {
     "appId": "com.github.manuel777.mtgatool",
-    "files": ["!**/__tests__/**"],
+    "files": [
+      "!**/__tests__/**"
+    ],
     "win": {
       "target": "NSIS",
       "icon": "icon.ico",
@@ -58,6 +60,25 @@
     "test:jest": "jest",
     "dist": "build --x64",
     "version": "node -p \"require('./package.json').version\""
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "linters": {
+      "*.js": [
+        "prettier --write",
+        "eslint --fix",
+        "git add"
+      ]
+    },
+    "ignore": [
+      "**/__tests__/**",
+      "window_background/messages_pb.js"
+    ]
   },
   "dependencies": {
     "async": "^2.6.1",
@@ -90,7 +111,9 @@
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.0.1",
+    "husky": "^2.2.0",
     "jest": "^24.8.0",
+    "lint-staged": "^8.1.6",
     "prettier": "1.16.4"
   }
 }
