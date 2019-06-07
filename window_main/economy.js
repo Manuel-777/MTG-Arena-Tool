@@ -833,7 +833,9 @@ function createEconomyUI(mainDiv) {
   div.appendChild(ntx);
 
   ntx = tx.cloneNode(true);
-  ntx.innerHTML = "Vault: " + formatPercent(pd.economy.vault / 100);
+  ntx.innerHTML =
+    "Vault: " +
+    formatPercent(pd.economy.vault / 100, { maximumSignificantDigits: 3 });
   ntx.style.marginLeft = "32px";
   div.appendChild(ntx);
 
