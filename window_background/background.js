@@ -106,7 +106,7 @@ var settingsStore = new Store({
 });
 
 const debugLog = false;
-const debugNet = true;
+const debugNet = false;
 var debugLogSpeed = 0.001;
 
 const actionLogDir = path.join(
@@ -357,8 +357,7 @@ ipc.on("request_explore", function(event, arg) {
   if (pd.userName === "") {
     ipc_send("offline", 1);
   } else {
-    let cards = store.get("cards.cards");
-    httpApi.httpGetExplore(arg, cards);
+    httpApi.httpGetExplore(arg);
   }
 });
 
@@ -1636,9 +1635,7 @@ function finishLoading() {
       update_deck(false);
     }
 
-    let obj = store.get("windowBounds");
-    ipc_send("renderer_set_bounds", obj);
-
+    ipc_send("renderer_set_bounds", pd.windowBounds);
     ipc_send("initialize", 1);
 
     if (pd.name) {

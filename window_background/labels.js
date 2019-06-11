@@ -546,37 +546,37 @@ function onLabelInPlayerInventoryGetPlayerInventory(entry, json) {
 function onLabelInPlayerInventoryGetPlayerCardsV3(entry, json) {
   if (!json) return;
 
-  var date = new Date(store.get("cards.cards_time"));
-  var now = new Date();
-  var diff = Math.abs(now.getTime() - date.getTime());
-  var days = Math.floor(diff / (1000 * 3600 * 24));
+  const date = new Date(pd.cards.cards_time);
+  const now = new Date();
+  const diff = Math.abs(now.getTime() - date.getTime());
+  const days = Math.floor(diff / (1000 * 3600 * 24));
 
-  if (store.get("cards.cards_time") == 0) {
-    store.set("cards.cards_time", now);
-    store.set("cards.cards_before", json);
-    store.set("cards.cards", json);
-  }
+  let cards_before = pd.cards.cards_before;
   // If a day has passed since last update
-  else if (days > 0) {
-    var cardsPrev = store.get("cards.cards");
-    store.set("cards.cards_time", now);
-    store.set("cards.cards_before", cardsPrev);
-    store.set("cards.cards", json);
+  if (pd.cards.cards_time !== 0 && days > 0) {
+    cards_before = pd.cards.cards;
   }
 
-  var cardsPrevious = store.get("cards.cards_before");
-  const cardsNew = {};
+  const cards = {
+    ...pd.cards,
+    cards_time: now,
+    cards_before,
+    cards: json
+  };
 
+  store.set("cards", cards);
+
+  const cardsNew = {};
   Object.keys(json).forEach(function(key) {
     // get differences
-    if (cardsPrevious[key] === undefined) {
+    if (cards_before[key] === undefined) {
       cardsNew[key] = json[key];
-    } else if (cardsPrevious[key] < json[key]) {
-      cardsNew[key] = json[key] - cardsPrevious[key];
+    } else if (cards_before[key] < json[key]) {
+      cardsNew[key] = json[key] - cards_before[key];
     }
   });
 
-  pd_set({ cards: json, cardsNew });
+  pd_set({ cards, cardsNew });
   if (!firstPass) ipc_send("player_data_refresh");
 }
 

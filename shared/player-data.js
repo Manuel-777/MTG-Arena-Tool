@@ -65,7 +65,7 @@ const overlayCfg = {
 
 const defaultCfg = {
   windowBounds: { width: 800, height: 600, x: 0, y: 0 },
-  cards: { cards_time: 0, cards_before: [], cards: [] },
+  cards: { cards_time: 0, cards_before: {}, cards: {} },
   cardsNew: {},
   settings: {
     sound_priority: false,

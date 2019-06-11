@@ -6,7 +6,6 @@ global
   db
   pd
   debugNet
-  store
   debugLog
   syncUserData
 */
@@ -431,9 +430,8 @@ function httpSetPlayer() {
   //httpAsync.push({'reqId': _id, 'method': 'set_player', 'name': name, 'rank': rank, 'tier': tier});
 }
 
-function httpGetExplore(query, collection) {
+function httpGetExplore(query) {
   var _id = makeId(6);
-  collection = JSON.stringify(collection);
   httpAsync.unshift({
     reqId: _id,
     method: "get_explore",
@@ -450,7 +448,7 @@ function httpGetExplore(query, collection) {
     filter_mana: query.filteredMana,
     filter_ranks: query.filteredranks,
     filter_skip: query.filterSkip,
-    collection: collection
+    collection: JSON.stringify(pd.cards.cards)
   });
 }
 
