@@ -91,7 +91,8 @@
     "queue": "^4.5.1",
     "spectrum-colorpicker": "^1.8.0",
     "striptags": "^3.1.1",
-    "time-elements": "^2.0.0"
+    "time-elements": "^2.0.0",
+    "vanilla-picker": "^2.8.1"
   },
   "devDependencies": {
     "acorn": "^6.1.1",
