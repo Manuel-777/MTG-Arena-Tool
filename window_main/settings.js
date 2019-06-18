@@ -30,7 +30,8 @@ const {
   addCheckbox,
   changeBackground,
   hideLoadingBars,
-  ipcSend
+  ipcSend,
+  showColorpicker
 } = require("./renderer-util");
 
 let lastSettingsSection = 1;
@@ -572,19 +573,23 @@ function appendVisual(section) {
     ["but_container_label"],
     "<span style='margin-right: 32px;'>Background shade:</span>"
   );
-  // TODO remove jQuery colorpicker
-  const colorPick = $('<input type="text" id="flat" class="color_picker" />');
-  colorPick.appendTo($(label));
-  colorPick.spectrum({
-    showInitial: true,
-    showAlpha: true,
-    showButtons: false
+  const colorPick = createInput(["color_picker"], "", {
+    id: "flat",
+    type: "text",
+    value: "Example Content"
   });
-  colorPick.spectrum("set", pd.settings.back_color);
-  colorPick.on("dragstop.spectrum", function(e, color) {
-    $(".main_wrapper").css("background-color", color.toRgbString());
-    updateUserSettings();
+  colorPick.style.backgroundColor = pd.settings.back_color;
+  colorPick.addEventListener("click", function(e) {
+    e.stopPropagation();
+    showColorpicker(
+      pd.settings.back_color,
+      color => (colorPick.style.backgroundColor = color.rgbaString),
+      color => updateUserSettingsBlend({ back_color: color.rgbaString }),
+      () => (colorPick.style.backgroundColor = pd.settings.back_color),
+      { alpha: true }
+    );
   });
+  label.appendChild(colorPick);
   section.appendChild(label);
 
   label = createLabel(["but_container_label"], "List style:");
@@ -817,14 +822,8 @@ function updateUserSettingsBlend(_settings = {}) {
     };
   });
 
-  // TODO remove jQuery colorpicker
-  const back_color = $(".color_picker")
-    .spectrum("get")
-    .toRgbString();
-
   ipcSend("save_user_settings", {
     anon_explore: byId("settings_anon_explore").checked,
-    back_color,
     back_url: byId("query_image").value || "default",
     close_on_match: byId("settings_closeonmatch").checked,
     close_to_tray: byId("settings_closetotray").checked,
