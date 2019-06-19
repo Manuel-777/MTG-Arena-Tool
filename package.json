@@ -66,6 +66,7 @@
     "version": "node -p \"require('./package.json').version\""
   },
   "dependencies": {
+    "animejs": "^3.0.1",
     "async": "^2.6.1",
     "chart.js": "^2.8.0",
     "conf": "^2.2.0",
