@@ -179,12 +179,6 @@ function renderData(container, index) {
   container.appendChild(div);
   rowsAdded++;
 
-  $(".list_economy_awarded").on("mousewheel", function(e) {
-    var delta = parseInt(e.originalEvent.deltaY) / 40;
-    this.scrollLeft += delta;
-    e.preventDefault();
-  });
-
   return rowsAdded;
 }
 
@@ -300,6 +294,10 @@ function createChangeRow(change, economyId) {
   // The next ~200 lines of code will add elements to these two containers
   var flexBottom = createDivision(["flex_bottom"]);
   var flexRight = createDivision(["tiny_scroll", "list_economy_awarded"]);
+  flexRight.addEventListener("mousewheel", function(e) {
+    this.scrollLeft += parseInt(e.deltaY / 2);
+    e.preventDefault();
+  });
 
   let checkGemsPaid = false;
   let checkGoldPaid = false;
