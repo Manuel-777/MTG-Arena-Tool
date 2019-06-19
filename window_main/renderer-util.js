@@ -44,6 +44,7 @@ const localState = {
   authToken: "",
   discordTag: null,
   lastDataIndex: 0,
+  lastScrollHandler: null,
   lastScrollTop: 0,
   exploreData: null
 };
@@ -159,6 +160,20 @@ function makeResizable(div, resizeCallback, finalCallback) {
     },
     false
   );
+}
+
+//
+exports.resetMainContainer = resetMainContainer;
+function resetMainContainer() {
+  const container = byId("ux_0");
+  container.innerHTML = "";
+  container.classList.remove("flex_item");
+  const { lastScrollHandler } = getLocalState();
+  if (lastScrollHandler) {
+    container.removeEventListener("scroll", lastScrollHandler);
+    setLocalState({ lastScrollHandler: null });
+  }
+  return container;
 }
 
 //
