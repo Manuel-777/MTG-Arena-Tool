@@ -16,9 +16,6 @@ if (!remote.app.isPackaged) {
   require("devtron").install();
 }
 const anime = require("animejs");
-
-window.$ = window.jQuery = require("jquery");
-require("jquery.easing");
 require("time-elements");
 
 const { HIDDEN_PW } = require("../shared/constants");
