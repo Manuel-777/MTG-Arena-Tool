@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const anime = require("animejs");
 
 const {
   CARD_RARITIES,
@@ -693,7 +694,12 @@ function deckLoad(_deck, index) {
     _deck.mainDeck = removeDuplicates(_deck.mainDeck).sort(compare_cards);
     _deck.sideboard = removeDuplicates(_deck.sideboard).sort(compare_cards);
     openDeck(_deck, null);
-    $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+    anime({
+      targets: ".moving_ux",
+      left: "-100%",
+      easing: "easeInOutCubic",
+      duration: 350
+    });
   });
 }
 

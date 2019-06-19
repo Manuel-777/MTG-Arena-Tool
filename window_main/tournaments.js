@@ -1,3 +1,5 @@
+const anime = require("animejs");
+
 const { queryElements: $$, createDivision } = require("../shared/dom-fns");
 const { createSelect } = require("../shared/select");
 const deckDrawer = require("../shared/deck-drawer");
@@ -35,7 +37,12 @@ let stateClockInterval = null;
 let lastSeenInterval = null;
 
 function tournamentCreate() {
-  $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
   let mainDiv = $$("#ux_1")[0];
   mainDiv.innerHTML = "";
   mainDiv.classList.remove("flex_item");
@@ -52,7 +59,12 @@ function tournamentCreate() {
   mainDiv.appendChild(top);
   buttonBack.addEventListener("click", () => {
     changeBackground("default");
-    $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+    anime({
+      targets: ".moving_ux",
+      left: 0,
+      easing: "easeInOutCubic",
+      duration: 350
+    });
   });
 }
 
@@ -154,7 +166,12 @@ function tournamentOpen(t) {
 
   topButtonBack.addEventListener("click", () => {
     changeBackground("default");
-    $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+    anime({
+      targets: ".moving_ux",
+      left: 0,
+      easing: "easeInOutCubic",
+      duration: 350
+    });
   });
 }
 
@@ -734,7 +751,6 @@ function selectTourneyDeck(index) {
   tournamentDeck = _deck.id;
   _deck.mainDeck.sort(compare_cards);
   _deck.sideboard.sort(compare_cards);
-  // drawDeck requires a jquery div... mmm
   drawDeck($$(".join_decklist")[0], _deck, true);
 
   $$(".but_join")[0].classList.add("button_simple");

@@ -1,3 +1,5 @@
+const anime = require("animejs");
+
 const autocomplete = require("../shared/autocomplete");
 const { MANA, RANKS } = require("../shared/constants");
 const db = require("../shared/database");
@@ -231,14 +233,22 @@ function renderData(container, index) {
 
 function handleOpenMatch(id) {
   openMatch(id);
-  // TODO find alternative to jQuery animate
-  $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
 }
 
 function handleOpenDraft(id) {
   openDraft(id);
-  // TODO find alternative to jQuery animate
-  $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
 }
 
 function attachMatchData(listItem, match) {

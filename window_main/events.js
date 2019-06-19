@@ -1,3 +1,5 @@
+const anime = require("animejs");
+
 const { MANA } = require("../shared/constants");
 const pd = require("../shared/player-data");
 const { createDivision, queryElementsByClass } = require("../shared/dom-fns");
@@ -293,7 +295,12 @@ function createMatchRow(match) {
 
 function handleOpenMatch(id) {
   openMatch(id);
-  $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
 }
 
 // This code is executed when an event row is clicked and adds

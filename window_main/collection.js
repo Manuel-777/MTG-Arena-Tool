@@ -1,3 +1,4 @@
+const anime = require("animejs");
 const { remote, shell } = require("electron");
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
@@ -600,7 +601,12 @@ function exportCollection() {
 
 //
 function printStats() {
-  $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
   let mainDiv = document.getElementById("ux_1");
   mainDiv.innerHTML = "";
   mainDiv.classList.remove("flex_item");
@@ -660,7 +666,12 @@ function printStats() {
   //
   $$(".back")[0].addEventListener("click", () => {
     changeBackground("default");
-    $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+    anime({
+      targets: ".moving_ux",
+      left: 0,
+      easing: "easeInOutCubic",
+      duration: 350
+    });
   });
 }
 

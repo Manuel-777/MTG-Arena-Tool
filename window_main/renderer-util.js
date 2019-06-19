@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { app, ipcRenderer: ipc, remote } = require("electron");
 const _ = require("lodash");
+const anime = require("animejs");
 const striptags = require("striptags");
 const Picker = require("vanilla-picker");
 
@@ -665,8 +666,12 @@ function openDraft(id, draftPosition = 1) {
 
   $$(".back")[0].addEventListener("click", () => {
     changeBackground("default");
-    // TODO find alternative to jQuery animate
-    $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+    anime({
+      targets: ".moving_ux",
+      left: 0,
+      easing: "easeInOutCubic",
+      duration: 350
+    });
   });
 }
 
@@ -679,8 +684,12 @@ function openActionLog(actionLogId) {
   const top = createDiv(["decklist_top"]);
   const backButton = createDiv(["button", "back"]);
   backButton.addEventListener("click", () => {
-    // TODO remove jquery.easing
-    $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+    anime({
+      targets: ".moving_ux",
+      left: "-100%",
+      easing: "easeInOutCubic",
+      duration: 350
+    });
   });
   top.appendChild(backButton);
   top.appendChild(createDiv(["deck_name"], "Action Log"));
@@ -717,8 +726,12 @@ function openActionLog(actionLogId) {
     obj.title = db.abilities[grpId] || "";
   });
 
-  // TODO remove jquery.easing
-  $(".moving_ux").animate({ left: "-200%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-200%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
 }
 
 //

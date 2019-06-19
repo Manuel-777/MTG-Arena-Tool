@@ -15,6 +15,8 @@ if (!remote.app.isPackaged) {
   });
   require("devtron").install();
 }
+const anime = require("animejs");
+
 window.$ = window.jQuery = require("jquery");
 require("jquery.easing");
 require("time-elements");
@@ -190,8 +192,12 @@ ipc.on("set_explore_decks", function(event, arg) {
 
 //
 ipc.on("open_course_deck", function(event, arg) {
-  // TODO remove jquery.easing
-  $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
   arg = arg.CourseDeck;
   arg.colors = get_deck_colors(arg);
   arg.mainDeck.sort(compare_cards);
@@ -474,8 +480,12 @@ ipc.on("popup", function(event, arg, time) {
 //
 function force_open_settings(section = -1) {
   sidebarActive = 6;
-  // TODO remove jquery.easing
-  $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: 0,
+    easing: "easeInOutCubic",
+    duration: 350
+  });
   $$(".top_nav_item").forEach(el => el.classList.remove("item_selected"));
   openSettingsTab(section, 0);
 }
@@ -483,8 +493,12 @@ function force_open_settings(section = -1) {
 //
 function force_open_about() {
   sidebarActive = 9;
-  // TODO remove jquery.easing
-  $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: 0,
+    easing: "easeInOutCubic",
+    duration: 350
+  });
   $$(".top_nav_item").forEach(el => el.classList.remove("item_selected"));
   openSettingsTab(5, 0);
 }
@@ -583,8 +597,12 @@ ready(function() {
       document.body.style.cursor = "auto";
       const classList = [...this.classList];
       if (!classList.includes("item_selected")) {
-        // TODO remove jquery.easing
-        $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+        anime({
+          targets: ".moving_ux",
+          left: 0,
+          easing: "easeInOutCubic",
+          duration: 350
+        });
         let filters = {};
         if (classList.includes("ith")) {
           sidebarActive = -1;
@@ -621,8 +639,12 @@ ready(function() {
         }
         openTab(sidebarActive, filters);
       } else {
-        // TODO remove jquery.easing
-        $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+        anime({
+          targets: ".moving_ux",
+          left: 0,
+          easing: "easeInOutCubic",
+          duration: 350
+        });
       }
     });
   });
@@ -644,6 +666,10 @@ ipc.on("set_draft_link", function(event, arg) {
 ipc.on("tou_set", function(event, arg) {
   document.body.style.cursor = "auto";
   tournamentOpen(arg);
-  // TODO remove jquery.easing
-  $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
 });

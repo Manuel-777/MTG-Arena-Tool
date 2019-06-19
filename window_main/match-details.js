@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const anime = require("animejs");
 
 const { MANA } = require("../shared/constants");
 const db = require("../shared/database");
@@ -340,8 +341,12 @@ function openMatch(id) {
 
   $$(".back")[0].addEventListener("click", () => {
     changeBackground("default");
-    // TODO find alternative to jQuery animate
-    $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+    anime({
+      targets: ".moving_ux",
+      left: 0,
+      easing: "easeInOutCubic",
+      duration: 350
+    });
   });
 }
 

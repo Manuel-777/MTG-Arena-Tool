@@ -1,3 +1,5 @@
+const anime = require("animejs");
+
 const { MANA, CARD_RARITIES } = require("../shared/constants");
 const db = require("../shared/database");
 const pd = require("../shared/player-data");
@@ -288,8 +290,12 @@ function openDeck(deck = currentOpenDeck, filters = currentFilters) {
 
   $$(".back")[0].addEventListener("click", () => {
     changeBackground("default");
-    // TODO find alternative to jQuery animate
-    $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
+    anime({
+      targets: ".moving_ux",
+      left: 0,
+      easing: "easeInOutCubic",
+      duration: 350
+    });
   });
 }
 

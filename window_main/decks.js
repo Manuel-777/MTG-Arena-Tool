@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const anime = require("animejs");
 
 const { MANA, CARD_RARITIES } = require("../shared/constants");
 const pd = require("../shared/player-data");
@@ -248,8 +249,12 @@ function openDeckCallback(id, filters) {
   const deck = pd.deck(id);
   if (!deck) return;
   openDeck(deck, { ...filters, deckId: id });
-  // TODO remove jquery.easing
-  $(".moving_ux").animate({ left: "-100%" }, 250, "easeInOutCubic");
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: "easeInOutCubic",
+    duration: 350
+  });
 }
 
 function createTag(div, deckId, tag, showClose = true) {
