@@ -16,10 +16,6 @@ exports.addCardHover = addCardHover;
 function addCardHover(element, card) {
   if (!card || !card.images || card.type == "Special") return;
 
-  if (element instanceof jQuery) {
-    element = element[0];
-  }
-
   element.addEventListener("mouseover", () => {
     $$(".loader, .main_hover").forEach(element => (element.style.opacity = 1));
 
