@@ -49,7 +49,7 @@ Please read about [our Privacy Policy and How we use your data here](./PRIVACY.m
 
 [Conic Gradient Polyfill by Lea Verou](https://leaverou.github.io/conic-gradient/)
 
-[Spectrum color picker by Brian Grinstead](http://bgrins.github.io/spectrum/)
+[vanilla-picker by Andreas Borgen, Adam Brooks](https://vanilla-picker.js.org/)
 
 [Draft ranking by Magic Community Set Reviews](https://www.mtgcommunityreview.com/)
 

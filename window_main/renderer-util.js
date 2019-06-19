@@ -3,6 +3,7 @@ const path = require("path");
 const { app, ipcRenderer: ipc, remote } = require("electron");
 const _ = require("lodash");
 const striptags = require("striptags");
+const Picker = require("vanilla-picker");
 
 const {
   CARD_TYPE_CODES,
@@ -776,6 +777,65 @@ function changeBackground(arg = "default", grpId = 0) {
     };
     xhr.send();
   }
+}
+
+//
+exports.showColorpicker = showColorpicker;
+function showColorpicker(
+  color,
+  onChange = () => {},
+  onDone = () => {},
+  onCancel = () => {},
+  pickerOptions = {}
+) {
+  const wrapper = $$(".dialog_wrapper")[0];
+  wrapper.style.opacity = 1;
+  wrapper.style.pointerEvents = "all";
+  wrapper.style.display = "block";
+
+  const dialog = $$(".dialog")[0];
+  dialog.innerHTML = "";
+  dialog.style.width = "260px";
+  dialog.style.height = "320px";
+  dialog.style.top = "calc(50% - 100px)";
+  dialog.addEventListener("mousedown", function(e) {
+    e.stopPropagation();
+  });
+
+  const closeDialog = () => {
+    wrapper.style.opacity = 0;
+    wrapper.style.pointerEvents = "none";
+
+    setTimeout(() => {
+      wrapper.style.display = "none";
+      dialog.style.width = "400px";
+      dialog.style.height = "160px";
+      dialog.style.top = "calc(50% - 80px)";
+    }, 250);
+  };
+
+  wrapper.addEventListener("mousedown", function() {
+    onCancel(color);
+    closeDialog();
+  });
+  // https://vanilla-picker.js.org/gen/Picker.html
+  new Picker({
+    alpha: false,
+    color,
+    parent: dialog,
+    popup: false,
+    onChange,
+    onDone: function(color) {
+      onDone(color);
+      closeDialog();
+    },
+    ...pickerOptions
+  });
+  const pickerWrapper = $$(".picker_wrapper")[0];
+  pickerWrapper.style.alignSelf = "center";
+  pickerWrapper.style.margin = "1px";
+  pickerWrapper.style.backgroundColor = "rgb(0,0,0,0)";
+  pickerWrapper.style.boxShadow = "none";
 }
 
 //

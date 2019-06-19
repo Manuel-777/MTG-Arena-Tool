@@ -29,6 +29,7 @@ const {
   ipcSend,
   makeResizable,
   openDraft,
+  showColorpicker,
   showLoadingBars,
   toggleArchived
 } = require("./renderer-util");
@@ -450,35 +451,13 @@ function createTag(div, matchId, tags, tag, showClose = true) {
 
   if (tag) {
     t.addEventListener("click", function(e) {
-      // TODO remove jquery colorpicker
-      const colorPick = $(t);
-      colorPick.spectrum({
-        showInitial: true,
-        showAlpha: false,
-        showButtons: false
-      });
-      colorPick.spectrum("set", tagCol);
-      colorPick.spectrum("show");
-
-      colorPick.on("move.spectrum", (e, color) => {
-        const tag = $(this).text();
-        const col = color.toRgbString();
-        $(".deck_tag").each((index, obj) => {
-          if (tag !== $(obj).text()) return;
-          $(obj).css("background-color", col);
-        });
-      });
-
-      colorPick.on("change.spectrum", (e, color) => {
-        const tag = $(this).text();
-        const col = color.toRgbString();
-        ipcSend("edit_tag", { tag, color: col });
-      });
-
-      colorPick.on("hide.spectrum", () => {
-        colorPick.spectrum("destroy");
-      });
       e.stopPropagation();
+      showColorpicker(
+        tagCol,
+        color => (t.style.backgroundColor = color.rgbString),
+        color => ipcSend("edit_tag", { tag, color: color.rgbString }),
+        () => (t.style.backgroundColor = tagCol)
+      );
     });
   } else {
     t.addEventListener("click", function(e) {

@@ -17,7 +17,6 @@ if (!remote.app.isPackaged) {
 }
 window.$ = window.jQuery = require("jquery");
 require("jquery.easing");
-require("spectrum-colorpicker");
 require("time-elements");
 
 const { HIDDEN_PW } = require("../shared/constants");
