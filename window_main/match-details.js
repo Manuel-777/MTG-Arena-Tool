@@ -4,17 +4,9 @@ const path = require("path");
 const { MANA } = require("../shared/constants");
 const db = require("../shared/database");
 const pd = require("../shared/player-data");
-const {
-  createDiv,
-  createImg,
-  createInput,
-  createLabel,
-  createSpan,
-  queryElements: $$
-} = require("../shared/dom-fns");
+const { createDiv, queryElements: $$ } = require("../shared/dom-fns");
 const deckDrawer = require("../shared/deck-drawer");
 const {
-  compare_cards,
   get_deck_export,
   get_deck_export_txt,
   get_rank_index,
@@ -31,7 +23,8 @@ const {
   drawCardList,
   drawDeck,
   ipcSend,
-  openActionLog
+  openActionLog,
+  toggleVisibility
 } = require("./renderer-util");
 
 const byId = id => document.getElementById(id);
@@ -39,407 +32,390 @@ const byId = id => document.getElementById(id);
 //
 exports.openMatch = openMatch;
 function openMatch(id) {
-  $("#ux_1").html("");
-  $("#ux_1").removeClass("flex_item");
   const match = pd.match(id);
+  if (!match) return;
+  const deck = match.playerDeck;
+  if (!deck) return;
 
-  let top = $(
-    '<div class="decklist_top"><div class="button back"></div><div class="deck_name">' +
-      match.playerDeck.name +
-      "</div></div>"
-  );
-  let flr = $('<div class="deck_top_colors"></div>');
+  const mainDiv = byId("ux_1");
+  mainDiv.classList.remove("flex_item");
+  mainDiv.innerHTML = "";
 
-  if (match.playerDeck.colors != undefined) {
-    match.playerDeck.colors.forEach(function(color) {
-      var m = $('<div class="mana_s20 mana_' + MANA[color] + '"></div>');
-      flr.append(m);
+  const tileGrpId = deck.deckTileId;
+  if (db.card(tileGrpId)) {
+    changeBackground("", tileGrpId);
+  }
+
+  const d = createDiv(["list_fill"]);
+  mainDiv.appendChild(d);
+
+  const top = createDiv(["decklist_top"]);
+  top.appendChild(createDiv(["button", "back"]));
+  top.appendChild(createDiv(["deck_name"], deck.name));
+
+  const deckColors = createDiv(["deck_top_colors"]);
+  deckColors.style.alignSelf = "center";
+  if (deck.colors) {
+    deck.colors.forEach(color => {
+      const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
+      deckColors.appendChild(m);
     });
   }
-  top.append(flr);
+  top.appendChild(deckColors);
+  mainDiv.appendChild(top);
 
-  var flc = $(
-    '<div class="flex_item" style="justify-content: space-evenly;"></div>'
-  );
+  const flc = createDiv(["flex_item"]);
+  flc.style.justifyContent = "space-evenly";
   if (fs.existsSync(path.join(actionLogDir, id + ".txt"))) {
-    $('<div class="button_simple openLog">Action log</div>').appendTo(flc);
+    const actionLogButton = createDiv(
+      ["button_simple", "openLog"],
+      "Action log"
+    );
+    actionLogButton.addEventListener("click", function() {
+      openActionLog(id, mainDiv);
+    });
+    flc.appendChild(actionLogButton);
   }
+  mainDiv.appendChild(flc);
 
-  var tileGrpid = match.playerDeck.deckTileId;
-  if (db.card(tileGrpid)) {
-    changeBackground("", tileGrpid);
-  }
-  var fld = $('<div class="flex_item"></div>');
-
-  // this is a mess
-  var flt = $('<div class="flex_item"></div>');
-  var fltl = $('<div class="flex_item"></div>');
-  var r = $('<div class="rank"></div>');
-  r.appendTo(fltl);
-
-  var fltr = $('<div class="flex_item"></div>');
-  fltr.css("flex-direction", "column");
-  var fltrt = $('<div class="flex_top"></div>');
-  var fltrb = $('<div class="flex_bottom"></div>');
-  fltrt.appendTo(fltr);
-  fltrb.appendTo(fltr);
-
-  fltl.appendTo(flt);
-  fltr.appendTo(flt);
-
-  var rank = match.player.rank;
-  var tier = match.player.tier;
-  r.css(
-    "background-position",
-    get_rank_index(rank, tier) * -48 + "px 0px"
-  ).attr("title", rank + " " + tier);
-
-  var name = $(
-    '<div class="list_match_player_left">' +
-      match.player.name.slice(0, -6) +
-      " (" +
-      match.player.win +
-      ")</div>"
+  const fld = createDiv(["flex_item"]);
+  const isLimited = db.ranked_events.includes(match.eventId);
+  renderSeat(
+    fld,
+    match.player,
+    match.playerDeck,
+    match.player.win > match.opponent.win,
+    isLimited
   );
-  name.appendTo(fltrt);
-
-  if (match.player.win > match.opponent.win) {
-    var w = $('<div class="list_match_player_left green">Winner</div>');
-    w.appendTo(fltrb);
-  }
-
-  var dl = $('<div class="decklist"></div>');
-  flt.appendTo(dl);
-
-  drawDeck(dl[0], match.playerDeck);
-
-  $(
-    '<div class="button_simple centered exportDeckPlayer">Export to Arena</div>'
-  ).appendTo(dl);
-  $(
-    '<div class="button_simple centered exportDeckStandardPlayer">Export to .txt</div>'
-  ).appendTo(dl);
-
-  flt = $('<div class="flex_item" style="flex-direction: row-reverse;"></div>');
-  fltl = $('<div class="flex_item"></div>');
-  r = $('<div class="rank"></div>');
-  r.appendTo(fltl);
-
-  fltr = $('<div class="flex_item"></div>');
-  fltr.css("flex-direction", "column");
-  fltr.css("align-items", "flex-end");
-  fltrt = $('<div class="flex_top"></div>');
-  fltrb = $('<div class="flex_bottom"></div>');
-  fltrt.appendTo(fltr);
-  fltrb.appendTo(fltr);
-
-  fltl.appendTo(flt);
-  fltr.appendTo(flt);
-
-  rank = match.opponent.rank;
-  tier = match.opponent.tier;
-  r.css(
-    "background-position",
-    get_rank_index(rank, tier) * -48 + "px 0px"
-  ).attr("title", rank + " " + tier);
-
-  name = $(
-    '<div class="list_match_player_right">' +
-      match.opponent.name.slice(0, -6) +
-      " (" +
-      match.opponent.win +
-      ")</div>"
+  renderSeat(
+    fld,
+    match.opponent,
+    match.oppDeck,
+    match.opponent.win > match.player.win,
+    isLimited,
+    true
   );
-  name.appendTo(fltrt);
-
-  if (match.player.win < match.opponent.win) {
-    w = $('<div class="list_match_player_right green">Winner</div>');
-    w.appendTo(fltrb);
-  }
-
-  var odl = $('<div class="decklist"></div>');
-  flt.appendTo(odl);
-
-  match.oppDeck.mainDeck.sort(compare_cards);
-  match.oppDeck.sideboard.sort(compare_cards);
-  /*
-  match.oppDeck.mainDeck.forEach(function(c) {
-    c.quantity = 9999;
-  });
-  match.oppDeck.sideboard.forEach(function(c) {
-    c.quantity = 9999;
-  });
-  */
-  drawDeck(odl[0], match.oppDeck);
-
-  $(
-    '<div class="button_simple centered exportDeck">Export to Arena</div>'
-  ).appendTo(odl);
-  $(
-    '<div class="button_simple centered exportDeckStandard">Export to .txt</div>'
-  ).appendTo(odl);
-
-  dl.appendTo(fld);
-  odl.appendTo(fld);
-
-  $("#ux_1").append(top);
-  $("#ux_1").append(flc);
-  $("#ux_1").append(fld);
+  mainDiv.appendChild(fld);
 
   if (match.gameStats) {
     match.gameStats.forEach((game, gameIndex) => {
       if (game && game.sideboardChanges) {
-        let separator1 = deckDrawer.cardSeparator(
+        const separator1 = deckDrawer.cardSeparator(
           `Game ${gameIndex + 1} Sideboard Changes`
         );
-        $("#ux_1").append(separator1);
-        let sideboardDiv = $('<div class="card_lists_list"></div>');
-        let additionsDiv = $('<div class="cardlist"></div>');
+        mainDiv.appendChild(separator1);
+        const sideboardDiv = createDiv(["card_lists_list"]);
+        const additionsDiv = createDiv(["cardlist"]);
         if (
           game.sideboardChanges.added.length == 0 &&
           game.sideboardChanges.removed.length == 0
         ) {
-          let separator2 = deckDrawer.cardSeparator("No changes");
-          additionsDiv.append(separator2);
-          additionsDiv.appendTo(sideboardDiv);
+          const separator2 = deckDrawer.cardSeparator("No changes");
+          additionsDiv.appendChild(separator2);
+          sideboardDiv.appendChild(additionsDiv);
         } else {
-          let separator3 = deckDrawer.cardSeparator("Sideboarded In");
-          additionsDiv.append(separator3);
-          drawCardList(additionsDiv[0], game.sideboardChanges.added);
-          additionsDiv.appendTo(sideboardDiv);
-          let removalsDiv = $('<div class="cardlist"></div>');
-          let separator4 = deckDrawer.cardSeparator("Sideboarded Out");
-          removalsDiv.append(separator4);
-          drawCardList(removalsDiv[0], game.sideboardChanges.removed);
-          removalsDiv.appendTo(sideboardDiv);
+          const separator3 = deckDrawer.cardSeparator("Sideboarded In");
+          additionsDiv.appendChild(separator3);
+          drawCardList(additionsDiv, game.sideboardChanges.added);
+          sideboardDiv.appendChild(additionsDiv);
+          const removalsDiv = createDiv(["cardlist"]);
+          const separator4 = deckDrawer.cardSeparator("Sideboarded Out");
+          removalsDiv.appendChild(separator4);
+          drawCardList(removalsDiv, game.sideboardChanges.removed);
+          sideboardDiv.appendChild(removalsDiv);
         }
 
-        $("#ux_1").append(sideboardDiv);
+        mainDiv.appendChild(sideboardDiv);
       }
 
-      let separator5 = deckDrawer.cardSeparator(
+      const separator5 = deckDrawer.cardSeparator(
         `Game ${gameIndex + 1} Hands Drawn`
       );
-      $("#ux_1").append(separator5);
+      mainDiv.appendChild(separator5);
 
-      let handsDiv = $('<div class="card_lists_list"></div>');
+      const handsDiv = createDiv(["card_lists_list"]);
       if (game && game.handsDrawn.length > 3) {
         // The default value of "center" apparently causes padding to be omitted in the calculation of how far
         // the scrolling should go. So, if there are enough hands to actually need scrolling, override it.
-        handsDiv.css("justify-content", "start");
+        handsDiv.style.justifyContent = "start";
       }
 
       if (game) {
         game.handsDrawn.forEach((hand, i) => {
-          let handDiv = $('<div class="cardlist"></div>');
-          drawCardList(handDiv[0], hand);
-          handDiv.appendTo(handsDiv);
-          if (game.bestOf == 1 && i == 0) {
-            let landDiv = $(
-              '<div style="margin: auto; text-align: center;" tooltip-top tooltip-content=' +
-                '"This hand was drawn with weighted odds that Wizards of the Coast has not disclosed because it is the first hand in a best-of-one match. ' +
-                'It should be more likely to have a close to average number of lands, but only they could calculate the exact odds.">Land Percentile: Unknown</div>'
-            );
-            landDiv.appendTo(handDiv);
+          const handDiv = createDiv(["cardlist"]);
+          drawCardList(handDiv, hand);
+          handsDiv.appendChild(handDiv);
+          let landText, landTooltip;
+          if (game.bestOf === 1 && i === 0) {
+            landText = "Land Percentile: Unknown";
+            landTooltip = `This hand was drawn with weighted odds that
+              Wizards of the Coast has not disclosed because it is the first
+              hand in a best-of-one match. It should be more likely to have a
+              close to average number of lands, but only they could calculate
+              the exact odds.`;
           } else {
-            let likelihood = hypergeometricSignificance(
+            const likelihood = hypergeometricSignificance(
               game.handLands[i],
               game.deckSize,
               hand.length,
               game.landsInDeck
             );
-            let landDiv = $(
-              '<div style="margin: auto; text-align: center;" tooltip-top tooltip-content=' +
-                '"The probability of a random hand of the same size having a number of lands at least as far from average as this one, ' +
-                'calculated as if the distribution were continuous. Over a large number of games, this should average about 50%.">Land Likelihood: ' +
-                (likelihood * 100).toFixed(2) +
-                "%</div>"
-            );
-            landDiv.appendTo(handDiv);
+            landText =
+              "Land Likelihood: " + (likelihood * 100).toFixed(2) + "%";
+            landTooltip = `The probability of a random hand of the same size
+              having a number of lands at least as far from average as this one,
+              calculated as if the distribution were continuous. Over a large
+              number of games, this should average about 50%.`;
           }
+          const landDiv = createDiv([], landText);
+          landDiv.setAttribute("tooltip-top", "");
+          landDiv.setAttribute("tooltip-content", landTooltip);
+          landDiv.style.margin = "auto";
+          landDiv.style.textAlign = "center";
+          handDiv.appendChild(landDiv);
         });
 
-        $("#ux_1").append(handsDiv);
+        mainDiv.appendChild(handsDiv);
 
-        let separator6 = deckDrawer.cardSeparator(
+        const separator6 = deckDrawer.cardSeparator(
           `Game ${gameIndex + 1} Shuffled Order`
         );
-        $("#ux_1").append(separator6);
-        let libraryDiv = $('<div class="library_list"></div>');
-        let unique = makeId(4);
-        let handSize = 8 - game.handsDrawn.length;
+        mainDiv.appendChild(separator6);
+        const libraryDiv = createDiv(["library_list"]);
+        const unique = makeId(4);
+        const handSize = 8 - game.handsDrawn.length;
 
         game.shuffledOrder.forEach((cardId, libraryIndex) => {
-          let rowShade =
+          const rowShades =
             libraryIndex === handSize - 1
-              ? "line_dark line_bottom_border"
+              ? ["line_dark", "line_bottom_border"]
               : libraryIndex < handSize - 1
-              ? "line_dark"
+              ? ["line_dark"]
               : (libraryIndex - handSize) % 2 === 0
-              ? "line_light"
-              : "line_dark";
-          let cardDiv = $(`<div class="library_card ${rowShade}"></div>`);
-          let tile = deckDrawer.cardTile(
+              ? ["line_light"]
+              : ["line_dark"];
+          const cardDiv = createDiv(["library_card", ...rowShades]);
+          const tile = deckDrawer.cardTile(
             pd.settings.card_tile_style,
             cardId,
             unique + libraryIndex,
             "#" + (libraryIndex + 1)
           );
-          cardDiv.append(tile);
-          cardDiv.appendTo(libraryDiv);
+          cardDiv.appendChild(tile);
+          libraryDiv.appendChild(cardDiv);
         });
-        let unknownCards = game.deckSize - game.shuffledOrder.length;
+        const unknownCards = game.deckSize - game.shuffledOrder.length;
         if (unknownCards > 0) {
-          let cardDiv = $('<div class="library_card"></div>');
-          let tile = deckDrawer.cardTile(
+          const cardDiv = createDiv(["library_card"]);
+          const tile = deckDrawer.cardTile(
             pd.settings.card_tile_style,
             null,
             unique + game.deckSize,
             unknownCards + "x"
           );
-          cardDiv.append(tile);
-          cardDiv.appendTo(libraryDiv);
+          cardDiv.appendChild(tile);
+          libraryDiv.appendChild(cardDiv);
         }
 
-        let handExplanation = $(
-          '<div class="library_hand">The opening hand is excluded from the below statistics to prevent mulligan choices from influencing them.</div>'
+        const handExplanation = createDiv(
+          ["library_hand"],
+          "The opening hand is excluded from the below statistics to prevent mulligan choices from influencing them."
         );
-        handExplanation.css("grid-row-end", "span " + (handSize - 1));
-        handExplanation.appendTo(libraryDiv);
+        handExplanation.style.gridRowEnd = "span " + (handSize - 1);
+        libraryDiv.appendChild(handExplanation);
 
-        let headerDiv = $(
-          '<div class="library_header" tooltip-bottom tooltip-content="The number of lands in the library at or before this point.">Lands</div>'
+        let headerDiv = createDiv(["library_header"], "Lands");
+        headerDiv.setAttribute("tooltip-bottom", "");
+        headerDiv.setAttribute(
+          "tooltip-content",
+          "The number of lands in the library at or before this point."
         );
-        headerDiv.css("grid-area", handSize + " / 2");
-        headerDiv.appendTo(libraryDiv);
-        headerDiv = $(
-          '<div class="library_header" tooltip-bottom tooltip-content="The average number of lands expected in the library at or before this point.">Expected</div>'
+        headerDiv.style.gridArea = handSize + " / 2";
+        libraryDiv.appendChild(headerDiv);
+        headerDiv = createDiv(["library_header"], "Expected");
+        headerDiv.setAttribute("tooltip-bottom", "");
+        headerDiv.setAttribute(
+          "tooltip-content",
+          "The average number of lands expected in the library at or before this point."
         );
-        headerDiv.css("grid-area", handSize + " / 3");
-        headerDiv.appendTo(libraryDiv);
-        headerDiv = $(
-          '<div class="library_header" tooltip-bottom tooltip-content="The probability of the number of lands being at least this far from average, calculated as if the distribution were continuous. For details see footnote. Over a large number of games, this should average about 50%.">Likelihood</div>'
+        headerDiv.style.gridArea = handSize + " / 3";
+        libraryDiv.appendChild(headerDiv);
+        headerDiv = createDiv(["library_header"], "Likelihood");
+        headerDiv.setAttribute("tooltip-bottom", "");
+        headerDiv.setAttribute(
+          "tooltip-content",
+          "The probability of the number of lands being at least this far from average, calculated as if the distribution were continuous. For details see footnote. Over a large number of games, this should average about 50%."
         );
-        headerDiv.css("grid-area", handSize + " / 4");
-        headerDiv.appendTo(libraryDiv);
-        headerDiv = $(
-          '<div class="library_header" tooltip-bottomright tooltip-content="The expected percentage of games where the actual number of lands is equal or less than this one. This is easier to calculate and more widely recognized but harder to assess the meaning of.">Percentile</div>'
+        headerDiv.style.gridArea = handSize + " / 4";
+        libraryDiv.appendChild(headerDiv);
+        headerDiv = createDiv(["library_header"], "Percentile");
+        headerDiv.setAttribute("tooltip-bottomright", "");
+        headerDiv.setAttribute(
+          "tooltip-content",
+          "The expected percentage of games where the actual number of lands is equal or less than this one. This is easier to calculate and more widely recognized but harder to assess the meaning of."
         );
-        headerDiv.css("grid-area", handSize + " / 5");
-        headerDiv.appendTo(libraryDiv);
+        headerDiv.style.gridArea = handSize + " / 5";
+        libraryDiv.appendChild(headerDiv);
 
         game.libraryLands.forEach((count, index) => {
-          let rowShade = index % 2 === 0 ? "line_light" : "line_dark";
-          let landsDiv = $(
-            `<div class="library_stat ${rowShade}">${count}</div>`
-          );
-          landsDiv.css("grid-area", handSize + index + 1 + " / 2");
-          landsDiv.appendTo(libraryDiv);
-          let expected = (
+          const rowShade = index % 2 === 0 ? "line_light" : "line_dark";
+          const landsDiv = createDiv(["library_stat", rowShade], count);
+          landsDiv.style.gridArea = handSize + index + 1 + " / 2";
+          libraryDiv.appendChild(landsDiv);
+          const expected = (
             ((index + 1) * game.landsInLibrary) /
             game.librarySize
           ).toFixed(2);
-          let expectedDiv = $(
-            `<div class="library_stat ${rowShade}">${expected}</div>`
-          );
-          expectedDiv.css("grid-area", handSize + index + 1 + " / 3");
-          expectedDiv.appendTo(libraryDiv);
-          let likelihood = hypergeometricSignificance(
+          const expectedDiv = createDiv(["library_stat", rowShade], expected);
+          expectedDiv.style.gridArea = handSize + index + 1 + " / 3";
+          libraryDiv.appendChild(expectedDiv);
+          const likelihood = hypergeometricSignificance(
             count,
             game.librarySize,
             index + 1,
             game.landsInLibrary
           );
-          let likelihoodDiv = $(
-            `<div class="library_stat ${rowShade}">${(likelihood * 100).toFixed(
-              2
-            )}</div>`
+          const likelihoodDiv = createDiv(
+            ["library_stat", rowShade],
+            (likelihood * 100).toFixed(2)
           );
-          likelihoodDiv.css("grid-area", handSize + index + 1 + " / 4");
-          likelihoodDiv.appendTo(libraryDiv);
-          let percentile = hypergeometricRange(
+          likelihoodDiv.style.gridArea = handSize + index + 1 + " / 4";
+          libraryDiv.appendChild(likelihoodDiv);
+          const percentile = hypergeometricRange(
             0,
             count,
             game.librarySize,
             index + 1,
             game.landsInLibrary
           );
-          let percentileDiv = $(
-            `<div class="library_stat ${rowShade}">${(percentile * 100).toFixed(
-              2
-            )}</div>`
+          const percentileDiv = createDiv(
+            ["library_stat", rowShade],
+            (percentile * 100).toFixed(2)
           );
-          percentileDiv.css("grid-area", handSize + index + 1 + " / 5");
-          percentileDiv.appendTo(libraryDiv);
+          percentileDiv.style.gridArea = handSize + index + 1 + " / 5";
+          libraryDiv.appendChild(percentileDiv);
         });
 
-        let footnoteLabel = $(
-          '<div id="library_footnote_label' +
-            gameIndex +
-            '" class="library_footnote" tooltip-bottom ' +
-            'tooltip-content="Click to show footnote" onclick="toggleVisibility(\'library_footnote_label' +
-            gameIndex +
-            "', 'library_footnote" +
-            gameIndex +
-            "')\">Footnote on Likelihood</div>"
+        const footnoteLabel = createDiv(
+          ["library_footnote"],
+          "Footnote on Likelihood",
+          { id: "library_footnote_label" + gameIndex }
         );
-        footnoteLabel.css("grid-row", game.shuffledOrder.length + 1);
-        footnoteLabel.appendTo(libraryDiv);
-        let footnote = $(
-          '<div id="library_footnote' +
-            gameIndex +
-            '" class="library_footnote hidden" ' +
-            "onclick=\"toggleVisibility('library_footnote_label" +
-            gameIndex +
-            "', 'library_footnote" +
-            gameIndex +
-            "')\">" +
-            "<p>The Likelihood column calculations are designed to enable assessment of fairness at a glance, in a way " +
-            "that is related to percentile but differs in important ways. In short, it treats the count of lands as if " +
-            "it were actually a bucket covering a continuous range, and calculates the cumulative probability of the " +
-            "continuous value being at least as far from the median as a randomly selected value within the range covered " +
-            "by the actual count. Importantly, this guarantees that the theoretical average will always be exactly 50%.</p>" +
-            "<p>For values that are not the median, the result is halfway between the value's own percentile and the " +
-            "next one up or down. For the median itself, the covered range is split and weighted for how much of it is " +
-            "on each side of the 50th percentile. In both cases, the result's meaning is the same for each direction " +
-            "from the 50th percentile, and scaled up by a factor of 2 to keep the possible range at 0% to 100%. " +
-            "For precise details, see the source code on github.</p></div>"
+        footnoteLabel.setAttribute("tooltip-bottom", "");
+        footnoteLabel.setAttribute("tooltip-content", "Click to show footnote");
+        footnoteLabel.addEventListener("click", function() {
+          toggleVisibility("library_footnote" + gameIndex);
+        });
+        footnoteLabel.style.gridRow = game.shuffledOrder.length + 1;
+        libraryDiv.appendChild(footnoteLabel);
+        const footnoteText =
+          "<p>The Likelihood column calculations are designed to enable assessment of fairness at a glance, in a way " +
+          "that is related to percentile but differs in important ways. In short, it treats the count of lands as if " +
+          "it were actually a bucket covering a continuous range, and calculates the cumulative probability of the " +
+          "continuous value being at least as far from the median as a randomly selected value within the range covered " +
+          "by the actual count. Importantly, this guarantees that the theoretical average will always be exactly 50%.</p>" +
+          "<p>For values that are not the median, the result is halfway between the value's own percentile and the " +
+          "next one up or down. For the median itself, the covered range is split and weighted for how much of it is " +
+          "on each side of the 50th percentile. In both cases, the result's meaning is the same for each direction " +
+          "from the 50th percentile, and scaled up by a factor of 2 to keep the possible range at 0% to 100%. " +
+          "For precise details, see the source code on github.</p>";
+        const footnote = createDiv(
+          ["library_footnote", "hidden"],
+          footnoteText,
+          {
+            id: "library_footnote" + gameIndex
+          }
         );
-        footnote.css("grid-row", game.shuffledOrder.length + 1);
-        footnote.appendTo(libraryDiv);
+        footnote.addEventListener("click", function() {
+          toggleVisibility("library_footnote" + gameIndex);
+        });
+        footnote.style.gridRow = game.shuffledOrder.length + 1;
+        footnote.style.marginTop = "24px";
+        libraryDiv.appendChild(footnote);
 
-        $("#ux_1").append(libraryDiv);
+        mainDiv.appendChild(libraryDiv);
       }
     });
   }
 
-  $(".openLog").click(function() {
-    openActionLog(id, $("#ux_1"));
-  });
-
-  $(".exportDeckPlayer").click(function() {
-    var list = get_deck_export(match.playerDeck);
-    ipcSend("set_clipboard", list);
-  });
-  $(".exportDeckStandardPlayer").click(function() {
-    var list = get_deck_export_txt(match.playerDeck);
-    ipcSend("export_txt", { str: list, name: match.playerDeck.name });
-  });
-
-  $(".exportDeck").click(function() {
-    var list = get_deck_export(match.oppDeck);
-    ipcSend("set_clipboard", list);
-  });
-  $(".exportDeckStandard").click(function() {
-    var list = get_deck_export_txt(match.oppDeck);
-    ipcSend("export_txt", {
-      str: list,
-      name: match.opponent.name.slice(0, -6) + "'s deck"
-    });
-  });
-
-  $(".back").click(function() {
+  $$(".back")[0].addEventListener("click", () => {
     changeBackground("default");
+    // TODO find alternative to jQuery animate
     $(".moving_ux").animate({ left: "0px" }, 250, "easeInOutCubic");
   });
+}
+
+//
+function renderSeat(
+  container,
+  player,
+  deck,
+  isWinner,
+  isLimited,
+  isReverse = false
+) {
+  const playerName = player.name.slice(0, -6);
+  const deckName = deck.name || playerName + "'s deck";
+
+  const decklist = createDiv(["decklist"]);
+  // drawDeck clears decklist content and must go first
+  drawDeck(decklist, deck);
+
+  const flt = createDiv(["flex_item"]);
+  if (isReverse) {
+    flt.style.flexDirection = "row-reverse";
+  }
+
+  const fltl = createDiv(["flex_item"]);
+  const rank = player.rank;
+  const tier = player.tier;
+  const rankClass = isLimited ? "top_limited_rank" : "top_constructed_rank";
+  const r = createDiv([rankClass], "", { title: rank + " " + tier });
+  r.style.backgroundPosition = get_rank_index(rank, tier) * -48 + "px 0px";
+  fltl.appendChild(r);
+  flt.appendChild(fltl);
+
+  const fltr = createDiv(["flex_item"]);
+  fltr.style.flexDirection = "column";
+  if (isReverse) {
+    fltr.style.alignItems = "flex-end";
+  }
+
+  const fltrt = createDiv(["flex_top"]);
+  const divClass = isReverse
+    ? "list_match_player_right"
+    : "list_match_player_left";
+  const name = createDiv([divClass], `${playerName} (${player.win})`);
+  fltrt.appendChild(name);
+  fltr.appendChild(fltrt);
+
+  const fltrb = createDiv(["flex_bottom"]);
+  if (isWinner) {
+    fltrb.appendChild(createDiv(["list_match_player_left", "green"], "Winner"));
+  }
+  fltr.appendChild(fltrb);
+  flt.appendChild(fltr);
+
+  decklist.insertBefore(flt, decklist.firstChild);
+
+  const arenaExport = createDiv(
+    ["button_simple", "centered", "exportDeckPlayer"],
+    "Export to Arena"
+  );
+  arenaExport.addEventListener("click", function() {
+    ipcSend("set_clipboard", get_deck_export(deck));
+  });
+  decklist.appendChild(arenaExport);
+
+  const textExport = createDiv(
+    ["button_simple", "centered", "exportDeckStandardPlayer"],
+    "Export to .txt"
+  );
+  textExport.addEventListener("click", function() {
+    const str = get_deck_export_txt(deck);
+    ipcSend("export_txt", { str, name: deckName });
+  });
+  decklist.appendChild(textExport);
+
+  container.appendChild(decklist);
 }
