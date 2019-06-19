@@ -259,15 +259,15 @@ function drawFilters() {
    *  Only owned filter
    **/
   let lab = addCheckbox(
-    $(buttonsMiddle),
+    buttonsMiddle,
     "Only owned",
     "settings_owned",
     onlyOwned,
     () => null
   );
-  lab.css("align-self", "center");
-  lab.css("margin-left", "0px");
-  lab.css("margin-right", "32px");
+  lab.style.alignSelf = "center";
+  lab.style.marginLeft = 0;
+  lab.style.marginRight = "32px";
 
   /**
    * Wildcards filters
@@ -297,63 +297,59 @@ function drawFilters() {
   /**
    *  Mana filter
    **/
-  var manas = $('<div class="mana_filters_explore"></div>');
+  const manas = createDivision(["mana_filters_explore"]);
   COLORS_BRIEF.forEach(function(s, i) {
-    var mi = [1, 2, 3, 4, 5];
-    var mf = "";
+    const mi = [1, 2, 3, 4, 5];
+    let mf = "";
     if (!inputMana.includes(mi[i])) {
       mf = "mana_filter_on";
     }
-    var manabutton = $(
-      `<div class="mana_filter ${mf}" style="background-image: url(../images/${s}20.png)"></div>`
-    );
-    manabutton.appendTo(manas);
-    manabutton.click(function() {
-      if (manabutton.hasClass("mana_filter_on")) {
-        manabutton.removeClass("mana_filter_on");
+    const manabutton = createDivision(["mana_filter", mf]);
+    manabutton.style.backgroundImage = "url(../images/${s}20.png)";
+    manabutton.addEventListener("click", function() {
+      if ([...manabutton.classList].includes("mana_filter_on")) {
+        manabutton.classList.remove("mana_filter_on");
         inputMana.push(mi[i]);
       } else {
-        manabutton.addClass("mana_filter_on");
+        manabutton.classList.add("mana_filter_on");
         let n = inputMana.indexOf(mi[i]);
         if (n > -1) {
           inputMana.splice(n, 1);
         }
       }
     });
+    manas.appendChild(manabutton);
   });
-  manas.appendTo(buttonsBottom);
+  buttonsBottom.appendChild(manas);
 
   /**
    *  Rank filter
    **/
   if (inputFilterType !== "Events") {
-    var ranks_filters = $('<div class="mana_filters_explore"></div>');
+    const ranks_filters = createDivision(["mana_filters_explore"]);
     RANKS.forEach(function(rr, index) {
-      var mf = "";
+      let mf = "";
       if (!inputRanks.includes(rr)) {
         mf = "rank_filter_on";
       }
-      var rankbutton = $(
-        `<div title="${rr}" class="rank_filter ${mf}" style="background-position: ${(index +
-          1) *
-          -16}px 0px; background-image: url(../images/ranks_16.png)"></div>`
-      );
-
-      rankbutton.appendTo(ranks_filters);
-      rankbutton.click(function() {
-        if (rankbutton.hasClass("rank_filter_on")) {
-          rankbutton.removeClass("rank_filter_on");
+      const rankbutton = createDivision(["rank_filter", mf], "", { title: rr });
+      rankbutton.style.backgroundPosition = (index + 1) * -16 + "px 0px";
+      rankbutton.style.backgroundImage = "url(../images/ranks_16.png)";
+      rankbutton.addEventListener("click", function() {
+        if ([...rankbutton.classList].includes("rank_filter_on")) {
+          rankbutton.classList.remove("rank_filter_on");
           inputRanks.push(rr);
         } else {
-          rankbutton.addClass("rank_filter_on");
+          rankbutton.classList.add("rank_filter_on");
           let n = inputRanks.indexOf(rr);
           if (n > -1) {
             inputRanks.splice(n, 1);
           }
         }
       });
+      ranks_filters.appendChild(rankbutton);
     });
-    ranks_filters.appendTo(buttonsBottom);
+    buttonsBottom.appendChild(ranks_filters);
   }
 
   /**
@@ -680,17 +676,17 @@ function deckLoad(_deck, index) {
 
   mainDiv.appendChild(div);
 
-  $("." + index).on("mouseenter", function() {
-    $("." + index + "t").css("opacity", 1);
-    $("." + index + "t").css("width", "200px");
+  div.addEventListener("mouseenter", function() {
+    tile.style.opacity = 1;
+    tile.style.width = "200px";
   });
 
-  $("." + index).on("mouseleave", function() {
-    $("." + index + "t").css("opacity", 0.66);
-    $("." + index + "t").css("width", "128px");
+  div.addEventListener("mouseleave", function() {
+    tile.style.opacity = 0.66;
+    tile.style.width = "128px";
   });
 
-  $("." + index).on("click", function() {
+  div.addEventListener("click", function() {
     _deck.mainDeck = removeDuplicates(_deck.mainDeck).sort(compare_cards);
     _deck.sideboard = removeDuplicates(_deck.sideboard).sort(compare_cards);
     openDeck(_deck, null);
