@@ -83,7 +83,6 @@
     "gunzip-file": "^0.1.1",
     "howler": "^2.1.2",
     "jquery": "^3.4.1",
-    "jquery.easing": "^1.4.1",
     "js-sha1": "^0.6.0",
     "lodash": "^4.17.11",
     "mathjs": "^5.9.0",
