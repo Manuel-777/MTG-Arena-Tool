@@ -18,6 +18,7 @@ const StatsPanel = require("./stats-panel");
 const {
   getEventWinLossClass,
   getLocalState,
+  resetMainContainer,
   toggleArchived
 } = require("./renderer-util");
 const { openMatch } = require("./match-details");
@@ -28,9 +29,7 @@ let filteredMatches;
 let sortedEvents;
 
 function openEventsTab(_filters, dataIndex = 25, scrollTop = 0) {
-  const mainDiv = document.getElementById("ux_0");
-  mainDiv.classList.remove("flex_item");
-  mainDiv.innerHTML = "";
+  const mainDiv = resetMainContainer();
   const d = createDivision(["list_fill"]);
   mainDiv.appendChild(d);
 

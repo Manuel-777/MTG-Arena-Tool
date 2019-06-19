@@ -29,6 +29,7 @@ const {
   ipcSend,
   makeResizable,
   openDraft,
+  resetMainContainer,
   showColorpicker,
   showLoadingBars,
   toggleArchived
@@ -75,8 +76,7 @@ function setFilters(selected = {}) {
 }
 
 function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
-  const mainDiv = byId("ux_0");
-  mainDiv.innerHTML = "";
+  const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
 
   sortedHistory = [...pd.history];

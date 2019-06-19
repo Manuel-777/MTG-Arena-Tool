@@ -5,7 +5,12 @@ const { queryElements: $$, createDivision } = require("../shared/dom-fns");
 const { addCardHover } = require("../shared/card-hover");
 const { toHHMMSS, toDDHHMMSS, timestamp } = require("../shared/util");
 const { tournamentCreate } = require("./tournaments");
-const { getLocalState, ipcSend, showLoadingBars } = require("./renderer-util");
+const {
+  getLocalState,
+  ipcSend,
+  resetMainContainer,
+  showLoadingBars
+} = require("./renderer-util");
 
 let usersActive;
 let tournaments_list;
@@ -29,9 +34,7 @@ function requestHome() {
 // Should separate these two into smaller functions
 function openHomeTab(arg, opentab = true) {
   const ls = getLocalState();
-  let mainDiv = document.getElementById("ux_0");
-  mainDiv.classList.remove("flex_item");
-  mainDiv.innerHTML = "";
+  const mainDiv = resetMainContainer();
 
   if (arg) {
     tournaments_list = arg.tournaments;

@@ -26,6 +26,7 @@ const {
   getWinrateClass,
   hideLoadingBars,
   ipcSend,
+  resetMainContainer,
   setLocalState,
   showLoadingBars
 } = require("./renderer-util");
@@ -68,11 +69,8 @@ function openExploreTab() {
     setLocalState({ exploreData });
   }
 
-  const mainDiv = document.getElementById("ux_0");
+  const mainDiv = resetMainContainer();
   let d;
-
-  mainDiv.classList.remove("flex_item");
-  mainDiv.innerHTML = "";
 
   let divFill = document.createElement("div");
   divFill.classList.add("list_fill");
@@ -120,8 +118,7 @@ function openExploreTab() {
     queryExplore();
   }
 
-  $(mainDiv).off();
-  $(mainDiv).on("scroll", () => {
+  const handler = () => {
     const { exploreData } = getLocalState();
     // do not spam server after reaching end of results
     if (exploreData.results_terminated) return;
@@ -131,7 +128,9 @@ function openExploreTab() {
     ) {
       queryExplore();
     }
-  });
+  };
+  mainDiv.addEventListener("scroll", handler);
+  setLocalState({ lastScrollHandler: handler });
 }
 
 function getEventPrettyName(event) {

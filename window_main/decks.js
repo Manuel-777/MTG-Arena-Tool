@@ -22,11 +22,11 @@ const {
   hideLoadingBars,
   ipcSend,
   makeResizable,
+  resetMainContainer,
   setLocalState,
   showColorpicker
 } = require("./renderer-util");
 
-const byId = id => document.getElementById(id);
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
 const tagPrompt = "Add";
@@ -52,9 +52,8 @@ function setFilters(selected = {}) {
 function openDecksTab(_filters = {}, scrollTop = 0) {
   hideLoadingBars();
   const ls = getLocalState();
-  const mainDiv = byId("ux_0");
+  const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
-  mainDiv.innerHTML = "";
   setFilters(_filters);
 
   const wrap_r = createDiv(["wrapper_column", "sidebar_column_l"]);

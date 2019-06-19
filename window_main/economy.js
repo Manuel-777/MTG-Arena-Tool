@@ -18,6 +18,7 @@ const DataScroller = require("./data-scroller");
 const {
   formatNumber,
   formatPercent,
+  resetMainContainer,
   toggleArchived
 } = require("./renderer-util");
 
@@ -132,7 +133,7 @@ function getPrettyContext(context, full = true) {
 }
 
 function openEconomyTab(dataIndex = 25, scrollTop = 0) {
-  const mainDiv = document.getElementById("ux_0");
+  const mainDiv = resetMainContainer();
   createEconomyUI(mainDiv);
   const dataScroller = new DataScroller(
     mainDiv,
@@ -735,9 +736,6 @@ function createEconomyUI(mainDiv) {
       dayList[daysago].vaultProgress += change.delta.vaultProgressDelta;
     }
   }
-
-  mainDiv.classList.remove("flex_item");
-  mainDiv.innerHTML = "";
 
   let div = createDivision(["list_economy_top", "flex_item"]);
 

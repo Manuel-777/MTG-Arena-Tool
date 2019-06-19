@@ -19,7 +19,8 @@ const {
 const {
   hideLoadingBars,
   changeBackground,
-  ipcSend
+  ipcSend,
+  resetMainContainer
 } = require("./renderer-util");
 
 let collectionPage = 0;
@@ -227,9 +228,7 @@ function openCollectionTab() {
   mainDiv = document.getElementById("ux_1");
   mainDiv.innerHTML = "";
   mainDiv.classList.remove("flex_item");
-  mainDiv = document.getElementById("ux_0");
-  mainDiv.innerHTML = "";
-  mainDiv.classList.remove("flex_item");
+  mainDiv = resetMainContainer();
 
   let div = createDivision(["inventory"]);
 

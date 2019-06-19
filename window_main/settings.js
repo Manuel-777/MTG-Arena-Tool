@@ -26,11 +26,12 @@ const { get_card_image } = require("../shared/util");
 const byId = id => document.getElementById(id);
 
 const {
-  setLocalState,
   addCheckbox,
   changeBackground,
   hideLoadingBars,
   ipcSend,
+  resetMainContainer,
+  setLocalState,
   showColorpicker
 } = require("./renderer-util");
 
@@ -53,9 +54,8 @@ function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
   }
   changeBackground("default");
   hideLoadingBars();
-  const mainDiv = byId("ux_0");
+  const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
-  mainDiv.innerHTML = "";
 
   const wrap_l = createDiv(["wrapper_column", "sidebar_column_r"]);
 

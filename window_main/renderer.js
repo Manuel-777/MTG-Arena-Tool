@@ -39,6 +39,7 @@ const {
   hideLoadingBars,
   ipcSend,
   pop,
+  resetMainContainer,
   setLocalState,
   showLoadingBars
 } = require("./renderer-util");
@@ -287,7 +288,7 @@ function openTab(tab, filters = {}, dataIndex = 0, scrollTop = 0) {
   showLoadingBars();
   $$(".top_nav_item").forEach(el => el.classList.remove("item_selected"));
   let tabClass = "it" + tab;
-  byId("ux_0").innerHTML = "";
+  resetMainContainer();
   switch (tab) {
     case 0:
       openDecksTab(filters, scrollTop);
