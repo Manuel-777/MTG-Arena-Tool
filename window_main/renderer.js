@@ -694,7 +694,10 @@ ready(function() {
         }
         setLocalState({ lastDataIndex: 0, lastScrollTop: 0 });
         openTab(sidebarActive, filters);
-        ipcSend("save_user_settings", { last_open_tab: sidebarActive });
+        ipcSend("save_user_settings", {
+          last_open_tab: sidebarActive,
+          last_date_filter: filters.date
+        });
       } else {
         anime({
           targets: ".moving_ux",
