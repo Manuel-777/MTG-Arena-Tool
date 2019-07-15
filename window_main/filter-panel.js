@@ -8,7 +8,7 @@ const {
   getRecentDeckName
 } = require("../shared/util");
 
-const { getTagColor } = require("./renderer-util");
+const { getTagColor, ipcSend, showDatepicker } = require("./renderer-util");
 const {
   DEFAULT_ARCH,
   DEFAULT_DECK,
@@ -125,6 +125,7 @@ class FilterPanel {
       filter => {
         this.filters.date = filter;
         this.onFilterChange({ date: filter }, this.filters);
+        ipcSend("save_user_settings", { last_date_filter: filter });
       },
       this.prefixId + "_query_date"
     );

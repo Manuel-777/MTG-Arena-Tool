@@ -66,6 +66,7 @@ const defaultCfg = {
     back_color: "rgba(0,0,0,0.3)",
     back_url: "",
     right_panel_width: 400,
+    last_date_filter: null,
     last_open_tab: -1,
     card_tile_style: CARD_TILE_FLAT,
     skip_firstpass: false,

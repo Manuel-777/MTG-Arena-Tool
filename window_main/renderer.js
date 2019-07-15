@@ -363,6 +363,8 @@ function rememberMe() {
 //
 function openTab(tab, filters = {}, dataIndex = 0, scrollTop = 0) {
   showLoadingBars();
+  if (pd.settings.last_date_filter && !("date" in filters))
+    filters.date = pd.settings.last_date_filter;
   $$(".top_nav_item").forEach(el => el.classList.remove("item_selected"));
   let tabClass = "it" + tab;
   resetMainContainer();
