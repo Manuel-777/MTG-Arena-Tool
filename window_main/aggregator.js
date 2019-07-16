@@ -84,7 +84,7 @@ class Aggregator {
       onlyCurrentDecks: false,
       arch: DEFAULT_ARCH,
       oppColors: Aggregator.getDefaultColorFilter(),
-      date: DATE_LAST_30,
+      date: null, // take default later from player config
       showArchived: false
     };
   }

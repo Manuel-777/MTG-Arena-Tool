@@ -8,7 +8,7 @@ const {
   getRecentDeckName
 } = require("../shared/util");
 
-const { getTagColor, ipcSend, showDatepicker } = require("./renderer-util");
+const { getTagColor, ipcSend } = require("./renderer-util");
 const {
   DEFAULT_ARCH,
   DEFAULT_DECK,
@@ -37,6 +37,7 @@ class FilterPanel {
     this.onFilterChange = onFilterChange;
     this.filters = {
       ...getDefaultFilters(),
+      date: pd.settings.last_date_filter || DATE_LAST_30,
       ...filters
     };
     this.events = events || [];
