@@ -1,6 +1,8 @@
 const { shell } = require("electron");
 
-const { differenceInCalendarDays } = require("date-fns");
+const differenceInCalendarDays = require("date-fns/differenceInCalendarDays");
+const startOfDay = require("date-fns/startOfDay");
+const compareAsc = require("date-fns/compareAsc");
 
 const db = require("../shared/database");
 const pd = require("../shared/player-data");
@@ -234,7 +236,8 @@ function renderData(container, index) {
 }
 
 function createDayHeader(change) {
-  daysago = differenceInCalendarDays(new Date(), new Date(change.date));
+  const timestamp = new Date(change.date);
+  daysago = differenceInCalendarDays(new Date(), timestamp);
   const headerGrid = createDiv(["economy_title"]);
 
   const tx = createDiv(["economy_sub"]);
@@ -251,9 +254,7 @@ function createDayHeader(change) {
   if (daysago == 0) gridTitle.innerHTML = "Today";
   if (daysago == 1) gridTitle.innerHTML = "Yesterday";
   if (daysago > 1) {
-    let date = new Date(change.date);
-    date = new Date(date.setHours(0, 0, 0, 0));
-    gridTitle.innerHTML = localDayDateFormat(date);
+    gridTitle.innerHTML = localDayDateFormat(startOfDay(timestamp));
   }
   headerGrid.appendChild(gridTitle);
 
@@ -970,8 +971,7 @@ function createEconomyUI(mainDiv) {
 function compare_economy(a, b) {
   if (a === undefined) return 0;
   if (b === undefined) return 0;
-
-  return Date.parse(a.date) - Date.parse(b.date);
+  return compareAsc(new Date(a.date), new Date(b.date));
 }
 
 module.exports = {
