@@ -1,3 +1,5 @@
+const formatDistanceStrict = require("date-fns/formatDistanceStrict");
+
 const {
   FORMATS,
   BLACK,
@@ -570,25 +572,9 @@ function get_deck_export_txt(deck) {
 
 //
 exports.timeSince = timeSince;
-function timeSince(_date) {
-  var seconds = Math.floor((new Date() - _date) / 1000);
-
-  var interval = Math.floor(seconds / 31536000);
-  if (interval == 1) return interval + " year";
-  if (interval > 0) return interval + " years";
-  interval = Math.floor(seconds / 2592000);
-  if (interval == 1) return interval + " month";
-  if (interval > 0) return interval + " months";
-  interval = Math.floor(seconds / 86400);
-  if (interval == 1) return interval + " day";
-  if (interval > 0) return interval + " days";
-  interval = Math.floor(seconds / 3600);
-  if (interval == 1) return interval + " hour";
-  if (interval > 0) return interval + " hours";
-  interval = Math.floor(seconds / 60);
-  if (interval == 1) return interval + " minute";
-  if (interval > 0) return interval + " minutes";
-  return Math.floor(seconds) + " seconds";
+function timeSince(_date, options = { addSuffix: true, includeSeconds: true }) {
+  // https://date-fns.org/v2.0.0-alpha.27/docs/formatDistanceStrict
+  return formatDistanceStrict(_date, new Date(), options);
 }
 
 //

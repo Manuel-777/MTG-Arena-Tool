@@ -299,7 +299,7 @@ function attachMatchData(listItem, match) {
   // Match time
   const matchTime = createDiv(
     ["list_match_time"],
-    timeSince(new Date(match.date)) + " ago - " + toMMSS(match.duration)
+    timeSince(new Date(match.date)) + " - " + toMMSS(match.duration)
   );
   listItem.rightBottom.appendChild(matchTime);
 
@@ -357,7 +357,7 @@ function attachDraftData(listItem, draft) {
 
   const draftTimeDiv = createDiv(
     ["list_match_time"],
-    timeSince(new Date(draft.date)) + " ago."
+    timeSince(new Date(draft.date)) + "."
   );
   listItem.rightBottom.appendChild(draftTimeDiv);
 

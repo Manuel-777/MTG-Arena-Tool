@@ -210,7 +210,7 @@ function attachEventData(listItem, course) {
   listItem.rightBottom.appendChild(
     createDiv(
       ["list_match_time"],
-      timeSince(new Date(course.date)) + " ago - " + toMMSS(stats.duration)
+      timeSince(new Date(course.date)) + " - " + toMMSS(stats.duration)
     )
   );
 
@@ -274,7 +274,7 @@ function createMatchRow(match) {
 
   let timeDiv = createDiv(
     ["list_match_time"],
-    timeSince(new Date(match.date)) + " ago - " + toMMSS(match.duration)
+    timeSince(new Date(match.date)) + " - " + toMMSS(match.duration)
   );
   matchRow.rightBottom.appendChild(timeDiv);
 

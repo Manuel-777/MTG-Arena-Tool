@@ -413,7 +413,7 @@ function setChangesTimeline(deckId) {
       title.innerHTML = change.label;
     } else {
       title.innerHTML =
-        nc + " changes, " + timeSince(Date.parse(change.date)) + " ago.";
+        nc + " changes, " + timeSince(Date.parse(change.date)) + ".";
     }
     datbox.appendChild(title);
     datbox.appendChild(data);
