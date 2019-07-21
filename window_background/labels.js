@@ -38,11 +38,14 @@
     firstPass
     debugLog
 */
-const { ARENA_MODE_IDLE } = require("../shared/constants");
 const _ = require("lodash");
+const differenceInDays = require("date-fns/differenceInDays");
+
+const { ARENA_MODE_IDLE } = require("../shared/constants");
 const db = require("../shared/database");
 const CardsList = require("../shared/cards-list");
 const { get_deck_colors, objectClone, replaceAll } = require("../shared/util");
+
 const {
   httpSetMythicRank,
   httpSubmitCourse,
@@ -565,16 +568,15 @@ function onLabelInPlayerInventoryGetPlayerInventory(entry, json) {
 
 function onLabelInPlayerInventoryGetPlayerCardsV3(entry, json) {
   if (!json) return;
-
-  const date = new Date(pd.cards.cards_time);
   const now = new Date();
-  const diff = Math.abs(now.getTime() - date.getTime());
-  const days = Math.floor(diff / (1000 * 3600 * 24));
 
   let cards_before = pd.cards.cards_before;
   // If a day has passed since last update
-  if (pd.cards.cards_time !== 0 && days > 0) {
-    cards_before = pd.cards.cards;
+  if (pd.cards.cards_time) {
+    const date = new Date(pd.cards.cards_time);
+    if (differenceInDays(now, date) > 0) {
+      cards_before = pd.cards.cards;
+    }
   }
 
   const cards = {
