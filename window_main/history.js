@@ -3,6 +3,7 @@ const anime = require("animejs");
 const autocomplete = require("../shared/autocomplete");
 const {
   DATE_SEASON,
+  DEFAULT_TILE,
   EASING_DEFAULT,
   MANA,
   RANKS
@@ -216,7 +217,11 @@ function renderData(container, index) {
     tileGrpid = match.playerDeck.deckTileId;
     clickCallback = handleOpenMatch;
   } else {
-    tileGrpid = db.sets[match.set].tile;
+    if (match.set in db.sets && db.sets[match.set].tile) {
+      tileGrpid = db.sets[match.set].tile;
+    } else {
+      tileGrpid = DEFAULT_TILE;
+    }
     clickCallback = handleOpenDraft;
   }
   const deleteCallback = id => {

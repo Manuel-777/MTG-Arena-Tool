@@ -9,6 +9,7 @@ const Picker = require("vanilla-picker");
 const {
   COLORS_ALL,
   DRAFT_RANKS,
+  DEFAULT_TILE,
   MANA_COLORS,
   PACK_SIZES,
   IPC_MAIN,
@@ -457,7 +458,12 @@ function openDraft(id, draftPosition = 1) {
 
   const draft = pd.draft(id);
   if (!draft) return;
-  const tileGrpid = db.sets[draft.set].tile;
+  let tileGrpid;
+  if (draft.set in db.sets && db.sets[draft.set].tile) {
+    tileGrpid = db.sets[draft.set].tile;
+  } else {
+    tileGrpid = DEFAULT_TILE;
+  }
   if (db.card(tileGrpid)) {
     changeBackground("", tileGrpid);
   }
