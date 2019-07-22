@@ -26,7 +26,7 @@ const {
   MAIN_LOGIN,
   MAIN_HOME,
   MAIN_DECKS,
-  MAIN_HISTORY,
+  MAIN_MATCHES,
   MAIN_EVENTS,
   MAIN_EXPLORE,
   MAIN_ECONOMY,
@@ -68,7 +68,7 @@ const { openHomeTab, requestHome } = require("./home");
 const { tournamentOpen } = require("./tournaments");
 const { openDecksTab } = require("./decks");
 const { openDeck } = require("./deck-details");
-const { openHistoryTab } = require("./history");
+const { openMatchesTab } = require("./matches");
 const { openEventsTab } = require("./events");
 const { openEconomyTab } = require("./economy");
 const { openExploreTab, setExploreDecks } = require("./explore");
@@ -372,7 +372,7 @@ function openTab(tab, filters = {}, dataIndex = 0, scrollTop = 0) {
       openDecksTab(filters, scrollTop);
       break;
     case 1:
-      openHistoryTab(filters, dataIndex, scrollTop);
+      openMatchesTab(filters, dataIndex, scrollTop);
       break;
     case 2:
       openEventsTab(filters, dataIndex, scrollTop);
@@ -663,7 +663,7 @@ ready(function() {
         } else if (classList.includes("it0")) {
           sidebarActive = MAIN_DECKS;
         } else if (classList.includes("it1")) {
-          sidebarActive = MAIN_HISTORY;
+          sidebarActive = MAIN_MATCHES;
         } else if (classList.includes("it2")) {
           sidebarActive = MAIN_EVENTS;
         } else if (classList.includes("it3")) {
@@ -675,7 +675,7 @@ ready(function() {
         } else if (classList.includes("it6")) {
           sidebarActive = MAIN_SETTINGS;
         } else if (classList.includes("it7")) {
-          sidebarActive = MAIN_HISTORY;
+          sidebarActive = MAIN_MATCHES;
           filters = {
             ...getDefaultFilters(),
             date: DATE_SEASON,
@@ -683,7 +683,7 @@ ready(function() {
             rankedMode: true
           };
         } else if (classList.includes("it8")) {
-          sidebarActive = MAIN_HISTORY;
+          sidebarActive = MAIN_MATCHES;
           filters = {
             ...getDefaultFilters(),
             date: DATE_SEASON,

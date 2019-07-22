@@ -70,7 +70,7 @@ function setFilters(selected = {}) {
   }
 }
 
-function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
+function openMatchesTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
   const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
 
@@ -140,7 +140,7 @@ function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
   });
   const filterPanel = new FilterPanel(
     "history_top",
-    selected => openHistoryTab(selected),
+    selected => openMatchesTab(selected),
     filters,
     totalAgg.events,
     matchesInEvent.tags,
@@ -261,7 +261,7 @@ function renderRanksStats(container, aggregator) {
   );
 
   seasonToggleButton.addEventListener("click", () => {
-    openHistoryTab(switchSeasonFilters);
+    openMatchesTab(switchSeasonFilters);
   });
 }
 
@@ -411,4 +411,4 @@ function compare_matches(a, b) {
   return Date.parse(a.date) - Date.parse(b.date);
 }
 
-module.exports = { openHistoryTab, setFilters };
+module.exports = { openMatchesTab, setFilters };
