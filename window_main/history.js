@@ -1,24 +1,11 @@
 const anime = require("animejs");
 
 const autocomplete = require("../shared/autocomplete");
-const {
-  DATE_SEASON,
-  EASING_DEFAULT,
-  MANA,
-  RANKS
-} = require("../shared/constants");
+const { DATE_SEASON, EASING_DEFAULT, RANKS } = require("../shared/constants");
 const db = require("../shared/database");
 const pd = require("../shared/player-data");
-const { createSelect } = require("../shared/select");
 const { createDiv, createInput } = require("../shared/dom-fns");
-const {
-  get_deck_colors,
-  get_rank_index_16,
-  getReadableEvent,
-  makeId,
-  timeSince,
-  toMMSS
-} = require("../shared/util");
+const { makeId } = require("../shared/util");
 
 const Aggregator = require("./aggregator");
 const DataScroller = require("./data-scroller");
@@ -26,15 +13,13 @@ const FilterPanel = require("./filter-panel");
 const ListItem = require("./list-item");
 const StatsPanel = require("./stats-panel");
 const {
+  attachMatchData,
   formatPercent,
   getTagColor,
   ipcSend,
   makeResizable,
-  openDialog,
-  openDraft,
   resetMainContainer,
   showColorpicker,
-  showLoadingBars,
   toggleArchived
 } = require("./renderer-util");
 const { openMatch } = require("./match-details");
@@ -89,7 +74,7 @@ function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
   const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
 
-  sortedHistory = [...pd.history];
+  sortedHistory = [...pd.matchList];
   sortedHistory.sort(compare_matches);
   setFilters(_filters);
   totalAgg = new Aggregator({ date: filters.date });
@@ -190,132 +175,25 @@ function renderData(container, index) {
   const match = sortedHistory[revIndex];
 
   //console.log("match: ", id, match);
-  if (match == undefined) {
-    return 0;
-  }
-
-  if (match.type == "match") {
-    if (match.opponent == undefined) {
-      return 0;
-    }
-    if (match.opponent.userid.indexOf("Familiar") !== -1) {
-      return 0;
-    }
-  }
-
-  if (match.type == "Event") {
-    return 0;
-  }
-
-  if (!filteredMatches.filterMatch(match)) {
-    return 0;
-  }
-
-  let tileGrpid, clickCallback;
-  if (match.type == "match") {
-    tileGrpid = match.playerDeck.deckTileId;
-    clickCallback = handleOpenMatch;
-  } else {
-    tileGrpid = db.sets[match.set].tile;
-    clickCallback = handleOpenDraft;
-  }
-  const deleteCallback = id => {
-    toggleArchived(id);
-  };
+  if (!match || !match.opponent) return 0;
+  if (!filteredMatches.filterMatch(match)) return 0;
+  if (match.opponent.userid.includes("Familiar")) return 0;
 
   const listItem = new ListItem(
-    tileGrpid,
+    match.playerDeck.deckTileId,
     match.id,
-    clickCallback,
-    deleteCallback,
+    handleOpenMatch,
+    id => toggleArchived(id),
     match.archived
   );
   listItem.divideLeft();
   listItem.divideRight();
 
-  if (match.type == "match") {
-    attachMatchData(listItem, match);
-  } else {
-    attachDraftData(listItem, match);
-  }
-
+  attachMatchData(listItem, match);
   container.appendChild(listItem.container);
 
-  //console.log("Load match: ", match_id, match);
-  //console.log("Match: ", match.type, match);
-  return 1;
-}
-
-function handleOpenMatch(id) {
-  openMatch(id);
-  anime({
-    targets: ".moving_ux",
-    left: "-100%",
-    easing: EASING_DEFAULT,
-    duration: 350
-  });
-}
-
-function handleOpenDraft(id) {
-  openDraft(id);
-  anime({
-    targets: ".moving_ux",
-    left: "-100%",
-    easing: EASING_DEFAULT,
-    duration: 350
-  });
-}
-
-function attachMatchData(listItem, match) {
-  // Deck name
-  const deckNameDiv = createDiv(["list_deck_name"], match.playerDeck.name);
-  listItem.leftTop.appendChild(deckNameDiv);
-
-  // Event name
-  const eventNameDiv = createDiv(
-    ["list_deck_name_it"],
-    getReadableEvent(match.eventId)
-  );
-  listItem.leftTop.appendChild(eventNameDiv);
-
-  match.playerDeck.colors.forEach(color => {
-    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    listItem.leftBottom.appendChild(m);
-  });
-
-  // Opp name
-  if (match.opponent.name == null) match.opponent.name = "-#000000";
-  const oppNameDiv = createDiv(
-    ["list_match_title"],
-    "vs " + match.opponent.name.slice(0, -6)
-  );
-  listItem.rightTop.appendChild(oppNameDiv);
-
-  // Opp rank
-  const oppRank = createDiv(["ranks_16"]);
-  oppRank.style.marginRight = "0px";
-  oppRank.style.backgroundPosition =
-    get_rank_index_16(match.opponent.rank) * -16 + "px 0px";
-  oppRank.title = match.opponent.rank + " " + match.opponent.tier;
-  listItem.rightTop.appendChild(oppRank);
-
-  // Match time
-  const matchTime = createDiv(
-    ["list_match_time"],
-    timeSince(new Date(match.date)) + " ago - " + toMMSS(match.duration)
-  );
-  listItem.rightBottom.appendChild(matchTime);
-
-  // Opp colors
-  get_deck_colors(match.oppDeck).forEach(color => {
-    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    listItem.rightBottom.appendChild(m);
-  });
-
-  const tagsDiv = createDiv(["history_tags"]);
-  listItem.rightBottom.appendChild(tagsDiv);
-
-  // Set tag
+  // Render tag
+  const tagsDiv = byId("history_tags_" + match.id);
   const allTags = [
     ...totalAgg.archs.filter(arch => arch !== NO_ARCH && arch !== DEFAULT_ARCH),
     ...db.archetypes.map(arch => arch.name)
@@ -330,77 +208,19 @@ function attachMatchData(listItem, match) {
     createTag(tagsDiv, match.id, tags, null, false);
   }
 
-  // Result
-  const resultDiv = createDiv(
-    [
-      "list_match_result",
-      match.player.win > match.opponent.win ? "green" : "red"
-    ],
-    `${match.player.win}:${match.opponent.win}`
-  );
-  listItem.right.after(resultDiv);
-
-  // On the play/draw
-  if (match.onThePlay) {
-    let onThePlay = false;
-    if (match.player.seat == match.onThePlay) {
-      onThePlay = true;
-    }
-    const div = createDiv([onThePlay ? "ontheplay" : "onthedraw"]);
-    div.title = onThePlay ? "On the play" : "On the draw";
-    listItem.right.after(div);
-  }
+  //console.log("Load match: ", match_id, match);
+  //console.log("Match: ", match.type, match);
+  return 1;
 }
 
-function attachDraftData(listItem, draft) {
-  // console.log("Draft: ", match);
-
-  const draftSetDiv = createDiv(["list_deck_name"], draft.set + " draft");
-  listItem.leftTop.appendChild(draftSetDiv);
-
-  const draftTimeDiv = createDiv(
-    ["list_match_time"],
-    timeSince(new Date(draft.date)) + " ago."
-  );
-  listItem.rightBottom.appendChild(draftTimeDiv);
-
-  const replayDiv = createDiv(["list_match_replay"], "See replay");
-  listItem.rightTop.appendChild(replayDiv);
-
-  const replayShareButton = createDiv(["list_draft_share", draft.id + "dr"]);
-  replayShareButton.addEventListener("click", e => {
-    e.stopPropagation();
-    const cont = createDiv(["dialog_content"]);
-    cont.style.width = "500px";
-
-    cont.append(createDiv(["share_title"], "Link for sharing:"));
-    const icd = createDiv(["share_input_container"]);
-    const linkInput = createInput([], "", {
-      id: "share_input",
-      autocomplete: "off"
-    });
-    linkInput.addEventListener("click", () => linkInput.select());
-    icd.appendChild(linkInput);
-    const but = createDiv(["button_simple"], "Copy");
-    but.addEventListener("click", function() {
-      ipcSend("set_clipboard", byId("share_input").value);
-    });
-    icd.appendChild(but);
-    cont.appendChild(icd);
-
-    cont.appendChild(createDiv(["share_subtitle"], "<i>Expires in: </i>"));
-    createSelect(
-      cont,
-      ["One day", "One week", "One month", "Never"],
-      "",
-      () => draftShareLink(draft.id),
-      "expire_select"
-    );
-
-    openDialog(cont);
-    draftShareLink(draft.id);
+function handleOpenMatch(id) {
+  openMatch(id);
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: EASING_DEFAULT,
+    duration: 350
   });
-  listItem.right.after(replayShareButton);
 }
 
 function renderRanksStats(container, aggregator) {
@@ -582,30 +402,6 @@ function getStepsUntilNextRank(mode, winrate) {
   }
 
   return "~" + n;
-}
-
-function draftShareLink(id) {
-  const shareExpire = byId("expire_select").value;
-  let expire = 0;
-  switch (shareExpire) {
-    case "One day":
-      expire = 0;
-      break;
-    case "One week":
-      expire = 1;
-      break;
-    case "One month":
-      expire = 2;
-      break;
-    case "Never":
-      expire = -1;
-      break;
-    default:
-      expire = 0;
-      break;
-  }
-  showLoadingBars();
-  ipcSend("request_draft_link", { expire, id });
 }
 
 function compare_matches(a, b) {
