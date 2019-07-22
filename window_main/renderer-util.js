@@ -10,6 +10,7 @@ const Pikaday = require("pikaday");
 const {
   COLORS_ALL,
   DRAFT_RANKS,
+  MANA,
   MANA_COLORS,
   PACK_SIZES,
   IPC_MAIN,
@@ -30,7 +31,16 @@ const {
 const deckDrawer = require("../shared/deck-drawer");
 const cardTypes = require("../shared/card-types");
 const { addCardHover } = require("../shared/card-hover");
-const { deckTypesStats, get_card_image, makeId } = require("../shared/util");
+const {
+  deckTypesStats,
+  get_deck_colors,
+  get_card_image,
+  get_rank_index_16,
+  getReadableEvent,
+  makeId,
+  timeSince,
+  toMMSS
+} = require("../shared/util");
 
 const byId = id => document.getElementById(id);
 let popTimeout = null;
@@ -880,4 +890,79 @@ function compareColorWinrates(a, b) {
   if (sa > sb) return 1;
 
   return 0;
+}
+
+//
+exports.attachMatchData = attachMatchData;
+function attachMatchData(listItem, match) {
+  // Deck name
+  const deckNameDiv = createDiv(["list_deck_name"], match.playerDeck.name);
+  listItem.leftTop.appendChild(deckNameDiv);
+
+  // Event name
+  const eventNameDiv = createDiv(
+    ["list_deck_name_it"],
+    getReadableEvent(match.eventId)
+  );
+  listItem.leftTop.appendChild(eventNameDiv);
+
+  match.playerDeck.colors.forEach(color => {
+    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
+    listItem.leftBottom.appendChild(m);
+  });
+
+  // Opp name
+  if (match.opponent.name == null) match.opponent.name = "-#000000";
+  const oppNameDiv = createDiv(
+    ["list_match_title"],
+    "vs " + match.opponent.name.slice(0, -6)
+  );
+  listItem.rightTop.appendChild(oppNameDiv);
+
+  // Opp rank
+  const oppRank = createDiv(["ranks_16"]);
+  oppRank.style.marginRight = "0px";
+  oppRank.style.backgroundPosition =
+    get_rank_index_16(match.opponent.rank) * -16 + "px 0px";
+  oppRank.title = match.opponent.rank + " " + match.opponent.tier;
+  listItem.rightTop.appendChild(oppRank);
+
+  // Match time
+  const matchTime = createDiv(
+    ["list_match_time"],
+    timeSince(new Date(match.date)) + " ago - " + toMMSS(match.duration)
+  );
+  listItem.rightBottom.appendChild(matchTime);
+
+  // Opp colors
+  get_deck_colors(match.oppDeck).forEach(color => {
+    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
+    listItem.rightBottom.appendChild(m);
+  });
+
+  const tagsDiv = createDiv(["history_tags"], "", {
+    id: "history_tags_" + match.id
+  });
+  listItem.rightBottom.appendChild(tagsDiv);
+
+  // Result
+  const resultDiv = createDiv(
+    [
+      "list_match_result",
+      match.player.win > match.opponent.win ? "green" : "red"
+    ],
+    `${match.player.win}:${match.opponent.win}`
+  );
+  listItem.right.after(resultDiv);
+
+  // On the play/draw
+  if (match.onThePlay) {
+    let onThePlay = false;
+    if (match.player.seat == match.onThePlay) {
+      onThePlay = true;
+    }
+    const div = createDiv([onThePlay ? "ontheplay" : "onthedraw"]);
+    div.title = onThePlay ? "On the play" : "On the draw";
+    listItem.right.after(div);
+  }
 }
