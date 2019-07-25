@@ -379,10 +379,7 @@ function expandEvent(id) {
 
   expandDiv.innerHTML = "";
   const wlGate = getWlGate(course);
-  if (!wlGate) return;
-  const matchesList = wlGate.ProcessedMatchIds;
-  if (!matchesList) return;
-
+  const matchesList = wlGate ? wlGate.ProcessedMatchIds || [] : [];
   const matchRows = matchesList
     .map(index => pd.match(index) || pd.match(index + "-" + pd.arenaId))
     .filter(
