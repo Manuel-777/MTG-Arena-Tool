@@ -26,7 +26,9 @@ const playerDataDefault = {
   arenaVersion: "",
   offline: false,
   patreon: false,
-  patreon_tier: 0
+  patreon_tier: 0,
+  last_log_timestamp: null,
+  last_log_format: ""
 };
 
 const overlayCfg = {
@@ -292,6 +294,8 @@ class PlayerData {
       "toolVersion",
       "auto_login",
       "launch_to_tray",
+      "logUri",
+      "log_locale_format",
       "remember_me",
       "beta_channel"
     ];

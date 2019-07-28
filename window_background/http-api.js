@@ -375,6 +375,7 @@ function httpNotificationsPull() {
 }
 
 function notificationProcess(data) {
+  if (!data) return;
   data.notifications.forEach(str => {
     console.log("notifications message:", str);
     if (typeof str == "string") {

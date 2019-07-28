@@ -2,12 +2,12 @@
 global
   debugLog
   firstPass
-  logLanguage
 */
 // Utility functions that belong only to background
 const { ipcRenderer: ipc } = require("electron");
 const _ = require("lodash");
-const parse = require("date-fns").parse;
+const parse = require("date-fns/parse");
+const isValid = require("date-fns/isValid");
 
 const {
   IPC_BACKGROUND,
@@ -18,7 +18,7 @@ const pd = require("../shared/player-data.js");
 
 // These were tested briefly , but hey are all taken from actual logs
 // At most some format from date-fns could be wrong;
-// https://date-fns.org/v2.0.0-alpha.7/docs/parse
+// https://date-fns.org/v2.0.0-alpha.27/docs/parse
 let dateLangs = [
   "dd.MM.yyyy HH:mm:ss",
   "dd/MM/yyyy HH:mm:ss",
@@ -30,26 +30,31 @@ let dateLangs = [
 
 // throws an error if it fails
 function parseWotcTime(dateStr) {
-  let date = parse(dateStr, dateLangs[0], new Date());
+  // Attempt parsing with custom app-level setting first
+  if (pd.settings.log_locale_format) {
+    const lang = pd.settings.log_locale_format;
+    // console.log(`Log datetime custom language attempt: ${lang}`);
+    const test = parse(dateStr, lang, new Date());
+    if (isValid(test) && !isNaN(test.getTime())) {
+      //console.log(`Log datetime language detected: ${lang}`, dateStr, test);
+      setData({ last_log_format: lang });
+      return test;
+    }
+  }
 
-  // This is to detect language when the one read does not match or logLanguage is not yet set
+  // Try parsing input with each format (in order) and return first valid result
+  dateLangs.forEach(lang => {
+    const test = parse(dateStr, lang, new Date());
+    if (isValid(test) && !isNaN(test.getTime())) {
+      //console.log(`Log datetime language detected: ${lang}`, dateStr, test);
+      setData({ last_log_format: lang });
+      return test;
+    }
+  });
+
   // Defaults to current time if none matches
-  if (!date || isNaN(date.getTime())) {
-    dateLangs.forEach(lang => {
-      let test = parse(dateStr, lang, new Date());
-      if (test && !isNaN(test.getTime())) {
-        //logLanguage = lang;
-        //console.log(`Log datetime language detected: ${lang}`, dateStr, test);
-        date = test;
-      }
-    });
-  }
-
-  if (!date || isNaN(date.getTime())) {
-    // console.log(`Invalid date ('${dateStr}') - using current date as backup.`);
-    date = new Date();
-  }
-  return date;
+  // console.log(`Invalid date ('${dateStr}') - using current date as backup.`);
+  return new Date();
 }
 
 function normaliseFields(iterator) {

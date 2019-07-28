@@ -19,7 +19,6 @@ const anime = require("animejs");
 require("time-elements");
 
 const {
-  DATE_LAST_30,
   DATE_SEASON,
   EASING_DEFAULT,
   HIDDEN_PW,
@@ -32,14 +31,13 @@ const {
   MAIN_ECONOMY,
   MAIN_COLLECTION,
   MAIN_SETTINGS,
-  MAIN_UPDATE
+  MAIN_UPDATE,
+  SETTINGS_ABOUT,
+  SETTINGS_OVERLAY,
+  SETTINGS_PRIVACY
 } = require("../shared/constants");
 const pd = require("../shared/player-data");
-const {
-  createDiv,
-  createInput,
-  queryElements: $$
-} = require("../shared/dom-fns");
+const { createDiv, queryElements: $$ } = require("../shared/dom-fns");
 const {
   compare_cards,
   get_deck_colors,
@@ -49,12 +47,12 @@ const {
 
 const {
   changeBackground,
-  closeDialog,
   getLocalState,
   hideLoadingBars,
   ipcSend,
   openDialog,
   pop,
+  renderLogInput,
   resetMainContainer,
   setLocalState,
   showLoadingBars
@@ -265,9 +263,17 @@ ipc.on("settings_updated", function() {
   lastSettings = { ...pd.settings };
 });
 
+let playerDataRefreshTimeout = null;
+
 //
 ipc.on("player_data_refresh", () => {
   if (sidebarActive === MAIN_LOGIN) return;
+
+  clearTimeout(playerDataRefreshTimeout);
+  playerDataRefreshTimeout = setTimeout(playerDataRefresh, 1000);
+});
+
+function playerDataRefresh() {
   const ls = getLocalState();
   updateTopBar();
   changeBackground("default");
@@ -278,12 +284,12 @@ ipc.on("player_data_refresh", () => {
     duration: 350
   });
   openTab(sidebarActive, {}, ls.lastDataIndex, ls.lastScrollTop);
-});
+}
 
 //
 ipc.on("set_update_state", function(event, arg) {
   if (sidebarActive === MAIN_UPDATE) {
-    openSettingsTab(5);
+    openSettingsTab(SETTINGS_ABOUT);
   }
 });
 
@@ -317,7 +323,7 @@ ipc.on("force_open_settings", function() {
 //
 ipc.on("force_open_overlay_settings", function(event, arg) {
   setCurrentOverlaySettings(arg);
-  force_open_settings(2);
+  force_open_settings(SETTINGS_OVERLAY);
 });
 
 //
@@ -451,39 +457,9 @@ ipc.on("no_log", function(event, arg) {
       '</div><div class="message_sub_16 white">if it does, try closing MTG Arena and deleting it.</div>';
   } else if (!logDialogOpen) {
     logDialogOpen = true;
-
     const cont = createDiv(["dialog_content"]);
-    cont.style.width = "600px";
-
-    const title = createDiv(["share_title"], "Enter output_log.txt location:");
-    title.style.margin = "12px auto";
-    cont.appendChild(title);
-    const icd = createDiv(["share_input_container"]);
-    const sin = createInput([], "", {
-      id: "log_input",
-      autofocus: true,
-      autocomplete: "off",
-      value: arg
-    });
-    sin.style.borderRadius = "3px";
-    sin.style.height = "28px";
-    sin.style.fontSize = "14px";
-    sin.style.margin = 0;
-    icd.appendChild(sin);
-    cont.appendChild(icd);
-
-    const but = createDiv(["button_simple"], "Save");
-    but.style.marginLeft = "auto";
-    but.style.marginRight = "auto";
-    but.addEventListener("click", function() {
-      ipcSend("set_log", byId("log_input").value);
-      closeDialog();
-      setTimeout(() => {
-        logDialogOpen = false;
-      }, 300);
-    });
-    cont.appendChild(but);
-
+    cont.style.width = "650px";
+    renderLogInput(cont);
     openDialog(cont, () => (logDialogOpen = false));
   }
 });
@@ -506,7 +482,7 @@ function showOfflineSplash() {
     <div class="message_sub_16 white">If you need an account, you can <a class="signup_link">sign up here</a>.</div>
   </div>`;
   $$(".privacy_link")[0].addEventListener("click", function() {
-    force_open_settings(4);
+    force_open_settings(SETTINGS_PRIVACY);
   });
   $$(".launch_login_link")[0].addEventListener("click", function() {
     const clearAppSettings = {
@@ -559,7 +535,7 @@ function force_open_about() {
     duration: 350
   });
   $$(".top_nav_item").forEach(el => el.classList.remove("item_selected"));
-  openSettingsTab(5, 0);
+  openSettingsTab(SETTINGS_ABOUT, 0);
 }
 
 //

@@ -694,7 +694,11 @@ exports.RANKS_SORT = {
   Mythic: 6
 };
 
-exports.PACK_SIZES = { "Ravnica Allegiance": 14, "Guilds of Ravnica": 14 };
+exports.PACK_SIZES = {
+  "Ravnica Allegiance": 14,
+  "Guilds of Ravnica": 14,
+  "Core Set 2020": 15
+};
 
 exports.DEFAULT_TILE = 67003;
 
@@ -713,6 +717,14 @@ exports.MAIN_ECONOMY = 4;
 exports.MAIN_COLLECTION = 5;
 exports.MAIN_SETTINGS = 6;
 exports.MAIN_UPDATE = 9;
+
+exports.SETTINGS_BEHAVIOUR = 1;
+exports.SETTINGS_ARENA_DATA = 2;
+exports.SETTINGS_OVERLAY = 3;
+exports.SETTINGS_VISUAL = 4;
+exports.SETTINGS_PRIVACY = 5;
+exports.SETTINGS_ABOUT = 6;
+exports.SETTINGS_LOGIN = 7;
 
 // Date constants
 exports.DATE_LAST_DAY = "Last 24 Hours";

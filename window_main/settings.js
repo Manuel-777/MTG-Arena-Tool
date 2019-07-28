@@ -3,6 +3,7 @@ const { ipcRenderer: ipc, remote, shell } = require("electron");
 const {
   CARD_TILE_ARENA,
   CARD_TILE_FLAT,
+  COLORS_ALL,
   OVERLAY_FULL,
   OVERLAY_LEFT,
   OVERLAY_ODDS,
@@ -12,7 +13,13 @@ const {
   OVERLAY_DRAFT_BREW,
   OVERLAY_LOG,
   OVERLAY_DRAFT_MODES,
-  COLORS_ALL
+  SETTINGS_BEHAVIOUR,
+  SETTINGS_ARENA_DATA,
+  SETTINGS_OVERLAY,
+  SETTINGS_VISUAL,
+  SETTINGS_PRIVACY,
+  SETTINGS_ABOUT,
+  SETTINGS_LOGIN
 } = require("../shared/constants");
 const db = require("../shared/database");
 const pd = require("../shared/player-data");
@@ -29,11 +36,15 @@ const { createSelect } = require("../shared/select");
 const { get_card_image } = require("../shared/util");
 const byId = id => document.getElementById(id);
 
+const parse = require("date-fns/parse");
+const isValid = require("date-fns/isValid");
+
 const {
   addCheckbox,
   changeBackground,
   hideLoadingBars,
   ipcSend,
+  renderLogInput,
   resetMainContainer,
   setLocalState,
   showColorpicker
@@ -64,13 +75,29 @@ function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
   const wrap_l = createDiv(["wrapper_column", "sidebar_column_r"]);
 
   wrap_l.appendChild(createDiv(["list_fill"]));
-  wrap_l.appendChild(createDiv(["settings_nav", "sn1"], "Behaviour"));
-  wrap_l.appendChild(createDiv(["settings_nav", "sn2"], "Overlay"));
-  wrap_l.appendChild(createDiv(["settings_nav", "sn3"], "Visual"));
-  wrap_l.appendChild(createDiv(["settings_nav", "sn4"], "Privacy"));
-  wrap_l.appendChild(createDiv(["settings_nav", "sn5"], "About"));
   wrap_l.appendChild(
-    createDiv(["settings_nav", "sn6"], pd.offline ? "Login" : "Logout")
+    createDiv(["settings_nav", "sn" + SETTINGS_BEHAVIOUR], "Behaviour")
+  );
+  wrap_l.appendChild(
+    createDiv(["settings_nav", "sn" + SETTINGS_ARENA_DATA], "Arena Data")
+  );
+  wrap_l.appendChild(
+    createDiv(["settings_nav", "sn" + SETTINGS_OVERLAY], "Overlay")
+  );
+  wrap_l.appendChild(
+    createDiv(["settings_nav", "sn" + SETTINGS_VISUAL], "Visual")
+  );
+  wrap_l.appendChild(
+    createDiv(["settings_nav", "sn" + SETTINGS_PRIVACY], "Privacy")
+  );
+  wrap_l.appendChild(
+    createDiv(["settings_nav", "sn" + SETTINGS_ABOUT], "About")
+  );
+  wrap_l.appendChild(
+    createDiv(
+      ["settings_nav", "sn" + SETTINGS_LOGIN],
+      pd.offline ? "Login" : "Logout"
+    )
   );
   mainDiv.appendChild(wrap_l);
   $$(".sn" + openSection)[0].classList.add("nav_selected");
@@ -104,6 +131,9 @@ function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
       } else if (classList.includes("sn6")) {
         lastSettingsSection = 6;
         $$(".ss6")[0].style.display = "block";
+      } else if (classList.includes("sn7")) {
+        lastSettingsSection = 7;
+        $$(".ss7")[0].style.display = "block";
       }
       this.classList.add("nav_selected");
     })
@@ -115,33 +145,38 @@ function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
   let section;
 
   // BEHAVIOR
-  section = createDiv(["settings_section", "ss1"]);
+  section = createDiv(["settings_section", "ss" + SETTINGS_BEHAVIOUR]);
   appendBehaviour(section);
   div.appendChild(section);
 
+  // DATA
+  section = createDiv(["settings_section", "ss" + SETTINGS_ARENA_DATA]);
+  appendArenaData(section);
+  div.appendChild(section);
+
   // OVERLAY
-  section = createDiv(["settings_section", "ss2"]);
+  section = createDiv(["settings_section", "ss" + SETTINGS_OVERLAY]);
   appendOverlay(section);
   div.appendChild(section);
 
   // VISUAL
-  section = createDiv(["settings_section", "ss3"]);
+  section = createDiv(["settings_section", "ss" + SETTINGS_VISUAL]);
   appendVisual(section);
   div.appendChild(section);
 
   // PRIVACY
-  section = createDiv(["settings_section", "ss4"]);
+  section = createDiv(["settings_section", "ss" + SETTINGS_PRIVACY]);
   appendPrivacy(section);
   div.appendChild(section);
 
   // ABOUT
-  section = createDiv(["settings_section", "ss5"]);
+  section = createDiv(["settings_section", "ss" + SETTINGS_ABOUT]);
   section.style.height = "100%";
   appendAbout(section);
   div.appendChild(section);
 
   // LOGIN
-  section = createDiv(["settings_section", "ss6"]);
+  section = createDiv(["settings_section", "ss" + SETTINGS_LOGIN]);
   section.style.height = "100%";
   appendLogin(section);
   div.appendChild(section);
@@ -188,25 +223,6 @@ function appendBehaviour(section) {
     pd.settings.startup,
     updateUserSettings
   );
-  addCheckbox(
-    section,
-    "Read entire Arena log during launch",
-    "settings_readlogonlogin",
-    !pd.settings.skip_firstpass,
-    updateUserSettings
-  );
-  const helpDiv = createDiv(
-    ["settings_note"],
-    `<p><i>Enabling this ensures that mtgatool will not miss any data still
-    available in your Arena log, even when mtgatool is launched while Arena is
-    running <b>(Recommended)</b>.</p>
-    <p>Disabling this will make mtgatool launch more quickly by skipping your
-    preexisting Arena log and only reading new log data. <b>This may miss data
-    if you launch mtgatool during an Arena session.</i></p>`
-  );
-  helpDiv.style.paddingLeft = "35px";
-  section.appendChild(helpDiv);
-
   addCheckbox(
     section,
     "Close main window on match found",
@@ -291,6 +307,91 @@ function appendBehaviour(section) {
     "<i>Possible variables: $Name, $Count, $SetName, $SetCode, $Collector, $Rarity, $Type, $Cmc</i>"
   );
   section.appendChild(textDiv);
+}
+
+function appendArenaData(section) {
+  section.appendChild(createDiv(["settings_title"], "Arena Data"));
+
+  renderLogInput(section);
+
+  addCheckbox(
+    section,
+    "Read entire Arena log during launch",
+    "settings_readlogonlogin",
+    !pd.settings.skip_firstpass,
+    updateUserSettings
+  );
+  const helpDiv = createDiv(
+    ["settings_note"],
+    `<p><i>Enabling this ensures that mtgatool will not miss any data still
+    available in your Arena log, even when mtgatool is launched while Arena is
+    running <b>(Recommended)</b>.</p>
+    <p>Disabling this will make mtgatool launch more quickly by skipping your
+    preexisting Arena log and only reading new log data. <b>This may miss data
+    if you launch mtgatool during an Arena session.</i></p>`
+  );
+  helpDiv.style.paddingLeft = "35px";
+  section.appendChild(helpDiv);
+
+  const logFormatLabel = createLabel(
+    ["but_container_label"],
+    "Log Timestamp Format:",
+    { for: "settings_log_locale_format" }
+  );
+  const logFormatCont = createDiv(["input_container"]);
+  logFormatCont.style.margin = "3px";
+  const logFormatInput = createInput([], "", {
+    type: "text",
+    id: "settings_log_locale_format",
+    autocomplete: "off",
+    placeholder: "default (auto)",
+    value: pd.settings.log_locale_format
+  });
+  logFormatInput.addEventListener("keyup", e => {
+    if (e.keyCode === 13) logFormatInput.blur();
+  });
+  logFormatInput.addEventListener("focusout", () => {
+    if (
+      logFormatInput.value &&
+      logFormatInput.value !== pd.settings.log_locale_format
+    ) {
+      updateAppSettings();
+    }
+  });
+  logFormatCont.appendChild(logFormatInput);
+  logFormatLabel.appendChild(logFormatCont);
+  section.appendChild(logFormatLabel);
+
+  const latestDateParsed = parse(
+    pd.last_log_timestamp,
+    pd.last_log_format,
+    new Date()
+  );
+  section.appendChild(
+    createDiv(
+      ["settings_note"],
+      `<p><i>Date and time format to use when parsing the Arena log. Incorrect
+      formats can cause issues importing or displaying data. mtgatool tries to
+      auto-detect formats, but sometimes manual input is required.</p>
+      <p>Leave blank to use default auto-detection, or
+      <a class="link parse_link">use ISO_8601 to specify a custom format</a>.</p></i>
+      <p>Last log timestamp: <b>${pd.last_log_timestamp}</b></p>
+      <p>Last format used: <b>${pd.last_log_format}</b></p>
+      <p>Parsed output: ${
+        isValid(latestDateParsed) && !isNaN(latestDateParsed.getTime())
+          ? '<b class="green">' +
+            latestDateParsed.toISOString() +
+            "</b><i> (simplified extended ISO_8601 format)</i>"
+          : '<b class="red">Invalid format or timestamp</b>'
+      }</p>`
+    )
+  );
+
+  setTimeout(() => {
+    $$(".parse_link")[0].addEventListener("click", () => {
+      shell.openExternal("https://date-fns.org/v2.0.0-alpha.27/docs/parse");
+    });
+  }, 100);
 }
 
 function appendOverlay(section) {
@@ -875,9 +976,11 @@ function updateAppSettings() {
   const auto_login = byId("settings_autologin").checked;
   const launch_to_tray = byId("settings_launchtotray").checked;
   const beta_channel = byId("settings_betachannel").checked;
+  const log_locale_format = byId("settings_log_locale_format").value;
   const rSettings = {
     auto_login,
     launch_to_tray,
+    log_locale_format,
     beta_channel
   };
   ipcSend("save_app_settings", rSettings);
