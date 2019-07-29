@@ -213,6 +213,37 @@ function get_deck_colors(deck) {
   return colorIndices;
 }
 
+function prettierDeckData(deckData) {
+  // many precon descriptions are total garbage
+  // manually update them with generic descriptions
+  const prettyDescriptions = {
+    "Decks/Precon/Precon_EPP_BG_Desc": "Golgari Swarm",
+    "Decks/Precon/Precon_EPP_BR_Desc": "Cult of Rakdos",
+    "Decks/Precon/Precon_EPP_GU_Desc": "Simic Combine",
+    "Decks/Precon/Precon_EPP_GW_Desc": "Selesnya Conclave",
+    "Decks/Precon/Precon_EPP_RG_Desc": "Gruul Clans",
+    "Decks/Precon/Precon_EPP_RW_Desc": "Boros Legion",
+    "Decks/Precon/Precon_EPP_UB_Desc": "House Dimir",
+    "Decks/Precon/Precon_EPP_UR_Desc": "Izzet League",
+    "Decks/Precon/Precon_EPP_WB_Desc": "Orzhov Syndicate",
+    "Decks/Precon/Precon_EPP_WU_Desc": "Azorius Senate",
+    "Decks/Precon/Precon_July_B": "Mono Black",
+    "Decks/Precon/Precon_July_U": "Mono Blue",
+    "Decks/Precon/Precon_July_G": "Mono Green",
+    "Decks/Precon/Precon_July_R": "Mono Red",
+    "Decks/Precon/Precon_July_W": "Mono White"
+  };
+  if (deckData.description in prettyDescriptions) {
+    deckData.description = prettyDescriptions[deckData.description];
+  }
+  if (deckData.name.includes("?=?Loc")) {
+    // precon deck names are garbage address locators
+    // mask them with description instead
+    deckData.name = deckData.description || "Preconstructed Deck";
+  }
+  return deckData;
+}
+
 class PlayerData {
   constructor() {
     if (PlayerData.instance) return PlayerData.instance;
@@ -325,12 +356,15 @@ class PlayerData {
 
   deck(id) {
     if (!this.deckExists(id)) return false;
-    return {
+    const preconData = db.preconDecks[id] || {};
+    const deckData = {
+      ...preconData,
       ...this.decks[id],
       colors: get_deck_colors(this.decks[id]),
       custom: !this.static_decks.includes(id),
       tags: this.decks_tags[id] || []
     };
+    return prettierDeckData(deckData);
   }
 
   deckExists(id) {
@@ -369,7 +403,15 @@ class PlayerData {
   match(id) {
     if (!this.matchExists(id)) return false;
     const matchData = this[id];
-    const playerDeck = { ...defaultDeck, ...matchData.playerDeck };
+    let preconData = {};
+    if (matchData.playerDeck && matchData.playerDeck.id in db.preconDecks) {
+      preconData = db.preconDecks[matchData.playerDeck.id];
+    }
+    const playerDeck = prettierDeckData({
+      ...defaultDeck,
+      ...preconData,
+      ...matchData.playerDeck
+    });
     playerDeck.colors = get_deck_colors(playerDeck);
 
     const oppDeck = { ...defaultDeck, ...matchData.oppDeck };

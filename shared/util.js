@@ -1,3 +1,6 @@
+const formatDistanceStrict = require("date-fns/formatDistanceStrict");
+const { shell } = require("electron");
+
 const {
   FORMATS,
   BLACK,
@@ -14,19 +17,56 @@ const pd = require("../shared/player-data");
 const { createDiv, createSpan } = require("../shared/dom-fns");
 
 //
-exports.get_card_image = get_card_image;
-function get_card_image(cardObj) {
+exports.getCardArtCrop = getCardArtCrop;
+function getCardArtCrop(cardObj) {
   if (typeof cardObj !== "object") {
     cardObj = db.card(cardObj);
   }
 
-  if (!cardObj) {
+  try {
+    return "https://img.scryfall.com/cards" + cardObj.images.art_crop;
+  } catch (e) {
+    console.log("Cant find card art crop: ", cardObj);
     return "../images/notfound.png";
-  } else {
+  }
+}
+
+//
+exports.getCardImage = getCardImage;
+function getCardImage(cardObj) {
+  if (typeof cardObj !== "object") {
+    cardObj = db.card(cardObj);
+  }
+
+  try {
     return (
       "https://img.scryfall.com/cards" +
       cardObj.images[pd.settings.cards_quality]
     );
+  } catch (e) {
+    console.log("Cant find card image: ", cardObj);
+    return "../images/notfound.png";
+  }
+}
+
+//
+exports.openScryfallCard = openScryfallCard;
+function openScryfallCard(cardObj) {
+  if (typeof cardObj !== "object") {
+    cardObj = db.card(cardObj);
+  }
+
+  try {
+    shell.openExternal(
+      "https://scryfall.com/card/" +
+        db.sets[cardObj.set].scryfall +
+        "/" +
+        cardObj.cid +
+        "/" +
+        cardObj.name
+    );
+  } catch (e) {
+    console.log("Cant open scryfall card: ", cardObj);
   }
 }
 
@@ -175,15 +215,6 @@ function compare_archetypes(a, b) {
   if (a.average > b.average) return -1;
   if (a.average < b.average) return 1;
   return 0;
-}
-
-//
-exports.get_set_scryfall = get_set_scryfall;
-function get_set_scryfall(set) {
-  if (set == undefined) return "";
-  let s = db.sets[set].scryfall;
-  if (s == undefined) s = set;
-  return s;
 }
 
 //
@@ -570,25 +601,9 @@ function get_deck_export_txt(deck) {
 
 //
 exports.timeSince = timeSince;
-function timeSince(_date) {
-  var seconds = Math.floor((new Date() - _date) / 1000);
-
-  var interval = Math.floor(seconds / 31536000);
-  if (interval == 1) return interval + " year";
-  if (interval > 0) return interval + " years";
-  interval = Math.floor(seconds / 2592000);
-  if (interval == 1) return interval + " month";
-  if (interval > 0) return interval + " months";
-  interval = Math.floor(seconds / 86400);
-  if (interval == 1) return interval + " day";
-  if (interval > 0) return interval + " days";
-  interval = Math.floor(seconds / 3600);
-  if (interval == 1) return interval + " hour";
-  if (interval > 0) return interval + " hours";
-  interval = Math.floor(seconds / 60);
-  if (interval == 1) return interval + " minute";
-  if (interval > 0) return interval + " minutes";
-  return Math.floor(seconds) + " seconds";
+function timeSince(_date, options = { includeSeconds: true }) {
+  // https://date-fns.org/v2.0.0-alpha.27/docs/formatDistanceStrict
+  return formatDistanceStrict(_date, new Date(), options);
 }
 
 //

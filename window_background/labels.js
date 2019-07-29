@@ -38,11 +38,14 @@
     firstPass
     debugLog
 */
-const { ARENA_MODE_IDLE } = require("../shared/constants");
 const _ = require("lodash");
+const differenceInDays = require("date-fns/differenceInDays");
+
+const { ARENA_MODE_IDLE } = require("../shared/constants");
 const db = require("../shared/database");
 const CardsList = require("../shared/cards-list");
 const { get_deck_colors, objectClone, replaceAll } = require("../shared/util");
+
 const {
   httpSetMythicRank,
   httpSubmitCourse,
@@ -346,6 +349,12 @@ function onLabelInDeckGetDeckListsV3(entry, json) {
   onLabelInDeckGetDeckLists(entry, json.map(d => convert_deck_from_v3(d)));
 }
 
+function onLabelInDeckGetPreconDecks(entry, json) {
+  if (!json) return;
+  ipc_send("set_precon_decks", json);
+  // console.log(json);
+}
+
 function onLabelInEventGetPlayerCourses(entry, json) {
   if (!json) return;
 
@@ -565,21 +574,23 @@ function onLabelInPlayerInventoryGetPlayerInventory(entry, json) {
 
 function onLabelInPlayerInventoryGetPlayerCardsV3(entry, json) {
   if (!json) return;
-
-  const date = new Date(pd.cards.cards_time);
   const now = new Date();
-  const diff = Math.abs(now.getTime() - date.getTime());
-  const days = Math.floor(diff / (1000 * 3600 * 24));
 
-  let cards_before = pd.cards.cards_before;
-  // If a day has passed since last update
-  if (pd.cards.cards_time !== 0 && days > 0) {
-    cards_before = pd.cards.cards;
+  let { cards_time, cards_before } = pd.cards;
+  if (cards_time) {
+    // If a day has passed since last update
+    if (differenceInDays(now, new Date(cards_time)) > 0) {
+      cards_before = pd.cards.cards;
+      cards_time = now;
+    }
+  } else {
+    // Initialize
+    cards_time = now;
   }
 
   const cards = {
     ...pd.cards,
-    cards_time: now,
+    cards_time,
     cards_before,
     cards: json
   };
@@ -966,6 +977,7 @@ module.exports = {
   onLabelInEventGetCombinedRankInfo,
   onLabelInDeckGetDeckLists,
   onLabelInDeckGetDeckListsV3,
+  onLabelInDeckGetPreconDecks,
   onLabelInEventGetPlayerCourses,
   onLabelInEventGetPlayerCoursesV2,
   onLabelInDeckUpdateDeck,

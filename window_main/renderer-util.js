@@ -34,8 +34,9 @@ const cardTypes = require("../shared/card-types");
 const { addCardHover } = require("../shared/card-hover");
 const {
   deckTypesStats,
+  getCardArtCrop,
+  getCardImage,
   get_deck_colors,
-  get_card_image,
   get_rank_index_16,
   getReadableEvent,
   makeId,
@@ -361,7 +362,7 @@ function drawDeckVisual(container, deck, openCallback) {
           const d = createDiv(["deck_visual_card"]);
           d.style.width = sz + "px";
           const img = createImg(["deck_visual_card_img"], "", {
-            src: get_card_image(card)
+            src: getCardImage(card)
           });
           img.style.width = sz + "px";
           addCardHover(img, card);
@@ -403,7 +404,7 @@ function drawDeckVisual(container, deck, openCallback) {
             }
 
             const img = createImg(["deck_visual_card_img"], "", {
-              src: get_card_image(card)
+              src: getCardImage(card)
             });
             img.style.width = sz + "px";
             addCardHover(img, card);
@@ -545,7 +546,7 @@ function openDraft(id, draftPosition = 1) {
     d.style.width = pd.cardsSize + "px";
 
     const img = createImg(["draft_card_img"], "", {
-      src: get_card_image(card)
+      src: getCardImage(card)
     });
     img.style.width = pd.cardsSize + "px";
     if (grpId === pick && draftPosition % 2 === 0) {
@@ -687,9 +688,7 @@ function changeBackground(arg = "default", grpId = 0) {
         "url(../images/Ghitu-Lavarunner-Dominaria-MtG-Art.jpg)";
     }
   } else if (_card) {
-    // console.log(_card.images["art_crop"]);
-    mainWrapper.style.backgroundImage =
-      "url(https://img.scryfall.com/cards" + _card.images["art_crop"] + ")";
+    mainWrapper.style.backgroundImage = `url(${getCardArtCrop(_card)})`;
     try {
       artistLine = _card.name + " by " + _card.artist;
       topArtist.innerHTML = artistLine;

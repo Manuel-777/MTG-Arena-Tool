@@ -1,5 +1,4 @@
-const { DEFAULT_TILE } = require("../shared/constants");
-const db = require("../shared/database");
+const { getCardArtCrop } = require("../shared/util");
 const { createDiv } = require("../shared/dom-fns");
 
 class ListItem {
@@ -22,15 +21,10 @@ class ListItem {
     this.deleteButton.title = isArchived
       ? "restore"
       : "archive (will not delete data)";
-    let cardObj = db.card(_grpId || DEFAULT_TILE);
     this.imageContainer = createDiv(["list_item_image"]);
-    try {
-      this.imageContainer.style.backgroundImage = `url(https://img.scryfall.com/cards${
-        cardObj.images["art_crop"]
-      })`;
-    } catch (e) {
-      console.log(e, _grpId);
-    }
+    this.imageContainer.style.backgroundImage = `url(${getCardArtCrop(
+      _grpId
+    )})`;
 
     this.container.appendChild(this.imageContainer);
     this.container.appendChild(this.left);

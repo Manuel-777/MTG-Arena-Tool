@@ -1,9 +1,12 @@
 const _ = require("lodash");
-const { shell } = require("electron");
 const db = require("./database.js");
 const { createDiv } = require("../shared/dom-fns");
 const { addCardHover } = require("../shared/card-hover");
-const { get_wc_missing, get_set_scryfall } = require("../shared/util");
+const {
+  get_wc_missing,
+  getCardArtCrop,
+  openScryfallCard
+} = require("../shared/util");
 
 const { CARD_TILE_FLAT, COLORS_ALL } = require("./constants.js");
 
@@ -210,11 +213,7 @@ function drawCardTileArena(
       if (card.dfc == "SplitHalf") {
         card = db.card(card.dfcId);
       }
-      shell.openExternal(
-        `https://scryfall.com/card/${get_set_scryfall(card.set)}/${card.cid}/${
-          card.name
-        }`
-      );
+      openScryfallCard(card);
     });
   }
   cont.appendChild(glow);
@@ -284,9 +283,7 @@ function drawCardTileFlat(
     if (card.type == "Special") {
       cardTile.style.backgroundImage = `url(${card.images["art_crop"]})`;
     } else {
-      cardTile.style.backgroundImage = `url(https://img.scryfall.com/cards${
-        card.images["art_crop"]
-      })`;
+      cardTile.style.backgroundImage = `url(${getCardArtCrop(card)})`;
     }
   } catch (e) {
     console.log(e);
@@ -343,11 +340,7 @@ function drawCardTileFlat(
       if (card.dfc == "SplitHalf") {
         card = db.card(card.dfcId);
       }
-      shell.openExternal(
-        `https://scryfall.com/card/${get_set_scryfall(card.set)}/${card.cid}/${
-          card.name
-        }`
-      );
+      openScryfallCard(card);
     });
   }
 

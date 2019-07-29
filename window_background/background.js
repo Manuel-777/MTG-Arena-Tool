@@ -1,5 +1,6 @@
 const electron = require("electron");
 const { remote, ipcRenderer: ipc } = require("electron");
+const format = require("date-fns/format");
 
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");
@@ -55,6 +56,7 @@ const {
   onLabelInEventGetCombinedRankInfo,
   onLabelInDeckGetDeckLists,
   onLabelInDeckGetDeckListsV3,
+  onLabelInDeckGetPreconDecks,
   onLabelInEventGetPlayerCourses,
   onLabelInEventGetPlayerCoursesV2,
   onLabelInDeckUpdateDeck,
@@ -786,6 +788,13 @@ function onLogEntryFound(entry) {
             }
             break;
 
+          case "Deck.GetPreconDecks":
+            if (entry.arrow == "<==") {
+              json = entry.json();
+              onLabelInDeckGetPreconDecks(entry, json);
+            }
+            break;
+
           case "Deck.UpdateDeck":
             if (entry.arrow == "<==") {
               json = entry.json();
@@ -1150,15 +1159,12 @@ function actionLog(seat, time, str, grpId = 0) {
   if (seat == -99) {
     currentActionLog = "version: 1\r\n";
   } else {
-    var hh = ("0" + time.getHours()).slice(-2);
-    var mm = ("0" + time.getMinutes()).slice(-2);
-    var ss = ("0" + time.getSeconds()).slice(-2);
     /*
     str = str.replace(/(<([^>]+)>)/gi, "");
     */
 
     currentActionLog += `${seat}\r\n`;
-    currentActionLog += `${hh}:${mm}:${ss}\r\n`;
+    currentActionLog += `${format(time, "HH:mm:ss")}\r\n`;
     currentActionLog += `${str}\r\n`;
 
     try {

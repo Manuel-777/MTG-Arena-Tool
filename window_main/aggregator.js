@@ -1,3 +1,10 @@
+const compareDesc = require("date-fns/compareDesc");
+const isAfter = require("date-fns/isAfter");
+const isEqual = require("date-fns/isEqual");
+const max = require("date-fns/max");
+const startOfDay = require("date-fns/startOfDay");
+const subDays = require("date-fns/subDays");
+
 const {
   COLORS_ALL,
   COLORS_BRIEF,
@@ -36,6 +43,8 @@ const SINGLE_MATCH_EVENTS = [
 const CONSTRUCTED_EVENTS = ["Ladder", "Traditional_Ladder"];
 // Archetype constants
 const NO_ARCH = "No Archetype";
+
+const dateMax = (a, b) => (a && b ? max([a, b]) : a || b);
 
 class Aggregator {
   constructor(filters) {
@@ -121,24 +130,18 @@ class Aggregator {
     const { date } = this.filters;
     let dateFilter = null;
     const now = new Date();
-    if (date === DATE_SEASON) {
+    if (date === DATE_ALL_TIME) {
+      return true;
+    } else if (date === DATE_SEASON) {
       dateFilter = db.season_starts;
     } else if (date === DATE_LAST_30) {
-      const then = new Date();
-      then.setDate(now.getDate() - 30);
-      dateFilter = then.toISOString();
+      dateFilter = startOfDay(subDays(now, 30));
     } else if (date === DATE_LAST_DAY) {
-      const then = new Date();
-      then.setDate(now.getDate() - 1);
-      dateFilter = then.toISOString();
+      dateFilter = subDays(now, 1);
     } else {
-      dateFilter = date;
+      dateFilter = new Date(date);
     }
-    return (
-      date === DATE_ALL_TIME ||
-      dateFilter === null ||
-      new Date(_date) >= new Date(dateFilter)
-    );
+    return isAfter(new Date(_date), dateFilter);
   }
 
   _filterDeckByColors(deck, _colors) {
@@ -312,13 +315,11 @@ class Aggregator {
     }
     // process event data
     if (match.eventId) {
-      let eventIsMoreRecent = true;
-      if (match.eventId in this.eventLastPlayed) {
-        eventIsMoreRecent = match.date > this.eventLastPlayed[match.eventId];
-      }
-      if (eventIsMoreRecent) {
-        this.eventLastPlayed[match.eventId] = match.date;
-      }
+      this.eventLastPlayed[match.eventId] = dateMax(
+        new Date(match.date),
+        this.eventLastPlayed[match.eventId]
+      );
+
       // process rank data
       if (match.player && match.player.rank) {
         const rank = match.player.rank.toLowerCase();
@@ -344,14 +345,11 @@ class Aggregator {
     // process deck data
     if (match.playerDeck && match.playerDeck.id) {
       const id = match.playerDeck.id;
-      let deckIsMoreRecent = true;
-      if (id in this.deckLastPlayed) {
-        deckIsMoreRecent = match.date > this.deckLastPlayed[id];
-      }
-      if (deckIsMoreRecent) {
-        this.deckMap[id] = match.playerDeck;
-        this.deckLastPlayed[id] = match.date;
-      }
+      this.deckMap[id] = match.playerDeck;
+      this.deckLastPlayed[id] = dateMax(
+        new Date(match.date),
+        this.deckLastPlayed[id]
+      );
       if (pd.deckExists(id)) {
         const currentDeck = pd.deck(match.playerDeck.id);
         if (!(id in this.deckStats)) {
@@ -361,7 +359,10 @@ class Aggregator {
         if (!(id in this.deckRecentStats)) {
           this.deckRecentStats[id] = Aggregator.getDefaultStats();
         }
-        if (currentDeck.lastUpdated && match.date > currentDeck.lastUpdated) {
+        if (
+          currentDeck.lastUpdated &&
+          isAfter(new Date(match.date), new Date(currentDeck.lastUpdated))
+        ) {
           statsToUpdate.push(this.deckRecentStats[id]);
         }
       }
@@ -417,21 +418,14 @@ class Aggregator {
   }
 
   compareDecks(a, b) {
-    const dateMax = (a, b) => (a > b ? a : b);
-    const aDate = dateMax(this.deckLastPlayed[a.id], a.lastUpdated);
-    const bDate = dateMax(this.deckLastPlayed[b.id], b.lastUpdated);
-    if (aDate && bDate && aDate !== bDate) {
-      return new Date(bDate) - new Date(aDate);
+    const aDate = dateMax(this.deckLastPlayed[a.id], new Date(a.lastUpdated));
+    const bDate = dateMax(this.deckLastPlayed[b.id], new Date(b.lastUpdated));
+    if (aDate && bDate && !isEqual(aDate, bDate)) {
+      return compareDesc(aDate, bDate);
     }
     const aName = getRecentDeckName(a.id);
     const bName = getRecentDeckName(b.id);
-    if (aName) {
-      return aName.localeCompare(bName);
-    }
-    // a is invalid, sort b first
-    if (bName) return 1;
-    // neither valid, leave in place
-    return 0;
+    return aName.localeCompare(bName);
   }
 
   compareDecksByWins(a, b) {
@@ -479,18 +473,12 @@ class Aggregator {
   compareEvents(a, b) {
     const aDate = this.eventLastPlayed[a];
     const bDate = this.eventLastPlayed[b];
-    if (aDate && bDate && aDate !== bDate) {
-      return new Date(bDate) - new Date(aDate);
+    if (aDate && bDate && !isEqual(aDate, bDate)) {
+      return compareDesc(aDate, bDate);
     }
     const aName = getReadableEvent(a);
     const bName = getReadableEvent(b);
-    if (aName) {
-      return aName.localeCompare(bName);
-    }
-    // a is invalid, sort b first
-    if (bName) return 1;
-    // neither valid, leave in place
-    return 0;
+    return aName.localeCompare(bName);
   }
 
   get matches() {

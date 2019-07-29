@@ -33,7 +33,7 @@ const {
 const deckDrawer = require("../shared/deck-drawer");
 const { showWhatsNew } = require("./whats-new");
 const { createSelect } = require("../shared/select");
-const { get_card_image } = require("../shared/util");
+const { getCardImage } = require("../shared/util");
 const byId = id => document.getElementById(id);
 
 const parse = require("date-fns/parse");
@@ -831,7 +831,7 @@ function appendVisual(section) {
   const img = createImg(["inventory_card_settings_img"]);
   img.style.width = pd.cardsSize + "px";
   const card = db.card(67518);
-  img.src = get_card_image(card);
+  img.src = getCardImage(card);
   d.appendChild(img);
   label.appendChild(d);
   section.appendChild(label);

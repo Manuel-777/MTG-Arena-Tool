@@ -1,7 +1,7 @@
 const db = require("../shared/database");
 const pd = require("../shared/player-data");
 const { createDiv, queryElements: $$ } = require("../shared/dom-fns");
-const { get_card_image } = require("../shared/util");
+const { getCardImage } = require("../shared/util");
 
 let renderer = 0;
 
@@ -27,7 +27,7 @@ function addCardHover(element, card) {
       });
 
       var dfcCard = db.card(card.dfcId);
-      var dfcCardImage = get_card_image(dfcCard);
+      var dfcCardImage = getCardImage(dfcCard);
 
       var dfcImageElement = $$(".main_hover_dfc")[0];
       dfcImageElement.src = dfcCardImage;
@@ -39,7 +39,7 @@ function addCardHover(element, card) {
     }
 
     var mainImageElement = $$(".main_hover")[0];
-    mainImageElement.src = get_card_image(card);
+    mainImageElement.src = getCardImage(card);
     mainImageElement.addEventListener("load", () => {
       $$(".loader").forEach(el => (el.style.opacity = 0));
     });
@@ -76,17 +76,17 @@ function attachOwnerhipStars(card, starContainer) {
   starContainer.style.opacity = 1;
 
   const owned = pd.cards.cards[card.id];
-  const aquired = pd.cardsNew[card.id];
-  starContainer.title = `${owned}/4 copies in collection`;
-  if (aquired) {
-    starContainer.title += ` (${aquired} recent)`;
+  const acquired = pd.cardsNew[card.id];
+  starContainer.title = `${owned || 0}/4 copies in collection`;
+  if (acquired) {
+    starContainer.title += ` (${acquired} recent)`;
   }
 
   for (let i = 0; i < 4; i++) {
     let color = "gray";
 
     if (i < owned) color = "green";
-    if (aquired && i >= owned - aquired && i < owned) color = "orange";
+    if (acquired && i >= owned - acquired && i < owned) color = "orange";
 
     starContainer.appendChild(createDiv([`inventory_card_quantity_${color}`]));
   }

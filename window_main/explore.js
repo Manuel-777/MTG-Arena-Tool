@@ -14,8 +14,7 @@ const db = require("../shared/database");
 const { queryElements: $$, createDiv } = require("../shared/dom-fns");
 const { createSelect } = require("../shared/select");
 const {
-  getReadableEvent,
-  timeSince,
+  getCardArtCrop,
   get_rank_index_16,
   removeDuplicates,
   compare_cards,
@@ -495,7 +494,7 @@ function queryExplore() {
 }
 
 function setExploreDecks(data) {
-  if (!queryInFlight) return;
+  if (!queryInFlight || !data || !data.result) return;
 
   const exploreList = document.getElementById("explore_list");
   const loadMessage = document.getElementById("explore_load_message");
@@ -589,10 +588,7 @@ function deckLoad(_deck, index) {
   }
 
   var tile = createDiv([index + "t", "deck_tile"]);
-  tile.style.backgroundImage =
-    "url(https://img.scryfall.com/cards" +
-    db.card(tileGrpid).images["art_crop"] +
-    ")";
+  tile.style.backgroundImage = `url(${getCardArtCrop(tileGrpid)})`;
 
   var div = createDiv([index, "list_deck"]);
 

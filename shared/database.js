@@ -11,14 +11,17 @@ class Database {
     this.handleSetDb = this.handleSetDb.bind(this);
     this.handleSetRewardResets = this.handleSetRewardResets.bind(this);
     this.handleSetSeason = this.handleSetSeason.bind(this);
+    this.handleSetPreconDecks = this.handleSetPreconDecks.bind(this);
     if (ipc) ipc.on("set_active_events", this.handleSetActiveEvents);
     if (ipc) ipc.on("set_db", this.handleSetDb);
     if (ipc) ipc.on("set_reward_resets", this.handleSetRewardResets);
     if (ipc) ipc.on("set_season", this.handleSetSeason);
+    if (ipc) ipc.on("set_precon_decks", this.handleSetPreconDecks);
 
     this.rewards_daily_ends = new Date();
     this.rewards_weekly_ends = new Date();
     this.activeEvents = [];
+    this.preconDecks = [];
 
     const dbUri = `${__dirname}/../resources/database.json`;
     const defaultDb = fs.readFileSync(dbUri, "utf8");
@@ -55,6 +58,18 @@ class Database {
       this.season = arg;
     } catch (e) {
       console.log("Error parsing metadata", e);
+    }
+  }
+
+  handleSetPreconDecks(_event, arg) {
+    if (!arg || !arg.length) return;
+    try {
+      this.preconDecks = {};
+      arg.forEach(deck => (this.preconDecks[deck.id] = deck));
+      // console.log(this.preconDecks);
+    } catch (e) {
+      console.log("Error parsing JSON:", arg);
+      return false;
     }
   }
 
