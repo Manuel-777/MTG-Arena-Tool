@@ -1,7 +1,6 @@
 const anime = require("animejs");
 
 const { queryElements: $$, createDiv } = require("../shared/dom-fns");
-const { createSelect } = require("../shared/select");
 const deckDrawer = require("../shared/deck-drawer");
 const { EASING_DEFAULT } = require("../shared/constants.js");
 const {
@@ -18,7 +17,7 @@ const {
 const pd = require("../shared/player-data");
 
 const Aggregator = require("./aggregator");
-const FilterPanel = require("./filter-panel");
+const { renderDeckFilter } = require("./filters");
 const {
   pop,
   changeBackground,
@@ -203,21 +202,15 @@ function showTournamentRegister(mainDiv, tou) {
     // filter to current decks in Arena with no missing cards
     const validDecks = pd.deckList
       .filter(deck => !deck.custom)
-      .filter(deck => getBoosterCountEstimate(get_deck_missing(deck)) === 0);
+      .filter(deck => !Object.values(get_deck_missing(deck)).some(x => x));
 
     validDecks.sort(new Aggregator({ onlyCurrentDecks: true }).compareDecks);
-    // hack to make pretty deck names
-    // TODO move getDeckString out of FilterPanel
-    const filterPanel = new FilterPanel("unused", null, {}, [], [], validDecks);
-    const deckSelect = createSelect(
-      deckSelectContainer,
-      validDecks.map(deck => deck.id),
+    const deckSelect = renderDeckFilter(
       -1,
+      validDecks,
       selectTourneyDeck,
-      "tou_deck_select",
-      filterPanel.getDeckString
+      deckSelectContainer
     );
-
     deckSelect.style.width = "300px";
     deckSelect.style.margin = "16px auto";
     mainDiv.appendChild(deckSelect);
