@@ -303,10 +303,6 @@ class PlayerData {
     return this.matches_index.filter(this.matchExists).map(this.match);
   }
 
-  get history() {
-    return [...this.matchList, ...this.draftList];
-  }
-
   get data() {
     const data = {};
     const blacklistKeys = [

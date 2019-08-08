@@ -22,11 +22,12 @@ const {
   DATE_SEASON,
   EASING_DEFAULT,
   HIDDEN_PW,
+  HISTORY_EVENTS,
+  HISTORY_METAGAME,
   MAIN_LOGIN,
   MAIN_HOME,
   MAIN_DECKS,
   MAIN_HISTORY,
-  MAIN_EVENTS,
   MAIN_EXPLORE,
   MAIN_ECONOMY,
   MAIN_COLLECTION,
@@ -67,7 +68,6 @@ const { tournamentOpen } = require("./tournaments");
 const { openDecksTab } = require("./decks");
 const { openDeck } = require("./deck-details");
 const { openHistoryTab } = require("./history");
-const { openEventsTab } = require("./events");
 const { openEconomyTab } = require("./economy");
 const { openExploreTab, setExploreDecks } = require("./explore");
 const { openCollectionTab } = require("./collection");
@@ -368,7 +368,13 @@ function rememberMe() {
 }
 
 //
-function openTab(tab, filters = {}, dataIndex = 0, scrollTop = 0) {
+function openTab(
+  tab,
+  filters = {},
+  dataIndex = 0,
+  scrollTop = 0,
+  section = -1
+) {
   showLoadingBars();
   $$(".top_nav_item").forEach(el => el.classList.remove("item_selected"));
   let tabClass = "it" + tab;
@@ -378,10 +384,11 @@ function openTab(tab, filters = {}, dataIndex = 0, scrollTop = 0) {
       openDecksTab(filters, scrollTop);
       break;
     case 1:
-      openHistoryTab(filters, dataIndex, scrollTop);
+      openHistoryTab(filters, dataIndex, scrollTop, section);
       break;
     case 2:
-      openEventsTab(filters, dataIndex, scrollTop);
+      // Used to be events tab before combined with History
+      openHistoryTab(filters, dataIndex, scrollTop, HISTORY_EVENTS);
       break;
     case 3:
       if (pd.offline) {
@@ -647,7 +654,8 @@ ready(function() {
         } else if (classList.includes("it1")) {
           sidebarActive = MAIN_HISTORY;
         } else if (classList.includes("it2")) {
-          sidebarActive = MAIN_EVENTS;
+          // Deprecated Events tab, just redirect to history
+          sidebarActive = MAIN_HISTORY;
         } else if (classList.includes("it3")) {
           sidebarActive = MAIN_EXPLORE;
         } else if (classList.includes("it4")) {

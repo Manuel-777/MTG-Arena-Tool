@@ -31,7 +31,6 @@ const RANKED_CONST = "Ranked Constructed";
 const RANKED_DRAFT = "Ranked Limited (Current)";
 // Draft-related constants
 const ALL_DRAFTS = "All Drafts";
-const DRAFT_REPLAYS = "Draft Replays";
 // Event-related constant
 const ALL_EVENT_TRACKS = "All Event Tracks";
 const SINGLE_MATCH_EVENTS = [
@@ -221,8 +220,7 @@ class Aggregator {
 
     const passesEventFilter =
       this.filterEvent(match.eventId) ||
-      (eventId === ALL_DRAFTS && Aggregator.isDraftMatch(match)) ||
-      (eventId === DRAFT_REPLAYS && match.type === "draft");
+      (eventId === ALL_DRAFTS && Aggregator.isDraftMatch(match));
     if (!passesEventFilter) return false;
 
     const passesPlayerDeckFilter = this.filterDeck(match.playerDeck);
@@ -274,7 +272,7 @@ class Aggregator {
     this.constructedStats = {};
     this.limitedStats = {};
 
-    this._matches = pd.history.filter(this.filterMatch);
+    this._matches = pd.matchList.filter(this.filterMatch);
     this._matches.forEach(this._processMatch);
 
     [
@@ -493,7 +491,6 @@ class Aggregator {
       RANKED_CONST,
       RANKED_DRAFT,
       ALL_DRAFTS,
-      DRAFT_REPLAYS,
       ...this._eventIds
     ];
   }
@@ -524,7 +521,6 @@ Aggregator.DEFAULT_ARCH = DEFAULT_ARCH;
 Aggregator.RANKED_CONST = RANKED_CONST;
 Aggregator.RANKED_DRAFT = RANKED_DRAFT;
 Aggregator.ALL_DRAFTS = ALL_DRAFTS;
-Aggregator.DRAFT_REPLAYS = DRAFT_REPLAYS;
 Aggregator.ALL_EVENT_TRACKS = ALL_EVENT_TRACKS;
 Aggregator.NO_ARCH = NO_ARCH;
 
