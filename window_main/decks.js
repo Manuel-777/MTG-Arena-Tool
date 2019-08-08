@@ -3,34 +3,49 @@ const anime = require("animejs");
 
 const { MANA, CARD_RARITIES, EASING_DEFAULT } = require("../shared/constants");
 const pd = require("../shared/player-data");
-const { createDiv, createInput } = require("../shared/dom-fns");
+const {
+  createDiv,
+  createInput,
+  createLabel,
+  queryElements: $$
+} = require("../shared/dom-fns");
+const { createSelect } = require("../shared/select");
 const {
   get_deck_missing,
   getBoosterCountEstimate,
+  getReadableEvent,
   getReadableFormat
 } = require("../shared/util");
 
 const Aggregator = require("./aggregator");
-const FilterPanel = require("./filter-panel");
 const ListItem = require("./list-item");
-const StatsPanel = require("./stats-panel");
 const { openDeck } = require("./deck-details");
 const {
   formatPercent,
-  getLocalState,
   getTagColor,
   getWinrateClass,
   hideLoadingBars,
   ipcSend,
-  makeResizable,
   resetMainContainer,
   setLocalState,
   showColorpicker
 } = require("./renderer-util");
+const {
+  getTagString,
+  renderDateFilter,
+  renderManaFilter,
+  renderSortOption
+} = require("./filters");
 
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
 const tagPrompt = "Add";
+
+const DECKS_ACTIVE = 1;
+const DECKS_CUSTOM = 2;
+const DECKS_WANTED = 3;
+const DECKS_ARCHIVED = 4;
+let lastOpenSection = DECKS_ACTIVE;
 
 function setFilters(selected = {}) {
   if (selected.eventId || selected.date) {
@@ -50,63 +65,117 @@ function setFilters(selected = {}) {
 }
 
 //
-function openDecksTab(_filters = {}, scrollTop = 0) {
+function openDecksTab(
+  _filters = {},
+  scrollTop = 0,
+  openSection = lastOpenSection
+) {
+  if (openSection !== -1) {
+    lastOpenSection = openSection;
+  } else {
+    openSection = lastOpenSection;
+  }
+  if (openSection === DECKS_ARCHIVED) {
+    _filters.showArchived = true;
+  }
+  if (openSection !== DECKS_ACTIVE) {
+    _filters.sort = "By Date";
+  }
+  setFilters(_filters);
+  const aggregator = new Aggregator(filters);
+
   hideLoadingBars();
   const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
-  setFilters(_filters);
 
-  const wrap_r = createDiv(["wrapper_column", "sidebar_column_l"]);
-  wrap_r.style.width = pd.settings.right_panel_width + "px";
-  wrap_r.style.flex = `0 0 ${pd.settings.right_panel_width}px`;
-  const aggregator = new Aggregator(filters);
-  const statsPanel = new StatsPanel(
-    "decks_top",
-    aggregator,
-    pd.settings.right_panel_width,
-    true
+  const navCol = createDiv(["wrapper_column", "sidebar_column_r"]);
+  navCol.appendChild(createDiv(["list_fill"]));
+
+  // Primary section nav
+  navCol.appendChild(
+    createDiv(["settings_nav", "sn" + DECKS_ACTIVE], "Active", {
+      title: "Complete decks currently in Arena"
+    })
   );
-  const decks_top_winrate = statsPanel.render();
-  decks_top_winrate.style.display = "flex";
-  decks_top_winrate.style.flexDirection = "column";
-  decks_top_winrate.style.marginTop = "16px";
-  decks_top_winrate.style.padding = "12px";
+  navCol.appendChild(
+    createDiv(["settings_nav", "sn" + DECKS_CUSTOM], "Saved", {
+      title: "Complete decks in mtg arena tool"
+    })
+  );
+  navCol.appendChild(
+    createDiv(["settings_nav", "sn" + DECKS_WANTED], "Wanted", {
+      title: "Incomplete decks in Arena or mtg arena tool"
+    })
+  );
+  navCol.appendChild(
+    createDiv(["settings_nav", "sn" + DECKS_ARCHIVED], "Archived", {
+      title: "Archived decks in mtg arena tool"
+    })
+  );
+  navCol.appendChild(createDiv(["list_fill"]));
+  navCol.appendChild(createDiv(["list_fill"]));
 
-  const drag = createDiv(["dragger"]);
-  wrap_r.appendChild(drag);
-  makeResizable(drag, statsPanel.handleResize);
+  const updateFilterHandler = key => {
+    return value => openDecksTab({ [key]: value });
+  };
 
-  wrap_r.appendChild(decks_top_winrate);
+  // Common Filters
+  navCol.appendChild(createLabel(["filter_label"], "Filters:"));
+  renderManaFilter(filters.colors, updateFilterHandler("colors"), navCol);
+  createSelect(
+    navCol,
+    Aggregator.gatherTags(Object.values(pd.decks)),
+    filters.tag,
+    updateFilterHandler("tag"),
+    "select_filter",
+    getTagString
+  );
+  navCol.appendChild(createDiv(["list_fill"]));
 
-  const wrap_l = createDiv(["wrapper_column"]);
-  wrap_l.setAttribute("id", "decks_column");
+  // Data filters (only for active decks)
+  if (openSection === DECKS_ACTIVE) {
+    renderSortOption(filters.sort, updateFilterHandler("sort"), navCol);
+    navCol.appendChild(createDiv(["list_fill"]));
+    navCol.appendChild(createLabel(["filter_label"], "Winrate Data:"));
+    renderDateFilter(filters.date, updateFilterHandler("date"), navCol);
+    createSelect(
+      navCol,
+      new Aggregator({ date: filters.date }).events,
+      filters.eventId,
+      updateFilterHandler("eventId"),
+      "select_filter",
+      getReadableEvent
+    );
+  }
+
+  mainDiv.appendChild(navCol);
+
+  // Nav Event Handlers
+  $$(".sn" + openSection)[0].classList.add("nav_selected");
+  $$(".settings_nav").forEach(el =>
+    el.addEventListener("click", function() {
+      const classList = [...this.classList];
+      if (classList.includes("nav_selected")) return;
+
+      if (classList.includes("sn1")) {
+        openDecksTab({}, 0, 1);
+      } else if (classList.includes("sn2")) {
+        openDecksTab({}, 0, 2);
+      } else if (classList.includes("sn3")) {
+        openDecksTab({}, 0, 3);
+      } else if (classList.includes("sn4")) {
+        openDecksTab({}, 0, 4);
+      }
+    })
+  );
+
+  const mainCol = createDiv(["wrapper_column"]);
+  mainCol.setAttribute("id", "decks_column");
 
   const d = createDiv(["list_fill"]);
-  wrap_l.appendChild(d);
+  mainCol.appendChild(d);
 
-  mainDiv.appendChild(wrap_l);
-  mainDiv.appendChild(wrap_r);
-
-  // Tags and filters
-  const decksTop = createDiv(["decks_top"]);
-
-  const tags = Aggregator.gatherTags(Object.values(pd.decks));
-  const filterPanel = new FilterPanel(
-    "decks_top",
-    selected => openDecksTab(selected),
-    filters,
-    new Aggregator({ date: filters.date }).events,
-    tags,
-    [],
-    true,
-    [],
-    false,
-    null,
-    true,
-    true
-  );
-  decksTop.appendChild(filterPanel.render());
-  wrap_l.appendChild(decksTop);
+  mainDiv.appendChild(mainCol);
 
   const decks = [...pd.deckList];
   if (filters.sort === "By Winrate") {
@@ -117,7 +186,22 @@ function openDecksTab(_filters = {}, scrollTop = 0) {
     decks.sort(aggregator.compareDecks);
   }
 
+  const filterDeckBySection = deck => {
+    const needsCards = Object.values(get_deck_missing(deck)).some(x => x);
+    if (openSection === DECKS_ACTIVE) {
+      return !deck.custom && !needsCards;
+    } else if (openSection === DECKS_CUSTOM) {
+      return !deck.archived && deck.custom && !needsCards;
+    } else if (openSection === DECKS_WANTED) {
+      return !deck.archived && needsCards;
+    } else if (openSection === DECKS_ARCHIVED) {
+      return deck.archived;
+    }
+    return true;
+  };
+
   const isDeckVisible = deck =>
+    filterDeckBySection(deck) &&
     aggregator.filterDeck(deck) &&
     (filters.eventId === Aggregator.DEFAULT_EVENT ||
       aggregator.deckLastPlayed[deck.id]);
@@ -240,14 +324,14 @@ function openDecksTab(_filters = {}, scrollTop = 0) {
       listItem.rightBottom.appendChild(deckWinrateLastDiv);
     }
 
-    wrap_l.appendChild(listItem.container);
+    mainCol.appendChild(listItem.container);
   });
 
-  wrap_l.addEventListener("scroll", function() {
-    setLocalState({ lastScrollTop: wrap_l.scrollTop });
+  mainCol.addEventListener("scroll", function() {
+    setLocalState({ lastScrollTop: mainCol.scrollTop });
   });
   if (scrollTop) {
-    wrap_l.scrollTop = scrollTop;
+    mainCol.scrollTop = scrollTop;
   }
 }
 
