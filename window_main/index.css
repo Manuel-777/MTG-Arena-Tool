@@ -2385,6 +2385,15 @@ a:hover {
     margin: 0 8px 0 8px;
 }
 
+.select_container.select_filter {
+    width: 200px;
+    margin: 8px;
+}
+
+.filter_label {
+    margin: 8px;
+}
+
 .select_button {
     color: var(--color-light);
     overflow: hidden;
