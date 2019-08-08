@@ -726,6 +726,11 @@ exports.SETTINGS_PRIVACY = 5;
 exports.SETTINGS_ABOUT = 6;
 exports.SETTINGS_LOGIN = 7;
 
+exports.HISTORY_MATCHES = 1;
+exports.HISTORY_EVENTS = 2;
+exports.HISTORY_DRAFTS = 3;
+exports.HISTORY_METAGAME = 4;
+
 // Date constants
 exports.DATE_LAST_DAY = "Last 24 Hours";
 exports.DATE_LAST_30 = "Last 30 Days";
