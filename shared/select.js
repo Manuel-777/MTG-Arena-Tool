@@ -14,7 +14,6 @@ function createSelect(
   optionFormatter
 ) {
   let selectContainer = createDiv(["select_container", divClass]);
-  selectContainer.id = divClass;
   if (!options.includes(current)) current = options[0];
   selectContainer.value = current;
   let currentDisplay = current;

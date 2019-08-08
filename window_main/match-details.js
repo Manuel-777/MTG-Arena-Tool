@@ -401,7 +401,7 @@ function logShareLink(id) {
   const actionLogFile = path.join(actionLogDir, id + ".txt");
   let log = fs.readFileSync(actionLogFile).toString("base64");
 
-  const shareExpire = byId("expire_select").value;
+  const shareExpire = $$(".expire_select")[0].value;
   let expire = 0;
   switch (shareExpire) {
     case "One day":
