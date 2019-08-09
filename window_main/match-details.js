@@ -17,6 +17,7 @@ const deckDrawer = require("../shared/deck-drawer");
 const {
   get_deck_export,
   get_deck_export_txt,
+  get_deck_missing,
   get_rank_index,
   makeId
 } = require("../shared/util");
@@ -480,9 +481,10 @@ function renderSeat(
 
   const id = sha1(matchId + "-" + player.id);
   if (!id || !pd.deckExists(id)) {
+    const needsCards = Object.values(get_deck_missing(deck)).some(x => x);
     const importDeck = createDiv(
       ["button_simple", "centered"],
-      "Add to My Decks"
+      "Add to " + (needsCards ? "Wanted" : "Saved") + " Decks"
     );
     importDeck.addEventListener("click", function() {
       ipcSend(

@@ -128,12 +128,12 @@ function deckStatsSection(deck) {
   stats.appendChild(visualView);
 
   const missingWildcards = get_deck_missing(deck);
-  const needsCards = Object.values(get_deck_missing(deck)).some(x => x);
+  const needsCards = Object.values(missingWildcards).some(x => x);
   const id = deck.id || deck._id;
   if (!id || !pd.deckExists(id)) {
     const importDeck = createDiv(
       ["button_simple", "centered"],
-      "Add to " + (needsCards ? "Wanted" : "Saved")
+      "Add to " + (needsCards ? "Wanted" : "Saved") + " Decks"
     );
     importDeck.addEventListener("click", function() {
       ipcSend(
