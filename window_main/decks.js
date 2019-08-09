@@ -22,6 +22,7 @@ const ListItem = require("./list-item");
 const { openDeck } = require("./deck-details");
 const {
   formatPercent,
+  getLocalState,
   getTagColor,
   getWinrateClass,
   hideLoadingBars,
@@ -36,6 +37,7 @@ const {
   renderManaFilter,
   renderSortOption
 } = require("./filters");
+const { renderExploreFilters, renderExploreDecks } = require("./explore");
 
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
@@ -43,6 +45,7 @@ const tagPrompt = "Add";
 
 const DECKS_ACTIVE = 1;
 const DECKS_CUSTOM = 2;
+const DECKS_EXPLORE = 5;
 const DECKS_WANTED = 3;
 const DECKS_ARCHIVED = 4;
 let lastOpenSection = DECKS_ACTIVE;
@@ -102,6 +105,13 @@ function openDecksTab(
       title: "Complete decks in mtg arena tool"
     })
   );
+  if (!pd.offline) {
+    navCol.appendChild(
+      createDiv(["settings_nav", "sn" + DECKS_EXPLORE], "Explore", {
+        title: "Discover decks played by others (requires account)"
+      })
+    );
+  }
   navCol.appendChild(
     createDiv(["settings_nav", "sn" + DECKS_WANTED], "Wanted", {
       title: "Incomplete decks in Arena or mtg arena tool"
@@ -119,17 +129,23 @@ function openDecksTab(
     return value => openDecksTab({ [key]: value });
   };
 
-  // Common Filters
+  // Filters
   navCol.appendChild(createLabel(["filter_label"], "Filters:"));
-  renderManaFilter(filters.colors, updateFilterHandler("colors"), navCol);
-  createSelect(
-    navCol,
-    Aggregator.gatherTags(Object.values(pd.decks)),
-    filters.tag,
-    updateFilterHandler("tag"),
-    "select_filter",
-    getTagString
-  );
+
+  if (openSection !== DECKS_EXPLORE) {
+    renderManaFilter(filters.colors, updateFilterHandler("colors"), navCol);
+    createSelect(
+      navCol,
+      Aggregator.gatherTags(Object.values(pd.decks)),
+      filters.tag,
+      updateFilterHandler("tag"),
+      "select_filter",
+      getTagString
+    );
+  } else {
+    const ls = getLocalState();
+    renderExploreFilters(navCol, () => openDecksTab({}, ls.lastScrollTop));
+  }
   navCol.appendChild(createDiv(["list_fill"]));
 
   // Data filters (only for active decks)
@@ -165,6 +181,8 @@ function openDecksTab(
         openDecksTab({}, 0, 3);
       } else if (classList.includes("sn4")) {
         openDecksTab({}, 0, 4);
+      } else if (classList.includes("sn5")) {
+        openDecksTab({}, 0, 5);
       }
     })
   );
@@ -176,6 +194,11 @@ function openDecksTab(
   mainCol.appendChild(d);
 
   mainDiv.appendChild(mainCol);
+
+  if (openSection === DECKS_EXPLORE) {
+    renderExploreDecks(mainCol);
+    return;
+  }
 
   const decks = [...pd.deckList];
   if (filters.sort === "By Winrate") {

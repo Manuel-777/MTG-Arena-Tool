@@ -11,7 +11,11 @@ const {
   EASING_DEFAULT
 } = require("../shared/constants");
 const db = require("../shared/database");
-const { queryElements: $$, createDiv } = require("../shared/dom-fns");
+const {
+  queryElements: $$,
+  createDiv,
+  createLabel
+} = require("../shared/dom-fns");
 const { createSelect } = require("../shared/select");
 const {
   getCardArtCrop,
@@ -25,13 +29,12 @@ const {
   addCheckbox,
   getLocalState,
   getWinrateClass,
-  hideLoadingBars,
   ipcSend,
-  resetMainContainer,
   setLocalState,
   showLoadingBars
 } = require("./renderer-util");
 const { openDeck } = require("./deck-details");
+const byId = id => document.getElementById(id);
 
 // default values for cached local state
 const defaultData = {
@@ -60,57 +63,16 @@ let inputMana = defaultData.filteredMana;
 let inputRanks = defaultData.filteredranks;
 let queryInFlight = false; // semaphore to limit simultaneous queries
 
-//
-function openExploreTab() {
-  hideLoadingBars();
+function renderExploreDecks(container) {
   queryInFlight = false;
   let { exploreData } = getLocalState();
   if (!exploreData) {
     exploreData = { ...defaultData };
     setLocalState({ exploreData });
   }
-
-  const mainDiv = resetMainContainer();
-  let d;
-
-  let divFill = document.createElement("div");
-  divFill.classList.add("list_fill");
-  mainDiv.appendChild(divFill);
-
-  let exploreFiltersContainer = createDiv(["explore_buttons_container"]);
-  let exploreFiltersSelects = createDiv([
-    "explore_buttons_row",
-    "explore_buttons_top"
-  ]);
-  let exploreFiltersButtons = createDiv([
-    "explore_buttons_row",
-    "explore_buttons_middle"
-  ]);
-  let exploreFiltersInputs = createDiv([
-    "explore_buttons_row",
-    "explore_buttons_bottom"
-  ]);
-  exploreFiltersContainer.appendChild(exploreFiltersSelects);
-  exploreFiltersContainer.appendChild(exploreFiltersButtons);
-  exploreFiltersContainer.appendChild(exploreFiltersInputs);
-  mainDiv.appendChild(exploreFiltersContainer);
-
   let exploreList = createDiv(["explore_list"]);
   exploreList.id = "explore_list";
-  mainDiv.appendChild(exploreList);
-
-  d = document.createElement("div");
-  d.classList.add("list_fill");
-  mainDiv.appendChild(d);
-  d = document.createElement("div");
-  d.classList.add("list_fill");
-  mainDiv.appendChild(d);
-
-  inputFilterType = exploreData.filterType;
-  inputMana = [...exploreData.filteredMana];
-  inputRanks = [...exploreData.filteredranks];
-
-  drawFilters();
+  container.appendChild(exploreList);
   if (exploreData.results_number) {
     // display cached query results
     renderData();
@@ -124,13 +86,13 @@ function openExploreTab() {
     // do not spam server after reaching end of results
     if (exploreData.results_terminated) return;
     if (
-      Math.round(mainDiv.scrollTop + mainDiv.offsetHeight) >=
-      mainDiv.scrollHeight
+      Math.round(container.scrollTop + container.offsetHeight) >=
+      container.scrollHeight
     ) {
       queryExplore();
     }
   };
-  mainDiv.addEventListener("scroll", handler);
+  container.addEventListener("scroll", handler);
   setLocalState({ lastScrollHandler: handler });
 }
 
@@ -138,8 +100,13 @@ function getEventPrettyName(event) {
   return db.event(event) || event;
 }
 
-function drawFilters() {
-  const { exploreData } = getLocalState();
+//
+function renderExploreFilters(container, onChange) {
+  let { exploreData } = getLocalState();
+  if (!exploreData) {
+    exploreData = { ...defaultData };
+    setLocalState({ exploreData });
+  }
   const {
     filterEvent,
     filterSort,
@@ -151,27 +118,23 @@ function drawFilters() {
     filterWCM
   } = exploreData;
 
-  let buttonsTop = $$(".explore_buttons_top")[0];
-  let buttonsMiddle = $$(".explore_buttons_middle")[0];
-  let buttonsBottom = $$(".explore_buttons_bottom")[0];
-
-  buttonsTop.innerHTML = "";
-  buttonsMiddle.innerHTML = "";
-  buttonsBottom.innerHTML = "";
+  inputFilterType = exploreData.filterType;
+  inputMana = [...exploreData.filteredMana];
+  inputRanks = [...exploreData.filteredranks];
 
   /**
    *  Type filter
    **/
   let typeFilter = ["Events", "Ranked Constructed", "Ranked Draft"];
   let typeSelect = createSelect(
-    buttonsTop,
+    container,
     typeFilter,
     inputFilterType,
     res => {
       inputFilterType = res;
-      drawFilters();
+      onChange();
     },
-    "explore_query_type"
+    "select_filter"
   );
   typeSelect.style.width = "200px";
 
@@ -216,57 +179,60 @@ function drawFilters() {
     }
   });
 
-  createSelect(
-    buttonsTop,
+  const eventSelect = createSelect(
+    container,
     eventFilters,
     filterEvent || eventFilters[0],
     () => null,
-    "explore_query_event"
+    "select_filter"
   );
+  eventSelect.id = "explore_query_event";
 
   /**
    *  Sort filter
    **/
-  let sortLabel = document.createElement("label");
-  sortLabel.innerHTML = "Sort";
-  sortLabel.style.margin = "auto 4px auto 16px";
-  buttonsTop.appendChild(sortLabel);
-
-  let sortFilters = ["By Date", "By Wins", "By Winrate", "By Player"];
-  let sortSelect = createSelect(
-    buttonsTop,
-    sortFilters,
+  const sortDiv = createDiv([]);
+  sortDiv.style.display = "flex";
+  const sortLabel = createLabel(["filter_label"], "Sort:");
+  sortDiv.appendChild(sortLabel);
+  const sortSelect = createSelect(
+    sortDiv,
+    ["By Date", "By Wins", "By Winrate", "By Player"],
     filterSort,
     () => null,
-    "explore_query_sort"
+    "select_filter"
   );
-  sortSelect.style.width = "130px";
+  sortSelect.id = "explore_query_sort";
+  sortSelect.style.width = "151px";
+  container.appendChild(sortDiv);
 
   /**
    *  Sort direction
    **/
   let sortDirection = ["Descending", "Ascending"];
   let sortDirSelect = createSelect(
-    buttonsTop,
+    container,
     sortDirection,
     filterSortDir,
     () => null,
-    "explore_query_sortdir"
+    "select_filter"
   );
-  sortDirSelect.style.width = "130px";
+  sortDirSelect.id = "explore_query_sortdir";
+  sortDirSelect.style.marginLeft = "57px";
+  sortDirSelect.style.width = "151px";
 
   /**
    *  Only owned filter
    **/
   let lab = addCheckbox(
-    buttonsMiddle,
+    container,
     "Only owned",
     "settings_owned",
     onlyOwned,
     () => null
   );
   lab.style.alignSelf = "center";
-  lab.style.marginLeft = 0;
+  lab.style.marginLeft = "8px";
   lab.style.marginRight = "32px";
 
   /**
@@ -289,10 +255,10 @@ function drawFilters() {
     filterWCM
   );
 
-  buttonsMiddle.appendChild(commonsInput);
-  buttonsMiddle.appendChild(uncommonsInput);
-  buttonsMiddle.appendChild(raresInput);
-  buttonsMiddle.appendChild(mythicInput);
+  container.appendChild(commonsInput);
+  container.appendChild(uncommonsInput);
+  container.appendChild(raresInput);
+  container.appendChild(mythicInput);
 
   /**
    *  Mana filter
@@ -320,7 +286,7 @@ function drawFilters() {
     });
     manas.appendChild(manabutton);
   });
-  buttonsBottom.appendChild(manas);
+  container.appendChild(manas);
 
   /**
    *  Rank filter
@@ -349,7 +315,7 @@ function drawFilters() {
       });
       ranks_filters.appendChild(rankbutton);
     });
-    buttonsBottom.appendChild(ranks_filters);
+    container.appendChild(ranks_filters);
   }
 
   /**
@@ -357,16 +323,16 @@ function drawFilters() {
    **/
   let searchButton = createDiv(["button_simple"], "Search");
   searchButton.id = "explore_query_button";
-  searchButton.margin = "0px !important;";
-  buttonsBottom.appendChild(searchButton);
+  searchButton.style.margin = "8px";
+  container.appendChild(searchButton);
   searchButton.addEventListener("click", handleNewSearch);
 }
 
 //
 function getInputValue(id, defaultVal) {
-  const q = $$("." + id);
-  if (!q.length) return defaultVal;
-  return q[0].value;
+  const el = byId(id);
+  if (!el) return defaultVal;
+  return el.value;
 }
 
 //
@@ -691,6 +657,7 @@ function deckLoad(_deck, index) {
 }
 
 module.exports = {
-  openExploreTab,
+  renderExploreDecks,
+  renderExploreFilters,
   setExploreDecks
 };
