@@ -25,11 +25,12 @@ const fs = require("fs");
 const sha1 = require("js-sha1");
 
 const httpApi = require("./http-api");
+
 const manifestParser = require("./manifest-parser");
 const greToClientInterpreter = require("./gre-to-client-interpreter");
 const Deck = require("../shared/deck");
 const db = require("../shared/database");
-const pd = require("../shared/player-data");
+const playerData = require("../shared/player-data");
 const { hypergeometricRange } = require("../shared/stats-fns");
 const {
   get_rank_index,
@@ -112,7 +113,7 @@ var rstore = new Store({
 
 var store = new Store({
   name: "default",
-  defaults: pd.defaultCfg
+  defaults: playerData.defaultCfg
 });
 
 var settingsStore = new Store({
@@ -246,12 +247,29 @@ ipc.on("save_app_settings", function(event, arg) {
   ipc_send("hide_loading");
 });
 
+function fixBadSettingsData() {
+  const appSettings = rstore.get("settings");
+
+  // Some people's date formats are set to "undefined"
+  // These should be an empty string.
+  if(appSettings.log_locale_format === "undefined") {
+    appSettings.log_locale_format = "";
+    rstore.set("settings", appSettings);
+  }
+  // include more fixes below. Be as specific 
+  // and conservitive as possible.
+}
+
 //
 ipc.on("start_background", function() {
+
+  fixBadSettingsData();
+
   // first time during bootstrapping that we load
   // app-level settings into singletons
+
   const appSettings = rstore.get("settings");
-  const settings = { ...pd.settings, ...appSettings, logUri };
+  const settings = { ...playerData.settings, ...appSettings, logUri };
   setData({ settings }, false);
   ipc_send("initial_settings", settings);
 
@@ -274,7 +292,7 @@ ipc.on("start_background", function() {
 
 function offlineLogin() {
   ipc_send("auth", { ok: true, user: -1 });
-  loadPlayerConfig(pd.arenaId);
+  loadPlayerConfig(playerData.arenaId);
   setData({ userName: "", offline: true });
 }
 
@@ -315,13 +333,13 @@ ipc.on("windowBounds", (event, windowBounds) => {
 
 //
 ipc.on("overlayBounds", (event, index, bounds) => {
-  const overlays = [...pd.settings.overlays];
+  const overlays = [...playerData.settings.overlays];
   const newOverlay = {
     ...overlays[index], // old overlay
     bounds // new bounds
   };
   overlays[index] = newOverlay;
-  setData({ settings: { ...pd.settings, overlays } }, false);
+  setData({ settings: { ...playerData.settings, overlays } }, false);
   store.set("settings.overlays", overlays);
 });
 
@@ -329,7 +347,7 @@ ipc.on("overlayBounds", (event, index, bounds) => {
 ipc.on("save_user_settings", function(event, settings) {
   // console.log("save_user_settings");
   ipc_send("show_loading");
-  const updated = { ...pd.settings, ...settings };
+  const updated = { ...playerData.settings, ...settings };
   store.set("settings", updated);
   syncSettings(updated);
   ipc_send("hide_loading");
@@ -345,7 +363,7 @@ ipc.on("import_custom_deck", function(event, arg) {
   ipc_send("show_loading");
   const data = JSON.parse(arg);
   const id = data.id;
-  if (!id || pd.deckExists(id)) return;
+  if (!id || playerData.deckExists(id)) return;
   const deckData = {
     ...objectClone(deckDefault),
     ...data
@@ -359,10 +377,10 @@ ipc.on("import_custom_deck", function(event, arg) {
 ipc.on("toggle_deck_archived", function(event, arg) {
   ipc_send("show_loading");
   const id = arg;
-  if (!pd.deckExists(id)) return;
-  const deckData = { ...pd.deck(id) };
+  if (!playerData.deckExists(id)) return;
+  const deckData = { ...playerData.deck(id) };
   deckData.archived = !deckData.archived;
-  const decks = { ...pd.decks, [id]: deckData };
+  const decks = { ...playerData.decks, [id]: deckData };
 
   setData({ decks });
   store.set("decks." + id, deckData);
@@ -373,7 +391,7 @@ ipc.on("toggle_deck_archived", function(event, arg) {
 ipc.on("toggle_archived", function(event, arg) {
   ipc_send("show_loading");
   const id = arg;
-  const item = pd[id];
+  const item = playerData[id];
   if (!item) return;
   const data = { ...item };
   data.archived = !data.archived;
@@ -384,7 +402,7 @@ ipc.on("toggle_archived", function(event, arg) {
 });
 
 ipc.on("request_explore", function(event, arg) {
-  if (pd.userName === "") {
+  if (playerData.userName === "") {
     ipc_send("offline", 1);
   } else {
     httpApi.httpGetExplore(arg);
@@ -396,7 +414,7 @@ ipc.on("request_course", function(event, arg) {
 });
 
 ipc.on("request_home", (event, set) => {
-  if (pd.userName === "") {
+  if (playerData.userName === "") {
     ipc_send("offline", 1);
   } else {
     httpApi.httpHomeGet(set);
@@ -417,41 +435,41 @@ ipc.on("tou_drop", function(event, arg) {
 
 ipc.on("edit_tag", (event, arg) => {
   const { tag, color } = arg;
-  setData({ tags_colors: { ...pd.tags_colors, [tag]: color } });
+  setData({ tags_colors: { ...playerData.tags_colors, [tag]: color } });
   store.set("tags_colors." + tag, color);
 });
 
 ipc.on("delete_tag", (event, arg) => {
   const { deckid, tag } = arg;
-  const deck = pd.deck(deckid);
+  const deck = playerData.deck(deckid);
   if (!deck || !tag) return;
   if (!deck.tags || !deck.tags.includes(tag)) return;
 
   const tags = [...deck.tags];
   tags.splice(tags.indexOf(tag), 1);
 
-  const decks_tags = { ...pd.decks_tags, [deckid]: tags };
+  const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
   setData({ decks_tags });
   store.set("decks_tags." + deckid, tags);
 });
 
 ipc.on("add_tag", (event, arg) => {
   const { deckid, tag } = arg;
-  const deck = pd.deck(deckid);
+  const deck = playerData.deck(deckid);
   if (!deck || !tag) return;
   if (getReadableFormat(deck.format) === tag) return;
   if (deck.tags && deck.tags.includes(tag)) return;
 
   const tags = [...deck.tags, tag];
 
-  const decks_tags = { ...pd.decks_tags, [deckid]: tags };
+  const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
   setData({ decks_tags });
   store.set("decks_tags." + deckid, tags);
 });
 
 ipc.on("delete_history_tag", (event, arg) => {
   const { matchid, tag } = arg;
-  const match = pd.match(matchid);
+  const match = playerData.match(matchid);
   if (!match || !tag) return;
   if (!match.tags || !match.tags.includes(tag)) return;
 
@@ -466,7 +484,7 @@ ipc.on("delete_history_tag", (event, arg) => {
 
 ipc.on("add_history_tag", (event, arg) => {
   const { matchid, tag } = arg;
-  const match = pd.match(matchid);
+  const match = playerData.match(matchid);
   if (!match || !tag) return;
   if (match.tags && match.tags.includes(tag)) return;
 
@@ -494,17 +512,17 @@ function loadPlayerConfig(playerId, serverData = undefined) {
   });
   store = new Store({
     name: playerId,
-    defaults: pd.defaultCfg
+    defaults: playerData.defaultCfg
   });
 
   const savedData = store.get();
   const savedOverlays = savedData.settings.overlays || [];
   const appSettings = rstore.get("settings");
   const settings = {
-    ...pd.settings,
+    ...playerData.settings,
     ...savedData.settings,
     ...appSettings,
-    overlays: pd.settings.overlays.map((overlay, index) => {
+    overlays: playerData.settings.overlays.map((overlay, index) => {
       if (index < savedOverlays.length) {
         // blend in new default overlay settings
         return { ...overlay, ...savedOverlays[index] };
@@ -513,14 +531,14 @@ function loadPlayerConfig(playerId, serverData = undefined) {
       }
     })
   };
-  const playerData = {
-    ...pd,
+  const __playerData = {
+    ...playerData,
     ...savedData,
     settings
   };
-  syncSettings(playerData.settings, true);
-  setData(playerData, false);
-  ipc_send("renderer_set_bounds", pd.windowBounds);
+  syncSettings(__playerData.settings, true);
+  setData(__playerData, false);
+  ipc_send("renderer_set_bounds", playerData.windowBounds);
 
   ipc_send("popup", {
     text: "Player history loaded.",
@@ -530,10 +548,10 @@ function loadPlayerConfig(playerId, serverData = undefined) {
 
   if (serverData) {
     const requestSync = {};
-    requestSync.courses = serverData.courses.filter(id => !(id in playerData));
-    requestSync.matches = serverData.matches.filter(id => !(id in playerData));
-    requestSync.drafts = serverData.drafts.filter(id => !(id in playerData));
-    requestSync.economy = serverData.economy.filter(id => !(id in playerData));
+    requestSync.courses = serverData.courses.filter(id => !(id in __playerData));
+    requestSync.matches = serverData.matches.filter(id => !(id in __playerData));
+    requestSync.drafts = serverData.drafts.filter(id => !(id in __playerData));
+    requestSync.economy = serverData.economy.filter(id => !(id in __playerData));
 
     const itemCount =
       requestSync.courses.length +
@@ -567,9 +585,9 @@ function loadPlayerConfig(playerId, serverData = undefined) {
 
 function syncUserData(data) {
   // Sync Events
-  const courses_index = [...pd.courses_index];
+  const courses_index = [...playerData.courses_index];
   data.courses
-    .filter(doc => !pd.eventExists(doc._id))
+    .filter(doc => !playerData.eventExists(doc._id))
     .forEach(doc => {
       const id = doc._id;
       doc.id = id;
@@ -581,9 +599,9 @@ function syncUserData(data) {
   if (debugLog || !firstPass) store.set("courses_index", courses_index);
 
   // Sync Matches
-  const matches_index = [...pd.matches_index];
+  const matches_index = [...playerData.matches_index];
   data.matches
-    .filter(doc => !pd.matchExists(doc._id))
+    .filter(doc => !playerData.matchExists(doc._id))
     .forEach(doc => {
       const id = doc._id;
       doc.id = id;
@@ -595,9 +613,9 @@ function syncUserData(data) {
   if (debugLog || !firstPass) store.set("matches_index", matches_index);
 
   // Sync Economy
-  const economy_index = [...pd.economy_index];
+  const economy_index = [...playerData.economy_index];
   data.economy
-    .filter(doc => !pd.transactionExists(doc._id))
+    .filter(doc => !playerData.transactionExists(doc._id))
     .forEach(doc => {
       const id = doc._id;
       doc.id = id;
@@ -609,9 +627,9 @@ function syncUserData(data) {
   if (debugLog || !firstPass) store.set("economy_index", economy_index);
 
   // Sync Drafts
-  const draft_index = [...pd.draft_index];
+  const draft_index = [...playerData.draft_index];
   data.drafts
-    .filter(doc => !pd.draftExists(doc._id))
+    .filter(doc => !playerData.draftExists(doc._id))
     .forEach(doc => {
       const id = doc._id;
       doc.id = id;
@@ -629,7 +647,7 @@ function syncUserData(data) {
 // (essentially fancy setData for settings field only)
 // To persist changes, see "save_user_settings" or "save_app_settings"
 function syncSettings(dirtySettings = {}, refresh = debugLog || !firstPass) {
-  const settings = { ...pd.settings, ...dirtySettings };
+  const settings = { ...playerData.settings, ...dirtySettings };
   setData({ settings }, refresh);
   if (refresh) ipc_send("set_settings", settings);
 }
@@ -695,14 +713,14 @@ function onLogEntryFound(entry) {
       name: entry.socket.PlayerScreenName
     };
     setData(data);
-  } else if (entry.playerId && entry.playerId !== pd.arenaId) {
+  } else if (entry.playerId && entry.playerId !== playerData.arenaId) {
     return;
   } else {
     //console.log("Entry:", entry.label, entry, entry.json());
     if (firstPass) {
       updateLoading(entry);
     }
-    if ((firstPass && !pd.settings.skip_firstpass) || !firstPass) {
+    if ((firstPass && !playerData.settings.skip_firstpass) || !firstPass) {
       try {
         switch (entry.label) {
           case "Log.Info":
@@ -1025,7 +1043,7 @@ async function logLoop() {
     if (value.includes(strCheck)) {
       parsedData.arenaVersion = unleakString(dataChop(value, strCheck, '"'));
       // We request manifest data here
-      //manifestParser.requestManifestData(pd.arenaVersion);
+      //manifestParser.requestManifestData(playerData.arenaVersion);
     }
     /*
     if (firstPass) {
@@ -1041,7 +1059,7 @@ async function logLoop() {
 
   prevLogSize = size;
 
-  if (!pd.arenaId || !pd.name) {
+  if (!playerData.arenaId || !playerData.name) {
     ipc_send("popup", {
       text: "output_log.txt contains no player data",
       time: 0
@@ -1049,12 +1067,12 @@ async function logLoop() {
     return;
   }
 
-  ipc_send("popup", { text: "Found Arena log for " + pd.name, time: 0 });
+  ipc_send("popup", { text: "Found Arena log for " + playerData.name, time: 0 });
   clearInterval(logLoopInterval);
 
   let username = "";
   let password = "";
-  const { auto_login, remember_me } = pd.settings;
+  const { auto_login, remember_me } = playerData.settings;
   if (remember_me) {
     username = rstore.get("email");
     const token = rstore.get("token");
@@ -1204,7 +1222,7 @@ function changePriority(previous, current, time) {
 function getNameBySeat(seat) {
   try {
     if (seat == currentMatch.player.seat) {
-      return pd.name.slice(0, -6);
+      return playerData.name.slice(0, -6);
     } else {
       let oppName = currentMatch.opponent.name;
       if (oppName && oppName !== "Sparky") {
@@ -1222,43 +1240,43 @@ function addCustomDeck(customDeck) {
   const id = customDeck.id;
   const deckData = {
     // preserve custom fields if possible
-    ...(pd.deck(id) || {}),
+    ...(playerData.deck(id) || {}),
     ...customDeck
   };
 
-  setData({ decks: { ...pd.decks, [customDeck.id]: deckData } });
+  setData({ decks: { ...playerData.decks, [customDeck.id]: deckData } });
   if (debugLog || !firstPass) store.set("decks." + id, deckData);
 }
 
 //
-function createMatch(arg) {
+function createMatch(json, matchBeginTime) {
   actionLog(-99, new Date(), "");
 
-  currentMatch = _.cloneDeep(currentMatchDefault);
+  var match = _.cloneDeep(currentMatchDefault);
 
   if (debugLog || !firstPass) {
-    if (pd.settings.close_on_match) {
+    if (playerData.settings.close_on_match) {
       ipc_send("renderer_hide", 1);
     }
 
     ipc_send("set_arena_state", ARENA_MODE_MATCH);
   }
 
-  currentMatch.player.originalDeck = originalDeck;
-  currentMatch.player.deck = originalDeck.clone();
-  currentMatch.playerCardsLeft = originalDeck.clone();
+  match.player.originalDeck = originalDeck;
+  match.player.deck = originalDeck.clone();
+  match.playerCardsLeft = originalDeck.clone();
 
-  currentMatch.opponent.name = arg.opponentScreenName;
-  currentMatch.opponent.rank = arg.opponentRankingClass;
-  currentMatch.opponent.tier = arg.opponentRankingTier;
-  currentMatch.opponent.cards = [];
-  currentMatch.eventId = arg.eventId;
-  currentMatch.matchId = arg.matchId + "-" + pd.arenaId;
-  currentMatch.gameStage = "";
+  match.opponent.name = json.opponentScreenName;
+  match.opponent.rank = json.opponentRankingClass;
+  match.opponent.tier = json.opponentRankingTier;
+  match.opponent.cards = [];
+  match.eventId = json.eventId;
+  match.matchId = json.matchId + "-" + playerData.arenaId;
+  match.gameStage = "";
 
-  currentMatch.beginTime = matchBeginTime;
+  match.beginTime = matchBeginTime;
 
-  currentMatch.lastPriorityChangeTime = matchBeginTime;
+  match.lastPriorityChangeTime = matchBeginTime;
   matchGameStats = [];
   matchCompletedOnGameNumber = 0;
   gameNumberCompleted = 0;
@@ -1266,22 +1284,28 @@ function createMatch(arg) {
   idChanges = {};
   instanceToCardIdMap = {};
 
-  ipc_send("ipc_log", "vs " + currentMatch.opponent.name);
-  ipc_send("set_timer", currentMatch.beginTime, IPC_OVERLAY);
-  ipc_send("set_opponent", currentMatch.opponent.name, IPC_OVERLAY);
+  ipc_send("ipc_log", "vs " + match.opponent.name);
+  ipc_send("set_timer", match.beginTime, IPC_OVERLAY);
+  ipc_send("set_opponent", match.opponent.name, IPC_OVERLAY);
   ipc_send(
     "set_opponent_rank",
-    get_rank_index(currentMatch.opponent.rank, currentMatch.opponent.tier),
-    currentMatch.opponent.rank + " " + currentMatch.opponent.tier,
+    get_rank_index(match.opponent.rank, match.opponent.tier),
+    match.opponent.rank + " " + match.opponent.tier,
     IPC_OVERLAY
   );
 
-  if (currentMatch.eventId == "DirectGame" && currentDeck) {
+  if (match.eventId == "DirectGame" && currentDeck) {
     let str = currentDeck.getSave();
-    httpApi.httpTournamentCheck(str, currentMatch.opponent.name, true);
+    httpApi.httpTournamentCheck(str, match.opponent.name, true);
   }
 
-  ipc_send("set_priority_timer", currentMatch.priorityTimers, IPC_OVERLAY);
+  // set global value
+
+  currentMatch = match;
+
+  ipc_send("set_priority_timer", match.priorityTimers, IPC_OVERLAY);
+
+  return match;
 }
 
 //
@@ -1309,7 +1333,7 @@ function update_deck(force) {
     forceDeckUpdate();
 
     let currentMatchCopy = objectClone(currentMatch);
-    currentMatchCopy.oppCards = getOppDeck();
+    currentMatchCopy.oppCards = getOppdeck();
     currentMatchCopy.playerCardsLeft = currentMatch.playerCardsLeft.getSave();
     currentMatchCopy.playerCardsOdds = currentMatch.playerChances;
     currentMatchCopy.player.deck = currentMatch.player.deck.getSave();
@@ -1414,7 +1438,7 @@ function getColorArchetype(c) {
 }
 
 //
-function getOppDeck() {
+function getOppdeck() {
   let _deck = new Deck({}, currentMatch.oppCardsUsed, false);
   _deck.mainboard.removeDuplicates(true);
   _deck.getColors();
@@ -1544,12 +1568,12 @@ function saveEconomyTransaction(transaction) {
   const id = transaction.id;
   const txnData = {
     // preserve custom fields if possible
-    ...(pd.transaction(id) || {}),
+    ...(playerData.transaction(id) || {}),
     ...transaction
   };
 
-  if (!pd.economy_index.includes(id)) {
-    const economy_index = [...pd.economy_index, id];
+  if (!playerData.economy_index.includes(id)) {
+    const economy_index = [...playerData.economy_index, id];
     if (debugLog || !firstPass) store.set("economy_index", economy_index);
     setData({ economy_index }, false);
   }
@@ -1567,12 +1591,12 @@ function saveCourse(json) {
   const eventData = {
     date: new Date(),
     // preserve custom fields if possible
-    ...(pd.event(id) || {}),
+    ...(playerData.event(id) || {}),
     ...json
   };
 
-  if (!pd.courses_index.includes(id)) {
-    const courses_index = [...pd.courses_index, id];
+  if (!playerData.courses_index.includes(id)) {
+    const courses_index = [...playerData.courses_index, id];
     if (debugLog || !firstPass) store.set("courses_index", courses_index);
     setData({ courses_index }, false);
   }
@@ -1582,7 +1606,7 @@ function saveCourse(json) {
 }
 
 //
-function saveMatch(id) {
+function saveMatch(id, matchEndTime) {
   //console.log(currentMatch.matchId, matchId);
   if (!currentMatch || !currentMatch.matchTime || currentMatch.matchId !== id) {
     return;
@@ -1606,7 +1630,7 @@ function saveMatch(id) {
 
   if (currentMatch.eventId === "AIBotMatch") return;
 
-  const match = pd.match(id) || {};
+  const match = playerData.match(id) || {};
   match.onThePlay = currentMatch.onThePlay;
   match.id = currentMatch.matchId;
   match.duration = currentMatch.matchTime;
@@ -1620,17 +1644,17 @@ function saveMatch(id) {
   };
   let rank, tier;
   if (db.ranked_events.includes(currentMatch.eventId)) {
-    rank = pd.rank.limited.rank;
-    tier = pd.rank.limited.tier;
+    rank = playerData.rank.limited.rank;
+    tier = playerData.rank.limited.tier;
   } else {
-    rank = pd.rank.constructed.rank;
-    tier = pd.rank.constructed.tier;
+    rank = playerData.rank.constructed.rank;
+    tier = playerData.rank.constructed.tier;
   }
   match.player = {
-    name: pd.name,
+    name: playerData.name,
     rank,
     tier,
-    userid: pd.arenaId,
+    userid: playerData.arenaId,
     seat: currentMatch.player.seat,
     win: pw
   };
@@ -1638,7 +1662,7 @@ function saveMatch(id) {
 
   match.eventId = currentMatch.eventId;
   match.playerDeck = currentMatch.player.originalDeck.getSave();
-  match.oppDeck = getOppDeck();
+  match.oppDeck = getOppdeck();
 
   if (
     (!match.tags || !match.tags.length) &&
@@ -1647,8 +1671,9 @@ function saveMatch(id) {
   ) {
     match.tags = [match.oppDeck.archetype];
   }
-
-  match.date = match.date || new Date();
+  if (matchEndTime) {
+    match.date = matchEndTime;
+  }
   match.bestOf = currentMatch.bestOf;
 
   match.gameStats = matchGameStats;
@@ -1658,8 +1683,8 @@ function saveMatch(id) {
   match.toolRunFromSource = !electron.remote.app.isPackaged;
 
   // console.log("Save match:", match);
-  if (!pd.matches_index.includes(id)) {
-    const matches_index = [...pd.matches_index, id];
+  if (!playerData.matches_index.includes(id)) {
+    const matches_index = [...playerData.matches_index, id];
     if (debugLog || !firstPass) store.set("matches_index", matches_index);
     setData({ matches_index }, false);
   }
@@ -1681,7 +1706,7 @@ function createDraft() {
 //
 function startDraft() {
   if (debugLog || !firstPass) {
-    if (pd.settings.close_on_match) {
+    if (playerData.settings.close_on_match) {
       ipc_send("renderer_hide", 1);
     }
     ipc_send("set_arena_state", ARENA_MODE_DRAFT);
@@ -1698,22 +1723,22 @@ function setDraftData(data) {
   const { id } = data;
 
   // console.log("Set draft data:", data);
-  if (!pd.draft_index.includes(id)) {
-    const draft_index = [...pd.draft_index, id];
+  if (!playerData.draft_index.includes(id)) {
+    const draft_index = [...playerData.draft_index, id];
     if (debugLog || !firstPass) store.set("draft_index", draft_index);
     setData({ draft_index }, false);
   }
 
   if (debugLog || !firstPass) store.set(id, data);
-  setData({ [id]: data, cards: pd.cards, cardsNew: pd.cardsNew });
+  setData({ [id]: data, cards: playerData.cards, cardsNew: playerData.cardsNew });
   ipc_send("set_draft_cards", data);
 }
 
 //
 function clearDraftData(draftId) {
-  if (pd.draftExists(draftId)) {
-    if (pd.draft_index.includes(draftId)) {
-      const draft_index = [...pd.draft_index];
+  if (playerData.draftExists(draftId)) {
+    if (playerData.draft_index.includes(draftId)) {
+      const draft_index = [...playerData.draft_index];
       draft_index.splice(draft_index.indexOf(draftId), 1);
       setData({ draft_index }, false);
       if (debugLog || !firstPass) store.set("draft_index", draft_index);
@@ -1754,7 +1779,7 @@ function finishLoading() {
       progress: 2
     });
     firstPass = false;
-    store.set(pd.data);
+    store.set(playerData.data);
     logReadEnd = new Date();
     let logReadElapsed = (logReadEnd - logReadStart) / 1000;
     ipc_send("ipc_log", `Log read in ${logReadElapsed}s`);
@@ -1766,7 +1791,7 @@ function finishLoading() {
     });
 
     if (duringMatch) {
-      if (pd.settings.close_on_match) {
+      if (playerData.settings.close_on_match) {
         ipc_send("renderer_hide", 1);
       }
       ipc_send("set_arena_state", ARENA_MODE_MATCH);
@@ -1775,17 +1800,17 @@ function finishLoading() {
       ipc_send("set_arena_state", ARENA_MODE_DRAFT);
     }
 
-    ipc_send("set_settings", pd.settings);
+    ipc_send("set_settings", playerData.settings);
     ipc_send("initialize");
     ipc_send("player_data_refresh");
 
-    if (pd.name) {
+    if (playerData.name) {
       httpApi.httpSetPlayer(
-        pd.name,
-        pd.rank.constructed.rank,
-        pd.rank.constructed.tier,
-        pd.rank.limited.rank,
-        pd.rank.limited.tier
+        playerData.name,
+        playerData.rank.constructed.rank,
+        playerData.rank.constructed.tier,
+        playerData.rank.limited.rank,
+        playerData.rank.limited.tier
       );
     }
 
