@@ -127,11 +127,13 @@ function deckStatsSection(deck) {
   const visualView = createDiv(["button_simple", "visualView"], "Visual View");
   stats.appendChild(visualView);
 
+  const missingWildcards = get_deck_missing(deck);
+  const needsCards = Object.values(get_deck_missing(deck)).some(x => x);
   const id = deck.id || deck._id;
   if (!id || !pd.deckExists(id)) {
     const importDeck = createDiv(
       ["button_simple", "centered"],
-      "Add to My Decks"
+      "Add to " + (needsCards ? "Wanted" : "Saved")
     );
     importDeck.addEventListener("click", function() {
       ipcSend(
@@ -209,7 +211,6 @@ function deckStatsSection(deck) {
     mythic: pd.economy.wcMythic
   };
 
-  const missingWildcards = get_deck_missing(deck);
   const boosterCost = getBoosterCountEstimate(missingWildcards);
   const costSection = createDiv(["wildcards_cost"]);
   costSection.appendChild(createSpan([], "Wildcards you have/need"));
