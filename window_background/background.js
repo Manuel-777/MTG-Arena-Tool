@@ -351,7 +351,6 @@ ipc.on("import_custom_deck", function(event, arg) {
     ...data
   };
   addCustomDeck(deckData);
-  ipc_send("force_open_tab", MAIN_DECKS);
   ipc_send("hide_loading");
 });
 
