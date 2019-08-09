@@ -126,17 +126,18 @@ function renderExploreFilters(container, onChange) {
    *  Type filter
    **/
   let typeFilter = ["Events", "Ranked Constructed", "Ranked Draft"];
-  let typeSelect = createSelect(
+  createSelect(
     container,
     typeFilter,
     inputFilterType,
     res => {
       inputFilterType = res;
+      exploreData.filterType = res;
+      setLocalState({ exploreData });
       onChange();
     },
     "select_filter"
   );
-  typeSelect.style.width = "200px";
 
   /**
    *  Event filter
@@ -188,77 +189,7 @@ function renderExploreFilters(container, onChange) {
   );
   eventSelect.id = "explore_query_event";
 
-  /**
-   *  Sort filter
-   **/
-  const sortDiv = createDiv([]);
-  sortDiv.style.display = "flex";
-  const sortLabel = createLabel(["filter_label"], "Sort:");
-  sortDiv.appendChild(sortLabel);
-  const sortSelect = createSelect(
-    sortDiv,
-    ["By Date", "By Wins", "By Winrate", "By Player"],
-    filterSort,
-    () => null,
-    "select_filter"
-  );
-  sortSelect.id = "explore_query_sort";
-  sortSelect.style.width = "151px";
-  container.appendChild(sortDiv);
-
-  /**
-   *  Sort direction
-   **/
-  let sortDirection = ["Descending", "Ascending"];
-  let sortDirSelect = createSelect(
-    container,
-    sortDirection,
-    filterSortDir,
-    () => null,
-    "select_filter"
-  );
-  sortDirSelect.id = "explore_query_sortdir";
-  sortDirSelect.style.marginLeft = "57px";
-  sortDirSelect.style.width = "151px";
-
-  /**
-   *  Only owned filter
-   **/
-  let lab = addCheckbox(
-    container,
-    "Only owned",
-    "settings_owned",
-    onlyOwned,
-    () => null
-  );
-  lab.style.alignSelf = "center";
-  lab.style.marginLeft = "8px";
-  lab.style.marginRight = "32px";
-
-  /**
-   * Wildcards filters
-   **/
-  const commonsInput = wildcardsInput(
-    "wc_common",
-    "explore_query_wc_c",
-    filterWCC
-  );
-  const uncommonsInput = wildcardsInput(
-    "wc_uncommon",
-    "explore_query_wc_u",
-    filterWCU
-  );
-  const raresInput = wildcardsInput("wc_rare", "explore_query_wc_r", filterWCR);
-  const mythicInput = wildcardsInput(
-    "wc_mythic",
-    "explore_query_wc_m",
-    filterWCM
-  );
-
-  container.appendChild(commonsInput);
-  container.appendChild(uncommonsInput);
-  container.appendChild(raresInput);
-  container.appendChild(mythicInput);
+  container.appendChild(createDiv(["list_fill"]));
 
   /**
    *  Mana filter
@@ -318,12 +249,92 @@ function renderExploreFilters(container, onChange) {
     container.appendChild(ranks_filters);
   }
 
+  container.appendChild(createDiv(["list_fill"]));
+
+  /**
+   *  Only owned filter
+   **/
+  const lab = addCheckbox(
+    container,
+    "Only owned",
+    "settings_owned",
+    onlyOwned,
+    () => null
+  );
+  lab.style.margin = "8px 24px";
+
+  /**
+   * Wildcards filters
+   **/
+  const wcRowA = createDiv(["wc_input_row"]);
+  const commonsInput = wildcardsInput(
+    "wc_common",
+    "explore_query_wc_c",
+    filterWCC
+  );
+  const uncommonsInput = wildcardsInput(
+    "wc_uncommon",
+    "explore_query_wc_u",
+    filterWCU
+  );
+  wcRowA.appendChild(commonsInput);
+  wcRowA.appendChild(uncommonsInput);
+  container.appendChild(wcRowA);
+
+  const wcRowB = createDiv(["wc_input_row"]);
+  const raresInput = wildcardsInput("wc_rare", "explore_query_wc_r", filterWCR);
+  const mythicInput = wildcardsInput(
+    "wc_mythic",
+    "explore_query_wc_m",
+    filterWCM
+  );
+  wcRowB.appendChild(raresInput);
+  wcRowB.appendChild(mythicInput);
+  container.appendChild(wcRowB);
+
+  container.appendChild(createDiv(["list_fill"]));
+
+  /**
+   *  Sort filter
+   **/
+  const sortDiv = createDiv(["sort_container"]);
+  const sortLabel = createLabel(["filter_label"], "Sort:");
+  sortDiv.appendChild(sortLabel);
+  const sortSelect = createSelect(
+    sortDiv,
+    ["By Date", "By Wins", "By Winrate", "By Player"],
+    filterSort,
+    () => null,
+    "sort_filter"
+  );
+  sortSelect.id = "explore_query_sort";
+  container.appendChild(sortDiv);
+
+  /**
+   *  Sort direction
+   **/
+  const sortDirection = ["Descending", "Ascending"];
+  const sortDirSelect = createSelect(
+    container,
+    sortDirection,
+    filterSortDir,
+    () => null,
+    "select_filter"
+  );
+  sortDirSelect.id = "explore_query_sortdir";
+  sortDirSelect.style.marginLeft = "73px";
+  sortDirSelect.style.maxWidth = "calc(100% - 98px)";
+
+  container.appendChild(createDiv(["list_fill"]));
+
   /**
    * Search button.
    **/
-  let searchButton = createDiv(["button_simple"], "Search");
+  const searchButton = createDiv(
+    ["button_simple", "explore_search_button"],
+    "Search"
+  );
   searchButton.id = "explore_query_button";
-  searchButton.style.margin = "8px";
   container.appendChild(searchButton);
   searchButton.addEventListener("click", handleNewSearch);
 }
@@ -496,7 +507,7 @@ function setExploreDecks(data) {
     queryExplore();
   } else {
     const button = document.getElementById("explore_query_button");
-    if (button) button.style.display = "initial";
+    if (button) button.style.display = "";
   }
 }
 

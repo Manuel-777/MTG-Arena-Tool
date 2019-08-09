@@ -144,7 +144,7 @@ function showLogin() {
 
 //
 function updateNavIcons() {
-  if ($$(".top_nav_icons")[0].offsetWidth < 530) {
+  if ($$(".top_nav_icons")[0].offsetWidth < 400) {
     if (!top_compact) {
       $$("span.top_nav_item_text").forEach(el => (el.style.opacity = 0));
       $$(".top_nav_icon").forEach(el => (el.style.display = "block"));

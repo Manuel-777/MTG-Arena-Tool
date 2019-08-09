@@ -131,8 +131,25 @@ function openDecksTab(
 
   // Filters
   navCol.appendChild(createLabel(["filter_label"], "Filters:"));
+  if (openSection === DECKS_EXPLORE) {
+    // Explore filters
+    const ls = getLocalState();
+    renderExploreFilters(navCol, () => openDecksTab({}, ls.lastScrollTop));
+  } else {
+    // Data filters (only for active decks)
+    if (openSection === DECKS_ACTIVE) {
+      renderDateFilter(filters.date, updateFilterHandler("date"), navCol);
+      createSelect(
+        navCol,
+        new Aggregator({ date: filters.date }).events,
+        filters.eventId,
+        updateFilterHandler("eventId"),
+        "select_filter",
+        getReadableEvent
+      );
+    }
 
-  if (openSection !== DECKS_EXPLORE) {
+    // Common filters
     renderManaFilter(filters.colors, updateFilterHandler("colors"), navCol);
     createSelect(
       navCol,
@@ -142,26 +159,12 @@ function openDecksTab(
       "select_filter",
       getTagString
     );
-  } else {
-    const ls = getLocalState();
-    renderExploreFilters(navCol, () => openDecksTab({}, ls.lastScrollTop));
-  }
-  navCol.appendChild(createDiv(["list_fill"]));
 
-  // Data filters (only for active decks)
-  if (openSection === DECKS_ACTIVE) {
-    renderSortOption(filters.sort, updateFilterHandler("sort"), navCol);
-    navCol.appendChild(createDiv(["list_fill"]));
-    navCol.appendChild(createLabel(["filter_label"], "Winrate Data:"));
-    renderDateFilter(filters.date, updateFilterHandler("date"), navCol);
-    createSelect(
-      navCol,
-      new Aggregator({ date: filters.date }).events,
-      filters.eventId,
-      updateFilterHandler("eventId"),
-      "select_filter",
-      getReadableEvent
-    );
+    // Data sorts (only for active decks)
+    if (openSection === DECKS_ACTIVE) {
+      navCol.appendChild(createDiv(["list_fill"]));
+      renderSortOption(filters.sort, updateFilterHandler("sort"), navCol);
+    }
   }
 
   mainDiv.appendChild(navCol);

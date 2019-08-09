@@ -129,10 +129,11 @@ function renderDateFilter(value, onChange, container) {
 
 exports.renderArchivedFilter = renderArchivedFilter;
 function renderArchivedFilter(value, onChange, container) {
-  const archiveCont = document.createElement("label");
+  const archiveCont = createLabel(
+    ["filter_label", "check_container", "hover_label"],
+    "archived"
+  );
   archiveCont.style.marginTop = "4px";
-  archiveCont.classList.add("check_container", "hover_label");
-  archiveCont.innerHTML = "archived";
   const archiveCheckbox = document.createElement("input");
   archiveCheckbox.type = "checkbox";
   archiveCheckbox.addEventListener("click", () => {
@@ -158,11 +159,7 @@ function renderManaFilter(value, onChange, container) {
     multi: "Allow unselected colors"
   };
   const colors = { ...value };
-  const manas = createDiv([]);
-  manas.style.display = "flex";
-  manas.style.margin = "8px";
-  manas.style.width = "150px";
-  manas.style.height = "32px";
+  const manas = createDiv(["mana_filter_container"]);
   COLORS_BRIEF.forEach(code => {
     const filterClasses = ["mana_filter"];
     if (!colors[code]) {
@@ -211,17 +208,16 @@ function renderManaFilter(value, onChange, container) {
 
 exports.renderSortOption = renderSortOption;
 function renderSortOption(value, onChange, container) {
-  const sortDiv = createDiv([]);
-  sortDiv.style.display = "flex";
+  const sortDiv = createDiv(["sort_container"]);
   const sortLabel = createLabel(["filter_label"], "Sort:");
   sortDiv.appendChild(sortLabel);
-  const sortSelect = createSelect(
+  createSelect(
     sortDiv,
     ["By Date", "By Wins", "By Winrate"],
     value,
-    onChange
+    onChange,
+    "sort_filter"
   );
-  sortSelect.style.width = "151px";
   if (container) container.appendChild(sortDiv);
   return sortDiv;
 }

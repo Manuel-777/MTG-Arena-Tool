@@ -1755,6 +1755,13 @@ a:hover {
     border-radius: 100%;
 }
 
+.mana_filter_container {
+    display: flex;
+    margin: 8px 24px;
+    width: 150px;
+    height: 32px;
+}
+
 .mana_filter {
     align-self: center;
     opacity: 1;
@@ -1782,7 +1789,7 @@ a:hover {
 
 .mana_filters_explore {
     display: flex;
-    margin: 6px 20px;
+    margin: 8px 24px;
 }
 
 .mana_filter:hover, .mana_filter_search:hover, .mana_filters_explore:hover, .rank_filter:hover {
@@ -1813,12 +1820,23 @@ a:hover {
     margin: 8px 0px;
 }
 
+.wc_input_row {
+    display: flex;
+    align-items: center;
+    margin: 8px 24px;
+}
+
 .input_container_explore {
     display: flex;
-    height: 24px;
-    width: 100%;
-    margin: 8px;
+    align-items: center;
+    height: 28px;
+    margin: 0 4px;
     align-self: center;
+}
+
+.button_simple.explore_search_button {
+    margin: 8px 24px;
+    width: auto;
 }
 
 .input_container_inventory label, .input_container_explore label {
@@ -2171,7 +2189,7 @@ a:hover {
 
 .sidebar_column_r {
     width: 30% !important;
-    max-width: 220px;
+    max-width: 280px;
     border-width: 2px;
     border-style: none solid none none;
     border-image: linear-gradient(to bottom, rgba(250, 229, 210, 0) 10px, var(--color-light-50) 10px, rgba(250, 229, 210, 0)) 1 100%;
@@ -2386,12 +2404,23 @@ a:hover {
 }
 
 .select_container.select_filter {
-    width: 200px;
-    margin: 8px;
+    width: 100%;
+    max-width: calc(100% - 48px);
+    margin: 8px 24px;
 }
 
 .filter_label {
-    margin: 8px;
+    margin: auto 8px auto 24px;
+}
+
+.sort_container {
+    display: flex;
+    margin: 8px 0;
+}
+
+.select_container.sort_filter {
+    width: 100%;
+    margin: 0 24px 0 8px;
 }
 
 .select_button {
