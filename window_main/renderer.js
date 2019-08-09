@@ -69,7 +69,7 @@ const { openDecksTab } = require("./decks");
 const { openDeck } = require("./deck-details");
 const { openHistoryTab } = require("./history");
 const { openEconomyTab } = require("./economy");
-const { setExploreDecks } = require("./explore");
+const { openExploreTab, setExploreDecks } = require("./explore");
 const { openCollectionTab } = require("./collection");
 const { openSettingsTab, setCurrentOverlaySettings } = require("./settings");
 const { showWhatsNew } = require("./whats-new");
@@ -144,7 +144,7 @@ function showLogin() {
 
 //
 function updateNavIcons() {
-  if ($$(".top_nav_icons")[0].offsetWidth < 400) {
+  if ($$(".top_nav_icons")[0].offsetWidth < 470) {
     if (!top_compact) {
       $$("span.top_nav_item_text").forEach(el => (el.style.opacity = 0));
       $$(".top_nav_icon").forEach(el => (el.style.display = "block"));
@@ -225,7 +225,7 @@ ipc.on("set_home", function(event, arg) {
 //
 ipc.on("set_explore_decks", function(event, arg) {
   hideLoadingBars();
-  if (sidebarActive === MAIN_DECKS) {
+  if (sidebarActive === MAIN_EXPLORE) {
     setExploreDecks(arg);
   }
 });
@@ -391,8 +391,11 @@ function openTab(
       openHistoryTab(filters, dataIndex, scrollTop, HISTORY_EVENTS);
       break;
     case 3:
-      // Used to be explore tab before combined with Decks
-      openDecksTab(filters, scrollTop);
+      if (pd.offline) {
+        showOfflineSplash();
+      } else {
+        openExploreTab();
+      }
       break;
     case 4:
       openEconomyTab(dataIndex, scrollTop);

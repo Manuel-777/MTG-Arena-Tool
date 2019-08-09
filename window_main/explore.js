@@ -29,7 +29,9 @@ const {
   addCheckbox,
   getLocalState,
   getWinrateClass,
+  hideLoadingBars,
   ipcSend,
+  resetMainContainer,
   setLocalState,
   showLoadingBars
 } = require("./renderer-util");
@@ -63,46 +65,14 @@ let inputMana = defaultData.filteredMana;
 let inputRanks = defaultData.filteredranks;
 let queryInFlight = false; // semaphore to limit simultaneous queries
 
-function renderExploreDecks(container) {
-  queryInFlight = false;
-  let { exploreData } = getLocalState();
-  if (!exploreData) {
-    exploreData = { ...defaultData };
-    setLocalState({ exploreData });
-  }
-  let exploreList = createDiv(["explore_list"]);
-  exploreList.id = "explore_list";
-  container.appendChild(exploreList);
-  if (exploreData.results_number) {
-    // display cached query results
-    renderData();
-  } else {
-    // automatically fetch data when local cache is empty
-    queryExplore();
-  }
-
-  const handler = () => {
-    const { exploreData } = getLocalState();
-    // do not spam server after reaching end of results
-    if (exploreData.results_terminated) return;
-    if (
-      Math.round(container.scrollTop + container.offsetHeight) >=
-      container.scrollHeight
-    ) {
-      queryExplore();
-    }
-  };
-  container.addEventListener("scroll", handler);
-  setLocalState({ lastScrollHandler: handler });
-}
-
 function getEventPrettyName(event) {
   return db.event(event) || event;
 }
 
 //
-function renderExploreFilters(container, onChange) {
-  let { exploreData } = getLocalState();
+function openExploreTab(scrollTop = 0) {
+  queryInFlight = false;
+  let { exploreData, lastScrollTop } = getLocalState();
   if (!exploreData) {
     exploreData = { ...defaultData };
     setLocalState({ exploreData });
@@ -117,24 +87,31 @@ function renderExploreFilters(container, onChange) {
     filterWCR,
     filterWCM
   } = exploreData;
-
   inputFilterType = exploreData.filterType;
   inputMana = [...exploreData.filteredMana];
   inputRanks = [...exploreData.filteredranks];
+
+  hideLoadingBars();
+  const mainDiv = resetMainContainer();
+  mainDiv.classList.add("flex_item");
+
+  const navCol = createDiv(["wrapper_column", "sidebar_column_r"]);
+  navCol.appendChild(createDiv(["list_fill"]));
+  navCol.appendChild(createLabel(["filter_label"], "Filters:"));
 
   /**
    *  Type filter
    **/
   let typeFilter = ["Events", "Ranked Constructed", "Ranked Draft"];
   createSelect(
-    container,
+    navCol,
     typeFilter,
     inputFilterType,
     res => {
       inputFilterType = res;
       exploreData.filterType = res;
       setLocalState({ exploreData });
-      onChange();
+      openExploreTab(lastScrollTop);
     },
     "select_filter"
   );
@@ -181,7 +158,7 @@ function renderExploreFilters(container, onChange) {
   });
 
   const eventSelect = createSelect(
-    container,
+    navCol,
     eventFilters,
     filterEvent || eventFilters[0],
     () => null,
@@ -189,7 +166,7 @@ function renderExploreFilters(container, onChange) {
   );
   eventSelect.id = "explore_query_event";
 
-  container.appendChild(createDiv(["list_fill"]));
+  navCol.appendChild(createDiv(["list_fill"]));
 
   /**
    *  Mana filter
@@ -217,7 +194,7 @@ function renderExploreFilters(container, onChange) {
     });
     manas.appendChild(manabutton);
   });
-  container.appendChild(manas);
+  navCol.appendChild(manas);
 
   /**
    *  Rank filter
@@ -246,16 +223,16 @@ function renderExploreFilters(container, onChange) {
       });
       ranks_filters.appendChild(rankbutton);
     });
-    container.appendChild(ranks_filters);
+    navCol.appendChild(ranks_filters);
   }
 
-  container.appendChild(createDiv(["list_fill"]));
+  navCol.appendChild(createDiv(["list_fill"]));
 
   /**
    *  Only owned filter
    **/
   const lab = addCheckbox(
-    container,
+    navCol,
     "Only owned",
     "settings_owned",
     onlyOwned,
@@ -279,7 +256,7 @@ function renderExploreFilters(container, onChange) {
   );
   wcRowA.appendChild(commonsInput);
   wcRowA.appendChild(uncommonsInput);
-  container.appendChild(wcRowA);
+  navCol.appendChild(wcRowA);
 
   const wcRowB = createDiv(["wc_input_row"]);
   const raresInput = wildcardsInput("wc_rare", "explore_query_wc_r", filterWCR);
@@ -290,9 +267,9 @@ function renderExploreFilters(container, onChange) {
   );
   wcRowB.appendChild(raresInput);
   wcRowB.appendChild(mythicInput);
-  container.appendChild(wcRowB);
+  navCol.appendChild(wcRowB);
 
-  container.appendChild(createDiv(["list_fill"]));
+  navCol.appendChild(createDiv(["list_fill"]));
 
   /**
    *  Sort filter
@@ -308,14 +285,14 @@ function renderExploreFilters(container, onChange) {
     "sort_filter"
   );
   sortSelect.id = "explore_query_sort";
-  container.appendChild(sortDiv);
+  navCol.appendChild(sortDiv);
 
   /**
    *  Sort direction
    **/
   const sortDirection = ["Descending", "Ascending"];
   const sortDirSelect = createSelect(
-    container,
+    navCol,
     sortDirection,
     filterSortDir,
     () => null,
@@ -325,7 +302,7 @@ function renderExploreFilters(container, onChange) {
   sortDirSelect.style.marginLeft = "73px";
   sortDirSelect.style.maxWidth = "calc(100% - 98px)";
 
-  container.appendChild(createDiv(["list_fill"]));
+  navCol.appendChild(createDiv(["list_fill"]));
 
   /**
    * Search button.
@@ -335,8 +312,45 @@ function renderExploreFilters(container, onChange) {
     "Search"
   );
   searchButton.id = "explore_query_button";
-  container.appendChild(searchButton);
+  navCol.appendChild(searchButton);
   searchButton.addEventListener("click", handleNewSearch);
+
+  mainDiv.appendChild(navCol);
+
+  // Main explore section
+  const mainCol = createDiv(["wrapper_column"]);
+  mainCol.setAttribute("id", "decks_column");
+  mainCol.appendChild(createDiv(["list_fill"]));
+
+  const exploreList = createDiv(["explore_list"]);
+  exploreList.id = "explore_list";
+  mainCol.appendChild(exploreList);
+  mainDiv.appendChild(mainCol);
+
+  if (exploreData.results_number) {
+    // display cached query results
+    renderData();
+    if (scrollTop) {
+      mainCol.scrollTop = scrollTop;
+    }
+  } else {
+    // automatically fetch data when local cache is empty
+    queryExplore();
+  }
+
+  const handler = () => {
+    const { exploreData } = getLocalState();
+    // do not spam server after reaching end of results
+    if (exploreData.results_terminated) return;
+    if (
+      Math.round(mainCol.scrollTop + mainCol.offsetHeight) >=
+      mainCol.scrollHeight
+    ) {
+      queryExplore();
+    }
+    setLocalState({ lastScrollTop: mainCol.scrollTop });
+  };
+  mainCol.addEventListener("scroll", handler);
 }
 
 //
@@ -668,7 +682,6 @@ function deckLoad(_deck, index) {
 }
 
 module.exports = {
-  renderExploreDecks,
-  renderExploreFilters,
+  openExploreTab,
   setExploreDecks
 };
