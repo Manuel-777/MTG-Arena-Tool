@@ -252,17 +252,16 @@ function fixBadSettingsData() {
 
   // Some people's date formats are set to "undefined"
   // These should be an empty string.
-  if(appSettings.log_locale_format === "undefined") {
+  if (appSettings.log_locale_format === "undefined") {
     appSettings.log_locale_format = "";
     rstore.set("settings", appSettings);
   }
-  // include more fixes below. Be as specific 
+  // include more fixes below. Be as specific
   // and conservitive as possible.
 }
 
 //
 ipc.on("start_background", function() {
-
   fixBadSettingsData();
 
   // first time during bootstrapping that we load
@@ -548,10 +547,16 @@ function loadPlayerConfig(playerId, serverData = undefined) {
 
   if (serverData) {
     const requestSync = {};
-    requestSync.courses = serverData.courses.filter(id => !(id in __playerData));
-    requestSync.matches = serverData.matches.filter(id => !(id in __playerData));
+    requestSync.courses = serverData.courses.filter(
+      id => !(id in __playerData)
+    );
+    requestSync.matches = serverData.matches.filter(
+      id => !(id in __playerData)
+    );
     requestSync.drafts = serverData.drafts.filter(id => !(id in __playerData));
-    requestSync.economy = serverData.economy.filter(id => !(id in __playerData));
+    requestSync.economy = serverData.economy.filter(
+      id => !(id in __playerData)
+    );
 
     const itemCount =
       requestSync.courses.length +
@@ -1067,7 +1072,10 @@ async function logLoop() {
     return;
   }
 
-  ipc_send("popup", { text: "Found Arena log for " + playerData.name, time: 0 });
+  ipc_send("popup", {
+    text: "Found Arena log for " + playerData.name,
+    time: 0
+  });
   clearInterval(logLoopInterval);
 
   let username = "";
@@ -1730,7 +1738,11 @@ function setDraftData(data) {
   }
 
   if (debugLog || !firstPass) store.set(id, data);
-  setData({ [id]: data, cards: playerData.cards, cardsNew: playerData.cardsNew });
+  setData({
+    [id]: data,
+    cards: playerData.cards,
+    cardsNew: playerData.cardsNew
+  });
   ipc_send("set_draft_cards", data);
 }
 
