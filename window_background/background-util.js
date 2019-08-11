@@ -69,6 +69,7 @@ function parseWotcTime(dateStr) {
 
 // Ignore date parsing errors and return `new Date()`
 // All other errors should still be passed upwards.
+// New code should preferentially use parseWotcTime and handle their own errors.
 function parseWotcTimeFallback(dateStr) {
   try {
     return parseWotcTime(dateStr);

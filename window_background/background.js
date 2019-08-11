@@ -250,6 +250,7 @@ ipc.on("save_app_settings", function(event, arg) {
 function fixBadSettingsData() {
   const appSettings = rstore.get("settings");
 
+  // First introduced in 2.8.4 (2019-07-25)
   // Some people's date formats are set to "undefined"
   // These should be an empty string.
   if (appSettings.log_locale_format === "undefined") {
@@ -1341,7 +1342,7 @@ function update_deck(force) {
     forceDeckUpdate();
 
     let currentMatchCopy = objectClone(currentMatch);
-    currentMatchCopy.oppCards = getOppDeck();
+    currentMatchCopy.oppCards = getOpponentDeck();
     currentMatchCopy.playerCardsLeft = currentMatch.playerCardsLeft.getSave();
     currentMatchCopy.playerCardsOdds = currentMatch.playerChances;
     currentMatchCopy.player.deck = currentMatch.player.deck.getSave();
@@ -1446,7 +1447,7 @@ function getColorArchetype(c) {
 }
 
 //
-function getOppDeck() {
+function getOpponentDeck() {
   let _deck = new Deck({}, currentMatch.oppCardsUsed, false);
   _deck.mainboard.removeDuplicates(true);
   _deck.getColors();
@@ -1670,7 +1671,7 @@ function saveMatch(id, matchEndTime) {
 
   match.eventId = currentMatch.eventId;
   match.playerDeck = currentMatch.player.originalDeck.getSave();
-  match.oppDeck = getOppDeck();
+  match.oppDeck = getOpponentDeck();
 
   if (
     (!match.tags || !match.tags.length) &&
