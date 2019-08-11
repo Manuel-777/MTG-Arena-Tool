@@ -1333,7 +1333,7 @@ function update_deck(force) {
     forceDeckUpdate();
 
     let currentMatchCopy = objectClone(currentMatch);
-    currentMatchCopy.oppCards = getOppdeck();
+    currentMatchCopy.oppCards = getOppDeck();
     currentMatchCopy.playerCardsLeft = currentMatch.playerCardsLeft.getSave();
     currentMatchCopy.playerCardsOdds = currentMatch.playerChances;
     currentMatchCopy.player.deck = currentMatch.player.deck.getSave();
@@ -1438,7 +1438,7 @@ function getColorArchetype(c) {
 }
 
 //
-function getOppdeck() {
+function getOppDeck() {
   let _deck = new Deck({}, currentMatch.oppCardsUsed, false);
   _deck.mainboard.removeDuplicates(true);
   _deck.getColors();
@@ -1662,7 +1662,7 @@ function saveMatch(id, matchEndTime) {
 
   match.eventId = currentMatch.eventId;
   match.playerDeck = currentMatch.player.originalDeck.getSave();
-  match.oppDeck = getOppdeck();
+  match.oppDeck = getOppDeck();
 
   if (
     (!match.tags || !match.tags.length) &&
