@@ -30,7 +30,6 @@ let dateFormats = [
   "yyyy/MM/dd HH:mm:ss"
 ];
 
-
 class DateParseError extends Error {
   constructor(message) {
     super(message);
@@ -38,7 +37,7 @@ class DateParseError extends Error {
   }
 }
 
-// Parse the localised date string using local format 
+// Parse the localised date string using local format
 // or attempted detection
 // This must throw an error if it fails
 // Calling code should notify user or fallback as requested.
@@ -51,13 +50,17 @@ function parseWotcTime(dateStr) {
   const dateFormat = getDateFormat(dateStr);
 
   if (!dateFormat) {
-    throw new DateParseError(`Invalid date or format ('${dateFormat}', '${dateStr}')`);
+    throw new DateParseError(
+      `Invalid date or format ('${dateFormat}', '${dateStr}')`
+    );
   }
 
   const date = parse(dateStr, dateFormat, new Date());
 
   if (!isValidDate(date)) {
-    throw new DateParseError(`Invalid date or format ('${dateFormat}', '${dateStr}')`);
+    throw new DateParseError(
+      `Invalid date or format ('${dateFormat}', '${dateStr}')`
+    );
   }
 
   // This must throw an error if it fails
@@ -69,9 +72,12 @@ function parseWotcTime(dateStr) {
 function parseWotcTimeFallback(dateStr) {
   try {
     return parseWotcTime(dateStr);
-  } catch(e) {
+  } catch (e) {
     if (e instanceof DateParseError) {
-      console.error('DateParseError: using new Date() fallback. Retain original date string.', e);
+      console.error(
+        "DateParseError: using new Date() fallback. Retain original date string.",
+        e
+      );
       return new Date();
     } else {
       throw e;
@@ -83,20 +89,18 @@ function isValidDate(date) {
   return isValid(date) && !isNaN(date.getTime());
 }
 
-
 function getDateFormat(dateStr) {
   if (playerData.settings.log_locale_format) {
     // return the players setting
     return playerData.settings.log_locale_format;
   } else {
-    // return the first date format which parses 
+    // return the first date format which parses
     // the string returning a valid date
     return dateFormats.find(dateFormat => {
       return isValidDate(parse(dateStr, dateFormat, new Date()));
     });
   }
 }
-
 
 function normaliseFields(iterator) {
   if (typeof iterator == "object") {
