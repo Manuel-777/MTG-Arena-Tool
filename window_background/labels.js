@@ -823,7 +823,7 @@ function onLabelInDraftDraftStatus(entry, json) {
   data.set = getDraftSet(eventName) || data.set;
 
   if (!data.date) {
-    // the first time we check the 
+    // the first time we check the
     // draft status we set the date.
     data.timestamp = entry.timestamp;
     data.date = logTime;
@@ -938,7 +938,10 @@ function onLabelMatchGameRoomStateChangedEvent(entry, json) {
     matchCompletedOnGameNumber = json.finalMatchResult.resultList.length - 1;
 
     var matchEndTime = parseWotcTimeFallback(entry.timestamp);
-    saveMatch(json.finalMatchResult.matchId + "-" + playerData.arenaId, matchEndTime);
+    saveMatch(
+      json.finalMatchResult.matchId + "-" + playerData.arenaId,
+      matchEndTime
+    );
   }
 
   if (json.players) {

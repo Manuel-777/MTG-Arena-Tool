@@ -32,7 +32,8 @@ function httpBasic() {
       var _headers = value;
 
       if (
-        (playerData.settings.send_data == false || playerData.offline == true) &&
+        (playerData.settings.send_data == false ||
+          playerData.offline == true) &&
         _headers.method != "auth" &&
         _headers.method != "delete_data" &&
         _headers.method != "get_database" &&
