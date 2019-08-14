@@ -22,8 +22,8 @@
     saveEconomyTransaction
     matchBeginTime
     clearDraftData
-    createMatch
-    createDraft
+    processMatch
+    getDraftData
     endDraft
     setDraftData
     startDraft
@@ -748,7 +748,7 @@ function onLabelEventMatchCreated(entry, json) {
 
   ipc_send("ipc_log", "MATCH CREATED: " + matchBeginTime);
   if (json.eventId != "NPE") {
-    createMatch(json, matchBeginTime);
+    processMatch(json, matchBeginTime);
   }
 }
 
@@ -791,22 +791,9 @@ function getDraftSet(eventName) {
   return "";
 }
 
-function getDraftData(id) {
-  const draftData = playerData.draft(id) || {
-    ...createDraft(),
-    id,
-    draftId: id,
-    date: undefined, // previously new Date()
-    owner: playerData.name
-  };
-  return draftData;
-}
-
 function onLabelInDraftDraftStatus(entry, json) {
   // console.log("LABEL:  Draft status ", json);
   if (!json) return;
-
-  logTime = parseWotcTimeFallback(entry.timestamp);
 
   startDraft();
   const { draftId, eventName, packNumber, pickNumber, pickedCards } = json;
@@ -815,19 +802,12 @@ function onLabelInDraftDraftStatus(entry, json) {
     clearDraftData(draftId);
   }
   const data = {
-    ...getDraftData(draftId),
+    ...getDraftData(draftId, entry),
     ...json,
     currentPack: (json.draftPack || []).slice(0)
   };
   data.draftId = data.id;
   data.set = getDraftSet(eventName) || data.set;
-
-  if (!data.date) {
-    // the first time we check the
-    // draft status we set the date.
-    data.timestamp = entry.timestamp;
-    data.date = logTime;
-  }
 
   setDraftData(data);
 }
@@ -838,7 +818,7 @@ function onLabelInDraftMakePick(entry, json) {
   const { draftId, eventName } = json;
   startDraft();
   const data = {
-    ...getDraftData(draftId),
+    ...getDraftData(draftId, entry),
     ...json,
     currentPack: (json.draftPack || []).slice(0)
   };
@@ -852,7 +832,7 @@ function onLabelOutDraftMakePick(entry, json) {
   if (!json || !json.params) return;
   const { draftId, packNumber, pickNumber, cardId } = json.params;
   const key = "pack_" + packNumber + "pick_" + pickNumber;
-  const data = getDraftData(draftId);
+  const data = getDraftData(draftId, entry);
   data[key] = {
     pick: cardId,
     pack: data.currentPack
@@ -864,11 +844,11 @@ function onLabelInEventCompleteDraft(entry, json) {
   // console.log("LABEL:  Complete draft ", json);
   if (!json) return;
   const toolId = json.Id + "-draft";
-  const savedData = getDraftData(toolId);
+  const savedData = getDraftData(toolId, entry);
   const draftId = json.ModuleInstanceData.DraftInfo.DraftId;
   const data = {
     ...savedData,
-    ...getDraftData(draftId),
+    ...getDraftData(draftId, entry),
     ...json
   };
   data.id = toolId;
@@ -911,7 +891,7 @@ function onLabelMatchGameRoomStateChangedEvent(entry, json) {
         matchId: json.gameRoomConfig.matchId
       };
       var matchBeginTime = parseWotcTimeFallback(entry.timestamp);
-      createMatch(arg, matchBeginTime);
+      processMatch(arg, matchBeginTime);
     }
     json.gameRoomConfig.reservedPlayers.forEach(player => {
       if (player.userId == playerData.arenaId) {

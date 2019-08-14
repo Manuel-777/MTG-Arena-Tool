@@ -84,6 +84,8 @@ const {
   onLabelTrackRewardTierUpdated
 } = require("./labels");
 
+const { createDeck, createDraft, createMatch } = require("./data");
+
 const toolVersion = electron.remote.app
   .getVersion()
   .split(".")
@@ -137,80 +139,6 @@ if (!fs.existsSync(actionLogDir)) {
 
 var firstPass = true;
 var tokenAuth = undefined;
-
-const deckDefault = {
-  deckTileId: DEFAULT_TILE,
-  description: "",
-  format: "Standard",
-  colors: [],
-  id: "00000000-0000-0000-0000-000000000000",
-  lastUpdated: "2018-05-31T00:06:29.7456958",
-  mainDeck: [],
-  name: "Undefined",
-  sideboard: []
-};
-
-var currentMatchDefault = {
-  eventId: "",
-  matchId: "",
-  beginTime: 0,
-  matchTime: 0,
-  currentPriority: 0,
-  bestOf: 1,
-  game: 0,
-  priorityTimers: [0, 0, 0, 0, 0],
-  lastPriorityChangeTime: 0,
-  results: [],
-  playerChances: {},
-  playerCardsLeft: {},
-  oppArchetype: "",
-  oppCards: {},
-  onThePlay: 0,
-  GREtoClient: {},
-  processedAnnotations: [],
-  timers: {},
-  zones: [],
-  players: {},
-  annotations: [],
-  gameObjs: {},
-  gameInfo: {},
-  gameStage: "",
-  turnInfo: {},
-  playerCardsUsed: [],
-  oppCardsUsed: [],
-  cardsCast: [],
-  player: {
-    seat: 1,
-    deck: { mainDeck: [], sideboard: [] },
-    life: 20,
-    turn: 0,
-    name: "",
-    id: "",
-    rank: "",
-    tier: 1
-  },
-  opponent: {
-    seat: 2,
-    deck: { mainDeck: [], sideboard: [] },
-    life: 20,
-    turn: 0,
-    name: "",
-    id: "",
-    rank: "",
-    tier: 1
-  }
-};
-
-var currentDraftDefault = {
-  eventId: "",
-  draftId: "",
-  set: "",
-  owner: "",
-  pickedCards: [],
-  packNumber: 0,
-  pickNumber: 0,
-  currentPack: []
-};
 
 var currentMatch = null;
 
@@ -365,7 +293,7 @@ ipc.on("import_custom_deck", function(event, arg) {
   const id = data.id;
   if (!id || playerData.deckExists(id)) return;
   const deckData = {
-    ...objectClone(deckDefault),
+    ...createDeck(),
     ...data
   };
   addCustomDeck(deckData);
@@ -1257,11 +1185,9 @@ function addCustomDeck(customDeck) {
   if (debugLog || !firstPass) store.set("decks." + id, deckData);
 }
 
-//
-function createMatch(json, matchBeginTime) {
+// Create a match from data, set globals and trigger ipc
+function processMatch(json, matchBeginTime) {
   actionLog(-99, new Date(), "");
-
-  var match = _.cloneDeep(currentMatchDefault);
 
   if (debugLog || !firstPass) {
     if (playerData.settings.close_on_match) {
@@ -1271,21 +1197,11 @@ function createMatch(json, matchBeginTime) {
     ipc_send("set_arena_state", ARENA_MODE_MATCH);
   }
 
-  match.player.originalDeck = originalDeck;
-  match.player.deck = originalDeck.clone();
-  match.playerCardsLeft = originalDeck.clone();
+  var match = createMatch(json, matchBeginTime);
 
-  match.opponent.name = json.opponentScreenName;
-  match.opponent.rank = json.opponentRankingClass;
-  match.opponent.tier = json.opponentRankingTier;
-  match.opponent.cards = [];
-  match.eventId = json.eventId;
-  match.matchId = json.matchId + "-" + playerData.arenaId;
-  match.gameStage = "";
+  // set global values
 
-  match.beginTime = matchBeginTime;
-
-  match.lastPriorityChangeTime = matchBeginTime;
+  currentMatch = match;
   matchGameStats = [];
   matchCompletedOnGameNumber = 0;
   gameNumberCompleted = 0;
@@ -1307,10 +1223,6 @@ function createMatch(json, matchBeginTime) {
     let str = currentDeck.getSave();
     httpApi.httpTournamentCheck(str, match.opponent.name, true);
   }
-
-  // set global value
-
-  currentMatch = match;
 
   ipc_send("set_priority_timer", match.priorityTimers, IPC_OVERLAY);
 
@@ -1708,11 +1620,6 @@ function saveMatch(id, matchEndTime) {
 }
 
 //
-function createDraft() {
-  return _.cloneDeep(currentDraftDefault);
-}
-
-//
 function startDraft() {
   if (debugLog || !firstPass) {
     if (playerData.settings.close_on_match) {
@@ -1721,6 +1628,10 @@ function startDraft() {
     ipc_send("set_arena_state", ARENA_MODE_DRAFT);
   }
   duringDraft = true;
+}
+
+function getDraftData(id, entry) {
+  return playerData.draft(id) || createDraft(id, entry);
 }
 
 //
