@@ -46,7 +46,12 @@ const {
   IPC_OVERLAY,
   MAIN_DECKS
 } = require("../shared/constants");
-const { ipc_send, setData, unleakString } = require("./background-util");
+const {
+  ipc_send,
+  setData,
+  unleakString,
+  parseWotcTimeFallback
+} = require("./background-util");
 const {
   onLabelOutLogInfo,
   onLabelGreToClient,
@@ -1624,7 +1629,15 @@ function startDraft() {
 }
 
 function getDraftData(id, entry) {
-  return playerData.draft(id) || createDraft(id, entry);
+  var data = playerData.draft(id) || createDraft(id, entry);
+
+  if (!data.date && entry.timestamp) {
+    // the first event we see we set the date.
+    data.timestamp = entry.timestamp;
+    data.date = parseWotcTimeFallback(entry.timestamp);
+  }
+
+  return data;
 }
 
 //

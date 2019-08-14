@@ -36,12 +36,6 @@ function createDraft(id, entry) {
     draftId: id,
     owner: playerData.name
   };
-
-  if (!data.date && entry.timestamp) {
-    // the first event we see we set the date.
-    data.timestamp = entry.timestamp;
-    data.date = parseWotcTimeFallback(entry.timestamp);
-  }
   return data;
 }
 
