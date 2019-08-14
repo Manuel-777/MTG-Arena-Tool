@@ -14,6 +14,7 @@ global
   instanceToCardIdMap
   update_deck
 */
+const { IPC_OVERLAY } = require("../shared/constants.js");
 const { objectClone } = require("../shared/util");
 
 const { ipc_send } = require("./background-util");
@@ -708,15 +709,19 @@ function checkTurnDiff(turnInfo) {
   }
 
   if (!firstPass) {
-    ipc_send("set_turn", {
-      playerSeat: currentMatch.player.seat,
-      turnPhase: turnInfo.phase,
-      turnStep: turnInfo.step,
-      turnNumber: turnInfo.turnNumber,
-      turnActive: turnInfo.activePlayer,
-      turnPriority: turnInfo.priorityPlayer,
-      turnDecision: turnInfo.decisionPlayer
-    });
+    ipc_send(
+      "set_turn",
+      {
+        playerSeat: currentMatch.player.seat,
+        turnPhase: turnInfo.phase,
+        turnStep: turnInfo.step,
+        turnNumber: turnInfo.turnNumber,
+        turnActive: turnInfo.activePlayer,
+        turnPriority: turnInfo.priorityPlayer,
+        turnDecision: turnInfo.decisionPlayer
+      },
+      IPC_OVERLAY
+    );
   }
 }
 

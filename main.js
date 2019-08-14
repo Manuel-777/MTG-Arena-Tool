@@ -30,7 +30,7 @@ const debugIPC = false;
 var mainWindow = null;
 var updaterWindow = null;
 var background = null;
-var overlays = [];
+var overlay = null;
 var mainTimeout = null;
 
 var tray = null;
@@ -41,12 +41,6 @@ const ipc = electron.ipcMain;
 
 var mainLoaded = false;
 var backLoaded = false;
-
-const {
-  OverlayProcess,
-  setArenaState,
-  setBackground
-} = require("./window_overlay/overlay-process.js");
 
 const singleLock = app.requestSingleInstanceLock();
 
@@ -132,18 +126,37 @@ function startApp() {
   }
   mainWindow = createMainWindow();
   background = createBackgroundWindow();
-  setBackground(background);
+
+  setTimeout(() => {
+    overlay = createOverlayWindow();
+  }, 500);
+
   appStarted = true;
 
   globalShortcut.register("Alt+Shift+D", () => {
-    if (!background.isVisible()) background.show();
-    else background.hide();
-    background.toggleDevTools();
-    mainWindow.toggleDevTools();
+    if (background.isDevToolsOpened()) {
+      background.closeDevTools();
+    } else {
+      background.openDevTools({ mode: "detach" });
+    }
+    if (mainWindow.isDevToolsOpened()) {
+      mainWindow.closeDevTools();
+    } else {
+      showWindow();
+      mainWindow.openDevTools();
+    }
+  });
+
+  globalShortcut.register("Alt+Shift+E", () => {
+    overlay.webContents.send("edit");
   });
 
   globalShortcut.register("Alt+Shift+O", () => {
-    overlays.forEach(overlay => overlay.window.toggleDevTools());
+    if (overlay.isDevToolsOpened()) {
+      overlay.closeDevTools();
+    } else {
+      overlay.openDevTools({ mode: "detach" });
+    }
   });
 
   mainWindow.webContents.once("dom-ready", () => {
@@ -168,9 +181,6 @@ function startApp() {
   }
 
   ipc.on("ipc_switch", function(event, method, from, arg, to) {
-    const overlayMux = () =>
-      overlays.forEach(overlay => overlay.window.webContents.send(method, arg));
-
     if (debugIPC && method != "log_read") {
       if (
         debugIPC == 2 &&
@@ -202,12 +212,12 @@ function startApp() {
 
       case "player_data_refresh":
         mainWindow.webContents.send("player_data_refresh");
-        overlayMux();
+        if (overlay) overlay.webContents.send("player_data_refresh");
         break;
 
       case "set_db":
         mainWindow.webContents.send("set_db", arg);
-        overlayMux();
+        if (overlay) overlay.webContents.send("set_db", arg);
         break;
 
       case "popup":
@@ -223,26 +233,14 @@ function startApp() {
         mainWindow.minimize();
         break;
 
-      // to main js / window handling
       case "set_arena_state":
-        setArenaState(arg);
-        overlays.forEach(overlay => overlay.updateVisible());
-        break;
-
-      case "set_draft_cards":
-        overlayMux();
-        break;
-
-      case "set_turn":
-        overlayMux();
+        mainWindow.webContents.send("player_data_refresh");
+        if (overlay) overlay.webContents.send("set_arena_state", arg);
         break;
 
       case "overlay_minimize":
-        overlays.forEach((overlay, index) => {
-          if (index !== arg) return;
-          if (overlay.window.isMinimized()) return;
-          overlay.window.minimize();
-        });
+        if (!overlay || overlay.isMinimized()) return;
+        overlay.minimize();
         break;
 
       case "renderer_set_bounds":
@@ -275,12 +273,6 @@ function startApp() {
 
       case "set_clipboard":
         clipboard.writeText(arg);
-        break;
-
-      case "reset_overlay_pos":
-        if (arg < overlays.length) {
-          overlays[arg].window.setPosition(0, 0);
-        }
         break;
 
       case "updates_check":
@@ -342,7 +334,7 @@ function startApp() {
       default:
         if (to == 0) background.webContents.send(method, arg);
         if (to == 1) mainWindow.webContents.send(method, arg);
-        if (to == 2) overlayMux();
+        if (to === 2 && overlay) overlay.webContents.send(method, arg);
         break;
     }
   });
@@ -364,13 +356,27 @@ function setSettings(settings) {
   launchToTray = settings.launch_to_tray;
   mainWindow.webContents.send("settings_updated");
 
-  settings.overlays.forEach((overlaySettings, index) => {
-    if (index < overlays.length) {
-      overlays[index].updateSettings(overlaySettings);
-    } else {
-      overlays.push(new OverlayProcess(overlaySettings, index));
+  let displayId = settings.overlay_display
+    ? settings.overlay_display
+    : electron.screen.getPrimaryDisplay().id;
+  let display = electron.screen
+    .getAllDisplays()
+    .filter(d => d.id == displayId)[0];
+  overlay.setSize(display.bounds.width, display.bounds.height);
+  overlay.setPosition(display.bounds.x, display.bounds.y);
+
+  settings.overlays.forEach((_settings, index) => {
+    globalShortcut.unregister("Alt+Shift+" + (index + 1));
+    if (_settings.keyboard_shortcut) {
+      globalShortcut.register("Alt+Shift+" + (index + 1), () => {
+        overlay.webContents.send("close", { action: -1, index: index });
+      });
     }
   });
+
+  // Send settings update
+  overlay.setAlwaysOnTop(settings.overlays[0].ontop, "floating");
+  overlay.webContents.send("settings_updated");
 }
 
 // Catch exceptions
@@ -410,6 +416,10 @@ function showWindow() {
   if (updaterWindow) {
     if (!updaterWindow.isVisible()) updaterWindow.show();
     else updaterWindow.moveTop();
+  }
+  if (overlay) {
+    if (!overlay.isVisible()) overlay.show();
+    else overlay.moveTop();
   }
 }
 
@@ -467,6 +477,40 @@ function createBackgroundWindow() {
   win.on("closed", onClosed);
 
   return win;
+}
+
+function createOverlayWindow() {
+  const overlay = new electron.BrowserWindow({
+    transparent: true,
+    x: -10,
+    y: -10,
+    width: 5,
+    height: 5,
+    frame: false,
+    resizable: false,
+    skipTaskbar: true,
+    focusable: false,
+    title: "MTG Arena Tool",
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
+  overlay.loadURL(`file://${__dirname}/window_overlay_v3/index.html`);
+  overlay.setIgnoreMouseEvents(true, { forward: true });
+
+  overlay.webContents.once("dom-ready", function() {
+    //We need to wait for the overlay to be initialized before we interact with it
+    const display = electron.screen.getPrimaryDisplay();
+    // display.workArea does not include the taskbar
+    overlay.setSize(display.bounds.width, display.bounds.height);
+    overlay.setPosition(display.bounds.x, display.bounds.height);
+    overlay.webContents.send("settings_updated");
+    // only show overlay after its ready
+    // TODO does this work with Linux transparency???
+    setTimeout(() => overlay.show(), 1000);
+  });
+
+  return overlay;
 }
 
 function createMainWindow() {

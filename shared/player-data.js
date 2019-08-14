@@ -42,7 +42,6 @@ const overlayCfg = {
   mana_curve: false,
   mode: 1,
   ontop: true,
-  scale: 100,
   show: true,
   show_always: false,
   sideboard: false,
@@ -73,6 +72,7 @@ const defaultCfg = {
     last_open_tab: -1,
     card_tile_style: CARD_TILE_FLAT,
     skip_firstpass: false,
+    overlay_scale: 100,
     overlays: [
       {
         ...overlayCfg,

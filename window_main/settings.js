@@ -237,49 +237,6 @@ function appendBehaviour(section) {
     pd.settings.close_to_tray,
     updateUserSettings
   );
-  addCheckbox(
-    section,
-    "Sound when priority changes",
-    "settings_soundpriority",
-    pd.settings.sound_priority,
-    updateUserSettings
-  );
-
-  const sliderSoundVolume = createDiv(["slidecontainer_settings"]);
-  const sliderSoundVolumeLabel = createLabel(
-    [],
-    "Volume: " + Math.round(pd.settings.sound_priority_volume * 100) + "%"
-  );
-  sliderSoundVolumeLabel.style.width = "400px";
-  sliderSoundVolume.appendChild(sliderSoundVolumeLabel);
-
-  const sliderSoundVolumeInput = createInput(
-    ["slider", "sliderSoundVolume"],
-    "",
-    {
-      id: "settings_soundpriorityvolume",
-      type: "range",
-      min: "0",
-      max: "1",
-      step: ".001",
-      value: pd.settings.sound_priority_volume
-    }
-  );
-  sliderSoundVolumeInput.addEventListener("input", function() {
-    const volume = Math.round(this.value * 100);
-    sliderSoundVolumeLabel.innerHTML = "Volume: " + volume + "%";
-  });
-  sliderSoundVolumeInput.addEventListener("change", function() {
-    let { Howl, Howler } = require("howler");
-    let sound = new Howl({ src: ["../sounds/blip.mp3"] });
-    Howler.volume(this.value);
-    sound.play();
-    updateUserSettingsBlend({
-      sound_priority_volume: this.value
-    });
-  });
-  sliderSoundVolume.appendChild(sliderSoundVolumeInput);
-  section.appendChild(sliderSoundVolume);
 
   const label = createLabel(["but_container_label"], "Export Format:");
   const icd = createDiv(["input_container"]);
@@ -393,15 +350,115 @@ function appendArenaData(section) {
 
 function appendOverlay(section) {
   section.appendChild(createDiv(["settings_title"], "Overlays"));
+
+  const sliderScale = createDiv(["slidecontainer_settings"]);
+  const sliderScaleLabel = createLabel(
+    ["card_size_container"],
+    "UI Scale: " + pd.settings.overlay_scale + "%"
+  );
+  sliderScaleLabel.style.width = "400px";
+  sliderScale.appendChild(sliderScaleLabel);
+
+  const sliderScaleInput = createInput(["slider"], "", {
+    id: "scaleRange",
+    type: "range",
+    min: "10",
+    max: "200",
+    step: "10",
+    value: pd.settings.overlay_scale
+  });
+  sliderScaleInput.addEventListener("input", function() {
+    sliderScaleLabel.innerHTML = "UI Scale: " + parseInt(this.value) + "%";
+  });
+  sliderScaleInput.addEventListener("change", function() {
+    updateUserSettingsBlend({ overlay_scale: parseInt(this.value) });
+  });
+  sliderScale.appendChild(sliderScaleInput);
+  section.appendChild(sliderScale);
+
+  addCheckbox(
+    section,
+    "Sound when priority changes",
+    "settings_soundpriority",
+    pd.settings.sound_priority,
+    updateUserSettings
+  );
+
+  const sliderSoundVolume = createDiv(["slidecontainer_settings"]);
+  const sliderSoundVolumeLabel = createLabel(
+    [],
+    "Volume: " + Math.round(pd.settings.sound_priority_volume * 100) + "%"
+  );
+  sliderSoundVolumeLabel.style.width = "400px";
+  sliderSoundVolume.appendChild(sliderSoundVolumeLabel);
+
+  const sliderSoundVolumeInput = createInput(
+    ["slider", "sliderSoundVolume"],
+    "",
+    {
+      id: "settings_soundpriorityvolume",
+      type: "range",
+      min: "0",
+      max: "1",
+      step: ".001",
+      value: pd.settings.sound_priority_volume
+    }
+  );
+  sliderSoundVolumeInput.addEventListener("input", function() {
+    const volume = Math.round(this.value * 100);
+    sliderSoundVolumeLabel.innerHTML = "Volume: " + volume + "%";
+  });
+  sliderSoundVolumeInput.addEventListener("change", function() {
+    let { Howl, Howler } = require("howler");
+    let sound = new Howl({ src: ["../sounds/blip.mp3"] });
+    Howler.volume(this.value);
+    sound.play();
+    updateUserSettingsBlend({
+      sound_priority_volume: this.value
+    });
+  });
+  sliderSoundVolume.appendChild(sliderSoundVolumeInput);
+  section.appendChild(sliderSoundVolume);
+
   const helpDiv = createDiv(
     ["settings_note"],
     `You can enable up to 5 independent overlay windows. Customize each overlay
-    using the settings below.`
+    using the settings below.</br>
+    To edit the overlay's position and size press Alt + Shift + E`
   );
-  helpDiv.style.margin = "0px 64px 0px 16px";
+  helpDiv.style.margin = "24px 64px 0px 16px";
   section.appendChild(helpDiv);
 
   const topCont = createDiv(["overlay_section_selector_cont", "top_nav_icons"]);
+
+  let overlayDisplay = pd.settings.overlay_display
+    ? pd.settings.overlay_display
+    : remote.screen.getPrimaryDisplay().id;
+
+  const label = createLabel(["but_container_label"], "Overlay Display:");
+  const displaySelect = createSelect(
+    label,
+    remote.screen.getAllDisplays().map((v, i) => {
+      return v.id;
+    }),
+    overlayDisplay,
+    filter => {
+      pd.settings.overlay_display = filter;
+      updateUserSettingsBlend();
+    },
+    `overlay_display`,
+    filter => {
+      let displayNumber = remote.screen
+        .getAllDisplays()
+        .findIndex(d => d.id == filter);
+      let primary = filter == remote.screen.getPrimaryDisplay().id;
+
+      return primary ? `${displayNumber} (primary)` : displayNumber;
+    }
+  );
+  displaySelect.style.width = "180px";
+  displaySelect.style.marginLeft = "32px";
+  section.appendChild(label);
 
   pd.settings.overlays.forEach((settings, index) => {
     const overlaySettingsNav = createDiv([
@@ -534,9 +591,17 @@ function appendOverlay(section) {
       settings.show_always,
       updateUserSettings
     );
+    const helpDiv = createDiv(
+      ["settings_note"],
+      `<p><i>Displays the overlay regardless of Arena match or draft status
+      ("Enable Overlay" must also be checked). To adjust overlay position,
+      click on its colored icon in the top left to toggle edit mode.</i></p>`
+    );
+    helpDiv.style.paddingLeft = "35px";
+    overlaySection.appendChild(helpDiv);
     addCheckbox(
       overlaySection,
-      `Enable Alt+${index + 1} keyboard shortcut`,
+      `Enable Alt+Shift+${index + 1} keyboard shortcut`,
       `overlay_${index}_keyboard_shortcut`,
       settings.keyboard_shortcut,
       updateUserSettings
@@ -677,38 +742,15 @@ function appendOverlay(section) {
     sliderOpacityBack.appendChild(sliderOpacityBackInput);
     overlaySection.appendChild(sliderOpacityBack);
 
-    const sliderScale = createDiv(["slidecontainer_settings"]);
-    const sliderScaleLabel = createLabel(
-      ["card_size_container"],
-      "Scale: " + settings.scale + "%"
-    );
-    sliderScaleLabel.style.width = "400px";
-    sliderScale.appendChild(sliderScaleLabel);
-
-    const sliderScaleInput = createInput(["slider"], "", {
-      id: "scaleRange",
-      type: "range",
-      min: "10",
-      max: "200",
-      step: "10",
-      value: settings.scale
-    });
-    sliderScaleInput.addEventListener("input", function() {
-      sliderScaleLabel.innerHTML = "Scale: " + parseInt(this.value) + "%";
-    });
-    sliderScaleInput.addEventListener("change", function() {
-      pd.settings.overlays[index].scale = parseInt(this.value);
-      updateUserSettingsBlend();
-    });
-    sliderScale.appendChild(sliderScaleInput);
-    overlaySection.appendChild(sliderScale);
-
     const resetButton = createDiv(
       ["button_simple", "centered"],
       "Reset Position"
     );
     resetButton.addEventListener("click", function() {
-      ipcSend("reset_overlay_pos", index);
+      pd.settings.overlays[index].bounds = {
+        ...pd.defaultCfg.settings.overlays[0].bounds
+      };
+      updateUserSettingsBlend();
     });
     overlaySection.appendChild(resetButton);
 

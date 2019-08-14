@@ -1211,13 +1211,6 @@ function processMatch(json, matchBeginTime) {
 
   ipc_send("ipc_log", "vs " + match.opponent.name);
   ipc_send("set_timer", match.beginTime, IPC_OVERLAY);
-  ipc_send("set_opponent", match.opponent.name, IPC_OVERLAY);
-  ipc_send(
-    "set_opponent_rank",
-    get_rank_index(match.opponent.rank, match.opponent.tier),
-    match.opponent.rank + " " + match.opponent.tier,
-    IPC_OVERLAY
-  );
 
   if (match.eventId == "DirectGame" && currentDeck) {
     let str = currentDeck.getSave();
@@ -1655,7 +1648,7 @@ function setDraftData(data) {
     cards: playerData.cards,
     cardsNew: playerData.cardsNew
   });
-  ipc_send("set_draft_cards", data);
+  ipc_send("set_draft_cards", data, IPC_OVERLAY);
 }
 
 //
