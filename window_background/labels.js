@@ -367,7 +367,7 @@ function onLabelMythicRatingUpdated(entry, json) {
   // }
 
   if (!json) return;
-  const rank = { ...pd.rank };
+  const rank = { ...playerData.rank };
 
   rank.constructed.percentile = json.newMythicPercentile;
   rank.constructed.leaderboardPlace = json.newMythicLeaderboardPlacement;

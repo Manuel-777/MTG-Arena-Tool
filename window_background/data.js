@@ -105,7 +105,7 @@ function createMatch(json, matchBeginTime) {
 
   match.opponent.percentile = json.opponentMythicPercentile;
   match.opponent.leaderboardPlace = json.opponentMythicLeaderboardPlace;
-  
+
   match.opponent.cards = [];
 
   match.eventId = json.eventId;
