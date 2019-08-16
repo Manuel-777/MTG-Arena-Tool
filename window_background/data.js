@@ -102,7 +102,12 @@ function createMatch(json, matchBeginTime) {
   match.opponent.name = json.opponentScreenName;
   match.opponent.rank = json.opponentRankingClass;
   match.opponent.tier = json.opponentRankingTier;
+
+  match.opponent.percentile = json.opponentMythicPercentile;
+  match.opponent.leaderboardPlace = json.opponentMythicLeaderboardPlace;
+  
   match.opponent.cards = [];
+
   match.eventId = json.eventId;
   match.matchId = json.matchId + "-" + playerData.arenaId;
   match.gameStage = "";

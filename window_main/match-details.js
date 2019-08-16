@@ -18,7 +18,8 @@ const {
   get_deck_export,
   get_deck_export_txt,
   get_rank_index,
-  makeId
+  makeId,
+  formatRank
 } = require("../shared/util");
 const {
   hypergeometricSignificance,
@@ -450,7 +451,7 @@ function renderSeat(
   const rank = player.rank;
   const tier = player.tier;
   const rankClass = isLimited ? "top_limited_rank" : "top_constructed_rank";
-  const r = createDiv([rankClass], "", { title: rank + " " + tier });
+  const r = createDiv([rankClass], "", { title: formatRank(player) });
   r.style.backgroundPosition = get_rank_index(rank, tier) * -48 + "px 0px";
   fltl.appendChild(r);
   flt.appendChild(fltl);

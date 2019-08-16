@@ -286,6 +286,14 @@ relative-time, local-time {
     background-position: 0px 0px;
 }
 
+.top_constructed_rank, .top_limited_rank {
+  /* Align leaderboard indicator to center and add text border*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
 .top_patreon {
     -webkit-app-region: no-drag;
     align-self: center;

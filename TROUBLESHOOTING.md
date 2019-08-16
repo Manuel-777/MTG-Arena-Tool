@@ -32,11 +32,11 @@ If this works, send the the old log file file to [mtgatool@gmail.com](mailto:mtg
 
 If that does not work;
 - Proceed to `%APPDATA%\mtg-arena-tool`
-- Locate a .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`
+- Locate your user-data file (the .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`)
 - Rename the file, adding something to the end. **Do not delete it!**
 - Run MTG Arena Tool again.
 
-If the last step worked, send the the .json file to [mtgatool@gmail.com](mailto:mtgatool@gmail.com) and I will inspect what is wrong with it.
+If the last step worked, send your user-data file to [mtgatool@gmail.com](mailto:mtgatool@gmail.com) and I will inspect what is wrong with it.
 
 ### If you recieve a "No log file found" error
 

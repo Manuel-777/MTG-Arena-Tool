@@ -309,8 +309,23 @@ function onLabelInEventGetCombinedRankInfo(entry, json) {
   rank.limited.lost = json.limitedMatchesLost;
   rank.limited.drawn = json.limitedMatchesDrawn;
 
+  rank.constructed.percentile = json.constructedPercentile;
+  rank.constructed.leaderboardPlace = json.constructedLeaderboardPlace;
+  rank.constructed.seasonOrdinal = json.constructedSeasonOrdinal;
+
+  rank.limited.percentile = json.limitedPercentile;
+  rank.limited.leaderboardPlace = json.limitedLeaderboardPlace;
+  rank.limited.seasonOrdinal = json.limitedSeasonOrdinal;
+
+  var infoLength = Object.keys(json).length - 1;
+  if (infoLength != Object.keys(rank).length) {
+    console.warn("rankInfo is not processing all data.", Object.keys(json));
+  }
+
   setData({ rank });
-  if (debugLog || !firstPass) store.set("rank", rank);
+  if (debugLog || !firstPass) {
+    store.set("rank", rank);
+  }
 }
 
 function onLabelInEventGetActiveEvents(entry, json) {
@@ -324,18 +339,43 @@ function onLabelRankUpdated(entry, json) {
   if (!json) return;
   const rank = { ...playerData.rank };
 
-  if (json.rankUpdateType === "Constructed") {
-    rank.constructed.rank = json.newClass;
-    rank.constructed.tier = json.newLevel;
-    rank.constructed.step = json.newStep;
-  } else {
-    rank.limited.rank = json.newClass;
-    rank.limited.tier = json.newLevel;
-    rank.limited.step = json.newStep;
-  }
+  // json.wasLossProtected
+  // json.seasonOrdinal
+  const updateType = json.rankUpdateType.toLowerCase();
+
+  rank[updateType].rank = json.newClass;
+  rank[updateType].tier = json.newLevel;
+  rank[updateType].step = json.newStep;
+  rank[updateType].seasonOrdinal = json.seasonOrdinal;
 
   setData({ rank });
-  if (debugLog || !firstPass) store.set("rank", rank);
+  if (debugLog || !firstPass) {
+    store.set("rank", rank);
+  }
+}
+
+function onLabelMythicRatingUpdated(entry, json) {
+  // This is exclusive to constructed?
+  // Not sure what the limited event is called.
+
+  // Example data:
+  // (-1) Incoming MythicRating.Updated {
+  //   "oldMythicPercentile": 100.0,
+  //   "newMythicPercentile": 100.0,
+  //   "newMythicLeaderboardPlacement": 77,
+  //   "context": "PostMatchResult"
+  // }
+
+  if (!json) return;
+  const rank = { ...pd.rank };
+
+  rank.constructed.percentile = json.newMythicPercentile;
+  rank.constructed.leaderboardPlace = json.newMythicLeaderboardPlacement;
+
+  setData({ rank });
+  if (debugLog || !firstPass) {
+    store.set("rank", rank);
+  }
 }
 
 function onLabelInDeckGetDeckLists(entry, json) {

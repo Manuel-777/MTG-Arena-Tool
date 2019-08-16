@@ -791,3 +791,15 @@ function deckTypesStats(deck) {
   });
   return typesContainer;
 }
+
+// pass in playerData.constructed / limited / historic objects
+function formatRank(rank) {
+  if (rank.leaderboardPlace) {
+    return `Mythic #${rank.leaderboardPlace}`;
+  }
+  if (rank.percentile) {
+    return `Mythic ${rank.percentile}%`;
+  }
+  return `${rank.rank} ${rank.tier}`;
+}
+exports.formatRank = formatRank;

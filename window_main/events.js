@@ -9,7 +9,8 @@ const {
   get_rank_index_16,
   getReadableEvent,
   timeSince,
-  toMMSS
+  toMMSS,
+  formatRank
 } = require("../shared/util");
 
 const Aggregator = require("./aggregator");
@@ -269,7 +270,7 @@ function createMatchRow(match) {
   oppRankDiv.style.backgroundPosition = `${get_rank_index_16(
     match.opponent.rank
   ) * -16}px 0px`;
-  oppRankDiv.title = match.opponent.rank + " " + match.opponent.tier;
+  oppRankDiv.title = formatRank(match.opponent);
   matchRow.rightTop.appendChild(oppRankDiv);
 
   let timeDiv = createDiv(

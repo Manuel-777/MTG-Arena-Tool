@@ -85,6 +85,7 @@ const {
   onLabelInEventGetSeasonAndRankDetail,
   onLabelGetPlayerInventoryGetRewardSchedule,
   onLabelRankUpdated,
+  onLabelMythicRatingUpdated,
   onLabelTrackProgressUpdated,
   onLabelTrackRewardTierUpdated
 } = require("./labels");
@@ -714,6 +715,13 @@ function onLogEntryFound(entry) {
             {
               json = entry.json();
               onLabelRankUpdated(entry, json);
+            }
+            break;
+
+          case "MythicRating.Updated":
+            {
+              json = entry.json();
+              onLabelMythicRatingUpdated(entry, json);
             }
             break;
 
