@@ -201,7 +201,7 @@ function saveOverlaysPosition() {
     overlays[index] = newOverlay;
   });
 
-  ipcSend("save_user_settings", { overlays });
+  ipcSend("save_user_settings", { overlays, skip_refresh: true });
 }
 
 ipc.on("close", (event, arg) => {

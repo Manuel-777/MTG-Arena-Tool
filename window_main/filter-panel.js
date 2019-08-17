@@ -152,12 +152,18 @@ class FilterPanel {
           showDatepicker(lastWeek, date => {
             const filter = date.toISOString();
             this.onFilterChange({ date: filter }, this.filters);
-            ipcSend("save_user_settings", { last_date_filter: filter });
+            ipcSend("save_user_settings", {
+              last_date_filter: filter,
+              skip_refresh: true
+            });
           });
         } else {
           this.filters.date = filter;
           this.onFilterChange({ date: filter }, this.filters);
-          ipcSend("save_user_settings", { last_date_filter: filter });
+          ipcSend("save_user_settings", {
+            last_date_filter: filter,
+            skip_refresh: true
+          });
         }
       },
       this.prefixId + "_query_date"

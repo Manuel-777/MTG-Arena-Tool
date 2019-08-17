@@ -139,7 +139,10 @@ function makeResizable(div, resizeCallback, finalCallback) {
   };
 
   let saveWidth = function(width) {
-    ipcSend("save_user_settings", { right_panel_width: width });
+    ipcSend("save_user_settings", {
+      right_panel_width: width,
+      skip_refresh: true
+    });
   };
 
   div.addEventListener(

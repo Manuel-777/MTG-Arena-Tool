@@ -348,7 +348,10 @@ ipc.on("force_open_tab", function(event, arg) {
   $$(".top_nav_item").forEach(el => el.classList.remove("item_selected"));
   setLocalState({ lastDataIndex: 0, lastScrollTop: 0 });
   openTab(arg);
-  ipcSend("save_user_settings", { last_open_tab: sidebarActive });
+  ipcSend("save_user_settings", {
+    last_open_tab: sidebarActive,
+    skip_refresh: true
+  });
 });
 
 //
@@ -682,7 +685,8 @@ ready(function() {
         openTab(sidebarActive, filters);
         ipcSend("save_user_settings", {
           last_open_tab: sidebarActive,
-          last_date_filter: filters.date
+          last_date_filter: filters.date,
+          skip_refresh: true
         });
       } else {
         anime({

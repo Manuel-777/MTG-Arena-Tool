@@ -131,3 +131,16 @@ function hypergeometricSignificance(
   let retVal = math.subtract(1, math.multiply(weightedAverage, 2));
   return returnBig ? retVal : math.number(retVal);
 }
+
+// Computes the Wald Interval aka Normal Approximation Interval
+// Useful for quickly estimating the 95% confidence interval
+// Can produce bad results when sample-size < 20
+// https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval
+// https://www.channelfireball.com/articles/magic-math-how-many-games-do-you-need-for-statistical-significance-in-playtesting/
+exports.normalApproximationInterval = normalApproximationInterval;
+function normalApproximationInterval(matches, wins) {
+  if (!matches) return { winrate: 0, interval: 0 };
+  const winrate = wins / matches;
+  const interval = 1.96 * Math.sqrt((winrate * (1 - winrate)) / matches);
+  return { winrate, interval };
+}

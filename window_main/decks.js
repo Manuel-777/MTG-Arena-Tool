@@ -211,12 +211,15 @@ function openDecksTab(_filters = {}, scrollTop = 0) {
       let colClass = getWinrateClass(dwr.winrate);
       deckWinrateDiv.innerHTML = `${dwr.wins}:${
         dwr.losses
-      } <span class="${colClass}_bright">(${formatPercent(
+      } (<span class="${colClass}_bright">${formatPercent(
         dwr.winrate
-      )})</span>`;
-      deckWinrateDiv.title = `${dwr.wins} matches won : ${
-        dwr.losses
-      } matches lost`;
+      )}</span> <i style="opacity:0.6;">&plusmn; ${formatPercent(
+        dwr.interval
+      )}</i>)`;
+      deckWinrateDiv.title = `${formatPercent(
+        dwr.winrateLow
+      )} to ${formatPercent(dwr.winrateHigh)} with 95% confidence
+(estimated actual winrate bounds, assuming a normal distribution)`;
       listItem.rightTop.appendChild(deckWinrateDiv);
 
       const deckWinrateLastDiv = createDiv(
@@ -230,9 +233,10 @@ function openDecksTab(_filters = {}, scrollTop = 0) {
         deckWinrateLastDiv.innerHTML += `<span class="${colClass}_bright">${formatPercent(
           drwr.winrate
         )}</span>`;
-        deckWinrateLastDiv.title = `${drwr.wins} matches won : ${
-          drwr.losses
-        } matches lost`;
+        deckWinrateLastDiv.title = `${formatPercent(
+          drwr.winrateLow
+        )} to ${formatPercent(drwr.winrateHigh)} with 95% confidence
+(estimated actual winrate bounds, assuming a normal distribution)`;
       } else {
         deckWinrateLastDiv.innerHTML += "<span>--</span>";
         deckWinrateLastDiv.title = "no data yet";

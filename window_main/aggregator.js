@@ -20,6 +20,7 @@ const {
   getReadableEvent,
   getRecentDeckName
 } = require("../shared/util");
+const { normalApproximationInterval } = require("../shared/stats-fns");
 
 // Default filter values
 const DEFAULT_DECK = "All Decks";
@@ -68,11 +69,12 @@ class Aggregator {
 
   static finishStats(stats) {
     const { wins, total } = stats;
-    let winrate = 0;
-    if (total) {
-      winrate = Math.round((wins / total) * 100) / 100;
-    }
-    stats.winrate = winrate;
+    const { winrate, interval } = normalApproximationInterval(total, wins);
+    const roundWinrate = x => Math.round(x * 100) / 100;
+    stats.winrate = roundWinrate(winrate);
+    stats.interval = roundWinrate(interval);
+    stats.winrateLow = roundWinrate(winrate - interval);
+    stats.winrateHigh = roundWinrate(winrate + interval);
   }
 
   static getDefaultColorFilter() {

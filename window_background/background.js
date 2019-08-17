@@ -281,9 +281,14 @@ ipc.on("overlayBounds", (event, index, bounds) => {
 ipc.on("save_user_settings", function(event, settings) {
   // console.log("save_user_settings");
   ipc_send("show_loading");
-  const updated = { ...playerData.settings, ...settings };
+  let refresh = true;
+  if (settings.skip_refresh) {
+    delete settings.skip_refresh;
+    refresh = false;
+  }
+  const updated = { ...pd.settings, ...settings };
   store.set("settings", updated);
-  syncSettings(updated);
+  syncSettings(updated, refresh);
   ipc_send("hide_loading");
 });
 
