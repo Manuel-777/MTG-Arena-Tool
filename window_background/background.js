@@ -286,7 +286,7 @@ ipc.on("save_user_settings", function(event, settings) {
     delete settings.skip_refresh;
     refresh = false;
   }
-  const updated = { ...pd.settings, ...settings };
+  const updated = { ...playerData.settings, ...settings };
   store.set("settings", updated);
   syncSettings(updated, refresh);
   ipc_send("hide_loading");
