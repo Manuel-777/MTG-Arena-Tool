@@ -308,10 +308,7 @@ function appendArenaData(section) {
     if (e.keyCode === 13) logFormatInput.blur();
   });
   logFormatInput.addEventListener("focusout", () => {
-    if (
-      logFormatInput.value &&
-      logFormatInput.value !== pd.settings.log_locale_format
-    ) {
+    if (logFormatInput.value !== pd.settings.log_locale_format) {
       updateAppSettings();
     }
   });

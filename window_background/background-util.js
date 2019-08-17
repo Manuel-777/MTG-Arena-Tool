@@ -14,12 +14,14 @@ const {
   IPC_MAIN,
   IPC_OVERLAY
 } = require("../shared/constants.js");
-const pd = require("../shared/player-data.js");
 
-// These were tested briefly , but hey are all taken from actual logs
-// At most some format from date-fns could be wrong;
+const playerData = require("../shared/player-data.js");
+
+// These were tested briefly
+// They are all taken from logs
+// Some format from date-fns could be wrong;
 // https://date-fns.org/v2.0.0-alpha.27/docs/parse
-let dateLangs = [
+let dateFormats = [
   "dd.MM.yyyy HH:mm:ss",
   "dd/MM/yyyy HH:mm:ss",
   "M/dd/yyyy hh:mm:ss aa",
@@ -28,33 +30,77 @@ let dateLangs = [
   "yyyy/MM/dd HH:mm:ss"
 ];
 
-// throws an error if it fails
+class DateParseError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "DateParseError";
+  }
+}
+
+// Parse the localised date string using local format
+// or attempted detection
+// This must throw an error if it fails
+// Calling code should notify user or fallback as requested.
+// The original date string should always be kept as backup.
+// Use parseWotcTimeFallback for non-important dates.
+
 function parseWotcTime(dateStr) {
-  // Attempt parsing with custom app-level setting first
-  if (pd.settings.log_locale_format) {
-    const lang = pd.settings.log_locale_format;
-    // console.log(`Log datetime custom language attempt: ${lang}`);
-    const test = parse(dateStr, lang, new Date());
-    if (isValid(test) && !isNaN(test.getTime())) {
-      //console.log(`Log datetime language detected: ${lang}`, dateStr, test);
-      setData({ last_log_format: lang });
-      return test;
-    }
+  // This must throw an error if it fails
+
+  const dateFormat = getDateFormat(dateStr);
+
+  if (!dateFormat) {
+    throw new DateParseError(
+      `Invalid date or format ('${dateFormat}', '${dateStr}')`
+    );
   }
 
-  // Try parsing input with each format (in order) and return first valid result
-  dateLangs.forEach(lang => {
-    const test = parse(dateStr, lang, new Date());
-    if (isValid(test) && !isNaN(test.getTime())) {
-      //console.log(`Log datetime language detected: ${lang}`, dateStr, test);
-      setData({ last_log_format: lang });
-      return test;
-    }
-  });
+  const date = parse(dateStr, dateFormat, new Date());
 
-  // Defaults to current time if none matches
-  // console.log(`Invalid date ('${dateStr}') - using current date as backup.`);
-  return new Date();
+  if (!isValidDate(date)) {
+    throw new DateParseError(
+      `Invalid date or format ('${dateFormat}', '${dateStr}')`
+    );
+  }
+
+  // This must throw an error if it fails
+  return date;
+}
+
+// Ignore date parsing errors and return `new Date()`
+// All other errors should still be passed upwards.
+// New code should preferentially use parseWotcTime and handle their own errors.
+function parseWotcTimeFallback(dateStr) {
+  try {
+    return parseWotcTime(dateStr);
+  } catch (e) {
+    if (e instanceof DateParseError) {
+      console.error(
+        "DateParseError: using new Date() fallback. Retain original date string.",
+        e
+      );
+      return new Date();
+    } else {
+      throw e;
+    }
+  }
+}
+
+function isValidDate(date) {
+  return isValid(date) && !isNaN(date.getTime());
+}
+
+function getDateFormat(dateStr) {
+  if (playerData.settings.log_locale_format) {
+    // return the players setting
+    return playerData.settings.log_locale_format;
+  } else {
+    // return the first date format which parses
+    // the string returning a valid date
+    return dateFormats.find(dateFormat => {
+      return isValidDate(parse(dateStr, dateFormat, new Date()));
+    });
+  }
 }
 
 function normaliseFields(iterator) {
@@ -105,7 +151,7 @@ const overlayWhitelist = [
 // (update is destructive, be sure to use spread syntax if necessary)
 function setData(data, refresh = debugLog || !firstPass) {
   const cleanData = _.omit(data, dataBlacklist);
-  pd.handleSetData(null, cleanData);
+  playerData.handleSetData(null, cleanData);
   ipc_send("set_player_data", cleanData, IPC_MAIN);
   const overlayData = _.pick(cleanData, overlayWhitelist);
   ipc_send("set_player_data", overlayData, IPC_OVERLAY);
@@ -116,6 +162,7 @@ module.exports = {
   ipc_send,
   normaliseFields,
   parseWotcTime,
+  parseWotcTimeFallback,
   setData,
   unleakString
 };

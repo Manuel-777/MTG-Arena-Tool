@@ -267,6 +267,12 @@ function handleOpenDraft(id) {
   });
 }
 
+function localDateFormat(date) {
+  return `<relative-time datetime="${date.toISOString()}">
+    ${date.toString()}
+  </relative-time>`;
+}
+
 function attachMatchData(listItem, match) {
   // Deck name
   const deckNameDiv = createDiv(["list_deck_name"], match.playerDeck.name);
@@ -303,7 +309,7 @@ function attachMatchData(listItem, match) {
   // Match time
   const matchTime = createDiv(
     ["list_match_time"],
-    timeSince(new Date(match.date)) + " ago - " + toMMSS(match.duration)
+    localDateFormat(new Date(match.date)) + " - " + toMMSS(match.duration)
   );
   listItem.rightBottom.appendChild(matchTime);
 
@@ -361,7 +367,7 @@ function attachDraftData(listItem, draft) {
 
   const draftTimeDiv = createDiv(
     ["list_match_time"],
-    timeSince(new Date(draft.date)) + " ago."
+    localDateFormat(new Date(draft.date))
   );
   listItem.rightBottom.appendChild(draftTimeDiv);
 
