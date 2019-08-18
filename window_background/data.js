@@ -41,7 +41,7 @@ function createDraft(id, entry) {
 
 // Match Creation
 
-var currentMatchDefault = {
+var matchDataDefault = {
   eventId: "",
   matchId: "",
   beginTime: 0,
@@ -93,7 +93,7 @@ var currentMatchDefault = {
 };
 
 function createMatch(json, matchBeginTime) {
-  var match = _.cloneDeep(currentMatchDefault);
+  var match = _.cloneDeep(matchDataDefault);
 
   match.player.originalDeck = originalDeck;
   match.player.deck = originalDeck.clone();
@@ -117,6 +117,80 @@ function createMatch(json, matchBeginTime) {
   match.lastPriorityChangeTime = matchBeginTime;
 
   return match;
+}
+
+// Given match data calculates derived data for storage.
+// This is called when a match is complete.
+function completeMatch(matchData) {
+  let pw = 0;
+  let ow = 0;
+  let dr = 0;
+  matchData.results.forEach(function(res) {
+    if (res.scope == "MatchScope_Game") {
+      if (res.result == "ResultType_Draw") {
+        dr += 1;
+      } else if (res.winningTeamId == matchData.player.seat) {
+        pw += 1;
+      }
+      if (res.winningTeamId == matchData.opponent.seat) {
+        ow += 1;
+      }
+    }
+  });
+
+  if (matchData.eventId === "AIBotMatch") return;
+
+  const match = playerData.match(id) || {};
+  match.onThePlay = matchData.onThePlay;
+  match.id = matchData.matchId;
+  match.duration = matchData.matchTime;
+  match.opponent = {
+    name: matchData.opponent.name,
+    rank: matchData.opponent.rank,
+    tier: matchData.opponent.tier,
+    userid: matchData.opponent.id,
+    seat: matchData.opponent.seat,
+    win: ow
+  };
+  let rank, tier;
+  if (db.ranked_events.includes(matchData.eventId)) {
+    rank = playerData.rank.limited.rank;
+    tier = playerData.rank.limited.tier;
+  } else {
+    rank = playerData.rank.constructed.rank;
+    tier = playerData.rank.constructed.tier;
+  }
+  match.player = {
+    name: playerData.name,
+    rank,
+    tier,
+    userid: playerData.arenaId,
+    seat: matchData.player.seat,
+    win: pw
+  };
+  match.draws = dr;
+
+  match.eventId = matchData.eventId;
+  match.playerDeck = matchData.player.originalDeck.getSave();
+  match.oppDeck = getOpponentDeck();
+
+  if (
+    (!match.tags || !match.tags.length) &&
+    match.oppDeck.archetype &&
+    match.oppDeck.archetype !== "-"
+  ) {
+    match.tags = [match.oppDeck.archetype];
+  }
+  if (matchEndTime) {
+    match.date = matchEndTime;
+  }
+  match.bestOf = matchData.bestOf;
+
+  match.gameStats = matchGameStats;
+
+  // Convert string "2.2.19" into number for easy comparison, 1 byte per part, allowing for versions up to 255.255.255
+  match.toolVersion = toolVersion;
+  match.toolRunFromSource = !electron.remote.app.isPackaged;
 }
 
 // Deck Creation
