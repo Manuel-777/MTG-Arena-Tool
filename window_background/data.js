@@ -1,21 +1,24 @@
 /*
   global
     originalDeck
+    matchGameStats
+    getOpponentDeck
+    toolVersion
 */
 
 // Generate objects using default templates.
 // Nothing in here should call IPC functions
 
 const _ = require("lodash");
+const electron = require("electron");
 
 const { DEFAULT_TILE } = require("../shared/constants");
 
 const { objectClone } = require("../shared/util");
 const playerData = require("../shared/player-data.js");
+const database = require("../shared/database");
 
 const { parseWotcTime, parseWotcTimeFallback } = require("./background-util");
-
-const {getOpponentDeck} = require("./background");
 
 // Draft Creation
 
@@ -97,6 +100,7 @@ var matchDataDefault = {
 function createMatch(json, matchBeginTime) {
   var match = _.cloneDeep(matchDataDefault);
 
+
   match.player.originalDeck = originalDeck;
   match.player.deck = originalDeck.clone();
   match.playerCardsLeft = originalDeck.clone();
@@ -143,13 +147,12 @@ function matchResults(matchData) {
 
 // Given match data calculates derived data for storage.
 // This is called when a match is complete.
-function completeMatch(matchData) {
-
+function completeMatch(match, matchData, matchEndTime) {
   if (matchData.eventId === "AIBotMatch") return;
+
 
   let [playerWins, opponentWins, draws] = matchResults(matchData);
 
-  const match = playerData.match(id) || {};
   match.onThePlay = matchData.onThePlay;
   match.id = matchData.matchId;
   match.duration = matchData.matchTime;
@@ -157,24 +160,25 @@ function completeMatch(matchData) {
     name: matchData.opponent.name,
     rank: matchData.opponent.rank,
     tier: matchData.opponent.tier,
-    percentile: matchData.percentile,
-    leaderboardPlace: matchData.leaderboardPlace,
+    percentile: matchData.opponent.percentile,
+    leaderboardPlace: matchData.opponent.leaderboardPlace,
     userid: matchData.opponent.id,
     seat: matchData.opponent.seat,
     win: opponentWins
   };
 
   let mode;
-  if(db.ranked_events.includes(matchData.eventId)) {
-    mode = 'limited';
+  if (database.ranked_events.includes(matchData.eventId)) {
+    mode = "limited";
   } else {
-    mode = 'constructed';
+    mode = "constructed";
   }
 
   match.player = {
     name: playerData.name,
     rank: playerData.rank[mode].rank,
     tier: playerData.rank[mode].tier,
+    step: playerData.rank[mode].step,
     percentile: playerData.rank[mode].percentile,
     leaderboardPlace: playerData.rank[mode].leaderboardPlace,
     userid: playerData.arenaId,
@@ -229,5 +233,6 @@ function createDeck() {
 module.exports = {
   createDeck,
   createDraft,
-  createMatch
+  createMatch,
+  completeMatch
 };

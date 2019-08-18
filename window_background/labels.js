@@ -318,7 +318,10 @@ function onLabelInEventGetCombinedRankInfo(entry, json) {
   rank.limited.seasonOrdinal = json.limitedSeasonOrdinal;
 
   var infoLength = Object.keys(json).length - 1;
-  if (infoLength != Object.keys(rank).length) {
+  var processedLength = [rank.limited, rank.constructed]
+    .map(o => Object.keys(o).length)
+    .reduce((a, b) => a + b, 0);
+  if (infoLength != processedLength) {
     console.warn("rankInfo is not processing all data.", Object.keys(json));
   }
 
@@ -1048,5 +1051,6 @@ module.exports = {
   onLabelGetPlayerInventoryGetRewardSchedule,
   onLabelRankUpdated,
   onLabelTrackProgressUpdated,
-  onLabelTrackRewardTierUpdated
+  onLabelTrackRewardTierUpdated,
+  onLabelMythicRatingUpdated
 };

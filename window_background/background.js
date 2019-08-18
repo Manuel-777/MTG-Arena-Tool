@@ -1548,8 +1548,8 @@ function saveMatch(id, matchEndTime) {
   if (!currentMatch || !currentMatch.matchTime || currentMatch.matchId !== id) {
     return;
   }
-
-  const match = completeMatch(currentMatch);
+  const existingMatch = playerData.match(id) || {};
+  const match = completeMatch(existingMatch, currentMatch, matchEndTime);
 
   // console.log("Save match:", match);
   if (!playerData.matches_index.includes(id)) {
