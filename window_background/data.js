@@ -100,7 +100,6 @@ var matchDataDefault = {
 function createMatch(json, matchBeginTime) {
   var match = _.cloneDeep(matchDataDefault);
 
-
   match.player.originalDeck = originalDeck;
   match.player.deck = originalDeck.clone();
   match.playerCardsLeft = originalDeck.clone();
@@ -149,7 +148,6 @@ function matchResults(matchData) {
 // This is called when a match is complete.
 function completeMatch(match, matchData, matchEndTime) {
   if (matchData.eventId === "AIBotMatch") return;
-
 
   let [playerWins, opponentWins, draws] = matchResults(matchData);
 
