@@ -148,22 +148,31 @@ function completeMatch(matchData) {
     name: matchData.opponent.name,
     rank: matchData.opponent.rank,
     tier: matchData.opponent.tier,
+    percentile: matchData.percentile,
+    leaderboardPlace: matchData.leaderboardPlace,
     userid: matchData.opponent.id,
     seat: matchData.opponent.seat,
     win: ow
   };
-  let rank, tier;
+
+  let rank, tier, percentile, leaderboardPlace;
   if (db.ranked_events.includes(matchData.eventId)) {
     rank = playerData.rank.limited.rank;
     tier = playerData.rank.limited.tier;
+    percentile = playerData.rank.limited.percentile;
+    leaderboardPlace = playerData.rank.limited.leaderboardPlace;
   } else {
     rank = playerData.rank.constructed.rank;
     tier = playerData.rank.constructed.tier;
+    percentile = playerData.rank.constructed.percentile;
+    leaderboardPlace = playerData.rank.constructed.leaderboardPlace;
   }
   match.player = {
     name: playerData.name,
     rank,
     tier,
+    percentile,
+    leaderboardPlace,
     userid: playerData.arenaId,
     seat: matchData.player.seat,
     win: pw
@@ -191,6 +200,8 @@ function completeMatch(matchData) {
   // Convert string "2.2.19" into number for easy comparison, 1 byte per part, allowing for versions up to 255.255.255
   match.toolVersion = toolVersion;
   match.toolRunFromSource = !electron.remote.app.isPackaged;
+
+  return match;
 }
 
 // Deck Creation
