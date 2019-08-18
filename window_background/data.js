@@ -15,6 +15,8 @@ const playerData = require("../shared/player-data.js");
 
 const { parseWotcTime, parseWotcTimeFallback } = require("./background-util");
 
+const {getOpponentDeck} = require("./background");
+
 // Draft Creation
 
 var currentDraftDefault = {
@@ -119,26 +121,33 @@ function createMatch(json, matchBeginTime) {
   return match;
 }
 
-// Given match data calculates derived data for storage.
-// This is called when a match is complete.
-function completeMatch(matchData) {
-  let pw = 0;
-  let ow = 0;
-  let dr = 0;
+function matchResults(matchData) {
+  let playerWins = 0;
+  let opponentWins = 0;
+  let draws = 0;
   matchData.results.forEach(function(res) {
     if (res.scope == "MatchScope_Game") {
       if (res.result == "ResultType_Draw") {
-        dr += 1;
+        draws += 1;
       } else if (res.winningTeamId == matchData.player.seat) {
-        pw += 1;
+        playerWins += 1;
       }
       if (res.winningTeamId == matchData.opponent.seat) {
-        ow += 1;
+        opponentWins += 1;
       }
     }
   });
 
+  return [playerWins, opponentWins, draws];
+}
+
+// Given match data calculates derived data for storage.
+// This is called when a match is complete.
+function completeMatch(matchData) {
+
   if (matchData.eventId === "AIBotMatch") return;
+
+  let [playerWins, opponentWins, draws] = matchResults(matchData);
 
   const match = playerData.match(id) || {};
   match.onThePlay = matchData.onThePlay;
@@ -152,32 +161,27 @@ function completeMatch(matchData) {
     leaderboardPlace: matchData.leaderboardPlace,
     userid: matchData.opponent.id,
     seat: matchData.opponent.seat,
-    win: ow
+    win: opponentWins
   };
 
-  let rank, tier, percentile, leaderboardPlace;
-  if (db.ranked_events.includes(matchData.eventId)) {
-    rank = playerData.rank.limited.rank;
-    tier = playerData.rank.limited.tier;
-    percentile = playerData.rank.limited.percentile;
-    leaderboardPlace = playerData.rank.limited.leaderboardPlace;
+  let mode;
+  if(db.ranked_events.includes(matchData.eventId)) {
+    mode = 'limited';
   } else {
-    rank = playerData.rank.constructed.rank;
-    tier = playerData.rank.constructed.tier;
-    percentile = playerData.rank.constructed.percentile;
-    leaderboardPlace = playerData.rank.constructed.leaderboardPlace;
+    mode = 'constructed';
   }
+
   match.player = {
     name: playerData.name,
-    rank,
-    tier,
-    percentile,
-    leaderboardPlace,
+    rank: playerData.rank[mode].rank,
+    tier: playerData.rank[mode].tier,
+    percentile: playerData.rank[mode].percentile,
+    leaderboardPlace: playerData.rank[mode].leaderboardPlace,
     userid: playerData.arenaId,
     seat: matchData.player.seat,
-    win: pw
+    win: playerWins
   };
-  match.draws = dr;
+  match.draws = draws;
 
   match.eventId = matchData.eventId;
   match.playerDeck = matchData.player.originalDeck.getSave();
