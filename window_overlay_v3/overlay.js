@@ -1148,14 +1148,9 @@ ready(function() {
         );
         let mainHoverDom = ".main_hover";
         let settings = pd.settings.overlays[index - 1];
-
-        if (settings.cards_overlay) {
-          console.log(index + " aktiviert");
-          queryElements(mainHoverDom)[0].style.display = "";
-        } else {
-          queryElements(mainHoverDom)[0].style.display = "none";
-          console.log(index + " deaktiviert");
-        }
+        settings.cards_overlay
+          ? (queryElements(mainHoverDom)[0].style.display = "")
+          : (queryElements(mainHoverDom)[0].style.display = "none");
       });
 
       const clockPrevDiv = queryElements(clockPrevDom)[0];
