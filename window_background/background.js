@@ -1544,6 +1544,28 @@ function saveMatch(id, matchEndTime) {
     return;
   }
 
+  const match = completeMatch();
+
+  // console.log("Save match:", match);
+  if (!playerData.matches_index.includes(id)) {
+    const matches_index = [...playerData.matches_index, id];
+    if (debugLog || !firstPass) store.set("matches_index", matches_index);
+    setData({ matches_index }, false);
+  }
+
+  if (debugLog || !firstPass) store.set(id, match);
+  setData({ [id]: match });
+  if (matchCompletedOnGameNumber === gameNumberCompleted) {
+    httpApi.httpSetMatch(match);
+  }
+  ipc_send("set_timer", 0, IPC_OVERLAY);
+  ipc_send("popup", { text: "Match saved!", time: 3000 });
+}
+
+// Given match data calculates derived data for storage.
+// This is called when a match is complete.
+function completeMatch() {
+
   let pw = 0;
   let ow = 0;
   let dr = 0;
@@ -1613,21 +1635,6 @@ function saveMatch(id, matchEndTime) {
   // Convert string "2.2.19" into number for easy comparison, 1 byte per part, allowing for versions up to 255.255.255
   match.toolVersion = toolVersion;
   match.toolRunFromSource = !electron.remote.app.isPackaged;
-
-  // console.log("Save match:", match);
-  if (!playerData.matches_index.includes(id)) {
-    const matches_index = [...playerData.matches_index, id];
-    if (debugLog || !firstPass) store.set("matches_index", matches_index);
-    setData({ matches_index }, false);
-  }
-
-  if (debugLog || !firstPass) store.set(id, match);
-  setData({ [id]: match });
-  if (matchCompletedOnGameNumber === gameNumberCompleted) {
-    httpApi.httpSetMatch(match);
-  }
-  ipc_send("set_timer", 0, IPC_OVERLAY);
-  ipc_send("popup", { text: "Match saved!", time: 3000 });
 }
 
 //
