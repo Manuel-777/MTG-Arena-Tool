@@ -277,9 +277,9 @@ function settingsUpdated() {
       : "none";
 
     queryElements(deckListDom)[0].style.display = _overlay.deck ? "" : "none";
-    queryElements(mainHoverDom)[0].style.width = pd.cardsSizeOverlayCard + "px";
+    queryElements(mainHoverDom)[0].style.width = pd.cardsSizeHoverCard + "px";
     queryElements(mainHoverDom)[0].style.height =
-      pd.cardsSizeOverlayCard / 0.71808510638 + "px";
+      pd.cardsSizeHoverCard / 0.71808510638 + "px";
 
     const showClock =
       _overlay.clock && !OVERLAY_DRAFT_MODES.includes(_overlay.mode);
@@ -632,7 +632,6 @@ function updateMatchView(index) {
     settings.draw_odds
   ) {
     drawDeckOdds(index);
-    return;
   }
 
   const deck = deckToDraw.getSave();

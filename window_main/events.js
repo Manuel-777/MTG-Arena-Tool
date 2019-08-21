@@ -1,17 +1,12 @@
 const anime = require("animejs");
+const compareAsc = require("date-fns/compareAsc");
+const compareDesc = require("date-fns/compareDesc");
 
-const { MANA, EASING_DEFAULT } = require("../shared/constants");
+const { DEFAULT_TILE, MANA, EASING_DEFAULT } = require("../shared/constants");
+const db = require("../shared/database");
 const pd = require("../shared/player-data");
 const { createDiv, queryElementsByClass } = require("../shared/dom-fns");
-const {
-  compare_cards,
-  get_deck_colors,
-  get_rank_index_16,
-  getReadableEvent,
-  timeSince,
-  toMMSS,
-  formatRank
-} = require("../shared/util");
+const { getReadableEvent, toMMSS } = require("../shared/util");
 
 const Aggregator = require("./aggregator");
 const DataScroller = require("./data-scroller");
@@ -19,8 +14,11 @@ const FilterPanel = require("./filter-panel");
 const ListItem = require("./list-item");
 const StatsPanel = require("./stats-panel");
 const {
+  attachDraftData,
+  attachMatchData,
   getEventWinLossClass,
-  getLocalState,
+  localTimeSince,
+  openDraft,
   resetMainContainer,
   toggleArchived
 } = require("./renderer-util");
@@ -37,7 +35,7 @@ function openEventsTab(_filters, dataIndex = 25, scrollTop = 0) {
   mainDiv.appendChild(d);
 
   sortedEvents = [...pd.eventList];
-  sortedEvents.sort(compare_courses);
+  sortedEvents.sort(compareEvents);
   filters = { ...filters, date: pd.settings.last_date_filter, ..._filters };
   filteredMatches = new Aggregator(filters);
 
@@ -167,7 +165,7 @@ function getCourseStats(course) {
     .map(pd.match)
     .filter(
       match =>
-        match !== undefined &&
+        match &&
         match.type === "match" &&
         (!match.archived || filters.showArchived)
     )
@@ -176,11 +174,9 @@ function getCourseStats(course) {
       if (match.duration && match.duration < 3600) {
         stats.duration += match.duration;
       }
-      stats.duration += match.duration || 0;
       if (match.player.win > match.opponent.win) {
         stats.wins++;
-      }
-      if (match.player.win < match.opponent.win) {
+      } else if (match.player.win < match.opponent.win) {
         stats.losses++;
       }
     });
@@ -211,7 +207,10 @@ function attachEventData(listItem, course) {
   listItem.rightBottom.appendChild(
     createDiv(
       ["list_match_time"],
-      timeSince(new Date(course.date)) + " ago - " + toMMSS(stats.duration)
+      localTimeSince(new Date(course.date)) +
+        " " +
+        toMMSS(stats.duration) +
+        " long"
     )
   );
 
@@ -237,67 +236,44 @@ function attachEventData(listItem, course) {
 // Given the data of a match will return a data row to be
 // inserted into one of the screens.
 function createMatchRow(match) {
-  //  if (match.opponent == undefined) continue;
-  //  if (match.opponent.userid.indexOf("Familiar") !== -1) continue;
-  match.playerDeck.mainDeck.sort(compare_cards);
-  match.oppDeck.mainDeck.sort(compare_cards);
+  let tileGrpid, clickCallback;
+  if (match.type == "match") {
+    tileGrpid = match.playerDeck.deckTileId;
+    clickCallback = handleOpenMatch;
+  } else {
+    if (match.set in db.sets && db.sets[match.set].tile) {
+      tileGrpid = db.sets[match.set].tile;
+    } else {
+      tileGrpid = DEFAULT_TILE;
+    }
+    clickCallback = handleOpenDraft;
+  }
 
-  var tileGrpid = match.playerDeck.deckTileId;
-
-  let matchRow = new ListItem(tileGrpid, match.id, handleOpenMatch);
+  const matchRow = new ListItem(tileGrpid, match.id, clickCallback);
   matchRow.divideLeft();
   matchRow.divideRight();
 
-  let deckNameDiv = createDiv(["list_deck_name"], match.playerDeck.name);
-  matchRow.leftTop.appendChild(deckNameDiv);
-
-  match.playerDeck.colors.forEach(color => {
-    var m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    matchRow.leftBottom.appendChild(m);
-  });
-
-  // Insert contents of flexCenterTop
-  if (match.opponent.name == null) {
-    match.opponent.name = "-#000000";
+  if (match.type === "match") {
+    attachMatchData(matchRow, match);
+  } else {
+    attachDraftData(matchRow, match);
   }
-  let oppNameDiv = createDiv(
-    ["list_match_title"],
-    "vs " + match.opponent.name.slice(0, -6)
-  );
-  matchRow.rightTop.appendChild(oppNameDiv);
-
-  var oppRankDiv = createDiv(["ranks_16"]);
-  oppRankDiv.style.backgroundPosition = `${get_rank_index_16(
-    match.opponent.rank
-  ) * -16}px 0px`;
-  oppRankDiv.title = formatRank(match.opponent);
-  matchRow.rightTop.appendChild(oppRankDiv);
-
-  let timeDiv = createDiv(
-    ["list_match_time"],
-    timeSince(new Date(match.date)) + " ago - " + toMMSS(match.duration)
-  );
-  matchRow.rightBottom.appendChild(timeDiv);
-
-  get_deck_colors(match.oppDeck).forEach(function(color) {
-    var m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    matchRow.rightBottom.appendChild(m);
-  });
-
-  matchRow.rightBottom.style.marginRight = "16px";
-
-  var winLossClass = match.player.win > match.opponent.win ? "green" : "red";
-  let resultDiv = createDiv(
-    ["list_match_result", winLossClass],
-    match.player.win + ":" + match.opponent.win
-  );
-  matchRow.right.after(resultDiv);
 
   return matchRow.container;
 }
 
 function handleOpenMatch(id) {
   openMatch(id);
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: EASING_DEFAULT,
+    duration: 350
+  });
+}
+
+function handleOpenDraft(id) {
+  openDraft(id);
   anime({
     targets: ".moving_ux",
     left: "-100%",
@@ -322,10 +298,7 @@ function expandEvent(id) {
 
   expandDiv.innerHTML = "";
   const wlGate = getWlGate(course);
-  if (!wlGate) return;
-  const matchesList = wlGate.ProcessedMatchIds;
-  if (!matchesList) return;
-
+  const matchesList = wlGate ? wlGate.ProcessedMatchIds || [] : [];
   const matchRows = matchesList
     .map(index => pd.match(index) || pd.match(index + "-" + pd.arenaId))
     .filter(
@@ -334,12 +307,14 @@ function expandEvent(id) {
         match.type === "match" &&
         (!match.archived || filters.showArchived)
     );
+  const draftId = id + "-draft";
   matchRows.sort((a, b) => {
-    if (a === undefined) return 0;
-    if (b === undefined) return 0;
-
-    return Date.parse(b.date) - Date.parse(a.date);
+    if (!a || !b) return 0;
+    return compareDesc(new Date(a.date), new Date(b.date));
   });
+  if (pd.draftExists(draftId)) {
+    matchRows.unshift(pd.draft(draftId));
+  }
   matchRows.forEach(match => {
     const row = createMatchRow(match);
     expandDiv.appendChild(row);
@@ -350,11 +325,9 @@ function expandEvent(id) {
   expandDiv.style.height = `${newHeight}px`;
 }
 
-function compare_courses(a, b) {
-  if (a === undefined) return 0;
-  if (b === undefined) return 0;
-
-  return Date.parse(a.date) - Date.parse(b.date);
+function compareEvents(a, b) {
+  if (!a || !b) return 0;
+  return compareAsc(new Date(a.date), new Date(b.date));
 }
 
 module.exports = {

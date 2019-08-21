@@ -100,6 +100,7 @@ relative-time, local-time {
 .release_notes_link, .link {
     cursor: pointer;
     text-decoration: underline;
+    margin-top: 12px;
 }
 
 .trouble_link {
@@ -246,6 +247,18 @@ relative-time, local-time {
 .button_simple:active {
     background-color: var(--color-mid);
     line-height: 34px;
+    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.6);
+}
+
+.button_edit {
+    height: 20px;
+    line-height: 20px;
+    margin: 6px auto;
+}
+
+.button_edit:active {
+    background-color: var(--color-mid);
+    line-height: 22px;
     box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.6);
 }
 
@@ -3518,4 +3531,25 @@ a:hover {
     width: 12px;
     height: 12px;
     margin: 2px 4px;
+}
+
+.shortcuts_grid {
+    display: grid;
+    font-size: 16px;
+    color: var(--color-light);
+    line-height: 32px;
+    max-width: calc(100% - 64px);
+}
+
+.shortcuts_line {
+    height: 32px;
+    padding-left: 12px;
+}
+
+.keycomb_desc {
+    font-family:  var(--main-font-name-it);
+    font-size: 20px;
+    border-bottom: solid var(--color-light-20) 2px;
+    color: var(--color-light);
+    margin: auto;
 }

@@ -59,11 +59,11 @@ function openHomeTab(arg, opentab = true) {
     );
     daily.style.textAlign = "center";
 
-    // let weekly = createDiv(
-    //   ["text_centered", "white", "weekly_left"],
-    //   "Weekly rewards end: -"
-    // );
-    // weekly.style.textAlign = "center";
+    const weekly = createDiv(
+      ["text_centered", "white", "weekly_left"],
+      "Weekly rewards end: -"
+    );
+    weekly.style.textAlign = "center";
 
     if (homeInterval !== null) clearInterval(homeInterval);
 
@@ -72,14 +72,14 @@ function openHomeTab(arg, opentab = true) {
       let timeleft = dd.getTime() / 1000 - timestamp();
       daily.innerHTML = "Daily rewards end: " + toDDHHMMSS(timeleft);
 
-      // dd = db.rewards_weekly_ends;
-      // timeleft = dd.getTime() / 1000 - timestamp();
-      // weekly.innerHTML = "Weekly rewards end: " + toDDHHMMSS(timeleft);
+      dd = db.rewards_weekly_ends;
+      timeleft = dd.getTime() / 1000 - timestamp();
+      weekly.innerHTML = "Weekly rewards end: " + toDDHHMMSS(timeleft);
     }, 250);
 
     mainDiv.appendChild(users);
     mainDiv.appendChild(daily);
-    // mainDiv.appendChild(weekly);
+    mainDiv.appendChild(weekly);
   }
 
   let d = createDiv(["list_fill"]);

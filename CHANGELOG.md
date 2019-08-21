@@ -32,6 +32,7 @@
 * hide top nav icons ([fefc2d2](https://github.com/Manuel-777/MTG-Arena-Tool/commit/fefc2d2))
 * improved dev tools logic ([dde2078](https://github.com/Manuel-777/MTG-Arena-Tool/commit/dde2078))
 * index-related bugfixes ([e25819b](https://github.com/Manuel-777/MTG-Arena-Tool/commit/e25819b))
+* init ([3bb961f](https://github.com/Manuel-777/MTG-Arena-Tool/commit/3bb961f))
 * Initial draft ([1fa78a3](https://github.com/Manuel-777/MTG-Arena-Tool/commit/1fa78a3))
 * keyboard shortcouts ([2df1b31](https://github.com/Manuel-777/MTG-Arena-Tool/commit/2df1b31))
 * linux compat ([9f92228](https://github.com/Manuel-777/MTG-Arena-Tool/commit/9f92228))

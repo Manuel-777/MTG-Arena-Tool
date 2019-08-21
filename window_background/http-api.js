@@ -4,7 +4,7 @@ global
   rstore
   loadPlayerConfig
   db
-  pd
+  playerData
   debugNet
   debugLog
   syncUserData
@@ -32,13 +32,14 @@ function httpBasic() {
       var _headers = value;
 
       if (
-        (pd.settings.send_data == false || pd.offline == true) &&
+        (playerData.settings.send_data == false ||
+          playerData.offline == true) &&
         _headers.method != "auth" &&
         _headers.method != "delete_data" &&
         _headers.method != "get_database" &&
         debugLog == false
       ) {
-        if (!pd.offline) setData({ offline: true });
+        if (!playerData.offline) setData({ offline: true });
         callback({
           message: "Settings dont allow sending data! > " + _headers.method
         });
@@ -191,9 +192,9 @@ function httpBasic() {
 
                 ipc_send("auth", parsedResult);
                 //ipc_send("auth", parsedResult.arenaids);
-                if (pd.settings.remember_me) {
+                if (playerData.settings.remember_me) {
                   rstore.set("token", tokenAuth);
-                  rstore.set("email", pd.userName);
+                  rstore.set("email", playerData.userName);
                 }
                 const data = {};
                 data.patreon = parsedResult.patreon;
@@ -212,7 +213,7 @@ function httpBasic() {
                   serverData.economy = parsedResult.economy;
                 }
                 setData(data, false);
-                loadPlayerConfig(pd.arenaId, serverData);
+                loadPlayerConfig(playerData.arenaId, serverData);
                 ipc_send("set_discord_tag", parsedResult.discord_tag);
                 httpNotificationsPull();
               }
@@ -309,7 +310,7 @@ function httpBasic() {
               });
             }
           } catch (e) {
-            console.error(e.message);
+            console.error(e);
           }
           try {
             callback();
@@ -413,20 +414,20 @@ function httpAuth(userName, pass) {
     method_path: "/api/login.php",
     email: userName,
     password: pass,
-    playerid: pd.arenaId,
-    playername: encodeURIComponent(pd.name),
-    mtgaversion: pd.arenaVersion,
+    playerid: playerData.arenaId,
+    playername: encodeURIComponent(playerData.name),
+    mtgaversion: playerData.arenaVersion,
     version: electron.remote.app.getVersion()
   });
 }
 
 function httpSubmitCourse(course) {
   var _id = makeId(6);
-  if (pd.settings.anon_explore == true) {
+  if (playerData.settings.anon_explore == true) {
     course.PlayerId = "000000000000000";
     course.PlayerName = "Anonymous";
   }
-  course.playerRank = pd.rank.limited.rank;
+  course.playerRank = playerData.rank.limited.rank;
   course = JSON.stringify(course);
   httpAsync.push({
     reqId: _id,
@@ -460,7 +461,7 @@ function httpGetExplore(query) {
     filter_mana: query.filteredMana,
     filter_ranks: query.filteredranks,
     filter_skip: query.filterSkip,
-    collection: JSON.stringify(pd.cards.cards)
+    collection: JSON.stringify(playerData.cards.cards)
   });
 }
 
@@ -494,7 +495,7 @@ function httpGetCourse(courseId) {
 
 function httpSetMatch(match) {
   var _id = makeId(6);
-  if (pd.settings.anon_explore == true) {
+  if (playerData.settings.anon_explore == true) {
     match.player.userid = "000000000000000";
     match.player.name = "Anonymous";
   }
@@ -588,7 +589,7 @@ function httpTournamentGet(tid) {
 
 function httpTournamentJoin(tid, _deck, pass) {
   let _id = makeId(6);
-  let deck = JSON.stringify(pd.deck(_deck));
+  let deck = JSON.stringify(playerData.deck(_deck));
   httpAsync.unshift({
     reqId: _id,
     method: "tou_join",

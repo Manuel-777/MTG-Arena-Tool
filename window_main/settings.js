@@ -1,4 +1,6 @@
 const { ipcRenderer: ipc, remote, shell } = require("electron");
+const format = require("date-fns/format");
+const fromUnixTime = require("date-fns/fromUnixTime");
 
 const {
   CARD_TILE_ARENA,
@@ -13,10 +15,12 @@ const {
   OVERLAY_DRAFT_BREW,
   OVERLAY_LOG,
   OVERLAY_DRAFT_MODES,
+  SHORTCUT_NAMES,
   SETTINGS_BEHAVIOUR,
   SETTINGS_ARENA_DATA,
   SETTINGS_OVERLAY,
   SETTINGS_VISUAL,
+  SETTINGS_SHORTCUTS,
   SETTINGS_PRIVACY,
   SETTINGS_ABOUT,
   SETTINGS_LOGIN
@@ -44,6 +48,8 @@ const {
   changeBackground,
   hideLoadingBars,
   ipcSend,
+  openDialog,
+  closeDialog,
   renderLogInput,
   resetMainContainer,
   setLocalState,
@@ -86,6 +92,9 @@ function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
   );
   wrap_l.appendChild(
     createDiv(["settings_nav", "sn" + SETTINGS_VISUAL], "Visual")
+  );
+  wrap_l.appendChild(
+    createDiv(["settings_nav", "sn" + SETTINGS_SHORTCUTS], "Shortcuts")
   );
   wrap_l.appendChild(
     createDiv(["settings_nav", "sn" + SETTINGS_PRIVACY], "Privacy")
@@ -134,6 +143,9 @@ function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
       } else if (classList.includes("sn7")) {
         lastSettingsSection = 7;
         $$(".ss7")[0].style.display = "block";
+      } else if (classList.includes("sn8")) {
+        lastSettingsSection = 8;
+        $$(".ss8")[0].style.display = "block";
       }
       this.classList.add("nav_selected");
     })
@@ -162,6 +174,11 @@ function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
   // VISUAL
   section = createDiv(["settings_section", "ss" + SETTINGS_VISUAL]);
   appendVisual(section);
+  div.appendChild(section);
+
+  // SHORTCUTS
+  section = createDiv(["settings_section", "ss" + SETTINGS_SHORTCUTS]);
+  appendShortcuts(section);
   div.appendChild(section);
 
   // PRIVACY
@@ -308,10 +325,7 @@ function appendArenaData(section) {
     if (e.keyCode === 13) logFormatInput.blur();
   });
   logFormatInput.addEventListener("focusout", () => {
-    if (
-      logFormatInput.value &&
-      logFormatInput.value !== pd.settings.log_locale_format
-    ) {
+    if (logFormatInput.value !== pd.settings.log_locale_format) {
       updateAppSettings();
     }
   });
@@ -604,13 +618,6 @@ function appendOverlay(section) {
     overlaySection.appendChild(helpDiv);
     addCheckbox(
       overlaySection,
-      `Enable Alt+Shift+${index + 1} keyboard shortcut`,
-      `overlay_${index}_keyboard_shortcut`,
-      settings.keyboard_shortcut,
-      updateUserSettings
-    );
-    addCheckbox(
-      overlaySection,
       "Show top bar",
       `overlay_${index}_top`,
       settings.top,
@@ -688,9 +695,7 @@ function appendOverlay(section) {
       `overlay_${index}_type_counts`,
       settings.type_counts,
       updateUserSettings,
-      [OVERLAY_LOG, OVERLAY_ODDS, OVERLAY_MIXED, OVERLAY_DRAFT].includes(
-        settings.mode
-      )
+      [OVERLAY_LOG, OVERLAY_DRAFT].includes(settings.mode)
     );
     addCheckbox(
       overlaySection,
@@ -698,9 +703,7 @@ function appendOverlay(section) {
       `overlay_${index}_mana_curve`,
       settings.mana_curve,
       updateUserSettings,
-      [OVERLAY_LOG, OVERLAY_ODDS, OVERLAY_MIXED, OVERLAY_DRAFT].includes(
-        settings.mode
-      )
+      [OVERLAY_LOG, OVERLAY_DRAFT].includes(settings.mode)
     );
 
     const sliderOpacity = createDiv(["slidecontainer_settings"]);
@@ -869,7 +872,7 @@ function appendVisual(section) {
 
   slider.appendChild(sliderlabel);
 
-  const sliderInput = createInput(["slider", "sliderA"], "", {
+  const sliderInput = createInput(["slider"], "", {
     type: "range",
     min: "0",
     max: "20",
@@ -900,6 +903,116 @@ function appendVisual(section) {
   d.appendChild(img);
   label.appendChild(d);
   section.appendChild(label);
+}
+
+function appendShortcuts(section) {
+  section.appendChild(createDiv(["settings_title"], "Shortcuts"));
+
+  addCheckbox(
+    section,
+    "Enable keyboard shortcuts",
+    "settings_enablekeyboardshortcuts",
+    pd.settings.enable_keyboard_shortcuts,
+    updateUserSettings
+  );
+
+  const helpDiv = createDiv(
+    ["settings_note"],
+    `Click Edit to change a shortcut</br>`
+  );
+  helpDiv.style.margin = "24px 16px 16px";
+  section.appendChild(helpDiv);
+
+  const gridDiv = createDiv(["shortcuts_grid"]);
+  let cell;
+  cell = createDiv(
+    ["line_dark", "line_bottom_border", "shortcuts_line"],
+    "Action"
+  );
+  cell.style.gridArea = `1 / 1 / auto / 3`;
+  gridDiv.appendChild(cell);
+
+  cell = createDiv(
+    ["line_dark", "line_bottom_border", "shortcuts_line"],
+    "Shortcut"
+  );
+  cell.style.gridArea = `1 / 2 / auto / 4`;
+  gridDiv.appendChild(cell);
+
+  Object.keys(SHORTCUT_NAMES).forEach(function(key, index) {
+    let ld = index % 2 ? "line_dark" : "line_light";
+
+    cell = createDiv([ld, "shortcuts_line"], SHORTCUT_NAMES[key]);
+    cell.style.gridArea = `${index + 2} / 1 / auto / 2`;
+    gridDiv.appendChild(cell);
+
+    cell = createDiv([ld, "shortcuts_line"], pd.settings[key]);
+    cell.style.gridArea = `${index + 2} / 2 / auto / 3`;
+    gridDiv.appendChild(cell);
+
+    cell = createDiv([ld, "shortcuts_line"]);
+    cell.style.gridArea = `${index + 2} / 3 / auto / 4`;
+
+    let editBut = createDiv([ld, "button_simple", "button_edit"], "Edit");
+
+    editBut.addEventListener("click", function() {
+      openKeyCombinationDialog(key);
+    });
+
+    cell.appendChild(editBut);
+
+    gridDiv.appendChild(cell);
+  });
+
+  section.appendChild(gridDiv);
+}
+
+function openKeyCombinationDialog(name) {
+  const cont = createDiv(["dialog_content"]);
+  cont.style.width = "320px";
+  cont.style.height = "120px";
+
+  remote.globalShortcut.unregisterAll();
+
+  let desc = createDiv(["keycomb_desc"], "Press any key");
+  let okButton = createDiv(["button_simple"], "Ok");
+
+  function reportKeyEvent(zEvent) {
+    let keyDesc = $$(".keycomb_desc")[0];
+    let keys = [];
+
+    if (zEvent.ctrlKey) keys.push("Control");
+    if (zEvent.shiftKey) keys.push("Shift");
+    if (zEvent.altKey) keys.push("Alt");
+    if (zEvent.metaKey) keys.push("Meta");
+
+    if (!["Control", "Shift", "Alt", "Meta"].includes(zEvent.key))
+      keys.push(zEvent.key);
+
+    let reportStr = keys.join("+");
+    keyDesc.innerHTML = reportStr;
+
+    zEvent.stopPropagation();
+    zEvent.preventDefault();
+  }
+
+  okButton.addEventListener("click", function() {
+    pd.settings[name] = $$(".keycomb_desc")[0].innerHTML;
+
+    ipcSend("save_user_settings", {
+      ...pd.settings
+    });
+
+    document.removeEventListener("keydown", reportKeyEvent);
+    closeDialog();
+  });
+
+  document.addEventListener("keydown", reportKeyEvent);
+  cont.appendChild(desc);
+  cont.appendChild(okButton);
+  openDialog(cont, () => {
+    document.removeEventListener("keydown", reportKeyEvent);
+  });
 }
 
 function appendPrivacy(section) {
@@ -949,6 +1062,14 @@ function appendAbout(section) {
     shell.openExternal("https://mtgatool.com/release-notes/");
   });
   about.appendChild(versionLink);
+  const metadataVersion = createDiv(
+    ["message_sub_15", "white"],
+    `Metadata: version ${db.data.version || "???"}, updated ${format(
+      db.data.updated ? fromUnixTime(db.data.updated) : "???",
+      "Pp"
+    )}`
+  );
+  about.appendChild(metadataVersion);
   about.appendChild(createDiv(["message_updates", "green"], updateState + "."));
   const updateButton = createDiv(
     ["button_simple", "centered"],
@@ -1073,7 +1194,6 @@ function updateUserSettingsBlend(_settings = {}) {
       ...settings,
       show: byId(`overlay_${index}_show`).checked,
       show_always: byId(`overlay_${index}_show_always`).checked,
-      keyboard_shortcut: byId(`overlay_${index}_keyboard_shortcut`).checked,
       top: byId(`overlay_${index}_top`).checked,
       title: byId(`overlay_${index}_title`).checked,
       deck: byId(`overlay_${index}_deck`).checked,
@@ -1094,6 +1214,7 @@ function updateUserSettingsBlend(_settings = {}) {
     close_on_match: byId("settings_closeonmatch").checked,
     close_to_tray: byId("settings_closetotray").checked,
     export_format: byId("settings_export_format").value,
+    enable_keyboard_shortcuts: byId("settings_enablekeyboardshortcuts").checked,
     send_data: byId("settings_senddata").checked,
     skip_firstpass: !byId("settings_readlogonlogin").checked,
     sound_priority: byId("settings_soundpriority").checked,
