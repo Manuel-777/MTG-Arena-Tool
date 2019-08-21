@@ -283,7 +283,14 @@ class PlayerData {
   }
 
   get cardsSizeOverlayCard() {
-    return 240 + this.settings.cards_size_overlay_card * 6;
+    if (this.settings.overlay_scale < 100) {
+      let scaleChange = (100 - this.settings.overlay_scale) / 100;
+      scaleChange = this.settings.cards_size * scaleChange;
+      let cardSizeScaled = this.settings.cards_size * 15 + scaleChange + 55;
+      return 100 + cardSizeScaled;
+    } else {
+      return 100 + this.settings.cards_size * 15;
+    }
   }
 
   get transactionList() {
