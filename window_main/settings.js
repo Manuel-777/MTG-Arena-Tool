@@ -860,42 +860,6 @@ function appendVisual(section) {
   tagSelect.style.marginLeft = "32px";
   section.appendChild(label);
 
-  //
-  const sliderHoverCard = createDiv(["slidecontainer_settings"]);
-  sliderHoverCard.style.marginTop = "20px";
-
-  const sliderlabelHoverCard = createLabel(
-    ["card_size_container", "card_size_label_hover_card"],
-    "Hover card size: " + pd.cardsSizeHoverCard + "px"
-  );
-  sliderlabelHoverCard.style.width = "300px";
-  sliderlabelHoverCard.style.margin = "0";
-  sliderlabelHoverCard.style.whiteSpace = "nowrap";
-
-  sliderHoverCard.appendChild(sliderlabelHoverCard);
-
-  const sliderInputHoverCard = createInput(["slider"], "", {
-    type: "range",
-    min: "0",
-    max: "20",
-    value: pd.settings.cards_size_hover_card,
-    id: "myRangeHoverCard"
-  });
-
-  sliderInputHoverCard.addEventListener("input", function() {
-    const cardSizeHoverCard = 100 + Math.round(parseInt(this.value)) * 15;
-    $$(".card_size_label_hover_card")[0].innerHTML =
-      "Hover card size: " + cardSizeHoverCard + "px";
-  });
-  sliderInputHoverCard.addEventListener("change", function() {
-    updateUserSettingsBlend({
-      cards_size_hover_card: Math.round(parseInt(this.value))
-    });
-  });
-  sliderHoverCard.appendChild(sliderInputHoverCard);
-  section.appendChild(sliderHoverCard);
-
-  //
   const slider = createDiv(["slidecontainer_settings"]);
   slider.style.marginTop = "20px";
   const sliderlabel = createLabel(
