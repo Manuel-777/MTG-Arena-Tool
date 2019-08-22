@@ -13,7 +13,6 @@ main.sublime-project
 /.vs
 /.pnp
 .pnp.js
-.gitattributes
 
 # testing
 /coverage

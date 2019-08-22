@@ -293,7 +293,7 @@ class PlayerData {
     return 100 + this.settings.cards_size * 15;
   }
 
-  get cardsSizeOverlayCard() {
+  get cardsSizeHoverCard() {
     if (this.settings.overlay_scale < 100) {
       let scaleChange = (100 - this.settings.overlay_scale) / 100;
       scaleChange = this.settings.cards_size * scaleChange;
