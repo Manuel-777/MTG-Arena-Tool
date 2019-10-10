@@ -1,6 +1,7 @@
 # See https://prettier.io/docs/en/ignore.html for more about ignoring files.
 
 # dependencies
+resources/amcharts/*
 shared/autocomplete.js
 window_background/messages_pb.js
 

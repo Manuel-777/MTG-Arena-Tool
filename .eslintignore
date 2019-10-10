@@ -1,6 +1,7 @@
 # See https://eslint.org/docs/user-guide/configuring#eslintignore for more about ignoring files.
 
 # dependencies
+resources/amcharts/*
 shared/autocomplete.js
 window_background/messages_pb.js
 
