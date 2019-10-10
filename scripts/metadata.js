@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 var http = require("https");
 const readline = require("readline");
+const _ = require("lodash");
 
 const manifestParser = require("./manifest-parser");
 const { generateMetadata } = require("./metadata-generator");
@@ -19,20 +20,8 @@ const {
 let metagameData = {};
 let ranksData = {};
 
-const VERSION = 20;
-/*
-  Languages available in loc.json;
-  "BR"
-  "DE"
-  "EN"
-  "ES"
-  "FR"
-  "IT"
-  "JP"
-  "RU"
-  "ko-KR"
-  "zh-CN"
-*/
+const VERSION = 22;
+
 const LANGUAGES = [
   "EN",
   "ES",
@@ -54,7 +43,7 @@ app.on("ready", () => {
   // obtain it from somewhere automatically, like a settings
   // file or the output log itself.
   manifestParser
-    .getManifestFiles("1776.732715")
+    .getManifestFiles("1805.734606")
     .then(checkSetsAvailable)
     .then(getRanksData)
     .then(getScryfallCards)
@@ -250,6 +239,9 @@ function generateScryfallDatabase() {
         if (line.length > 0) {
           try {
             var obj = JSON.parse(line);
+            /*if (obj.set == "eld" && obj.collector_number == 149) {
+              console.log(line);
+            }*/
             if (ALLOWED_SCRYFALL.includes(obj.set)) {
               obj.lang = obj.lang.toUpperCase();
               let name = obj.name;
@@ -263,8 +255,9 @@ function generateScryfallDatabase() {
               if (obj.layout == "adventure") {
                 obj.card_faces.forEach(face => {
                   let name = face.name;
+                  let newObj = Object.assign(_.cloneDeep(obj), face);
                   scryfallDataAdd(
-                    obj,
+                    newObj,
                     obj.lang,
                     obj.set,
                     name,
@@ -275,8 +268,9 @@ function generateScryfallDatabase() {
               if (obj.layout == "transform") {
                 obj.card_faces.forEach(face => {
                   let name = face.name;
+                  let newObj = Object.assign(_.cloneDeep(obj), face);
                   scryfallDataAdd(
-                    face,
+                    newObj,
                     obj.lang,
                     obj.set,
                     name,
@@ -287,8 +281,9 @@ function generateScryfallDatabase() {
               if (obj.layout == "split") {
                 obj.card_faces.forEach(face => {
                   let name = face.name;
+                  let newObj = Object.assign(_.cloneDeep(obj), face);
                   scryfallDataAdd(
-                    obj,
+                    newObj,
                     obj.lang,
                     obj.set,
                     name,

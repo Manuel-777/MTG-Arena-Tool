@@ -8,6 +8,30 @@ const cachePath =
     ? path.join((app || remote.app).getPath("userData"), "database.json")
     : null;
 
+/*
+ This is cool for debugging the metadata files, so we can
+ test and view the output files without copypasta.
+
+const cachePath =
+  app || (remote && remote.app)
+    ? path.join(
+        (app || remote.app).getPath("userData"),
+        "..",
+        "Electron",
+        "external",
+        "v22-zh-cn-database.json"
+      )
+    : null;
+
+const scryfallDataPath = path.join(
+  (app || remote.app).getPath("userData"),
+  "..",
+  "Electron",
+  "external",
+  "scryfall-cards.json"
+);
+*/
+
 // Some other things should go here later, like updating from MTGA Servers themselves.
 class Database {
   constructor() {
@@ -34,6 +58,15 @@ class Database {
       dbUri = cachePath;
     }
     const defaultDb = fs.readFileSync(dbUri, "utf8");
+    /*
+    try {
+      let scryfallData = fs.readFileSync(scryfallDataPath, "utf8");
+      this.scryfallData = JSON.parse(scryfallData);
+    } catch (e) {
+      console.log("Error parsing scryfall data", e);
+    }
+    */
+
     this.handleSetDb(null, defaultDb);
 
     Database.instance = this;

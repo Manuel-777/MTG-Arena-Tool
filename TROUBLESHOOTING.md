@@ -34,11 +34,19 @@ If this works, send the the old log file file to [mtgatool@gmail.com](mailto:mtg
 
 If that does not work;
 - Proceed to `%APPDATA%\mtg-arena-tool`
-- Locate your user-data file (the .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`)
+- Locate your *user-data file* (the .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`)
 - Rename the file, adding something to the end. **Do not delete it!**
 - Run MTG Arena Tool again.
 
 If the last step worked, send your user-data file to [mtgatool@gmail.com](mailto:mtgatool@gmail.com) and I will inspect what is wrong with it.
+
+### I want to reset all my historical data
+
+If the amount of data is __small__ you can archive it all. The intended purpose of archiving is to remove from stats and hide from the UI.
+
+If you have a patreon subscription with data syncing it is best to directly email [mtgatool@gmail.com](mailto:mtgatool@gmail.com). Otherwise some deleted data will be resynced.
+
+Otherwise, with a large amount of bad data, it's best to rename the *user-data file*. (the .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`)
 
 ### If you have any other unexpected behaviour
 

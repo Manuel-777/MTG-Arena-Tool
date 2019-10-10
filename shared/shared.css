@@ -590,11 +590,11 @@ label {
     z-index: 15;
     pointer-events: none;
     background-size: contain;
-    box-shadow: -1px 1px black;
-    border-radius: 100%;
     width: 20px;
     height: 20px;
     margin: 0 2px auto 2px;
+    background-repeat: no-repeat;
+    filter: drop-shadow(-1px 1px black);
 }
 
 .mana_s16 {
