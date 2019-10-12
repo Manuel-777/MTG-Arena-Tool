@@ -22,7 +22,6 @@ const sha1 = require("js-sha1");
 
 const httpApi = require("./http-api");
 
-const db = require("common/database");
 const playerData = require("common/player-data");
 const { getReadableFormat } = require("common/util");
 const {
@@ -95,12 +94,10 @@ let logLoopInterval = null;
 const debugArenaID = undefined;
 var debugLogSpeed = 0.001;
 
-var lastDeckUpdate = new Date();
-
 const addCustomDeck = require("./addCustomDeck");
 const forceDeckUpdate = require("./forceDeckUpdate");
 const getOpponentDeck = require("./getOpponentDeck");
-const { loadPlayerConfig, syncSettings } = require("./loadPlayerConfig");
+const { loadPlayerConfig, syncSettings, startWatchingLog } = require("./loadPlayerConfig");
 const update_deck = require("./updateDeck");
 
 //
@@ -421,18 +418,17 @@ ipc.on("add_history_tag", (event, arg) => {
   httpApi.httpSetDeckTag(tag, match.oppDeck.mainDeck, match.eventId);
 });
 
-let odds_sample_size = 1;
 ipc.on("set_odds_samplesize", function(event, state) {
-  odds_sample_size = state;
+  globals.odds_sample_size = state;
   forceDeckUpdate(false);
   update_deck(true);
 });
 
 // Set a new log URI
 ipc.on("set_log", function(event, arg) {
-  if (watchingLog) {
-    stopWatchingLog();
-    stopWatchingLog = startWatchingLog();
+  if (globals.watchingLog) {
+    globals.stopWatchingLog();
+    globals.stopWatchingLog = startWatchingLog();
   }
   logUri = arg;
   settingsStore.set("logUri", arg);
@@ -442,8 +438,6 @@ ipc.on("set_log", function(event, arg) {
 // Set variables to default first
 const mtgaLog = require("./mtga-log");
 let prevLogSize = 0;
-let watchingLog = false;
-let stopWatchingLog;
 
 let logUri = mtgaLog.defaultLogUri();
 let settingsLogUri = settingsStore.get("logUri");
@@ -460,17 +454,6 @@ const ArenaLogWatcher = require("./arena-log-watcher");
 
 let logReadStart = null;
 let logReadEnd = null;
-
-function startWatchingLog() {
-  logReadStart = new Date();
-  return ArenaLogWatcher.start({
-    path: logUri,
-    chunkSize: 268435440,
-    onLogEntry: onLogEntryFound,
-    onError: err => console.error(err),
-    onFinish: finishLoading
-  });
-}
 
 function sendSettings() {
   let tags_colors = playerData.tags_colors;
@@ -937,92 +920,6 @@ function dataChop(data, startStr, endStr) {
   }
 
   return data;
-}
-
-function getBestArchetype(deck) {
-  let bestMatch = "-";
-
-  // Calculate worst possible deviation for this deck
-  let mainDeviations = [];
-  if (deck.mainboard.get().length == 0) return bestMatch;
-  deck.mainboard.get().forEach(card => {
-    let deviation = card.quantity;
-    mainDeviations.push(deviation * deviation);
-  });
-  let lowestDeviation = Math.sqrt(
-    mainDeviations.reduce((a, b) => a + b) / (mainDeviations.length - 1)
-  );
-  let highest = lowestDeviation; //err..
-
-  // Test for each archetype
-  db.archetypes.forEach(arch => {
-    //console.log(arch.name);
-    mainDeviations = [];
-    deck.mainboard.get().forEach(card => {
-      //let q = card.quantity;
-      let name = db.card(card.id).name;
-      let archMain = arch.average.mainDeck;
-
-      let deviation = 1 - (archMain[name] ? 1 : 0); // archMain[name] ? archMain[name] : 0 // for full data
-      mainDeviations.push(deviation * deviation);
-      //console.log(name, deviation, q, archMain[name]);
-    });
-    let averageDeviation =
-      mainDeviations.reduce((a, b) => a + b) / (mainDeviations.length - 1);
-    let finalDeviation = Math.sqrt(averageDeviation);
-
-    if (finalDeviation < lowestDeviation) {
-      lowestDeviation = finalDeviation;
-      bestMatch = arch;
-    }
-    //console.log(">>", averageDeviation, Math.sqrt(averageDeviation));
-  });
-
-  if (lowestDeviation > highest * 0.5) {
-    return "Unknown";
-  }
-
-  return bestMatch.name;
-}
-
-function getColorArchetype(c) {
-  if (c.length == 1) {
-    if (c.w) return "Mono White";
-    if (c.u) return "Mono Blue";
-    if (c.b) return "Mono Black";
-    if (c.g) return "Mono Green";
-    if (c.r) return "Mono Red";
-  } else if (c.length == 2) {
-    if (c.w && c.u) return "Azorius";
-    if (c.b && c.r) return "Rakdos";
-    if (c.g && c.w) return "Selesnya";
-    if (c.u && c.b) return "Dimir";
-    if (c.r && c.g) return "Gruul";
-    if (c.w && c.b) return "Orzhov";
-    if (c.u && c.r) return "Izzet";
-    if (c.b && c.g) return "Golgari";
-    if (c.r && c.w) return "Boros";
-    if (c.g && c.u) return "Simic";
-  } else if (c.length == 3) {
-    if (c.w && c.u && c.b) return "Esper";
-    if (c.u && c.b && c.r) return "Grixis";
-    if (c.b && c.r && c.g) return "Jund";
-    if (c.r && c.g && c.w) return "Naya";
-    if (c.g && c.w && c.u) return "Bant";
-    if (c.g && c.w && c.b) return "Abzan";
-    if (c.w && c.u && c.r) return "Jeskai";
-    if (c.u && c.b && c.g) return "Sultai";
-    if (c.b && c.r && c.w) return "Mardu";
-    if (c.r && c.g && c.u) return "Temur";
-  } else if (c.length == 4) {
-    if (c.w && c.u && c.b && c.r) return "WUBR";
-    if (c.u && c.b && c.r && c.g) return "UBRG";
-    if (c.w && c.b && c.r && c.g) return "WBRG";
-    if (c.w && c.u && c.r && c.g) return "WURG";
-    if (c.w && c.u && c.b && c.g) return "WUBG";
-  } else if (c.length == 5) {
-    return "5-color";
-  }
 }
 
 //

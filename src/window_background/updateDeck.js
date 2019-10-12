@@ -5,6 +5,8 @@ const forceDeckUpdate = require("./forceDeckUpdate");
 const getOpponentDeck = require("./getOpponentDeck");
 const { objectClone } = require("common/util");
 
+var lastDeckUpdate = new Date();
+
 function update_deck(force) {
   var nd = new Date();
   if (

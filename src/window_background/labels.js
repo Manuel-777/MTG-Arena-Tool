@@ -28,7 +28,8 @@ const {
   parseWotcTimeFallback,
   setData
 } = require("./background-util");
-const { IPC_OVERLAY } = require("common/constants.js");
+const { IPC_OVERLAY, ARENA_MODE_MATCH,
+  ARENA_MODE_DRAFT, } = require("../shared/constants.js");
 
 const actionLog = require("./actionLog");
 const addCustomDeck = require("./addCustomDeck");

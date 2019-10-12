@@ -1,5 +1,7 @@
 const { ipc_send, setData } = require("./background-util");
 const httpApi = require("./http-api");
+const globals = require("./globals");
+const playerData = require("../shared/player-data");
 
 // Merges settings and updates singletons across processes
 // (essentially fancy setData for settings field only)
@@ -21,7 +23,7 @@ function loadPlayerConfig(playerId, serverData = undefined) {
     time: 0,
     progress: 2
   });
-  store = new Store({
+  globals.store = new Store({
     name: playerId,
     defaults: playerData.defaultCfg
   });
@@ -91,8 +93,8 @@ function loadPlayerConfig(playerId, serverData = undefined) {
     progress: 2
   });
 
-  watchingLog = true;
-  stopWatchingLog = startWatchingLog();
+  globals.watchingLog = true;
+  globals.stopWatchingLog = startWatchingLog();
   ipc_send("popup", {
     text: "Settings loaded.",
     time: 3000,
@@ -100,7 +102,19 @@ function loadPlayerConfig(playerId, serverData = undefined) {
   });
 }
 
+function startWatchingLog() {
+  logReadStart = new Date();
+  return ArenaLogWatcher.start({
+    path: logUri,
+    chunkSize: 268435440,
+    onLogEntry: onLogEntryFound,
+    onError: err => console.error(err),
+    onFinish: finishLoading
+  });
+}
+
 module.exports = {
   loadPlayerConfig,
-  syncSettings
+  syncSettings,
+  startWatchingLog
 };
