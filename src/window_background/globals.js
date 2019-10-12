@@ -5,6 +5,11 @@ const Deck = require("common/deck");
 const path = require("path");
 const fs = require("fs");
 
+// Hey! If you're here, you might be thinking of adding stuff to this file.
+// Don't. This is a shadowy place. You must never go here.
+// Hopefully we'll be able to get rid of all of the ones that can change,
+// and put them into stores or better structures than a giant export list.
+
 const actionLogDir = path.join(
   (electron.app || electron.remote.app).getPath("userData"),
   "actionlogs"
@@ -12,6 +17,9 @@ const actionLogDir = path.join(
 if (!fs.existsSync(actionLogDir)) {
   fs.mkdirSync(actionLogDir);
 }
+
+const mtgaLog = require("./mtga-log");
+let logUri = mtgaLog.defaultLogUri();
 
 var currentDeck = new Deck();
 
@@ -34,6 +42,8 @@ let idChanges = {};
 let initialLibraryInstanceIds = [];
 
 let instanceToCardIdMap = {};
+
+let logReadStart = null;
 
 let logTime = false;
 
@@ -93,9 +103,12 @@ module.exports = {
   idChanges,
   initialLibraryInstanceIds,
   instanceToCardIdMap,
+  logReadStart,
   logTime,
+  logUri,
   matchCompletedOnGameNumber,
   matchGameStats,
+  mtgaLog,
   odds_sample_size,
   originalDeck,
   rStore,

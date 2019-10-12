@@ -10,7 +10,7 @@ const { objectClone } = require("common/util");
 const playerData = require("common/player-data.js");
 const database = require("common/database");
 const getOpponentDeck = require("./getOpponentDeck");
-const globals = require('./globals');
+const globals = require("./globals");
 
 // Draft Creation
 

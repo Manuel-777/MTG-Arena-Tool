@@ -50,19 +50,67 @@ const forceDeckUpdate = function(removeUsed = true) {
 
     let chancesObj = {};
     let landsCount = main.getLandsAmounts();
-    chancesObj.landW = chanceType(landsCount.w, cardsleft, globals.odds_sample_size);
-    chancesObj.landU = chanceType(landsCount.u, cardsleft, globals.odds_sample_size);
-    chancesObj.landB = chanceType(landsCount.b, cardsleft, globals.odds_sample_size);
-    chancesObj.landR = chanceType(landsCount.r, cardsleft, globals.odds_sample_size);
-    chancesObj.landG = chanceType(landsCount.g, cardsleft, globals.odds_sample_size);
+    chancesObj.landW = chanceType(
+      landsCount.w,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.landU = chanceType(
+      landsCount.u,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.landB = chanceType(
+      landsCount.b,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.landR = chanceType(
+      landsCount.r,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.landG = chanceType(
+      landsCount.g,
+      cardsleft,
+      globals.odds_sample_size
+    );
 
-    chancesObj.chanceCre = chanceType(typeCre, cardsleft, globals.odds_sample_size);
-    chancesObj.chanceIns = chanceType(typeIns, cardsleft, globals.odds_sample_size);
-    chancesObj.chanceSor = chanceType(typeSor, cardsleft, globals.odds_sample_size);
-    chancesObj.chancePla = chanceType(typePla, cardsleft, globals.odds_sample_size);
-    chancesObj.chanceArt = chanceType(typeArt, cardsleft, globals.odds_sample_size);
-    chancesObj.chanceEnc = chanceType(typeEnc, cardsleft, globals.odds_sample_size);
-    chancesObj.chanceLan = chanceType(typeLan, cardsleft, globals.odds_sample_size);
+    chancesObj.chanceCre = chanceType(
+      typeCre,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.chanceIns = chanceType(
+      typeIns,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.chanceSor = chanceType(
+      typeSor,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.chancePla = chanceType(
+      typePla,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.chanceArt = chanceType(
+      typeArt,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.chanceEnc = chanceType(
+      typeEnc,
+      cardsleft,
+      globals.odds_sample_size
+    );
+    chancesObj.chanceLan = chanceType(
+      typeLan,
+      cardsleft,
+      globals.odds_sample_size
+    );
 
     chancesObj.deckSize = decksize;
     chancesObj.cardsLeft = cardsleft;
