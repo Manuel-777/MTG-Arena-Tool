@@ -1,27 +1,14 @@
-const compareDesc = require("date-fns/compareDesc");
-const isAfter = require("date-fns/isAfter");
-const isEqual = require("date-fns/isEqual");
-const max = require("date-fns/max");
-const startOfDay = require("date-fns/startOfDay");
-const subDays = require("date-fns/subDays");
-
-const {
-  COLORS_ALL,
-  COLORS_BRIEF,
-  DATE_ALL_TIME,
-  DATE_LAST_30,
-  DATE_LAST_DAY,
-  DATE_SEASON
-} = require("common/constants");
-const db = require("common/database");
-const pd = require("common/player-data");
-const {
-  getReadableEvent,
-  getRecentDeckName,
-  get_deck_missing,
-  getBoosterCountEstimate
-} = require("common/util");
-const { normalApproximationInterval } = require("common/stats-fns");
+import compareDesc from 'date-fns/compareDesc';
+import isAfter from 'date-fns/isAfter';
+import isEqual from 'date-fns/isEqual';
+import max from 'date-fns/max';
+import startOfDay from 'date-fns/startOfDay';
+import subDays from 'date-fns/subDays';
+import { COLORS_ALL, COLORS_BRIEF, DATE_ALL_TIME, DATE_LAST_30, DATE_LAST_DAY, DATE_SEASON } from 'common/constants';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { getReadableEvent, getRecentDeckName, get_deck_missing, getBoosterCountEstimate } from 'common/util';
+import { normalApproximationInterval } from 'common/stats-fns';
 
 // Default filter values
 const DEFAULT_DECK = "All Decks";
@@ -41,7 +28,7 @@ const NO_ARCH = "No Archetype";
 
 const dateMax = (a, b) => (a && b ? max([a, b]) : a || b);
 
-class Aggregator {
+export class Aggregator {
   constructor(filters) {
     this.filterDate = this.filterDate.bind(this);
     this.filterDeck = this.filterDeck.bind(this);
@@ -543,4 +530,4 @@ Aggregator.DRAFT_REPLAYS = DRAFT_REPLAYS;
 Aggregator.ALL_EVENT_TRACKS = ALL_EVENT_TRACKS;
 Aggregator.NO_ARCH = NO_ARCH;
 
-module.exports = Aggregator;
+export default Aggregator;

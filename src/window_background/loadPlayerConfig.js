@@ -1,60 +1,22 @@
-const {
-  onLabelOutLogInfo,
-  onLabelGreToClient,
-  onLabelClientToMatchServiceMessageTypeClientToGREMessage,
-  onLabelInEventGetPlayerCourse,
-  onLabelInEventGetPlayerCourseV2,
-  onLabelInEventJoin,
-  onLabelInEventGetCombinedRankInfo,
-  onLabelInDeckGetDeckLists,
-  onLabelInDeckGetDeckListsV3,
-  onLabelInDeckGetPreconDecks,
-  onLabelInEventGetPlayerCourses,
-  onLabelInEventGetPlayerCoursesV2,
-  onLabelInDeckUpdateDeck,
-  onLabelInDeckUpdateDeckV3,
-  onLabelInventoryUpdated,
-  onLabelInPlayerInventoryGetPlayerInventory,
-  onLabelInPlayerInventoryGetPlayerCardsV3,
-  onLabelInProgressionGetPlayerProgress,
-  onLabelInEventDeckSubmit,
-  onLabelInEventDeckSubmitV3,
-  onLabelInEventGetActiveEvents,
-  onLabelEventMatchCreated,
-  onLabelOutDirectGameChallenge,
-  onLabelOutEventAIPractice,
-  onLabelInDraftDraftStatus,
-  onLabelInDraftMakePick,
-  onLabelOutDraftMakePick,
-  onLabelInEventCompleteDraft,
-  onLabelMatchGameRoomStateChangedEvent,
-  onLabelInEventGetSeasonAndRankDetail,
-  onLabelGetPlayerInventoryGetRewardSchedule,
-  onLabelRankUpdated,
-  onLabelMythicRatingUpdated,
-  onLabelTrackProgressUpdated,
-  onLabelTrackRewardTierUpdated
-} = require("./labels");
-
-const { ARENA_MODE_MATCH, ARENA_MODE_DRAFT } = require("../shared/constants");
-
-const update_deck = require("./updateDeck");
+import { onLabelOutLogInfo, onLabelGreToClient, onLabelClientToMatchServiceMessageTypeClientToGREMessage, onLabelInEventGetPlayerCourse, onLabelInEventGetPlayerCourseV2, onLabelInEventJoin, onLabelInEventGetCombinedRankInfo, onLabelInDeckGetDeckLists, onLabelInDeckGetDeckListsV3, onLabelInDeckGetPreconDecks, onLabelInEventGetPlayerCourses, onLabelInEventGetPlayerCoursesV2, onLabelInDeckUpdateDeck, onLabelInDeckUpdateDeckV3, onLabelInventoryUpdated, onLabelInPlayerInventoryGetPlayerInventory, onLabelInPlayerInventoryGetPlayerCardsV3, onLabelInProgressionGetPlayerProgress, onLabelInEventDeckSubmit, onLabelInEventDeckSubmitV3, onLabelInEventGetActiveEvents, onLabelEventMatchCreated, onLabelOutDirectGameChallenge, onLabelOutEventAIPractice, onLabelInDraftDraftStatus, onLabelInDraftMakePick, onLabelOutDraftMakePick, onLabelInEventCompleteDraft, onLabelMatchGameRoomStateChangedEvent, onLabelInEventGetSeasonAndRankDetail, onLabelGetPlayerInventoryGetRewardSchedule, onLabelRankUpdated, onLabelMythicRatingUpdated, onLabelTrackProgressUpdated, onLabelTrackRewardTierUpdated } from './labels';
+import { ARENA_MODE_MATCH, ARENA_MODE_DRAFT } from 'common/constants';
+import update_deck from './updateDeck';
 
 var debugLogSpeed = 0.001;
 
-const { ipc_send, setData, getDateFormat } = require("./background-util");
-const httpApi = require("./http-api");
-const globals = require("./globals");
-const playerData = require("../shared/player-data");
-const Store = require("electron-store");
-const ArenaLogWatcher = require("./arena-log-watcher");
+import { ipc_send, setData, getDateFormat } from './background-util';
+import * as httpApi from './http-api';
+import globals from './globals';
+import playerData from 'common/player-data';
+import Store from 'electron-store';
+import ArenaLogWatcher from './arena-log-watcher';
 
 let logReadEnd = null;
 
 // Merges settings and updates singletons across processes
 // (essentially fancy setData for settings field only)
 // To persist changes, see "save_user_settings" or "save_app_settings"
-function syncSettings(
+export function syncSettings(
   dirtySettings = {},
   refresh = globals.debugLog || !globals.firstPass
 ) {
@@ -64,7 +26,7 @@ function syncSettings(
 }
 
 // Loads this player's configuration file
-function loadPlayerConfig(playerId, serverData = undefined) {
+export function loadPlayerConfig(playerId, serverData = undefined) {
   ipc_send("ipc_log", "Load player ID: " + playerId);
   ipc_send("popup", {
     text: "Loading player history...",
@@ -150,7 +112,7 @@ function loadPlayerConfig(playerId, serverData = undefined) {
   });
 }
 
-function startWatchingLog() {
+export function startWatchingLog() {
   globals.logReadStart = new Date();
   return ArenaLogWatcher.start({
     path: globals.logUri,
@@ -495,9 +457,3 @@ function updateLoading(entry) {
     });
   }
 }
-
-module.exports = {
-  loadPlayerConfig,
-  syncSettings,
-  startWatchingLog
-};

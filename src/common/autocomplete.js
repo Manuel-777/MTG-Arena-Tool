@@ -140,4 +140,4 @@ function autocomplete(inp, arr, _onClick = () => {}, _onBlur = () => {}) {
   });
 }
 
-module.exports = autocomplete;
+export default autocomplete;

@@ -1,16 +1,11 @@
-const { shell } = require("electron");
-const db = require("common/database");
-const pd = require("common/player-data");
-const { queryElements: $$, createDiv } = require("common/dom-fns");
-const { addCardHover } = require("common/card-hover");
-const { toHHMMSS, toDDHHMMSS, timestamp } = require("common/util");
-const { tournamentCreate } = require("./tournaments");
-const {
-  getLocalState,
-  ipcSend,
-  resetMainContainer,
-  showLoadingBars
-} = require("./renderer-util");
+import { shell } from 'electron';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { queryElements as $$, createDiv } from 'common/dom-fns';
+import { addCardHover } from 'common/card-hover';
+import { toHHMMSS, toDDHHMMSS, timestamp } from 'common/util';
+import { tournamentCreate } from './tournaments';
+import { getLocalState, ipcSend, resetMainContainer, showLoadingBars } from './renderer-util';
 
 let usersActive;
 let tournaments_list;
@@ -27,12 +22,12 @@ function clearHomeInverals() {
 }
 
 //
-function requestHome() {
+export function requestHome() {
   ipcSend("request_home", filteredWildcardsSet);
 }
 
 // Should separate these two into smaller functions
-function openHomeTab(arg, opentab = true) {
+export function openHomeTab(arg, opentab = true) {
   const ls = getLocalState();
   const mainDiv = resetMainContainer();
 
@@ -360,8 +355,3 @@ function openHomeTab(arg, opentab = true) {
     mainDiv.appendChild(cont);
   }
 }
-
-module.exports = {
-  openHomeTab,
-  requestHome
-};

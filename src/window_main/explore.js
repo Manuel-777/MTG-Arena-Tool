@@ -1,37 +1,12 @@
-const _ = require("lodash");
-const anime = require("animejs");
-
-const {
-  CARD_RARITIES,
-  MANA,
-  COLORS_BRIEF,
-  DEFAULT_TILE,
-  RANKS,
-  RANKS_SORT,
-  EASING_DEFAULT
-} = require("common/constants");
-const db = require("common/database");
-const { queryElements: $$, createDiv } = require("common/dom-fns");
-const { createSelect } = require("common/select");
-const {
-  getCardArtCrop,
-  get_rank_index_16,
-  removeDuplicates,
-  compare_cards,
-  getBoosterCountEstimate
-} = require("common/util");
-
-const {
-  addCheckbox,
-  getLocalState,
-  getWinrateClass,
-  hideLoadingBars,
-  ipcSend,
-  resetMainContainer,
-  setLocalState,
-  showLoadingBars
-} = require("./renderer-util");
-const { openDeck } = require("./deck-details");
+import _ from 'lodash';
+import anime from 'animejs';
+import { CARD_RARITIES, MANA, COLORS_BRIEF, DEFAULT_TILE, RANKS, RANKS_SORT, EASING_DEFAULT } from 'common/constants';
+import db from 'common/database';
+import { queryElements as $$, createDiv } from 'common/dom-fns';
+import { createSelect } from 'common/select';
+import { getCardArtCrop, get_rank_index_16, removeDuplicates, compare_cards, getBoosterCountEstimate } from 'common/util';
+import { addCheckbox, getLocalState, getWinrateClass, hideLoadingBars, ipcSend, resetMainContainer, setLocalState, showLoadingBars } from './renderer-util';
+import { openDeck } from './deck-details';
 
 // default values for cached local state
 const defaultData = {
@@ -61,7 +36,7 @@ let inputRanks = defaultData.filteredranks;
 let queryInFlight = false; // semaphore to limit simultaneous queries
 
 //
-function openExploreTab() {
+export function openExploreTab() {
   hideLoadingBars();
   queryInFlight = false;
   let { exploreData } = getLocalState();
@@ -482,7 +457,7 @@ function queryExplore() {
   ipcSend("request_explore", query);
 }
 
-function setExploreDecks(data) {
+export function setExploreDecks(data) {
   if (!queryInFlight || !data || !data.result) return;
 
   const exploreList = document.getElementById("explore_list");
@@ -678,8 +653,3 @@ function deckLoad(_deck, index) {
     });
   });
 }
-
-module.exports = {
-  openExploreTab,
-  setExploreDecks
-};

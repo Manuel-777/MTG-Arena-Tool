@@ -1,7 +1,8 @@
 /* eslint-env jest */
 
-const fs = require("fs");
-const ArenaLogDecoder = require("../arena-log-decoder");
+import fs from 'fs';
+
+import ArenaLogDecoder from '../arena-log-decoder';
 
 const text = fs.readFileSync(__dirname + "/output_log.txt", "utf-8");
 

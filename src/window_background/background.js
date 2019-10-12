@@ -1,4 +1,4 @@
-const { remote, ipcRenderer: ipc } = require("electron");
+import { remote, ipcRenderer as ipc } from 'electron';
 
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");
@@ -16,20 +16,16 @@ if (!remote.app.isPackaged) {
   require("devtron").install();
 }
 
-const Store = require("electron-store");
-const fs = require("fs");
-const sha1 = require("js-sha1");
-
-const httpApi = require("./http-api");
-
-const playerData = require("../shared/player-data");
-const { getReadableFormat } = require("../shared/util");
-const { HIDDEN_PW, MAIN_DECKS } = require("../shared/constants");
-const { ipc_send, setData, unleakString } = require("./background-util");
-
-const { createDeck } = require("./data");
-
-const globals = require("./globals");
+import Store from 'electron-store';
+import fs from 'fs';
+import sha1 from 'js-sha1';
+import * as httpApi from './http-api';
+import playerData from 'common/player-data';
+import { getReadableFormat } from 'common/util';
+import { HIDDEN_PW, MAIN_DECKS } from 'common/constants';
+import { ipc_send, setData, unleakString } from './background-util';
+import { createDeck } from './data';
+import globals from './globals';
 
 const settingsCfg = {
   gUri: ""
@@ -43,14 +39,10 @@ var settingsStore = new Store({
 let logLoopInterval = null;
 const debugArenaID = undefined;
 
-const addCustomDeck = require("./addCustomDeck");
-const forceDeckUpdate = require("./forceDeckUpdate");
-const {
-  loadPlayerConfig,
-  syncSettings,
-  startWatchingLog
-} = require("./loadPlayerConfig");
-const update_deck = require("./updateDeck");
+import addCustomDeck from './addCustomDeck';
+import forceDeckUpdate from './forceDeckUpdate';
+import { loadPlayerConfig, syncSettings, startWatchingLog } from './loadPlayerConfig';
+import update_deck from './updateDeck';
 
 //
 ipc.on("save_app_settings", function(event, arg) {
@@ -448,7 +440,7 @@ async function logLoop() {
   }
 */
 
-  const { size } = await global.mtgaLog.stat(globals.logUri);
+  const { size } = await globals.mtgaLog.stat(globals.logUri);
 
   if (size == undefined) {
     // Something went wrong obtaining the file size, try again later
@@ -464,8 +456,8 @@ async function logLoop() {
 
   const logSegment =
     delta > 0
-      ? await global.mtgaLog.readSegment(globals.logUri, prevLogSize, delta)
-      : await global.mtgaLog.readSegment(globals.logUri, 0, size);
+      ? await globals.mtgaLog.readSegment(globals.logUri, prevLogSize, delta)
+      : await globals.mtgaLog.readSegment(globals.logUri, 0, size);
 
   // We are looping only to get user data (processLogUser)
   // Process only the user data for initial loading (prior to log in)

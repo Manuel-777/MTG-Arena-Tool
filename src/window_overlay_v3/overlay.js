@@ -1,6 +1,6 @@
-const { ipcRenderer: ipc, webFrame, remote } = require("electron");
-const interact = require("interactjs");
-const format = require("date-fns/format");
+import { ipcRenderer as ipc, webFrame, remote } from 'electron';
+import interact from 'interactjs';
+import format from 'date-fns/format';
 
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");
@@ -17,50 +17,21 @@ if (!remote.app.isPackaged) {
   });
 }
 
-const TransparencyMouseFix = require("./electron-transparency-mouse-fix.js");
+import TransparencyMouseFix from './electron-transparency-mouse-fix.js';
 let fix = null;
 
-const striptags = require("striptags");
+import striptags from 'striptags';
+import db from 'common/database';
+import pd from 'common/player-data';
+import Deck from 'common/deck.js';
+import Colors from 'common/colors';
+import * as deckDrawer from 'common/deck-drawer';
+import { compare_cards, deckManaCurve, deckTypesStats, get_card_type_sort } from 'common/util';
+import { addCardHover, attachOwnerhipStars, setRenderer } from 'common/card-hover';
+import { queryElements, createDiv } from 'common/dom-fns';
+import { ARENA_MODE_IDLE, ARENA_MODE_MATCH, ARENA_MODE_DRAFT, COLORS_ALL, DRAFT_RANKS, MANA, PACK_SIZES, IPC_BACKGROUND, IPC_OVERLAY, IPC_MAIN, OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_ODDS, OVERLAY_MIXED, OVERLAY_SEEN, OVERLAY_DRAFT, OVERLAY_LOG, OVERLAY_DRAFT_BREW, OVERLAY_DRAFT_MODES } from 'common/constants.js';
 
-const db = require("common/database");
-const pd = require("common/player-data");
-const Deck = require("common/deck.js");
-const Colors = require("common/colors");
-const deckDrawer = require("common/deck-drawer");
-const {
-  compare_cards,
-  deckManaCurve,
-  deckTypesStats,
-  get_card_type_sort
-} = require("common/util");
-const {
-  addCardHover,
-  attachOwnerhipStars,
-  setRenderer
-} = require("common/card-hover");
-const { queryElements, createDiv } = require("common/dom-fns");
-
-const {
-  ARENA_MODE_IDLE,
-  ARENA_MODE_MATCH,
-  ARENA_MODE_DRAFT,
-  COLORS_ALL,
-  DRAFT_RANKS,
-  MANA,
-  PACK_SIZES,
-  IPC_BACKGROUND,
-  IPC_OVERLAY,
-  IPC_MAIN,
-  OVERLAY_FULL,
-  OVERLAY_LEFT,
-  OVERLAY_ODDS,
-  OVERLAY_MIXED,
-  OVERLAY_SEEN,
-  OVERLAY_DRAFT,
-  OVERLAY_LOG,
-  OVERLAY_DRAFT_BREW,
-  OVERLAY_DRAFT_MODES
-} = require("common/constants.js");
+import DEFAULT_BACKGROUND from '../images/Bedevil-Art.jpg';
 
 const byId = id => document.getElementById(id);
 
@@ -1049,7 +1020,7 @@ function change_background(index, arg = "default") {
     if (pd.settings.back_url && pd.settings.back_url !== "default") {
       mainWrapper.style.backgroundImage = "url(" + pd.settings.back_url + ")";
     } else {
-      mainWrapper.style.backgroundImage = "url(../images/Bedevil-Art.jpg)";
+      mainWrapper.style.backgroundImage = "url(" + DEFAULT_BACKGROUND + ")";
     }
   } else {
     const xhr = new XMLHttpRequest();

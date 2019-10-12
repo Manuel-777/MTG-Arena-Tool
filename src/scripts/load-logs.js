@@ -13,8 +13,9 @@
 // At the time of writing there are several backward compatibility issues
 // with very old logs.
 
-const { app, BrowserWindow, ipcMain: ipc } = require("electron");
-const path = require("path");
+import { app, BrowserWindow, ipcMain as ipc } from 'electron';
+
+import path from 'path';
 
 function createBackgroundWindow() {
   const win = new BrowserWindow({

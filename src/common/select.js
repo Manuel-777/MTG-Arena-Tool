@@ -1,10 +1,5 @@
-const { createDiv, queryElements: $$ } = require("common/dom-fns");
+import { createDiv, queryElements as $$ } from 'common/dom-fns';
 
-/**
- * Creates a select box
- * This is a "fixed" version of SelectAdd and should replace it.
- **/
-exports.createSelect = createSelect;
 function createSelect(
   parent,
   options,
@@ -65,9 +60,7 @@ function createSelect(
   return selectContainer;
 }
 
-// When given a <select> element will convert to
-// list format to allow more style options
-exports.selectAdd = selectAdd;
+export { createSelect, selectAdd };
 function selectAdd(selectElement, callback) {
   selectElement.classList.add("select-hidden");
 

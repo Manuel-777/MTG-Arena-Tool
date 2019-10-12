@@ -1,5 +1,5 @@
 /* eslint-env jest */
-const nthLastIndexOf = require("../nth-last-index-of");
+import nthLastIndexOf from '../nth-last-index-of';
 
 describe("nthLastIndexOf", () => {
   it("returns the last index of a substring when n is 1", () => {

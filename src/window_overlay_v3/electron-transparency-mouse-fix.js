@@ -8,7 +8,7 @@
 // TODO: Windows: can't drag files over voids
 
 // No external dependencies!
-const electron = require("electron");
+import electron from 'electron';
 
 // Style for the default console logging tag
 const consoleTag = [
@@ -283,4 +283,4 @@ class TransparencyMouseFix {
   }
 }
 
-module.exports = TransparencyMouseFix;
+export default TransparencyMouseFix;

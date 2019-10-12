@@ -89,7 +89,7 @@ label {
 
 @font-face {
     font-family: 'roboto-bold';
-    src: url('../fonts/roboto-v18-v12-latin-500.woff') format('woff');
+    src: url('../fonts/roboto-v18-latin-500.woff') format('woff');
 }
 
 @font-face {

@@ -1,5 +1,5 @@
-const playerData = require("common/player-data");
-const globals = require("./globals");
+import playerData from 'common/player-data';
+import globals from './globals';
 
 // Get player name by seat in the game
 const getNameBySeat = function(seat) {
@@ -18,4 +18,4 @@ const getNameBySeat = function(seat) {
   }
 };
 
-module.exports = getNameBySeat;
+export default getNameBySeat;

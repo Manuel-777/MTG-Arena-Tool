@@ -1,20 +1,8 @@
-const path = require("path");
-const fs = require("fs");
-const {
-  APPDATA,
-  SETS_DATA,
-  SET_NAMES,
-  RARITY,
-  NO_DUPES_ART_SETS,
-  EVENT_TO_NAME,
-  EVENT_TO_FORMAT,
-  LIMITED_RANKED_EVENTS,
-  STANDARD_RANKED_EVENTS,
-  SINGLE_MATCH_EVENTS,
-  SCRYFALL_LANGUAGE
-} = require("./metadata-constants");
+import path from 'path';
+import fs from 'fs';
+import { APPDATA, SETS_DATA, SET_NAMES, RARITY, NO_DUPES_ART_SETS, EVENT_TO_NAME, EVENT_TO_FORMAT, LIMITED_RANKED_EVENTS, STANDARD_RANKED_EVENTS, SINGLE_MATCH_EVENTS, SCRYFALL_LANGUAGE } from './metadata-constants';
 
-exports.generateMetadata = function(
+export const generateMetadata = function(
   ScryfallCards,
   ranksData,
   metagameData,

@@ -1,7 +1,6 @@
-const { remote } = require("electron");
-
-const { createDiv, queryElements } = require("common/dom-fns");
-const { openDialog } = require("./renderer-util");
+import { remote } from 'electron';
+import { createDiv, queryElements } from 'common/dom-fns';
+import { openDialog } from './renderer-util';
 
 // We should clear this on releases and fill as we add new features
 const screens = [];
@@ -9,7 +8,7 @@ const screens = [];
 let selectedScreen = 0;
 let screenoffset = (screens.length - 1) * 50;
 
-function showWhatsNew() {
+export function showWhatsNew() {
   // Only show if we actually do have stuff to show
   if (screens.length == 0) return;
   const cont = createDiv(["dialog_content"]);
@@ -93,5 +92,3 @@ function showWhatsNew() {
 
   openDialog(cont);
 }
-
-module.exports = { showWhatsNew };

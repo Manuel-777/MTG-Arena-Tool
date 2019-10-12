@@ -41,4 +41,4 @@ function length(text, position) {
   }
 }
 
-module.exports = { starts, length };
+export default { starts, length };

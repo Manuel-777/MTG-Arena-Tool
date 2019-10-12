@@ -1,5 +1,5 @@
-const globals = require("./globals");
-const { hypergeometricRange } = require("common/stats-fns");
+import globals from './globals';
+import { hypergeometricRange } from 'common/stats-fns';
 
 const forceDeckUpdate = function(removeUsed = true) {
   var decksize = 0;
@@ -150,4 +150,4 @@ function chanceType(quantity, cardsleft, odds_sample_size) {
   );
 }
 
-module.exports = forceDeckUpdate;
+export default forceDeckUpdate;

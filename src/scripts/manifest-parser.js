@@ -1,11 +1,9 @@
-var http = require("https");
-
-const path = require("path");
-const fs = require("fs");
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-const gunzip = require("gunzip-file");
-
-const { APPDATA } = require("./metadata-constants");
+import http from 'https';
+import path from 'path';
+import fs from 'fs';
+import { XMLHttpRequest } from 'xmlhttprequest';
+import gunzip from 'gunzip-file';
+import { APPDATA } from './metadata-constants';
 
 function requestManifestData(version) {
   return new Promise(resolve => {
@@ -138,6 +136,6 @@ function httpGetFile(url, file) {
   });
 }
 
-module.exports = {
+export default {
   getManifestFiles: getManifestFiles
 };

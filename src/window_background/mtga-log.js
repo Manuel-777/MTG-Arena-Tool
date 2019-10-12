@@ -1,5 +1,5 @@
-const fs = require("fs");
-const { promisify } = require("util");
+import fs from 'fs';
+import { promisify } from 'util';
 
 const fsPromises = {
   access: promisify(fs.access),
@@ -47,4 +47,4 @@ async function readSegment(path, start, length) {
   }
 }
 
-module.exports = { defaultLogUri, exists, stat, readSegment };
+export default { defaultLogUri, exists, stat, readSegment };

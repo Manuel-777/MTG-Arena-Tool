@@ -1,9 +1,9 @@
-const electron = require("electron");
-const playerData = require("common/player-data");
-const Store = require("electron-store");
-const Deck = require("common/deck");
-const path = require("path");
-const fs = require("fs");
+import electron from 'electron';
+import playerData from 'common/player-data';
+import Store from 'electron-store';
+import Deck from 'common/deck';
+import path from 'path';
+import fs from 'fs';
 
 // Hey! If you're here, you might be thinking of adding stuff to this file.
 // Don't. This is a shadowy place. You must never go here.
@@ -18,7 +18,7 @@ if (!fs.existsSync(actionLogDir)) {
   fs.mkdirSync(actionLogDir);
 }
 
-const mtgaLog = require("./mtga-log");
+import mtgaLog from './mtga-log';
 let logUri = mtgaLog.defaultLogUri();
 
 var currentDeck = new Deck();
@@ -90,7 +90,7 @@ let watchingLog = false;
 
 let stopWatchingLog;
 
-module.exports = {
+export default {
   actionLogDir,
   currentDeck,
   currentMatch,

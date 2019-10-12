@@ -1,23 +1,8 @@
-const electron = require("electron");
+import electron from 'electron';
 const ipc = electron.ipcRenderer;
-const _ = require("lodash");
-
-const {
-  CARD_TILE_FLAT,
-  DATE_LAST_30,
-  DEFAULT_TILE,
-  BLACK,
-  BLUE,
-  GREEN,
-  RED,
-  WHITE,
-  OVERLAY_LEFT,
-  OVERLAY_FULL,
-  OVERLAY_SEEN,
-  OVERLAY_DRAFT,
-  OVERLAY_LOG
-} = require("common/constants");
-const db = require("common/database");
+import _ from 'lodash';
+import { CARD_TILE_FLAT, DATE_LAST_30, DEFAULT_TILE, BLACK, BLUE, GREEN, RED, WHITE, OVERLAY_LEFT, OVERLAY_FULL, OVERLAY_SEEN, OVERLAY_DRAFT, OVERLAY_LOG } from 'common/constants';
+import db from 'common/database';
 
 const playerDataDefault = {
   name: "",
@@ -457,4 +442,4 @@ class PlayerData {
   }
 }
 
-module.exports = new PlayerData();
+export default new PlayerData();

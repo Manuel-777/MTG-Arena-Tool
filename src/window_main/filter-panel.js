@@ -1,29 +1,10 @@
-const {
-  COLORS_ALL,
-  COLORS_BRIEF,
-  DATE_LAST_30,
-  DATE_LAST_DAY,
-  DATE_ALL_TIME,
-  DATE_SEASON
-} = require("common/constants");
-const pd = require("common/player-data");
-const { createDiv, createLabel } = require("common/dom-fns");
-const { createSelect } = require("common/select");
-const {
-  getReadableEvent,
-  getReadableFormat,
-  getRecentDeckName,
-  timeSince
-} = require("common/util");
-
-const { getTagColor, ipcSend, showDatepicker } = require("./renderer-util");
-const {
-  DEFAULT_ARCH,
-  DEFAULT_DECK,
-  DEFAULT_TAG,
-  NO_ARCH,
-  getDefaultFilters
-} = require("./aggregator");
+import { COLORS_ALL, COLORS_BRIEF, DATE_LAST_30, DATE_LAST_DAY, DATE_ALL_TIME, DATE_SEASON } from 'common/constants';
+import pd from 'common/player-data';
+import { createDiv, createLabel } from 'common/dom-fns';
+import { createSelect } from 'common/select';
+import { getReadableEvent, getReadableFormat, getRecentDeckName, timeSince } from 'common/util';
+import { getTagColor, ipcSend, showDatepicker } from './renderer-util';
+import Aggregator from './aggregator';
 
 class FilterPanel {
   constructor(
@@ -43,7 +24,7 @@ class FilterPanel {
     this.prefixId = prefixId;
     this.onFilterChange = onFilterChange;
     this.filters = {
-      ...getDefaultFilters(),
+      ...Aggregator.getDefaultFilters(),
       ...filters
     };
     this.events = events || [];
@@ -61,8 +42,8 @@ class FilterPanel {
   }
 
   getTagString(tag, showCount = false) {
-    if (tag === DEFAULT_TAG) return tag;
-    if (tag === DEFAULT_ARCH) return tag;
+    if (tag === Aggregator.DEFAULT_TAG) return tag;
+    if (tag === Aggregator.DEFAULT_ARCH) return tag;
     const color = getTagColor(tag);
     const margins = "margin: 5px; margin-right: 30px;";
     const style = `white-space: nowrap; background-color:${color}; color: black; padding-right: 12px; ${margins}`;
@@ -70,12 +51,12 @@ class FilterPanel {
     if (showCount && tag in this.archCounts) {
       tagString += ` (${this.archCounts[tag]})`;
     }
-    if (tag === NO_ARCH) return tagString;
+    if (tag === Aggregator.NO_ARCH) return tagString;
     return `<div class="deck_tag" style="${style}">${tagString}</div>`;
   }
 
   getDeckString(deckId) {
-    if (deckId === DEFAULT_DECK) return deckId;
+    if (deckId === Aggregator.DEFAULT_DECK) return deckId;
     const matches = this.decks.filter(_deck => _deck.id === deckId);
     if (matches.length === 0) return deckId;
     const deck = matches[0];
@@ -385,4 +366,4 @@ class FilterPanel {
   }
 }
 
-module.exports = FilterPanel;
+export default FilterPanel;

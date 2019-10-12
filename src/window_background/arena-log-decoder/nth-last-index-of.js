@@ -7,4 +7,4 @@ function nthLastIndexOf(text, searchString, n) {
   return text.lastIndexOf(searchString, i - 1);
 }
 
-module.exports = nthLastIndexOf;
+export default nthLastIndexOf;

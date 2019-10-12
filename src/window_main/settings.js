@@ -1,60 +1,19 @@
-const { ipcRenderer: ipc, remote, shell } = require("electron");
-const format = require("date-fns/format");
-const fromUnixTime = require("date-fns/fromUnixTime");
-
-const {
-  CARD_TILE_ARENA,
-  CARD_TILE_FLAT,
-  COLORS_ALL,
-  OVERLAY_FULL,
-  OVERLAY_LEFT,
-  OVERLAY_ODDS,
-  OVERLAY_MIXED,
-  OVERLAY_SEEN,
-  OVERLAY_DRAFT,
-  OVERLAY_DRAFT_BREW,
-  OVERLAY_LOG,
-  OVERLAY_DRAFT_MODES,
-  SHORTCUT_NAMES,
-  SETTINGS_BEHAVIOUR,
-  SETTINGS_ARENA_DATA,
-  SETTINGS_OVERLAY,
-  SETTINGS_VISUAL,
-  SETTINGS_SHORTCUTS,
-  SETTINGS_PRIVACY,
-  SETTINGS_ABOUT,
-  SETTINGS_LOGIN
-} = require("common/constants");
-const db = require("common/database");
-const pd = require("common/player-data");
-const {
-  createDiv,
-  createImg,
-  createInput,
-  createLabel,
-  queryElements: $$
-} = require("common/dom-fns");
-const deckDrawer = require("common/deck-drawer");
-const { showWhatsNew } = require("./whats-new");
-const { createSelect } = require("common/select");
-const { getCardImage } = require("common/util");
+import { ipcRenderer as ipc, remote, shell } from 'electron';
+import format from 'date-fns/format';
+import fromUnixTime from 'date-fns/fromUnixTime';
+import { CARD_TILE_ARENA, CARD_TILE_FLAT, COLORS_ALL, OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_ODDS, OVERLAY_MIXED, OVERLAY_SEEN, OVERLAY_DRAFT, OVERLAY_DRAFT_BREW, OVERLAY_LOG, OVERLAY_DRAFT_MODES, SHORTCUT_NAMES, SETTINGS_BEHAVIOUR, SETTINGS_ARENA_DATA, SETTINGS_OVERLAY, SETTINGS_VISUAL, SETTINGS_SHORTCUTS, SETTINGS_PRIVACY, SETTINGS_ABOUT, SETTINGS_LOGIN } from 'common/constants';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { createDiv, createImg, createInput, createLabel, queryElements as $$ } from 'common/dom-fns';
+import * as deckDrawer from 'common/deck-drawer';
+import { showWhatsNew } from './whats-new';
+import { createSelect } from 'common/select';
+import { getCardImage } from 'common/util';
 const byId = id => document.getElementById(id);
 
-const parse = require("date-fns/parse");
-const isValid = require("date-fns/isValid");
-
-const {
-  addCheckbox,
-  changeBackground,
-  hideLoadingBars,
-  ipcSend,
-  openDialog,
-  closeDialog,
-  renderLogInput,
-  resetMainContainer,
-  setLocalState,
-  showColorpicker
-} = require("./renderer-util");
+import parse from 'date-fns/parse';
+import isValid from 'date-fns/isValid';
+import { addCheckbox, changeBackground, hideLoadingBars, ipcSend, openDialog, closeDialog, renderLogInput, resetMainContainer, setLocalState, showColorpicker } from './renderer-util';
 
 let lastSettingsSection = 1;
 let updateState = "";
@@ -115,7 +74,7 @@ function blurIfEnterKey(element) {
 let currentOverlay = 0;
 
 //
-function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
+export function openSettingsTab(openSection = lastSettingsSection, scrollTop = 0) {
   if (openSection !== -1) {
     lastSettingsSection = openSection;
   } else {
@@ -1376,8 +1335,6 @@ function eraseData() {
   }
 }
 
-function setCurrentOverlaySettings(index) {
+export function setCurrentOverlaySettings(index) {
   currentOverlay = index;
 }
-
-module.exports = { setCurrentOverlaySettings, openSettingsTab };

@@ -1,31 +1,13 @@
-const anime = require("animejs");
-
-const { queryElements: $$, createDiv } = require("common/dom-fns");
-const { createSelect } = require("common/select");
-const deckDrawer = require("common/deck-drawer");
-const { EASING_DEFAULT } = require("common/constants.js");
-const {
-  compare_cards,
-  get_deck_export,
-  get_deck_missing,
-  getBoosterCountEstimate,
-  makeId,
-  objectClone,
-  timestamp,
-  toHHMMSS,
-  urlDecode
-} = require("common/util");
-const pd = require("common/player-data");
-
-const Aggregator = require("./aggregator");
-const FilterPanel = require("./filter-panel");
-const {
-  pop,
-  changeBackground,
-  drawDeck,
-  drawDeckVisual,
-  ipcSend
-} = require("./renderer-util");
+import anime from 'animejs';
+import { queryElements as $$, createDiv } from 'common/dom-fns';
+import { createSelect } from 'common/select';
+import * as deckDrawer from 'common/deck-drawer';
+import { EASING_DEFAULT } from 'common/constants.js';
+import { compare_cards, get_deck_export, get_deck_missing, getBoosterCountEstimate, makeId, objectClone, timestamp, toHHMMSS, urlDecode } from 'common/util';
+import pd from 'common/player-data';
+import Aggregator from './aggregator';
+import FilterPanel from './filter-panel';
+import { pop, changeBackground, drawDeck, drawDeckVisual, ipcSend } from './renderer-util';
 
 let tournamentDeck = null;
 let currentDeck = null;
@@ -37,7 +19,7 @@ let touStates = {};
 let stateClockInterval = null;
 let lastSeenInterval = null;
 
-function tournamentCreate() {
+export function tournamentCreate() {
   anime({
     targets: ".moving_ux",
     left: "-100%",
@@ -71,7 +53,7 @@ function tournamentCreate() {
 
 let stats;
 let record = "-";
-function tournamentOpen(t) {
+export function tournamentOpen(t) {
   //console.log(t);
   tou = t;
   let mainDiv = $$("#ux_1")[0];
@@ -718,7 +700,7 @@ function createDecklistTab() {
   return tab_cont_c;
 }
 
-function tournamentSetState(state) {
+export function tournamentSetState(state) {
   touStates[state.tid] = state;
   if (state.tid == tou._id) {
     $$(".tou_checks")[0].innerHTML = "";
@@ -812,9 +794,3 @@ function drawSideboardDeck(div) {
   div.appendChild(mainboardDiv);
   div.appendChild(sideboardDiv);
 }
-
-module.exports = {
-  tournamentOpen: tournamentOpen,
-  tournamentCreate: tournamentCreate,
-  tournamentSetState: tournamentSetState
-};

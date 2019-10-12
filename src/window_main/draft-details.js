@@ -1,22 +1,11 @@
-const anime = require("animejs");
-
-const {
-  DRAFT_RANKS,
-  EASING_DEFAULT,
-  PACK_SIZES
-} = require("common/constants");
-const db = require("common/database");
-const pd = require("common/player-data");
-const {
-  createDiv,
-  createImg,
-  createInput,
-  queryElements: $$
-} = require("common/dom-fns");
-const { addCardHover } = require("common/card-hover");
-const { getCardImage } = require("common/util");
-
-const { changeBackground } = require("./renderer-util");
+import anime from 'animejs';
+import { DRAFT_RANKS, EASING_DEFAULT, PACK_SIZES } from 'common/constants';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { createDiv, createImg, createInput, queryElements as $$ } from 'common/dom-fns';
+import { addCardHover } from 'common/card-hover';
+import { getCardImage } from 'common/util';
+import { changeBackground } from './renderer-util';
 
 const byId = id => document.getElementById(id);
 
@@ -43,8 +32,7 @@ function getPickedCards(draft, draftPosition) {
 }
 
 let arrowsChange = null;
-//
-exports.openDraft = openDraft;
+export { openDraft };
 function openDraft(id, draftPosition = 1) {
   // console.log("OPEN DRAFT", id, draftPosition);
   const draft = pd.draft(id);

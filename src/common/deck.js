@@ -1,14 +1,8 @@
-const db = require("./database.js");
-const CardsList = require("./cards-list.js");
-const Colors = require("./colors.js");
-const {
-  compare_cards,
-  get_set_code,
-  getWildcardsMissing,
-  objectClone
-} = require("common/util");
-
-const { DEFAULT_TILE } = require("common/constants.js");
+import db from './database.js';
+import CardsList from './cards-list.js';
+import Colors from './colors.js';
+import { compare_cards, get_set_code, get_wc_missing, objectClone } from 'common/util';
+import { DEFAULT_TILE } from 'common/constants.js';
 
 class Deck {
   constructor(mtgaDeck = {}, main = false, side = false) {
@@ -112,7 +106,7 @@ class Deck {
         var quantity = card.quantity;
         var rarity = db.card(grpid).rarity;
 
-        let add = getWildcardsMissing(grpid, quantity);
+        let add = get_wc_missing(grpid, quantity);
 
         missing[rarity] += add;
       });
@@ -124,7 +118,7 @@ class Deck {
         var quantity = card.quantity;
         var rarity = db.card(grpid).rarity;
 
-        let add = getWildcardsMissing(grpid, quantity);
+        let add = get_wc_missing(grpid, quantity);
 
         missing[rarity] += add;
       });
@@ -243,4 +237,4 @@ class Deck {
   }
 }
 
-module.exports = Deck;
+export default Deck;

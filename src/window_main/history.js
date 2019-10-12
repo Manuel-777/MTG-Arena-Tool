@@ -1,35 +1,18 @@
-const anime = require("animejs");
-
-const autocomplete = require("common/autocomplete");
-const {
-  DATE_SEASON,
-  DEFAULT_TILE,
-  EASING_DEFAULT,
-  RANKS
-} = require("common/constants");
-const db = require("common/database");
-const pd = require("common/player-data");
-const { createDiv, createInput } = require("common/dom-fns");
-const { makeId } = require("common/util");
-
-const Aggregator = require("./aggregator");
-const DataScroller = require("./data-scroller");
-const FilterPanel = require("./filter-panel");
-const ListItem = require("./list-item");
-const StatsPanel = require("./stats-panel");
-const {
-  attachDraftData,
-  attachMatchData,
-  formatPercent,
-  getTagColor,
-  ipcSend,
-  makeResizable,
-  resetMainContainer,
-  showColorpicker,
-  toggleArchived
-} = require("./renderer-util");
-const { openDraft } = require("./draft-details");
-const { openMatch } = require("./match-details");
+import anime from 'animejs';
+import autocomplete from 'common/autocomplete';
+import { DATE_SEASON, DEFAULT_TILE, EASING_DEFAULT, RANKS } from 'common/constants';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { createDiv, createInput } from 'common/dom-fns';
+import { makeId } from 'common/util';
+import Aggregator from './aggregator';
+import DataScroller from './data-scroller';
+import FilterPanel from './filter-panel';
+import ListItem from './list-item';
+import StatsPanel from './stats-panel';
+import { attachDraftData, attachMatchData, formatPercent, getTagColor, ipcSend, makeResizable, resetMainContainer, showColorpicker, toggleArchived } from './renderer-util';
+import { openDraft } from './draft-details';
+import { openMatch } from './match-details';
 
 const byId = id => document.getElementById(id);
 const {
@@ -54,7 +37,7 @@ function getNextRank(currentRank) {
   }
 }
 
-function setFilters(selected = {}) {
+export function setFilters(selected = {}) {
   if (selected.eventId || selected.date) {
     // clear all dependent filters
     filters = {
@@ -77,7 +60,7 @@ function setFilters(selected = {}) {
   }
 }
 
-function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
+export function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
   const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
 
@@ -467,5 +450,3 @@ function compare_matches(a, b) {
 
   return Date.parse(a.date) - Date.parse(b.date);
 }
-
-module.exports = { openHistoryTab, setFilters };

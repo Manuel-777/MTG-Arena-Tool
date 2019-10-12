@@ -1,24 +1,11 @@
-const formatDistanceStrict = require("date-fns/formatDistanceStrict");
-const { shell } = require("electron");
+import formatDistanceStrict from 'date-fns/formatDistanceStrict';
+import { shell } from 'electron';
+import { FORMATS, BLACK, BLUE, GREEN, RED, WHITE, MANA_COLORS, CARD_TYPES, CARD_TYPE_CODES } from 'common/constants';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { createDiv, createSpan } from 'common/dom-fns';
 
-const {
-  FORMATS,
-  BLACK,
-  BLUE,
-  GREEN,
-  RED,
-  WHITE,
-  MANA_COLORS,
-  CARD_TYPES,
-  CARD_TYPE_CODES
-} = require("common/constants");
-const db = require("common/database");
-const pd = require("common/player-data");
-const { createDiv, createSpan } = require("common/dom-fns");
-
-//
-exports.getCardArtCrop = getCardArtCrop;
-function getCardArtCrop(cardObj) {
+export function getCardArtCrop(cardObj) {
   if (typeof cardObj !== "object") {
     cardObj = db.card(cardObj);
   }
@@ -31,9 +18,7 @@ function getCardArtCrop(cardObj) {
   }
 }
 
-//
-exports.getCardImage = getCardImage;
-function getCardImage(cardObj) {
+export function getCardImage(cardObj) {
   if (typeof cardObj !== "object") {
     cardObj = db.card(cardObj);
   }
@@ -51,9 +36,7 @@ function getCardImage(cardObj) {
   }
 }
 
-//
-exports.openScryfallCard = openScryfallCard;
-function openScryfallCard(cardObj) {
+export function openScryfallCard(cardObj) {
   if (typeof cardObj !== "object") {
     cardObj = db.card(cardObj);
   }
@@ -72,9 +55,7 @@ function openScryfallCard(cardObj) {
   }
 }
 
-//
-exports.get_rank_index = get_rank_index;
-function get_rank_index(_rank, _tier) {
+export function get_rank_index(_rank, _tier) {
   var ii = 0;
   if (_rank == "Unranked") ii = 0;
   if (_rank == "Bronze") ii = 1 + (_tier - 1); //1 2 3 4
@@ -86,9 +67,7 @@ function get_rank_index(_rank, _tier) {
   return ii;
 }
 
-//
-exports.get_rank_index_16 = get_rank_index_16;
-function get_rank_index_16(_rank) {
+export function get_rank_index_16(_rank) {
   var ii = 0;
   if (_rank == "Unranked") ii = 0;
   if (_rank == "Bronze") ii = 1;
@@ -100,15 +79,11 @@ function get_rank_index_16(_rank) {
   return ii;
 }
 
-//
-exports.getRecentDeckName = getRecentDeckName;
-function getRecentDeckName(deckId) {
+export function getRecentDeckName(deckId) {
   return pd.deckExists(deckId) ? pd.deck(deckId).name : deckId;
 }
 
-//
-exports.getReadableEvent = getReadableEvent;
-function getReadableEvent(arg) {
+export function getReadableEvent(arg) {
   if (db.events[arg] != undefined) {
     return db.events[arg];
   }
@@ -116,18 +91,14 @@ function getReadableEvent(arg) {
   return arg;
 }
 
-//
-exports.getReadableFormat = getReadableFormat;
-function getReadableFormat(format) {
+export function getReadableFormat(format) {
   if (format in FORMATS) {
     return FORMATS[format];
   }
   return format || "Unknown";
 }
 
-//
-exports.removeDuplicates = removeDuplicates;
-function removeDuplicates(decklist) {
+export function removeDuplicates(decklist) {
   var newList = [];
   try {
     decklist.forEach(function(card) {
@@ -156,9 +127,7 @@ function removeDuplicates(decklist) {
   }
 }
 
-//
-exports.get_card_type_sort = get_card_type_sort;
-function get_card_type_sort(a) {
+export function get_card_type_sort(a) {
   if (a == undefined) return 0;
   if (a.includes("Creature", 0)) return 1;
   if (a.includes("Planeswalker", 0)) return 2;
@@ -171,9 +140,7 @@ function get_card_type_sort(a) {
   return 0;
 }
 
-//
-exports.compare_cards = compare_cards;
-function compare_cards(a, b) {
+export function compare_cards(a, b) {
   // Yeah this is lazy.. I know
   a = db.card(a.id);
   b = db.card(b.id);
@@ -211,26 +178,20 @@ function compare_cards(a, b) {
   return 0;
 }
 
-//
-exports.compare_archetypes = compare_archetypes;
-function compare_archetypes(a, b) {
+export function compare_archetypes(a, b) {
   if (a.average > b.average) return -1;
   if (a.average < b.average) return 1;
   return 0;
 }
 
-//
-exports.get_set_code = get_set_code;
-function get_set_code(set) {
+export function get_set_code(set) {
   if (set == undefined) return "";
   let s = db.sets[set].code;
   if (s == undefined) s = set;
   return s;
 }
 
-//
-exports.getRaritySortValue = getRaritySortValue;
-function getRaritySortValue(rarity) {
+export function getRaritySortValue(rarity) {
   rarity = rarity.toLowerCase();
   switch (rarity) {
     case "land":
@@ -248,9 +209,7 @@ function getRaritySortValue(rarity) {
   }
 }
 
-//
-exports.collectionSortRarity = collectionSortRarity;
-function collectionSortRarity(a, b) {
+export function collectionSortRarity(a, b) {
   a = db.card(a);
   b = db.card(b);
   if (getRaritySortValue(a.rarity) < getRaritySortValue(b.rarity)) return -1;
@@ -264,15 +223,7 @@ function collectionSortRarity(a, b) {
   return 0;
 }
 
-// When passed a `deck` object sets `deck.colors` to a sorted array
-// of deck colour indices and returns the array.
-//
-// FIXME: Consider renaming to `set_deck_colors` or removing side
-//        effects. `get*` functions should not have side effects.
-// FIXME: Rename to camelCase to match javsascript function naming.
-
-exports.get_deck_colors = get_deck_colors;
-function get_deck_colors(deck) {
+export function get_deck_colors(deck) {
   var colorIndices = [];
   try {
     deck.mainDeck.forEach(card => {
@@ -321,9 +272,7 @@ function get_deck_colors(deck) {
   return colorIndices;
 }
 
-//
-exports.get_wc_missing = get_wc_missing;
-function get_wc_missing(deck, grpid, isSideboard) {
+export function get_wc_missing(deck, grpid, isSideboard) {
   let mainQuantity = 0;
   let mainMatches = deck.mainDeck.filter(card => card.id == grpid);
   if (mainMatches.length) {
@@ -369,9 +318,7 @@ function get_wc_missing(deck, grpid, isSideboard) {
   return Math.max(0, needed - copiesLeft);
 }
 
-//
-exports.get_deck_missing = get_deck_missing;
-function get_deck_missing(deck) {
+export function get_deck_missing(deck) {
   let missing = { rare: 0, common: 0, uncommon: 0, mythic: 0 };
   let alreadySeenIds = new Set(); // prevents double counting cards across main/sideboard
   let entireDeck = [...deck.mainDeck, ...deck.sideboard];
@@ -390,17 +337,13 @@ function get_deck_missing(deck) {
   return missing;
 }
 
-//
-exports.getCardsMissingCount = getCardsMissingCount;
-function getCardsMissingCount(deck, grpid) {
+export function getCardsMissingCount(deck, grpid) {
   let mainMissing = get_wc_missing(deck, grpid, false);
   let sideboardMissing = get_wc_missing(deck, grpid, true);
   return mainMissing + sideboardMissing;
 }
 
-//
-exports.getBoosterCountEstimate = getBoosterCountEstimate;
-function getBoosterCountEstimate(neededWildcards) {
+export function getBoosterCountEstimate(neededWildcards) {
   let boosterCost = 0;
   const boosterEstimates = {
     common: 3.36,
@@ -425,9 +368,7 @@ function getBoosterCountEstimate(neededWildcards) {
   return Math.round(boosterCost);
 }
 
-//
-exports.get_deck_types_ammount = get_deck_types_ammount;
-function get_deck_types_ammount(deck) {
+export function get_deck_types_ammount(deck) {
   const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
   if (!deck.mainDeck) return types;
 
@@ -453,9 +394,7 @@ function get_deck_types_ammount(deck) {
   return types;
 }
 
-//
-exports.get_deck_curve = get_deck_curve;
-function get_deck_curve(deck) {
+export function get_deck_curve(deck) {
   const curve = [];
   if (!deck.mainDeck) return curve;
 
@@ -495,9 +434,7 @@ function get_deck_curve(deck) {
   return curve;
 }
 
-//
-exports.get_deck_export = get_deck_export;
-function get_deck_export(deck) {
+export function get_deck_export(deck) {
   let str = "";
   deck.mainDeck = removeDuplicates(deck.mainDeck);
   deck.mainDeck.forEach(function(card) {
@@ -572,9 +509,7 @@ function get_deck_export(deck) {
   return str;
 }
 
-//
-exports.get_deck_export_txt = get_deck_export_txt;
-function get_deck_export_txt(deck) {
+export function get_deck_export_txt(deck) {
   var str = "";
   deck.mainDeck = removeDuplicates(deck.mainDeck);
   deck.mainDeck.forEach(function(card) {
@@ -603,28 +538,20 @@ function get_deck_export_txt(deck) {
   return str;
 }
 
-//
-exports.timeSince = timeSince;
-function timeSince(_date, options = { includeSeconds: true }) {
+export function timeSince(_date, options = { includeSeconds: true }) {
   // https://date-fns.org/v2.2.1/docs/formatDistanceStrict
   return formatDistanceStrict(_date, new Date(), options);
 }
 
-//
-exports.replaceAll = replaceAll;
-function replaceAll(str, find, replace) {
+export function replaceAll(str, find, replace) {
   return str.replace(new RegExp(find, "g"), replace);
 }
 
-//
-exports.urlDecode = urlDecode;
-function urlDecode(url) {
+export function urlDecode(url) {
   return decodeURIComponent(url.replace(/\+/g, " "));
 }
 
-//
-exports.makeId = makeId;
-function makeId(length) {
+export function makeId(length) {
   var ret = "";
   var possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -634,17 +561,11 @@ function makeId(length) {
   return ret;
 }
 
-//
-exports.timestamp = timestamp;
-function timestamp() {
+export function timestamp() {
   return Math.floor(Date.now() / 1000);
 }
 
-// Converts an integer number of seconds into a string of either:
-// HH:MM:SS or MM:SS depending on if the duration
-// is longer than an hour
-exports.toMMSS = toMMSS;
-function toMMSS(sec_num) {
+export function toMMSS(sec_num) {
   var hours = Math.floor(sec_num / 3600);
   var minutes = Math.floor((sec_num - hours * 3600) / 60);
   var seconds = sec_num - hours * 3600 - minutes * 60;
@@ -662,9 +583,7 @@ function toMMSS(sec_num) {
   }
 }
 
-//
-exports.toDDHHMMSS = toDDHHMMSS;
-function toDDHHMMSS(sec_num) {
+export function toDDHHMMSS(sec_num) {
   let dd = Math.floor(sec_num / 86400);
   let hh = Math.floor((sec_num - dd * 86400) / 3600);
   let mm = Math.floor((sec_num - dd * 86400 - hh * 3600) / 60);
@@ -681,9 +600,7 @@ ${minutes},
 ${seconds}`;
 }
 
-//
-exports.toHHMMSS = toHHMMSS;
-function toHHMMSS(sec_num) {
+export function toHHMMSS(sec_num) {
   var hours = Math.floor(sec_num / 3600);
   var minutes = Math.floor((sec_num - hours * 3600) / 60);
   var seconds = sec_num - hours * 3600 - minutes * 60;
@@ -700,9 +617,7 @@ function toHHMMSS(sec_num) {
   return hours + ":" + minutes + ":" + seconds;
 }
 
-//
-exports.toHHMM = toHHMM;
-function toHHMM(sec_num) {
+export function toHHMM(sec_num) {
   var hours = Math.floor(sec_num / 3600);
   var minutes = Math.floor((sec_num - hours * 3600) / 60);
   if (hours < 10) {
@@ -714,21 +629,15 @@ function toHHMM(sec_num) {
   return hours + ":" + minutes;
 }
 
-//
-exports.add = add;
-function add(a, b) {
+export function add(a, b) {
   return a + b;
 }
 
-//
-exports.objectClone = objectClone;
-function objectClone(originalObject) {
+export function objectClone(originalObject) {
   return JSON.parse(JSON.stringify(originalObject));
 }
 
-//
-exports.deckManaCurve = deckManaCurve;
-function deckManaCurve(deck) {
+export function deckManaCurve(deck) {
   const manaCounts = get_deck_curve(deck);
   const curveMax = Math.max(
     ...manaCounts
@@ -778,9 +687,7 @@ function deckManaCurve(deck) {
   return container;
 }
 
-//
-exports.deckTypesStats = deckTypesStats;
-function deckTypesStats(deck) {
+export function deckTypesStats(deck) {
   const cardTypes = get_deck_types_ammount(deck);
   const typesContainer = createDiv(["types_container"]);
   CARD_TYPE_CODES.forEach((cardTypeKey, index) => {
@@ -797,7 +704,7 @@ function deckTypesStats(deck) {
 }
 
 // pass in playerData.constructed / limited / historic objects
-function formatRank(rank) {
+export function formatRank(rank) {
   if (rank.leaderboardPlace) {
     return `Mythic #${rank.leaderboardPlace}`;
   }
@@ -806,4 +713,3 @@ function formatRank(rank) {
   }
   return `${rank.rank} ${rank.tier}`;
 }
-exports.formatRank = formatRank;

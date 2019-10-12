@@ -1,40 +1,15 @@
-const anime = require("animejs");
-const _ = require("lodash");
-
-const { MANA, CARD_RARITIES, EASING_DEFAULT } = require("common/constants");
-const db = require("common/database");
-const pd = require("common/player-data");
-const { createSelect } = require("common/select");
-const {
-  createDiv,
-  createSpan,
-  createInput,
-  queryElements: $$
-} = require("common/dom-fns");
-const deckDrawer = require("common/deck-drawer");
-const {
-  deckManaCurve,
-  deckTypesStats,
-  get_deck_export,
-  get_deck_export_txt,
-  get_deck_missing,
-  getBoosterCountEstimate,
-  timeSince
-} = require("common/util");
-
-const Aggregator = require("./aggregator");
-const StatsPanel = require("./stats-panel");
-const {
-  changeBackground,
-  colorPieChart,
-  drawDeck,
-  drawDeckVisual,
-  openDialog,
-  ipcSend,
-  makeResizable,
-  showLoadingBars,
-  pop
-} = require("./renderer-util");
+import anime from 'animejs';
+import _ from 'lodash';
+import { MANA, CARD_RARITIES, EASING_DEFAULT } from 'common/constants';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { createSelect } from 'common/select';
+import { createDiv, createSpan, createInput, queryElements as $$ } from 'common/dom-fns';
+import * as deckDrawer from 'common/deck-drawer';
+import { deckManaCurve, deckTypesStats, get_deck_export, get_deck_export_txt, get_deck_missing, getBoosterCountEstimate, timeSince } from 'common/util';
+import Aggregator from './aggregator';
+import StatsPanel from './stats-panel';
+import { changeBackground, colorPieChart, drawDeck, drawDeckVisual, openDialog, ipcSend, makeResizable, showLoadingBars, pop } from './renderer-util';
 
 const byId = id => document.getElementById(id);
 // We need to store a sorted list of card types so we create the card counts in the same order.
@@ -236,7 +211,7 @@ function deckStatsSection(deck) {
   return stats;
 }
 
-function openDeck(deck = currentOpenDeck, filters = currentFilters) {
+export function openDeck(deck = currentOpenDeck, filters = currentFilters) {
   if (!deck) return;
   currentOpenDeck = deck;
   if (filters && deck.id !== filters.deckId) filters = null;
@@ -555,7 +530,3 @@ function compare_changes_inner(a, b) {
   }
   return 0;
 }
-
-module.exports = {
-  openDeck
-};

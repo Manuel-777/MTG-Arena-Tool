@@ -1,6 +1,6 @@
-const globals = require("./globals");
-const db = require("common/database");
-const Deck = require("common/deck");
+import globals from './globals';
+import db from 'common/database';
+import Deck from 'common/deck';
 
 function getOpponentDeck() {
   let _deck = new Deck({}, globals.currentMatch.oppCardsUsed, false);
@@ -111,4 +111,4 @@ function getColorArchetype(c) {
   }
 }
 
-module.exports = getOpponentDeck;
+export default getOpponentDeck;

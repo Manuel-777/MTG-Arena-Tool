@@ -1,4 +1,4 @@
-@import '../node_modules/pikaday/css/pikaday.css';
+@import '~pikaday/css/pikaday.css';
 
 span i {
     margin-left: 4px;
@@ -828,16 +828,6 @@ a:hover {
     text-align: center;
     margin: 4px;
     color: rgb(220, 195, 150);
-}
-
-.opp_rank {
-    -webkit-app-region: no-drag;
-    align-self: center;
-    margin-left: 16px;
-    width: 32px;
-    height: 32px;
-    background: url(../images/ranks_32.png);
-    background-position: 32px 0px;
 }
 
 .ranks_16 {
@@ -2393,10 +2383,6 @@ a:hover {
     line-height: 24px;
     color: var(--color-light);
 }
-
-
-@import "compass/css3";
-@import "compass";
 
 .explore_buttons_container {
     display: flex;

@@ -1,16 +1,13 @@
-const { IPC_OVERLAY } = require("common/constants.js");
-const { objectClone } = require("common/util");
-const { ipc_send } = require("./background-util");
-
-const Deck = require("common/deck");
-
-const globals = require("./globals");
-
-const actionLog = require("./actionLog");
-const db = require("common/database");
-const forceDeckUpdate = require("./forceDeckUpdate");
-const getNameBySeat = require("./getNameBySeat");
-const update_deck = require("./updateDeck");
+import { IPC_OVERLAY } from 'common/constants.js';
+import { objectClone } from 'common/util';
+import { ipc_send } from './background-util';
+import Deck from 'common/deck';
+import globals from './globals';
+import actionLog from './actionLog';
+import db from 'common/database';
+import forceDeckUpdate from './forceDeckUpdate';
+import getNameBySeat from './getNameBySeat';
+import update_deck from './updateDeck';
 
 let actionType = [];
 actionType[0] = "ActionType_None";
@@ -798,7 +795,7 @@ GREMessages.GREMessageType_DieRollResultsResp = function(msg) {
   return true;
 };
 
-module.exports = {
+export default {
   GREMessage,
   GREMessageByID,
   processAll

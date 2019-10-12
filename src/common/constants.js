@@ -1,20 +1,21 @@
-exports.IPC_BACKGROUND = 0;
-exports.IPC_MAIN = 1;
-exports.IPC_OVERLAY = 2;
+export const IPC_BACKGROUND = 0;
+export const IPC_MAIN = 1;
+export const IPC_OVERLAY = 2;
 
 // Colour indices
-exports.WHITE = 1;
-exports.BLUE = 2;
-exports.BLACK = 3;
-exports.RED = 4;
-exports.GREEN = 5;
-exports.COLORLESS = 6;
-exports.MULTI = 7;
+export const WHITE = 1;
+
+export const BLUE = 2;
+export const BLACK = 3;
+export const RED = 4;
+export const GREEN = 5;
+export const COLORLESS = 6;
+export const MULTI = 7;
 
 // Magic constant to represent auth token in form
-exports.HIDDEN_PW = "********";
+export const HIDDEN_PW = "********";
 
-exports.ENUMS = {
+export const ENUMS = {
   CounterType: {
     "1": "+1/+1",
     "2": "-1/-1",
@@ -599,15 +600,15 @@ exports.ENUMS = {
   Color: { "1": "White", "2": "Blue", "3": "Black", "4": "Red", "5": "Green" }
 };
 
-exports.FACE_NONE = 0;
-exports.FACE_DFC_BACK = 1;
-exports.FACE_DFC_FRONT = 2;
-exports.FACE_SPLIT_FULL = 6;
-exports.FACE_SPLIT = 5;
-exports.FACE_ADVENTURE = 7;
-exports.FACE_ADVENTURE_MAIN = 8;
+export const FACE_NONE = 0;
+export const FACE_DFC_BACK = 1;
+export const FACE_DFC_FRONT = 2;
+export const FACE_SPLIT_FULL = 6;
+export const FACE_SPLIT = 5;
+export const FACE_ADVENTURE = 7;
+export const FACE_ADVENTURE_MAIN = 8;
 
-exports.FORMATS = {
+export const FORMATS = {
   Standard: "Standard",
   TraditionalStandard: "Traditional Standard",
   Historic: "Historic",
@@ -629,26 +630,26 @@ exports.FORMATS = {
   XLN: "Ixalan Constructed"
 };
 
-exports.COLORS_ALL = ["w", "u", "b", "r", "g", "c"];
-exports.COLORS_BRIEF = ["w", "u", "b", "r", "g"];
-exports.RANKS = ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Mythic"];
+export const COLORS_ALL = ["w", "u", "b", "r", "g", "c"];
+export const COLORS_BRIEF = ["w", "u", "b", "r", "g"];
+export const RANKS = ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Mythic"];
+export const OVERLAY_FULL = 0;
+export const OVERLAY_LEFT = 1;
+export const OVERLAY_ODDS = 2;
+export const OVERLAY_SEEN = 3;
+export const OVERLAY_LOG = 4;
+export const OVERLAY_DRAFT = 5;
+export const OVERLAY_DRAFT_BREW = 6;
+export const OVERLAY_MIXED = 7;
 
-exports.OVERLAY_FULL = 0;
-exports.OVERLAY_LEFT = 1;
-exports.OVERLAY_ODDS = 2;
-exports.OVERLAY_SEEN = 3;
-exports.OVERLAY_LOG = 4;
-exports.OVERLAY_DRAFT = 5;
-exports.OVERLAY_DRAFT_BREW = 6;
-exports.OVERLAY_MIXED = 7;
-exports.OVERLAY_DRAFT_MODES = [
-  exports.OVERLAY_DRAFT,
-  exports.OVERLAY_DRAFT_BREW
+export const OVERLAY_DRAFT_MODES = [
+  OVERLAY_DRAFT,
+  OVERLAY_DRAFT_BREW
 ];
 
-exports.ARENA_MODE_IDLE = 0;
-exports.ARENA_MODE_MATCH = 1;
-exports.ARENA_MODE_DRAFT = 2;
+export const ARENA_MODE_IDLE = 0;
+export const ARENA_MODE_MATCH = 1;
+export const ARENA_MODE_DRAFT = 2;
 
 const DRAFT_RANKS = [];
 DRAFT_RANKS[12] = "A+";
@@ -664,10 +665,10 @@ DRAFT_RANKS[3] = "D+";
 DRAFT_RANKS[2] = "D";
 DRAFT_RANKS[1] = "D-";
 DRAFT_RANKS[0] = "F";
-exports.DRAFT_RANKS = DRAFT_RANKS;
+export { DRAFT_RANKS };
+export const CARD_TYPE_CODES = ["cre", "lan", "ins", "sor", "enc", "art", "pla"];
 
-exports.CARD_TYPE_CODES = ["cre", "lan", "ins", "sor", "enc", "art", "pla"];
-exports.CARD_TYPES = [
+export const CARD_TYPES = [
   "Creatures",
   "Lands",
   "Instants",
@@ -676,8 +677,10 @@ exports.CARD_TYPES = [
   "Artifacts",
   "Planeswalkers"
 ];
-exports.CARD_RARITIES = ["common", "uncommon", "rare", "mythic"];
-exports.MANA_COLORS = [
+
+export const CARD_RARITIES = ["common", "uncommon", "rare", "mythic"];
+
+export const MANA_COLORS = [
   "#E7CA8E",
   "#AABEDF",
   "#A18E87",
@@ -686,7 +689,7 @@ exports.MANA_COLORS = [
   "#E3E3E3"
 ];
 
-exports.MANA = {
+export const MANA = {
   0: "",
   1: "white",
   2: "blue",
@@ -698,7 +701,7 @@ exports.MANA = {
   8: "x"
 };
 
-exports.RANKS_SORT = {
+export const RANKS_SORT = {
   Begginer: 0,
   Bronze: 1,
   Silver: 2,
@@ -708,31 +711,28 @@ exports.RANKS_SORT = {
   Mythic: 6
 };
 
-exports.PACK_SIZES = {
+export const PACK_SIZES = {
   "Ravnica Allegiance": 14,
   "Guilds of Ravnica": 14,
   "Core Set 2020": 15
 };
 
-exports.DEFAULT_TILE = 67003;
+export const DEFAULT_TILE = 67003;
+export const CARD_TILE_ARENA = 0;
+export const CARD_TILE_FLAT = 1;
+export const EASING_DEFAULT = "cubicBezier(0.570, 0.165, 0.210, 0.990)";
+export const MAIN_LOGIN = -2;
+export const MAIN_HOME = -1;
+export const MAIN_DECKS = 0;
+export const MAIN_HISTORY = 1;
+export const MAIN_EVENTS = 2;
+export const MAIN_EXPLORE = 3;
+export const MAIN_ECONOMY = 4;
+export const MAIN_COLLECTION = 5;
+export const MAIN_SETTINGS = 6;
+export const MAIN_UPDATE = 9;
 
-exports.CARD_TILE_ARENA = 0;
-exports.CARD_TILE_FLAT = 1;
-
-exports.EASING_DEFAULT = "cubicBezier(0.570, 0.165, 0.210, 0.990)";
-
-exports.MAIN_LOGIN = -2;
-exports.MAIN_HOME = -1;
-exports.MAIN_DECKS = 0;
-exports.MAIN_HISTORY = 1;
-exports.MAIN_EVENTS = 2;
-exports.MAIN_EXPLORE = 3;
-exports.MAIN_ECONOMY = 4;
-exports.MAIN_COLLECTION = 5;
-exports.MAIN_SETTINGS = 6;
-exports.MAIN_UPDATE = 9;
-
-exports.SHORTCUT_NAMES = {
+export const SHORTCUT_NAMES = {
   shortcut_overlay_1: "Toggle Overlay 1",
   shortcut_overlay_2: "Toggle Overlay 2",
   shortcut_overlay_3: "Toggle Overlay 3",
@@ -743,17 +743,18 @@ exports.SHORTCUT_NAMES = {
   shortcut_devtools_overlay: "Toggle Developer Tools (overlays)"
 };
 
-exports.SETTINGS_BEHAVIOUR = 1;
-exports.SETTINGS_ARENA_DATA = 2;
-exports.SETTINGS_OVERLAY = 3;
-exports.SETTINGS_VISUAL = 4;
-exports.SETTINGS_SHORTCUTS = 5;
-exports.SETTINGS_PRIVACY = 6;
-exports.SETTINGS_ABOUT = 7;
-exports.SETTINGS_LOGIN = 8;
+export const SETTINGS_BEHAVIOUR = 1;
+export const SETTINGS_ARENA_DATA = 2;
+export const SETTINGS_OVERLAY = 3;
+export const SETTINGS_VISUAL = 4;
+export const SETTINGS_SHORTCUTS = 5;
+export const SETTINGS_PRIVACY = 6;
+export const SETTINGS_ABOUT = 7;
+export const SETTINGS_LOGIN = 8;
 
 // Date constants
-exports.DATE_LAST_DAY = "Last 24 Hours";
-exports.DATE_LAST_30 = "Last 30 Days";
-exports.DATE_SEASON = "Current Season";
-exports.DATE_ALL_TIME = "All Time";
+export const DATE_LAST_DAY = "Last 24 Hours";
+
+export const DATE_LAST_30 = "Last 30 Days";
+export const DATE_SEASON = "Current Season";
+export const DATE_ALL_TIME = "All Time";

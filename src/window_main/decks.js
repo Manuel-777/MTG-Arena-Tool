@@ -1,32 +1,16 @@
-const _ = require("lodash");
-const anime = require("animejs");
-const format = require("date-fns/format");
-
-const { MANA, CARD_RARITIES, EASING_DEFAULT } = require("common/constants");
-const pd = require("common/player-data");
-const { createDiv, createInput } = require("common/dom-fns");
-const {
-  get_deck_missing,
-  getBoosterCountEstimate,
-  getReadableFormat
-} = require("common/util");
-
-const Aggregator = require("./aggregator");
-const FilterPanel = require("./filter-panel");
-const ListItem = require("./list-item");
-const StatsPanel = require("./stats-panel");
-const { openDeck } = require("./deck-details");
-const {
-  formatPercent,
-  getTagColor,
-  getWinrateClass,
-  hideLoadingBars,
-  ipcSend,
-  makeResizable,
-  resetMainContainer,
-  setLocalState,
-  showColorpicker
-} = require("./renderer-util");
+import _ from 'lodash';
+import anime from 'animejs';
+import format from 'date-fns/format';
+import { MANA, CARD_RARITIES, EASING_DEFAULT } from 'common/constants';
+import pd from 'common/player-data';
+import { createDiv, createInput } from 'common/dom-fns';
+import { get_deck_missing, getBoosterCountEstimate, getReadableFormat } from 'common/util';
+import Aggregator from './aggregator';
+import FilterPanel from './filter-panel';
+import ListItem from './list-item';
+import StatsPanel from './stats-panel';
+import { openDeck } from './deck-details';
+import { formatPercent, getTagColor, getWinrateClass, hideLoadingBars, ipcSend, makeResizable, resetMainContainer, setLocalState, showColorpicker } from './renderer-util';
 
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
@@ -50,7 +34,7 @@ function setFilters(selected = {}) {
 }
 
 //
-function openDecksTab(_filters = {}, scrollTop = 0) {
+export function openDecksTab(_filters = {}, scrollTop = 0) {
   hideLoadingBars();
   const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
@@ -355,5 +339,3 @@ function deleteTag(deckid, tag) {
 
   ipcSend("delete_tag", { deckid, tag });
 }
-
-module.exports = { openDecksTab: openDecksTab };

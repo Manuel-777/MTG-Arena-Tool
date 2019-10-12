@@ -1,6 +1,6 @@
-const _ = require("lodash");
-const db = require("./database.js");
-const Colors = require("./colors.js");
+import _ from 'lodash';
+import db from './database.js';
+import Colors from './colors.js';
 
 class CardsList {
   /**
@@ -300,4 +300,4 @@ class CardsList {
   }
 }
 
-module.exports = CardsList;
+export default CardsList;

@@ -1,11 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const commonConfig = {
     resolve: {
         alias: {
-            common: path.resolve(__dirname, 'src/common/')
+            common: path.resolve(__dirname, 'src/common/'),
+            static: path.resolve(__dirname, 'static/')
         }
     },
     mode: 'development',
@@ -13,29 +15,48 @@ const commonConfig = {
     module: {
         rules: [
             {
-                test: /\.jsx?$/,
+                test: /\.(js|jsx)$/,
                 loader: "babel-loader",
+                exclude: /node_modules/,
                 options: {
-                    presets: ["@babel/react"]
+                    presets: [["@babel/preset-env", {
+                        targets: {
+                            electron: "5.0.1",
+                        }
+                    }],"@babel/react"],
+                    plugins: ["@babel/plugin-proposal-class-properties"],
                 }
             }
-        // ,{
-        //     test: /\.(html)$/,
-        //     use: {
-        //         loader: 'file-loader',
-        //         options: {
-        //             name: '[name].[ext]',
-        //             outputPath: (url, resourcePath, context) => {
-        //                 console.log(url);
-        //                 console.log(resourcePath);
-        //                 console.log(context);
-        //                 const relativePath = path.relative(context, resourcePath);
-        //                 console.log(relativePath);
-        //                 return relativePath;
-        //             }
-        //           },
-        //     },
-        // }
+            ,{
+                test: /\.(html)$/,
+                use: {
+                    loader: 'html-loader',
+                    // options: {
+                    //     name: '[name].[ext]',
+                    //     outputPath: (url, resourcePath, context) => {
+                    //         console.log(url);
+                    //         console.log(resourcePath);
+                    //         console.log(context);
+                    //         const relativePath = path.relative(context, resourcePath);
+                    //         console.log(relativePath);
+                    //         return relativePath;
+                    //     }
+                    //   },
+                },
+            }
+            ,{
+                test: /\.(png|jpg|gif|woff|woff2|eot|ttf|svg)$/i,
+                use: {
+                    loader: 'url-loader',
+                    options: {
+                    limit: 8192,
+                    },
+                },
+            }
+            ,{
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
+            }
         ]
     },
     node: {
@@ -49,6 +70,9 @@ const webpacks = [
             main: './src/main.js'
         },
         target: 'electron-main',
+        plugins: [
+            new CopyPlugin([ { from: 'static', to: 'static' } ]),
+        ]
     }, commonConfig),
     Object.assign({
         entry: {

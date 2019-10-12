@@ -1,21 +1,13 @@
-const { app } = require("electron");
-const path = require("path");
-const fs = require("fs");
-var http = require("https");
-const readline = require("readline");
-const _ = require("lodash");
-
-const manifestParser = require("./manifest-parser");
-const { generateMetadata } = require("./metadata-generator");
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-
-const {
-  APPDATA,
-  RANKS_SHEETS,
-  SET_NAMES,
-  NO_DUPES_ART_SETS,
-  ALLOWED_SCRYFALL
-} = require("./metadata-constants");
+import { app } from 'electron';
+import path from 'path';
+import fs from 'fs';
+import http from 'https';
+import readline from 'readline';
+import _ from 'lodash';
+import manifestParser from './manifest-parser';
+import { generateMetadata } from './metadata-generator';
+import { XMLHttpRequest } from 'xmlhttprequest';
+import { APPDATA, RANKS_SHEETS, SET_NAMES, NO_DUPES_ART_SETS, ALLOWED_SCRYFALL } from './metadata-constants';
 
 let metagameData = {};
 let ranksData = {};

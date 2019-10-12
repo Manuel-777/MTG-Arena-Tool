@@ -1,46 +1,20 @@
-const anime = require("animejs");
-const { remote } = require("electron");
+import anime from 'animejs';
+import { remote } from 'electron';
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
 
-const {
-  COLORS_BRIEF,
-  CARD_RARITIES,
-  EASING_DEFAULT
-} = require("common/constants");
-const db = require("common/database");
-const pd = require("common/player-data");
-const { queryElements: $$, createDiv } = require("common/dom-fns");
-const { createSelect } = require("common/select");
-const { reactSelect } = require('common/selectreact.jsx');
-const { addCardHover, attachOwnerhipStars } = require("common/card-hover");
-const {
-  collectionSortRarity,
-  getCardImage,
-  getCardsMissingCount,
-  openScryfallCard,
-  replaceAll
-} = require("common/util");
-
-const Colors = require("common/colors");
-const {
-  MULTI,
-  COLORLESS,
-  WHITE,
-  BLUE,
-  BLACK,
-  GREEN,
-  RED
-} = require("common/constants.js");
-
-const {
-  hideLoadingBars,
-  changeBackground,
-  ipcSend,
-  resetMainContainer
-} = require("./renderer-util");
-
-const ReactDOM = require('react-dom');
+import { COLORS_BRIEF, CARD_RARITIES, EASING_DEFAULT } from 'common/constants';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { queryElements as $$, createDiv } from 'common/dom-fns';
+import { createSelect } from 'common/select';
+import { reactSelect } from 'common/selectreact.jsx';
+import { addCardHover, attachOwnerhipStars } from 'common/card-hover';
+import { collectionSortRarity, getCardImage, getCardsMissingCount, openScryfallCard, replaceAll } from 'common/util';
+import Colors from 'common/colors';
+import { MULTI, COLORLESS, WHITE, BLUE, BLACK, GREEN, RED } from 'common/constants.js';
+import { hideLoadingBars, changeBackground, ipcSend, resetMainContainer } from './renderer-util';
+import ReactDOM from 'react-dom';
 
 let collectionPage = 0;
 let sortingAlgorithm = "Sort by Set";
@@ -254,7 +228,7 @@ function get_collection_stats() {
 }
 
 //
-function openCollectionTab() {
+export function openCollectionTab() {
   filteredSets = [];
   filteredMana = [];
   orderedSets = Object.keys(db.sets);
@@ -324,19 +298,30 @@ function openCollectionTab() {
   });
 
   let sortby = ["Sort by Set", "Sort by Name", "Sort by Rarity", "Sort by CMC"];
-  ReactDOM.render(
-    reactSelect({
-      options: sortby,
-      current: sortingAlgorithm,
-      callback: res => {
-        sortingAlgorithm = res;
-        printCollectionPage();
-      },
-      divClass: "query_select",
-      optionFormatter: (val) => val,
-    }),
-    filb
+  // ReactDOM.render(
+  //   reactSelect({
+  //     options: sortby,
+  //     current: sortingAlgorithm,
+  //     callback: res => {
+  //       sortingAlgorithm = res;
+  //       printCollectionPage();
+  //     },
+  //     divClass: "query_select",
+  //     optionFormatter: (val) => val,
+  //   }),
+  //   filb
+  // );
+  createSelect(
+    fllb,
+    sortby,
+    sortingAlgorithm,
+    res => {
+      sortingAlgorithm = res;
+      printCollectionPage();
+    },
+    "query_select"
   );
+
 
   let exp = createDiv(["button_simple", "button_thin"], "Export Collection");
   fllb.appendChild(exp);
@@ -1218,7 +1203,3 @@ function printCollectionPage(page = 0) {
   collectionPage = page;
   printCards();
 }
-
-module.exports = {
-  openCollectionTab: openCollectionTab
-};

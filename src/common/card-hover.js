@@ -1,25 +1,16 @@
-const db = require("common/database");
-const pd = require("common/player-data");
-const { cardHasType } = require("common/card-types.js");
-const { createDiv, queryElements: $$ } = require("common/dom-fns");
-const { getCardImage } = require("common/util");
-
-const {
-  DRAFT_RANKS,
-  FACE_DFC_BACK,
-  FACE_DFC_FRONT
-} = require("common/constants.js");
+import db from 'common/database';
+import pd from 'common/player-data';
+import { cardHasType } from 'common/card-types.js';
+import { createDiv, queryElements as $$ } from 'common/dom-fns';
+import { getCardImage } from 'common/util';
+import { DRAFT_RANKS, FACE_DFC_BACK, FACE_DFC_FRONT } from 'common/constants.js';
 
 let renderer = 0;
 
-exports.setRenderer = value => {
+export const setRenderer = value => {
   renderer = value;
 };
 
-// Attaches a hover event to any DOM element.
-// Howver over the element with the mouse pops up
-// card info for `card`
-exports.addCardHover = addCardHover;
 function addCardHover(element, card) {
   if (!card || !card.images || card.type == "Special") return;
 
@@ -88,7 +79,6 @@ function hide(element) {
   return element;
 }
 
-exports.attachOwnerhipStars = attachOwnerhipStars;
 function attachOwnerhipStars(card, starContainer) {
   let isbasic = cardHasType(card, "Basic Land");
   starContainer.innerHTML = "";
@@ -129,7 +119,7 @@ function attachOwnerhipStars(card, starContainer) {
   }
 }
 
-exports.attachDraftRatings = attachDraftRatings;
+export { addCardHover, attachOwnerhipStars, attachDraftRatings };
 function attachDraftRatings(card, ratingsContainer) {
   ratingsContainer.innerHTML = "";
   ratingsContainer.style.opacity = 1;

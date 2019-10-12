@@ -1,5 +1,5 @@
-const { ipcRenderer: ipc, remote, shell } = require("electron");
-const sha1 = require("js-sha1");
+import { ipcRenderer as ipc, remote, shell } from 'electron';
+import sha1 from 'js-sha1';
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");
   const unhandled = require("electron-unhandled");
@@ -15,65 +15,30 @@ if (!remote.app.isPackaged) {
   });
   require("devtron").install();
 }
-const anime = require("animejs");
-require("time-elements");
+import anime from 'animejs';
+import 'time-elements';
+import { DATE_SEASON, EASING_DEFAULT, HIDDEN_PW, MAIN_LOGIN, MAIN_HOME, MAIN_DECKS, MAIN_HISTORY, MAIN_EVENTS, MAIN_EXPLORE, MAIN_ECONOMY, MAIN_COLLECTION, MAIN_SETTINGS, MAIN_UPDATE, SETTINGS_ABOUT, SETTINGS_OVERLAY, SETTINGS_PRIVACY } from 'common/constants';
+import pd from 'common/player-data';
+import { createDiv, queryElements as $$ } from 'common/dom-fns';
+import { compare_cards, get_deck_colors, get_rank_index, removeDuplicates, formatRank } from 'common/util';
+import { changeBackground, getLocalState, hideLoadingBars, ipcSend, openDialog, pop, renderLogInput, resetMainContainer, setLocalState, showLoadingBars } from './renderer-util';
+import Aggregator from './aggregator';
+import { openHomeTab, requestHome } from './home';
+import { tournamentOpen } from './tournaments';
+import { openDecksTab } from './decks';
+import { openDeck } from './deck-details';
+import { openHistoryTab } from './history';
+import { openEventsTab } from './events';
+import { openEconomyTab } from './economy';
+import { openExploreTab, setExploreDecks } from './explore';
+import { openCollectionTab } from './collection';
+import { openSettingsTab, setCurrentOverlaySettings } from './settings';
+import { showWhatsNew } from './whats-new';
 
-const {
-  DATE_SEASON,
-  EASING_DEFAULT,
-  HIDDEN_PW,
-  MAIN_LOGIN,
-  MAIN_HOME,
-  MAIN_DECKS,
-  MAIN_HISTORY,
-  MAIN_EVENTS,
-  MAIN_EXPLORE,
-  MAIN_ECONOMY,
-  MAIN_COLLECTION,
-  MAIN_SETTINGS,
-  MAIN_UPDATE,
-  SETTINGS_ABOUT,
-  SETTINGS_OVERLAY,
-  SETTINGS_PRIVACY
-} = require("common/constants");
-const pd = require("common/player-data");
-const { createDiv, queryElements: $$ } = require("common/dom-fns");
-const {
-  compare_cards,
-  get_deck_colors,
-  get_rank_index,
-  removeDuplicates,
-  formatRank
-} = require("common/util");
-
-const {
-  changeBackground,
-  getLocalState,
-  hideLoadingBars,
-  ipcSend,
-  openDialog,
-  pop,
-  renderLogInput,
-  resetMainContainer,
-  setLocalState,
-  showLoadingBars
-} = require("./renderer-util");
-const {
-  getDefaultFilters,
-  RANKED_CONST,
-  RANKED_DRAFT
-} = require("./aggregator");
-const { openHomeTab, requestHome } = require("./home");
-const { tournamentOpen } = require("./tournaments");
-const { openDecksTab } = require("./decks");
-const { openDeck } = require("./deck-details");
-const { openHistoryTab } = require("./history");
-const { openEventsTab } = require("./events");
-const { openEconomyTab } = require("./economy");
-const { openExploreTab, setExploreDecks } = require("./explore");
-const { openCollectionTab } = require("./collection");
-const { openSettingsTab, setCurrentOverlaySettings } = require("./settings");
-const { showWhatsNew } = require("./whats-new");
+// import css files to be included in the webpack output.
+import './index.css';
+import './flags.min.css';
+import 'common/shared.css';
 
 const byId = id => document.getElementById(id);
 let sidebarActive = MAIN_LOGIN;
@@ -683,17 +648,17 @@ ready(function() {
         } else if (classList.includes("it7")) {
           sidebarActive = MAIN_HISTORY;
           filters = {
-            ...getDefaultFilters(),
+            ...Aggregator.getDefaultFilters(),
             date: DATE_SEASON,
-            eventId: RANKED_CONST,
+            eventId: Aggregator.RANKED_CONST,
             rankedMode: true
           };
         } else if (classList.includes("it8")) {
           sidebarActive = MAIN_HISTORY;
           filters = {
-            ...getDefaultFilters(),
+            ...Aggregator.getDefaultFilters(),
             date: DATE_SEASON,
-            eventId: RANKED_DRAFT,
+            eventId: Aggregator.RANKED_DRAFT,
             rankedMode: true
           };
         }

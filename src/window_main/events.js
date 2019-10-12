@@ -1,35 +1,26 @@
-const anime = require("animejs");
-const compareAsc = require("date-fns/compareAsc");
-const compareDesc = require("date-fns/compareDesc");
-
-const { DEFAULT_TILE, MANA, EASING_DEFAULT } = require("common/constants");
-const db = require("common/database");
-const pd = require("common/player-data");
-const { createDiv, queryElementsByClass } = require("common/dom-fns");
-const { getReadableEvent, toMMSS } = require("common/util");
-
-const Aggregator = require("./aggregator");
-const DataScroller = require("./data-scroller");
-const FilterPanel = require("./filter-panel");
-const ListItem = require("./list-item");
-const StatsPanel = require("./stats-panel");
-const {
-  attachDraftData,
-  attachMatchData,
-  getEventWinLossClass,
-  localTimeSince,
-  resetMainContainer,
-  toggleArchived
-} = require("./renderer-util");
-const { openMatch } = require("./match-details");
-const { openDraft } = require("./draft-details");
+import anime from 'animejs';
+import compareAsc from 'date-fns/compareAsc';
+import compareDesc from 'date-fns/compareDesc';
+import { DEFAULT_TILE, MANA, EASING_DEFAULT } from 'common/constants';
+import db from 'common/database';
+import pd from 'common/player-data';
+import { createDiv, queryElementsByClass } from 'common/dom-fns';
+import { getReadableEvent, toMMSS } from 'common/util';
+import Aggregator from './aggregator';
+import DataScroller from './data-scroller';
+import FilterPanel from './filter-panel';
+import ListItem from './list-item';
+import StatsPanel from './stats-panel';
+import { attachDraftData, attachMatchData, getEventWinLossClass, localTimeSince, resetMainContainer, toggleArchived } from './renderer-util';
+import { openMatch } from './match-details';
+import { openDraft } from './draft-details';
 
 let filters = Aggregator.getDefaultFilters();
 filters.eventId = Aggregator.ALL_EVENT_TRACKS;
 let filteredMatches;
 let sortedEvents;
 
-function openEventsTab(_filters, dataIndex = 25, scrollTop = 0) {
+export function openEventsTab(_filters, dataIndex = 25, scrollTop = 0) {
   const mainDiv = resetMainContainer();
   const d = createDiv(["list_fill"]);
   mainDiv.appendChild(d);
@@ -309,7 +300,7 @@ function handleOpenDraft(id) {
 
 // This code is executed when an event row is clicked and adds
 // rows below the event for every match in that event.
-function expandEvent(id) {
+export function expandEvent(id) {
   const course = pd.event(id);
   let expandDiv = queryElementsByClass(id + "exp")[0];
 
@@ -354,8 +345,3 @@ function compareEvents(a, b) {
   if (!a || !b) return 0;
   return compareAsc(new Date(a.date), new Date(b.date));
 }
-
-module.exports = {
-  openEventsTab: openEventsTab,
-  expandEvent: expandEvent
-};

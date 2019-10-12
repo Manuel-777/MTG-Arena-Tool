@@ -1,14 +1,8 @@
-const { MANA, RANKS } = require("common/constants");
-const { createDiv, createLabel } = require("common/dom-fns");
-const { createSelect } = require("common/select");
-const { get_rank_index, toDDHHMMSS, toMMSS } = require("common/util");
-
-const {
-  compareWinrates,
-  formatPercent,
-  getTagColor,
-  getWinrateClass
-} = require("./renderer-util");
+import { MANA, RANKS } from 'common/constants';
+import { createDiv, createLabel } from 'common/dom-fns';
+import { createSelect } from 'common/select';
+import { get_rank_index, toDDHHMMSS, toMMSS } from 'common/util';
+import { compareWinrates, formatPercent, getTagColor, getWinrateClass } from './renderer-util';
 
 class StatsPanel {
   constructor(
@@ -316,4 +310,4 @@ class StatsPanel {
   }
 }
 
-module.exports = StatsPanel;
+export default StatsPanel;

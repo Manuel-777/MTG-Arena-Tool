@@ -68,9 +68,6 @@
     "metadata": "electron \"./scripts/metadata.js\"",
     "webpack": "webpack --config webpack.config.js"
   },
-  "sideEffects": [
-    "./src/window_background/background.js"
-  ],
   "dependencies": {
     "animejs": "^3.0.1",
     "async": "^2.6.1",
@@ -84,7 +81,7 @@
     "electron-unhandled": "^2.2.0",
     "electron-updater": "^4.0.6",
     "electron-util": "^0.11.0",
-    "google-protobuf": "^3.7.1",
+    "google-protobuf": "^3.8.0",
     "gunzip-file": "^0.1.1",
     "howler": "^2.1.2",
     "interactjs": "1.5.2",
@@ -104,10 +101,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.6.3",
     "acorn": "^6.1.1",
     "babel-loader": "^8.0.6",
+    "copy-webpack-plugin": "^5.0.4",
+    "css-loader": "^3.2.0",
     "devtron": "^1.4.0",
     "electron": "^5.0.1",
     "electron-builder": "^20.40.2",
@@ -120,6 +120,8 @@
     "html-webpack-plugin": "^3.2.0",
     "jest": "^24.8.0",
     "prettier": "1.16.4",
+    "style-loader": "^1.0.0",
+    "url-loader": "^2.2.0",
     "webpack": "^4.41.1",
     "webpack-cli": "^3.3.9"
   }

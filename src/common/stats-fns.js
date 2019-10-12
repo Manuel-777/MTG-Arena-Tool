@@ -1,4 +1,4 @@
-const math = require("mathjs");
+import math from 'mathjs';
 
 math.config({ precision: 2000 });
 
@@ -20,8 +20,6 @@ function hypergeometric(
   );
 }
 
-//
-exports.hypergeometricRange = hypergeometricRange;
 function hypergeometricRange(
   lowerBound,
   upperBound,
@@ -61,15 +59,6 @@ function hypergeometricRange(
   return returnBig ? probability : math.number(probability);
 }
 
-// This function is designed to assess the "significance" of a particular result by calculating an alternative to
-// percentile designed to measure deviation from median in both directions the same way and ensure the average returned
-// value (assuming true random) is always 50%. This is done by treating the given result as a range of values
-// distributed evenly throughout the percentile range covered by the result. For example, a result of 0 that has a 20%
-// chance of happening is treated as a composite distributed evenly by percentile through the 0% to 20% percentile
-// range. The returned value is the probability that a result is at least as far from median as the given value. Return
-// values close to 1 indicate the passed in value was very close to average, return values close to 0 indicate it was
-// very far from average.
-exports.hypergeometricSignificance = hypergeometricSignificance;
 function hypergeometricSignificance(
   value,
   population,
@@ -132,12 +121,7 @@ function hypergeometricSignificance(
   return returnBig ? retVal : math.number(retVal);
 }
 
-// Computes the Wald Interval aka Normal Approximation Interval
-// Useful for quickly estimating the 95% confidence interval
-// Can produce bad results when sample-size < 20
-// https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Normal_approximation_interval
-// https://www.channelfireball.com/articles/magic-math-how-many-games-do-you-need-for-statistical-significance-in-playtesting/
-exports.normalApproximationInterval = normalApproximationInterval;
+export { hypergeometricRange, hypergeometricSignificance, normalApproximationInterval };
 function normalApproximationInterval(matches, wins) {
   if (!matches) return { winrate: 0, interval: 0 };
   const winrate = wins / matches;

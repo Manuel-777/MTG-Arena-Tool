@@ -1,9 +1,9 @@
-const fs = require("fs");
-const { promisify } = require("util");
-const { StringDecoder } = require("string_decoder");
-const queue = require("queue");
-const ArenaLogDecoder = require("./arena-log-decoder");
-const pd = require("common/player-data");
+import fs from 'fs';
+import { promisify } from 'util';
+import { StringDecoder } from 'string_decoder';
+import queue from 'queue';
+import ArenaLogDecoder from './arena-log-decoder/arena-log-decoder';
+import pd from 'common/player-data';
 
 const fsAsync = {
   close: promisify(fs.close),
@@ -110,4 +110,4 @@ async function readChunk(path, position, length) {
   return buffer;
 }
 
-module.exports = { start };
+export default { start };

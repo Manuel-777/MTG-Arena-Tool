@@ -1,7 +1,9 @@
-const { setData } = require("./background-util");
+import { setData } from './background-util';
+
 // import store
-const globals = require("./globals");
-const playerData = require("common/player-data.js");
+import globals from './globals';
+
+import playerData from 'common/player-data.js';
 
 const addCustomDeck = function(customDeck) {
   const id = customDeck.id;
@@ -16,4 +18,4 @@ const addCustomDeck = function(customDeck) {
     globals.store.set("decks." + id, deckData);
 };
 
-module.exports = addCustomDeck;
+export default addCustomDeck;

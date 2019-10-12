@@ -1,7 +1,7 @@
-const path = require("path");
-const { app, remote, ipcRenderer: ipc } = require("electron");
-const fs = require("fs");
-const _ = require("lodash");
+import path from 'path';
+import { app, remote, ipcRenderer as ipc } from 'electron';
+import fs from 'fs';
+import _ from 'lodash';
 
 const cachePath =
   app || (remote && remote.app)
@@ -230,4 +230,4 @@ class Database {
   }
 }
 
-module.exports = new Database();
+export default new Database();

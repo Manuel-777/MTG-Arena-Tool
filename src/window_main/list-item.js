@@ -1,5 +1,5 @@
-const { getCardArtCrop } = require("common/util");
-const { createDiv } = require("common/dom-fns");
+import { getCardArtCrop } from 'common/util';
+import { createDiv } from 'common/dom-fns';
 
 class ListItem {
   constructor(_grpId, _id, _onClick, _onDelete = false, isArchived = false) {
@@ -94,4 +94,4 @@ class ListItem {
   }
 }
 
-module.exports = ListItem;
+export default ListItem;

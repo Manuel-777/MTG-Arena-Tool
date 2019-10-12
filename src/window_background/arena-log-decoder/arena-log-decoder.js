@@ -1,7 +1,7 @@
-const _ = require("lodash");
-const nthLastIndexOf = require("./nth-last-index-of");
-const jsonText = require("./json-text");
-const { unleakString } = require("../background-util");
+import _ from 'lodash';
+import nthLastIndexOf from './nth-last-index-of';
+import jsonText from './json-text';
+import { unleakString } from '../background-util';
 
 const CONNECTION_JSON_PATTERN = /\[(?:UnityCrossThreadLogger|Client GRE)\]WebSocketClient (?<client>.*) WebSocketSharp\.WebSocket connecting to .*: (?<socket>.*)(?:\r\n|\n)/;
 
@@ -28,20 +28,24 @@ const logEntryPattern = new RegExp(
   "g"
 );
 
-function ArenaLogDecoder() {
-  let buffer = "";
-  let bufferDiscarded = 0;
-  return { append };
+export default class ArenaLogDecoder {
+  buffer = "";
+  bufferDiscarded;
 
-  function append(newText, callback) {
+  constructor() {
+    this.buffer = "";
+    this.bufferDiscarded = 0;
+  }
+
+  append(newText, callback) {
     logEntryPattern.lastIndex = 0;
 
-    buffer = buffer.length ? buffer.concat(newText) : newText;
+    this.buffer = this.buffer.length ? this.buffer.concat(newText) : newText;
     let bufferUsed = false;
     let match;
-    while ((match = logEntryPattern.exec(buffer))) {
+    while ((match = logEntryPattern.exec(this.buffer))) {
       const [type, length, entry] = parseLogEntry(
-        buffer,
+        this.buffer,
         match[0],
         match.index
       );
@@ -56,20 +60,20 @@ function ArenaLogDecoder() {
           bufferUsed = match.index + length;
           callback({
             ...entry,
-            position: bufferDiscarded + match.index
+            position: this.bufferDiscarded + match.index
           });
           break;
       }
     }
 
     if (bufferUsed === false) {
-      const i = nthLastIndexOf(buffer, "\n", maxLinesOfAnyPattern);
+      const i = nthLastIndexOf(this.buffer, "\n", maxLinesOfAnyPattern);
       bufferUsed = i === -1 ? 0 : i;
     }
 
     if (bufferUsed > 0) {
-      bufferDiscarded += bufferUsed;
-      buffer = unleakString(buffer.substr(bufferUsed));
+      this.bufferDiscarded += bufferUsed;
+      this.buffer = unleakString(this.buffer.substr(bufferUsed));
     }
 
     unleakRegExp();
@@ -191,5 +195,3 @@ function occurrences(text, re) {
 function unleakRegExp() {
   /\s*/g.exec("");
 }
-
-module.exports = ArenaLogDecoder;
