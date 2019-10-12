@@ -6,8 +6,8 @@ const { makeId } = require("common/util");
 const { ipc_send, setData } = require("./background-util");
 
 const globals = require("./globals");
-const db = require("../shared/database");
-const playerData = require("../shared/player-data.js");
+const db = require("common/database");
+const playerData = require("common/player-data.js");
 const { loadPlayerConfig } = require("./loadPlayerConfig");
 
 let metadataState = false;

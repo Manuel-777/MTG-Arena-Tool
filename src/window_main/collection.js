@@ -22,7 +22,7 @@ const {
   replaceAll
 } = require("common/util");
 
-const Colors = require("../shared/colors");
+const Colors = require("common/colors");
 const {
   MULTI,
   COLORLESS,
@@ -31,7 +31,7 @@ const {
   BLACK,
   GREEN,
   RED
-} = require("../shared/constants.js");
+} = require("common/constants.js");
 
 const {
   hideLoadingBars,

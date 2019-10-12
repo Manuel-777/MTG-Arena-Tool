@@ -1,6 +1,6 @@
 const globals = require("./globals");
-const db = require("../shared/database");
-const Deck = require("../shared/deck");
+const db = require("common/database");
+const Deck = require("common/deck");
 
 function getOpponentDeck() {
   let _deck = new Deck({}, globals.currentMatch.oppCardsUsed, false);

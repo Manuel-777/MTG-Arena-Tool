@@ -1,8 +1,9 @@
 const electron = require("electron");
-const playerData = require("../shared/player-data");
+const playerData = require("common/player-data");
 const Store = require("electron-store");
-const Deck = require("../shared/deck");
+const Deck = require("common/deck");
 const path = require("path");
+const fs = require("fs");
 
 const actionLogDir = path.join(
   (electron.app || electron.remote.app).getPath("userData"),

@@ -1,9 +1,9 @@
 const globals = require("./globals");
-const { IPC_OVERLAY } = require("../shared/constants.js");
+const { IPC_OVERLAY } = require("common/constants.js");
 const { ipc_send } = require("./background-util");
 const forceDeckUpdate = require("./forceDeckUpdate");
 const getOpponentDeck = require("./getOpponentDeck");
-const { objectClone } = require("../shared/util");
+const { objectClone } = require("common/util");
 
 function update_deck(force) {
   var nd = new Date();

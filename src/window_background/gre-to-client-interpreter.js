@@ -1,5 +1,5 @@
-const { IPC_OVERLAY } = require("../shared/constants.js");
-const { objectClone } = require("../shared/util");
+const { IPC_OVERLAY } = require("common/constants.js");
+const { objectClone } = require("common/util");
 const { ipc_send } = require("./background-util");
 
 const Deck = require("common/deck");
@@ -7,7 +7,7 @@ const Deck = require("common/deck");
 const globals = require("./globals");
 
 const actionLog = require("./actionLog");
-const db = require("../shared/database");
+const db = require("common/database");
 const forceDeckUpdate = require("./forceDeckUpdate");
 const getNameBySeat = require("./getNameBySeat");
 const update_deck = require("./updateDeck");

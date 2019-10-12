@@ -1,5 +1,5 @@
 const globals = require("./globals");
-const { hypergeometricRange } = require("../shared/stats-fns");
+const { hypergeometricRange } = require("common/stats-fns");
 
 const forceDeckUpdate = function(removeUsed = true) {
   var decksize = 0;

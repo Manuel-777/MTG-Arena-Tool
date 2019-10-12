@@ -11,11 +11,11 @@ const CardsList = require("common/cards-list");
 const { get_deck_colors, objectClone, replaceAll } = require("common/util");
 
 const greToClientInterpreter = require("./gre-to-client-interpreter");
-const playerData = require("../shared/player-data.js");
+const playerData = require("common/player-data.js");
 const sha1 = require("js-sha1");
 const httpApi = require("./http-api");
 const getNameBySeat = require("./getNameBySeat");
-const Deck = require("../shared/deck");
+const Deck = require("common/deck");
 
 const {
   httpSetMythicRank,
@@ -28,7 +28,7 @@ const {
   parseWotcTimeFallback,
   setData
 } = require("./background-util");
-const { IPC_OVERLAY } = require("../shared/constants.js");
+const { IPC_OVERLAY } = require("common/constants.js");
 
 const actionLog = require("./actionLog");
 const addCustomDeck = require("./addCustomDeck");

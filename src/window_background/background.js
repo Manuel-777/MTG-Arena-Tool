@@ -22,9 +22,9 @@ const sha1 = require("js-sha1");
 
 const httpApi = require("./http-api");
 
-const db = require("../shared/database");
-const playerData = require("../shared/player-data");
-const { getReadableFormat } = require("../shared/util");
+const db = require("common/database");
+const playerData = require("common/player-data");
+const { getReadableFormat } = require("common/util");
 const {
   ARENA_MODE_MATCH,
   ARENA_MODE_DRAFT,

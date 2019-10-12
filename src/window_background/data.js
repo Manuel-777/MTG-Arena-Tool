@@ -6,9 +6,9 @@ const electron = require("electron");
 
 const { DEFAULT_TILE } = require("common/constants");
 
-const { objectClone } = require("../shared/util");
-const playerData = require("../shared/player-data.js");
-const database = require("../shared/database");
+const { objectClone } = require("common/util");
+const playerData = require("common/player-data.js");
+const database = require("common/database");
 const getOpponentDeck = require("./getOpponentDeck");
 
 const { parseWotcTime, parseWotcTimeFallback } = require("./background-util");

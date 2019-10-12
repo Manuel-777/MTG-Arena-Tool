@@ -1,7 +1,7 @@
-const { MANA, RANKS } = require("../shared/constants");
-const { createDiv, createLabel } = require("../shared/dom-fns");
-const { createSelect } = require("../shared/select");
-const { get_rank_index, toDDHHMMSS, toMMSS } = require("../shared/util");
+const { MANA, RANKS } = require("common/constants");
+const { createDiv, createLabel } = require("common/dom-fns");
+const { createSelect } = require("common/select");
+const { get_rank_index, toDDHHMMSS, toMMSS } = require("common/util");
 
 const {
   compareWinrates,

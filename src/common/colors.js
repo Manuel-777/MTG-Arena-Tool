@@ -6,7 +6,7 @@ const {
   GREEN,
   MULTI,
   COLORLESS
-} = require("../shared/constants.js");
+} = require("./constants.js");
 
 class Colors {
   /**

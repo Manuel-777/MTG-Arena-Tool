@@ -1,4 +1,4 @@
-const playerData = require("../shared/player-data");
+const playerData = require("common/player-data");
 const globals = require("./globals");
 
 // Get player name by seat in the game
