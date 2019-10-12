@@ -1453,10 +1453,15 @@ a:hover {
 
 
 .main_stats {
-    margin: 16px;
-    width: 50%;
+    margin: 16px 16px 16px 32px;
+    min-width: 320px;
     display: block;
     text-align: center;
+}
+
+.main_stats.sub_stats {
+    margin: 16px;
+    width: -webkit-fill-available;
 }
 
 .stats_set_completion {
@@ -3563,4 +3568,76 @@ a:hover {
     border-bottom: solid var(--color-light-20) 2px;
     color: var(--color-light);
     margin: auto;
+}
+
+.completion_table {
+    width: 100%;
+    max-width: 600px;
+    margin: 16px auto;
+    text-align: center;
+    display: grid;
+    line-height: 24px;
+    font-size: 14px;
+    grid-template-columns: repeat(35, 1fr);
+    color: var(--color-light);
+}
+
+.completion_table_color_title {
+    height: 24px;
+    margin-right: 20%;
+    margin-bottom: 4px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.completion_table_rarity_title {
+    height: 8px;
+    margin-bottom: 2px;
+}
+
+.completion_table_rarity_title.common {
+    background-color: var(--color-common);
+}
+.completion_table_rarity_title.uncommon {
+    background-color: var(--color-uncommon);
+}
+.completion_table_rarity_title.rare {
+    background-color: var(--color-rare);
+}
+.completion_table_rarity_title.mythic {
+    background-color: var(--color-mythic);
+}
+
+.completion_table_card {
+    font-family: var(--sub-font-name-bold);
+    color: var(--color-back);
+    height: 24px;
+    line-height: 24px;
+}
+
+.completion_table_card:hover {
+    opacity: 0.8;
+    border: 1px white solid;
+    margin: -1px;
+    z-index: 1;
+}
+
+.completion_table_card.n0 {
+    background-color: #af593c;
+}
+.completion_table_card.n1 {
+    background-color: #dc8a6e;
+}
+.completion_table_card.n2 {
+    background-color: #ffdf9e;
+}
+.completion_table_card.n3 {
+    background-color: #e9ff92;
+}
+.completion_table_card.n4 {
+    background-color: #d3ebb0;
+}
+.completion_table_card.wanted {
+    opacity: 0.5;
 }

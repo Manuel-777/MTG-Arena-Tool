@@ -1,15 +1,3 @@
-/*
-global
-  tokenAuth
-  rstore
-  loadPlayerConfig
-  db
-  playerData
-  debugNet
-  debugLog
-  syncUserData
-*/
-
 const electron = require("electron");
 const async = require("async");
 const qs = require("qs");
@@ -17,11 +5,86 @@ const qs = require("qs");
 const { makeId } = require("common/util");
 const { ipc_send, setData } = require("./background-util");
 
+const globals = require("./globals");
+const db = require("../shared/database");
+const playerData = require("../shared/player-data.js");
+const { loadPlayerConfig } = require("./loadPlayerConfig");
+
 let metadataState = false;
 
 var httpAsync = [];
 
 const serverAddress = "mtgatool.com";
+
+function syncUserData(data) {
+  // Sync Events
+  const courses_index = [...playerData.courses_index];
+  data.courses
+    .filter(doc => !playerData.eventExists(doc._id))
+    .forEach(doc => {
+      const id = doc._id;
+      doc.id = id;
+      delete doc._id;
+      courses_index.push(id);
+      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      setData({ [id]: doc }, false);
+    });
+  if (globals.debugLog || !globals.firstPass)
+    globals.store.set("courses_index", courses_index);
+
+  // Sync Matches
+  const matches_index = [...playerData.matches_index];
+  data.matches
+    .filter(doc => !playerData.matchExists(doc._id))
+    .forEach(doc => {
+      const id = doc._id;
+      doc.id = id;
+      delete doc._id;
+      matches_index.push(id);
+      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      setData({ [id]: doc }, false);
+    });
+  if (globals.debugLog || !globals.firstPass)
+    globals.store.set("matches_index", matches_index);
+
+  // Sync Economy
+  const economy_index = [...playerData.economy_index];
+  data.economy
+    .filter(doc => !playerData.transactionExists(doc._id))
+    .forEach(doc => {
+      const id = doc._id;
+      doc.id = id;
+      delete doc._id;
+      economy_index.push(id);
+      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      setData({ [id]: doc }, false);
+    });
+  if (globals.debugLog || !globals.firstPass)
+    globals.store.set("economy_index", economy_index);
+
+  // Sync Drafts
+  const draft_index = [...playerData.draft_index];
+  data.drafts
+    .filter(doc => !playerData.draftExists(doc._id))
+    .forEach(doc => {
+      const id = doc._id;
+      doc.id = id;
+      delete doc._id;
+      draft_index.push(id);
+      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      setData({ [id]: doc }, false);
+    });
+  if (globals.debugLog || !globals.firstPass)
+    globals.store.set("draft_index", draft_index);
+
+  if (data.settings.tags_colors) {
+    let newTags = data.settings.tags_colors;
+    setData({ tags_colors: { ...newTags } });
+    globals.store.set("tags_colors", newTags);
+  }
+
+  setData({ courses_index, draft_index, economy_index, matches_index });
+}
 
 function httpBasic() {
   var httpAsyncNew = httpAsync.slice(0);
@@ -37,7 +100,7 @@ function httpBasic() {
         _headers.method != "auth" &&
         _headers.method != "delete_data" &&
         _headers.method != "get_database" &&
-        debugLog == false
+        globals.debugLog == false
       ) {
         if (!playerData.offline) setData({ offline: true });
         callback({
@@ -47,7 +110,7 @@ function httpBasic() {
         return;
       }
 
-      _headers.token = tokenAuth;
+      _headers.token = globals.tokenAuth;
 
       var http = require("https");
       var options;
@@ -98,7 +161,7 @@ function httpBasic() {
         };
       }
 
-      if (debugNet && _headers.method !== "notifications") {
+      if (globals.debugNet && _headers.method !== "notifications") {
         console.log(
           "SEND >> " + index + ", " + _headers.method,
           _headers,
@@ -137,7 +200,7 @@ function httpBasic() {
             results = results + chunk;
           });
           res.on("end", function() {
-            if (debugNet) {
+            if (globals.debugNet) {
               if (_headers.method !== "notifications") {
                 ipc_send(
                   "ipc_log",
@@ -163,7 +226,7 @@ function httpBasic() {
               try {
                 parsedResult = JSON.parse(results);
               } catch (e) {
-                if (debugNet) {
+                if (globals.debugNet) {
                   console.log(results);
                 }
                 ipc_send("popup", {
@@ -223,13 +286,13 @@ function httpBasic() {
               }
               if (parsedResult && parsedResult.ok) {
                 if (_headers.method == "auth") {
-                  tokenAuth = parsedResult.token;
+                  globals.tokenAuth = parsedResult.token;
 
                   ipc_send("auth", parsedResult);
                   //ipc_send("auth", parsedResult.arenaids);
                   if (playerData.settings.remember_me) {
-                    rstore.set("token", tokenAuth);
-                    rstore.set("email", playerData.userName);
+                    globals.rStore.set("token", globals.tokenAuth);
+                    globals.rStore.set("email", playerData.userName);
                   }
                   const data = {};
                   data.patreon = parsedResult.patreon;
@@ -328,9 +391,9 @@ function httpBasic() {
                   });
                 }
                 if (_headers.method == "auth") {
-                  tokenAuth = undefined;
-                  rstore.set("email", "");
-                  rstore.set("token", "");
+                  globals.tokenAuth = undefined;
+                  globals.rStore.set("email", "");
+                  globals.rStore.set("token", "");
                   ipc_send("auth", {});
                   ipc_send("toggle_login", true);
                   ipc_send("clear_pwd", 1);
@@ -359,7 +422,7 @@ function httpBasic() {
             }
 
             removeFromHttp(_headers.reqId);
-            if (debugNet && _headers.method !== "notifications") {
+            if (globals.debugNet && _headers.method !== "notifications") {
               var str = "";
               httpAsync.forEach(function(h) {
                 str += h.reqId + ", ";

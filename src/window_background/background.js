@@ -1,6 +1,4 @@
-const electron = require("electron");
 const { remote, ipcRenderer: ipc } = require("electron");
-const format = require("date-fns/format");
 
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");
@@ -18,28 +16,18 @@ if (!remote.app.isPackaged) {
   require("devtron").install();
 }
 
-const _ = require("lodash");
-const path = require("path");
 const Store = require("electron-store");
 const fs = require("fs");
 const sha1 = require("js-sha1");
 
 const httpApi = require("./http-api");
 
-const greToClientInterpreter = require("./gre-to-client-interpreter");
-const Deck = require("common/deck");
-const db = require("common/database");
-const playerData = require("common/player-data");
-const { hypergeometricRange } = require("common/stats-fns");
-const {
-  get_rank_index,
-  getReadableFormat,
-  objectClone
-} = require("common/util");
+const db = require("../shared/database");
+const playerData = require("../shared/player-data");
+const { getReadableFormat } = require("../shared/util");
 const {
   ARENA_MODE_MATCH,
   ARENA_MODE_DRAFT,
-  ARENA_MODE_IDLE,
   DEFAULT_TILE,
   HIDDEN_PW,
   IPC_OVERLAY,
@@ -90,45 +78,13 @@ const {
   onLabelTrackRewardTierUpdated
 } = require("./labels");
 
-const {
-  createDeck,
-  createDraft,
-  createMatch,
-  completeMatch
-} = require("./data");
+const { createDeck } = require("./data");
 
-const toolVersion = electron.remote.app
-  .getVersion()
-  .split(".")
-  .reduce((acc, cur) => +acc * 256 + +cur);
-
-const rememberCfg = {
-  email: "",
-  token: "",
-  settings: {
-    toolVersion: toolVersion,
-    auto_login: false,
-    launch_to_tray: false,
-    remember_me: true,
-    beta_channel: false,
-    metadata_lang: "en",
-    log_locale_format: ""
-  }
-};
+const globals = require("./globals");
 
 const settingsCfg = {
   gUri: ""
 };
-
-var rstore = new Store({
-  name: "remember",
-  defaults: rememberCfg
-});
-
-var store = new Store({
-  name: "default",
-  defaults: playerData.defaultCfg
-});
 
 var settingsStore = new Store({
   name: "settings",
@@ -137,78 +93,55 @@ var settingsStore = new Store({
 
 let logLoopInterval = null;
 const debugArenaID = undefined;
-const debugLog = false;
-const debugNet = true;
 var debugLogSpeed = 0.001;
 
-const actionLogDir = path.join(
-  (electron.app || electron.remote.app).getPath("userData"),
-  "actionlogs"
-);
-if (!fs.existsSync(actionLogDir)) {
-  fs.mkdirSync(actionLogDir);
-}
-
-var firstPass = true;
-var tokenAuth = undefined;
-
-var currentMatch = null;
-
-var originalDeck = null;
-
-var currentDeck = new Deck();
-var duringMatch = false;
-let duringDraft = false;
-var matchBeginTime = 0;
-var matchGameStats = [];
-var matchCompletedOnGameNumber = 0;
-var gameNumberCompleted = 0;
-let initialLibraryInstanceIds = [];
-let idChanges = {};
-let instanceToCardIdMap = {};
-
-var logLanguage = "English";
 var lastDeckUpdate = new Date();
+
+const addCustomDeck = require("./addCustomDeck");
+const forceDeckUpdate = require("./forceDeckUpdate");
+const getOpponentDeck = require("./getOpponentDeck");
+const { loadPlayerConfig, syncSettings } = require("./loadPlayerConfig");
+const update_deck = require("./updateDeck");
 
 //
 ipc.on("save_app_settings", function(event, arg) {
   ipc_send("show_loading");
-  const rSettings = rstore.get("settings");
-  rSettings.toolVersion = toolVersion;
+  const rSettings = globals.rStore.get("settings");
+  rSettings.toolVersion = globals.toolVersion;
   const updated = { ...rSettings, ...arg };
 
   if (!updated.remember_me) {
-    rstore.set("email", "");
-    rstore.set("token", "");
+    globals.rStore.set("email", "");
+    globals.rStore.set("token", "");
   }
-  rstore.set("settings", updated);
+  globals.rStore.set("settings", updated);
 
   syncSettings(updated);
   ipc_send("hide_loading");
 });
 
 function fixBadSettingsData() {
-  const appSettings = rstore.get("settings");
+  const appSettings = globals.rStore.get("settings");
 
   // First introduced in 2.8.4 (2019-07-25)
   // Some people's date formats are set to "undefined"
   // These should be an empty string.
   if (appSettings.log_locale_format === "undefined") {
     appSettings.log_locale_format = "";
-    rstore.set("settings", appSettings);
+    globals.rStore.set("settings", appSettings);
   }
 
   // Define new metadata language setting.
   if (appSettings.metadata_lang === undefined) {
     appSettings.metadata_lang = "en";
-    rstore.set("settings", appSettings);
+    globals.rStore.set("settings", appSettings);
   }
   // include more fixes below. Be as specific
   // and conservitive as possible.
 }
 
 function downloadMetadata() {
-  const appSettings = rstore.get("settings");
+  const appSettings = globals.rStore.get("settings");
   httpApi.httpGetDatabase(appSettings.metadata_lang);
   ipc_send("popup", {
     text: `Downloading metadata ${appSettings.metadata_lang}`,
@@ -225,7 +158,7 @@ ipc.on("start_background", function() {
   // first time during bootstrapping that we load
   // app-level settings into singletons
 
-  const appSettings = rstore.get("settings");
+  const appSettings = globals.rStore.get("settings");
   const settings = { ...playerData.settings, ...appSettings, logUri };
   setData({ settings }, false);
   ipc_send("initial_settings", settings);
@@ -244,7 +177,7 @@ ipc.on("start_background", function() {
   // Check if it is the first time we open this version
   if (
     appSettings.toolVersion == undefined ||
-    toolVersion > appSettings.toolVersion
+    globals.toolVersion > appSettings.toolVersion
   ) {
     ipc_send("show_whats_new");
   }
@@ -259,12 +192,12 @@ function offlineLogin() {
 //
 ipc.on("login", function(event, arg) {
   if (arg.password == HIDDEN_PW) {
-    tokenAuth = rstore.get("token");
+    globals.tokenAuth = globals.rStore.get("token");
     httpApi.httpAuth(arg.username, arg.password);
   } else if (arg.username === "" && arg.password === "") {
     offlineLogin();
   } else {
-    tokenAuth = "";
+    globals.tokenAuth = "";
     httpApi.httpAuth(arg.username, arg.password);
   }
 });
@@ -291,9 +224,9 @@ ipc.on("request_deck_link", function(event, obj) {
 
 //
 ipc.on("windowBounds", (event, windowBounds) => {
-  if (firstPass) return;
+  if (globals.firstPass) return;
   setData({ windowBounds }, false);
-  store.set("windowBounds", windowBounds);
+  globals.store.set("windowBounds", windowBounds);
 });
 
 //
@@ -305,7 +238,7 @@ ipc.on("overlayBounds", (event, index, bounds) => {
   };
   overlays[index] = newOverlay;
   setData({ settings: { ...playerData.settings, overlays } }, false);
-  store.set("settings.overlays", overlays);
+  globals.store.set("settings.overlays", overlays);
 });
 
 //
@@ -325,7 +258,7 @@ ipc.on("save_overlay_settings", function(event, settings) {
   });
 
   const updated = { ...playerData.settings, overlays };
-  store.set("settings", updated);
+  globals.store.set("settings", updated);
   syncSettings(updated);
   ipc_send("hide_loading");
 });
@@ -340,7 +273,7 @@ ipc.on("save_user_settings", function(event, settings) {
     refresh = false;
   }
   const updated = { ...playerData.settings, ...settings };
-  store.set("settings", updated);
+  globals.store.set("settings", updated);
   syncSettings(updated, refresh);
   ipc_send("hide_loading");
 });
@@ -375,7 +308,7 @@ ipc.on("toggle_deck_archived", function(event, arg) {
   const decks = { ...playerData.decks, [id]: deckData };
 
   setData({ decks });
-  store.set("decks." + id, deckData);
+  globals.store.set("decks." + id, deckData);
   ipc_send("hide_loading");
 });
 
@@ -389,7 +322,7 @@ ipc.on("toggle_archived", function(event, arg) {
   data.archived = !data.archived;
 
   setData({ [id]: data });
-  store.set(id, data);
+  globals.store.set(id, data);
   ipc_send("hide_loading");
 });
 
@@ -428,7 +361,7 @@ ipc.on("tou_drop", function(event, arg) {
 ipc.on("edit_tag", (event, arg) => {
   const { tag, color } = arg;
   setData({ tags_colors: { ...playerData.tags_colors, [tag]: color } });
-  store.set("tags_colors." + tag, color);
+  globals.store.set("tags_colors." + tag, color);
   sendSettings();
 });
 
@@ -443,7 +376,7 @@ ipc.on("delete_tag", (event, arg) => {
 
   const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
   setData({ decks_tags });
-  store.set("decks_tags." + deckid, tags);
+  globals.store.set("decks_tags." + deckid, tags);
 });
 
 ipc.on("add_tag", (event, arg) => {
@@ -457,7 +390,7 @@ ipc.on("add_tag", (event, arg) => {
 
   const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
   setData({ decks_tags });
-  store.set("decks_tags." + deckid, tags);
+  globals.store.set("decks_tags." + deckid, tags);
 });
 
 ipc.on("delete_history_tag", (event, arg) => {
@@ -472,7 +405,7 @@ ipc.on("delete_history_tag", (event, arg) => {
   const matchData = { ...match, tags };
 
   setData({ [matchid]: matchData });
-  store.set(matchid + ".tags", tags);
+  globals.store.set(matchid + ".tags", tags);
 });
 
 ipc.on("add_history_tag", (event, arg) => {
@@ -484,7 +417,7 @@ ipc.on("add_history_tag", (event, arg) => {
   const tags = [...(match.tags || []), tag];
 
   setData({ [matchid]: { ...match, tags } });
-  store.set(matchid + ".tags", tags);
+  globals.store.set(matchid + ".tags", tags);
   httpApi.httpSetDeckTag(tag, match.oppDeck.mainDeck, match.eventId);
 });
 
@@ -494,168 +427,6 @@ ipc.on("set_odds_samplesize", function(event, state) {
   forceDeckUpdate(false);
   update_deck(true);
 });
-
-// Loads this player's configuration file
-function loadPlayerConfig(playerId, serverData = undefined) {
-  ipc_send("ipc_log", "Load player ID: " + playerId);
-  ipc_send("popup", {
-    text: "Loading player history...",
-    time: 0,
-    progress: 2
-  });
-  store = new Store({
-    name: playerId,
-    defaults: playerData.defaultCfg
-  });
-
-  const savedData = store.get();
-  const savedOverlays = savedData.settings.overlays || [];
-  const appSettings = rstore.get("settings");
-  const settings = {
-    ...playerData.settings,
-    ...savedData.settings,
-    ...appSettings,
-    overlays: playerData.settings.overlays.map((overlay, index) => {
-      if (index < savedOverlays.length) {
-        // blend in new default overlay settings
-        return { ...overlay, ...savedOverlays[index] };
-      } else {
-        return overlay;
-      }
-    })
-  };
-  const __playerData = {
-    ...playerData,
-    ...savedData,
-    settings
-  };
-  syncSettings(__playerData.settings, true);
-  setData(__playerData, false);
-  ipc_send("renderer_set_bounds", playerData.windowBounds);
-
-  ipc_send("popup", {
-    text: "Player history loaded.",
-    time: 3000,
-    progress: -1
-  });
-
-  if (serverData) {
-    const requestSync = {};
-    requestSync.courses = serverData.courses.filter(
-      id => !(id in __playerData)
-    );
-    requestSync.matches = serverData.matches.filter(
-      id => !(id in __playerData)
-    );
-    requestSync.drafts = serverData.drafts.filter(id => !(id in __playerData));
-    requestSync.economy = serverData.economy.filter(
-      id => !(id in __playerData)
-    );
-
-    const itemCount =
-      requestSync.courses.length +
-      requestSync.matches.length +
-      requestSync.drafts.length +
-      requestSync.economy.length;
-
-    if (itemCount) {
-      ipc_send("ipc_log", "Fetch remote player items: " + itemCount);
-      httpApi.httpSyncRequest(requestSync);
-      // console.log("requestSync", requestSync);
-    } else {
-      ipc_send("ipc_log", "No need to fetch remote player items.");
-    }
-  }
-
-  ipc_send("popup", {
-    text: "Loading settings...",
-    time: 0,
-    progress: 2
-  });
-
-  watchingLog = true;
-  stopWatchingLog = startWatchingLog();
-  ipc_send("popup", {
-    text: "Settings loaded.",
-    time: 3000,
-    progress: -1
-  });
-}
-
-function syncUserData(data) {
-  // Sync Events
-  const courses_index = [...playerData.courses_index];
-  data.courses
-    .filter(doc => !playerData.eventExists(doc._id))
-    .forEach(doc => {
-      const id = doc._id;
-      doc.id = id;
-      delete doc._id;
-      courses_index.push(id);
-      if (debugLog || !firstPass) store.set(id, doc);
-      setData({ [id]: doc }, false);
-    });
-  if (debugLog || !firstPass) store.set("courses_index", courses_index);
-
-  // Sync Matches
-  const matches_index = [...playerData.matches_index];
-  data.matches
-    .filter(doc => !playerData.matchExists(doc._id))
-    .forEach(doc => {
-      const id = doc._id;
-      doc.id = id;
-      delete doc._id;
-      matches_index.push(id);
-      if (debugLog || !firstPass) store.set(id, doc);
-      setData({ [id]: doc }, false);
-    });
-  if (debugLog || !firstPass) store.set("matches_index", matches_index);
-
-  // Sync Economy
-  const economy_index = [...playerData.economy_index];
-  data.economy
-    .filter(doc => !playerData.transactionExists(doc._id))
-    .forEach(doc => {
-      const id = doc._id;
-      doc.id = id;
-      delete doc._id;
-      economy_index.push(id);
-      if (debugLog || !firstPass) store.set(id, doc);
-      setData({ [id]: doc }, false);
-    });
-  if (debugLog || !firstPass) store.set("economy_index", economy_index);
-
-  // Sync Drafts
-  const draft_index = [...playerData.draft_index];
-  data.drafts
-    .filter(doc => !playerData.draftExists(doc._id))
-    .forEach(doc => {
-      const id = doc._id;
-      doc.id = id;
-      delete doc._id;
-      draft_index.push(id);
-      if (debugLog || !firstPass) store.set(id, doc);
-      setData({ [id]: doc }, false);
-    });
-  if (debugLog || !firstPass) store.set("draft_index", draft_index);
-
-  if (data.settings.tags_colors) {
-    let newTags = data.settings.tags_colors;
-    setData({ tags_colors: { ...newTags } });
-    store.set("tags_colors", newTags);
-  }
-
-  setData({ courses_index, draft_index, economy_index, matches_index });
-}
-
-// Merges settings and updates singletons across processes
-// (essentially fancy setData for settings field only)
-// To persist changes, see "save_user_settings" or "save_app_settings"
-function syncSettings(dirtySettings = {}, refresh = debugLog || !firstPass) {
-  const settings = { ...playerData.settings, ...dirtySettings };
-  setData({ settings }, refresh);
-  if (refresh) ipc_send("set_settings", JSON.stringify(settings));
-}
 
 // Set a new log URI
 ipc.on("set_log", function(event, arg) {
@@ -707,10 +478,8 @@ function sendSettings() {
   httpApi.httpSetSettings(settingsData);
 }
 
-let skipMatch = false;
-
 function onLogEntryFound(entry) {
-  if (debugLog) {
+  if (globals.debugLog) {
     let currentTime = new Date().getTime();
     while (currentTime + debugLogSpeed >= new Date().getTime()) {
       // sleep
@@ -728,10 +497,13 @@ function onLogEntryFound(entry) {
     return;
   } else {
     //console.log("Entry:", entry.label, entry, entry.json());
-    if (firstPass) {
+    if (globals.firstPass) {
       updateLoading(entry);
     }
-    if ((firstPass && !playerData.settings.skip_firstpass) || !firstPass) {
+    if (
+      (globals.firstPass && !playerData.settings.skip_firstpass) ||
+      !globals.firstPass
+    ) {
       try {
         switch (entry.label) {
           case "Log.BI":
@@ -1010,12 +782,12 @@ async function logLoop() {
     return;
   }
 
-  if (!firstPass) {
+  if (!globals.firstPass) {
     ipc_send("log_read", 1);
   }
   /*
-  if (debugLog) {
-    firstPass = false;
+  if (globals.debugLog) {
+    globals.firstPass = false;
   }
 */
 
@@ -1084,7 +856,7 @@ async function logLoop() {
       parsedData.arenaVersion = unleakString(dataChop(value, strCheck, '"'));
     }
     /*
-    if (firstPass) {
+    if (globals.firstPass) {
       ipc_send("popup", {"text": "Reading: "+Math.round(100/splitString.length*index)+"%", "time": 1000});
     }
     */
@@ -1117,11 +889,11 @@ async function logLoop() {
   let password = "";
   const { auto_login, remember_me } = playerData.settings;
   if (remember_me) {
-    username = rstore.get("email");
-    const token = rstore.get("token");
+    username = globals.rStore.get("email");
+    const token = globals.rStore.get("token");
     if (username != "" && token != "") {
       password = HIDDEN_PW;
-      tokenAuth = token;
+      globals.tokenAuth = token;
     }
   }
 
@@ -1134,7 +906,7 @@ async function logLoop() {
 
   if (auto_login) {
     ipc_send("toggle_login", false);
-    if (remember_me && username && tokenAuth) {
+    if (remember_me && username && globals.tokenAuth) {
       ipc_send("popup", {
         text: "Logging in automatically...",
         time: 0,
@@ -1152,42 +924,6 @@ async function logLoop() {
   }
 }
 
-function decodePayload(json) {
-  const messages = require("./messages_pb");
-
-  const msgType = json.clientToMatchServiceMessageType.split("_")[1],
-    binaryMsg = new Buffer.from(json.payload, "base64");
-
-  try {
-    let msgDeserialiser;
-    if (
-      msgType === "ClientToGREMessage" ||
-      msgType === "ClientToGREUIMessage"
-    ) {
-      msgDeserialiser = messages.ClientToGREMessage;
-    } else if (msgType === "ClientToMatchDoorConnectRequest") {
-      msgDeserialiser = messages.ClientToMatchDoorConnectRequest;
-    } else if (msgType === "AuthenticateRequest") {
-      msgDeserialiser = messages.AuthenticateRequest;
-    } else if (msgType === "CreateMatchGameRoomRequest") {
-      msgDeserialiser = messages.CreateMatchGameRoomRequest;
-    } else if (msgType === "EchoRequest") {
-      msgDeserialiser = messages.EchoRequest;
-    } else {
-      console.warn(`${msgType} - unknown message type`);
-      return;
-    }
-    const msg = msgDeserialiser.deserializeBinary(binaryMsg);
-    //console.log(json.msgType);
-    //console.log(msg.toObject());
-    return msg.toObject();
-  } catch (e) {
-    console.log(e.message);
-  }
-
-  return;
-}
-
 // Cuts the string "data" between first ocurrences of the two selected words "startStr" and "endStr";
 function dataChop(data, startStr, endStr) {
   var start = data.indexOf(startStr) + startStr.length;
@@ -1201,170 +937,6 @@ function dataChop(data, startStr, endStr) {
   }
 
   return data;
-}
-
-function actionLogGenerateLink(grpId) {
-  var card = db.card(grpId);
-  return '<log-card id="' + grpId + '">' + card.name + "</log-card>";
-}
-
-function actionLogGenerateAbilityLink(abId) {
-  return `<log-ability id="${abId}">ability</log-ability>`;
-}
-
-var currentActionLog = "";
-
-// Send action log data to overlay
-function actionLog(seat, time, str, grpId = 0) {
-  if (!time) time = new Date();
-  if (seat == -99) {
-    currentActionLog = "version: 1\r\n";
-  } else {
-    /*
-    str = str.replace(/(<([^>]+)>)/gi, "");
-    */
-
-    currentActionLog += `${seat}\r\n`;
-    currentActionLog += `${format(time, "HH:mm:ss")}\r\n`;
-    currentActionLog += `${str}\r\n`;
-
-    try {
-      fs.writeFileSync(
-        path.join(actionLogDir, currentMatch.matchId + ".txt"),
-        currentActionLog,
-        "utf-8"
-      );
-    } catch (e) {
-      //
-    }
-  }
-
-  //console.log("action_log", { seat: seat, time: time }, str);
-  ipc_send(
-    "action_log",
-    { seat: seat, time: time, str: str, grpId: grpId },
-    IPC_OVERLAY
-  );
-}
-
-//
-function changePriority(previous, current, time) {
-  currentMatch.priorityTimers[previous] +=
-    time - currentMatch.lastPriorityChangeTime;
-
-  currentMatch.lastPriorityChangeTime = time;
-  currentMatch.priorityTimers[0] = currentMatch.lastPriorityChangeTime;
-
-  currentMatch.currentPriority = current;
-  //console.log(priorityTimers);
-  //console.log("since match begin:", time - matchBeginTime);
-  ipc_send("set_priority_timer", currentMatch.priorityTimers, IPC_OVERLAY);
-}
-
-// Get player name by seat in the game
-function getNameBySeat(seat) {
-  try {
-    if (seat == currentMatch.player.seat) {
-      return playerData.name.slice(0, -6);
-    } else {
-      let oppName = currentMatch.opponent.name;
-      if (oppName && oppName !== "Sparky") {
-        oppName = oppName.slice(0, -6);
-      }
-      return oppName || "Opponent";
-    }
-  } catch (e) {
-    return "???";
-  }
-}
-
-//
-function addCustomDeck(customDeck) {
-  const id = customDeck.id;
-  const deckData = {
-    // preserve custom fields if possible
-    ...(playerData.deck(id) || {}),
-    ...customDeck
-  };
-
-  setData({ decks: { ...playerData.decks, [customDeck.id]: deckData } });
-  if (debugLog || !firstPass) store.set("decks." + id, deckData);
-}
-
-// Create a match from data, set globals and trigger ipc
-function processMatch(json, matchBeginTime) {
-  actionLog(-99, new Date(), "");
-
-  if (debugLog || !firstPass) {
-    ipc_send("set_arena_state", ARENA_MODE_MATCH);
-  }
-
-  var match = createMatch(json, matchBeginTime);
-
-  // set global values
-
-  currentMatch = match;
-  matchGameStats = [];
-  matchCompletedOnGameNumber = 0;
-  gameNumberCompleted = 0;
-  initialLibraryInstanceIds = [];
-  idChanges = {};
-  instanceToCardIdMap = {};
-
-  ipc_send("ipc_log", "vs " + match.opponent.name);
-  ipc_send("set_timer", match.beginTime, IPC_OVERLAY);
-
-  if (match.eventId == "DirectGame" && currentDeck) {
-    let str = currentDeck.getSave();
-    httpApi.httpTournamentCheck(str, match.opponent.name, true);
-  }
-
-  ipc_send("set_priority_timer", match.priorityTimers, IPC_OVERLAY);
-
-  return match;
-}
-
-//
-function select_deck(arg) {
-  if (arg.CourseDeck) {
-    currentDeck = new Deck(arg.CourseDeck);
-  } else {
-    currentDeck = new Deck(arg);
-  }
-  // console.log("Select deck: ", currentDeck, arg);
-  originalDeck = currentDeck.clone();
-  ipc_send("set_deck", currentDeck.getSave(), IPC_OVERLAY);
-}
-
-//
-function clear_deck() {
-  var deck = { mainDeck: [], sideboard: [], name: "" };
-  ipc_send("set_deck", deck, IPC_OVERLAY);
-}
-
-//
-function update_deck(force) {
-  var nd = new Date();
-  if ((debugLog || force || !firstPass) && nd - lastDeckUpdate > 1000) {
-    forceDeckUpdate();
-
-    let currentMatchCopy = objectClone(currentMatch);
-    currentMatchCopy.oppCards = getOpponentDeck();
-    currentMatchCopy.playerCardsLeft = currentMatch.playerCardsLeft.getSave();
-    currentMatchCopy.playerCardsOdds = currentMatch.playerChances;
-    currentMatchCopy.player.deck = currentMatch.player.deck.getSave();
-    currentMatchCopy.player.originalDeck = currentMatch.player.originalDeck.getSave();
-    delete currentMatchCopy.GREtoClient;
-    delete currentMatchCopy.oppCardsUsed;
-    delete currentMatchCopy.playerChances;
-    delete currentMatchCopy.annotations;
-    delete currentMatchCopy.gameObjs;
-    delete currentMatchCopy.latestMessage;
-    delete currentMatchCopy.processedAnnotations;
-    delete currentMatchCopy.zones;
-    currentMatchCopy = JSON.stringify(currentMatchCopy);
-    ipc_send("set_match", currentMatchCopy, IPC_OVERLAY);
-  }
 }
 
 function getBestArchetype(deck) {
@@ -1454,275 +1026,8 @@ function getColorArchetype(c) {
 }
 
 //
-function getOpponentDeck() {
-  let _deck = new Deck({}, currentMatch.oppCardsUsed, false);
-  _deck.mainboard.removeDuplicates(true);
-  _deck.getColors();
-
-  let format = db.events_format[currentMatch.eventId];
-  currentMatch.opponent.deck.archetype = "-";
-  let deckSave = _deck.getSave();
-
-  currentMatch.oppArchetype = getBestArchetype(_deck);
-  if (
-    (format !== "Standard" && format !== "Traditional Standard") ||
-    currentMatch.oppArchetype == "Unknown"
-  ) {
-    // console.log(_deck);
-    // console.log(_deck.colors);
-    currentMatch.oppArchetype = getColorArchetype(_deck.colors);
-  }
-  deckSave.archetype = currentMatch.oppArchetype;
-
-  return deckSave;
-}
-
-//
-function forceDeckUpdate(removeUsed = true) {
-  var decksize = 0;
-  var cardsleft = 0;
-  var typeCre = 0;
-  var typeIns = 0;
-  var typeSor = 0;
-  var typePla = 0;
-  var typeArt = 0;
-  var typeEnc = 0;
-  var typeLan = 0;
-
-  currentMatch.playerCardsLeft = currentMatch.player.deck.clone();
-
-  if (debugLog || !firstPass) {
-    currentMatch.playerCardsLeft.mainboard.get().forEach(card => {
-      card.total = card.quantity;
-      decksize += card.quantity;
-      cardsleft += card.quantity;
-    });
-
-    if (removeUsed) {
-      cardsleft -= currentMatch.playerCardsUsed.length;
-      currentMatch.playerCardsUsed.forEach(grpId => {
-        currentMatch.playerCardsLeft.mainboard.remove(grpId, 1);
-      });
-    }
-    let main = currentMatch.playerCardsLeft.mainboard;
-    main.addProperty("chance", card =>
-      Math.round(
-        hypergeometricRange(
-          1,
-          Math.min(odds_sample_size, card.quantity),
-          cardsleft,
-          odds_sample_size,
-          card.quantity
-        ) * 100
-      )
-    );
-
-    typeLan = main.countType("Land");
-    typeCre = main.countType("Creature");
-    typeArt = main.countType("Artifact");
-    typeEnc = main.countType("Enchantment");
-    typeIns = main.countType("Instant");
-    typeSor = main.countType("Sorcery");
-    typePla = main.countType("Planeswalker");
-
-    let chancesObj = {};
-    let landsCount = main.getLandsAmounts();
-    chancesObj.landW = chanceType(landsCount.w, cardsleft, odds_sample_size);
-    chancesObj.landU = chanceType(landsCount.u, cardsleft, odds_sample_size);
-    chancesObj.landB = chanceType(landsCount.b, cardsleft, odds_sample_size);
-    chancesObj.landR = chanceType(landsCount.r, cardsleft, odds_sample_size);
-    chancesObj.landG = chanceType(landsCount.g, cardsleft, odds_sample_size);
-
-    chancesObj.chanceCre = chanceType(typeCre, cardsleft, odds_sample_size);
-    chancesObj.chanceIns = chanceType(typeIns, cardsleft, odds_sample_size);
-    chancesObj.chanceSor = chanceType(typeSor, cardsleft, odds_sample_size);
-    chancesObj.chancePla = chanceType(typePla, cardsleft, odds_sample_size);
-    chancesObj.chanceArt = chanceType(typeArt, cardsleft, odds_sample_size);
-    chancesObj.chanceEnc = chanceType(typeEnc, cardsleft, odds_sample_size);
-    chancesObj.chanceLan = chanceType(typeLan, cardsleft, odds_sample_size);
-
-    chancesObj.deckSize = decksize;
-    chancesObj.cardsLeft = cardsleft;
-    currentMatch.playerChances = chancesObj;
-  } else {
-    let main = currentMatch.playerCardsLeft.mainboard;
-    main.addProperty("chance", () => 1);
-
-    let chancesObj = {};
-    chancesObj.landW = 0;
-    chancesObj.landU = 0;
-    chancesObj.landB = 0;
-    chancesObj.landR = 0;
-    chancesObj.landG = 0;
-    chancesObj.chanceCre = 0;
-    chancesObj.chanceIns = 0;
-    chancesObj.chanceSor = 0;
-    chancesObj.chancePla = 0;
-    chancesObj.chanceArt = 0;
-    chancesObj.chanceEnc = 0;
-    chancesObj.chanceLan = 0;
-    currentMatch.playerChances = chancesObj;
-  }
-}
-
-function chanceType(quantity, cardsleft, odds_sample_size) {
-  return (
-    Math.round(
-      hypergeometricRange(
-        1,
-        Math.min(odds_sample_size, quantity),
-        cardsleft,
-        odds_sample_size,
-        quantity
-      ) * 1000
-    ) / 10
-  );
-}
-
-//
-function saveEconomyTransaction(transaction) {
-  const id = transaction.id;
-  const txnData = {
-    // preserve custom fields if possible
-    ...(playerData.transaction(id) || {}),
-    ...transaction
-  };
-
-  if (!playerData.economy_index.includes(id)) {
-    const economy_index = [...playerData.economy_index, id];
-    if (debugLog || !firstPass) store.set("economy_index", economy_index);
-    setData({ economy_index }, false);
-  }
-
-  if (debugLog || !firstPass) store.set(id, txnData);
-  setData({ [id]: txnData });
-  httpApi.httpSetEconomy(txnData);
-}
-
-//
-function saveCourse(json) {
-  const id = json._id;
-  delete json._id;
-  json.id = id;
-  const eventData = {
-    date: new Date(),
-    // preserve custom fields if possible
-    ...(playerData.event(id) || {}),
-    ...json
-  };
-
-  if (!playerData.courses_index.includes(id)) {
-    const courses_index = [...playerData.courses_index, id];
-    if (debugLog || !firstPass) store.set("courses_index", courses_index);
-    setData({ courses_index }, false);
-  }
-
-  if (debugLog || !firstPass) store.set(id, eventData);
-  setData({ [id]: eventData });
-}
-
-//
-function saveMatch(id, matchEndTime) {
-  //console.log(currentMatch.matchId, id);
-  if (!currentMatch || !currentMatch.matchTime || currentMatch.matchId !== id) {
-    return;
-  }
-  const existingMatch = playerData.match(id) || {};
-  const match = completeMatch(existingMatch, currentMatch, matchEndTime);
-  if (!match) {
-    return;
-  }
-
-  // console.log("Save match:", match);
-  if (!playerData.matches_index.includes(id)) {
-    const matches_index = [...playerData.matches_index, id];
-    if (debugLog || !firstPass) store.set("matches_index", matches_index);
-    setData({ matches_index }, false);
-  }
-
-  if (debugLog || !firstPass) store.set(id, match);
-  setData({ [id]: match });
-  if (matchCompletedOnGameNumber === gameNumberCompleted) {
-    httpApi.httpSetMatch(match);
-  }
-  ipc_send("set_timer", 0, IPC_OVERLAY);
-  ipc_send("popup", { text: "Match saved!", time: 3000 });
-}
-
-//
-function startDraft() {
-  if (debugLog || !firstPass) {
-    if (playerData.settings.close_on_match) {
-      ipc_send("renderer_hide", 1);
-    }
-    ipc_send("set_arena_state", ARENA_MODE_DRAFT);
-  }
-  duringDraft = true;
-}
-
-function getDraftData(id, entry) {
-  var data = playerData.draft(id) || createDraft(id, entry);
-
-  if (!data.date && entry.timestamp) {
-    // the first event we see we set the date.
-    data.timestamp = entry.timestamp;
-    data.date = parseWotcTimeFallback(entry.timestamp);
-  }
-
-  return data;
-}
-
-//
-function setDraftData(data) {
-  if (!data || !data.id) {
-    console.log("Couldnt save undefined draft:", data);
-    return;
-  }
-  const { id } = data;
-
-  // console.log("Set draft data:", data);
-  if (!playerData.draft_index.includes(id)) {
-    const draft_index = [...playerData.draft_index, id];
-    if (debugLog || !firstPass) store.set("draft_index", draft_index);
-    setData({ draft_index }, false);
-  }
-
-  if (debugLog || !firstPass) store.set(id, data);
-  setData({
-    [id]: data,
-    cards: playerData.cards,
-    cardsNew: playerData.cardsNew
-  });
-  ipc_send("set_draft_cards", data, IPC_OVERLAY);
-}
-
-//
-function clearDraftData(draftId) {
-  if (playerData.draftExists(draftId)) {
-    if (playerData.draft_index.includes(draftId)) {
-      const draft_index = [...playerData.draft_index];
-      draft_index.splice(draft_index.indexOf(draftId), 1);
-      setData({ draft_index }, false);
-      if (debugLog || !firstPass) store.set("draft_index", draft_index);
-    }
-    setData({ [draftId]: null });
-    // Note: we must always run delete, regardless of firstpass
-    store.delete(draftId);
-  }
-}
-
-//
-function endDraft(data) {
-  duringDraft = false;
-  if (debugLog || !firstPass) ipc_send("set_arena_state", ARENA_MODE_IDLE);
-  if (!data) return;
-  httpApi.httpSetDraft(data);
-  ipc_send("popup", { text: "Draft saved!", time: 3000 });
-}
-
-//
 function updateLoading(entry) {
-  if (firstPass) {
+  if (globals.firstPass) {
     const completion = entry.position / entry.size;
     ipc_send("popup", {
       text: `Reading log: ${Math.round(100 * completion)}%`,
@@ -1734,14 +1039,14 @@ function updateLoading(entry) {
 
 //
 function finishLoading() {
-  if (firstPass) {
+  if (globals.firstPass) {
     ipc_send("popup", {
       text: "Finishing initial log read...",
       time: 0,
       progress: 2
     });
-    firstPass = false;
-    store.set(playerData.data);
+    globals.firstPass = false;
+    globals.store.set(playerData.data);
     logReadEnd = new Date();
     let logReadElapsed = (logReadEnd - logReadStart) / 1000;
     ipc_send("ipc_log", `Log read in ${logReadElapsed}s`);
@@ -1752,10 +1057,10 @@ function finishLoading() {
       progress: 2
     });
 
-    if (duringMatch) {
+    if (globals.duringMatch) {
       ipc_send("set_arena_state", ARENA_MODE_MATCH);
       update_deck(false);
-    } else if (duringDraft) {
+    } else if (globals.duringDraft) {
       ipc_send("set_arena_state", ARENA_MODE_DRAFT);
     }
 

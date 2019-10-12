@@ -22,6 +22,17 @@ const {
   replaceAll
 } = require("common/util");
 
+const Colors = require("../shared/colors");
+const {
+  MULTI,
+  COLORLESS,
+  WHITE,
+  BLUE,
+  BLACK,
+  GREEN,
+  RED
+} = require("../shared/constants.js");
+
 const {
   hideLoadingBars,
   changeBackground,
@@ -142,6 +153,7 @@ function collectionSortName(a, b) {
 class SetStats {
   constructor(set) {
     this.set = set;
+    this.cards = [];
     this.common = new CountStats();
     this.uncommon = new CountStats();
     this.rare = new CountStats();
@@ -179,6 +191,10 @@ function get_collection_stats() {
   db.cardList.forEach(card => {
     if (!card.collectible || card.rarity === "land") return;
     if (!(card.set in stats)) return;
+    let obj = {
+      id: card.id,
+      owned: 0
+    };
     let collation = db.sets[card.set].collation;
     // add to totals
     if (card.booster || !collation) {
@@ -191,6 +207,8 @@ function get_collection_stats() {
     // add cards we own
     if (pd.cards.cards[card.id] !== undefined) {
       const owned = pd.cards.cards[card.id];
+      obj.owned = owned;
+
       if (card.booster || !collation) {
         stats[card.set][card.rarity].owned += owned;
         stats[card.set][card.rarity].uniqueOwned += 1;
@@ -207,6 +225,10 @@ function get_collection_stats() {
       }
     }
 
+    let col = new Colors();
+    col.addFromCost(card.cost);
+    let colorIndex = col.getBaseColor();
+
     // count cards we know we want across decks
     const wanted = Math.max(
       ...pd.deckList
@@ -219,6 +241,13 @@ function get_collection_stats() {
     // count unique cards we know we want across decks
     stats[card.set][card.rarity].uniqueWanted += Math.min(1, wanted);
     stats.complete[card.rarity].uniqueWanted += Math.min(1, wanted);
+
+    obj.wanted = wanted;
+    if (!stats[card.set].cards[colorIndex])
+      stats[card.set].cards[colorIndex] = {};
+    if (!stats[card.set].cards[colorIndex][card.rarity])
+      stats[card.set].cards[colorIndex][card.rarity] = [];
+    stats[card.set].cards[colorIndex][card.rarity].push(obj);
   });
 
   return stats;
@@ -621,6 +650,7 @@ function printStats() {
   mainDiv.innerHTML = "";
   mainDiv.classList.remove("flex_item");
   const stats = get_collection_stats();
+  console.log(stats);
 
   let top = createDiv(["decklist_top"]);
   top.appendChild(createDiv(["button", "back"]));
@@ -715,6 +745,52 @@ function renderSetStats(setStats, setIconCode, setName) {
     let label = document.createElement("label");
     label.innerHTML = setName + " completion";
     substats.appendChild(label);
+
+    // Draw completion table for this set
+    let table = createDiv(["completion_table"]);
+    for (var c = 0; c < 7; c++) {
+      let tile = "";
+      if (c + 1 == MULTI) tile = "mana_multi";
+      if (c + 1 == COLORLESS) tile = "mana_colorless";
+      if (c + 1 == WHITE) tile = "mana_white";
+      if (c + 1 == BLUE) tile = "mana_blue";
+      if (c + 1 == BLACK) tile = "mana_black";
+      if (c + 1 == RED) tile = "mana_red";
+      if (c + 1 == GREEN) tile = "mana_green";
+
+      let cell = createDiv(["completion_table_color_title", tile]);
+      cell.style.gridArea = `1 / ${c * 5 + 1} / auto / ${c * 5 + 6}`;
+      table.appendChild(cell);
+
+      for (var r = 0; r < 4; r++) {
+        let rarity = CARD_RARITIES[r];
+        let cell = createDiv(["completion_table_rarity_title", rarity]);
+        cell.title = rarity;
+        cell.style.gridArea = `2 / ${c * 5 + 1 + r} / auto / ${c * 5 + 1 + r}`;
+        table.appendChild(cell);
+
+        // A little hacky to use "c + 1"..
+        if (setStats.cards[c + 1]) {
+          let cardsArray = setStats.cards[c + 1][rarity];
+          if (cardsArray) {
+            cardsArray.forEach((card, index) => {
+              let classes = ["completion_table_card", "n" + card.owned];
+              if (card.wanted > 0) classes.push("wanted");
+              let cell = createDiv(classes, card.owned);
+              cell.style.gridArea = `${index + 3} / ${c * 5 +
+                1 +
+                r} / auto / ${c * 5 + 1 + r}`;
+              table.appendChild(cell);
+
+              let dbCard = db.card(card.id);
+              addCardHover(cell, dbCard);
+            });
+          }
+        }
+      }
+    }
+
+    substats.appendChild(table);
 
     let wanted = {};
     let missing = {};

@@ -8,6 +8,8 @@ exports.BLUE = 2;
 exports.BLACK = 3;
 exports.RED = 4;
 exports.GREEN = 5;
+exports.COLORLESS = 6;
+exports.MULTI = 7;
 
 // Magic constant to represent auth token in form
 exports.HIDDEN_PW = "********";
