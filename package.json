@@ -55,7 +55,7 @@
     "clean:modules": "rm -fr node_modules",
     "clean:lock": "rm -f package-lock.json",
     "postclean": "npm install",
-    "start": "electron .",
+    "start": "electron \"./dist/main.js\"",
     "postinstall": "install-app-deps",
     "format": "prettier --write \"**/*.js\"",
     "test": "npm run --silent test:eslint && npm run --silent test:prettier && npm run --silent test:jest",
@@ -65,8 +65,12 @@
     "dist": "build --x64",
     "version": "node -p \"require('./package.json').version\"",
     "load-logs": "electron \"./scripts/load-logs.js\"",
-    "metadata": "electron \"./scripts/metadata.js\""
+    "metadata": "electron \"./scripts/metadata.js\"",
+    "webpack": "webpack --config webpack.config.js"
   },
+  "sideEffects": [
+    "./src/window_background/background.js"
+  ],
   "dependencies": {
     "animejs": "^3.0.1",
     "async": "^2.6.1",
@@ -91,13 +95,19 @@
     "pikaday": "^1.8.0",
     "qs": "^6.7.0",
     "queue": "^4.5.1",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
     "striptags": "^3.1.1",
     "time-elements": "^2.0.0",
     "vanilla-picker": "^2.8.1",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
     "acorn": "^6.1.1",
+    "babel-loader": "^8.0.6",
     "devtron": "^1.4.0",
     "electron": "^5.0.1",
     "electron-builder": "^20.40.2",
@@ -105,7 +115,12 @@
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-prettier": "^3.1.0",
+    "file-loader": "^4.2.0",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
     "jest": "^24.8.0",
-    "prettier": "1.16.4"
+    "prettier": "1.16.4",
+    "webpack": "^4.41.1",
+    "webpack-cli": "^3.3.9"
   }
 }
