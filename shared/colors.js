@@ -1,4 +1,12 @@
-const { WHITE, BLUE, BLACK, RED, GREEN } = require("../shared/constants.js");
+const {
+  WHITE,
+  BLUE,
+  BLACK,
+  RED,
+  GREEN,
+  MULTI,
+  COLORLESS
+} = require("../shared/constants.js");
 
 class Colors {
   /**
@@ -51,6 +59,18 @@ class Colors {
   }
 
   /**
+   * Return the color, multicolor or colorless.
+   */
+  getBaseColor() {
+    if (this.length > 1) {
+      return MULTI;
+    } else if (this.length == 0) {
+      return COLORLESS;
+    }
+    return this.get()[0];
+  }
+
+  /**
    * Returns the number of colors
    */
   get length() {
@@ -68,16 +88,16 @@ class Colors {
    * Adds a string mana cost to this class.
    */
   addFromCost(cost) {
-    cost.forEach(cost => {
-      if (cost === "w") {
+    cost.forEach(_c => {
+      if (_c == "w") {
         this._w += 1;
-      } else if (cost === "u") {
+      } else if (_c == "u") {
         this._u += 1;
-      } else if (cost === "b") {
+      } else if (_c == "b") {
         this._b += 1;
-      } else if (cost === "r") {
+      } else if (_c == "r") {
         this._r += 1;
-      } else if (cost === "g") {
+      } else if (_c == "g") {
         this._g += 1;
       }
     });

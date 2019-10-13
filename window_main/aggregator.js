@@ -16,7 +16,12 @@ const {
 } = require("../shared/constants");
 const db = require("../shared/database");
 const pd = require("../shared/player-data");
-const { getReadableEvent, getRecentDeckName } = require("../shared/util");
+const {
+  getReadableEvent,
+  getRecentDeckName,
+  get_deck_missing,
+  getBoosterCountEstimate
+} = require("../shared/util");
 const { normalApproximationInterval } = require("../shared/stats-fns");
 
 // Default filter values
@@ -56,6 +61,9 @@ class Aggregator {
     this.compareDecks = this.compareDecks.bind(this);
     this.compareDecksByWins = this.compareDecksByWins.bind(this);
     this.compareDecksByWinrates = this.compareDecksByWinrates.bind(this);
+    this.compareDecksByIncompleteness = this.compareDecksByIncompleteness.bind(
+      this
+    );
     this.compareEvents = this.compareEvents.bind(this);
     this.updateFilters(filters);
   }
@@ -465,6 +473,25 @@ class Aggregator {
     return (
       bStats.winrate - aStats.winrate ||
       bStats.wins - aStats.wins ||
+      aName.localeCompare(bName)
+    );
+  }
+
+  compareDecksByIncompleteness(a, b) {
+    const aMissing = get_deck_missing(a);
+    const bMissing = get_deck_missing(b);
+    const aMissingBoosters = getBoosterCountEstimate(aMissing);
+    const bMissingBoosters = getBoosterCountEstimate(bMissing);
+
+    const aName = getRecentDeckName(a.id);
+    const bName = getRecentDeckName(b.id);
+
+    return (
+      bMissingBoosters - aMissingBoosters ||
+      bMissing.mythic - aMissing.mythic ||
+      bMissing.rare - aMissing.rare ||
+      bMissing.uncommon - aMissing.uncommon ||
+      bMissing.common - aMissing.common ||
       aName.localeCompare(bName)
     );
   }

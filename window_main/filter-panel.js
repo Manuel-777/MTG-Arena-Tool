@@ -357,7 +357,7 @@ class FilterPanel {
       sortDiv.appendChild(sortLabel);
       const sortSelect = createSelect(
         sortDiv,
-        ["By Date", "By Wins", "By Winrate"],
+        ["By Date", "By Wins", "By Winrate", "By Incomplete"],
         this.filters.sort,
         filter => {
           this.filters.sort = filter;

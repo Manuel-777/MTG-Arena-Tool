@@ -139,6 +139,7 @@ exports.generateMetadata = function(
         cardObj.dfc = card.linkedFaceType;
         cardObj.collectible = card.isCollectible;
         cardObj.craftable = card.isCraftable;
+        cardObj.booster = false;
 
         let scryfallObject = undefined;
         let scryfallSet = SETS_DATA[set].scryfall;
@@ -243,6 +244,7 @@ exports.generateMetadata = function(
               ].replace(rep, "");
             });
           }
+          cardObj.booster = scryfallObject.booster;
           cardObj.images = scryfallObject.image_uris;
         }
 

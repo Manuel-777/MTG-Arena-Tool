@@ -1,5 +1,6 @@
 const { MANA, RANKS } = require("../shared/constants");
-const { createDiv } = require("../shared/dom-fns");
+const { createDiv, createLabel } = require("../shared/dom-fns");
+const { createSelect } = require("../shared/select");
 const { get_rank_index, toDDHHMMSS, toMMSS } = require("../shared/util");
 
 const {
@@ -135,35 +136,43 @@ class StatsPanel {
   renderCharts() {
     const barsToShow = Math.max(3, Math.round(this.width / 40));
     const frequencySort = (a, b) => b.total - a.total;
+
     // Archetypes
     let tagsWinrates = [...Object.values(this.data.tagStats)];
+    // frequent matchups
     tagsWinrates.sort(frequencySort);
-    tagsWinrates = tagsWinrates.slice(0, barsToShow);
+    const freqTagStats = tagsWinrates.slice(0, barsToShow);
+    const freqCurveMaxTags = Math.max(...tagsWinrates.map(cwr => cwr.total));
+    // wins vs losses
+    tagsWinrates = [...freqTagStats];
     const curveMaxTags = Math.max(
       ...tagsWinrates.map(cwr => Math.max(cwr.wins || 0, cwr.losses || 0)),
       0
     );
     tagsWinrates.sort(compareWinrates);
+
     // Colors
     let colorsWinrates = [...Object.values(this.data.colorStats)];
+    // frequent matchups
     colorsWinrates.sort(frequencySort);
-    colorsWinrates = colorsWinrates.slice(0, barsToShow);
+    const freqCurveMax = Math.max(...colorsWinrates.map(cwr => cwr.total));
+    const freqColorStats = colorsWinrates.slice(0, barsToShow);
+    // wins vs losses
+    colorsWinrates = [...freqColorStats];
     const curveMax = Math.max(
       ...colorsWinrates.map(cwr => Math.max(cwr.wins || 0, cwr.losses || 0)),
       0
     );
     colorsWinrates.sort(compareWinrates);
 
-    if (curveMaxTags || curveMax) {
-      const chartTitle = createDiv(["ranks_history_title"]);
-      chartTitle.innerHTML = "Frequent Matchups";
-      chartTitle.style.marginTop = "24px";
-      this.container.appendChild(chartTitle);
+    if (!curveMaxTags && !curveMax) {
+      // no charts to show
+      return;
     }
 
     const getStyleHeight = frac => Math.round(frac * 100) + "%";
 
-    const appendChart = (winrates, _curveMax, showTags) => {
+    const appendWinrateChart = (container, winrates, _curveMax, showTags) => {
       const curve = createDiv(["mana_curve"]);
       const numbers = createDiv(["mana_curve_costs"]);
 
@@ -205,18 +214,104 @@ class StatsPanel {
         numbers.append(curveNumber);
       });
 
-      this.container.appendChild(curve);
-      this.container.appendChild(numbers);
+      container.appendChild(curve);
+      container.appendChild(numbers);
     };
+
+    const appendFreqChart = (container, winrates, _curveMax, showTags) => {
+      const curve = createDiv(["mana_curve"]);
+      const numbers = createDiv(["mana_curve_costs"]);
+
+      winrates.forEach(cwr => {
+        const totalCol = createDiv(["mana_curve_column", "back_blue"]);
+        totalCol.style.height = getStyleHeight(cwr.total / _curveMax);
+        totalCol.title = `${cwr.total} matches`;
+        curve.appendChild(totalCol);
+
+        const curveNumber = createDiv(["mana_curve_column_number"]);
+        let frequency = 0;
+        if (cwr.total) {
+          frequency = cwr.total / this.data.stats.total;
+        }
+        curveNumber.innerHTML = `<span class="white_bright">${formatPercent(
+          frequency
+        )}</span>`;
+        curveNumber.title = `${cwr.total} matches`;
+
+        if (showTags) {
+          const curveTag = createDiv(["mana_curve_tag"], cwr.tag);
+          curveTag.style.backgroundColor = getTagColor(cwr.tag);
+          curveNumber.appendChild(curveTag);
+        }
+
+        cwr.colors.forEach(color => {
+          const tagColor = createDiv(["mana_s16", "mana_" + MANA[color]]);
+          tagColor.style.margin = "3px auto 3px auto";
+          curveNumber.appendChild(tagColor);
+        });
+        numbers.append(curveNumber);
+      });
+
+      container.appendChild(curve);
+      container.appendChild(numbers);
+    };
+
+    const archContainer = createDiv(["stats_panel_arch_charts"]);
+    const colorContainer = createDiv(["stats_panel_color_charts"]);
+
+    // Toggle
+    if (curveMaxTags && curveMax) {
+      archContainer.style.display = "block";
+      colorContainer.style.display = "none";
+      let label = createLabel(["but_container_label"], "Group by:");
+      const langSelect = createSelect(
+        label,
+        ["Archetype", "Color"],
+        "Archetype",
+        filter => {
+          if (filter === "Archetype") {
+            archContainer.style.display = "block";
+            colorContainer.style.display = "none";
+          } else {
+            archContainer.style.display = "none";
+            colorContainer.style.display = "block";
+          }
+        }
+      );
+      langSelect.style.width = "120px";
+      this.container.appendChild(label);
+    }
 
     // Archetypes
     if (curveMaxTags) {
-      appendChart(tagsWinrates, curveMaxTags, true);
+      const chartTitle = createDiv(
+        ["ranks_history_title"],
+        "Frequent Matchups"
+      );
+      chartTitle.style.marginTop = "24px";
+      archContainer.appendChild(chartTitle);
+      appendFreqChart(archContainer, freqTagStats, freqCurveMaxTags, true);
+      const chartTitle2 = createDiv(["ranks_history_title"], "Wins vs Losses");
+      chartTitle2.style.marginTop = "24px";
+      archContainer.appendChild(chartTitle2);
+      appendWinrateChart(archContainer, tagsWinrates, curveMaxTags, true);
+      this.container.appendChild(archContainer);
     }
 
     // Colors
     if (curveMax) {
-      appendChart(colorsWinrates, curveMax, false);
+      const chartTitle = createDiv(
+        ["ranks_history_title"],
+        "Frequent Matchups"
+      );
+      chartTitle.style.marginTop = "24px";
+      colorContainer.appendChild(chartTitle);
+      appendFreqChart(colorContainer, freqColorStats, freqCurveMax, false);
+      const chartTitle2 = createDiv(["ranks_history_title"], "Wins vs Losses");
+      chartTitle2.style.marginTop = "24px";
+      colorContainer.appendChild(chartTitle2);
+      appendWinrateChart(colorContainer, colorsWinrates, curveMax, false);
+      this.container.appendChild(colorContainer);
     }
   }
 }

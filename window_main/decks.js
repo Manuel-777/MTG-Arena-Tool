@@ -113,6 +113,8 @@ function openDecksTab(_filters = {}, scrollTop = 0) {
     decks.sort(aggregator.compareDecksByWinrates);
   } else if (filters.sort === "By Wins") {
     decks.sort(aggregator.compareDecksByWins);
+  } else if (filters.sort === "By Incomplete") {
+    decks.sort(aggregator.compareDecksByIncompleteness);
   } else {
     decks.sort(aggregator.compareDecks);
   }

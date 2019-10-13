@@ -21,6 +21,17 @@ const {
   replaceAll
 } = require("../shared/util");
 
+const Colors = require("../shared/colors");
+const {
+  MULTI,
+  COLORLESS,
+  WHITE,
+  BLUE,
+  BLACK,
+  GREEN,
+  RED
+} = require("../shared/constants.js");
+
 const {
   hideLoadingBars,
   changeBackground,
@@ -139,6 +150,7 @@ function collectionSortName(a, b) {
 class SetStats {
   constructor(set) {
     this.set = set;
+    this.cards = [];
     this.common = new CountStats();
     this.uncommon = new CountStats();
     this.rare = new CountStats();
@@ -176,26 +188,43 @@ function get_collection_stats() {
   db.cardList.forEach(card => {
     if (!card.collectible || card.rarity === "land") return;
     if (!(card.set in stats)) return;
+    let obj = {
+      id: card.id,
+      owned: 0
+    };
+    let collation = db.sets[card.set].collation;
     // add to totals
-    stats[card.set][card.rarity].total += 4;
+    if (card.booster || !collation) {
+      stats[card.set][card.rarity].total += 4;
+      stats[card.set][card.rarity].unique += 1;
+    }
     stats.complete[card.rarity].total += 4;
-    stats[card.set][card.rarity].unique += 1;
     stats.complete[card.rarity].unique += 1;
 
     // add cards we own
     if (pd.cards.cards[card.id] !== undefined) {
       const owned = pd.cards.cards[card.id];
-      stats[card.set][card.rarity].owned += owned;
+      obj.owned = owned;
+
+      if (card.booster || !collation) {
+        stats[card.set][card.rarity].owned += owned;
+        stats[card.set][card.rarity].uniqueOwned += 1;
+      }
       stats.complete[card.rarity].owned += owned;
-      stats[card.set][card.rarity].uniqueOwned += 1;
       stats.complete[card.rarity].uniqueOwned += 1;
 
       // count complete sets we own
       if (owned == 4) {
-        stats[card.set][card.rarity].complete += 1;
+        if (card.booster || !collation) {
+          stats[card.set][card.rarity].complete += 1;
+        }
         stats.complete[card.rarity].complete += 1;
       }
     }
+
+    let col = new Colors();
+    col.addFromCost(card.cost);
+    let colorIndex = col.getBaseColor();
 
     // count cards we know we want across decks
     const wanted = Math.max(
@@ -209,6 +238,13 @@ function get_collection_stats() {
     // count unique cards we know we want across decks
     stats[card.set][card.rarity].uniqueWanted += Math.min(1, wanted);
     stats.complete[card.rarity].uniqueWanted += Math.min(1, wanted);
+
+    obj.wanted = wanted;
+    if (!stats[card.set].cards[colorIndex])
+      stats[card.set].cards[colorIndex] = {};
+    if (!stats[card.set].cards[colorIndex][card.rarity])
+      stats[card.set].cards[colorIndex][card.rarity] = [];
+    stats[card.set].cards[colorIndex][card.rarity].push(obj);
   });
 
   return stats;
@@ -396,18 +432,6 @@ function openCollectionTab() {
 
   addCheckboxSearch(
     cont,
-    '<div class="icon_search_unowned"></div>Show unowned',
-    "query_unown",
-    false
-  );
-  addCheckboxSearch(
-    cont,
-    '<div class="icon_search_incomplete"></div>Incomplete only',
-    "query_incomplete",
-    false
-  );
-  addCheckboxSearch(
-    cont,
     '<div class="icon_search_new"></div>Newly acquired only',
     "query_new",
     false
@@ -484,6 +508,43 @@ function openCollectionTab() {
   main_but_cont.appendChild(cont);
   filters.appendChild(main_but_cont);
 
+  cont = createDiv(["buttons_container"]);
+  icd = createDiv(["input_container_inventory", "auto_width"]);
+
+  label = document.createElement("label");
+  label.style.display = "table";
+  label.innerHTML = "Owned Qty:";
+  icd.appendChild(label);
+
+  let inputQty = document.createElement("input");
+  inputQty.style.maxWidth = "80px";
+  inputQty.id = "query_qty";
+  inputQty.autocomplete = "off";
+  inputQty.type = "number";
+  inputQty.min = "0";
+  inputQty.max = "4";
+
+  icd.appendChild(inputQty);
+  cont.appendChild(icd);
+  let checkboxQtyHigher = addCheckboxSearch(
+    cont,
+    "Higher than",
+    "query_qtyhigher",
+    false,
+    true
+  );
+  addCheckboxSearch(cont, "Equal to", "query_qtyequal", true);
+  let checkboxQtyLower = addCheckboxSearch(
+    cont,
+    "Lower than",
+    "query_qtylower",
+    false,
+    true
+  );
+
+  main_but_cont.appendChild(cont);
+  filters.appendChild(main_but_cont);
+
   searchButton = createDiv(["button_simple", "button_thin"], "Search");
   searchButton.style.margin = "24px auto";
   filters.appendChild(searchButton);
@@ -505,6 +566,18 @@ function openCollectionTab() {
   checkboxCmcHigher.addEventListener("change", () => {
     if (document.getElementById("query_cmchigher").checked == true) {
       document.getElementById("query_cmclower").checked = false;
+    }
+  });
+
+  checkboxQtyLower.addEventListener("change", () => {
+    if (document.getElementById("query_qtylower").checked == true) {
+      document.getElementById("query_qtyhigher").checked = false;
+    }
+  });
+
+  checkboxQtyHigher.addEventListener("change", () => {
+    if (document.getElementById("query_qtyhigher").checked == true) {
+      document.getElementById("query_qtylower").checked = false;
     }
   });
 
@@ -571,8 +644,6 @@ function resetFilters() {
 
   document.getElementById("query_name").value = "";
   document.getElementById("query_type").value = "";
-  document.getElementById("query_unown").checked = false;
-  document.getElementById("query_incomplete").checked = false;
   document.getElementById("query_new").checked = false;
   document.getElementById("query_multicolor").checked = false;
   document.getElementById("query_exclude").checked = false;
@@ -586,6 +657,10 @@ function resetFilters() {
   document.getElementById("query_cmclower").checked = false;
   document.getElementById("query_cmcequal").checked = true;
   document.getElementById("query_cmchigher").checked = false;
+
+  document.getElementById("query_qtylower").checked = false;
+  document.getElementById("query_qtyequal").checked = true;
+  document.getElementById("query_qtyhigher").checked = false;
 
   printCollectionPage();
 }
@@ -608,6 +683,7 @@ function printStats() {
   mainDiv.innerHTML = "";
   mainDiv.classList.remove("flex_item");
   const stats = get_collection_stats();
+  console.log(stats);
 
   let top = createDiv(["decklist_top"]);
   top.appendChild(createDiv(["button", "back"]));
@@ -702,6 +778,52 @@ function renderSetStats(setStats, setIconCode, setName) {
     let label = document.createElement("label");
     label.innerHTML = setName + " completion";
     substats.appendChild(label);
+
+    // Draw completion table for this set
+    let table = createDiv(["completion_table"]);
+    for (var c = 0; c < 7; c++) {
+      let tile = "";
+      if (c + 1 == MULTI) tile = "mana_multi";
+      if (c + 1 == COLORLESS) tile = "mana_colorless";
+      if (c + 1 == WHITE) tile = "mana_white";
+      if (c + 1 == BLUE) tile = "mana_blue";
+      if (c + 1 == BLACK) tile = "mana_black";
+      if (c + 1 == RED) tile = "mana_red";
+      if (c + 1 == GREEN) tile = "mana_green";
+
+      let cell = createDiv(["completion_table_color_title", tile]);
+      cell.style.gridArea = `1 / ${c * 5 + 1} / auto / ${c * 5 + 6}`;
+      table.appendChild(cell);
+
+      for (var r = 0; r < 4; r++) {
+        let rarity = CARD_RARITIES[r];
+        let cell = createDiv(["completion_table_rarity_title", rarity]);
+        cell.title = rarity;
+        cell.style.gridArea = `2 / ${c * 5 + 1 + r} / auto / ${c * 5 + 1 + r}`;
+        table.appendChild(cell);
+
+        // A little hacky to use "c + 1"..
+        if (setStats.cards[c + 1]) {
+          let cardsArray = setStats.cards[c + 1][rarity];
+          if (cardsArray) {
+            cardsArray.forEach((card, index) => {
+              let classes = ["completion_table_card", "n" + card.owned];
+              if (card.wanted > 0) classes.push("wanted");
+              let cell = createDiv(classes, card.owned);
+              cell.style.gridArea = `${index + 3} / ${c * 5 +
+                1 +
+                r} / auto / ${c * 5 + 1 + r}`;
+              table.appendChild(cell);
+
+              let dbCard = db.card(card.id);
+              addCardHover(cell, dbCard);
+            });
+          }
+        }
+      }
+    }
+
+    substats.appendChild(table);
 
     let wanted = {};
     let missing = {};
@@ -849,8 +971,6 @@ function printCards() {
 
   let filterName = document.getElementById("query_name").value.toLowerCase();
   let filterType = document.getElementById("query_type").value.toLowerCase();
-  let filterUnown = document.getElementById("query_unown").checked;
-  let filterIncomplete = document.getElementById("query_incomplete").checked;
   let filterNew = document.getElementById("query_new");
   let filterMulti = document.getElementById("query_multicolor");
   let filterExclude = document.getElementById("query_exclude");
@@ -867,9 +987,14 @@ function printCards() {
   let filterCmcEqual = document.getElementById("query_cmcequal").checked;
   let filterCmcHigher = document.getElementById("query_cmchigher").checked;
 
+  let filterQty = document.getElementById("query_qty").value;
+  let filterQtyLower = document.getElementById("query_qtylower").checked;
+  let filterQtyEqual = document.getElementById("query_qtyequal").checked;
+  let filterQtyHigher = document.getElementById("query_qtyhigher").checked;
+
   let totalCards = 0;
   let list;
-  if (filterUnown) {
+  if (filterQty == 0 || filterQtyLower) {
     list = db.cardIds;
   } else {
     list = Object.keys(pd.cards.cards);
@@ -914,13 +1039,6 @@ function printCards() {
       }
     }
 
-    if (filterIncomplete) {
-      const owned = pd.cards.cards[card.id];
-      if (owned >= 4) {
-        continue;
-      }
-    }
-
     if (filterNew.checked && pd.cardsNew[key] === undefined) {
       continue;
     }
@@ -950,6 +1068,31 @@ function printCards() {
         }
       } else if (!filterCmcHigher && !filterCmcLower && filterCmcEqual) {
         if (cmc != filterCMC) {
+          continue;
+        }
+      }
+    }
+
+    if (filterQty > 0) {
+      const owned = pd.cards.cards[card.id];
+      if (filterQtyLower && filterQtyEqual) {
+        if (owned > filterQty) {
+          continue;
+        }
+      } else if (filterQtyHigher && filterQtyEqual) {
+        if (owned < filterQty) {
+          continue;
+        }
+      } else if (filterQtyLower && !filterQtyEqual) {
+        if (owned >= filterQty) {
+          continue;
+        }
+      } else if (filterQtyHigher && !filterQtyEqual) {
+        if (owned <= filterQty) {
+          continue;
+        }
+      } else if (!filterQtyHigher && !filterQtyLower && filterQtyEqual) {
+        if (owned != filterQty) {
           continue;
         }
       }

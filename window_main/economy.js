@@ -525,7 +525,7 @@ function createChangeRow(change, economyId) {
   }
 
   if (checkGemsEarnt && change.delta.gemsDelta) {
-    bos = createDiv(["economy_gems_med"]);
+    bos = createDiv(["economy_gems_med"], "", { style: "flex-shrink: 0;" });
     bos.title = "Gems";
 
     bon = createDiv();
