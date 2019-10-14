@@ -760,6 +760,8 @@ function printStats() {
   mainDiv.appendChild(top);
   mainDiv.appendChild(flex);
 
+  openSetStats(stats.complete, "Complete collection");
+
   //
   $$(".back")[0].addEventListener("click", () => {
     changeBackground("default");
@@ -798,12 +800,6 @@ function renderSetStats(setStats, setIconCode, setName) {
   setDiv.addEventListener("click", () => {
     openSetStats(setStats, setName);
   });
-
-  if (defaultSetName == setName) {
-    setTimeout(() => {
-      openSetStats(setStats, setName);
-    }, 100);
-  }
 
   return setDiv;
 }
