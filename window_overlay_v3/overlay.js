@@ -15,6 +15,10 @@ if (!remote.app.isPackaged) {
       });
     }
   });
+  const Sentry = require("@sentry/electron");
+  Sentry.init({
+    dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
+  });
 }
 
 const TransparencyMouseFix = require("./electron-transparency-mouse-fix.js");
@@ -138,14 +142,19 @@ ipc.on("edit", () => {
 function toggleEditMode() {
   editMode = !editMode;
 
+  let divsList = [];
+  let mainHover = queryElements(".main_hover")[0];
+  mainHover.style.opacity = "1";
+  divsList.push(byId("overlay_hover"));
+  pd.settings.overlays.forEach((_overlay, index) => {
+    if (!getVisible(_overlay)) return;
+    divsList.push(byId("overlay_" + (index + 1)));
+  });
+
   if (editMode) {
     document.body.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
 
-    pd.settings.overlays.forEach((_overlay, index) => {
-      const overlayDiv = byId("overlay_" + (index + 1));
-
-      if (!getVisible(_overlay)) return;
-
+    divsList.forEach(overlayDiv => {
       if (!overlayDiv.classList.contains("click-on"))
         overlayDiv.classList.add("click-on");
       overlayDiv.classList.remove("click-through");
@@ -189,14 +198,15 @@ function toggleEditMode() {
         });
     });
   } else {
-    pd.settings.overlays.forEach((_overlay, index) => {
-      const overlayDiv = byId("overlay_" + (index + 1));
-      if (!overlayDiv.classList.contains("click-through"))
-        overlayDiv.classList.add("click-through");
-      overlayDiv.classList.remove("click-on");
-      overlayDiv.classList.remove("editable");
-      interact(overlayDiv).unset();
+    mainHover.style.opacity = "0";
+    divsList.forEach(_div => {
+      if (!_div.classList.contains("click-through"))
+        _div.classList.add("click-through");
+      _div.classList.remove("click-on");
+      _div.classList.remove("editable");
+      interact(_div).unset();
     });
+
     document.body.style.backgroundColor = "rgba(0, 0, 0, 0.05)";
     saveOverlaysPosition();
   }
@@ -205,10 +215,10 @@ function toggleEditMode() {
 function saveOverlaysPosition() {
   // Update each overlay with the new dimensions
   const overlays = [...pd.settings.overlays];
+  const forceInt = num => Math.round(parseFloat(num));
 
   overlays.forEach((_overlay, index) => {
     const overlayDiv = byId("overlay_" + (index + 1));
-    const forceInt = num => Math.round(parseFloat(num));
     const bounds = {
       width: forceInt(overlayDiv.style.width),
       height: forceInt(overlayDiv.style.height),
@@ -222,7 +232,12 @@ function saveOverlaysPosition() {
     overlays[index] = newOverlay;
   });
 
-  ipcSend("save_user_settings", { overlays, skip_refresh: true });
+  const hoverDiv = byId("overlay_hover");
+  let overlayHover = {
+    x: forceInt(hoverDiv.style.left),
+    y: forceInt(hoverDiv.style.top)
+  };
+  ipcSend("save_user_settings", { overlays, overlayHover, skip_refresh: true });
 }
 
 ipc.on("close", (event, arg) => {
@@ -247,6 +262,19 @@ function settingsUpdated() {
   // temporarily allow the overlays to go stale during editing
   // (should be okay since ending edit-mode causes a refresh)
   if (editMode) return;
+
+  console.log(window.innerWidth, window.innerHeight);
+  let hoverContainer = byId("overlay_hover");
+  if (pd.settings.overlayHover) {
+    hoverContainer.style.left = `${pd.settings.overlayHover.x}px`;
+    hoverContainer.style.top = `${pd.settings.overlayHover.y}px`;
+  } else {
+    hoverContainer.style.left = `${window.innerWidth / 2 -
+      pd.cardsSizeHoverCard / 2}px`;
+    hoverContainer.style.top = `${window.innerHeight -
+      pd.cardsSizeHoverCard / 0.71808510638 -
+      50}px`;
+  }
 
   webFrame.setZoomFactor(pd.settings.overlay_scale / 100);
   pd.settings.overlays.forEach((_overlay, index) => {
@@ -1178,7 +1206,7 @@ ready(function() {
   }, 500);
   setTimeout(() => {
     fix = new TransparencyMouseFix({
-      log: true,
+      log: false,
       fixPointerEvents: "auto"
     });
   }, 1000);

@@ -75,6 +75,10 @@ app.on("ready", () => {
   if (app.isPackaged) {
     startUpdater();
   } else {
+    const Sentry = require("@sentry/electron");
+    Sentry.init({
+      dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
+    });
     require("devtron").install();
     startApp();
   }
@@ -412,19 +416,20 @@ function updateOverlayVisibility() {
     // hide entire overlay window
     // Add a 1 second timeout for animations
     overlayHideTimeout = setTimeout(function() {
-      overlay.setBounds({ x: -10, y: -10, width: 5, height: 5 });
+      overlay.hide();
     }, 1000);
   } else if (shouldDisplayOverlay && !isOverlayVisible) {
     // display entire overlay window
     clearTimeout(overlayHideTimeout);
     overlayHideTimeout = undefined;
+    overlay.show();
+
     let displayId = settings.overlay_display
       ? settings.overlay_display
       : electron.screen.getPrimaryDisplay().id;
     let display = electron.screen
       .getAllDisplays()
       .filter(d => d.id == displayId)[0];
-
     if (display) {
       overlay.setBounds(display.bounds);
     } else {
@@ -435,12 +440,7 @@ function updateOverlayVisibility() {
 
 function isEntireOverlayVisible() {
   if (!overlay) return false;
-  const bounds = overlay.getBounds();
-  // use a size-based test for visibility because GPU edge cases
-  // require us to avoid the standard isVisible() API
-  // we cannot rely on x/y position values to derive visiblity because
-  // multi-display setups may have negative values for x or y
-  return bounds.width > 100 && bounds.height > 100;
+  return overlay.isVisible();
 }
 
 function getOverlayVisible(settings) {
@@ -559,12 +559,13 @@ function createBackgroundWindow() {
 }
 
 function createOverlayWindow() {
+  let bounds = electron.screen.getPrimaryDisplay().bounds;
   const overlay = new electron.BrowserWindow({
     transparent: true,
-    x: -10,
-    y: -10,
-    width: 5,
-    height: 5,
+    x: bounds.x,
+    y: bounds.y,
+    width: bounds.width,
+    height: bounds.height,
     frame: false,
     show: false,
     resizable: false,
@@ -613,7 +614,7 @@ function createMainWindow() {
     iconPath = path.join(__dirname, "icon-tray@8x.png");
   }
   if (process.platform == "win32") {
-    iconPath = path.join(__dirname, "icon-tray@8x.png");
+    iconPath = path.join(__dirname, "icon-256.png");
   }
 
   tray = new Tray(iconPath);

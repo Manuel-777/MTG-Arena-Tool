@@ -48,8 +48,11 @@ let orderedSets;
 const ALL_CARDS = "All cards";
 const SINGLETONS = "Singletons (at least one)";
 const FULL_SETS = "Full sets (all 4 copies)";
+const BOOSTER_CARDS = "Only in Boosters";
 
 let countMode = ALL_CARDS;
+let displayMode = BOOSTER_CARDS;
+let defaultSetName = "Complete collection";
 
 //
 function get_collection_export(exportFormat) {
@@ -188,16 +191,16 @@ function get_collection_stats() {
   db.cardList.forEach(card => {
     if (!card.collectible || card.rarity === "land") return;
     if (!(card.set in stats)) return;
+    if (!card.booster && displayMode == BOOSTER_CARDS) return;
+
     let obj = {
       id: card.id,
       owned: 0
     };
     let collation = db.sets[card.set].collation;
     // add to totals
-    if (card.booster || !collation) {
-      stats[card.set][card.rarity].total += 4;
-      stats[card.set][card.rarity].unique += 1;
-    }
+    stats[card.set][card.rarity].total += 4;
+    stats[card.set][card.rarity].unique += 1;
     stats.complete[card.rarity].total += 4;
     stats.complete[card.rarity].unique += 1;
 
@@ -206,18 +209,14 @@ function get_collection_stats() {
       const owned = pd.cards.cards[card.id];
       obj.owned = owned;
 
-      if (card.booster || !collation) {
-        stats[card.set][card.rarity].owned += owned;
-        stats[card.set][card.rarity].uniqueOwned += 1;
-      }
+      stats[card.set][card.rarity].owned += owned;
+      stats[card.set][card.rarity].uniqueOwned += 1;
       stats.complete[card.rarity].owned += owned;
       stats.complete[card.rarity].uniqueOwned += 1;
 
       // count complete sets we own
       if (owned == 4) {
-        if (card.booster || !collation) {
-          stats[card.set][card.rarity].complete += 1;
-        }
+        stats[card.set][card.rarity].complete += 1;
         stats.complete[card.rarity].complete += 1;
       }
     }
@@ -695,6 +694,26 @@ function printStats() {
   const flex = createDiv(["flex_item"]);
   const mainstats = createDiv(["main_stats"]);
 
+  let onlyBoostersLabel = document.createElement("label");
+  onlyBoostersLabel.innerHTML = "Show cards";
+  mainstats.appendChild(onlyBoostersLabel);
+
+  // Counting Mode Selector
+  const displayModeDiv = createDiv(["stats_count_div"]);
+  const displayModeSelect = createSelect(
+    displayModeDiv,
+    [BOOSTER_CARDS, ALL_CARDS],
+    displayMode,
+    selectedMode => {
+      displayMode = selectedMode;
+      printStats();
+    },
+    "stats_mode_select"
+  );
+  displayModeSelect.style.margin = "12px auto";
+  displayModeSelect.style.textAlign = "left";
+  mainstats.appendChild(displayModeSelect);
+
   let completionLabel = document.createElement("label");
   completionLabel.innerHTML = "Sets Completion";
   mainstats.appendChild(completionLabel);
@@ -719,8 +738,13 @@ function printStats() {
   let rs = renderSetStats(stats.complete, "PW", "Complete collection");
   mainstats.appendChild(rs);
 
+  // Filter out non booster sets ?
+  let sets =
+    displayMode == BOOSTER_CARDS
+      ? orderedSets.filter(set => db.sets[set].collation > 0)
+      : orderedSets;
   // each set stats
-  orderedSets
+  sets
     .slice()
     .reverse()
     .forEach(set => {
@@ -772,14 +796,29 @@ function renderSetStats(setStats, setIconCode, setName) {
   });
 
   setDiv.addEventListener("click", () => {
-    const substats = $$(".sub_stats")[0];
-    substats.innerHTML = "";
+    openSetStats(setStats, setName);
+  });
 
-    let label = document.createElement("label");
-    label.innerHTML = setName + " completion";
-    substats.appendChild(label);
+  if (defaultSetName == setName) {
+    setTimeout(() => {
+      openSetStats(setStats, setName);
+    }, 500);
+  }
 
-    // Draw completion table for this set
+  return setDiv;
+}
+
+function openSetStats(setStats, setName) {
+  defaultSetName = setName;
+  const substats = $$(".sub_stats")[0];
+  substats.innerHTML = "";
+
+  let label = document.createElement("label");
+  label.innerHTML = setName + " completion";
+  substats.appendChild(label);
+
+  // Draw completion table for this set
+  if (setName != "Complete collection") {
     let table = createDiv(["completion_table"]);
     for (var c = 0; c < 7; c++) {
       let tile = "";
@@ -807,86 +846,88 @@ function renderSetStats(setStats, setIconCode, setName) {
           let cardsArray = setStats.cards[c + 1][rarity];
           if (cardsArray) {
             cardsArray.forEach((card, index) => {
-              let classes = ["completion_table_card", "n" + card.owned];
-              if (card.wanted > 0) classes.push("wanted");
-              let cell = createDiv(classes, card.owned);
-              cell.style.gridArea = `${index + 3} / ${c * 5 +
-                1 +
-                r} / auto / ${c * 5 + 1 + r}`;
-              table.appendChild(cell);
-
               let dbCard = db.card(card.id);
-              addCardHover(cell, dbCard);
+
+              if (
+                (!dbCard.booster && displayMode == ALL_CARDS) ||
+                dbCard.booster
+              ) {
+                let classes = ["completion_table_card", "n" + card.owned];
+                if (card.wanted > 0) classes.push("wanted");
+                let cell = createDiv(classes, card.owned);
+                cell.style.gridArea = `${index + 3} / ${c * 5 +
+                  1 +
+                  r} / auto / ${c * 5 + 1 + r}`;
+                table.appendChild(cell);
+
+                addCardHover(cell, dbCard);
+              }
             });
           }
         }
       }
     }
-
     substats.appendChild(table);
+  }
 
-    let wanted = {};
-    let missing = {};
-    CARD_RARITIES.forEach(rarity => {
-      const countStats = setStats[rarity];
-      if (countStats.total > 0) {
-        const capitalizedRarity =
-          rarity[0].toUpperCase() + rarity.slice(1) + "s";
-        let compDiv = renderCompletionDiv(
-          countStats,
-          "wc_" + rarity + ".png",
-          capitalizedRarity
-        );
-        compDiv.style.opacity = 1;
-        substats.appendChild(compDiv);
-      }
-      wanted[rarity] = countStats.wanted;
-      missing[rarity] = countStats.total - countStats.owned;
-    });
-
-    // If the set has a collationId, it means boosters for it exists
-    if (db.sets[setName] && db.sets[setName].collation) {
-      let chanceBoosterHasMythic = 0.125; // assume 1/8 of packs have a mythic
-      let chanceBoosterHasRare = 1 - chanceBoosterHasMythic;
-      let wantedText =
-        "<abbr title='missing copy of a card in a current deck'>wanted</abbr>";
-
-      // chance that the next booster opened contains a rare missing from one of our decks
-      let possibleRares = setStats["rare"].unique - setStats["rare"].complete;
-      let chanceBoosterRareWanted = (
-        (chanceBoosterHasRare * setStats["rare"].uniqueWanted) /
-        possibleRares
-      ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
-      let rareWantedDiv = createDiv(["stats_set_completion"]);
-      let rareWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
-      rareWantedIcon.style.height = "30px";
-      let rareWantedSpan = document.createElement("span");
-      rareWantedSpan.innerHTML = `<i>~${chanceBoosterRareWanted} chance next booster has ${wantedText} rare.</i>`;
-      rareWantedSpan.style.fontSize = "13px";
-      rareWantedIcon.appendChild(rareWantedSpan);
-      rareWantedDiv.appendChild(rareWantedIcon);
-      substats.appendChild(rareWantedDiv);
-
-      // chance that the next booster opened contains a mythic missing from one of our decks
-      let possibleMythics =
-        setStats["mythic"].unique - setStats["mythic"].complete;
-      let chanceBoosterMythicWanted = (
-        (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted) /
-        possibleMythics
-      ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
-      let mythicWantedDiv = createDiv(["stats_set_completion"]);
-      let mythicWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
-      mythicWantedIcon.style.height = "30px";
-      let mythicWantedSpan = document.createElement("span");
-      mythicWantedSpan.innerHTML = `<i>~${chanceBoosterMythicWanted} chance next booster has ${wantedText} mythic.</i>`;
-      mythicWantedSpan.style.fontSize = "13px";
-      mythicWantedIcon.appendChild(mythicWantedSpan);
-      mythicWantedDiv.appendChild(mythicWantedIcon);
-      substats.appendChild(mythicWantedDiv);
+  let wanted = {};
+  let missing = {};
+  CARD_RARITIES.forEach(rarity => {
+    const countStats = setStats[rarity];
+    if (countStats.total > 0) {
+      const capitalizedRarity = rarity[0].toUpperCase() + rarity.slice(1) + "s";
+      let compDiv = renderCompletionDiv(
+        countStats,
+        "wc_" + rarity + ".png",
+        capitalizedRarity
+      );
+      compDiv.style.opacity = 1;
+      substats.appendChild(compDiv);
     }
+    wanted[rarity] = countStats.wanted;
+    missing[rarity] = countStats.total - countStats.owned;
   });
 
-  return setDiv;
+  // If the set has a collationId, it means boosters for it exists
+  if (db.sets[setName] && db.sets[setName].collation) {
+    let chanceBoosterHasMythic = 0.125; // assume 1/8 of packs have a mythic
+    let chanceBoosterHasRare = 1 - chanceBoosterHasMythic;
+    let wantedText =
+      "<abbr title='missing copy of a card in a current deck'>wanted</abbr>";
+
+    // chance that the next booster opened contains a rare missing from one of our decks
+    let possibleRares = setStats["rare"].unique - setStats["rare"].complete;
+    let chanceBoosterRareWanted = (
+      (chanceBoosterHasRare * setStats["rare"].uniqueWanted) /
+      possibleRares
+    ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
+    let rareWantedDiv = createDiv(["stats_set_completion"]);
+    let rareWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
+    rareWantedIcon.style.height = "30px";
+    let rareWantedSpan = document.createElement("span");
+    rareWantedSpan.innerHTML = `<i>~${chanceBoosterRareWanted} chance next booster has ${wantedText} rare.</i>`;
+    rareWantedSpan.style.fontSize = "13px";
+    rareWantedIcon.appendChild(rareWantedSpan);
+    rareWantedDiv.appendChild(rareWantedIcon);
+    substats.appendChild(rareWantedDiv);
+
+    // chance that the next booster opened contains a mythic missing from one of our decks
+    let possibleMythics =
+      setStats["mythic"].unique - setStats["mythic"].complete;
+    let chanceBoosterMythicWanted = (
+      (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted) /
+      possibleMythics
+    ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
+    let mythicWantedDiv = createDiv(["stats_set_completion"]);
+    let mythicWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
+    mythicWantedIcon.style.height = "30px";
+    let mythicWantedSpan = document.createElement("span");
+    mythicWantedSpan.innerHTML = `<i>~${chanceBoosterMythicWanted} chance next booster has ${wantedText} mythic.</i>`;
+    mythicWantedSpan.style.fontSize = "13px";
+    mythicWantedIcon.appendChild(mythicWantedSpan);
+    mythicWantedDiv.appendChild(mythicWantedIcon);
+    substats.appendChild(mythicWantedDiv);
+  }
 }
 
 //
