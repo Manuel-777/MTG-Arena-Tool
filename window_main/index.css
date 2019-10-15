@@ -3577,6 +3577,11 @@ a:hover {
     margin: 16px;
 }
 
+.timeline_top {
+    display: flex;
+    margin: 16px;
+}
+
 .completion_table {
     width: 100%;
     max-width: 600px;

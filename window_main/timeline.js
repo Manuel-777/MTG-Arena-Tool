@@ -11,6 +11,7 @@ const _ = require("lodash");
 
 const { hideLoadingBars, resetMainContainer } = require("./renderer-util");
 const { get_rank_index } = require("../shared/util");
+const { createSelect } = require("../shared/select");
 const { createDiv } = require("../shared/dom-fns");
 
 function getRankY(rank, tier, steps) {
@@ -38,13 +39,43 @@ function getRankY(rank, tier, steps) {
   return value + 6 * (4 - tier) + steps;
 }
 
+const CONSTRUCTED = "Constructed";
+const LIMITED = "Limited";
+
+let seasonType = CONSTRUCTED;
+
 function openTimelineTab() {
   hideLoadingBars();
   const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
-  let seasonType = "constructed";
+  mainDiv.style.flexDirection = "column";
+
+  let topButtons = createDiv(["timeline_top"]);
+
+  let onlyBoostersLabel = document.createElement("label");
+  onlyBoostersLabel.innerHTML = "Season: ";
+  topButtons.appendChild(onlyBoostersLabel);
+
+  // Season mode
+  const displayModeDiv = createDiv(["stats_count_div"]);
+  const displayModeSelect = createSelect(
+    displayModeDiv,
+    [CONSTRUCTED, LIMITED],
+    seasonType,
+    selectedMode => {
+      seasonType = selectedMode;
+      openTimelineTab();
+    },
+    "stats_mode_select"
+  );
+  displayModeSelect.style.textAlign = "left";
+  topButtons.appendChild(displayModeSelect);
+
+  mainDiv.appendChild(topButtons);
+
   let chartDiv = createDiv(["chartdiv"]);
 
+  // Draw chart
   let season = playerData.rank.constructed.seasonOrdinal;
   let chartData = playerData.seasonalRank(season, seasonType);
 
@@ -95,7 +126,7 @@ function openTimelineTab() {
   var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
   dateAxis.skipEmptyPeriods = true;
   dateAxis.renderer.minGridDistance = 40;
-  dateAxis.tooltipDateFormat = "HH:mm";
+  dateAxis.tooltipDateFormat = "dd/MM/yyyy, HH:mm";
 
   var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
   valueAxis.title.text = "Rank";
@@ -108,7 +139,7 @@ function openTimelineTab() {
   series.tooltip.pointerOrientation = "vertical";
   series.dataFields.valueY = "yPos";
   series.dataFields.dateX = "date";
-  series.sequencedInterpolation = true;
+  //series.sequencedInterpolation = true;
   series.strokeWidth = 3;
   series.fillOpacity = 0.5;
   series.minBulletDistance = 1;
