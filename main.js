@@ -587,7 +587,7 @@ function createOverlayWindow() {
     overlay.webContents.send("settings_updated");
     // only show overlay after its ready
     // TODO does this work with Linux transparency???
-    setTimeout(() => overlay.show(), 1000);
+    //setTimeout(() => overlay.show(), 1000);
   });
 
   return overlay;

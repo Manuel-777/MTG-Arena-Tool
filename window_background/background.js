@@ -555,12 +555,16 @@ function loadPlayerConfig(playerId, serverData = undefined) {
     requestSync.economy = serverData.economy.filter(
       id => !(id in __playerData)
     );
+    requestSync.seasonal = serverData.seasonal.filter(
+      id => !(id in __playerData)
+    );
 
     const itemCount =
       requestSync.courses.length +
       requestSync.matches.length +
       requestSync.drafts.length +
-      requestSync.economy.length;
+      requestSync.economy.length +
+      requestSync.seasonal.length;
 
     if (itemCount) {
       ipc_send("ipc_log", "Fetch remote player items: " + itemCount);
@@ -642,6 +646,15 @@ function syncUserData(data) {
       setData({ [id]: doc }, false);
     });
   if (debugLog || !firstPass) store.set("draft_index", draft_index);
+
+  // Sync seasonal
+  data.seasonal.forEach(doc => {
+    const id = doc._id;
+    doc.id = id;
+    delete doc._id;
+    if (debugLog || !firstPass)
+      playerData.addSeasonalRank(doc, false, doc.rankUpdateType);
+  });
 
   if (data.settings.tags_colors) {
     let newTags = data.settings.tags_colors;

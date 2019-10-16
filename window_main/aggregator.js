@@ -8,7 +8,6 @@ const subDays = require("date-fns/subDays");
 const {
   COLORS_ALL,
   COLORS_BRIEF,
-  CONSTRUCTED_EVENTS,
   DATE_ALL_TIME,
   DATE_LAST_30,
   DATE_LAST_DAY,
@@ -37,13 +36,6 @@ const ALL_DRAFTS = "All Drafts";
 const DRAFT_REPLAYS = "Draft Replays";
 // Event-related constant
 const ALL_EVENT_TRACKS = "All Event Tracks";
-const SINGLE_MATCH_EVENTS = [
-  "AIBotMatch",
-  "DirectGame",
-  "Play",
-  "Ladder",
-  "Traditional_Ladder"
-];
 
 // Archetype constants
 const NO_ARCH = "No Archetype";

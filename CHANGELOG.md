@@ -1,3 +1,18 @@
+## <small>2.12.3 (2019-10-16)</small>
+
+* bugfix ([469211e](https://github.com/Manuel-777/MTG-Arena-Tool/commit/469211e))
+* constructed events constant ([8e7300f](https://github.com/Manuel-777/MTG-Arena-Tool/commit/8e7300f))
+* edit mode - hover card ([662f0c3](https://github.com/Manuel-777/MTG-Arena-Tool/commit/662f0c3))
+* mythic rank update ([85af02f](https://github.com/Manuel-777/MTG-Arena-Tool/commit/85af02f))
+* save to store ([c7b4a18](https://github.com/Manuel-777/MTG-Arena-Tool/commit/c7b4a18))
+* seasonal http send ([ca1d249](https://github.com/Manuel-777/MTG-Arena-Tool/commit/ca1d249))
+* Separate data from index ([552b738](https://github.com/Manuel-777/MTG-Arena-Tool/commit/552b738))
+* sync seasonal ([1f7c4a0](https://github.com/Manuel-777/MTG-Arena-Tool/commit/1f7c4a0))
+* track season rank ([9ec8a27](https://github.com/Manuel-777/MTG-Arena-Tool/commit/9ec8a27))
+* Update player-data.js ([5cef87b](https://github.com/Manuel-777/MTG-Arena-Tool/commit/5cef87b))
+
+
+
 ## <small>2.12.2 (2019-10-14)</small>
 
 * bugfix ([c84edd1](https://github.com/Manuel-777/MTG-Arena-Tool/commit/c84edd1))

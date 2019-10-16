@@ -26,7 +26,7 @@
   "homepage": "https://mtgatool.com/",
   "repository": "https://github.com/Manuel-777/MTG-Arena-Tool",
   "bugs": "https://github.com/Manuel-777/MTG-Arena-Tool/issues",
-  "version": "2.12.2",
+  "version": "2.12.3",
   "main": "main.js",
   "build": {
     "appId": "com.github.manuel777.mtgatool",

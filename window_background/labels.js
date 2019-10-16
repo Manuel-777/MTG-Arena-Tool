@@ -48,6 +48,7 @@ const { get_deck_colors, objectClone, replaceAll } = require("../shared/util");
 
 const {
   httpSetMythicRank,
+  httpSetSeasonal,
   httpSubmitCourse,
   httpTournamentCheck
 } = require("./http-api");
@@ -363,11 +364,17 @@ function onLabelRankUpdated(entry, json) {
   rank[updateType].step = json.newStep;
   rank[updateType].seasonOrdinal = json.seasonOrdinal;
 
+  json.id = sha1(
+    updateType + json.seasonOrdinal + json.lastMatchId + json.date
+  );
+
   let seasonal_rank = playerData.addSeasonalRank(
     json,
     json.seasonOrdinal,
     updateType
   );
+
+  httpSetSeasonal(json);
 
   setData({ rank, seasonal_rank });
   if (debugLog || !firstPass) {
