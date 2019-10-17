@@ -652,8 +652,21 @@ function syncUserData(data) {
     const id = doc._id;
     doc.id = id;
     delete doc._id;
-    if (debugLog || !firstPass)
-      playerData.addSeasonalRank(doc, false, doc.rankUpdateType);
+
+    let seasonal_rank = playerData.addSeasonalRank(
+      doc,
+      doc.seasonOrdinal,
+      doc.rankUpdateType
+    );
+    setData({ seasonal_rank });
+
+    const seasonal = { ...playerData.seasonal, [id]: doc };
+    setData({ seasonal });
+
+    if (debugLog || !firstPass) {
+      store.set("seasonal." + id, doc);
+      store.set("seasonal_rank", seasonal_rank);
+    }
   });
 
   if (data.settings.tags_colors) {
@@ -662,7 +675,12 @@ function syncUserData(data) {
     store.set("tags_colors", newTags);
   }
 
-  setData({ courses_index, draft_index, economy_index, matches_index });
+  setData({
+    courses_index,
+    draft_index,
+    economy_index,
+    matches_index
+  });
 }
 
 // Merges settings and updates singletons across processes

@@ -279,7 +279,6 @@ class PlayerData {
     this.matchExists = this.matchExists.bind(this);
     this.seasonalExists = this.seasonalExists.bind(this);
     this.deckChanges = this.deckChanges.bind(this);
-    this.seasonalRank = this.seasonalRank.bind(this);
 
     Object.assign(this, {
       ...playerDataDefault,
@@ -434,32 +433,27 @@ class PlayerData {
     return id in this.seasonal;
   }
 
-  seasonalRank(seasonOrdinal, type = "constructed") {
-    let seasonTag = seasonOrdinal + "_" + type.toLowerCase();
-
-    // Default if no data is found
-    if (this.seasonal_rank[seasonTag]) {
-      return this.seasonal_rank[seasonTag];
-    } else {
-      this.seasonal_rank[seasonTag] = [];
-      return this.seasonal_rank[seasonTag];
-    }
-  }
-
   // I was not sure weter it was correct to include this here or in the
   // utilities file. here its easier to handle the data.
   addSeasonalRank(rank, seasonOrdinal, type = "constructed") {
     if (!seasonOrdinal && rank.seasonOrdinal) {
       seasonOrdinal = rank.seasonOrdinal;
     }
-    let seasonData = this.seasonalRank(seasonOrdinal, type.toLowerCase());
+
+    let seasonTag = seasonOrdinal + "_" + type.toLowerCase();
+    if (!this.seasonal_rank[seasonTag]) {
+      this.seasonal_rank[seasonTag] = [];
+    }
 
     // Check if this entry exists in the season data.
+    console.log("id: " + rank.id, this.seasonalExists(rank.id));
     if (!this.seasonalExists(rank.id)) {
-      seasonData.push(rank.id);
+      console.log("ADDD");
+      this.seasonal_rank[seasonTag].push(rank.id);
       this.seasonal[rank.id] = rank;
     }
 
+    // Return tag for references?
     return this.seasonal_rank;
   }
 
