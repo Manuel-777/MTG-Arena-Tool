@@ -76,29 +76,36 @@ function openTimelineTab() {
   let chartDiv = createDiv(["chartdiv"]);
 
   // Draw chart
-  let season = playerData.rank.constructed.seasonOrdinal;
-  let chartData = playerData.seasonalRank(season, seasonType);
+  let seasonOrdinal = playerData.rank.constructed.seasonOrdinal;
+  let seasonTag = seasonOrdinal + "_" + seasonType.toLowerCase();
+
+  let chartData = playerData.seasonal_rank[seasonTag];
+  if (!chartData) {
+    chartData = [];
+  }
 
   chartData = _.orderBy(
-    chartData.map(obj => {
-      let yPos = getRankY(obj.newClass, obj.newLevel, obj.newStep);
-      obj.date = new Date(obj.timestamp);
+    chartData
+      .map(_id => playerData.seasonal[_id])
+      .map(obj => {
+        let yPos = getRankY(obj.newClass, obj.newLevel, obj.newStep);
+        obj.date = new Date(obj.timestamp);
 
-      let match = playerData[obj.lastMatchId];
-      obj.deck = false;
-      obj.deckId = match.playerDeck.id;
-      obj.deckName = match.playerDeck.name;
-      obj.deckColors = match.playerDeck.colors;
+        let match = playerData[obj.lastMatchId];
+        obj.deck = false;
+        obj.deckId = match.playerDeck.id;
+        obj.deckName = match.playerDeck.name;
+        obj.deckColors = match.playerDeck.colors;
 
-      if (obj.oldLevel !== obj.newLevel) {
-        obj.bullet = `../images/rank_${seasonType.toLowerCase()}/${
-          obj.newClass
-        }_${obj.newLevel}.png`;
-      } else {
-        obj.bullet = "";
-      }
-      return { ...obj, yPos };
-    }),
+        if (obj.oldLevel !== obj.newLevel) {
+          obj.bullet = `../images/rank_${seasonType.toLowerCase()}/${
+            obj.newClass
+          }_${obj.newLevel}.png`;
+        } else {
+          obj.bullet = "";
+        }
+        return { ...obj, yPos };
+      }),
     ["date"],
     ["asc"]
   );
@@ -124,7 +131,7 @@ function openTimelineTab() {
 
   // Create axes
   var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-  dateAxis.skipEmptyPeriods = true;
+  //dateAxis.skipEmptyPeriods = true;
   dateAxis.renderer.minGridDistance = 40;
   dateAxis.tooltipDateFormat = "dd/MM/yyyy, HH:mm";
 
@@ -166,6 +173,7 @@ function openTimelineTab() {
   chart.cursor.snapToSeries = series;
 
   mainDiv.appendChild(chartDiv);
+
 }
 
 module.exports = { openTimelineTab: openTimelineTab, getRankY: getRankY };
