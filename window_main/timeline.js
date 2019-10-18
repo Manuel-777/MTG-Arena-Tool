@@ -173,7 +173,6 @@ function openTimelineTab() {
   chart.cursor.snapToSeries = series;
 
   mainDiv.appendChild(chartDiv);
-
 }
 
 module.exports = { openTimelineTab: openTimelineTab, getRankY: getRankY };
