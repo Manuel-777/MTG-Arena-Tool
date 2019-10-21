@@ -33,7 +33,7 @@ let daysago = 0;
 let dayList = [];
 let sortedChanges = [];
 
-class economyDay {
+class EconomyDay {
   constructor(
     goldEarned = 0,
     gemsEarned = 0,
@@ -810,7 +810,7 @@ function createEconomyUI(mainDiv) {
       daysago != differenceInCalendarDays(new Date(), new Date(change.date))
     ) {
       daysago = differenceInCalendarDays(new Date(), new Date(change.date));
-      dayList[daysago] = new economyDay();
+      dayList[daysago] = new EconomyDay();
       // console.log("new day", change.date);
     }
 

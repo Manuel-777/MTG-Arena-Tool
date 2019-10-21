@@ -823,7 +823,7 @@ function openSetStats(setStats, setName) {
   // Draw completion table for this set
   if (setName != "Complete collection") {
     const table = createDiv(["completion_table"]);
-    for (var c = 0; c < 7; c++) {
+    for (let c = 0; c < 7; c++) {
       let tile = "";
       if (c + 1 == MULTI) tile = "mana_multi";
       if (c + 1 == COLORLESS) tile = "mana_colorless";
@@ -837,7 +837,7 @@ function openSetStats(setStats, setName) {
       cell.style.gridArea = `1 / ${c * 5 + 1} / auto / ${c * 5 + 6}`;
       table.appendChild(cell);
 
-      for (var r = 0; r < 4; r++) {
+      for (let r = 0; r < 4; r++) {
         const rarity = CARD_RARITIES[r];
         const cell = createDiv(["completion_table_rarity_title", rarity]);
         cell.title = rarity;

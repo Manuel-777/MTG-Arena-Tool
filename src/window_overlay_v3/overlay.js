@@ -1,29 +1,7 @@
 import { ipcRenderer as ipc, webFrame, remote } from "electron";
 import interact from "interactjs";
 import format from "date-fns/format";
-
-if (!remote.app.isPackaged) {
-  const { openNewGitHubIssue, debugInfo } = require("electron-util");
-  const unhandled = require("electron-unhandled");
-  unhandled({
-    showDialog: true,
-    reportButton: error => {
-      openNewGitHubIssue({
-        user: "Manuel-777",
-        repo: "MTG-Arena-Tool",
-        body: `\`\`\`\n${error.stack}\n\`\`\`\n\n---\n\n${debugInfo()}`
-      });
-    }
-  });
-  const Sentry = require("@sentry/electron");
-  Sentry.init({
-    dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
-  });
-}
-
 import TransparencyMouseFix from "./electron-transparency-mouse-fix.js";
-let fix = null;
-
 import striptags from "striptags";
 import db from "../shared/database";
 import pd from "../shared/player-data";
@@ -63,6 +41,27 @@ import {
   OVERLAY_DRAFT_BREW,
   OVERLAY_DRAFT_MODES
 } from "../shared/constants.js";
+import { openNewGitHubIssue, debugInfo } from "electron-util";
+import unhandled from "electron-unhandled";
+import * as Sentry from "@sentry/electron";
+
+let fix = null;
+
+if (!remote.app.isPackaged) {
+  unhandled({
+    showDialog: true,
+    reportButton: error => {
+      openNewGitHubIssue({
+        user: "Manuel-777",
+        repo: "MTG-Arena-Tool",
+        body: `\`\`\`\n${error.stack}\n\`\`\`\n\n---\n\n${debugInfo()}`
+      });
+    }
+  });
+  Sentry.init({
+    dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
+  });
+}
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -436,10 +435,9 @@ function updateMatchView(index) {
   queryElements(deckColorsDom)[0].innerHTML = "";
   queryElements(deckNameDom)[0].innerHTML = "";
 
-  let deckListDiv;
   const overlayMode = settings.mode;
 
-  deckListDiv = queryElements(deckListDom)[0];
+  const deckListDiv = queryElements(deckListDom)[0];
   if (overlayMode === OVERLAY_LOG) {
     // Action Log Mode
     queryElements(deckNameDom)[0].innerHTML = "Action Log";

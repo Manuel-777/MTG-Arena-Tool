@@ -1,24 +1,24 @@
 {
-  "parser": "@typescript-eslint/parser",
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier/@typescript-eslint", "plugin:prettier/recommended"],
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaVersion": 9,
-    "project": "./tsconfig.json"
-  },
-  "env": {
-    "node": true
-  },
-  "rules": {
-    "allowEmptyCatch": true,
-    "no-cond-assign": 0,
-    "no-console": "off",
-    "no-unused-vars": "warn",
-    "no-redeclare": "warn",
-    "no-undef": "error",
-    "no-global-assign": "warn",
-    "no-empty": "warn",
-    "complexity": ["warn", 40],
-    "max-statements": ["warn", 100]
-  }
+    "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 9
+    },
+    "env": {
+      "es6": true,
+      "node": true,
+      "browser": true
+    },
+    "rules": {
+      "allowEmptyCatch": true,
+      "no-cond-assign": 0,
+      "no-console": "off",
+      "no-unused-vars": "warn",
+      "no-redeclare": "warn",
+      "no-undef": "error",
+      "no-global-assign": "warn",
+      "no-empty": "warn",
+      "complexity": ["warn", 40],
+      "max-statements": ["warn", 100]
+    }
 }

@@ -562,8 +562,7 @@ function getCardsTypeZone() {
             obj.cardTypes
               .filter(cardType => cardTypes.includes(cardType))
               .forEach(cardType => {
-                let grpId;
-                grpId = obj.grpId;
+                const grpId = obj.grpId;
                 const owner = obj.controllerSeatId;
                 if (!data[owner]) data[owner] = {};
                 if (!data[owner][zoneType]) data[owner][zoneType] = {};

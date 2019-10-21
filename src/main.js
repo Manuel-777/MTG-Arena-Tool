@@ -5,6 +5,9 @@ import fs from "fs";
 import { autoUpdater } from "electron-updater";
 import Store from "electron-store";
 import { format as formatUrl } from "url";
+import electronDebug from "electron-debug";
+import * as Sentry from "@sentry/electron";
+import devtron from "devtron";
 
 const rememberStore = new Store({
   name: "remember",
@@ -21,7 +24,7 @@ import {
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
 // Adds debug features like hotkeys for triggering dev tools and reload
-require("electron-debug")({ showDevTools: false });
+electronDebug({ showDevTools: false });
 console.log(process.platform);
 
 const debugBack = false;
@@ -68,11 +71,10 @@ app.on("ready", () => {
   if (app.isPackaged) {
     startUpdater();
   } else {
-    const Sentry = require("@sentry/electron");
     Sentry.init({
       dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
     });
-    require("devtron").install();
+    devtron.install();
     startApp();
   }
 });

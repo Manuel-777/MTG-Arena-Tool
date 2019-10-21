@@ -23,20 +23,40 @@ class Colors {
     return this;
   }
 
+  get w() {
+    return this._w;
+  }
+
   set w(number) {
     this._w = number;
+  }
+
+  get u() {
+    return this._u;
   }
 
   set u(number) {
     this._u = number;
   }
 
+  get b() {
+    return this._b;
+  }
+
   set b(number) {
     this._b = number;
   }
 
+  get r() {
+    return this._r;
+  }
+
   set r(number) {
     this._r = number;
+  }
+
+  get g() {
+    return this._g;
   }
 
   set g(number) {
@@ -153,26 +173,6 @@ class Colors {
       return true;
 
     return false;
-  }
-
-  get w() {
-    return this._w;
-  }
-
-  get u() {
-    return this._u;
-  }
-
-  get b() {
-    return this._b;
-  }
-
-  get r() {
-    return this._r;
-  }
-
-  get g() {
-    return this._g;
   }
 }
 

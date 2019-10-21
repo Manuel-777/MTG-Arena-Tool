@@ -730,9 +730,11 @@ function generateChecks(state, seat) {
   const checks = createDiv(["tou_check_cont"]);
 
   state.forEach((c, index) => {
-    let ch;
     const ss = index % 2;
-    ch = createDiv(["tou_check", c ? "green_bright_bg" : "red_bright_bg"]);
+    const ch = createDiv([
+      "tou_check",
+      c ? "green_bright_bg" : "red_bright_bg"
+    ]);
     ch.title = ss == seat ? "You" : tou.current_opponent.slice(0, -6);
     checks.appendChild(ch);
   });

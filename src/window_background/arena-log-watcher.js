@@ -50,6 +50,7 @@ import {
 import { ARENA_MODE_MATCH, ARENA_MODE_DRAFT } from "../shared/constants";
 import update_deck from "./updateDeck";
 import globals from "./globals";
+import * as httpApi from "./http-api";
 
 const debugLogSpeed = 0.001;
 let logReadEnd = null;
@@ -482,7 +483,6 @@ function finishLoading() {
 
     if (playerData.name) {
       // This needs to be triggered somewhere else
-      const httpApi = require("./http-api");
       httpApi.httpSetPlayer(
         playerData.name,
         playerData.rank.constructed.rank,
