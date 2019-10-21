@@ -104,39 +104,49 @@ let currentMatch = null;
 let arenaState = ARENA_MODE_IDLE;
 let editMode = false;
 
+function getVisible(settings) {
+  if (!settings) return false;
+
+  const currentModeApplies =
+    (OVERLAY_DRAFT_MODES.includes(settings.mode) &&
+      arenaState === ARENA_MODE_DRAFT) ||
+    (!OVERLAY_DRAFT_MODES.includes(settings.mode) &&
+      arenaState === ARENA_MODE_MATCH);
+
+  return settings.show && (currentModeApplies || settings.show_always);
+}
+
 function ipcSend(method, arg, to = IPC_BACKGROUND) {
   ipc.send("ipc_switch", method, IPC_OVERLAY, arg, to);
 }
 
-ipc.on("set_arena_state", function(event, arg) {
-  arenaState = arg;
+function saveOverlaysPosition() {
+  // Update each overlay with the new dimensions
+  const overlays = [...pd.settings.overlays];
+  const forceInt = num => Math.round(parseFloat(num));
 
-  // Change how cards hover are drawn if we are in a draft
-  setRenderer(1);
-  if (arenaState == ARENA_MODE_DRAFT) {
-    setRenderer(2);
-  }
-  settingsUpdated();
-});
+  overlays.forEach((_overlay, index) => {
+    const overlayDiv = byId("overlay_" + (index + 1));
+    const bounds = {
+      width: forceInt(overlayDiv.style.width),
+      height: forceInt(overlayDiv.style.height),
+      x: forceInt(overlayDiv.style.left),
+      y: forceInt(overlayDiv.style.top)
+    };
+    const newOverlay = {
+      ...overlays[index], // old overlay
+      bounds // new setting
+    };
+    overlays[index] = newOverlay;
+  });
 
-ipc.on("set_timer", function(event, arg) {
-  if (arg == -1) {
-    matchBeginTime = Date.now();
-  } else if (arg !== 0) {
-    //matchBeginTime = arg == 0 ? 0 : Date.parse(arg);
-    matchBeginTime = Date.parse(arg);
-  }
-});
-
-ipc.on("set_priority_timer", function(event, arg) {
-  if (arg) {
-    priorityTimers = arg;
-  }
-});
-
-ipc.on("edit", () => {
-  toggleEditMode();
-});
+  const hoverDiv = byId("overlay_hover");
+  const overlayHover = {
+    x: forceInt(hoverDiv.style.left),
+    y: forceInt(hoverDiv.style.top)
+  };
+  ipcSend("save_user_settings", { overlays, overlayHover, skip_refresh: true });
+}
 
 function toggleEditMode() {
   editMode = !editMode;
@@ -211,199 +221,166 @@ function toggleEditMode() {
   }
 }
 
-function saveOverlaysPosition() {
-  // Update each overlay with the new dimensions
-  const overlays = [...pd.settings.overlays];
-  const forceInt = num => Math.round(parseFloat(num));
+function changeBackground(index, arg = "default") {
+  if (!arg) return;
 
-  overlays.forEach((_overlay, index) => {
-    const overlayDiv = byId("overlay_" + (index + 1));
-    const bounds = {
-      width: forceInt(overlayDiv.style.width),
-      height: forceInt(overlayDiv.style.height),
-      x: forceInt(overlayDiv.style.left),
-      y: forceInt(overlayDiv.style.top)
-    };
-    const newOverlay = {
-      ...overlays[index], // old overlay
-      bounds // new setting
-    };
-    overlays[index] = newOverlay;
-  });
-
-  const hoverDiv = byId("overlay_hover");
-  const overlayHover = {
-    x: forceInt(hoverDiv.style.left),
-    y: forceInt(hoverDiv.style.top)
-  };
-  ipcSend("save_user_settings", { overlays, overlayHover, skip_refresh: true });
-}
-
-ipc.on("close", (event, arg) => {
-  close(arg.action, arg.index);
-});
-
-ipc.on("action_log", function(event, arg) {
-  arg.str = striptags(arg.str, ["log-card", "log-ability"]);
-
-  actionLog.push(arg);
-  if (arg.seat == -99) {
-    actionLog = [];
-  }
-  actionLog.sort(compare_logs);
-  //console.log(arg.seat, arg.str);
-});
-
-ipc.on("settings_updated", settingsUpdated);
-
-function settingsUpdated() {
-  // mid-match Arena updates can make edit-mode difficult
-  // temporarily allow the overlays to go stale during editing
-  // (should be okay since ending edit-mode causes a refresh)
-  if (editMode) return;
-
-  console.log(window.innerWidth, window.innerHeight);
-  const hoverContainer = byId("overlay_hover");
-  if (pd.settings.overlayHover) {
-    hoverContainer.style.left = `${pd.settings.overlayHover.x}px`;
-    hoverContainer.style.top = `${pd.settings.overlayHover.y}px`;
+  const mainWrapper = queryElements(
+    `#overlay_${index + 1} .overlay_bg_image`
+  )[0];
+  if (arg === "default") {
+    if (pd.settings.back_url && pd.settings.back_url !== "default") {
+      mainWrapper.style.backgroundImage = "url(" + pd.settings.back_url + ")";
+    } else {
+      mainWrapper.style.backgroundImage = "url(" + DEFAULT_BACKGROUND + ")";
+    }
   } else {
-    hoverContainer.style.left = `${window.innerWidth / 2 -
-      pd.cardsSizeHoverCard / 2}px`;
-    hoverContainer.style.top = `${window.innerHeight -
-      pd.cardsSizeHoverCard / 0.71808510638 -
-      50}px`;
-  }
-
-  webFrame.setZoomFactor(pd.settings.overlay_scale / 100);
-  pd.settings.overlays.forEach((_overlay, index) => {
-    const overlayDiv = byId("overlay_" + (index + 1));
-    overlayDiv.style.height = _overlay.bounds.height + "px";
-    overlayDiv.style.width = _overlay.bounds.width + "px";
-    overlayDiv.style.left = _overlay.bounds.x + "px";
-    overlayDiv.style.top = _overlay.bounds.y + "px";
-
-    if (getVisible(_overlay)) {
-      overlayDiv.style.opacity = "1";
-      overlayDiv.style.visibility = "visible";
-    } else {
-      overlayDiv.style.opacity = "0";
-      overlayDiv.style.visibility = "hidden";
-    }
-
-    change_background(index, pd.settings.back_url);
-
-    const deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
-    const deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
-    const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
-    const clockDom = `#overlay_${index + 1} .overlay_clock_container`;
-    const bgImageDom = `#overlay_${index + 1} .overlay_bg_image`;
-    const elementsDom = `#overlay_${index + 1} .elements_wrapper`;
-    const topDom = `#overlay_${index + 1} .top_nav_wrapper`;
-    const mainHoverDom = ".main_hover";
-
-    queryElements(bgImageDom)[0].style.opacity = _overlay.alpha_back.toString();
-    queryElements(elementsDom)[0].style.opacity = _overlay.alpha.toString();
-
-    queryElements(topDom)[0].style = "";
-    queryElements(topDom)[0].style.display = _overlay.top ? "" : "none";
-    queryElements(deckNameDom)[0].style = "";
-    queryElements(deckNameDom)[0].style.display = _overlay.title ? "" : "none";
-    queryElements(deckColorsDom)[0].style = "";
-    queryElements(deckColorsDom)[0].style.display = _overlay.title
-      ? ""
-      : "none";
-
-    queryElements(deckListDom)[0].style.display = _overlay.deck ? "" : "none";
-    queryElements(mainHoverDom)[0].style.width = pd.cardsSizeHoverCard + "px";
-    queryElements(mainHoverDom)[0].style.height =
-      pd.cardsSizeHoverCard / 0.71808510638 + "px";
-
-    const showClock =
-      _overlay.clock && !OVERLAY_DRAFT_MODES.includes(_overlay.mode);
-    queryElements(clockDom)[0].style.display = showClock ? "" : "none";
-
-    if (OVERLAY_DRAFT_MODES.includes(_overlay.mode)) {
-      updateDraftView(index);
-    } else {
-      updateMatchView(index);
-    }
-  });
-}
-
-function getVisible(settings) {
-  if (!settings) return false;
-
-  const currentModeApplies =
-    (OVERLAY_DRAFT_MODES.includes(settings.mode) &&
-      arenaState === ARENA_MODE_DRAFT) ||
-    (!OVERLAY_DRAFT_MODES.includes(settings.mode) &&
-      arenaState === ARENA_MODE_MATCH);
-
-  return settings.show && (currentModeApplies || settings.show_always);
-}
-
-ipc.on("set_draft_cards", (event, draft) => {
-  currentDraft = draft;
-  pd.settings.overlays.forEach((_overlay, index) => {
-    if (!OVERLAY_DRAFT_MODES.includes(_overlay.mode)) return;
-    updateDraftView(index, currentDraft.packNumber, currentDraft.pickNumber);
-  });
-});
-
-ipc.on("set_turn", (event, arg) => {
-  const { playerSeat: _we, turnPriority: _priority } = arg;
-  playerSeat = _we;
-  if (
-    turnPriority != _priority &&
-    _priority == playerSeat &&
-    pd.settings.sound_priority
-  ) {
-    //    playBlip();
-    const { Howl, Howler } = require("howler");
-    const sound = new Howl({ src: ["../sounds/blip.mp3"] });
-    Howler.volume(pd.settings.sound_priority_volume);
-    sound.play();
-  }
-  //turnPhase = _phase;
-  //turnStep = _step;
-  //turnNumber = _number;
-  //turnActive = _active;
-  turnPriority = _priority;
-  //turnDecision = _decision;
-
-  pd.settings.overlays.forEach((_overlay, index) => {
-    const clockTurnDom = `#overlay_${index + 1} .clock_turn`;
-    if (clockMode[index] === 0) {
-      recreateClock(index);
-    }
-    if (clockMode[index] > 0) {
-      if (turnPriority === playerSeat) {
-        queryElements(clockTurnDom)[0].innerHTML = "You have priority.";
+    const xhr = new XMLHttpRequest();
+    xhr.open("HEAD", arg);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        mainWrapper.style.backgroundImage = "url(" + arg + ")";
       } else {
-        queryElements(clockTurnDom)[0].innerHTML = `${oppName} has priority.`;
+        mainWrapper.style.backgroundImage = "";
       }
+    };
+    xhr.send();
+  }
+}
+
+function compareQuantity(a, b) {
+  return b.quantity - a.quantity;
+}
+
+function attachLandOdds(tile, odds) {
+  const landsDiv = createDiv(["lands_div"]);
+
+  const createManaChanceDiv = function(odds, color) {
+    const cont = createDiv(["mana_cont"], odds + "%");
+    const div = createDiv(["mana_s16", "flex_end", "mana_" + color]);
+    cont.appendChild(div);
+    landsDiv.appendChild(cont);
+  };
+
+  if (odds.landW) createManaChanceDiv(odds.landW, "w");
+  if (odds.landU) createManaChanceDiv(odds.landU, "u");
+  if (odds.landB) createManaChanceDiv(odds.landB, "b");
+  if (odds.landR) createManaChanceDiv(odds.landR, "r");
+  if (odds.landG) createManaChanceDiv(odds.landG, "g");
+
+  tile.addEventListener("mouseover", () => {
+    if (queryElements(".lands_div").length == 0) {
+      queryElements(".overlay_hover_container")[0].appendChild(landsDiv);
     }
   });
-});
 
-ipc.on("set_match", (event, arg) => {
-  currentMatch = JSON.parse(arg);
-  currentMatch.oppCards = new Deck(currentMatch.oppCards);
-
-  const tempMain = currentMatch.playerCardsLeft.mainDeck;
-  currentMatch.playerCardsLeft = new Deck(currentMatch.playerCardsLeft);
-  currentMatch.playerCardsLeft.mainboard._list = tempMain;
-
-  currentMatch.player.deck = new Deck(currentMatch.player.deck);
-  currentMatch.player.originalDeck = new Deck(currentMatch.player.originalDeck);
-
-  pd.settings.overlays.forEach((_overlay, index) => {
-    if (OVERLAY_DRAFT_MODES.includes(_overlay.mode)) return;
-    recreateClock(index);
-    updateMatchView(index);
+  tile.addEventListener("mouseleave", () => {
+    queryElements(".lands_div").forEach(div => {
+      if (div) {
+        queryElements(".overlay_hover_container")[0].removeChild(div);
+      }
+    });
   });
-});
+}
+
+function drawDeckOdds(index) {
+  const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
+  const deckListDiv = queryElements(deckListDom)[0];
+
+  const navCont = createDiv(["overlay_samplesize_container"]);
+
+  const oddsPrev = createDiv(["odds_prev", "click-on"]);
+  const oddsNext = createDiv(["odds_next", "click-on"]);
+
+  navCont.appendChild(oddsPrev);
+  navCont.appendChild(
+    createDiv(["odds_number"], "Sample size: " + oddsSampleSize)
+  );
+  navCont.appendChild(oddsNext);
+
+  deckListDiv.appendChild(navCont);
+
+  deckListDiv.appendChild(createDiv(["chance_title"])); // Add some space
+
+  const cardOdds = currentMatch.playerCardsOdds;
+
+  deckListDiv.appendChild(
+    createDiv(
+      ["chance_title"],
+      "Creature: " +
+        (cardOdds.chanceCre != undefined ? cardOdds.chanceCre : "0") +
+        "%"
+    )
+  );
+  deckListDiv.appendChild(
+    createDiv(
+      ["chance_title"],
+      "Instant: " +
+        (cardOdds.chanceIns != undefined ? cardOdds.chanceIns : "0") +
+        "%"
+    )
+  );
+  deckListDiv.appendChild(
+    createDiv(
+      ["chance_title"],
+      "Sorcery: " +
+        (cardOdds.chanceSor != undefined ? cardOdds.chanceSor : "0") +
+        "%"
+    )
+  );
+  deckListDiv.appendChild(
+    createDiv(
+      ["chance_title"],
+      "Artifact: " +
+        (cardOdds.chanceArt != undefined ? cardOdds.chanceArt : "0") +
+        "%"
+    )
+  );
+  deckListDiv.appendChild(
+    createDiv(
+      ["chance_title"],
+      "Enchantment: " +
+        (cardOdds.chanceEnc != undefined ? cardOdds.chanceEnc : "0") +
+        "%"
+    )
+  );
+  deckListDiv.appendChild(
+    createDiv(
+      ["chance_title"],
+      "Planeswalker: " +
+        (cardOdds.chancePla != undefined ? cardOdds.chancePla : "0") +
+        "%"
+    )
+  );
+  deckListDiv.appendChild(
+    createDiv(
+      ["chance_title"],
+      "Land: " +
+        (cardOdds.chanceLan != undefined ? cardOdds.chanceLan : "0") +
+        "%"
+    )
+  );
+
+  const oddNextDom = `#overlay_${index + 1} .odds_next`;
+  const oddPrevDom = `#overlay_${index + 1} .odds_prev`;
+  //
+  queryElements(oddPrevDom)[0].addEventListener("click", function() {
+    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
+    oddsSampleSize -= 1;
+    if (oddsSampleSize < 1) {
+      oddsSampleSize = cardsLeft - 1;
+    }
+    ipcSend("set_odds_samplesize", oddsSampleSize);
+  });
+  //
+  queryElements(oddNextDom)[0].addEventListener("click", function() {
+    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
+    oddsSampleSize += 1;
+    if (oddsSampleSize > cardsLeft - 1) {
+      oddsSampleSize = 1;
+    }
+    ipcSend("set_odds_samplesize", oddsSampleSize);
+  });
+}
 
 function updateMatchView(index) {
   if (!currentMatch) return;
@@ -552,7 +529,7 @@ function updateMatchView(index) {
 
   let sortFunc = compare_cards;
   if (overlayMode === OVERLAY_ODDS || overlayMode == OVERLAY_MIXED) {
-    sortFunc = compare_quantity;
+    sortFunc = compareQuantity;
   }
 
   const mainCards = deckToDraw.mainboard;
@@ -670,135 +647,42 @@ function updateMatchView(index) {
   }
 }
 
-function attachLandOdds(tile, odds) {
-  const landsDiv = createDiv(["lands_div"]);
-
-  const createManaChanceDiv = function(odds, color) {
-    const cont = createDiv(["mana_cont"], odds + "%");
-    const div = createDiv(["mana_s16", "flex_end", "mana_" + color]);
-    cont.appendChild(div);
-    landsDiv.appendChild(cont);
-  };
-
-  if (odds.landW) createManaChanceDiv(odds.landW, "w");
-  if (odds.landU) createManaChanceDiv(odds.landU, "u");
-  if (odds.landB) createManaChanceDiv(odds.landB, "b");
-  if (odds.landR) createManaChanceDiv(odds.landR, "r");
-  if (odds.landG) createManaChanceDiv(odds.landG, "g");
-
-  tile.addEventListener("mouseover", () => {
-    if (queryElements(".lands_div").length == 0) {
-      queryElements(".overlay_hover_container")[0].appendChild(landsDiv);
+function getIdsColors(list) {
+  const colors = [];
+  list.forEach(function(grpid) {
+    const cdb = db.card(grpid);
+    if (cdb) {
+      //var card_name = cdb.name;
+      const cardCost = cdb.cost;
+      cardCost.forEach(function(c) {
+        if (c.indexOf("w") !== -1 && !colors.includes(1)) colors.push(1);
+        if (c.indexOf("u") !== -1 && !colors.includes(2)) colors.push(2);
+        if (c.indexOf("b") !== -1 && !colors.includes(3)) colors.push(3);
+        if (c.indexOf("r") !== -1 && !colors.includes(4)) colors.push(4);
+        if (c.indexOf("g") !== -1 && !colors.includes(5)) colors.push(5);
+      });
     }
   });
 
-  tile.addEventListener("mouseleave", () => {
-    queryElements(".lands_div").forEach(div => {
-      if (div) {
-        queryElements(".overlay_hover_container")[0].removeChild(div);
-      }
-    });
-  });
+  return colors;
 }
 
-function drawDeckOdds(index) {
-  const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
-  const deckListDiv = queryElements(deckListDom)[0];
-
-  const navCont = createDiv(["overlay_samplesize_container"]);
-
-  const oddsPrev = createDiv(["odds_prev", "click-on"]);
-  const oddsNext = createDiv(["odds_next", "click-on"]);
-
-  navCont.appendChild(oddsPrev);
-  navCont.appendChild(
-    createDiv(["odds_number"], "Sample size: " + oddsSampleSize)
+function compareDraftPicks(a, b) {
+  const aCard = db.card(a);
+  const bCard = db.card(b);
+  const aColors = new Colors();
+  aColors.addFromCost(aCard.cost);
+  const bColors = new Colors();
+  bColors.addFromCost(bCard.cost);
+  const aType = get_card_type_sort(aCard.type);
+  const bType = get_card_type_sort(bCard.type);
+  return (
+    bCard.rank - aCard.rank ||
+    aColors.length - bColors.length ||
+    aCard.cmc - bCard.cmc ||
+    aType - bType ||
+    aCard.name.localeCompare(bCard.name)
   );
-  navCont.appendChild(oddsNext);
-
-  deckListDiv.appendChild(navCont);
-
-  deckListDiv.appendChild(createDiv(["chance_title"])); // Add some space
-
-  const cardOdds = currentMatch.playerCardsOdds;
-
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Creature: " +
-        (cardOdds.chanceCre != undefined ? cardOdds.chanceCre : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Instant: " +
-        (cardOdds.chanceIns != undefined ? cardOdds.chanceIns : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Sorcery: " +
-        (cardOdds.chanceSor != undefined ? cardOdds.chanceSor : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Artifact: " +
-        (cardOdds.chanceArt != undefined ? cardOdds.chanceArt : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Enchantment: " +
-        (cardOdds.chanceEnc != undefined ? cardOdds.chanceEnc : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Planeswalker: " +
-        (cardOdds.chancePla != undefined ? cardOdds.chancePla : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Land: " +
-        (cardOdds.chanceLan != undefined ? cardOdds.chanceLan : "0") +
-        "%"
-    )
-  );
-
-  const oddNextDom = `#overlay_${index + 1} .odds_next`;
-  const oddPrevDom = `#overlay_${index + 1} .odds_prev`;
-  //
-  queryElements(oddPrevDom)[0].addEventListener("click", function() {
-    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
-    oddsSampleSize -= 1;
-    if (oddsSampleSize < 1) {
-      oddsSampleSize = cardsLeft - 1;
-    }
-    ipcSend("set_odds_samplesize", oddsSampleSize);
-  });
-  //
-  queryElements(oddNextDom)[0].addEventListener("click", function() {
-    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
-    oddsSampleSize += 1;
-    if (oddsSampleSize > cardsLeft - 1) {
-      oddsSampleSize = 1;
-    }
-    ipcSend("set_odds_samplesize", oddsSampleSize);
-  });
 }
 
 let currentDraft;
@@ -897,7 +781,7 @@ function updateDraftView(index, _packN = -1, _pickN = -1) {
       draftPack = draftPack.pack;
     }
 
-    const colors = get_ids_colors(draftPack);
+    const colors = getIdsColors(draftPack);
     colors.forEach(function(color) {
       queryElements(deckColorsDom)[0].appendChild(
         createDiv(["mana_s20", "mana_" + MANA[color]])
@@ -966,12 +850,80 @@ function updateDraftView(index, _packN = -1, _pickN = -1) {
   }
 }
 
-window.setInterval(() => {
+function settingsUpdated() {
+  // mid-match Arena updates can make edit-mode difficult
+  // temporarily allow the overlays to go stale during editing
+  // (should be okay since ending edit-mode causes a refresh)
+  if (editMode) return;
+
+  console.log(window.innerWidth, window.innerHeight);
+  const hoverContainer = byId("overlay_hover");
+  if (pd.settings.overlayHover) {
+    hoverContainer.style.left = `${pd.settings.overlayHover.x}px`;
+    hoverContainer.style.top = `${pd.settings.overlayHover.y}px`;
+  } else {
+    hoverContainer.style.left = `${window.innerWidth / 2 -
+      pd.cardsSizeHoverCard / 2}px`;
+    hoverContainer.style.top = `${window.innerHeight -
+      pd.cardsSizeHoverCard / 0.71808510638 -
+      50}px`;
+  }
+
+  webFrame.setZoomFactor(pd.settings.overlay_scale / 100);
   pd.settings.overlays.forEach((_overlay, index) => {
-    updateClock(index);
+    const overlayDiv = byId("overlay_" + (index + 1));
+    overlayDiv.style.height = _overlay.bounds.height + "px";
+    overlayDiv.style.width = _overlay.bounds.width + "px";
+    overlayDiv.style.left = _overlay.bounds.x + "px";
+    overlayDiv.style.top = _overlay.bounds.y + "px";
+
+    if (getVisible(_overlay)) {
+      overlayDiv.style.opacity = "1";
+      overlayDiv.style.visibility = "visible";
+    } else {
+      overlayDiv.style.opacity = "0";
+      overlayDiv.style.visibility = "hidden";
+    }
+
+    changeBackground(index, pd.settings.back_url);
+
+    const deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
+    const deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
+    const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
+    const clockDom = `#overlay_${index + 1} .overlay_clock_container`;
+    const bgImageDom = `#overlay_${index + 1} .overlay_bg_image`;
+    const elementsDom = `#overlay_${index + 1} .elements_wrapper`;
+    const topDom = `#overlay_${index + 1} .top_nav_wrapper`;
+    const mainHoverDom = ".main_hover";
+
+    queryElements(bgImageDom)[0].style.opacity = _overlay.alpha_back.toString();
+    queryElements(elementsDom)[0].style.opacity = _overlay.alpha.toString();
+
+    queryElements(topDom)[0].style = "";
+    queryElements(topDom)[0].style.display = _overlay.top ? "" : "none";
+    queryElements(deckNameDom)[0].style = "";
+    queryElements(deckNameDom)[0].style.display = _overlay.title ? "" : "none";
+    queryElements(deckColorsDom)[0].style = "";
+    queryElements(deckColorsDom)[0].style.display = _overlay.title
+      ? ""
+      : "none";
+
+    queryElements(deckListDom)[0].style.display = _overlay.deck ? "" : "none";
+    queryElements(mainHoverDom)[0].style.width = pd.cardsSizeHoverCard + "px";
+    queryElements(mainHoverDom)[0].style.height =
+      pd.cardsSizeHoverCard / 0.71808510638 + "px";
+
+    const showClock =
+      _overlay.clock && !OVERLAY_DRAFT_MODES.includes(_overlay.mode);
+    queryElements(clockDom)[0].style.display = showClock ? "" : "none";
+
+    if (OVERLAY_DRAFT_MODES.includes(_overlay.mode)) {
+      updateDraftView(index);
+    } else {
+      updateMatchView(index);
+    }
   });
-  //if (fix) fix.registerWindow();
-}, 250);
+}
 
 function updateClock(index) {
   let hh, mm, ss;
@@ -1065,32 +1017,6 @@ function recreateClock(index) {
   updateClock(index);
 }
 
-function change_background(index, arg = "default") {
-  if (!arg) return;
-
-  const mainWrapper = queryElements(
-    `#overlay_${index + 1} .overlay_bg_image`
-  )[0];
-  if (arg === "default") {
-    if (pd.settings.back_url && pd.settings.back_url !== "default") {
-      mainWrapper.style.backgroundImage = "url(" + pd.settings.back_url + ")";
-    } else {
-      mainWrapper.style.backgroundImage = "url(" + DEFAULT_BACKGROUND + ")";
-    }
-  } else {
-    const xhr = new XMLHttpRequest();
-    xhr.open("HEAD", arg);
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        mainWrapper.style.backgroundImage = "url(" + arg + ")";
-      } else {
-        mainWrapper.style.backgroundImage = "";
-      }
-    };
-    xhr.send();
-  }
-}
-
 function close(bool, index) {
   // -1 to toggle, else set
   const _new = bool == -1 ? !pd.settings.overlays[index].show : bool;
@@ -1115,6 +1041,130 @@ function ready(fn) {
     document.addEventListener("DOMContentLoaded", fn);
   }
 }
+
+function compare_logs(a, b) {
+  if (a.time < b.time) return -1;
+  if (a.time > b.time) return 1;
+  return 0;
+}
+
+// Effectful stuff goes here
+
+ipc.on("set_arena_state", function(event, arg) {
+  arenaState = arg;
+
+  // Change how cards hover are drawn if we are in a draft
+  setRenderer(1);
+  if (arenaState == ARENA_MODE_DRAFT) {
+    setRenderer(2);
+  }
+  settingsUpdated();
+});
+
+ipc.on("set_timer", function(event, arg) {
+  if (arg == -1) {
+    matchBeginTime = Date.now();
+  } else if (arg !== 0) {
+    //matchBeginTime = arg == 0 ? 0 : Date.parse(arg);
+    matchBeginTime = Date.parse(arg);
+  }
+});
+
+ipc.on("set_priority_timer", function(event, arg) {
+  if (arg) {
+    priorityTimers = arg;
+  }
+});
+
+ipc.on("edit", () => {
+  toggleEditMode();
+});
+
+ipc.on("close", (event, arg) => {
+  close(arg.action, arg.index);
+});
+
+ipc.on("action_log", function(event, arg) {
+  arg.str = striptags(arg.str, ["log-card", "log-ability"]);
+
+  actionLog.push(arg);
+  if (arg.seat == -99) {
+    actionLog = [];
+  }
+  actionLog.sort(compare_logs);
+  //console.log(arg.seat, arg.str);
+});
+
+ipc.on("settings_updated", settingsUpdated);
+
+ipc.on("set_draft_cards", (event, draft) => {
+  currentDraft = draft;
+  pd.settings.overlays.forEach((_overlay, index) => {
+    if (!OVERLAY_DRAFT_MODES.includes(_overlay.mode)) return;
+    updateDraftView(index, currentDraft.packNumber, currentDraft.pickNumber);
+  });
+});
+
+ipc.on("set_turn", (event, arg) => {
+  const { playerSeat: _we, turnPriority: _priority } = arg;
+  playerSeat = _we;
+  if (
+    turnPriority != _priority &&
+    _priority == playerSeat &&
+    pd.settings.sound_priority
+  ) {
+    //    playBlip();
+    const { Howl, Howler } = require("howler");
+    const sound = new Howl({ src: ["../sounds/blip.mp3"] });
+    Howler.volume(pd.settings.sound_priority_volume);
+    sound.play();
+  }
+  //turnPhase = _phase;
+  //turnStep = _step;
+  //turnNumber = _number;
+  //turnActive = _active;
+  turnPriority = _priority;
+  //turnDecision = _decision;
+
+  pd.settings.overlays.forEach((_overlay, index) => {
+    const clockTurnDom = `#overlay_${index + 1} .clock_turn`;
+    if (clockMode[index] === 0) {
+      recreateClock(index);
+    }
+    if (clockMode[index] > 0) {
+      if (turnPriority === playerSeat) {
+        queryElements(clockTurnDom)[0].innerHTML = "You have priority.";
+      } else {
+        queryElements(clockTurnDom)[0].innerHTML = `${oppName} has priority.`;
+      }
+    }
+  });
+});
+
+ipc.on("set_match", (event, arg) => {
+  currentMatch = JSON.parse(arg);
+  currentMatch.oppCards = new Deck(currentMatch.oppCards);
+
+  const tempMain = currentMatch.playerCardsLeft.mainDeck;
+  currentMatch.playerCardsLeft = new Deck(currentMatch.playerCardsLeft);
+  currentMatch.playerCardsLeft.mainboard._list = tempMain;
+
+  currentMatch.player.deck = new Deck(currentMatch.player.deck);
+  currentMatch.player.originalDeck = new Deck(currentMatch.player.originalDeck);
+
+  pd.settings.overlays.forEach((_overlay, index) => {
+    if (OVERLAY_DRAFT_MODES.includes(_overlay.mode)) return;
+    recreateClock(index);
+    updateMatchView(index);
+  });
+});
+
+window.setInterval(() => {
+  pd.settings.overlays.forEach((_overlay, index) => {
+    updateClock(index);
+  });
+  //if (fix) fix.registerWindow();
+}, 250);
 
 ready(function() {
   document.body.style.backgroundColor = "rgba(0, 0, 0, 0)";
@@ -1209,51 +1259,3 @@ ready(function() {
     });
   }, 1000);
 });
-
-function get_ids_colors(list) {
-  const colors = [];
-  list.forEach(function(grpid) {
-    const cdb = db.card(grpid);
-    if (cdb) {
-      //var card_name = cdb.name;
-      const card_cost = cdb.cost;
-      card_cost.forEach(function(c) {
-        if (c.indexOf("w") !== -1 && !colors.includes(1)) colors.push(1);
-        if (c.indexOf("u") !== -1 && !colors.includes(2)) colors.push(2);
-        if (c.indexOf("b") !== -1 && !colors.includes(3)) colors.push(3);
-        if (c.indexOf("r") !== -1 && !colors.includes(4)) colors.push(4);
-        if (c.indexOf("g") !== -1 && !colors.includes(5)) colors.push(5);
-      });
-    }
-  });
-
-  return colors;
-}
-
-function compare_quantity(a, b) {
-  return b.quantity - a.quantity;
-}
-
-function compare_logs(a, b) {
-  if (a.time < b.time) return -1;
-  if (a.time > b.time) return 1;
-  return 0;
-}
-
-function compareDraftPicks(a, b) {
-  const aCard = db.card(a);
-  const bCard = db.card(b);
-  const aColors = new Colors();
-  aColors.addFromCost(aCard.cost);
-  const bColors = new Colors();
-  bColors.addFromCost(bCard.cost);
-  const aType = get_card_type_sort(aCard.type);
-  const bType = get_card_type_sort(bCard.type);
-  return (
-    bCard.rank - aCard.rank ||
-    aColors.length - bColors.length ||
-    aCard.cmc - bCard.cmc ||
-    aType - bType ||
-    aCard.name.localeCompare(bCard.name)
-  );
-}
