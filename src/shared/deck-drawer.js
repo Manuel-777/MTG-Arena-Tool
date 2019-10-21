@@ -193,7 +193,7 @@ function drawCardTileArena(
     });
 
     if (card.dfc == FACE_ADVENTURE_MAIN) {
-      let adventure = db.card(card.dfcId);
+      const adventure = db.card(card.dfcId);
       fl2.innerHTML += "//";
       adventure.cost.forEach(cost => {
         fl2.appendChild(createDiv(["mana_s16", "flex_end", `mana_${cost}`]));
@@ -315,8 +315,8 @@ function drawCardTileFlat(
   }
   cardTile.style.borderImage = `linear-gradient(to bottom, var(--color-${colorA}) 30%, var(--color-${colorB}) 70%) 1 100%`;
 
-  let name = card ? card.name : "Unknown";
-  let cardName = createDiv(["card_tile_name_flat"], name);
+  const name = card ? card.name : "Unknown";
+  const cardName = createDiv(["card_tile_name_flat"], name);
   cont.appendChild(cardName);
 
   const cardCost = createDiv(["cart_tile_mana_flat"]);
@@ -335,7 +335,7 @@ function drawCardTileFlat(
     });
 
     if (card.dfc == FACE_ADVENTURE_MAIN) {
-      let adventure = db.card(card.dfcId);
+      const adventure = db.card(card.dfcId);
       cardCost.innerHTML += "//";
       adventure.cost.forEach(cost => {
         cardCost.appendChild(

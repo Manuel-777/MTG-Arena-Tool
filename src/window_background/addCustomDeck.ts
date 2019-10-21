@@ -6,7 +6,7 @@ export interface Deck {
   id: string;
 }
 
-type StoreShim = { set:(key: string, value: any) => void };
+type StoreShim = { set: (key: string, value: any) => void };
 
 const addCustomDeck = function(customDeck: Deck): void {
   const id = customDeck.id;
@@ -18,7 +18,7 @@ const addCustomDeck = function(customDeck: Deck): void {
 
   setData({ decks: { ...playerData.decks, [customDeck.id]: deckData } });
   if ((globals.debugLog || !globals.firstPass) && globals.store) {
-     ((globals.store as unknown) as StoreShim).set("decks." + id, deckData);
+    ((globals.store as unknown) as StoreShim).set("decks." + id, deckData);
   }
 };
 

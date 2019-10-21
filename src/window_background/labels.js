@@ -26,12 +26,12 @@ import actionLog from "./actionLog";
 import addCustomDeck from "./addCustomDeck";
 import { createDraft, createMatch, completeMatch } from "./data";
 
-var logLanguage = "English";
+let logLanguage = "English";
 
 let skipMatch = false;
 
 function clear_deck() {
-  var deck = { mainDeck: [], sideboard: [], name: "" };
+  const deck = { mainDeck: [], sideboard: [], name: "" };
   ipc_send("set_deck", deck, IPC_OVERLAY);
 }
 
@@ -97,7 +97,7 @@ function startDraft() {
 }
 
 function getDraftData(id, entry) {
-  var data = playerData.draft(id) || createDraft(id, entry);
+  const data = playerData.draft(id) || createDraft(id, entry);
 
   if (!data.date && entry.timestamp) {
     // the first event we see we set the date.
@@ -152,7 +152,7 @@ function processMatch(json, matchBeginTime) {
     ipc_send("set_arena_state", ARENA_MODE_MATCH);
   }
 
-  var match = createMatch(json, matchBeginTime);
+  const match = createMatch(json, matchBeginTime);
 
   // set global values
 
@@ -168,7 +168,7 @@ function processMatch(json, matchBeginTime) {
   ipc_send("set_timer", match.beginTime, IPC_OVERLAY);
 
   if (match.eventId == "DirectGame" && globals.currentDeck) {
-    let str = globals.currentDeck.getSave();
+    const str = globals.currentDeck.getSave();
     const httpApi = require("./http-api");
     httpApi.httpTournamentCheck(str, match.opponent.name, true);
   }
@@ -274,7 +274,7 @@ function select_deck(arg) {
 function convert_deck_from_v3(deck) {
   return JSON.parse(JSON.stringify(deck), (key, value) => {
     if (key === "mainDeck" || key === "sideboard") {
-      let ret = [];
+      const ret = [];
       for (let i = 0; i < value.length; i += 2) {
         if (value[i + 1] > 0) {
           ret.push({ id: value[i], quantity: value[i + 1] });
@@ -291,7 +291,7 @@ export function onLabelOutLogInfo(entry, json) {
   globals.logTime = parseWotcTimeFallback(entry.timestamp);
 
   if (json.params.messageName == "Client.UserDeviceSpecs") {
-    let payload = {
+    const payload = {
       isWindowed: json.params.payloadObject.isWindowed,
       monitor: json.params.payloadObject.monitorResolution,
       game: json.params.payloadObject.gameResolution
@@ -299,7 +299,7 @@ export function onLabelOutLogInfo(entry, json) {
     ipc_send("set_device_specs", payload);
   }
   if (json.params.messageName == "DuelScene.GameStart") {
-    let gameNumber = json.params.payloadObject.gameNumber;
+    const gameNumber = json.params.payloadObject.gameNumber;
     actionLog(-2, globals.logTime, `Game ${gameNumber} Start`);
   }
 
@@ -310,9 +310,9 @@ export function onLabelOutLogInfo(entry, json) {
   if (json.params.messageName == "DuelScene.GameStop") {
     globals.currentMatch.opponent.cards = globals.currentMatch.oppCardsUsed;
 
-    var payload = json.params.payloadObject;
+    const payload = json.params.payloadObject;
 
-    let loserName = getNameBySeat(payload.winningTeamId == 1 ? 2 : 1);
+    const loserName = getNameBySeat(payload.winningTeamId == 1 ? 2 : 1);
     if (payload.winningReason == "ResultReason_Concede") {
       actionLog(-1, globals.logTime, `${loserName} Conceded`);
     }
@@ -320,15 +320,15 @@ export function onLabelOutLogInfo(entry, json) {
       actionLog(-1, globals.logTime, `${loserName} Timed out`);
     }
 
-    let playerName = getNameBySeat(payload.winningTeamId);
+    const playerName = getNameBySeat(payload.winningTeamId);
     actionLog(-1, globals.logTime, `${playerName} Wins!`);
 
-    var mid = payload.matchId + "-" + playerData.arenaId;
-    var time = payload.secondsCount;
+    const mid = payload.matchId + "-" + playerData.arenaId;
+    const time = payload.secondsCount;
     if (mid == globals.currentMatch.matchId) {
       globals.gameNumberCompleted = payload.gameNumber;
 
-      let game = {};
+      const game = {};
       game.time = time;
       game.winner = payload.winningTeamId;
       // Just a shortcut for future aggregations
@@ -344,7 +344,7 @@ export function onLabelOutLogInfo(entry, json) {
         ) {
           instance = globals.idChanges[instance];
         }
-        let cardId = globals.instanceToCardIdMap[instance];
+        const cardId = globals.instanceToCardIdMap[instance];
         if (db.card(cardId)) {
           game.shuffledOrder.push(cardId);
         } else {
@@ -359,7 +359,7 @@ export function onLabelOutLogInfo(entry, json) {
       );
 
       if (globals.gameNumberCompleted > 1) {
-        let deckDiff = {};
+        const deckDiff = {};
         globals.currentMatch.player.deck.mainboard.get().forEach(card => {
           deckDiff[card.id] = card.quantity;
         });
@@ -370,7 +370,7 @@ export function onLabelOutLogInfo(entry, json) {
           });
         globals.matchGameStats.forEach((stats, i) => {
           if (i !== 0) {
-            let prevChanges = stats.sideboardChanges;
+            const prevChanges = stats.sideboardChanges;
             prevChanges.added.forEach(
               id => (deckDiff[id] = (deckDiff[id] || 0) - 1)
             );
@@ -380,12 +380,12 @@ export function onLabelOutLogInfo(entry, json) {
           }
         });
 
-        let sideboardChanges = {
+        const sideboardChanges = {
           added: [],
           removed: []
         };
         Object.keys(deckDiff).forEach(id => {
-          let quantity = deckDiff[id];
+          const quantity = deckDiff[id];
           for (let i = 0; i < quantity; i++) {
             sideboardChanges.added.push(id);
           }
@@ -401,34 +401,34 @@ export function onLabelOutLogInfo(entry, json) {
       game.handLands = game.handsDrawn.map(
         hand => hand.filter(card => db.card(card).type.includes("Land")).length
       );
-      let handSize = 8 - game.handsDrawn.length;
+      const handSize = 8 - game.handsDrawn.length;
       let deckSize = 0;
       let landsInDeck = 0;
-      let multiCardPositions = { "2": {}, "3": {}, "4": {} };
-      let cardCounts = {};
+      const multiCardPositions = { "2": {}, "3": {}, "4": {} };
+      const cardCounts = {};
       globals.currentMatch.player.deck.mainboard.get().forEach(card => {
         cardCounts[card.id] = card.quantity;
         deckSize += card.quantity;
         if (card.quantity >= 2 && card.quantity <= 4) {
           multiCardPositions[card.quantity][card.id] = [];
         }
-        let cardObj = db.card(card.id);
+        const cardObj = db.card(card.id);
         if (cardObj && cardObj.type.includes("Land")) {
           landsInDeck += card.quantity;
         }
       });
-      let librarySize = deckSize - handSize;
-      let landsInLibrary =
+      const librarySize = deckSize - handSize;
+      const landsInLibrary =
         landsInDeck - game.handLands[game.handLands.length - 1];
       let landsSoFar = 0;
-      let libraryLands = [];
+      const libraryLands = [];
       game.shuffledOrder.forEach((cardId, i) => {
-        let cardCount = cardCounts[cardId];
+        const cardCount = cardCounts[cardId];
         if (cardCount >= 2 && cardCount <= 4) {
           multiCardPositions[cardCount][cardId].push(i + 1);
         }
         if (i >= handSize) {
-          let card = db.card(cardId);
+          const card = db.card(cardId);
           if (card && card.type.includes("Land")) {
             landsSoFar++;
           }
@@ -472,7 +472,7 @@ export function onLabelGreToClient(entry, json) {
 
   json = json.greToClientEvent.greToClientMessages;
   json.forEach(function(msg) {
-    let msgId = msg.msgId;
+    const msgId = msg.msgId;
     greToClientInterpreter.GREMessage(msg, globals.logTime);
     /*
     globals.currentMatch.GREtoClient[msgId] = msg;
@@ -501,11 +501,11 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
 
   if (json.payload.submitdeckresp) {
     // Get sideboard changes
-    let deckResp = json.payload.submitdeckresp.deck;
+    const deckResp = json.payload.submitdeckresp.deck;
 
-    let tempMain = new CardsList(deckResp.deckcards);
-    let tempSide = new CardsList(deckResp.sideboardcards);
-    let newDeck = globals.currentMatch.player.deck.clone();
+    const tempMain = new CardsList(deckResp.deckcards);
+    const tempSide = new CardsList(deckResp.sideboardcards);
+    const newDeck = globals.currentMatch.player.deck.clone();
     newDeck.mainboard = tempMain;
     newDeck.sideboard = tempSide;
     newDeck.getColors();
@@ -543,8 +543,8 @@ export function onLabelInEventGetCombinedRankInfo(entry, json) {
   rank.limited.leaderboardPlace = json.limitedLeaderboardPlace;
   rank.limited.seasonOrdinal = json.limitedSeasonOrdinal;
 
-  var infoLength = Object.keys(json).length - 1;
-  var processedLength = [rank.limited, rank.constructed]
+  const infoLength = Object.keys(json).length - 1;
+  const processedLength = [rank.limited, rank.constructed]
     .map(o => Object.keys(o).length)
     .reduce((a, b) => a + b, 0);
   if (infoLength != processedLength) {
@@ -560,7 +560,7 @@ export function onLabelInEventGetCombinedRankInfo(entry, json) {
 export function onLabelInEventGetActiveEvents(entry, json) {
   if (!json) return;
 
-  let activeEvents = json.map(event => event.InternalEventName);
+  const activeEvents = json.map(event => event.InternalEventName);
   ipc_send("set_active_events", JSON.stringify(activeEvents));
 }
 
@@ -585,7 +585,7 @@ export function onLabelRankUpdated(entry, json) {
     updateType + json.seasonOrdinal + json.lastMatchId + json.date
   );
 
-  let seasonal_rank = playerData.addSeasonalRank(
+  const seasonal_rank = playerData.addSeasonalRank(
     json,
     json.seasonOrdinal,
     updateType
@@ -632,7 +632,7 @@ export function onLabelMythicRatingUpdated(entry, json) {
   rank.constructed.percentile = json.newMythicPercentile;
   rank.constructed.leaderboardPlace = json.newMythicLeaderboardPlacement;
 
-  let seasonal_rank = playerData.addSeasonalRank(
+  const seasonal_rank = playerData.addSeasonalRank(
     json,
     rank.constructed.seasonOrdinal,
     type
@@ -837,9 +837,9 @@ export function onLabelInDeckUpdateDeckV3(entry, json) {
 // Given a shallow object of numbers and lists return a
 // new object which doesn't contain 0s or empty lists.
 function minifiedDelta(delta) {
-  let newDelta = {};
+  const newDelta = {};
   Object.keys(delta).forEach(key => {
-    let val = delta[key];
+    const val = delta[key];
     if (val === 0 || (Array.isArray(val) && !val.length)) {
       return;
     }
@@ -862,7 +862,7 @@ export function onLabelInventoryUpdated(entry, transaction) {
   transaction.delta = minifiedDelta(transaction.delta);
 
   // Construct a unique ID
-  let context = transaction.context;
+  const context = transaction.context;
   //let milliseconds = transaction.date.getTime();
   // We use the original time string for the ID to ensure parsing does not alter it
   // This will make the ID the same if parsing either changes or breaks
@@ -1061,7 +1061,7 @@ export function onLabelInEventDeckSubmitV3(entry, json) {
 
 export function onLabelEventMatchCreated(entry, json) {
   if (!json) return;
-  var matchBeginTime = parseWotcTimeFallback(entry.timestamp);
+  const matchBeginTime = parseWotcTimeFallback(entry.timestamp);
 
   if (json.opponentRankingClass == "Mythic") {
     const httpApi = require("./http-api");
@@ -1079,7 +1079,7 @@ export function onLabelEventMatchCreated(entry, json) {
 
 export function onLabelOutDirectGameChallenge(entry, json) {
   if (!json) return;
-  var deck = json.params.deck;
+  let deck = json.params.deck;
 
   deck = replaceAll(deck, '"Id"', '"id"');
   deck = replaceAll(deck, '"Quantity"', '"quantity"');
@@ -1098,7 +1098,7 @@ export function onLabelOutDirectGameChallenge(entry, json) {
 
 export function onLabelOutEventAIPractice(entry, json) {
   if (!json) return;
-  var deck = json.params.deck;
+  let deck = json.params.deck;
 
   deck = replaceAll(deck, '"Id"', '"id"');
   deck = replaceAll(deck, '"Quantity"', '"quantity"');
@@ -1108,7 +1108,7 @@ export function onLabelOutEventAIPractice(entry, json) {
 
 function getDraftSet(eventName) {
   if (!eventName) return "";
-  for (let set in db.sets) {
+  for (const set in db.sets) {
     const setCode = db.sets[set].code;
     if (eventName.includes(setCode)) {
       return set;
@@ -1209,14 +1209,14 @@ export function onLabelMatchGameRoomStateChangedEvent(entry, json) {
         }
       });
 
-      let arg = {
+      const arg = {
         opponentScreenName: oName,
         opponentRankingClass: "",
         opponentRankingTier: 1,
         eventId: eventId,
         matchId: json.gameRoomConfig.matchId
       };
-      var matchBeginTime = parseWotcTimeFallback(entry.timestamp);
+      const matchBeginTime = parseWotcTimeFallback(entry.timestamp);
       processMatch(arg, matchBeginTime);
     }
     json.gameRoomConfig.reservedPlayers.forEach(player => {
@@ -1247,7 +1247,7 @@ export function onLabelMatchGameRoomStateChangedEvent(entry, json) {
     globals.matchCompletedOnGameNumber =
       json.finalMatchResult.resultList.length - 1;
 
-    var matchEndTime = parseWotcTimeFallback(entry.timestamp);
+    const matchEndTime = parseWotcTimeFallback(entry.timestamp);
     saveMatch(
       json.finalMatchResult.matchId + "-" + playerData.arenaId,
       matchEndTime

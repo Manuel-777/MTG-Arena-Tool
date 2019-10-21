@@ -8,7 +8,7 @@ function createSelect(
   divClass,
   optionFormatter
 ) {
-  let selectContainer = createDiv(["select_container", divClass]);
+  const selectContainer = createDiv(["select_container", divClass]);
   selectContainer.id = divClass;
   if (!options.includes(current)) current = options[0];
   selectContainer.value = current;
@@ -16,8 +16,8 @@ function createSelect(
   if (typeof optionFormatter === "function") {
     currentDisplay = optionFormatter(current);
   }
-  let selectButton = createDiv(["select_button"], currentDisplay);
-  let selectOptions = createDiv(["select_options_container"]);
+  const selectButton = createDiv(["select_button"], currentDisplay);
+  const selectOptions = createDiv(["select_options_container"]);
 
   selectContainer.appendChild(selectButton);
   selectContainer.appendChild(selectOptions);
@@ -35,7 +35,7 @@ function createSelect(
             optionDisplay = optionFormatter(optionDisplay);
           }
 
-          let option = createDiv(["select_option"], optionDisplay);
+          const option = createDiv(["select_option"], optionDisplay);
           selectOptions.appendChild(option);
 
           option.addEventListener("click", () => {
@@ -70,22 +70,22 @@ function selectAdd(selectElement, callback) {
   //   styledSelect
   //   list
 
-  var container = createDiv(["select"]);
+  const container = createDiv(["select"]);
   wrap(selectElement, container);
 
-  var styledSelect = createDiv(
+  const styledSelect = createDiv(
     ["select-styled"],
     selectElement.options[0].textContent
   );
   container.appendChild(styledSelect);
 
-  var list = document.createElement("ul");
+  const list = document.createElement("ul");
   list.className = "select-options";
   container.appendChild(list);
 
   // insert list entries
   [...selectElement.options].forEach(option => {
-    var li = document.createElement("li");
+    const li = document.createElement("li");
     li.innerHTML = option.textContent;
     li.rel = option.value;
     list.appendChild(li);
@@ -111,7 +111,7 @@ function selectAdd(selectElement, callback) {
   // var listItems = list.childNodes;
   list.addEventListener("click", evt => {
     evt.stopPropagation();
-    var option = evt.target;
+    const option = evt.target;
     console.log("option", option, evt);
 
     styledSelect.innerHTML = option.textContent;

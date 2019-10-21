@@ -68,7 +68,7 @@ globals.store = new Store({
   defaults: playerData.defaultCfg
 });
 
-var settingsStore = new Store({
+const settingsStore = new Store({
   name: "settings",
   defaults: settingsCfg
 });
@@ -418,7 +418,7 @@ ipc.on("set_log", function(event, arg) {
 // Set variables to default first
 let prevLogSize = 0;
 
-let settingsLogUri = settingsStore.get("logUri");
+const settingsLogUri = settingsStore.get("logUri");
 if (settingsLogUri) {
   globals.logUri = settingsLogUri;
 }
@@ -430,8 +430,8 @@ if (typeof process.env.LOGFILE !== "undefined") {
 console.log(globals.logUri);
 
 function sendSettings() {
-  let tags_colors = playerData.tags_colors;
-  let settingsData = { tags_colors };
+  const tags_colors = playerData.tags_colors;
+  const settingsData = { tags_colors };
   httpApi.httpSetSettings(settingsData);
 }
 
@@ -495,7 +495,7 @@ async function logLoop() {
   // Process only the user data for initial loading (prior to log in)
   // Same logic as processLog() but without the processLogData() function
   const rawString = logSegment;
-  var splitString = rawString.split("[UnityCrossThread");
+  const splitString = rawString.split("[UnityCrossThread");
   const parsedData = {};
 
   let detailedLogs = true;
@@ -545,7 +545,7 @@ async function logLoop() {
 
   if (!detailedLogs) return;
 
-  for (let key in parsedData) {
+  for (const key in parsedData) {
     ipc_send("ipc_log", `Initial log parse: ${key}=${parsedData[key]}`);
   }
   setData(parsedData, false);
@@ -607,8 +607,8 @@ async function logLoop() {
 
 // Cuts the string "data" between first ocurrences of the two selected words "startStr" and "endStr";
 function dataChop(data, startStr, endStr) {
-  var start = data.indexOf(startStr) + startStr.length;
-  var end = data.length;
+  let start = data.indexOf(startStr) + startStr.length;
+  let end = data.length;
   data = data.substring(start, end);
 
   if (endStr != "") {

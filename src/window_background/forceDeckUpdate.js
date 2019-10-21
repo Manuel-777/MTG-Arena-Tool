@@ -2,15 +2,15 @@ import globals from "./globals";
 import { hypergeometricRange } from "../shared/stats-fns";
 
 const forceDeckUpdate = function(removeUsed = true) {
-  var decksize = 0;
-  var cardsleft = 0;
-  var typeCre = 0;
-  var typeIns = 0;
-  var typeSor = 0;
-  var typePla = 0;
-  var typeArt = 0;
-  var typeEnc = 0;
-  var typeLan = 0;
+  let decksize = 0;
+  let cardsleft = 0;
+  let typeCre = 0;
+  let typeIns = 0;
+  let typeSor = 0;
+  let typePla = 0;
+  let typeArt = 0;
+  let typeEnc = 0;
+  let typeLan = 0;
 
   globals.currentMatch.playerCardsLeft = globals.currentMatch.player.deck.clone();
 
@@ -27,7 +27,7 @@ const forceDeckUpdate = function(removeUsed = true) {
         globals.currentMatch.playerCardsLeft.mainboard.remove(grpId, 1);
       });
     }
-    let main = globals.currentMatch.playerCardsLeft.mainboard;
+    const main = globals.currentMatch.playerCardsLeft.mainboard;
     main.addProperty("chance", card =>
       Math.round(
         hypergeometricRange(
@@ -48,8 +48,8 @@ const forceDeckUpdate = function(removeUsed = true) {
     typeSor = main.countType("Sorcery");
     typePla = main.countType("Planeswalker");
 
-    let chancesObj = {};
-    let landsCount = main.getLandsAmounts();
+    const chancesObj = {};
+    const landsCount = main.getLandsAmounts();
     chancesObj.landW = chanceType(
       landsCount.w,
       cardsleft,
@@ -116,10 +116,10 @@ const forceDeckUpdate = function(removeUsed = true) {
     chancesObj.cardsLeft = cardsleft;
     globals.currentMatch.playerChances = chancesObj;
   } else {
-    let main = globals.currentMatch.playerCardsLeft.mainboard;
+    const main = globals.currentMatch.playerCardsLeft.mainboard;
     main.addProperty("chance", () => 1);
 
-    let chancesObj = {};
+    const chancesObj = {};
     chancesObj.landW = 0;
     chancesObj.landU = 0;
     chancesObj.landB = 0;

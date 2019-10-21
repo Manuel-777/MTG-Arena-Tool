@@ -402,7 +402,7 @@ function openMatch(id) {
 
 function logShareLink(id) {
   const actionLogFile = path.join(actionLogDir, id + ".txt");
-  let log = fs.readFileSync(actionLogFile).toString("base64");
+  const log = fs.readFileSync(actionLogFile).toString("base64");
 
   const shareExpire = byId("expire_select").value;
   let expire = 0;

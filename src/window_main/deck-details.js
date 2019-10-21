@@ -41,7 +41,7 @@ let currentFilters = null;
 
 //
 function get_deck_colors_ammount(deck) {
-  var colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
+  const colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
   //var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
   deck.mainDeck.forEach(function(card) {
@@ -80,11 +80,11 @@ function get_deck_colors_ammount(deck) {
 
 //
 function get_deck_lands_ammount(deck) {
-  var colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
+  const colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
   //var mana = {0: "", 1: "white", 2: "blue", 3: "black", 4: "red", 5: "green", 6: "colorless", 7: "", 8: "x"}
   deck.mainDeck.forEach(function(card) {
-    var quantity = card.quantity;
+    const quantity = card.quantity;
     card = db.card(card.id);
     if (quantity > 0) {
       if (card.type.indexOf("Land") != -1 || card.type.indexOf("land") != -1) {
@@ -376,7 +376,7 @@ export function openDeck(deck = currentOpenDeck, filters = currentFilters) {
 
 //
 function deckShareLink(deck) {
-  let deckString = JSON.stringify(deck);
+  const deckString = JSON.stringify(deck);
 
   const shareExpire = byId("expire_select").value;
   let expire = 0;

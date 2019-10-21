@@ -51,7 +51,7 @@ import { ARENA_MODE_MATCH, ARENA_MODE_DRAFT } from "../shared/constants";
 import update_deck from "./updateDeck";
 import globals from "./globals";
 
-var debugLogSpeed = 0.001;
+const debugLogSpeed = 0.001;
 let logReadEnd = null;
 
 const fsAsync = {
@@ -172,7 +172,7 @@ function startWatchingLog() {
 
 function onLogEntryFound(entry) {
   if (globals.debugLog) {
-    let currentTime = new Date().getTime();
+    const currentTime = new Date().getTime();
     while (currentTime + debugLogSpeed >= new Date().getTime()) {
       // sleep
     }
@@ -460,7 +460,7 @@ function finishLoading() {
     globals.firstPass = false;
     globals.store.set(playerData.data);
     logReadEnd = new Date();
-    let logReadElapsed = (logReadEnd - globals.logReadStart) / 1000;
+    const logReadElapsed = (logReadEnd - globals.logReadStart) / 1000;
     ipc_send("ipc_log", `Log read in ${logReadElapsed}s`);
 
     ipc_send("popup", {

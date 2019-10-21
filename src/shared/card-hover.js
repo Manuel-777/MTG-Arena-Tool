@@ -27,10 +27,10 @@ export function addCardHover(element, card) {
         el.style.opacity = 1;
       });
 
-      var dfcCard = db.card(card.dfcId);
-      var dfcCardImage = getCardImage(dfcCard);
+      const dfcCard = db.card(card.dfcId);
+      const dfcCardImage = getCardImage(dfcCard);
 
-      var dfcImageElement = $$(".main_hover_dfc")[0];
+      const dfcImageElement = $$(".main_hover_dfc")[0];
       dfcImageElement.src = dfcCardImage;
       dfcImageElement.addEventListener("load", () => {
         $$(".loader_dfc").forEach(el => (el.style.opacity = 0));
@@ -39,7 +39,7 @@ export function addCardHover(element, card) {
       $$(".main_hover_dfc, .loader_dfc").forEach(hide);
     }
 
-    var mainImageElement = $$(".main_hover")[0];
+    const mainImageElement = $$(".main_hover")[0];
     mainImageElement.src = getCardImage(card);
     mainImageElement.addEventListener("load", () => {
       $$(".loader").forEach(el => (el.style.opacity = 0));
@@ -80,7 +80,7 @@ function hide(element) {
 }
 
 export function attachOwnerhipStars(card, starContainer) {
-  let isbasic = cardHasType(card, "Basic Land");
+  const isbasic = cardHasType(card, "Basic Land");
   starContainer.innerHTML = "";
   starContainer.style.opacity = 1;
 
@@ -124,28 +124,28 @@ export function attachDraftRatings(card, ratingsContainer) {
   ratingsContainer.style.opacity = 1;
   ratingsContainer.style.display = "flex";
 
-  let rank = card.rank;
-  let rankValues = card.rank_values;
-  let rankControversy = card.rank_controversy;
+  const rank = card.rank;
+  const rankValues = card.rank_values;
+  const rankControversy = card.rank_controversy;
 
-  let maxValue = Math.max.apply(Math, card.rank_values);
+  const maxValue = Math.max.apply(Math, card.rank_values);
 
-  let valuesContainer = createDiv([`rank_values_main_container`]);
+  const valuesContainer = createDiv([`rank_values_main_container`]);
 
-  let rankCont = createDiv(
+  const rankCont = createDiv(
     [`rank_value_container`],
     `Rank: ${DRAFT_RANKS[Math.round(rank)]}`
   );
   valuesContainer.appendChild(rankCont);
-  let controversyCont = createDiv(
+  const controversyCont = createDiv(
     [`rank_value_container`],
     `Controversy: ${rankControversy}`
   );
   valuesContainer.appendChild(controversyCont);
 
   rankValues.forEach((v, index) => {
-    let rv = 12 - index;
-    let rank = DRAFT_RANKS[rv];
+    const rv = 12 - index;
+    const rank = DRAFT_RANKS[rv];
 
     let colorClass = "white";
     if (rank == "A+" || rank == "A") colorClass = "blue";
@@ -153,9 +153,9 @@ export function attachDraftRatings(card, ratingsContainer) {
     if (rank == "C-" || rank == "D+" || rank == "D") colorClass = "orange";
     if (rank == "D-" || rank == "F") colorClass = "red";
 
-    let divCont = createDiv([`rank_value_container`]);
-    let divTitle = createDiv([`rank_value_title`, colorClass], rank);
-    let divBar = createDiv([`rank_value_bar`]);
+    const divCont = createDiv([`rank_value_container`]);
+    const divTitle = createDiv([`rank_value_title`, colorClass], rank);
+    const divBar = createDiv([`rank_value_bar`]);
     divBar.style.width = (240 / maxValue) * v + "px";
 
     divCont.appendChild(divTitle);

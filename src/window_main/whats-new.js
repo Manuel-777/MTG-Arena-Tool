@@ -6,7 +6,7 @@ import { openDialog } from "./renderer-util";
 const screens = [];
 
 let selectedScreen = 0;
-let screenoffset = (screens.length - 1) * 50;
+const screenoffset = (screens.length - 1) * 50;
 
 export function showWhatsNew() {
   // Only show if we actually do have stuff to show
@@ -17,16 +17,16 @@ export function showWhatsNew() {
   cont.style.justifyContent = "center";
   cont.style.overflow = "hidden";
 
-  let title = createDiv(["wnew_title"], "What is new?");
-  let subVersion = createDiv(
+  const title = createDiv(["wnew_title"], "What is new?");
+  const subVersion = createDiv(
     ["wnew_sub_version"],
     "Version " + remote.app.getVersion()
   );
-  let scrollerContainer = createDiv(["wnew_scroller"]);
+  const scrollerContainer = createDiv(["wnew_scroller"]);
   scrollerContainer.style.width = screens.length * 100 + "%";
   scrollerContainer.style.left = screenoffset + selectedScreen * -100 + "%";
 
-  let scrollerPosCont = createDiv(["wnew_scroller_pos_cont"]);
+  const scrollerPosCont = createDiv(["wnew_scroller_pos_cont"]);
 
   let prev, next;
   if (screens.length > 1) {
@@ -35,19 +35,19 @@ export function showWhatsNew() {
   }
 
   screens.forEach((sc, index) => {
-    let imageCont = createDiv(["wnew_image_cont"]);
-    let image = createDiv(["wnew_image"]);
+    const imageCont = createDiv(["wnew_image_cont"]);
+    const image = createDiv(["wnew_image"]);
     image.style.backgroundImage = `url(../images/new/${sc.image})`;
-    let imageTitle = createDiv(["wnew_image_title"], sc.title);
-    let imageDesc = createDiv(["wnew_image_desc"], sc.desciption);
+    const imageTitle = createDiv(["wnew_image_title"], sc.title);
+    const imageDesc = createDiv(["wnew_image_desc"], sc.desciption);
 
     imageCont.appendChild(imageTitle);
     imageCont.appendChild(image);
     imageCont.appendChild(imageDesc);
     scrollerContainer.appendChild(imageCont);
 
-    let pName = "pos_ball_" + index;
-    let posBall = createDiv(["wnew_pos_ball", pName]);
+    const pName = "pos_ball_" + index;
+    const posBall = createDiv(["wnew_pos_ball", pName]);
     scrollerPosCont.appendChild(posBall);
 
     if (selectedScreen == index) {
@@ -55,13 +55,13 @@ export function showWhatsNew() {
     }
   });
 
-  let updateScroller = function() {
-    let scrollerContainer = queryElements(".wnew_scroller")[0];
+  const updateScroller = function() {
+    const scrollerContainer = queryElements(".wnew_scroller")[0];
     scrollerContainer.style.left = screenoffset + selectedScreen * -100 + "%";
 
     screens.forEach((sc, index) => {
-      let pName = ".pos_ball_" + index;
-      let ball = queryElements(pName)[0];
+      const pName = ".pos_ball_" + index;
+      const ball = queryElements(pName)[0];
       ball.classList.remove("wnew_pos_ball_selected");
       if (index == selectedScreen) {
         ball.classList.toggle("wnew_pos_ball_selected");

@@ -27,10 +27,10 @@ const vaultPercentFormat = {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1
 };
-var filterEconomy = "All";
+let filterEconomy = "All";
 let showArchived = false;
-var daysago = 0;
-var dayList = [];
+let daysago = 0;
+let dayList = [];
 let sortedChanges = [];
 
 class economyDay {
@@ -146,7 +146,7 @@ function getReadableQuest(questCode) {
 
 //
 function get_collation_set(collationid) {
-  for (let name in db.sets) {
+  for (const name in db.sets) {
     if (db.sets[name].collation === collationid) {
       return name;
     }
@@ -335,7 +335,7 @@ function createDayHeader(change) {
   // Gems
   const gridGems = createDiv(["economy_metric"]);
   gridGems.style.gridArea = "1 / 5 / auto / 6";
-  let icge = createDiv(["economy_gems_med"], "", { title: "Gems" });
+  const icge = createDiv(["economy_gems_med"], "", { title: "Gems" });
   gridGems.appendChild(icge);
 
   const upcontge = createDiv(["economy_delta"]);
@@ -371,8 +371,8 @@ function createDayHeader(change) {
 
 function createChangeRow(change, economyId) {
   // The next ~200 lines of code will add elements to these two containers
-  var flexBottom = createDiv(["flex_bottom"]);
-  var flexRight = createDiv(["tiny_scroll", "list_economy_awarded"], "", {
+  const flexBottom = createDiv(["flex_bottom"]);
+  const flexRight = createDiv(["tiny_scroll", "list_economy_awarded"], "", {
     id: economyId
   });
 
@@ -386,20 +386,20 @@ function createChangeRow(change, economyId) {
   let checkGoldEarnt = false;
   let checkSkinsAdded = false;
 
-  var bon, bos;
+  let bon, bos;
 
   const fullContext = getPrettyContext(change.originalContext);
 
   if (fullContext === "Booster Open") {
     change.delta.boosterDelta.forEach(function(booster) {
-      var set = get_collation_set(booster.collationId);
+      const set = get_collation_set(booster.collationId);
 
-      var bos = createDiv(["set_logo"]);
+      const bos = createDiv(["set_logo"]);
       bos.style.backgroundImage =
         "url(../images/sets/" + db.sets[set].code + ".png)";
       bos.title = set;
 
-      var bon = createDiv();
+      const bon = createDiv();
       bon.style.lineHeight = "32px";
       bon.classList.add("economy_sub");
 
@@ -591,14 +591,14 @@ function createChangeRow(change, economyId) {
 
   if (checkBoosterAdded && change.delta.boosterDelta) {
     change.delta.boosterDelta.forEach(function(booster) {
-      var set = get_collation_set(booster.collationId);
+      const set = get_collation_set(booster.collationId);
 
-      var bos = createDiv(["set_logo_med"]);
+      const bos = createDiv(["set_logo_med"]);
       bos.style.backgroundImage =
         "url(../images/sets/" + db.sets[set].code + ".png)";
       bos.title = set;
 
-      var bon = createDiv();
+      const bon = createDiv();
       bon.style.lineHeight = "64px";
       bon.classList.add("economy_sub");
       bon.innerHTML = "x" + Math.abs(booster.count);
@@ -660,16 +660,16 @@ function createChangeRow(change, economyId) {
   if (checkCardsAdded && change.delta.cardsAdded !== undefined) {
     change.delta.cardsAdded.sort(collectionSortRarity);
     change.delta.cardsAdded.forEach(function(grpId) {
-      var card = db.card(grpId);
-      var divWithNoName = createInventoryCard(card);
+      const card = db.card(grpId);
+      const divWithNoName = createInventoryCard(card);
       flexRight.appendChild(divWithNoName);
     });
   }
 
   if (checkAetherized && change.aetherizedCards !== undefined) {
     change.aetherizedCards.forEach(function(obj) {
-      var grpId = obj.grpId;
-      var card = db.card(grpId);
+      const grpId = obj.grpId;
+      let card = db.card(grpId);
       let draw = false;
       if (card) {
         if (change.delta.cardsAdded) {
@@ -681,10 +681,10 @@ function createChangeRow(change, economyId) {
         }
       }
       if (draw) {
-        var d = createDiv(["inventory_card"]);
+        const d = createDiv(["inventory_card"]);
         d.style.width = "39px";
 
-        var img = document.createElement("img");
+        const img = document.createElement("img");
         img.classList.add("inventory_card_img");
         img.classList.add("inventory_card_aetherized");
         img.style.width = "39px";
@@ -727,7 +727,7 @@ function createChangeRow(change, economyId) {
 
   if (checkSkinsAdded && change.delta.artSkinsAdded !== undefined) {
     change.delta.artSkinsAdded.forEach(obj => {
-      let card = db.cardFromArt(obj.artId);
+      const card = db.cardFromArt(obj.artId);
 
       bos = createDiv(["economy_skin_art"]);
       bos.title = card.name + " Skin";
@@ -744,7 +744,7 @@ function createChangeRow(change, economyId) {
   //      flexBottom
   //   flexRight
 
-  var flexTop = createDiv(["flex_top", "economy_sub"]);
+  const flexTop = createDiv(["flex_top", "economy_sub"]);
   flexTop.style.lineHeight = "32px";
 
   flexTop.appendChild(
@@ -754,19 +754,19 @@ function createChangeRow(change, economyId) {
     )
   );
 
-  var niceDate = localDateFormat(new Date(change.date));
+  const niceDate = localDateFormat(new Date(change.date));
   flexTop.appendChild(createDiv(["list_economy_time"], niceDate));
 
-  var flexLeft = createDiv(["flex_item"]);
+  const flexLeft = createDiv(["flex_item"]);
   flexLeft.style.flexDirection = "column";
   flexLeft.appendChild(flexTop);
   flexLeft.appendChild(flexBottom);
 
-  var changeRow = createDiv([economyId, "list_economy"]);
+  const changeRow = createDiv([economyId, "list_economy"]);
   changeRow.appendChild(flexLeft);
   changeRow.appendChild(flexRight);
 
-  var deleteButton = document.createElement("div");
+  const deleteButton = document.createElement("div");
   deleteButton.classList.add("flex_item");
   deleteButton.classList.add(economyId + "_del");
   const archiveClass = change.archived

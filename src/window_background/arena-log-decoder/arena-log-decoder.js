@@ -134,7 +134,7 @@ function parseLogEntry(text, matchText, position) {
     ];
   }
 
-  for (let pattern of LABEL_JSON_PATTERNS) {
+  for (const pattern of LABEL_JSON_PATTERNS) {
     rematches = matchText.match(pattern);
     if (!rematches) continue;
 

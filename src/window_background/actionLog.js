@@ -5,7 +5,7 @@ import { IPC_OVERLAY } from "../shared/constants.js";
 import globals from "./globals";
 import format from "date-fns/format";
 
-var currentActionLog = "";
+let currentActionLog = "";
 
 const actionLog = function(seat, time, str, grpId = 0) {
   if (!time) time = new Date();

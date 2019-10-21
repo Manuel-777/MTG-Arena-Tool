@@ -5,10 +5,10 @@ import forceDeckUpdate from "./forceDeckUpdate";
 import getOpponentDeck from "./getOpponentDeck";
 import { objectClone } from "../shared/util";
 
-var lastDeckUpdate = new Date();
+const lastDeckUpdate = new Date();
 
 function update_deck(force) {
-  var nd = new Date();
+  const nd = new Date();
   if (
     (globals.debugLog || force || !globals.firstPass) &&
     nd - lastDeckUpdate > 1000

@@ -408,11 +408,11 @@ function deleteTag(matchid, tag) {
 }
 
 function getStepsUntilNextRank(mode, winrate) {
-  let rr = mode ? pd.rank.limited : pd.rank.constructed;
+  const rr = mode ? pd.rank.limited : pd.rank.constructed;
 
-  let cr = rr.rank;
-  let cs = rr.step;
-  let ct = rr.tier;
+  const cr = rr.rank;
+  const cs = rr.step;
+  const ct = rr.tier;
 
   let st = 1;
   let stw = 1;
@@ -446,7 +446,7 @@ function getStepsUntilNextRank(mode, winrate) {
   const expectedValue = winrate * stw - (1 - winrate) * stl;
   if (expectedValue <= 0) return "&#x221e";
 
-  let stepsNeeded = st * ct - cs;
+  const stepsNeeded = st * ct - cs;
   let expected = 0;
   let n = 0;
   // console.log("stepsNeeded", stepsNeeded);

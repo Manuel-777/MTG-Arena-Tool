@@ -191,11 +191,11 @@ function get_collection_stats() {
     if (!(card.set in stats)) return;
     if (!card.booster && displayMode == BOOSTER_CARDS) return;
 
-    let obj = {
+    const obj = {
       id: card.id,
       owned: 0
     };
-    let collation = db.sets[card.set].collation;
+    const collation = db.sets[card.set].collation;
     // add to totals
     stats[card.set][card.rarity].total += 4;
     stats[card.set][card.rarity].unique += 1;
@@ -219,9 +219,9 @@ function get_collection_stats() {
       }
     }
 
-    let col = new Colors();
+    const col = new Colors();
     col.addFromCost(card.cost);
-    let colorIndex = col.getBaseColor();
+    const colorIndex = col.getBaseColor();
 
     // count cards we know we want across decks
     const wanted = Math.max(
@@ -267,17 +267,17 @@ export function openCollectionTab() {
   mainDiv.classList.remove("flex_item");
   mainDiv = resetMainContainer();
 
-  let div = createDiv(["inventory"]);
+  const div = createDiv(["inventory"]);
 
-  let basicFilters = createDiv(["inventory_filters_basic"]);
+  const basicFilters = createDiv(["inventory_filters_basic"]);
 
-  let fll = createDiv(["inventory_flex_half"]);
-  let flr = createDiv(["inventory_flex_half"]);
+  const fll = createDiv(["inventory_flex_half"]);
+  const flr = createDiv(["inventory_flex_half"]);
 
-  let fllt = createDiv(["inventory_flex"]);
-  let fllb = createDiv(["inventory_flex"]);
-  let flrt = createDiv(["inventory_flex"]);
-  let flrb = createDiv(["inventory_flex"]);
+  const fllt = createDiv(["inventory_flex"]);
+  const fllb = createDiv(["inventory_flex"]);
+  const flrt = createDiv(["inventory_flex"]);
+  const flrb = createDiv(["inventory_flex"]);
 
   let icd = createDiv(["input_container_inventory"]);
 
@@ -286,7 +286,7 @@ export function openCollectionTab() {
   label.innerHTML = "Search";
   icd.appendChild(label);
 
-  let input = document.createElement("input");
+  const input = document.createElement("input");
   input.id = "query_name";
   input.autocomplete = "off";
   input.type = "search";
@@ -303,7 +303,7 @@ export function openCollectionTab() {
   let searchButton = createDiv(["button_simple", "button_thin"], "Search");
   flrt.appendChild(searchButton);
 
-  let advancedButton = createDiv(
+  const advancedButton = createDiv(
     ["button_simple", "button_thin"],
     "Advanced Filters"
   );
@@ -317,7 +317,12 @@ export function openCollectionTab() {
     expandFilters();
   });
 
-  let sortby = ["Sort by Set", "Sort by Name", "Sort by Rarity", "Sort by CMC"];
+  const sortby = [
+    "Sort by Set",
+    "Sort by Name",
+    "Sort by Rarity",
+    "Sort by CMC"
+  ];
   createSelect(
     fllb,
     sortby,
@@ -329,13 +334,13 @@ export function openCollectionTab() {
     "query_select"
   );
 
-  let exp = createDiv(["button_simple", "button_thin"], "Export Collection");
+  const exp = createDiv(["button_simple", "button_thin"], "Export Collection");
   fllb.appendChild(exp);
 
-  let reset = createDiv(["button_simple", "button_thin"], "Reset");
+  const reset = createDiv(["button_simple", "button_thin"], "Reset");
   flrb.appendChild(reset);
 
-  let stats = createDiv(["button_simple", "button_thin"], "Collection Stats");
+  const stats = createDiv(["button_simple", "button_thin"], "Collection Stats");
   flrb.appendChild(stats);
 
   exp.addEventListener("click", () => {
@@ -358,9 +363,9 @@ export function openCollectionTab() {
   basicFilters.appendChild(flr);
 
   // "ADVANCED" FILTERS
-  let filters = createDiv(["inventory_filters"]);
+  const filters = createDiv(["inventory_filters"]);
 
-  let flex = createDiv(["inventory_flex_half"]);
+  const flex = createDiv(["inventory_flex_half"]);
 
   icd = createDiv(["input_container_inventory"]);
   icd.style.paddingBottom = "8px";
@@ -371,7 +376,7 @@ export function openCollectionTab() {
   label.innerHTML = "Type line";
   icd.appendChild(label);
 
-  let typeInput = document.createElement("input");
+  const typeInput = document.createElement("input");
   typeInput.id = "query_type";
   typeInput.autocomplete = "off";
   typeInput.type = "search";
@@ -380,10 +385,10 @@ export function openCollectionTab() {
   flex.appendChild(icd);
   filters.appendChild(flex);
 
-  let sets = createDiv(["sets_container"]);
+  const sets = createDiv(["sets_container"]);
 
   orderedSets.forEach(set => {
-    let setbutton = createDiv(["set_filter", "set_filter_on"]);
+    const setbutton = createDiv(["set_filter", "set_filter_on"]);
     setbutton.style.backgroundImage = `url(../images/sets/${
       db.sets[set].code
     }.png)`;
@@ -394,7 +399,7 @@ export function openCollectionTab() {
       if (!setbutton.classList.toggle("set_filter_on")) {
         filteredSets.push(set);
       } else {
-        let n = filteredSets.indexOf(set);
+        const n = filteredSets.indexOf(set);
         if (n > -1) {
           filteredSets.splice(n, 1);
         }
@@ -403,11 +408,11 @@ export function openCollectionTab() {
   });
   filters.appendChild(sets);
 
-  let manas = createDiv(["sets_container"]);
-  let ms = ["w", "u", "b", "r", "g"];
+  const manas = createDiv(["sets_container"]);
+  const ms = ["w", "u", "b", "r", "g"];
   ms.forEach(function(s, i) {
-    let mi = [1, 2, 3, 4, 5];
-    let manabutton = createDiv(["mana_filter_search", "mana_filter_on"]);
+    const mi = [1, 2, 3, 4, 5];
+    const manabutton = createDiv(["mana_filter_search", "mana_filter_on"]);
     manabutton.style.backgroundImage = `url(../images/${s}64.png)`;
 
     manas.appendChild(manabutton);
@@ -415,7 +420,7 @@ export function openCollectionTab() {
       if (!manabutton.classList.toggle("mana_filter_on")) {
         filteredMana.push(mi[i]);
       } else {
-        let n = filteredMana.indexOf(mi[i]);
+        const n = filteredMana.indexOf(mi[i]);
         if (n > -1) {
           filteredMana.splice(n, 1);
         }
@@ -424,7 +429,7 @@ export function openCollectionTab() {
   });
   filters.appendChild(manas);
 
-  let main_but_cont = createDiv(["main_buttons_container"]);
+  const main_but_cont = createDiv(["main_buttons_container"]);
   let cont = createDiv(["buttons_container"]);
 
   addCheckboxSearch(
@@ -477,7 +482,7 @@ export function openCollectionTab() {
   label.innerHTML = "CMC:";
   icd.appendChild(label);
 
-  let inputCmc = document.createElement("input");
+  const inputCmc = document.createElement("input");
   inputCmc.style.maxWidth = "80px";
   inputCmc.id = "query_cmc";
   inputCmc.autocomplete = "off";
@@ -486,7 +491,7 @@ export function openCollectionTab() {
   icd.appendChild(inputCmc);
   cont.appendChild(icd);
 
-  let checkboxCmcHigher = addCheckboxSearch(
+  const checkboxCmcHigher = addCheckboxSearch(
     cont,
     "Higher than",
     "query_cmchigher",
@@ -494,7 +499,7 @@ export function openCollectionTab() {
     true
   );
   addCheckboxSearch(cont, "Equal to", "query_cmcequal", true);
-  let checkboxCmcLower = addCheckboxSearch(
+  const checkboxCmcLower = addCheckboxSearch(
     cont,
     "Lower than",
     "query_cmclower",
@@ -513,7 +518,7 @@ export function openCollectionTab() {
   label.innerHTML = "Owned Qty:";
   icd.appendChild(label);
 
-  let inputQty = document.createElement("input");
+  const inputQty = document.createElement("input");
   inputQty.style.maxWidth = "80px";
   inputQty.id = "query_qty";
   inputQty.autocomplete = "off";
@@ -523,7 +528,7 @@ export function openCollectionTab() {
 
   icd.appendChild(inputQty);
   cont.appendChild(icd);
-  let checkboxQtyHigher = addCheckboxSearch(
+  const checkboxQtyHigher = addCheckboxSearch(
     cont,
     "Higher than",
     "query_qtyhigher",
@@ -531,7 +536,7 @@ export function openCollectionTab() {
     true
   );
   addCheckboxSearch(cont, "Equal to", "query_qtyequal", true);
-  let checkboxQtyLower = addCheckboxSearch(
+  const checkboxQtyLower = addCheckboxSearch(
     cont,
     "Lower than",
     "query_qtylower",
@@ -583,18 +588,18 @@ export function openCollectionTab() {
 
 //
 function addCheckboxSearch(div, label, iid, def, toggle = false) {
-  let labelCheck = document.createElement("label");
+  const labelCheck = document.createElement("label");
   labelCheck.classList.add("check_container");
   labelCheck.classList.add("hover_label");
   labelCheck.innerHTML = label;
 
-  let inputCheck = document.createElement("input");
+  const inputCheck = document.createElement("input");
   inputCheck.type = "checkbox";
   inputCheck.id = iid;
   inputCheck.innerHTML = label;
   inputCheck.checked = def;
 
-  let spanCheck = document.createElement("span");
+  const spanCheck = document.createElement("span");
   spanCheck.classList.add("checkmark");
   if (toggle) spanCheck.style.borderRadius = "100%";
 
@@ -606,13 +611,13 @@ function addCheckboxSearch(div, label, iid, def, toggle = false) {
 }
 
 function expandFilters() {
-  let mainDiv = document.getElementById("ux_0");
+  const mainDiv = document.getElementById("ux_0");
   mainDiv.style.overflow = "hidden";
   setTimeout(() => {
     mainDiv.removeAttribute("style");
   }, 1000);
 
-  let div = $$(".inventory_filters")[0];
+  const div = $$(".inventory_filters")[0];
   if (div.style.opacity == 1) {
     div.style.height = "0px";
     div.style.opacity = 0;
@@ -664,7 +669,7 @@ function resetFilters() {
 
 //
 function exportCollection() {
-  let list = get_collection_export(pd.settings.export_format);
+  const list = get_collection_export(pd.settings.export_format);
   ipcSend("export_csvtxt", { str: list, name: "collection" });
 }
 
@@ -676,13 +681,13 @@ function printStats() {
     easing: EASING_DEFAULT,
     duration: 350
   });
-  let mainDiv = document.getElementById("ux_1");
+  const mainDiv = document.getElementById("ux_1");
   mainDiv.innerHTML = "";
   mainDiv.classList.remove("flex_item");
   const stats = get_collection_stats();
   console.log(stats);
 
-  let top = createDiv(["decklist_top"]);
+  const top = createDiv(["decklist_top"]);
   top.appendChild(createDiv(["button", "back"]));
   top.appendChild(createDiv(["deck_name"], "Collection Statistics"));
   top.appendChild(createDiv(["deck_top_colors"]));
@@ -692,7 +697,7 @@ function printStats() {
   const flex = createDiv(["flex_item"]);
   const mainstats = createDiv(["main_stats"]);
 
-  let onlyBoostersLabel = document.createElement("label");
+  const onlyBoostersLabel = document.createElement("label");
   onlyBoostersLabel.innerHTML = "Show cards";
   mainstats.appendChild(onlyBoostersLabel);
 
@@ -712,7 +717,7 @@ function printStats() {
   displayModeSelect.style.textAlign = "left";
   mainstats.appendChild(displayModeSelect);
 
-  let completionLabel = document.createElement("label");
+  const completionLabel = document.createElement("label");
   completionLabel.innerHTML = "Sets Completion";
   mainstats.appendChild(completionLabel);
 
@@ -733,11 +738,11 @@ function printStats() {
   mainstats.appendChild(countModeSelect);
 
   // Complete collection sats
-  let rs = renderSetStats(stats.complete, "PW", "Complete collection");
+  const rs = renderSetStats(stats.complete, "PW", "Complete collection");
   mainstats.appendChild(rs);
 
   // Filter out non booster sets ?
-  let sets =
+  const sets =
     displayMode == BOOSTER_CARDS
       ? orderedSets.filter(set => db.sets[set].collation > 0)
       : orderedSets;
@@ -746,7 +751,7 @@ function printStats() {
     .slice()
     .reverse()
     .forEach(set => {
-      let rs = renderSetStats(stats[set], db.sets[set].code, set);
+      const rs = renderSetStats(stats[set], db.sets[set].code, set);
       mainstats.appendChild(rs);
     });
 
@@ -779,14 +784,14 @@ function renderSetStats(setStats, setIconCode, setName) {
   );
 
   setDiv.addEventListener("mouseover", () => {
-    let span = setDiv
+    const span = setDiv
       .getElementsByClassName("stats_set_icon")[0]
       .getElementsByTagName("span")[0];
     span.style.marginLeft = "48px";
     setDiv.style.opacity = 1;
   });
   setDiv.addEventListener("mouseout", () => {
-    let span = setDiv
+    const span = setDiv
       .getElementsByClassName("stats_set_icon")[0]
       .getElementsByTagName("span")[0];
     span.style.marginLeft = "36px";
@@ -811,13 +816,13 @@ function openSetStats(setStats, setName) {
   const substats = $$(".sub_stats")[0];
   substats.innerHTML = "";
 
-  let label = document.createElement("label");
+  const label = document.createElement("label");
   label.innerHTML = setName + " completion";
   substats.appendChild(label);
 
   // Draw completion table for this set
   if (setName != "Complete collection") {
-    let table = createDiv(["completion_table"]);
+    const table = createDiv(["completion_table"]);
     for (var c = 0; c < 7; c++) {
       let tile = "";
       if (c + 1 == MULTI) tile = "mana_multi";
@@ -828,31 +833,31 @@ function openSetStats(setStats, setName) {
       if (c + 1 == RED) tile = "mana_red";
       if (c + 1 == GREEN) tile = "mana_green";
 
-      let cell = createDiv(["completion_table_color_title", tile]);
+      const cell = createDiv(["completion_table_color_title", tile]);
       cell.style.gridArea = `1 / ${c * 5 + 1} / auto / ${c * 5 + 6}`;
       table.appendChild(cell);
 
       for (var r = 0; r < 4; r++) {
-        let rarity = CARD_RARITIES[r];
-        let cell = createDiv(["completion_table_rarity_title", rarity]);
+        const rarity = CARD_RARITIES[r];
+        const cell = createDiv(["completion_table_rarity_title", rarity]);
         cell.title = rarity;
         cell.style.gridArea = `2 / ${c * 5 + 1 + r} / auto / ${c * 5 + 1 + r}`;
         table.appendChild(cell);
 
         // A little hacky to use "c + 1"..
         if (setStats.cards[c + 1]) {
-          let cardsArray = setStats.cards[c + 1][rarity];
+          const cardsArray = setStats.cards[c + 1][rarity];
           if (cardsArray) {
             cardsArray.forEach((card, index) => {
-              let dbCard = db.card(card.id);
+              const dbCard = db.card(card.id);
 
               if (
                 (!dbCard.booster && displayMode == ALL_CARDS) ||
                 dbCard.booster
               ) {
-                let classes = ["completion_table_card", "n" + card.owned];
+                const classes = ["completion_table_card", "n" + card.owned];
                 if (card.wanted > 0) classes.push("wanted");
-                let cell = createDiv(classes, card.owned);
+                const cell = createDiv(classes, card.owned);
                 cell.style.gridArea = `${index + 3} / ${c * 5 +
                   1 +
                   r} / auto / ${c * 5 + 1 + r}`;
@@ -868,13 +873,13 @@ function openSetStats(setStats, setName) {
     substats.appendChild(table);
   }
 
-  let wanted = {};
-  let missing = {};
+  const wanted = {};
+  const missing = {};
   CARD_RARITIES.forEach(rarity => {
     const countStats = setStats[rarity];
     if (countStats.total > 0) {
       const capitalizedRarity = rarity[0].toUpperCase() + rarity.slice(1) + "s";
-      let compDiv = renderCompletionDiv(
+      const compDiv = renderCompletionDiv(
         countStats,
         "wc_" + rarity + ".png",
         capitalizedRarity
@@ -888,21 +893,21 @@ function openSetStats(setStats, setName) {
 
   // If the set has a collationId, it means boosters for it exists
   if (db.sets[setName] && db.sets[setName].collation) {
-    let chanceBoosterHasMythic = 0.125; // assume 1/8 of packs have a mythic
-    let chanceBoosterHasRare = 1 - chanceBoosterHasMythic;
-    let wantedText =
+    const chanceBoosterHasMythic = 0.125; // assume 1/8 of packs have a mythic
+    const chanceBoosterHasRare = 1 - chanceBoosterHasMythic;
+    const wantedText =
       "<abbr title='missing copy of a card in a current deck'>wanted</abbr>";
 
     // chance that the next booster opened contains a rare missing from one of our decks
-    let possibleRares = setStats["rare"].unique - setStats["rare"].complete;
-    let chanceBoosterRareWanted = (
+    const possibleRares = setStats["rare"].unique - setStats["rare"].complete;
+    const chanceBoosterRareWanted = (
       (chanceBoosterHasRare * setStats["rare"].uniqueWanted) /
       possibleRares
     ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
-    let rareWantedDiv = createDiv(["stats_set_completion"]);
-    let rareWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
+    const rareWantedDiv = createDiv(["stats_set_completion"]);
+    const rareWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
     rareWantedIcon.style.height = "30px";
-    let rareWantedSpan = document.createElement("span");
+    const rareWantedSpan = document.createElement("span");
     rareWantedSpan.innerHTML = `<i>~${chanceBoosterRareWanted} chance next booster has ${wantedText} rare.</i>`;
     rareWantedSpan.style.fontSize = "13px";
     rareWantedIcon.appendChild(rareWantedSpan);
@@ -910,16 +915,16 @@ function openSetStats(setStats, setName) {
     substats.appendChild(rareWantedDiv);
 
     // chance that the next booster opened contains a mythic missing from one of our decks
-    let possibleMythics =
+    const possibleMythics =
       setStats["mythic"].unique - setStats["mythic"].complete;
-    let chanceBoosterMythicWanted = (
+    const chanceBoosterMythicWanted = (
       (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted) /
       possibleMythics
     ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
-    let mythicWantedDiv = createDiv(["stats_set_completion"]);
-    let mythicWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
+    const mythicWantedDiv = createDiv(["stats_set_completion"]);
+    const mythicWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
     mythicWantedIcon.style.height = "30px";
-    let mythicWantedSpan = document.createElement("span");
+    const mythicWantedSpan = document.createElement("span");
     mythicWantedSpan.innerHTML = `<i>~${chanceBoosterMythicWanted} chance next booster has ${wantedText} mythic.</i>`;
     mythicWantedSpan.style.fontSize = "13px";
     mythicWantedIcon.appendChild(mythicWantedSpan);
@@ -950,9 +955,9 @@ function renderCompletionDiv(countStats, image, title) {
 
   const completionDiv = createDiv(["stats_set_completion"]);
 
-  let setIcon = createDiv(["stats_set_icon"]);
+  const setIcon = createDiv(["stats_set_icon"]);
   setIcon.style.backgroundImage = `url(../images/${image})`;
-  let setIconSpan = document.createElement("span");
+  const setIconSpan = document.createElement("span");
   setIconSpan.innerHTML = title;
   setIcon.appendChild(setIconSpan);
   completionDiv.appendChild(setIcon);
@@ -980,7 +985,7 @@ function renderCompletionDiv(countStats, image, title) {
   wrapperDiv.appendChild(detailsDiv);
   completionDiv.appendChild(wrapperDiv);
 
-  let setBar = createDiv(["stats_set_bar"]);
+  const setBar = createDiv(["stats_set_bar"]);
   setBar.style.width = Math.round(completionRatio * 100) + "%";
 
   completionDiv.appendChild(setBar);
@@ -994,7 +999,7 @@ function sortCollection(alg) {
 
 //
 function printCards() {
-  let mainDiv = document.getElementById("ux_0");
+  const mainDiv = document.getElementById("ux_0");
   mainDiv.style.overflow = "hidden";
 
   let div = $$(".inventory_filters")[0];
@@ -1005,31 +1010,31 @@ function printCards() {
   div = $$(".inventory")[0];
   div.innerHTML = "";
 
-  let paging = createDiv(["paging_container"]);
+  const paging = createDiv(["paging_container"]);
   div.appendChild(paging);
 
-  let filterName = document.getElementById("query_name").value.toLowerCase();
-  let filterType = document.getElementById("query_type").value.toLowerCase();
-  let filterNew = document.getElementById("query_new");
-  let filterMulti = document.getElementById("query_multicolor");
-  let filterExclude = document.getElementById("query_exclude");
+  const filterName = document.getElementById("query_name").value.toLowerCase();
+  const filterType = document.getElementById("query_type").value.toLowerCase();
+  const filterNew = document.getElementById("query_new");
+  const filterMulti = document.getElementById("query_multicolor");
+  const filterExclude = document.getElementById("query_exclude");
 
-  let filterCommon = document.getElementById("query_common").checked;
-  let filterUncommon = document.getElementById("query_uncommon").checked;
-  let filterRare = document.getElementById("query_rare").checked;
-  let filterMythic = document.getElementById("query_mythic").checked;
-  let filterAnyRarityChecked =
+  const filterCommon = document.getElementById("query_common").checked;
+  const filterUncommon = document.getElementById("query_uncommon").checked;
+  const filterRare = document.getElementById("query_rare").checked;
+  const filterMythic = document.getElementById("query_mythic").checked;
+  const filterAnyRarityChecked =
     filterCommon || filterUncommon || filterRare || filterMythic;
 
-  let filterCMC = document.getElementById("query_cmc").value;
-  let filterCmcLower = document.getElementById("query_cmclower").checked;
-  let filterCmcEqual = document.getElementById("query_cmcequal").checked;
-  let filterCmcHigher = document.getElementById("query_cmchigher").checked;
+  const filterCMC = document.getElementById("query_cmc").value;
+  const filterCmcLower = document.getElementById("query_cmclower").checked;
+  const filterCmcEqual = document.getElementById("query_cmcequal").checked;
+  const filterCmcHigher = document.getElementById("query_cmchigher").checked;
 
-  let filterQty = document.getElementById("query_qty").value;
-  let filterQtyLower = document.getElementById("query_qtylower").checked;
-  let filterQtyEqual = document.getElementById("query_qtyequal").checked;
-  let filterQtyHigher = document.getElementById("query_qtyhigher").checked;
+  const filterQty = document.getElementById("query_qty").value;
+  const filterQtyLower = document.getElementById("query_qtylower").checked;
+  const filterQtyEqual = document.getElementById("query_qtyequal").checked;
+  const filterQtyHigher = document.getElementById("query_qtyhigher").checked;
 
   let totalCards = 0;
   let list;
@@ -1039,7 +1044,7 @@ function printCards() {
     list = Object.keys(pd.cards.cards);
   }
 
-  let keysSorted = [...list];
+  const keysSorted = [...list];
   if (sortingAlgorithm == "Sort by Set") keysSorted.sort(collectionSortSet);
   if (sortingAlgorithm == "Sort by Name") keysSorted.sort(collectionSortName);
   if (sortingAlgorithm == "Sort by Rarity")
@@ -1047,16 +1052,16 @@ function printCards() {
   if (sortingAlgorithm == "Sort by CMC") keysSorted.sort(collectionSortCmc);
 
   cardLoop: for (let n = 0; n < keysSorted.length; n++) {
-    let key = keysSorted[n];
+    const key = keysSorted[n];
 
-    let grpId = key;
+    const grpId = key;
     let card = db.card(grpId);
-    let name = card.name.toLowerCase();
-    let type = card.type.toLowerCase();
-    let rarity = card.rarity;
-    let cost = card.cost;
-    let cmc = card.cmc;
-    let set = card.set;
+    const name = card.name.toLowerCase();
+    const type = card.type.toLowerCase();
+    const rarity = card.rarity;
+    const cost = card.cost;
+    const cmc = card.cmc;
+    const set = card.set;
 
     if (card.images == undefined) continue;
     if (!card.collectible) continue;
@@ -1147,12 +1152,12 @@ function printCards() {
     if (filterExclude.checked && cost.length == 0) {
       continue;
     } else {
-      let s = [];
+      const s = [];
       let generic = false;
       for (let i = 0; i < cost.length; i++) {
-        let m = cost[i];
+        const m = cost[i];
         for (let j = 0; j < COLORS_BRIEF.length; j++) {
-          let code = COLORS_BRIEF[j];
+          const code = COLORS_BRIEF[j];
           if (m.indexOf(code) !== -1) {
             if (filterExclude.checked && !filteredMana.includes(j + 1)) {
               continue cardLoop;
@@ -1165,7 +1170,7 @@ function printCards() {
         }
       }
 
-      let ms = s.reduce((a, b) => a + b, 0);
+      const ms = s.reduce((a, b) => a + b, 0);
       if (generic && ms == 0 && filterExclude.checked) {
         continue;
       }
@@ -1224,7 +1229,7 @@ function printCards() {
     div.appendChild(cardDiv);
   }
 
-  let paging_bottom = createDiv(["paging_container"]);
+  const paging_bottom = createDiv(["paging_container"]);
   div.appendChild(paging_bottom);
   let but, butClone;
   if (collectionPage <= 0) {
@@ -1245,14 +1250,14 @@ function printCards() {
   paging.appendChild(but);
   paging_bottom.appendChild(butClone);
 
-  let totalPages = Math.ceil(totalCards / 100);
+  const totalPages = Math.ceil(totalCards / 100);
   for (let n = 0; n < totalPages; n++) {
     but = createDiv(["paging_button"], n + 1);
     if (collectionPage == n) {
       but.classList.add("paging_active");
     }
 
-    let page = n;
+    const page = n;
     but.addEventListener("click", () => {
       printCollectionPage(page);
     });
@@ -1287,13 +1292,15 @@ function printCards() {
 
 function addCardMenu(div, card) {
   if (!(card.set in db.sets)) return;
-  let arenaCode = `1 ${card.name} (${db.sets[card.set].arenacode}) ${card.cid}`;
+  const arenaCode = `1 ${card.name} (${db.sets[card.set].arenacode}) ${
+    card.cid
+  }`;
   div.addEventListener(
     "contextmenu",
     e => {
       e.preventDefault();
-      let menu = new Menu();
-      let menuItem = new MenuItem({
+      const menu = new Menu();
+      const menuItem = new MenuItem({
         label: "Copy Arena code",
         click: () => {
           remote.clipboard.writeText(arenaCode);

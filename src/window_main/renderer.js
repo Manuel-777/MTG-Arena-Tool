@@ -255,7 +255,7 @@ ipc.on("open_course_deck", function(event, arg) {
 
 //
 ipc.on("settings_updated", function() {
-  let cardQuantityWidth = Math.min(pd.cardsSizeHoverCard - 24, 180);
+  const cardQuantityWidth = Math.min(pd.cardsSizeHoverCard - 24, 180);
 
   $$(".hover_card_quantity")[0].style.left =
     cardQuantityWidth + (pd.cardsSizeHoverCard - cardQuantityWidth) / 2 + "px";

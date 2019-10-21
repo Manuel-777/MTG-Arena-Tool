@@ -71,20 +71,20 @@ export function openExploreTab() {
   const mainDiv = resetMainContainer();
   let d;
 
-  let divFill = document.createElement("div");
+  const divFill = document.createElement("div");
   divFill.classList.add("list_fill");
   mainDiv.appendChild(divFill);
 
-  let exploreFiltersContainer = createDiv(["explore_buttons_container"]);
-  let exploreFiltersSelects = createDiv([
+  const exploreFiltersContainer = createDiv(["explore_buttons_container"]);
+  const exploreFiltersSelects = createDiv([
     "explore_buttons_row",
     "explore_buttons_top"
   ]);
-  let exploreFiltersButtons = createDiv([
+  const exploreFiltersButtons = createDiv([
     "explore_buttons_row",
     "explore_buttons_middle"
   ]);
-  let exploreFiltersInputs = createDiv([
+  const exploreFiltersInputs = createDiv([
     "explore_buttons_row",
     "explore_buttons_bottom"
   ]);
@@ -93,7 +93,7 @@ export function openExploreTab() {
   exploreFiltersContainer.appendChild(exploreFiltersInputs);
   mainDiv.appendChild(exploreFiltersContainer);
 
-  let exploreList = createDiv(["explore_list"]);
+  const exploreList = createDiv(["explore_list"]);
   exploreList.id = "explore_list";
   mainDiv.appendChild(exploreList);
 
@@ -149,9 +149,9 @@ function drawFilters() {
     filterWCM
   } = exploreData;
 
-  let buttonsTop = $$(".explore_buttons_top")[0];
-  let buttonsMiddle = $$(".explore_buttons_middle")[0];
-  let buttonsBottom = $$(".explore_buttons_bottom")[0];
+  const buttonsTop = $$(".explore_buttons_top")[0];
+  const buttonsMiddle = $$(".explore_buttons_middle")[0];
+  const buttonsBottom = $$(".explore_buttons_bottom")[0];
 
   buttonsTop.innerHTML = "";
   buttonsMiddle.innerHTML = "";
@@ -160,8 +160,8 @@ function drawFilters() {
   /**
    *  Type filter
    **/
-  let typeFilter = ["Events", "Ranked Constructed", "Ranked Draft"];
-  let typeSelect = createSelect(
+  const typeFilter = ["Events", "Ranked Constructed", "Ranked Draft"];
+  const typeSelect = createSelect(
     buttonsTop,
     typeFilter,
     inputFilterType,
@@ -195,7 +195,7 @@ function drawFilters() {
     return 0;
   });
 
-  let mappedActive = db.activeEvents.map(getEventPrettyName);
+  const mappedActive = db.activeEvents.map(getEventPrettyName);
   eventFilters.forEach(item => {
     if (mappedActive.includes(item)) {
       eventFilters.splice(eventFilters.indexOf(item), 1);
@@ -214,13 +214,13 @@ function drawFilters() {
   /**
    *  Sort filter
    **/
-  let sortLabel = document.createElement("label");
+  const sortLabel = document.createElement("label");
   sortLabel.innerHTML = "Sort";
   sortLabel.style.margin = "auto 4px auto 16px";
   buttonsTop.appendChild(sortLabel);
 
-  let sortFilters = ["By Date", "By Wins", "By Winrate", "By Player"];
-  let sortSelect = createSelect(
+  const sortFilters = ["By Date", "By Wins", "By Winrate", "By Player"];
+  const sortSelect = createSelect(
     buttonsTop,
     sortFilters,
     filterSort,
@@ -232,8 +232,8 @@ function drawFilters() {
   /**
    *  Sort direction
    **/
-  let sortDirection = ["Descending", "Ascending"];
-  let sortDirSelect = createSelect(
+  const sortDirection = ["Descending", "Ascending"];
+  const sortDirSelect = createSelect(
     buttonsTop,
     sortDirection,
     filterSortDir,
@@ -245,7 +245,7 @@ function drawFilters() {
   /**
    *  Only owned filter
    **/
-  let lab = addCheckbox(
+  const lab = addCheckbox(
     buttonsMiddle,
     "Only owned",
     "settings_owned",
@@ -287,7 +287,7 @@ function drawFilters() {
   const manas = createDiv(["mana_filters_explore"]);
   COLORS_BRIEF.forEach(function(s, i) {
     const mi = [1, 2, 3, 4, 5];
-    let classes = ["mana_filter"];
+    const classes = ["mana_filter"];
     if (!inputMana.includes(mi[i])) {
       classes.push("mana_filter_on");
     }
@@ -299,7 +299,7 @@ function drawFilters() {
         inputMana.push(mi[i]);
       } else {
         manabutton.classList.add("mana_filter_on");
-        let n = inputMana.indexOf(mi[i]);
+        const n = inputMana.indexOf(mi[i]);
         if (n > -1) {
           inputMana.splice(n, 1);
         }
@@ -315,7 +315,7 @@ function drawFilters() {
   if (inputFilterType !== "Events") {
     const ranks_filters = createDiv(["mana_filters_explore"]);
     RANKS.forEach(function(rr, index) {
-      let classes = ["rank_filter"];
+      const classes = ["rank_filter"];
       if (!inputRanks.includes(rr)) {
         classes.push("rank_filter_on");
       }
@@ -328,7 +328,7 @@ function drawFilters() {
           inputRanks.push(rr);
         } else {
           rankbutton.classList.add("rank_filter_on");
-          let n = inputRanks.indexOf(rr);
+          const n = inputRanks.indexOf(rr);
           if (n > -1) {
             inputRanks.splice(n, 1);
           }
@@ -342,7 +342,7 @@ function drawFilters() {
   /**
    * Search button.
    **/
-  let searchButton = createDiv(["button_simple"], "Search");
+  const searchButton = createDiv(["button_simple"], "Search");
   searchButton.id = "explore_query_button";
   searchButton.margin = "0px !important;";
   buttonsBottom.appendChild(searchButton);
@@ -392,16 +392,16 @@ function handleNewSearch() {
 
 //
 function wildcardsInput(_class, _id, _default) {
-  let inputContainer = createDiv(["input_container_explore", "auto_width"]);
+  const inputContainer = createDiv(["input_container_explore", "auto_width"]);
 
-  let label = createDiv([_class, "wc_search_icon"]);
+  const label = createDiv([_class, "wc_search_icon"]);
   label.style.display = "table";
   label.style.justifySelf = "center";
   label.style.marginRight = "0px";
 
   inputContainer.appendChild(label);
 
-  let input = document.createElement("input");
+  const input = document.createElement("input");
   input.id = _id;
   input.classList.add(_id);
   input.type = "number";
@@ -530,16 +530,16 @@ function renderData(startIndex = 0) {
 }
 
 function deckLoad(_deck, index) {
-  var mainDiv = document.getElementById("explore_list");
+  const mainDiv = document.getElementById("explore_list");
   index = "result_" + index;
 
-  var flcf = createDiv(["flex_item"]);
+  const flcf = createDiv(["flex_item"]);
   flcf.style.width = "20%";
   flcf.style.justifyContent = "center";
 
   let wc;
   let n = 0;
-  let boosterCost = getBoosterCountEstimate(_deck.wildcards);
+  const boosterCost = getBoosterCountEstimate(_deck.wildcards);
   CARD_RARITIES.forEach(rarity => {
     const key = rarity[0];
     if (_deck.wildcards.hasOwnProperty(key) && _deck.wildcards[key] > 0) {
@@ -554,7 +554,7 @@ function deckLoad(_deck, index) {
     wc = createDiv(["wc_complete"]);
     flcf.appendChild(wc);
   } else {
-    let bo = createDiv(["bo_explore_cost"], Math.round(boosterCost));
+    const bo = createDiv(["bo_explore_cost"], Math.round(boosterCost));
     bo.title = "Boosters needed (estimated)";
     flcf.appendChild(bo);
   }
@@ -567,39 +567,39 @@ function deckLoad(_deck, index) {
     _deck.ml = 0;
   }
 
-  var tileGrpid = _deck.tile;
+  let tileGrpid = _deck.tile;
   try {
     db.card(tileGrpid).images["art_crop"];
   } catch (e) {
     tileGrpid = DEFAULT_TILE;
   }
 
-  var tile = createDiv([index + "t", "deck_tile"]);
+  const tile = createDiv([index + "t", "deck_tile"]);
   tile.style.backgroundImage = `url(${getCardArtCrop(tileGrpid)})`;
 
-  var div = createDiv([index, "list_deck"]);
+  const div = createDiv([index, "list_deck"]);
 
-  var fll = createDiv(["flex_item"]);
+  const fll = createDiv(["flex_item"]);
 
-  var flc = createDiv(["flex_item"]);
+  const flc = createDiv(["flex_item"]);
   flc.style.flexDirection = "column";
   flc.style.width = "40%";
 
-  var flr = createDiv(["flex_item"]);
+  const flr = createDiv(["flex_item"]);
   flr.style.flexDirection = "column";
   flr.style.justifyContent = "center";
   flr.style.overflow = "hidden";
   flr.style.width = "40%";
 
-  var flt = createDiv(["flex_top"]);
+  const flt = createDiv(["flex_top"]);
 
-  var flb = createDiv(["flex_bottom"]);
+  const flb = createDiv(["flex_bottom"]);
 
   let d;
   d = createDiv(["list_deck_name"], _deck.name);
   flt.appendChild(d);
 
-  let pname =
+  const pname =
     _deck.player.length > 1 ? `Various (${_deck.player.length})` : _deck.player;
   d = createDiv(["list_deck_name_it"], "by " + pname);
   if (pname !== _deck.player) {
@@ -609,11 +609,11 @@ function deckLoad(_deck, index) {
   flt.appendChild(d);
 
   _deck.colors.forEach(function(color) {
-    let manaIcon = createDiv(["mana_s20", "mana_" + MANA[color]]);
+    const manaIcon = createDiv(["mana_s20", "mana_" + MANA[color]]);
     flb.appendChild(manaIcon);
   });
 
-  let colClass = getWinrateClass((1 / _deck.mt) * _deck.mw);
+  const colClass = getWinrateClass((1 / _deck.mt) * _deck.mw);
   d = createDiv(
     ["list_deck_record"],
     `${_deck.mw}:${_deck.ml} <span class="${colClass}_bright">(${Math.round(
@@ -623,17 +623,17 @@ function deckLoad(_deck, index) {
 
   flr.appendChild(d);
 
-  let rcont = createDiv(["flex_item"]);
+  const rcont = createDiv(["flex_item"]);
   rcont.style.marginRight = "16px";
   rcont.style.marginLeft = "auto";
 
-  let eventName = createDiv(["list_deck_name_it"], db.events[_deck.event]);
+  const eventName = createDiv(["list_deck_name_it"], db.events[_deck.event]);
   rcont.appendChild(eventName);
 
   _deck.rank.sort((a, b) => RANKS_SORT[a] - RANKS_SORT[b]);
 
   _deck.rank.forEach(_rank => {
-    let rankIcon = createDiv(["ranks_16"]);
+    const rankIcon = createDiv(["ranks_16"]);
     rankIcon.style.marginTop = "4px";
     rankIcon.style.backgroundPosition =
       get_rank_index_16(_rank) * -16 + "px 0px";

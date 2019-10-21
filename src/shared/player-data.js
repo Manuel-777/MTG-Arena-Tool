@@ -191,14 +191,14 @@ function getDeckColors(deck) {
       return;
     }
 
-    let cardData = db.card(card.id);
+    const cardData = db.card(card.id);
 
     if (!cardData) {
       return;
     }
 
-    let isLand = cardData.type.indexOf("Land") !== -1;
-    let frame = cardData.frame;
+    const isLand = cardData.type.indexOf("Land") !== -1;
+    const frame = cardData.frame;
     if (isLand && frame.length < 3) {
       frame.forEach(colorIndex => colorSet.add(colorIndex));
     }
@@ -443,7 +443,7 @@ class PlayerData {
       seasonOrdinal = rank.seasonOrdinal;
     }
 
-    let seasonTag = seasonOrdinal + "_" + type.toLowerCase();
+    const seasonTag = seasonOrdinal + "_" + type.toLowerCase();
     if (!this.seasonal_rank[seasonTag]) {
       this.seasonal_rank[seasonTag] = [];
     }

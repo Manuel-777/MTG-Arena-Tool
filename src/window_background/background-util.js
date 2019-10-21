@@ -12,7 +12,7 @@ import globals from "./globals";
 // They are all taken from logs
 // Some format from date-fns could be wrong;
 // https://date-fns.org/v2.2.1/docs/parse
-let dateFormats = [
+const dateFormats = [
   "dd.MM.yyyy HH:mm:ss",
   "dd/MM/yyyy HH:mm:ss",
   "M/dd/yyyy hh:mm:ss aa",
@@ -108,7 +108,7 @@ export function getDateFormat(dateStr) {
 export function normaliseFields(iterator) {
   if (typeof iterator == "object") {
     return _.transform(iterator, function(result, value, key) {
-      let nkey =
+      const nkey =
         typeof key == "string" ? key.replace(/List$/, "").toLowerCase() : key;
       result[nkey] = normaliseFields(value);
     });

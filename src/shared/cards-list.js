@@ -71,21 +71,21 @@ class CardsList {
       throw new Error("quantity must be a number");
     }
     if (byName) {
-      let removed = 0;
-      let cardToFind = db.card(grpId);
+      const removed = 0;
+      const cardToFind = db.card(grpId);
       this._list.forEach(function(card) {
-        let cardInList = db.card(card.id);
+        const cardInList = db.card(card.id);
         if (cardToFind.name == cardInList.name) {
-          let remove = Math.min(card.quantity, quantity);
+          const remove = Math.min(card.quantity, quantity);
           card.quantity -= remove;
           quantity -= remove;
         }
       });
     } else {
-      let removed = 0;
+      const removed = 0;
       this._list.forEach(function(card) {
         if (grpId == card.id) {
-          let remove = Math.min(card.quantity, quantity);
+          const remove = Math.min(card.quantity, quantity);
           card.quantity -= remove;
           quantity -= remove;
         }
@@ -114,10 +114,10 @@ class CardsList {
    * Creates a n object containing how many of each type the list has
    **/
   countTypesAll() {
-    let types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
+    const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
 
     this._list.forEach(function(card) {
-      let c = db.card(card.id);
+      const c = db.card(card.id);
       if (c) {
         if (c.type.includes("Land", 0))
           types.lan += card.measurable ? card.quantity : 1;
@@ -143,7 +143,7 @@ class CardsList {
    * Counts how many cards of a given type the list has.
    **/
   countType(type) {
-    let types = this.countTypesAll();
+    const types = this.countTypesAll();
     if (type.includes("Land", 0)) return types.lan;
     else if (type.includes("Creature", 0)) return types.cre;
     else if (type.includes("Artifact", 0)) return types.art;
@@ -159,7 +159,7 @@ class CardsList {
    * Creates an object containing the colors distribution of the list.
    **/
   getColorsAmmounts() {
-    let colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
+    const colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
     this._list.forEach(function(card) {
       if (card.quantity > 0) {
@@ -199,10 +199,10 @@ class CardsList {
    * Creates an object containing the lands color distribution of the list.
    **/
   getLandsAmounts() {
-    var colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
+    const colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
     this._list.forEach(function(card) {
-      var quantity = card.quantity;
+      const quantity = card.quantity;
       card = db.card(card.id);
       if (quantity > 0) {
         if (
@@ -257,11 +257,11 @@ class CardsList {
    * Get all colors in the list as a Colors object.
    **/
   getColors() {
-    let colors = new Colors();
+    const colors = new Colors();
     this._list.forEach(card => {
-      let cardData = db.card(card.id);
+      const cardData = db.card(card.id);
       if (cardData) {
-        let isLand = cardData.type.indexOf("Land") !== -1;
+        const isLand = cardData.type.indexOf("Land") !== -1;
         if (isLand && cardData.frame.length < 3) {
           colors.addFromArray(cardData.frame);
         }
@@ -278,11 +278,11 @@ class CardsList {
    * Returns the new list (not a cardsList object)
    **/
   removeDuplicates(replaceList = true) {
-    var newList = [];
+    const newList = [];
 
     this._list.forEach(function(card) {
-      let cardObj = db.card(card.id);
-      let found = newList.find(c => db.card(c.id).name === cardObj.name);
+      const cardObj = db.card(card.id);
+      const found = newList.find(c => db.card(c.id).name === cardObj.name);
       if (found) {
         if (found.measurable) {
           found.quantity += card.quantity;

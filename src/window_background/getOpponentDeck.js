@@ -3,13 +3,13 @@ import db from "../shared/database";
 import Deck from "../shared/deck";
 
 function getOpponentDeck() {
-  let _deck = new Deck({}, globals.currentMatch.oppCardsUsed, false);
+  const _deck = new Deck({}, globals.currentMatch.oppCardsUsed, false);
   _deck.mainboard.removeDuplicates(true);
   _deck.getColors();
 
-  let format = db.events_format[globals.currentMatch.eventId];
+  const format = db.events_format[globals.currentMatch.eventId];
   globals.currentMatch.opponent.deck.archetype = "-";
-  let deckSave = _deck.getSave();
+  const deckSave = _deck.getSave();
 
   globals.currentMatch.oppArchetype = getBestArchetype(_deck);
   if (
@@ -32,13 +32,13 @@ function getBestArchetype(deck) {
   let mainDeviations = [];
   if (deck.mainboard.get().length == 0) return bestMatch;
   deck.mainboard.get().forEach(card => {
-    let deviation = card.quantity;
+    const deviation = card.quantity;
     mainDeviations.push(deviation * deviation);
   });
   let lowestDeviation = Math.sqrt(
     mainDeviations.reduce((a, b) => a + b) / (mainDeviations.length - 1)
   );
-  let highest = lowestDeviation; //err..
+  const highest = lowestDeviation; //err..
 
   // Test for each archetype
   db.archetypes.forEach(arch => {
@@ -46,16 +46,16 @@ function getBestArchetype(deck) {
     mainDeviations = [];
     deck.mainboard.get().forEach(card => {
       //let q = card.quantity;
-      let name = db.card(card.id).name;
-      let archMain = arch.average.mainDeck;
+      const name = db.card(card.id).name;
+      const archMain = arch.average.mainDeck;
 
-      let deviation = 1 - (archMain[name] ? 1 : 0); // archMain[name] ? archMain[name] : 0 // for full data
+      const deviation = 1 - (archMain[name] ? 1 : 0); // archMain[name] ? archMain[name] : 0 // for full data
       mainDeviations.push(deviation * deviation);
       //console.log(name, deviation, q, archMain[name]);
     });
-    let averageDeviation =
+    const averageDeviation =
       mainDeviations.reduce((a, b) => a + b) / (mainDeviations.length - 1);
-    let finalDeviation = Math.sqrt(averageDeviation);
+    const finalDeviation = Math.sqrt(averageDeviation);
 
     if (finalDeviation < lowestDeviation) {
       lowestDeviation = finalDeviation;

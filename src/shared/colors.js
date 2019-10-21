@@ -48,7 +48,7 @@ class Colors {
    * inside an array.
    */
   get() {
-    let _arr = [];
+    const _arr = [];
     if (this._w) _arr.push(WHITE);
     if (this._u) _arr.push(BLUE);
     if (this._b) _arr.push(BLACK);

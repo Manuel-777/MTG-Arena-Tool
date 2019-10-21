@@ -6,7 +6,7 @@ import { autoUpdater } from "electron-updater";
 import Store from "electron-store";
 import { format as formatUrl } from "url";
 
-var rememberStore = new Store({
+const rememberStore = new Store({
   name: "remember",
   defaults: {}
 });
@@ -27,23 +27,23 @@ console.log(process.platform);
 const debugBack = false;
 const debugIPC = false;
 
-var mainWindow = null;
-var updaterWindow = null;
-var background = null;
-var overlay = null;
-var mainTimeout = null;
+let mainWindow = null;
+let updaterWindow = null;
+let background = null;
+let overlay = null;
+let mainTimeout = null;
 let settings = {
   close_to_tray: false,
   launch_to_tray: false
 };
-var tray = null;
+let tray = null;
 
 const ipc = electron.ipcMain;
 
-var mainLoaded = false;
-var backLoaded = false;
+let mainLoaded = false;
+let backLoaded = false;
 let arenaState = ARENA_MODE_IDLE;
-let overlayShow = false;
+const overlayShow = false;
 
 const singleLock = app.requestSingleInstanceLock();
 
@@ -87,7 +87,7 @@ function startUpdater() {
   });
 
   autoUpdater.allowDowngrade = true;
-  let betaChannel = rememberStore.get("settings.beta_channel");
+  const betaChannel = rememberStore.get("settings.beta_channel");
   if (betaChannel) {
     autoUpdater.allowPrerelease = true;
   }
@@ -380,7 +380,7 @@ function setSettings(_settings) {
       overlay.webContents.send("edit");
     });
     settings.overlays.forEach((_settings, index) => {
-      let short = "shortcut_overlay_" + (index + 1);
+      const short = "shortcut_overlay_" + (index + 1);
       globalShortcut.register(settings[short], () => {
         overlay.webContents.send("close", { action: -1, index: index });
       });
@@ -417,10 +417,10 @@ function updateOverlayVisibility() {
     overlayHideTimeout = undefined;
     overlay.show();
 
-    let displayId = settings.overlay_display
+    const displayId = settings.overlay_display
       ? settings.overlay_display
       : electron.screen.getPrimaryDisplay().id;
-    let display = electron.screen
+    const display = electron.screen
       .getAllDisplays()
       .filter(d => d.id == displayId)[0];
     if (display) {
@@ -500,9 +500,9 @@ function quit() {
 }
 
 function saveWindowPos() {
-  var obj = {};
-  var bounds = mainWindow.getBounds();
-  var pos = mainWindow.getPosition();
+  const obj = {};
+  const bounds = mainWindow.getBounds();
+  const pos = mainWindow.getPosition();
   obj.width = Math.floor(bounds.width);
   obj.height = Math.floor(bounds.height);
   obj.x = Math.floor(pos[0]);
@@ -552,7 +552,7 @@ function createBackgroundWindow() {
 }
 
 function createOverlayWindow() {
-  let bounds = electron.screen.getPrimaryDisplay().bounds;
+  const bounds = electron.screen.getPrimaryDisplay().bounds;
   const overlay = new electron.BrowserWindow({
     transparent: true,
     x: bounds.x,

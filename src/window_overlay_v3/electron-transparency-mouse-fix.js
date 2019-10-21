@@ -156,7 +156,7 @@ class TransparencyMouseFix {
   registerWindow() {
     this.htmlWindow.addEventListener("mousemove", this._scopedOnMouseEvent);
     this.htmlWindow.addEventListener("dragover", this._scopedOnMouseEvent);
-    let styleSheet = this.htmlWindow.document.createElement("style");
+    const styleSheet = this.htmlWindow.document.createElement("style");
     styleSheet.classList.add("etmf-css");
     styleSheet.innerHTML = `
       html {pointer-events: none}
@@ -188,7 +188,7 @@ class TransparencyMouseFix {
   onMouseEvent(event) {
     this.log && this.log("debug", event);
 
-    let sinkHole = event.target.classList.contains("etmf-void");
+    const sinkHole = event.target.classList.contains("etmf-void");
 
     // Handle dragging events
     if (event.type === "dragover") {
@@ -197,9 +197,9 @@ class TransparencyMouseFix {
     }
 
     // Is the pointer is hovering an element that receives events?
-    let reachedBottom =
+    const reachedBottom =
       event.target === this.htmlWindow.document.documentElement;
-    let ignoreEvents = sinkHole || reachedBottom;
+    const ignoreEvents = sinkHole || reachedBottom;
     if (ignoreEvents) {
       // Latched state
       if (this._ignoringMouse) return;
@@ -252,8 +252,8 @@ class TransparencyMouseFix {
 
     // If the cursor is within content bounds, check the element it's hovering,
     //   emulate a MouseMove event with the element as target
-    let { x, y } = electron.screen.getCursorScreenPoint();
-    let {
+    const { x, y } = electron.screen.getCursorScreenPoint();
+    const {
       x: left,
       y: top,
       width,
@@ -265,7 +265,7 @@ class TransparencyMouseFix {
         window: { left, top, width, height }
       });
     if (x >= left && x < left + width && y >= top && y < top + height) {
-      let tgt = document.elementFromPoint(x - left, y - top);
+      const tgt = document.elementFromPoint(x - left, y - top);
       // HINT: update classList checks when expanding code
       if (
         tgt &&

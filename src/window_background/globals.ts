@@ -6,45 +6,45 @@ import * as mtgaLog from "./mtga-log";
 // Hopefully we'll be able to get rid of all of the ones that can change,
 // and put them into stores or better structures than a giant export list.
 
-let actionLogDir = "";
+const actionLogDir = "";
 
-let logUri = mtgaLog.defaultLogUri();
+const logUri = mtgaLog.defaultLogUri();
 
-let currentDeck = new Deck();
+const currentDeck = new Deck();
 
-let currentMatch: any = null;
+const currentMatch: any = null;
 
 const debugLog = false;
 
 const debugNet = true;
 
-let duringDraft = false;
+const duringDraft = false;
 
-let duringMatch = false;
+const duringMatch = false;
 
-let firstPass = true;
+const firstPass = true;
 
-let gameNumberCompleted = 0;
+const gameNumberCompleted = 0;
 
-let idChanges: any = {};
+const idChanges: any = {};
 
-let initialLibraryInstanceIds: any[] = [];
+const initialLibraryInstanceIds: any[] = [];
 
-let instanceToCardIdMap: any = {};
+const instanceToCardIdMap: any = {};
 
-let logReadStart: any = null;
+const logReadStart: any = null;
 
-let logTime = false;
+const logTime = false;
 
-let matchCompletedOnGameNumber = 0;
+const matchCompletedOnGameNumber = 0;
 
-let matchGameStats: any[] = [];
+const matchGameStats: any[] = [];
 
-let originalDeck: any = undefined;
+const originalDeck: any = undefined;
 
-let odds_sample_size = 1;
+const odds_sample_size = 1;
 
-let toolVersion: any = null;
+const toolVersion: any = null;
 
 const rememberCfg = {
   email: "",
@@ -60,13 +60,13 @@ const rememberCfg = {
   }
 };
 
-let rStore: any = null;
+const rStore: any = null;
 
-let store: any = null;
+const store: any = null;
 
-let tokenAuth: any = undefined;
+const tokenAuth: any = undefined;
 
-let watchingLog = false;
+const watchingLog = false;
 
 let stopWatchingLog: any;
 

@@ -110,21 +110,21 @@ function getTagColor(tag) {
 }
 
 function makeResizable(div, resizeCallback, finalCallback) {
-  var m_pos;
+  let m_pos;
   let finalWidth;
 
-  let resize = function(e) {
-    var parent = div.parentNode;
-    var dx = m_pos - e.x;
+  const resize = function(e) {
+    const parent = div.parentNode;
+    const dx = m_pos - e.x;
     m_pos = e.x;
-    let newWidth = Math.max(10, parseInt(parent.style.width) + dx);
+    const newWidth = Math.max(10, parseInt(parent.style.width) + dx);
     parent.style.width = `${newWidth}px`;
     parent.style.flex = `0 0 ${newWidth}px`;
     if (resizeCallback instanceof Function) resizeCallback(newWidth);
     finalWidth = newWidth;
   };
 
-  let saveWidth = function(width) {
+  const saveWidth = function(width) {
     ipcSend("save_user_settings", {
       right_panel_width: width,
       skip_refresh: true
@@ -171,8 +171,8 @@ function drawDeck(div, deck, showWildcards = false) {
   const unique = makeId(4);
 
   if (deck.commandZoneGRPId) {
-    let commander = deck.commandZoneGRPId;
-    let separator = deckDrawer.cardSeparator(`Commander`);
+    const commander = deck.commandZoneGRPId;
+    const separator = deckDrawer.cardSeparator(`Commander`);
     div.appendChild(separator);
 
     const tile = deckDrawer.cardTile(
@@ -249,7 +249,7 @@ function drawDeck(div, deck, showWildcards = false) {
   const sideboardSize = _.sumBy(deck.sideboard, "quantity");
   if (sideboardSize) {
     // draw a separator for the sideboard
-    let separator = deckDrawer.cardSeparator(`Sideboard (${sideboardSize})`);
+    const separator = deckDrawer.cardSeparator(`Sideboard (${sideboardSize})`);
     div.appendChild(separator);
 
     // draw the cards
@@ -273,11 +273,11 @@ function drawDeck(div, deck, showWildcards = false) {
 }
 
 function drawCardList(div, cards) {
-  let unique = makeId(4);
-  let counts = {};
+  const unique = makeId(4);
+  const counts = {};
   cards.forEach(cardId => (counts[cardId] = (counts[cardId] || 0) + 1));
   Object.keys(counts).forEach(cardId => {
-    let tile = deckDrawer.cardTile(
+    const tile = deckDrawer.cardTile(
       pd.settings.card_tile_style,
       cardId,
       unique,
@@ -475,7 +475,7 @@ function openActionLog(actionLogId) {
   const actionLogContainer = createDiv(["action_log_container"]);
 
   const actionLogFile = path.join(actionLogDir, actionLogId + ".txt");
-  let str = fs.readFileSync(actionLogFile).toString();
+  const str = fs.readFileSync(actionLogFile).toString();
 
   const actionLog = str.split("\n");
   for (let line = 1; line < actionLog.length - 1; line += 3) {
@@ -784,8 +784,8 @@ function getEventWinLossClass(wlGate) {
 }
 
 function compareWinrates(a, b) {
-  let _a = a.wins / a.losses;
-  let _b = b.wins / b.losses;
+  const _a = a.wins / a.losses;
+  const _b = b.wins / b.losses;
 
   if (_a < _b) return 1;
   if (_a > _b) return -1;
@@ -800,10 +800,10 @@ function compareColorWinrates(a, b) {
   if (a.length < b.length) return -1;
   if (a.length > b.length) return 1;
 
-  let sa = a.reduce(function(_a, _b) {
+  const sa = a.reduce(function(_a, _b) {
     return _a + _b;
   }, 0);
-  let sb = b.reduce(function(_a, _b) {
+  const sb = b.reduce(function(_a, _b) {
     return _a + _b;
   }, 0);
   if (sa < sb) return -1;
@@ -851,7 +851,7 @@ function attachMatchData(listItem, match) {
   oppRank.title = formatRank(match.opponent);
   listItem.rightTop.appendChild(oppRank);
 
-  let date = !match.date
+  const date = !match.date
     ? "Unknown date - "
     : localTimeSince(new Date(match.date));
   // Match time
@@ -899,10 +899,10 @@ function createDraftSetDiv(draft) {
 }
 
 export function createInventoryCard(card) {
-  var inventoryCard = createDiv(["inventory_card"]);
+  const inventoryCard = createDiv(["inventory_card"]);
   inventoryCard.style.width = "39px";
 
-  var img = createImg();
+  const img = createImg();
   img.style.width = "39px";
   img.src = getCardImage(card);
   img.title = card.name;
@@ -922,7 +922,7 @@ export function createInventoryCard(card) {
 }
 
 export function createRoundCard(card, rarityOverlay = false) {
-  var roundCard = createDiv([
+  const roundCard = createDiv([
     "round_card",
     card.rarity,
     `rarity-overlay${rarityOverlay ? "" : "-none"}`
@@ -944,7 +944,7 @@ export function createRoundCard(card, rarityOverlay = false) {
 }
 
 function createDraftRares(draft) {
-  var draftRares = createDiv(["flex_item"]);
+  const draftRares = createDiv(["flex_item"]);
   draftRares.style.margin = "auto";
   if (!draft.pickedCards) return draftRares;
 
@@ -1020,7 +1020,7 @@ export function attachDraftData(listItem, draft) {
 
 function draftShareLink(id, draft) {
   const shareExpire = byId("expire_select").value;
-  let draftData = JSON.stringify(draft);
+  const draftData = JSON.stringify(draft);
   let expire = 0;
   switch (shareExpire) {
     case "One day":

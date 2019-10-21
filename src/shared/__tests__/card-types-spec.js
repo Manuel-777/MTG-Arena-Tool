@@ -27,7 +27,7 @@ describe("card-types", () => {
         if (!_.has(card, "name")) return; // some properties are not cards :(
         if (card.name === "City's Blessing") return; // has no type
         if (card.id === 100) return; // has invalid type
-        let act = () => cardType(card);
+        const act = () => cardType(card);
         expect(act).not.toThrow();
       });
     });

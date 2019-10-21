@@ -68,7 +68,7 @@ const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 const byId = id => document.getElementById(id);
 
-let landsCard = {
+const landsCard = {
   id: 100,
   name: "Lands",
   set: "",
@@ -142,8 +142,8 @@ ipc.on("edit", () => {
 function toggleEditMode() {
   editMode = !editMode;
 
-  let divsList = [];
-  let mainHover = queryElements(".main_hover")[0];
+  const divsList = [];
+  const mainHover = queryElements(".main_hover")[0];
   mainHover.style.opacity = "1";
   divsList.push(byId("overlay_hover"));
   pd.settings.overlays.forEach((_overlay, index) => {
@@ -233,7 +233,7 @@ function saveOverlaysPosition() {
   });
 
   const hoverDiv = byId("overlay_hover");
-  let overlayHover = {
+  const overlayHover = {
     x: forceInt(hoverDiv.style.left),
     y: forceInt(hoverDiv.style.top)
   };
@@ -264,7 +264,7 @@ function settingsUpdated() {
   if (editMode) return;
 
   console.log(window.innerWidth, window.innerHeight);
-  let hoverContainer = byId("overlay_hover");
+  const hoverContainer = byId("overlay_hover");
   if (pd.settings.overlayHover) {
     hoverContainer.style.left = `${pd.settings.overlayHover.x}px`;
     hoverContainer.style.top = `${pd.settings.overlayHover.y}px`;
@@ -294,14 +294,14 @@ function settingsUpdated() {
 
     change_background(index, pd.settings.back_url);
 
-    let deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
-    let deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
-    let deckListDom = `#overlay_${index + 1} .overlay_decklist`;
-    let clockDom = `#overlay_${index + 1} .overlay_clock_container`;
-    let bgImageDom = `#overlay_${index + 1} .overlay_bg_image`;
-    let elementsDom = `#overlay_${index + 1} .elements_wrapper`;
-    let topDom = `#overlay_${index + 1} .top_nav_wrapper`;
-    let mainHoverDom = ".main_hover";
+    const deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
+    const deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
+    const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
+    const clockDom = `#overlay_${index + 1} .overlay_clock_container`;
+    const bgImageDom = `#overlay_${index + 1} .overlay_bg_image`;
+    const elementsDom = `#overlay_${index + 1} .elements_wrapper`;
+    const topDom = `#overlay_${index + 1} .top_nav_wrapper`;
+    const mainHoverDom = ".main_hover";
 
     queryElements(bgImageDom)[0].style.opacity = _overlay.alpha_back.toString();
     queryElements(elementsDom)[0].style.opacity = _overlay.alpha.toString();
@@ -353,7 +353,7 @@ ipc.on("set_draft_cards", (event, draft) => {
 });
 
 ipc.on("set_turn", (event, arg) => {
-  let { playerSeat: _we, turnPriority: _priority } = arg;
+  const { playerSeat: _we, turnPriority: _priority } = arg;
   playerSeat = _we;
   if (
     turnPriority != _priority &&
@@ -361,8 +361,8 @@ ipc.on("set_turn", (event, arg) => {
     pd.settings.sound_priority
   ) {
     //    playBlip();
-    let { Howl, Howler } = require("howler");
-    let sound = new Howl({ src: ["../sounds/blip.mp3"] });
+    const { Howl, Howler } = require("howler");
+    const sound = new Howl({ src: ["../sounds/blip.mp3"] });
     Howler.volume(pd.settings.sound_priority_volume);
     sound.play();
   }
@@ -374,7 +374,7 @@ ipc.on("set_turn", (event, arg) => {
   //turnDecision = _decision;
 
   pd.settings.overlays.forEach((_overlay, index) => {
-    let clockTurnDom = `#overlay_${index + 1} .clock_turn`;
+    const clockTurnDom = `#overlay_${index + 1} .clock_turn`;
     if (clockMode[index] === 0) {
       recreateClock(index);
     }
@@ -408,12 +408,12 @@ ipc.on("set_match", (event, arg) => {
 
 function updateMatchView(index) {
   if (!currentMatch) return;
-  let settings = pd.settings.overlays[index];
+  const settings = pd.settings.overlays[index];
 
-  let deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
-  let deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
-  let deckListDom = `#overlay_${index + 1} .overlay_decklist`;
-  let archDom = `#overlay_${index + 1} .overlay_archetype`;
+  const deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
+  const deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
+  const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
+  const archDom = `#overlay_${index + 1} .overlay_archetype`;
 
   let cleanName =
     currentMatch && currentMatch.opponent && currentMatch.opponent.name;
@@ -437,14 +437,14 @@ function updateMatchView(index) {
   queryElements(deckNameDom)[0].innerHTML = "";
 
   let deckListDiv;
-  let overlayMode = settings.mode;
+  const overlayMode = settings.mode;
 
   deckListDiv = queryElements(deckListDom)[0];
   if (overlayMode === OVERLAY_LOG) {
     // Action Log Mode
     queryElements(deckNameDom)[0].innerHTML = "Action Log";
 
-    let initalTime = actionLog[0] ? new Date(actionLog[0].time) : new Date();
+    const initalTime = actionLog[0] ? new Date(actionLog[0].time) : new Date();
     actionLog.forEach(log => {
       log.str = log.str.replace(
         "<log-card",
@@ -492,21 +492,21 @@ function updateMatchView(index) {
 
   if (overlayMode === OVERLAY_FULL) {
     // Full Deck Mode
-    let cardsCount = currentMatch.player.deck.mainboard.count();
+    const cardsCount = currentMatch.player.deck.mainboard.count();
     deckListDiv.appendChild(
       createDiv(["decklist_title"], "Full Deck: " + cardsCount + " cards")
     );
     deckToDraw = currentMatch.player.deck;
   } else if (overlayMode === OVERLAY_LEFT) {
     // Library Mode
-    let cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
+    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
     deckListDiv.appendChild(
       createDiv(["decklist_title"], "Library: " + cardsLeft + " cards")
     );
     deckToDraw = currentMatch.playerCardsLeft;
   } else if (overlayMode === OVERLAY_ODDS || overlayMode === OVERLAY_MIXED) {
     // Next Draw Odds Mode
-    let cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
+    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
     deckListDiv.appendChild(
       createDiv(
         ["decklist_title"],
@@ -557,7 +557,7 @@ function updateMatchView(index) {
     sortFunc = compare_quantity;
   }
 
-  let mainCards = deckToDraw.mainboard;
+  const mainCards = deckToDraw.mainboard;
   mainCards.removeDuplicates();
   // group lands
   if (
@@ -568,9 +568,9 @@ function updateMatchView(index) {
   ) {
     let landsNumber = 0;
     let landsChance = 0;
-    let landsColors = new Colors();
+    const landsColors = new Colors();
     mainCards.get().forEach(card => {
-      let cardObj = db.card(card.id);
+      const cardObj = db.card(card.id);
       if (cardObj && cardObj.type.includes("Land", 0)) {
         landsNumber += card.quantity;
         landsChance += card.chance !== undefined ? card.chance : 0;
@@ -581,7 +581,7 @@ function updateMatchView(index) {
         }
       }
     });
-    let lands = mainCards.add(landsCard, landsNumber, true);
+    const lands = mainCards.add(landsCard, landsNumber, true);
     if (landsChance > 0) {
       lands.chance = landsChance;
     }
@@ -593,8 +593,8 @@ function updateMatchView(index) {
   mainCards.get().forEach(card => {
     let tile;
     if (overlayMode === OVERLAY_MIXED) {
-      let odds = (card.chance !== undefined ? card.chance : "0") + "%";
-      let q = card.quantity;
+      const odds = (card.chance !== undefined ? card.chance : "0") + "%";
+      const q = card.quantity;
 
       if (!settings.lands || (settings.lands && odds !== "0%")) {
         tile = deckDrawer.cardTile(pd.settings.card_tile_style, card.id, "a", {
@@ -603,7 +603,7 @@ function updateMatchView(index) {
         });
       }
     } else if (overlayMode === OVERLAY_ODDS) {
-      let quantity = (card.chance !== undefined ? card.chance : "0") + "%";
+      const quantity = (card.chance !== undefined ? card.chance : "0") + "%";
       if (!settings.lands || (settings.lands && quantity !== "0%")) {
         tile = deckDrawer.cardTile(
           pd.settings.card_tile_style,
@@ -673,11 +673,11 @@ function updateMatchView(index) {
 }
 
 function attachLandOdds(tile, odds) {
-  let landsDiv = createDiv(["lands_div"]);
+  const landsDiv = createDiv(["lands_div"]);
 
-  let createManaChanceDiv = function(odds, color) {
-    let cont = createDiv(["mana_cont"], odds + "%");
-    let div = createDiv(["mana_s16", "flex_end", "mana_" + color]);
+  const createManaChanceDiv = function(odds, color) {
+    const cont = createDiv(["mana_cont"], odds + "%");
+    const div = createDiv(["mana_s16", "flex_end", "mana_" + color]);
     cont.appendChild(div);
     landsDiv.appendChild(cont);
   };
@@ -704,13 +704,13 @@ function attachLandOdds(tile, odds) {
 }
 
 function drawDeckOdds(index) {
-  let deckListDom = `#overlay_${index + 1} .overlay_decklist`;
-  let deckListDiv = queryElements(deckListDom)[0];
+  const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
+  const deckListDiv = queryElements(deckListDom)[0];
 
   const navCont = createDiv(["overlay_samplesize_container"]);
 
-  let oddsPrev = createDiv(["odds_prev", "click-on"]);
-  let oddsNext = createDiv(["odds_next", "click-on"]);
+  const oddsPrev = createDiv(["odds_prev", "click-on"]);
+  const oddsNext = createDiv(["odds_next", "click-on"]);
 
   navCont.appendChild(oddsPrev);
   navCont.appendChild(
@@ -722,7 +722,7 @@ function drawDeckOdds(index) {
 
   deckListDiv.appendChild(createDiv(["chance_title"])); // Add some space
 
-  let cardOdds = currentMatch.playerCardsOdds;
+  const cardOdds = currentMatch.playerCardsOdds;
 
   deckListDiv.appendChild(
     createDiv(
@@ -781,11 +781,11 @@ function drawDeckOdds(index) {
     )
   );
 
-  let oddNextDom = `#overlay_${index + 1} .odds_next`;
-  let oddPrevDom = `#overlay_${index + 1} .odds_prev`;
+  const oddNextDom = `#overlay_${index + 1} .odds_next`;
+  const oddPrevDom = `#overlay_${index + 1} .odds_prev`;
   //
   queryElements(oddPrevDom)[0].addEventListener("click", function() {
-    let cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
+    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
     oddsSampleSize -= 1;
     if (oddsSampleSize < 1) {
       oddsSampleSize = cardsLeft - 1;
@@ -794,7 +794,7 @@ function drawDeckOdds(index) {
   });
   //
   queryElements(oddNextDom)[0].addEventListener("click", function() {
-    let cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
+    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
     oddsSampleSize += 1;
     if (oddsSampleSize > cardsLeft - 1) {
       oddsSampleSize = 1;
@@ -803,7 +803,7 @@ function drawDeckOdds(index) {
   });
 }
 
-var currentDraft;
+let currentDraft;
 let packN;
 let pickN;
 
@@ -819,14 +819,14 @@ function updateDraftView(index, _packN = -1, _pickN = -1) {
   }
   const key = "pack_" + packN + "pick_" + pickN;
 
-  let deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
-  let deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
-  let deckListDom = `#overlay_${index + 1} .overlay_decklist`;
+  const deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
+  const deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
+  const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
 
   queryElements(deckListDom)[0].innerHTML = "";
   queryElements(deckColorsDom)[0].innerHTML = "";
 
-  let overlayMode = settings.mode;
+  const overlayMode = settings.mode;
   if (overlayMode === OVERLAY_DRAFT) {
     const titleDiv = queryElements(deckNameDom)[0];
     titleDiv.style.display = "";
@@ -845,7 +845,7 @@ function updateDraftView(index, _packN = -1, _pickN = -1) {
     const draftPrev = createDiv(["draft_prev", "click-on"]);
     draftPrev.addEventListener("click", function() {
       pickN -= 1;
-      let packSize = (currentDraft && PACK_SIZES[currentDraft.set]) || 14;
+      const packSize = (currentDraft && PACK_SIZES[currentDraft.set]) || 14;
 
       if (pickN < 0) {
         pickN = packSize;
@@ -865,7 +865,7 @@ function updateDraftView(index, _packN = -1, _pickN = -1) {
     const draftNext = createDiv(["draft_next", "click-on"]);
     draftNext.addEventListener("click", function() {
       pickN += 1;
-      let packSize = (currentDraft && PACK_SIZES[currentDraft.set]) || 14;
+      const packSize = (currentDraft && PACK_SIZES[currentDraft.set]) || 14;
 
       if (pickN > packSize) {
         pickN = 0;
@@ -977,9 +977,9 @@ window.setInterval(() => {
 
 function updateClock(index) {
   let hh, mm, ss;
-  let clockPriority1Dom = `#overlay_${index + 1} .clock_priority_1`;
-  let clockPriority2Dom = `#overlay_${index + 1} .clock_priority_2`;
-  let clockElapsedDom = `#overlay_${index + 1} .clock_elapsed`;
+  const clockPriority1Dom = `#overlay_${index + 1} .clock_priority_1`;
+  const clockPriority2Dom = `#overlay_${index + 1} .clock_priority_2`;
+  const clockElapsedDom = `#overlay_${index + 1} .clock_elapsed`;
 
   if (matchBeginTime === 0) {
     hh = 0;
@@ -1025,8 +1025,8 @@ function updateClock(index) {
 }
 
 function recreateClock(index) {
-  let clockTurnDom = `#overlay_${index + 1} .clock_turn`;
-  let clockElapsedDom = `#overlay_${index + 1} .clock_elapsed`;
+  const clockTurnDom = `#overlay_${index + 1} .clock_turn`;
+  const clockElapsedDom = `#overlay_${index + 1} .clock_elapsed`;
 
   const clockTurn = queryElements(clockTurnDom)[0];
   const clockElapsed = queryElements(clockElapsedDom)[0];
@@ -1095,7 +1095,7 @@ function change_background(index, arg = "default") {
 
 function close(bool, index) {
   // -1 to toggle, else set
-  let _new = bool == -1 ? !pd.settings.overlays[index].show : bool;
+  const _new = bool == -1 ? !pd.settings.overlays[index].show : bool;
 
   const overlays = [...pd.settings.overlays];
   const newOverlay = {
@@ -1160,11 +1160,11 @@ ready(function() {
 
       const deckListDiv = queryElements(deckListDom)[0];
       deckListDiv.addEventListener("mouseover", function() {
-        let index = this.offsetParent.offsetParent.attributes["0"].value.slice(
-          -1
-        );
-        let mainHoverDom = ".main_hover";
-        let settings = pd.settings.overlays[index - 1];
+        const index = this.offsetParent.offsetParent.attributes[
+          "0"
+        ].value.slice(-1);
+        const mainHoverDom = ".main_hover";
+        const settings = pd.settings.overlays[index - 1];
 
         if (settings.cards_overlay) {
           queryElements(mainHoverDom)[0].style.display = "";
@@ -1213,12 +1213,12 @@ ready(function() {
 });
 
 function get_ids_colors(list) {
-  var colors = [];
+  const colors = [];
   list.forEach(function(grpid) {
-    var cdb = db.card(grpid);
+    const cdb = db.card(grpid);
     if (cdb) {
       //var card_name = cdb.name;
-      var card_cost = cdb.cost;
+      const card_cost = cdb.cost;
       card_cost.forEach(function(c) {
         if (c.indexOf("w") !== -1 && !colors.includes(1)) colors.push(1);
         if (c.indexOf("u") !== -1 && !colors.includes(2)) colors.push(2);

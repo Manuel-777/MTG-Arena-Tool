@@ -123,7 +123,7 @@ export function openDecksTab(_filters = {}, scrollTop = 0) {
       aggregator.deckLastPlayed[deck.id]);
 
   decks.filter(isDeckVisible).forEach(deck => {
-    let tileGrpid = deck.deckTileId;
+    const tileGrpid = deck.deckTileId;
     let listItem;
     if (deck.custom) {
       const archiveCallback = id => {
@@ -168,11 +168,11 @@ export function openDecksTab(_filters = {}, scrollTop = 0) {
       mythic: pd.economy.wcMythic
     };
 
-    let missingWildcards = get_deck_missing(deck);
+    const missingWildcards = get_deck_missing(deck);
 
     let wc;
     let n = 0;
-    let boosterCost = getBoosterCountEstimate(missingWildcards);
+    const boosterCost = getBoosterCountEstimate(missingWildcards);
     CARD_RARITIES.forEach(cardRarity => {
       if (missingWildcards[cardRarity]) {
         n++;

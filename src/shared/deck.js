@@ -53,10 +53,10 @@ class Deck {
    * returns a clone of this deck, not referenced to this instance.
    **/
   clone() {
-    let main = objectClone(this.mainboard.get());
-    let side = objectClone(this.sideboard.get());
+    const main = objectClone(this.mainboard.get());
+    const side = objectClone(this.sideboard.get());
 
-    let obj = {
+    const obj = {
       name: this.name,
       id: this.id,
       lastUpdated: this.lastUpdated,
@@ -66,7 +66,7 @@ class Deck {
       commandZoneGRPId: this.commandZoneGRPId
     };
 
-    let ret = new Deck(objectClone(obj), main, side);
+    const ret = new Deck(objectClone(obj), main, side);
 
     return ret;
   }
@@ -80,12 +80,12 @@ class Deck {
     this._colors = new Colors();
 
     if (countMainboard) {
-      let mainboardColors = this.mainboard.getColors();
+      const mainboardColors = this.mainboard.getColors();
       this._colors.addFromColor(mainboardColors);
     }
 
     if (countSideboard) {
-      let sideboardColors = this.sideboard.getColors();
+      const sideboardColors = this.sideboard.getColors();
       this._colors.addFromColor(sideboardColors);
     }
 
@@ -96,7 +96,7 @@ class Deck {
    * Return how many of each wildcard we need to complete this deck.
    **/
   getMissingWildcards(countMainboard = true, countSideboard = true) {
-    let missing = {
+    const missing = {
       rare: 0,
       common: 0,
       uncommon: 0,
@@ -107,11 +107,11 @@ class Deck {
 
     if (countMainboard) {
       this.mainboard.get().forEach(card => {
-        var grpid = card.id;
-        var quantity = card.quantity;
-        var rarity = db.card(grpid).rarity;
+        const grpid = card.id;
+        const quantity = card.quantity;
+        const rarity = db.card(grpid).rarity;
 
-        let add = get_wc_missing(grpid, quantity);
+        const add = get_wc_missing(grpid, quantity);
 
         missing[rarity] += add;
       });
@@ -119,11 +119,11 @@ class Deck {
 
     if (countSideboard) {
       this.sideboard.get().forEach(card => {
-        var grpid = card.id;
-        var quantity = card.quantity;
-        var rarity = db.card(grpid).rarity;
+        const grpid = card.id;
+        const quantity = card.quantity;
+        const rarity = db.card(grpid).rarity;
 
-        let add = get_wc_missing(grpid, quantity);
+        const add = get_wc_missing(grpid, quantity);
 
         missing[rarity] += add;
       });
@@ -137,20 +137,20 @@ class Deck {
    **/
   getExportTxt() {
     let str = "";
-    let mainList = this.mainboard.removeDuplicates(false);
+    const mainList = this.mainboard.removeDuplicates(false);
     mainList.forEach(function(card) {
-      let grpid = card.id;
-      let card_name = db.card(grpid).name;
+      const grpid = card.id;
+      const card_name = db.card(grpid).name;
 
       str += (card.measurable ? card.quantity : 1) + " " + card_name + "\r\n";
     });
 
     str += "\r\n";
 
-    let sideList = this.sideboard.removeDuplicates(false);
+    const sideList = this.sideboard.removeDuplicates(false);
     sideList.forEach(function(card) {
-      let grpid = card.id;
-      let card_name = db.card(grpid).name;
+      const grpid = card.id;
+      const card_name = db.card(grpid).name;
 
       str += (card.measurable ? card.quantity : 1) + " " + card_name + "\r\n";
     });
@@ -160,7 +160,7 @@ class Deck {
 
   getExportArena() {
     let str = "";
-    let listMain = this.mainboard.removeDuplicates(false);
+    const listMain = this.mainboard.removeDuplicates(false);
     listMain.forEach(function(card) {
       let grpid = card.id;
       let cardObj = db.card(grpid);
@@ -170,18 +170,18 @@ class Deck {
         cardObj = db.card(grpid);
       }
 
-      let card_name = cardObj.name;
-      let card_set = cardObj.set;
-      let card_cn = cardObj.cid;
-      let card_q = card.measurable ? card.quantity : 1;
+      const card_name = cardObj.name;
+      const card_set = cardObj.set;
+      const card_cn = cardObj.cid;
+      const card_q = card.measurable ? card.quantity : 1;
 
-      let set_code = db.sets[card_set].arenacode || get_set_code(card_set);
+      const set_code = db.sets[card_set].arenacode || get_set_code(card_set);
       str += `${card_q} ${card_name} (${set_code}) ${card_cn} \r\n`;
     });
 
     str += "\r\n";
 
-    let listSide = this.sideboard.removeDuplicates(false);
+    const listSide = this.sideboard.removeDuplicates(false);
     listSide.forEach(function(card) {
       let grpid = card.id;
       let cardObj = db.card(grpid);
@@ -191,12 +191,12 @@ class Deck {
         cardObj = db.card(grpid);
       }
 
-      let card_name = cardObj.name;
-      let card_set = cardObj.set;
-      let card_cn = cardObj.cid;
-      let card_q = card.measurable ? card.quantity : 1;
+      const card_name = cardObj.name;
+      const card_set = cardObj.set;
+      const card_cn = cardObj.cid;
+      const card_q = card.measurable ? card.quantity : 1;
 
-      let set_code = db.sets[card_set].arenacode || get_set_code(card_set);
+      const set_code = db.sets[card_set].arenacode || get_set_code(card_set);
       str += `${card_q} ${card_name} (${set_code}) ${card_cn} \r\n`;
     });
 
@@ -208,7 +208,7 @@ class Deck {
   }
 
   getSaveRaw() {
-    let ret = {};
+    const ret = {};
     ret.mainDeck = this.mainboard.get();
     ret.sideboard = this.sideboard.get();
     ret.name = this.name;

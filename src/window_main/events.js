@@ -118,7 +118,7 @@ function renderData(container, index) {
   listItem.divideRight();
   attachEventData(listItem, course);
 
-  var divExp = createDiv([course.id + "exp", "list_event_expand"]);
+  const divExp = createDiv([course.id + "exp", "list_event_expand"]);
 
   container.appendChild(listItem.container);
   container.appendChild(divExp);
@@ -173,7 +173,7 @@ function getCourseStats(course) {
 
   if (!wlGate) return stats;
 
-  let matchesList = wlGate.ProcessedMatchIds;
+  const matchesList = wlGate.ProcessedMatchIds;
 
   if (courseDataIsCorrupt(course)) {
     // If there's no matches list we can't count duration.
@@ -212,16 +212,16 @@ function getCourseStats(course) {
 }
 
 function attachEventData(listItem, course) {
-  let deckName = getReadableEvent(course.InternalEventName);
-  let deckNameDiv = createDiv(["list_deck_name"], deckName);
+  const deckName = getReadableEvent(course.InternalEventName);
+  const deckNameDiv = createDiv(["list_deck_name"], deckName);
   listItem.leftTop.appendChild(deckNameDiv);
 
   course.CourseDeck.colors.forEach(color => {
-    let m = createDiv(["mana_s20", `mana_${MANA[color]}`]);
+    const m = createDiv(["mana_s20", `mana_${MANA[color]}`]);
     listItem.leftBottom.appendChild(m);
   });
 
-  var eventState = course.CurrentEventState;
+  const eventState = course.CurrentEventState;
   if (course.custom || eventState === "DoneWithMatches" || eventState === 2) {
     listItem.rightTop.appendChild(createDiv(["list_event_phase"], "Completed"));
   } else {
@@ -251,7 +251,7 @@ function attachEventData(listItem, course) {
     CurrentLosses: losses
   });
 
-  let resultDiv = createDiv(["list_match_result", winLossClass], wl);
+  const resultDiv = createDiv(["list_match_result", winLossClass], wl);
   resultDiv.style.marginLeft = "8px";
   listItem.right.after(resultDiv);
 }
@@ -309,7 +309,7 @@ function handleOpenDraft(id) {
 // rows below the event for every match in that event.
 export function expandEvent(id) {
   const course = pd.event(id);
-  let expandDiv = queryElementsByClass(id + "exp")[0];
+  const expandDiv = queryElementsByClass(id + "exp")[0];
 
   if (expandDiv.hasAttribute("style")) {
     expandDiv.removeAttribute("style");

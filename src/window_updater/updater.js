@@ -19,9 +19,9 @@ if (!remote.app.isPackaged) {
 ipc.on("update_progress", (event, state) => {
   console.log(state);
 
-  let progress = state.percent;
-  let speed = Math.round(state.bytesPerSecond / 1024);
-  let progressBar = document.getElementById("progressBar");
+  const progress = state.percent;
+  const speed = Math.round(state.bytesPerSecond / 1024);
+  const progressBar = document.getElementById("progressBar");
   progressBar.style.width = Math.round(progress) + "%";
 
   state.total = Math.round((state.total / 1024 / 1024) * 100) / 100;

@@ -351,7 +351,7 @@ function appendBehaviour(section) {
 function appendArenaData(section) {
   section.appendChild(createDiv(["settings_title"], "Arena Data"));
 
-  let label = createLabel(["but_container_label"], "Cards language:");
+  const label = createLabel(["but_container_label"], "Cards language:");
   const langSelect = createSelect(
     label,
     LANGUAGES,
@@ -523,8 +523,8 @@ function appendOverlay(section) {
     sliderSoundVolumeLabel.innerHTML = "Volume: " + volume + "%";
   });
   sliderSoundVolumeInput.addEventListener("change", function() {
-    let { Howl, Howler } = require("howler");
-    let sound = new Howl({ src: ["../sounds/blip.mp3"] });
+    const { Howl, Howler } = require("howler");
+    const sound = new Howl({ src: ["../sounds/blip.mp3"] });
     Howler.volume(this.value);
     sound.play();
     ipcSend("save_user_settings", {
@@ -547,7 +547,7 @@ function appendOverlay(section) {
 
   const topCont = createDiv(["overlay_section_selector_cont", "top_nav_icons"]);
 
-  let overlayDisplay = pd.settings.overlay_display
+  const overlayDisplay = pd.settings.overlay_display
     ? pd.settings.overlay_display
     : remote.screen.getPrimaryDisplay().id;
 
@@ -570,10 +570,10 @@ function appendOverlay(section) {
     filter => ipcSend("save_user_settings", { overlay_display: filter }),
     "overlay_display",
     filter => {
-      let displayNumber = remote.screen
+      const displayNumber = remote.screen
         .getAllDisplays()
         .findIndex(d => d.id == filter);
-      let primary = filter == remote.screen.getPrimaryDisplay().id;
+      const primary = filter == remote.screen.getPrimaryDisplay().id;
 
       return `Display ${displayNumber} ${primary ? "(primary)" : ""}`;
     }
@@ -1126,7 +1126,7 @@ function appendShortcuts(section) {
   gridDiv.appendChild(cell);
 
   Object.keys(SHORTCUT_NAMES).forEach(function(key, index) {
-    let ld = index % 2 ? "line_dark" : "line_light";
+    const ld = index % 2 ? "line_dark" : "line_light";
 
     cell = createDiv([ld, "shortcuts_line"], SHORTCUT_NAMES[key]);
     cell.style.gridArea = `${index + 2} / 1 / auto / 2`;
@@ -1139,7 +1139,7 @@ function appendShortcuts(section) {
     cell = createDiv([ld, "shortcuts_line"]);
     cell.style.gridArea = `${index + 2} / 3 / auto / 4`;
 
-    let editBut = createDiv([ld, "button_simple", "button_edit"], "Edit");
+    const editBut = createDiv([ld, "button_simple", "button_edit"], "Edit");
 
     editBut.addEventListener("click", function() {
       openKeyCombinationDialog(key);
@@ -1160,12 +1160,12 @@ function openKeyCombinationDialog(name) {
 
   remote.globalShortcut.unregisterAll();
 
-  let desc = createDiv(["keycomb_desc"], "Press any key");
-  let okButton = createDiv(["button_simple"], "Ok");
+  const desc = createDiv(["keycomb_desc"], "Press any key");
+  const okButton = createDiv(["button_simple"], "Ok");
 
   function reportKeyEvent(zEvent) {
-    let keyDesc = $$(".keycomb_desc")[0];
-    let keys = [];
+    const keyDesc = $$(".keycomb_desc")[0];
+    const keys = [];
 
     if (zEvent.ctrlKey) keys.push("Control");
     if (zEvent.shiftKey) keys.push("Shift");
@@ -1175,7 +1175,7 @@ function openKeyCombinationDialog(name) {
     if (!["Control", "Shift", "Alt", "Meta"].includes(zEvent.key))
       keys.push(zEvent.key);
 
-    let reportStr = keys.join("+");
+    const reportStr = keys.join("+");
     keyDesc.innerHTML = reportStr;
 
     zEvent.stopPropagation();

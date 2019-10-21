@@ -44,16 +44,16 @@ export function openHomeTab(arg, opentab = true) {
   }
 
   if (usersActive) {
-    let d = createDiv(["list_fill"]);
+    const d = createDiv(["list_fill"]);
     mainDiv.appendChild(d);
-    let title = createDiv(["card_tile_separator"], "General");
+    const title = createDiv(["card_tile_separator"], "General");
     mainDiv.appendChild(title);
-    let users = createDiv(["text_centered"], "Users active: " + usersActive);
+    const users = createDiv(["text_centered"], "Users active: " + usersActive);
     users.setAttribute("tooltip-content", "In the last 24 hours.");
     users.setAttribute("tooltip-bottom", "");
     users.style.textAlign = "center";
 
-    let daily = createDiv(
+    const daily = createDiv(
       ["text_centered", "white", "daily_left"],
       "Daily rewards end: -"
     );
@@ -89,9 +89,9 @@ export function openHomeTab(arg, opentab = true) {
   let cont = createDiv(["tournament_list_cont"]);
 
   if (ls.discordTag === null || ls.discordTag == "") {
-    let but = createDiv(["discord_but"]);
+    const but = createDiv(["discord_but"]);
     but.addEventListener("click", () => {
-      let url =
+      const url =
         "https://discordapp.com/api/oauth2/authorize?client_id=531626302004789280&redirect_uri=http%3A%2F%2Fmtgatool.com%2Fdiscord%2F&response_type=code&scope=identify%20email&state=" +
         ls.authToken;
       shell.openExternal(url);
@@ -99,8 +99,8 @@ export function openHomeTab(arg, opentab = true) {
 
     cont.appendChild(but);
   } else {
-    let dname = ls.discordTag.split("#")[0];
-    let fl = createDiv(
+    const dname = ls.discordTag.split("#")[0];
+    const fl = createDiv(
       ["flex_item"],
       `<div class="discord_icon"></div><div class="top_username discord_username">${dname}</div><div class="discord_message">Your discord tag will be visible to your opponents.</div>`
     );
@@ -108,7 +108,7 @@ export function openHomeTab(arg, opentab = true) {
     fl.style.width = "fit-content";
     mainDiv.appendChild(fl);
 
-    let unlinkBut = createDiv(["button_simple", "centered"], "Unlink");
+    const unlinkBut = createDiv(["button_simple", "centered"], "Unlink");
     mainDiv.appendChild(unlinkBut);
 
     unlinkBut.addEventListener("click", () => {
@@ -120,11 +120,11 @@ export function openHomeTab(arg, opentab = true) {
     if (tournaments_list) {
       // Create tournament button
       if (pd.name === "Manuel777#63494") {
-        let div = createDiv(["tou_container"]);
+        const div = createDiv(["tou_container"]);
         div.id = "create";
         div.style.justifyContent = "center";
-        let createBut = createDiv(["tou_create_but"]);
-        let nam = createDiv(["tou_name"], "Create tournament");
+        const createBut = createDiv(["tou_create_but"]);
+        const nam = createDiv(["tou_name"], "Create tournament");
         nam.style.width = "auto";
 
         div.appendChild(createBut);
@@ -134,10 +134,10 @@ export function openHomeTab(arg, opentab = true) {
 
       // Tournaments list
       tournaments_list.forEach(function(tou, index) {
-        let div = createDiv(["tou_container"]);
+        const div = createDiv(["tou_container"]);
         div.id = tou._id;
 
-        let stat = createDiv(["top_status"]);
+        const stat = createDiv(["top_status"]);
         if (tou.password) {
           stat.classList.add("status_locked");
         } else {
@@ -146,11 +146,11 @@ export function openHomeTab(arg, opentab = true) {
           else stat.classList.add("status_green");
         }
 
-        let sd = tou.signupDuration;
-        let rd = tou.roundDuration;
+        const sd = tou.signupDuration;
+        const rd = tou.roundDuration;
 
-        let roundsStart = tou.starts + sd * 60 * 60;
-        let roundEnd =
+        const roundsStart = tou.starts + sd * 60 * 60;
+        const roundEnd =
           tou.starts + sd * 60 * 60 + (tou.currentRound + 1) * (60 * 60) * rd;
 
         let state = "-";
@@ -159,7 +159,7 @@ export function openHomeTab(arg, opentab = true) {
           state = "";
           listInterval.push(
             window.setInterval(() => {
-              let now = timestamp();
+              const now = timestamp();
               try {
                 $$(".list_state_" + index)[0].innerHTML =
                   "Registration begins in " + toHHMMSS(now - tou.starts);
@@ -174,7 +174,7 @@ export function openHomeTab(arg, opentab = true) {
           stateb = "";
           listInterval.push(
             window.setInterval(() => {
-              let now = timestamp();
+              const now = timestamp();
               try {
                 $$(".list_stateb_" + index)[0].innerHTML =
                   toHHMMSS(roundsStart - now) + " left";
@@ -194,7 +194,7 @@ export function openHomeTab(arg, opentab = true) {
           stateb = "";
           listInterval.push(
             window.setInterval(() => {
-              let now = timestamp();
+              const now = timestamp();
               try {
                 $$(".list_stateb_" + index)[0].innerHTML =
                   toHHMMSS(roundEnd - now) + " left";
@@ -213,11 +213,11 @@ export function openHomeTab(arg, opentab = true) {
           stateb = "Winner: " + tou.winner.slice(0, -6);
         }
 
-        let nam = createDiv(["tou_name"], tou.name);
-        let fo = createDiv(["tou_cell"], tou.format);
-        let st = createDiv(["tou_state", "list_state_" + index], state);
-        let stb = createDiv(["tou_cell"], tou.players.length + " players.");
-        let pln = createDiv(["tou_cell", "list_stateb_" + index], stateb);
+        const nam = createDiv(["tou_name"], tou.name);
+        const fo = createDiv(["tou_cell"], tou.format);
+        const st = createDiv(["tou_state", "list_state_" + index], state);
+        const stb = createDiv(["tou_cell"], tou.players.length + " players.");
+        const pln = createDiv(["tou_cell", "list_stateb_" + index], stateb);
         pln.style.width = "140px";
         div.appendChild(stat);
         div.appendChild(nam);
@@ -243,7 +243,7 @@ export function openHomeTab(arg, opentab = true) {
     });
   });
 
-  let orderedSets = Object.keys(db.sets).filter(
+  const orderedSets = Object.keys(db.sets).filter(
     set => db.sets[set].collation > 0
   );
 
@@ -261,9 +261,9 @@ export function openHomeTab(arg, opentab = true) {
     title.setAttribute("tooltip-bottom", "");
     mainDiv.appendChild(title);
 
-    let setsContainer = createDiv(["top_wildcards_sets_cont"]);
+    const setsContainer = createDiv(["top_wildcards_sets_cont"]);
     orderedSets.forEach(set => {
-      let setbutton = createDiv(["set_filter"]);
+      const setbutton = createDiv(["set_filter"]);
       if (filteredWildcardsSet !== set) {
         setbutton.classList.add("set_filter_on");
       }
@@ -311,8 +311,8 @@ export function openHomeTab(arg, opentab = true) {
     cont.appendChild(cell);
 
     topWildcards.forEach((wc, index) => {
-      let card = db.card(wc.grpId);
-      let ld = index % 2 ? "line_dark" : "line_light";
+      const card = db.card(wc.grpId);
+      const ld = index % 2 ? "line_dark" : "line_light";
 
       cell = createDiv([ld], index + 1);
       cell.style.gridArea = `${index + 2} / 1 / auto / auto`;

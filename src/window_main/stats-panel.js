@@ -262,7 +262,7 @@ class StatsPanel {
     if (curveMaxTags && curveMax) {
       archContainer.style.display = "block";
       colorContainer.style.display = "none";
-      let label = createLabel(["but_container_label"], "Group by:");
+      const label = createLabel(["but_container_label"], "Group by:");
       const langSelect = createSelect(
         label,
         ["Archetype", "Color"],
