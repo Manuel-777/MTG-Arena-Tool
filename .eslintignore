@@ -18,4 +18,5 @@ src/fonts/*
 
 # production
 /build
+/lib
 /dist

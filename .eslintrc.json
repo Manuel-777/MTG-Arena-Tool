@@ -1,14 +1,13 @@
 {
-  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-  "plugins": ["prettier"],
+  "parser": "@typescript-eslint/parser",
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier/@typescript-eslint", "plugin:prettier/recommended"],
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 9
+    "ecmaVersion": 9,
+    "project": "./tsconfig.json"
   },
   "env": {
-    "es6": true,
-    "node": true,
-    "browser": true
+    "node": true
   },
   "rules": {
     "allowEmptyCatch": true,
