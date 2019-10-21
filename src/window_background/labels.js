@@ -25,6 +25,7 @@ import {
 import actionLog from "./actionLog";
 import addCustomDeck from "./addCustomDeck";
 import { createDraft, createMatch, completeMatch } from "./data";
+import * as httpApi from "./http-api";
 
 let logLanguage = "English";
 
@@ -51,6 +52,8 @@ function clearDraftData(draftId) {
 }
 
 function decodePayload(json) {
+  // I don't want to mess with this messages_pb stuff.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const messages = require("./messages_pb");
 
   const msgType = json.clientToMatchServiceMessageType.split("_")[1],
@@ -139,7 +142,6 @@ function endDraft(data) {
   if (globals.debugLog || !globals.firstPass)
     ipc_send("set_arena_state", ARENA_MODE_IDLE);
   if (!data) return;
-  const httpApi = require("./http-api");
   httpApi.httpSetDraft(data);
   ipc_send("popup", { text: "Draft saved!", time: 3000 });
 }
@@ -169,7 +171,6 @@ function processMatch(json, matchBeginTime) {
 
   if (match.eventId == "DirectGame" && globals.currentDeck) {
     const str = globals.currentDeck.getSave();
-    const httpApi = require("./http-api");
     httpApi.httpTournamentCheck(str, match.opponent.name, true);
   }
 
@@ -218,7 +219,6 @@ function saveEconomyTransaction(transaction) {
 
   if (globals.debugLog || !globals.firstPass) globals.store.set(id, txnData);
   setData({ [id]: txnData });
-  const httpApi = require("./http-api");
   httpApi.httpSetEconomy(txnData);
 }
 
@@ -252,7 +252,6 @@ function saveMatch(id, matchEndTime) {
   if (globals.debugLog || !globals.firstPass) globals.store.set(id, match);
   setData({ [id]: match });
   if (globals.matchCompletedOnGameNumber === globals.gameNumberCompleted) {
-    const httpApi = require("./http-api");
     httpApi.httpSetMatch(match);
   }
   ipc_send("set_timer", 0, IPC_OVERLAY);
@@ -591,7 +590,6 @@ export function onLabelRankUpdated(entry, json) {
     updateType
   );
 
-  const httpApi = require("./http-api");
   httpApi.httpSetSeasonal(json);
 
   setData({ rank, seasonal_rank });
@@ -715,7 +713,6 @@ export function onLabelInEventGetPlayerCourse(entry, json) {
       addCustomDeck(json.CourseDeck);
       //json.date = timestamp();
       //console.log(json.CourseDeck, json.CourseDeck.colors)
-      const httpApi = require("./http-api");
       httpApi.httpSubmitCourse(json);
       saveCourse(json);
     }
@@ -1064,7 +1061,6 @@ export function onLabelEventMatchCreated(entry, json) {
   const matchBeginTime = parseWotcTimeFallback(entry.timestamp);
 
   if (json.opponentRankingClass == "Mythic") {
-    const httpApi = require("./http-api");
     httpApi.httpSetMythicRank(
       json.opponentScreenName,
       json.opponentMythicLeaderboardPlace
@@ -1086,7 +1082,6 @@ export function onLabelOutDirectGameChallenge(entry, json) {
   deck = JSON.parse(deck);
   select_deck(deck);
 
-  const httpApi = require("./http-api");
   httpApi.httpTournamentCheck(
     deck,
     json.params.opponentDisplayName,

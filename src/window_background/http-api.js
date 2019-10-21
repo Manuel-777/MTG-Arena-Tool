@@ -7,6 +7,7 @@ import playerData from "../shared/player-data";
 import db from "../shared/database";
 import globals from "./globals";
 import { loadPlayerConfig } from "./loadPlayerConfig";
+import { request as httpRequest } from "https";
 
 let metadataState = false;
 
@@ -133,7 +134,6 @@ export function httpBasic() {
 
       _headers.token = globals.tokenAuth;
 
-      const http = require("https");
       let options;
       if (_headers.method == "get_database") {
         options = {
@@ -209,7 +209,7 @@ export function httpBasic() {
       };
 
       let results = "";
-      const req = http.request(options, function(res) {
+      const req = httpRequest(options, function(res) {
         if (res.statusCode < 200 || res.statusCode > 299) {
           ipc_send("popup", {
             text: `Error with request. (${_headers.method}: ${res.statusCode})`,

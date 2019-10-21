@@ -20,10 +20,11 @@ import {
   startWatchingLog
 } from "./loadPlayerConfig";
 import update_deck from "./updateDeck";
+import { openNewGitHubIssue, debugInfo } from "electron-util";
+import unhandled from "electron-unhandled";
+import { init as sentryInit } from "@sentry/electron";
 
 if (!remote.app.isPackaged) {
-  const { openNewGitHubIssue, debugInfo } = require("electron-util");
-  const unhandled = require("electron-unhandled");
   unhandled({
     showDialog: true,
     reportButton: error => {
@@ -35,8 +36,7 @@ if (!remote.app.isPackaged) {
     }
   });
   require("devtron").install();
-  const Sentry = require("@sentry/electron");
-  Sentry.init({
+  sentryInit({
     dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
   });
 }

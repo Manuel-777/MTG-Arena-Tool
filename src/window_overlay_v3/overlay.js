@@ -43,7 +43,8 @@ import {
 } from "../shared/constants.js";
 import { openNewGitHubIssue, debugInfo } from "electron-util";
 import unhandled from "electron-unhandled";
-import * as Sentry from "@sentry/electron";
+import { init as sentryInit } from "@sentry/electron";
+import { Howl, Howler } from "howler";
 
 let fix = null;
 
@@ -58,7 +59,7 @@ if (!remote.app.isPackaged) {
       });
     }
   });
-  Sentry.init({
+  sentryInit({
     dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
   });
 }
@@ -1114,7 +1115,6 @@ ipc.on("set_turn", (event, arg) => {
     pd.settings.sound_priority
   ) {
     //    playBlip();
-    const { Howl, Howler } = require("howler");
     const sound = new Howl({ src: ["../sounds/blip.mp3"] });
     Howler.volume(pd.settings.sound_priority_volume);
     sound.play();

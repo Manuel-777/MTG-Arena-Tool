@@ -1,8 +1,8 @@
 import { ipcRenderer as ipc, remote } from "electron";
+import { openNewGitHubIssue, debugInfo } from "electron-util";
+import unhandled from "electron-unhandled";
 
 if (!remote.app.isPackaged) {
-  const { openNewGitHubIssue, debugInfo } = require("electron-util");
-  const unhandled = require("electron-unhandled");
   unhandled({
     showDialog: true,
     reportButton: error => {

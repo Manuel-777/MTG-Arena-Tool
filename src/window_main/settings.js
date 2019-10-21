@@ -37,8 +37,6 @@ import * as deckDrawer from "../shared/deck-drawer";
 import { showWhatsNew } from "./whats-new";
 import { createSelect } from "../shared/select";
 import { getCardImage } from "../shared/util";
-const byId = id => document.getElementById(id);
-
 import parse from "date-fns/parse";
 import isValid from "date-fns/isValid";
 import {
@@ -53,6 +51,9 @@ import {
   setLocalState,
   showColorpicker
 } from "./renderer-util";
+import { Howl, Howler } from "howler";
+
+const byId = id => document.getElementById(id);
 
 let lastSettingsSection = 1;
 let updateState = "";
@@ -523,7 +524,6 @@ function appendOverlay(section) {
     sliderSoundVolumeLabel.innerHTML = "Volume: " + volume + "%";
   });
   sliderSoundVolumeInput.addEventListener("change", function() {
-    const { Howl, Howler } = require("howler");
     const sound = new Howl({ src: ["../sounds/blip.mp3"] });
     Howler.volume(this.value);
     sound.play();
