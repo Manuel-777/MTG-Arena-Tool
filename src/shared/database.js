@@ -19,7 +19,7 @@ const cachePath =
         "..",
         "Electron",
         "external",
-        "v22-zh-cn-database.json"
+        "v25-en-database.json"
       )
     : null;
 

@@ -487,6 +487,14 @@ exports.SETS_DATA = {
     tile: 64827,
     release: "2016-07-22"
   },
+  "Dragons of Tarkir": {
+    collation: -1,
+    scryfall: "dtk",
+    code: "DTK",
+    arenacode: "DTK",
+    tile: 64827,
+    release: "2015-03-27"
+  },
   "": {
     collation: -1,
     scryfall: "",
@@ -541,7 +549,8 @@ exports.SET_NAMES = {
   ZEN: "Zendikar",
   GTC: "Gatecrash",
   C13: "Commander 2013",
-  EMN: "Eldritch Moon"
+  EMN: "Eldritch Moon",
+  DTK: "Dragons of Tarkir"
 };
 
 exports.NO_DUPES_ART_SETS = [
@@ -608,7 +617,8 @@ exports.ALLOWED_SCRYFALL = [
   "zen",
   "gtc",
   "c13",
-  "emn"
+  "emn",
+  "dtk"
 ];
 
 exports.RANKS_SHEETS = [

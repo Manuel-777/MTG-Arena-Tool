@@ -1,7 +1,6 @@
 import { ipcRenderer as ipc, webFrame, remote } from "electron";
 import interact from "interactjs";
 import format from "date-fns/format";
-import TransparencyMouseFix from "./electron-transparency-mouse-fix.js";
 import striptags from "striptags";
 import db from "../shared/database";
 import pd from "../shared/player-data";
@@ -274,13 +273,44 @@ function attachLandOdds(tile, odds) {
     }
   });
 
-  tile.addEventListener("mouseleave", () => {
-    queryElements(".lands_div").forEach(div => {
-      if (div) {
-        queryElements(".overlay_hover_container")[0].removeChild(div);
-      }
-    });
-  });
+  changeBackground(index, pd.settings.back_url);
+
+  const messageDom = `#overlay_${index + 1} .overlay_message`;
+  const deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
+  const deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
+  const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
+  const clockDom = `#overlay_${index + 1} .overlay_clock_container`;
+  const bgImageDom = `#overlay_${index + 1} .overlay_bg_image`;
+  const elementsDom = `#overlay_${index + 1} .elements_wrapper`;
+  const topDom = `#overlay_${index + 1} .top_nav_wrapper`;
+  const mainHoverDom = ".main_hover";
+
+  queryElements(bgImageDom)[0].style.opacity = _overlay.alpha_back.toString();
+  queryElements(elementsDom)[0].style.opacity = _overlay.alpha.toString();
+
+  queryElements(topDom)[0].style = "";
+  queryElements(topDom)[0].style.display = _overlay.top ? "" : "none";
+  queryElements(deckNameDom)[0].style = "";
+  queryElements(deckNameDom)[0].style.display = _overlay.title ? "" : "none";
+  queryElements(deckColorsDom)[0].style = "";
+  queryElements(deckColorsDom)[0].style.display = _overlay.title
+    ? ""
+    : "none";
+
+  queryElements(deckListDom)[0].style.display = _overlay.deck ? "" : "none";
+  queryElements(mainHoverDom)[0].style.width = pd.cardsSizeHoverCard + "px";
+  queryElements(mainHoverDom)[0].style.height =
+    pd.cardsSizeHoverCard / 0.71808510638 + "px";
+
+  const showClock =
+    _overlay.clock && !OVERLAY_DRAFT_MODES.includes(_overlay.mode);
+  queryElements(clockDom)[0].style.display = showClock ? "" : "none";
+
+  if (OVERLAY_DRAFT_MODES.includes(_overlay.mode)) {
+    updateDraftView(index);
+  } else {
+    updateMatchView(index);
+  }
 }
 
 function drawDeckOdds(index) {
@@ -1178,13 +1208,14 @@ ready(function() {
       <div class="outer_wrapper elements_wrapper">
         <div class="overlay_deckname"></div>
         <div class="overlay_deckcolors"></div>
-        <div class="overlay_decklist"></div>
+        <div class="overlay_decklist click-on"></div>
         <div class="overlay_clock_container">
             <div class="clock_prev click-on"></div>
             <div class="clock_turn"></div>
             <div class="clock_elapsed"></div>
             <div class="clock_next click-on"></div>
         </div>
+        <div class="overlay_message click-on"></div>
       </div>
       <div class="outer_wrapper top_nav_wrapper">
         <div class="flex_item overlay_icon click-on"></div>

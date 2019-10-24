@@ -5,14 +5,27 @@ import { createDiv, queryElements as $$ } from "./dom-fns";
 import { getCardImage } from "./util";
 import { DRAFT_RANKS, FACE_DFC_BACK, FACE_DFC_FRONT } from "./constants.js";
 
+// controls when to auto-hide hover display
+// workaround for edge case bugs that cause hover to "get stuck"
+const MAX_HOVER_TIME = 10000; // 10 seconds
+
 let renderer = 0;
 
 export const setRenderer = value => {
   renderer = value;
 };
 
+let lastHoverStart = null;
+
 export function addCardHover(element, card) {
   if (!card || !card.images || card.type == "Special") return;
+
+  const hideHover = () => {
+    $$(
+      ".hover_card_quantity, .main_hover, .main_hover_ratings, .main_hover_dfc, .loader, .loader_dfc"
+    ).forEach(element => (element.style.opacity = 0));
+    lastHoverStart = null;
+  };
 
   element.addEventListener("mouseover", () => {
     $$(".loader, .main_hover").forEach(element => (element.style.opacity = 1));
@@ -57,13 +70,17 @@ export function addCardHover(element, card) {
         element => (element.style.display = "none")
       );
     }
+
+    lastHoverStart = Date.now();
+
+    setTimeout(() => {
+      if (lastHoverStart && Date.now() - lastHoverStart > MAX_HOVER_TIME) {
+        hideHover();
+      }
+    }, MAX_HOVER_TIME + 1);
   });
 
-  element.addEventListener("mouseleave", () => {
-    $$(
-      ".hover_card_quantity, .main_hover, .main_hover_ratings, .main_hover_dfc, .loader, .loader_dfc"
-    ).forEach(element => (element.style.opacity = 0));
-  });
+  element.addEventListener("mouseleave", hideHover);
 }
 
 function show(element, mode) {

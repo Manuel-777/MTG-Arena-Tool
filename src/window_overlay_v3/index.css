@@ -547,3 +547,15 @@ body {
     height: 32px !important;
     justify-content: flex-end !important;
 }
+
+.overlay_text {
+    position: absolute;
+    color: var(--color-r);
+    font-size: 20px;
+    font-family: var(--sub-font-name-it);
+    text-align: center;
+    width: 100%;
+    height: 32px;
+    line-height: 32px;
+    top: calc(50% - 16px);
+}

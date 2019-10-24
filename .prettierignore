@@ -19,3 +19,4 @@ coverage
 # production
 build
 dist
+lib

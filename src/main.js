@@ -45,8 +45,8 @@ const ipc = electron.ipcMain;
 
 let mainLoaded = false;
 let backLoaded = false;
+let overlayLoaded = false;
 let arenaState = ARENA_MODE_IDLE;
-const overlayShow = false;
 
 const singleLock = app.requestSingleInstanceLock();
 
@@ -136,9 +136,11 @@ function startApp() {
   mainWindow = createMainWindow();
   background = createBackgroundWindow();
 
-  setTimeout(() => {
-    overlay = createOverlayWindow();
-  }, 500);
+  const startBackgroundWhenReady = () => {
+    if (mainLoaded && backLoaded && overlayLoaded) {
+      background.webContents.send("start_background");
+    }
+  };
 
   globalShortcut.register("Alt+Shift+D", openDevTools);
 
@@ -146,17 +148,21 @@ function startApp() {
 
   mainWindow.webContents.once("dom-ready", () => {
     mainLoaded = true;
-    if (backLoaded == true) {
-      background.webContents.send("start_background");
-    }
+    startBackgroundWhenReady();
   });
 
   background.webContents.once("dom-ready", () => {
     backLoaded = true;
-    if (mainLoaded == true) {
-      background.webContents.send("start_background");
-    }
+    startBackgroundWhenReady();
   });
+
+  setTimeout(() => {
+    overlay = createOverlayWindow();
+    overlay.webContents.once("dom-ready", () => {
+      overlayLoaded = true;
+      startBackgroundWhenReady();
+    });
+  }, 500);
 
   // If we destroy updater before creating another renderer
   // Electron shuts down the whole app.
@@ -203,12 +209,12 @@ function startApp() {
         if (arenaState === ARENA_MODE_IDLE) {
           mainWindow.webContents.send("player_data_refresh");
         }
-        if (overlay) overlay.webContents.send("player_data_refresh");
+        overlay.webContents.send("player_data_refresh");
         break;
 
       case "set_db":
         mainWindow.webContents.send("set_db", arg);
-        if (overlay) overlay.webContents.send("set_db", arg);
+        overlay.webContents.send("set_db", arg);
         break;
 
       case "popup":
@@ -316,7 +322,7 @@ function startApp() {
       default:
         if (to == 0) background.webContents.send(method, arg);
         if (to == 1) mainWindow.webContents.send(method, arg);
-        if (to === 2 && overlay) overlay.webContents.send(method, arg);
+        if (to === 2) overlay.webContents.send(method, arg);
         break;
     }
   });
@@ -434,7 +440,6 @@ function updateOverlayVisibility() {
 }
 
 function isEntireOverlayVisible() {
-  if (!overlay) return false;
   return overlay.isVisible();
 }
 
@@ -566,24 +571,18 @@ function createOverlayWindow() {
     resizable: false,
     skipTaskbar: true,
     focusable: false,
-    title: "MTG Arena Tool",
+    title: "Overlay",
     webPreferences: {
       nodeIntegration: true
     }
   });
   overlay.loadURL(`file://${__dirname}/window_overlay_v3/index.html`);
-  //overlay.setIgnoreMouseEvents(true, { forward: true });
 
-  overlay.webContents.once("dom-ready", function() {
-    //We need to wait for the overlay to be initialized before we interact with it
-    //const display = electron.screen.getPrimaryDisplay();
-    // display.workArea does not include the taskbar
-    //overlay.setBounds(display.bounds);
-    overlay.webContents.send("settings_updated");
-    // only show overlay after its ready
-    // TODO does this work with Linux transparency???
-    //setTimeout(() => overlay.show(), 1000);
-  });
+  if (process.platform !== "linux") {
+    // https://electronjs.org/docs/api/browser-window#winsetignoremouseeventsignore-options
+    // does not currently support Linux
+    overlay.setIgnoreMouseEvents(true, { forward: true });
+  }
 
   return overlay;
 }
