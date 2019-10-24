@@ -734,8 +734,6 @@ function renderLogInput(section) {
       )
     ) {
       ipcSend("set_log", byId("settings_log_uri").value);
-      remote.app.relaunch();
-      remote.app.exit(0);
     } else {
       logUriInput.value = pd.settings.logUri;
     }

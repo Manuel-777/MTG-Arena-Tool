@@ -5,8 +5,9 @@ import { makeId } from "../shared/util";
 import { ipc_send, setData } from "./background-util";
 import playerData from "../shared/player-data";
 import db from "../shared/database";
+import { appDb, playerDb } from "../shared/local-database";
 import globals from "./globals";
-import { loadPlayerConfig } from "./loadPlayerConfig";
+import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 
 let metadataState = false;
 
@@ -25,11 +26,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       courses_index.push(id);
-      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      playerDb.upsert("", id, doc, null, globals);
       setData({ [id]: doc }, false);
     });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("courses_index", courses_index);
+  playerDb.upsert("", "courses_index", courses_index, null, globals);
 
   // Sync Matches
   const matches_index = [...playerData.matches_index];
@@ -40,11 +40,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       matches_index.push(id);
-      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      playerDb.upsert("", id, doc, null, globals);
       setData({ [id]: doc }, false);
     });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("matches_index", matches_index);
+  playerDb.upsert("", "matches_index", matches_index, null, globals);
 
   // Sync Economy
   const economy_index = [...playerData.economy_index];
@@ -55,11 +54,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       economy_index.push(id);
-      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      playerDb.upsert("", id, doc, null, globals);
       setData({ [id]: doc }, false);
     });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("economy_index", economy_index);
+  playerDb.upsert("", "economy_index", economy_index, null, globals);
 
   // Sync Drafts
   const draft_index = [...playerData.draft_index];
@@ -70,11 +68,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       draft_index.push(id);
-      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      playerDb.upsert("", id, doc, null, globals);
       setData({ [id]: doc }, false);
     });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("draft_index", draft_index);
+  playerDb.upsert("", "draft_index", draft_index, null, globals);
 
   // Sync seasonal
   data.seasonal.forEach(doc => {
@@ -101,7 +98,7 @@ function syncUserData(data) {
   if (data.settings.tags_colors) {
     let newTags = data.settings.tags_colors;
     setData({ tags_colors: { ...newTags } });
-    globals.store.set("tags_colors", newTags);
+    playerDb.upsert("", "tags_colors", newTags, null, globals);
   }
 
   setData({ courses_index, draft_index, economy_index, matches_index });
@@ -131,7 +128,7 @@ export function httpBasic() {
         return;
       }
 
-      _headers.token = globals.tokenAuth;
+      _headers.token = playerData.settings.token;
 
       var http = require("https");
       var options;
@@ -307,13 +304,13 @@ export function httpBasic() {
               }
               if (parsedResult && parsedResult.ok) {
                 if (_headers.method == "auth") {
-                  globals.tokenAuth = parsedResult.token;
+                  syncSettings({ token: parsedResult.token }, false);
 
                   ipc_send("auth", parsedResult);
                   //ipc_send("auth", parsedResult.arenaids);
                   if (playerData.settings.remember_me) {
-                    globals.rStore.set("token", globals.tokenAuth);
-                    globals.rStore.set("email", playerData.userName);
+                    appDb.upsert("", "token", parsedResult.token);
+                    appDb.upsert("", "email", playerData.userName);
                   }
                   const data = {};
                   data.patreon = parsedResult.patreon;
@@ -449,9 +446,9 @@ export function httpBasic() {
                   });
                 }
                 if (_headers.method == "auth") {
-                  globals.tokenAuth = undefined;
-                  globals.rStore.set("email", "");
-                  globals.rStore.set("token", "");
+                  syncSettings({ token: "" }, false);
+                  appDb.upsert("", "email", "");
+                  appDb.upsert("", "token", "");
                   ipc_send("auth", {});
                   ipc_send("toggle_login", true);
                   ipc_send("clear_pwd", 1);
@@ -537,7 +534,7 @@ export function httpNotificationsPull() {
 }
 
 function notificationProcess(data) {
-  if (!data) return;
+  if (!data || !data.notifications) return;
   data.notifications.forEach(str => {
     console.log("notifications message:", str);
     if (typeof str == "string") {

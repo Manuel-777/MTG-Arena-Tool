@@ -47,6 +47,7 @@ import {
   setData,
   updateLoading
 } from "./background-util";
+import { playerDb } from "../shared/local-database";
 import { ARENA_MODE_MATCH, ARENA_MODE_DRAFT } from "../shared/constants";
 import update_deck from "./updateDeck";
 import globals from "./globals";
@@ -159,10 +160,10 @@ async function readChunk(path, position, length) {
   return buffer;
 }
 
-function startWatchingLog() {
+function startWatchingLog(path) {
   globals.logReadStart = new Date();
   return start({
-    path: globals.logUri,
+    path,
     chunkSize: 268435440,
     onLogEntry: onLogEntryFound,
     onError: err => console.error(err),
@@ -458,7 +459,7 @@ function finishLoading() {
       progress: 2
     });
     globals.firstPass = false;
-    globals.store.set(playerData.data);
+    playerDb.upsertAll(playerData.data);
     logReadEnd = new Date();
     let logReadElapsed = (logReadEnd - globals.logReadStart) / 1000;
     ipc_send("ipc_log", `Log read in ${logReadElapsed}s`);

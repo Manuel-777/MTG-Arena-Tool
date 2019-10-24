@@ -1,7 +1,8 @@
+import _ from "lodash";
 import { ipc_send, setData } from "./background-util";
 import globals from "./globals";
+import { playerDb } from "../shared/local-database";
 import playerData from "../shared/player-data";
-import Store from "electron-store";
 import arenaLogWatcher from "./arena-log-watcher";
 
 // Merges settings and updates singletons across processes
@@ -24,55 +25,23 @@ export function loadPlayerConfig(playerId) {
     time: 0,
     progress: 2
   });
-  globals.store = new Store({
-    name: playerId,
-    defaults: playerData.defaultCfg
+  playerDb.init(playerId, playerData.name);
+
+  playerDb.findAll((err, savedData) => {
+    const __playerData = _.defaultsDeep(savedData, playerData);
+    const { settings } = __playerData;
+
+    syncSettings(settings, true);
+    setData(__playerData, false);
+    ipc_send("renderer_set_bounds", __playerData.windowBounds);
+
+    ipc_send("popup", {
+      text: "Player history loaded.",
+      time: 3000,
+      progress: -1
+    });
+
+    globals.watchingLog = true;
+    globals.stopWatchingLog = arenaLogWatcher.startWatchingLog(settings.logUri);
   });
-
-  const savedData = globals.store.get();
-  const savedOverlays = savedData.settings.overlays || [];
-  const appSettings = globals.rStore.get("settings");
-  const settings = {
-    ...playerData.settings,
-    ...savedData.settings,
-    ...appSettings,
-    overlays: playerData.settings.overlays.map((overlay, index) => {
-      if (index < savedOverlays.length) {
-        // blend in new default overlay settings
-        return { ...overlay, ...savedOverlays[index] };
-      } else {
-        return overlay;
-      }
-    })
-  };
-  const __playerData = {
-    ...playerData,
-    ...savedData,
-    settings
-  };
-  syncSettings(__playerData.settings, true);
-  setData(__playerData, false);
-  ipc_send("renderer_set_bounds", playerData.windowBounds);
-
-  ipc_send("popup", {
-    text: "Player history loaded.",
-    time: 3000,
-    progress: -1
-  });
-
-  ipc_send("popup", {
-    text: "Loading settings...",
-    time: 0,
-    progress: 2
-  });
-
-  globals.watchingLog = true;
-  globals.stopWatchingLog = arenaLogWatcher.startWatchingLog();
-  ipc_send("popup", {
-    text: "Settings loaded.",
-    time: 3000,
-    progress: -1
-  });
-
-  return __playerData;
 }

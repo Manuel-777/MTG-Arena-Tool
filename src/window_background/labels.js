@@ -8,6 +8,7 @@ import {
   CONSTRUCTED_EVENTS
 } from "../shared/constants";
 import db from "../shared/database";
+import { playerDb } from "../shared/local-database";
 import CardsList from "../shared/cards-list";
 import { get_deck_colors, objectClone, replaceAll } from "../shared/util";
 import * as greToClientInterpreter from "./gre-to-client-interpreter";
@@ -41,12 +42,10 @@ function clearDraftData(draftId) {
       const draft_index = [...playerData.draft_index];
       draft_index.splice(draft_index.indexOf(draftId), 1);
       setData({ draft_index }, false);
-      if (globals.debugLog || !globals.firstPass)
-        globals.store.set("draft_index", draft_index);
+      playerDb.upsert("", "draft_index", draft_index, null, globals);
     }
     setData({ [draftId]: null });
-    // Note: we must always run delete, regardless of firstpass
-    globals.store.delete(draftId);
+    playerDb.remove("", draftId);
   }
 }
 
@@ -119,12 +118,11 @@ function setDraftData(data) {
   // console.log("Set draft data:", data);
   if (!playerData.draft_index.includes(id)) {
     const draft_index = [...playerData.draft_index, id];
-    if (globals.debugLog || !globals.firstPass)
-      globals.store.set("draft_index", draft_index);
+    playerDb.upsert("", "draft_index", draft_index, null, globals);
     setData({ draft_index }, false);
   }
 
-  if (globals.debugLog || !globals.firstPass) globals.store.set(id, data);
+  playerDb.upsert("", id, data, null, globals);
   setData({
     [id]: data,
     cards: playerData.cards,
@@ -192,12 +190,11 @@ function saveCourse(json) {
 
   if (!playerData.courses_index.includes(id)) {
     const courses_index = [...playerData.courses_index, id];
-    if (globals.debugLog || !globals.firstPass)
-      globals.store.set("courses_index", courses_index);
+    playerDb.upsert("", "courses_index", courses_index, null, globals);
     setData({ courses_index }, false);
   }
 
-  if (globals.debugLog || !globals.firstPass) globals.store.set(id, eventData);
+  playerDb.upsert("", id, eventData, null, globals);
   setData({ [id]: eventData });
 }
 
@@ -211,12 +208,11 @@ function saveEconomyTransaction(transaction) {
 
   if (!playerData.economy_index.includes(id)) {
     const economy_index = [...playerData.economy_index, id];
-    if (globals.debugLog || !globals.firstPass)
-      globals.store.set("economy_index", economy_index);
+    playerDb.upsert("", "economy_index", economy_index, null, globals);
     setData({ economy_index }, false);
   }
 
-  if (globals.debugLog || !globals.firstPass) globals.store.set(id, txnData);
+  playerDb.upsert("", id, txnData, null, globals);
   setData({ [id]: txnData });
   const httpApi = require("./http-api");
   httpApi.httpSetEconomy(txnData);
@@ -244,12 +240,11 @@ function saveMatch(id, matchEndTime) {
   // console.log("Save match:", match);
   if (!playerData.matches_index.includes(id)) {
     const matches_index = [...playerData.matches_index, id];
-    if (globals.debugLog || !globals.firstPass)
-      globals.store.set("matches_index", matches_index);
+    playerDb.upsert("", "matches_index", matches_index, null, globals);
     setData({ matches_index }, false);
   }
 
-  if (globals.debugLog || !globals.firstPass) globals.store.set(id, match);
+  playerDb.upsert("", id, match, null, globals);
   setData({ [id]: match });
   if (globals.matchCompletedOnGameNumber === globals.gameNumberCompleted) {
     const httpApi = require("./http-api");
@@ -552,9 +547,7 @@ export function onLabelInEventGetCombinedRankInfo(entry, json) {
   }
 
   setData({ rank });
-  if (globals.debugLog || !globals.firstPass) {
-    globals.store.set("rank", rank);
-  }
+  playerDb.upsert("", "rank", rank, null, globals);
 }
 
 export function onLabelInEventGetActiveEvents(entry, json) {
@@ -595,10 +588,8 @@ export function onLabelRankUpdated(entry, json) {
   httpApi.httpSetSeasonal(json);
 
   setData({ rank, seasonal_rank });
-  if (globals.debugLog || !globals.firstPass) {
-    globals.store.set("rank", rank);
-    globals.store.set("seasonal_rank", seasonal_rank);
-  }
+  playerDb.upsert("", "rank", rank, null, globals);
+  playerDb.upsert("", "seasonal_rank", seasonal_rank, null, globals);
 }
 
 export function onLabelMythicRatingUpdated(entry, json) {
@@ -639,10 +630,8 @@ export function onLabelMythicRatingUpdated(entry, json) {
   );
 
   setData({ rank, seasonal_rank });
-  if (globals.debugLog || !globals.firstPass) {
-    globals.store.set("rank", rank);
-    globals.store.set("seasonal_rank", seasonal_rank);
-  }
+  playerDb.upsert("", "rank", rank, null, globals);
+  playerDb.upsert("", "seasonal_rank", seasonal_rank, null, globals);
 }
 
 export function onLabelInDeckGetDeckLists(entry, json) {
@@ -653,14 +642,12 @@ export function onLabelInDeckGetDeckLists(entry, json) {
   json.forEach(deck => {
     const deckData = { ...(playerData.deck(deck.id) || {}), ...deck };
     decks[deck.id] = deckData;
-    if (globals.debugLog || !globals.firstPass)
-      globals.store.set("decks." + deck.id, deckData);
+    playerDb.upsert("decks", deck.id, deckData, null, globals);
     static_decks.push(deck.id);
   });
 
   setData({ decks, static_decks });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("static_decks", static_decks);
+  playerDb.upsert("", "static_decks", static_decks, null, globals);
 }
 
 export function onLabelInDeckGetDeckListsV3(entry, json) {
@@ -688,8 +675,7 @@ export function onLabelInEventGetPlayerCourses(entry, json) {
   });
 
   setData({ static_events });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("static_events", static_events);
+  playerDb.upsert("", "static_events", static_events, null, globals);
 }
 
 export function onLabelInEventGetPlayerCoursesV2(entry, json) {
@@ -809,23 +795,26 @@ export function onLabelInDeckUpdateDeck(entry, json) {
     (deltaDeck.changesMain.length || deltaDeck.changesSide.length);
 
   if (foundNewDeckChange) {
-    if (globals.debugLog || !globals.firstPass)
-      globals.store.set("deck_changes." + changeId, deltaDeck);
+    playerDb.upsert("deckChanges", changeId, deltaDeck, null, globals);
     const deck_changes = { ...playerData.deck_changes, [changeId]: deltaDeck };
     const deck_changes_index = [...playerData.deck_changes_index];
     if (!deck_changes_index.includes(changeId)) {
       deck_changes_index.push(changeId);
     }
-    if (globals.debugLog || !globals.firstPass)
-      globals.store.set("deck_changes_index", deck_changes_index);
+    playerDb.upsert(
+      "",
+      "deck_changes_index",
+      deck_changes_index,
+      null,
+      globals
+    );
 
     setData({ deck_changes, deck_changes_index });
   }
 
   const deckData = { ..._deck, ...json };
   const decks = { ...playerData.decks, [json.id]: deckData };
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("decks." + json.id, deckData);
+  playerDb.upsert("decks", json.id, deckData, null, globals);
   setData({ decks });
 }
 
@@ -891,8 +880,7 @@ export function onLabelInPlayerInventoryGetPlayerInventory(entry, json) {
     boosters: json.boosters
   };
   setData({ economy });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("economy", economy);
+  playerDb.upsert("", "economy", economy, null, globals);
 }
 
 export function onLabelInPlayerInventoryGetPlayerCardsV3(entry, json) {
@@ -918,7 +906,7 @@ export function onLabelInPlayerInventoryGetPlayerCardsV3(entry, json) {
     cards: json
   };
 
-  if (globals.debugLog || !globals.firstPass) globals.store.set("cards", cards);
+  playerDb.upsert("", "cards", cards, null, globals);
 
   const cardsNew = {};
   Object.keys(json).forEach(function(key) {
@@ -947,8 +935,7 @@ export function onLabelInProgressionGetPlayerProgress(entry, json) {
     currentOrbCount: activeTrack.currentOrbCount
   };
   setData({ economy });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("economy", economy);
+  playerDb.upsert("", "economy", economy, null, globals);
 }
 
 //
@@ -1003,8 +990,7 @@ export function onLabelTrackProgressUpdated(entry, json) {
   });
   // console.log(economy);
   setData({ economy });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("economy", economy);
+  playerDb.upsert("", "economy", economy, null, globals);
 }
 
 //
@@ -1045,8 +1031,7 @@ export function onLabelTrackRewardTierUpdated(entry, json) {
 
   // console.log(economy);
   setData({ economy });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("economy", economy);
+  playerDb.upsert("", "economy", economy, null, globals);
 }
 
 export function onLabelInEventDeckSubmit(entry, json) {
