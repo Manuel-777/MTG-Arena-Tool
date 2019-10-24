@@ -10,6 +10,7 @@ src/sounds/*
 src/fonts/*
 
 # development
+/lib
 /.pnp
 .pnp.js
 
