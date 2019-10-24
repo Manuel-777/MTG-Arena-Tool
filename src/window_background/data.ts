@@ -24,7 +24,7 @@ const currentDraftDefault = {
   date: undefined
 };
 
-export function createDraft(id: string, entry: any) {
+export function createDraft(id: string) {
   const data = {
     ..._.cloneDeep(currentDraftDefault),
     id,

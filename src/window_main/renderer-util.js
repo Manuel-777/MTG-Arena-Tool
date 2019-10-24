@@ -961,7 +961,7 @@ function createDraftTimeDiv(draft) {
   return createDiv(["list_match_time"], localTimeSince(new Date(draft.date)));
 }
 
-function createReplayDiv(draft) {
+function createReplayDiv() {
   return createDiv(["list_match_replay"], "See replay");
 }
 

@@ -6,6 +6,7 @@
   },
   "rules": {
     "@typescript-eslint/camelcase": "warn",
-    "@typescript-eslint/no-use-before-define": "warn"
+    "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/no-unused-vars": "error"
   }
 }

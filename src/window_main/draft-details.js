@@ -36,7 +36,6 @@ function getPickedCards(draft, draftPosition) {
   return cards;
 }
 
-const arrowsChange = null;
 export { openDraft };
 function openDraft(id, draftPosition = 1) {
   // console.log("OPEN DRAFT", id, draftPosition);

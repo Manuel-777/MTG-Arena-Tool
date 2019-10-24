@@ -7,7 +7,6 @@ import subDays from "date-fns/subDays";
 import {
   COLORS_ALL,
   COLORS_BRIEF,
-  CONSTRUCTED_EVENTS,
   DATE_ALL_TIME,
   DATE_LAST_30,
   DATE_LAST_DAY,

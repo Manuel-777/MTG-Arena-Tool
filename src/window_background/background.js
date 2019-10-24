@@ -1,5 +1,4 @@
 import { app, remote, ipcRenderer as ipc } from "electron";
-import _ from "lodash";
 import path from "path";
 import Store from "electron-store";
 import fs from "fs";
@@ -180,7 +179,7 @@ ipc.on("login", function(event, arg) {
 });
 
 //
-ipc.on("unlink_discord", function(event, obj) {
+ipc.on("unlink_discord", function() {
   httpApi.httpDiscordUnlink();
 });
 

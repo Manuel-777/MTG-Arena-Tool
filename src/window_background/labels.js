@@ -27,8 +27,6 @@ import addCustomDeck from "./addCustomDeck";
 import { createDraft, createMatch, completeMatch } from "./data";
 import * as httpApi from "./http-api";
 
-let logLanguage = "English";
-
 let skipMatch = false;
 
 function clear_deck() {
@@ -302,9 +300,6 @@ export function onLabelOutLogInfo(entry, json) {
     actionLog(-2, globals.logTime, `Game ${gameNumber} Start`);
   }
 
-  if (json.params.messageName == "Client.Connected") {
-    logLanguage = json.params.payloadObject.settings.language.language;
-  }
   if (skipMatch) return;
   if (json.params.messageName == "DuelScene.GameStop") {
     globals.currentMatch.opponent.cards = globals.currentMatch.oppCardsUsed;
@@ -471,7 +466,6 @@ export function onLabelGreToClient(entry, json) {
 
   json = json.greToClientEvent.greToClientMessages;
   json.forEach(function(msg) {
-    const msgId = msg.msgId;
     greToClientInterpreter.GREMessage(msg, globals.logTime);
     /*
     globals.currentMatch.GREtoClient[msgId] = msg;

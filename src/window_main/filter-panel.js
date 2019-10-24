@@ -12,8 +12,7 @@ import { createSelect } from "../shared/select";
 import {
   getReadableEvent,
   getReadableFormat,
-  getRecentDeckName,
-  timeSince
+  getRecentDeckName
 } from "../shared/util";
 import { getTagColor, ipcSend, showDatepicker } from "./renderer-util";
 import Aggregator from "./aggregator";

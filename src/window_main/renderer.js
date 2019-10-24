@@ -307,7 +307,7 @@ ipc.on("player_data_refresh", () => {
 });
 
 //
-ipc.on("set_update_state", function(event, arg) {
+ipc.on("set_update_state", function() {
   if (sidebarActive === MAIN_UPDATE) {
     openSettingsTab(SETTINGS_ABOUT);
   }
@@ -378,11 +378,12 @@ ipc.on("prefill_auth_form", function(event, arg) {
 
 let isNew = false;
 //
-ipc.on("show_whats_new", function(event, arg) {
+ipc.on("show_whats_new", function() {
   isNew = true;
 });
 
-//
+// this function is currently referenced in index.html
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function rememberMe() {
   const rSettings = {
     remember_me: byId("rememberme").checked

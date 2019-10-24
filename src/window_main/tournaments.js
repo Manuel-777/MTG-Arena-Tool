@@ -9,7 +9,6 @@ import {
   get_deck_missing,
   getBoosterCountEstimate,
   makeId,
-  objectClone,
   timestamp,
   toHHMMSS,
   urlDecode
@@ -27,7 +26,6 @@ import {
 
 let tournamentDeck = null;
 let currentDeck = null;
-let originalDeck = null;
 let tou = null;
 
 const touStates = {};
@@ -84,7 +82,6 @@ export function tournamentOpen(t) {
 
   if (tou.deck) {
     currentDeck = tou.deck;
-    originalDeck = objectClone(tou.deck);
   }
 
   let joined = false;
@@ -389,7 +386,7 @@ function showTournamentStarted(mainDiv, tou) {
   mainDiv.appendChild(tabs);
 
   const tab_cont_a = createRoundsTab(joined);
-  const tab_cont_b = createStandingsTab(joined);
+  const tab_cont_b = createStandingsTab();
 
   mainDiv.appendChild(tab_cont_a);
   mainDiv.appendChild(tab_cont_b);
@@ -459,7 +456,6 @@ function createMatchDiv(match) {
     console.error(e);
   }
 
-  let s = "";
   const p1 = createDiv(
     ["tou_match_p", match.p1 + "pn"],
     match.p1.slice(0, -6) + d1
@@ -468,9 +464,6 @@ function createMatchDiv(match) {
   else p1.style.borderLeft = "solid 4px #dd8263";
   const p1w = createDiv([p1wc, "tou_match_score"], match.p1w);
   p1.appendChild(p1w);
-
-  s = "";
-  if (match.p2 == "BYE#00000") s = 'style="color: rgba(250, 229, 210, 0.65);"';
 
   const p2 = createDiv(
     ["tou_match_p", match.p2 + "pn"],
@@ -551,7 +544,7 @@ function createRoundsTab(joined) {
   return tab_cont_a;
 }
 
-function createStandingsTab(joined) {
+function createStandingsTab() {
   const tab_cont_b = createDiv(["tou_cont_b", "tou_cont_div"]);
   tab_cont_b.style.height = "0px";
 

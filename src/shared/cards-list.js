@@ -47,7 +47,7 @@ class CardsList {
       throw new Error("quantity must be a number");
     }
     if (merge) {
-      this._list.forEach((card, index) => {
+      this._list.forEach(card => {
         if (card.id == grpId) {
           card.quantity += quantity;
           return card;
@@ -71,7 +71,6 @@ class CardsList {
       throw new Error("quantity must be a number");
     }
     if (byName) {
-      const removed = 0;
       const cardToFind = db.card(grpId);
       this._list.forEach(function(card) {
         const cardInList = db.card(card.id);
@@ -82,7 +81,6 @@ class CardsList {
         }
       });
     } else {
-      const removed = 0;
       this._list.forEach(function(card) {
         if (grpId == card.id) {
           const remove = Math.min(card.quantity, quantity);

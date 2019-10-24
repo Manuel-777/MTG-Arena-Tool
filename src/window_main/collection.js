@@ -195,7 +195,6 @@ function get_collection_stats() {
       id: card.id,
       owned: 0
     };
-    const collation = db.sets[card.set].collation;
     // add to totals
     stats[card.set][card.rarity].total += 4;
     stats[card.set][card.rarity].unique += 1;
@@ -990,11 +989,6 @@ function renderCompletionDiv(countStats, image, title) {
 
   completionDiv.appendChild(setBar);
   return completionDiv;
-}
-
-function sortCollection(alg) {
-  sortingAlgorithm = alg;
-  printCollectionPage();
 }
 
 //

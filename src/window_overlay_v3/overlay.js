@@ -46,8 +46,6 @@ import {
   OVERLAY_DRAFT_MODES
 } from "../shared/constants.js";
 
-let fix = null;
-
 if (!remote.app.isPackaged) {
   unhandled({
     showDialog: true,
@@ -295,7 +293,6 @@ function settingsUpdated() {
 
     change_background(index, pd.settings.back_url);
 
-    const messageDom = `#overlay_${index + 1} .overlay_message`;
     const deckNameDom = `#overlay_${index + 1} .overlay_deckname`;
     const deckColorsDom = `#overlay_${index + 1} .overlay_deckcolors`;
     const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
@@ -1206,7 +1203,7 @@ ready(function() {
     });
   }, 500);
   setTimeout(() => {
-    fix = new TransparencyMouseFix({
+    new TransparencyMouseFix({
       log: false,
       fixPointerEvents: "auto"
     });

@@ -4,7 +4,6 @@ import path from "path";
 import fs from "fs";
 import { autoUpdater } from "electron-updater";
 import Store from "electron-store";
-import { format as formatUrl } from "url";
 import electronDebug from "electron-debug";
 import * as Sentry from "@sentry/electron";
 import devtron from "devtron";
@@ -467,7 +466,7 @@ function onBackClosed() {
   quit();
 }
 
-function onMainClosed(e) {
+function onMainClosed() {
   quit();
   //hideWindow();
   //e.preventDefault();

@@ -9,8 +9,6 @@ import globals from "./globals";
 import { loadPlayerConfig } from "./loadPlayerConfig";
 import { request as httpRequest } from "https";
 
-let metadataState = false;
-
 const httpAsync = [];
 
 const serverAddress = "mtgatool.com";
@@ -353,13 +351,6 @@ export function httpBasic() {
                     id => !(id in playerData.seasonal)
                   );
 
-                  const itemCount =
-                    requestSync.courses.length +
-                    requestSync.matches.length +
-                    requestSync.drafts.length +
-                    requestSync.economy.length +
-                    requestSync.seasonal.length;
-
                   if (requestSync) {
                     ipc_send("ipc_log", "Fetch remote player items");
                     console.log(requestSync);
@@ -409,7 +400,6 @@ export function httpBasic() {
 
                 if (_headers.method == "get_database") {
                   //resetLogLoop(100);
-                  metadataState = true;
                   delete parsedResult.ok;
                   ipc_send("popup", {
                     text: "Metadata: Ok",
@@ -428,11 +418,6 @@ export function httpBasic() {
                   text: parsedResult.error,
                   time: 10000
                 });
-              } else if (_headers.method == "tou_check") {
-                const notif = new Notification("MTG Arena Tool", {
-                  body: parsedResult.state
-                });
-                //ipc_send("popup", {"text": parsedResult.state, "time": 10000});
               } else if (
                 parsedResult &&
                 parsedResult.ok == false &&
