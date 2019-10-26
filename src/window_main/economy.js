@@ -1,3 +1,4 @@
+import _ from "lodash";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import startOfDay from "date-fns/startOfDay";
 import compareAsc from "date-fns/compareAsc";
@@ -56,25 +57,25 @@ class economyDay {
 // These should match the full text of the event
 const economyTransactionContextsMap = {
   "Booster.Open": "Booster Open",
+  "Booster.Open.BoosterOpen": "Booster Open",
   "Event.GrantCardPool": "Event Card Pool",
   "Event.PayEntry": "Pay Event Entry",
+  "Event.PayEntry.EventPayEntry": "Pay Event Entry",
   "Event.Season.Constructed.Payout": "Constructed Season Rewards",
   "Event.Season.Limited.Payout": "Limited Season Rewards",
-  "PlayerReward.OnMatchCompletedDaily": "Player Rewards",
+  "PlayerReward.OnMatchCompletedDaily": "Match Rewards: Daily Wins",
   PurchasedCosmetic: "Cosmetic Purchase",
-  "Quest.Completed": "Quest Completed",
+  "Quest Completed": "Match Rewards: Quest Reward",
   Store: "Store Transaction",
-  "Store.Fulfillment": "Store Transaction",
-  "Store.Fulfillment.Chest": "Store Transaction",
-  "Store.Fulfillment.Chest.ProgressionRewards": "Store Transaction",
-  "Store.Fulfillment.Boosters": "Store Booster Purchase",
-  "Store.Fulfillment.Gems": "Store Gems Purchase",
+  "PlayerInventory.RedeemBulkWildcards": "Redeem Wildcard",
   "WildCard.Redeem": "Redeem Wildcard",
   "Vault.Complete": "Vault Opening",
-  "PlayerReward.OnMatchCompletedWeekly": "Weekly Rewards",
+  "PlayerReward.OnMatchCompletedWeekly": "Match Rewards: Weekly Wins",
   "PlayerProgression.OrbSpend": "Orb Spend",
-  "Track.Progress": "Track Progress",
-  "Track.RewardTier.Updated": "Mastery Pass Purchase"
+  "Track Progress": "Match Rewards: Level Up",
+  "Track.RewardTier.Updated": "Mastery Pass Purchase",
+  "Player Rewards": "Match Rewards",
+  "Event Prize": "Event Rewards"
 };
 
 const trackCodeMap = {
@@ -103,7 +104,17 @@ function localDayDateFormat(date) {
 }
 
 function getReadableTrack(trackCode) {
-  return trackCodeMap[trackCode] || trackCode;
+  return trackCodeMap[trackCode] || getReadableCode(trackCode);
+}
+
+// quick and dirty generic pretty formatting
+// "WhyDoesWotc.KeepChanging.Codes" => "Why Does Wotc: Keep Changing: Codes"
+function getReadableCode(code) {
+  let result = "";
+  code.split(".").forEach(group => {
+    result += ": " + _.startCase(group);
+  });
+  return result.substring(2);
 }
 
 function getReadableQuest(questCode) {
@@ -162,26 +173,61 @@ function getPrettyContext(context, full = true) {
   if (context.startsWith("Track.Progress")) {
     const trackCode = context.substring(15);
     return full
-      ? `Track Progress: ${getReadableTrack(trackCode)}`
-      : "Track Progress";
+      ? `Match Rewards: Level Up: ${getReadableTrack(trackCode)}`
+      : "Match Rewards";
   }
 
   if (context.startsWith("Event.Prize")) {
     const eventCode = context.substring(12);
-    return full ? `Event Prize: ${getReadableEvent(eventCode)}` : "Event Prize";
+    return full
+      ? `Event Rewards: ${getReadableEvent(eventCode)}`
+      : "Event Rewards";
+  }
+
+  if (context.endsWith("EventReward")) {
+    const eventCode = context.split(".")[0];
+    return full
+      ? `Event Rewards: ${getReadableEvent(eventCode)}`
+      : "Event Rewards";
+  }
+
+  if (context.startsWith("PostMatch.Update")) {
+    const rewardCode = context.substring(17);
+    let readableReward = getReadableCode(rewardCode);
+    if (rewardCode.startsWith("BattlePassLevelUp")) {
+      const trackCode = rewardCode.substring(18);
+      readableReward = "Level Up: " + getReadableTrack(trackCode);
+    } else if (rewardCode.startsWith("QuestReward")) {
+      const questCode = rewardCode.substring(12);
+      readableReward = "Quest Reward: " + getReadableQuest(questCode);
+    }
+    return full ? `Match Rewards: ${readableReward}` : "Match Rewards";
   }
 
   if (context.startsWith("Quest.Completed")) {
     const questCode = context.substring(16);
     return full
-      ? `Quest Completed: ${getReadableQuest(questCode)}`
-      : "Quest Completed";
+      ? `Match Rewards: Quest Reward: ${getReadableQuest(questCode)}`
+      : "Match Rewards";
   }
 
-  const pretty = economyTransactionContextsMap[context];
+  if (context.startsWith("Store.Fulfillment")) {
+    const storeCode = context.substring(18);
+    if (!storeCode || !full) {
+      return "Store Transaction";
+    }
+    return `Store Transaction: ${getReadableCode(storeCode)}`;
+  }
 
-  // If there's no valid pretty context keep the code as is.
-  return pretty || context;
+  // If there's no valid pretty context, fallback on generic formatting
+  const pretty =
+    economyTransactionContextsMap[context] || getReadableCode(context);
+
+  if (!full && pretty.includes(":")) {
+    return pretty.split(":")[0];
+  }
+
+  return pretty;
 }
 
 export function openEconomyTab(dataIndex = 25, scrollTop = 0) {
@@ -239,7 +285,7 @@ function renderData(container, index) {
 
   // Track Progress txns are mostly redundant with inventory change txns
   // Non-duplicate data (should be) only on txns with level changes
-  if (selectVal === "Track Progress") {
+  if (change.context.startsWith("Track.Progress")) {
     if (!change.trackDiff) return rowsAdded;
     const lvlDelta = Math.abs(
       (change.trackDiff.currentLevel || 0) - (change.trackDiff.oldLevel || 0)

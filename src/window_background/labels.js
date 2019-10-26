@@ -838,7 +838,28 @@ function minifiedDelta(delta) {
 }
 
 // Called for all "Inventory.Updated" labels
-export function onLabelInventoryUpdated(entry, transaction) {
+export function onLabelInventoryUpdatedV4(entry, transaction) {
+  if (!transaction) return;
+
+  if (transaction.updates) {
+    // 2019-10-24 this section handles the log format released in Arena client 1857.738996
+    transaction.updates.forEach(update => {
+      const delta = { ...update };
+      if (update.context && update.context.source) {
+        // combine sub-context with parent context
+        delta.subContext = update.context; // preserve sub-context object data
+        delta.context = transaction.context + "." + update.context.source;
+      }
+      onLabelInventoryUpdated(entry, delta);
+    });
+  } else if (transaction.delta) {
+    // 2019-10-24 this section handles the log format prior to Arena client 1857.738996
+    onLabelInventoryUpdated(entry, transaction);
+  }
+}
+
+// 2019-10-24 DEPRECATED as of Arena client 1857.738996
+function onLabelInventoryUpdated(entry, transaction) {
   if (!transaction) return;
 
   // Store this in case there are any future date parsing issues
@@ -862,6 +883,89 @@ export function onLabelInventoryUpdated(entry, transaction) {
   // Do not modify the context from now on.
   saveEconomyTransaction(transaction);
   return;
+}
+
+function inventoryUpdate(entry, update) {
+  // combine sub-context with parent context
+  let context = "PostMatch.Update";
+  if (update.context && update.context.source) {
+    // combine sub-context with parent context
+    context += "." + update.context.source;
+    if (update.context.sourceId && update.context.source === "QuestReward") {
+      context += "." + update.context.sourceId;
+    }
+  }
+  if (update.context && update.context.subSource) {
+    // combine sub-sub-context with parent context
+    context += "." + update.context.subSource;
+  }
+
+  // We use the original time string for the ID to ensure parsing does not alter it
+  // This will make the ID the same if parsing either changes or breaks
+  let id = sha1(entry.timestamp + context + JSON.stringify(update.delta));
+
+  let transaction = {
+    ...update,
+    timestamp: entry.timestamp,
+    // Add missing data
+    date: parseWotcTimeFallback(entry.timestamp),
+    // Reduce the size for storage
+    delta: minifiedDelta(update.delta),
+    context,
+    subContext: update.context, // preserve sub-context object data
+    id: id
+  };
+
+  saveEconomyTransaction(transaction);
+}
+
+function trackUpdate(entry, trackUpdate) {
+  if (!trackUpdate) return;
+  const { trackName, trackTier, trackDiff, orbDiff } = trackUpdate;
+
+  if (trackDiff && trackDiff.inventoryUpdates) {
+    trackDiff.inventoryUpdates.forEach(update => {
+      const data = {
+        ...update,
+        trackName,
+        trackTier
+      };
+      data.context.subSource = trackName;
+      inventoryUpdate(entry, data);
+    });
+  }
+
+  // For some reason, orbs live separately from all other inventory
+  if (
+    orbDiff &&
+    orbDiff.oldOrbCount &&
+    orbDiff.currentOrbCount &&
+    orbDiff.currentOrbCount - orbDiff.oldOrbCount
+  ) {
+    const data = { trackName, trackTier, orbDiff };
+    inventoryUpdate(entry, data);
+  }
+}
+
+export function onLabelPostMatchUpdate(entry, json) {
+  if (!json) return;
+
+  json.questUpdate.forEach(quest => {
+    if (quest.inventoryUpdate) {
+      inventoryUpdate(entry, quest.inventoryUpdate);
+    }
+  });
+
+  json.dailyWinUpdates.forEach(update => {
+    inventoryUpdate(entry, update);
+  });
+
+  json.weeklyWinUpdates.forEach(update => {
+    inventoryUpdate(entry, update);
+  });
+
+  trackUpdate(entry, json.eppUpdate);
+  trackUpdate(entry, json.battlePassUpdate);
 }
 
 export function onLabelInPlayerInventoryGetPlayerInventory(entry, json) {
@@ -938,7 +1042,7 @@ export function onLabelInProgressionGetPlayerProgress(entry, json) {
   playerDb.upsert("", "economy", economy, null, globals);
 }
 
-//
+// 2019-10-24 DEPRECATED as of Arena client version 1857.738996
 export function onLabelTrackProgressUpdated(entry, json) {
   if (!json) return;
   // console.log(json);

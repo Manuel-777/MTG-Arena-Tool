@@ -59,6 +59,7 @@ exports.EVENT_TO_NAME = {
   WinEveryCard_20191005: "Win Every Card - Standard",
   CompCons_Metagame_Challenge_20191004: "Metagame Challenge 10/19",
 
+  Brawl_Launch_20191024: "Brawl Launch",
   Precon_Brawl_ELD: "Precon Brawl",
   Lore_WAR1_Momir: "Ravnica at War I - Momir",
   Lore_WAR2_Pauper: "Ravnica at War II - Pauper",
@@ -120,6 +121,7 @@ exports.EVENT_TO_FORMAT = {
   WinEveryCard_20191005: "Standard",
   CompCons_Metagame_Challenge_20191004: "Traditional Standard",
 
+  Brawl_Launch_20191024: "Brawl",
   Precon_Brawl_ELD: "Brawl",
   Lore_WAR1_Momir: "Momir",
   Lore_WAR2_Pauper: "Pauper",

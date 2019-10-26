@@ -1,3 +1,29 @@
+## <small>2.12.5 (2019-10-26)</small>
+
+* Add sourcemaps ([62b6de9](https://github.com/Manuel-777/MTG-Arena-Tool/commit/62b6de9))
+* add typescript support ([59d9590](https://github.com/Manuel-777/MTG-Arena-Tool/commit/59d9590))
+* audit fix ([4ef4fba](https://github.com/Manuel-777/MTG-Arena-Tool/commit/4ef4fba))
+* bugfix background arenaLogWatcher.startWatchingLog ([fa52dd0](https://github.com/Manuel-777/MTG-Arena-Tool/commit/fa52dd0))
+* bugfix http-api undefined notifications js error ([a6c5a1b](https://github.com/Manuel-777/MTG-Arena-Tool/commit/a6c5a1b))
+* database ([16e5bef](https://github.com/Manuel-777/MTG-Arena-Tool/commit/16e5bef))
+* Don't show booster chance if there are 0 wanteds ([0f69bcc](https://github.com/Manuel-777/MTG-Arena-Tool/commit/0f69bcc))
+* down the typescript rabbit hole ([253688f](https://github.com/Manuel-777/MTG-Arena-Tool/commit/253688f))
+* economy changes ([29167e0](https://github.com/Manuel-777/MTG-Arena-Tool/commit/29167e0))
+* economy page context standardization ([7bf7a6f](https://github.com/Manuel-777/MTG-Arena-Tool/commit/7bf7a6f))
+* first pass prettier economy page ([c51d6e6](https://github.com/Manuel-777/MTG-Arena-Tool/commit/c51d6e6))
+* hardcode arena lands ([f710d41](https://github.com/Manuel-777/MTG-Arena-Tool/commit/f710d41)), closes [#650](https://github.com/Manuel-777/MTG-Arena-Tool/issues/650)
+* more background label processing updates ([9987fa9](https://github.com/Manuel-777/MTG-Arena-Tool/commit/9987fa9))
+* new labels functions append additional context info ([6179ec4](https://github.com/Manuel-777/MTG-Arena-Tool/commit/6179ec4))
+* non infinite recursion ([58dbc29](https://github.com/Manuel-777/MTG-Arena-Tool/commit/58dbc29))
+* overlay warnings css/div ([6202eaf](https://github.com/Manuel-777/MTG-Arena-Tool/commit/6202eaf))
+* player-data filters out app settings ([de83f06](https://github.com/Manuel-777/MTG-Arena-Tool/commit/de83f06))
+* typed a few more files ([b19fc2d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/b19fc2d))
+* Update .eslintignore ([94ff5af](https://github.com/Manuel-777/MTG-Arena-Tool/commit/94ff5af))
+* Update metadata-constants.js ([ef59c78](https://github.com/Manuel-777/MTG-Arena-Tool/commit/ef59c78))
+* use electron-transparency-mouse-fix package again ([2d64aa7](https://github.com/Manuel-777/MTG-Arena-Tool/commit/2d64aa7))
+
+
+
 ## <small>2.12.4 (2019-10-22)</small>
 
 * add babel for transpile ([e1c150d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/e1c150d))

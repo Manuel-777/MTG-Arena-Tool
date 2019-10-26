@@ -895,36 +895,40 @@ function openSetStats(setStats, setName) {
 
     // chance that the next booster opened contains a rare missing from one of our decks
     let possibleRares = setStats["rare"].unique - setStats["rare"].complete;
-    let chanceBoosterRareWanted = (
-      (chanceBoosterHasRare * setStats["rare"].uniqueWanted) /
-      possibleRares
-    ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
-    let rareWantedDiv = createDiv(["stats_set_completion"]);
-    let rareWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
-    rareWantedIcon.style.height = "30px";
-    let rareWantedSpan = document.createElement("span");
-    rareWantedSpan.innerHTML = `<i>~${chanceBoosterRareWanted} chance next booster has ${wantedText} rare.</i>`;
-    rareWantedSpan.style.fontSize = "13px";
-    rareWantedIcon.appendChild(rareWantedSpan);
-    rareWantedDiv.appendChild(rareWantedIcon);
-    substats.appendChild(rareWantedDiv);
+    if (possibleRares && setStats["rare"].uniqueWanted) {
+      let chanceBoosterRareWanted = (
+        (chanceBoosterHasRare * setStats["rare"].uniqueWanted) /
+        possibleRares
+      ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
+      let rareWantedDiv = createDiv(["stats_set_completion"]);
+      let rareWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
+      rareWantedIcon.style.height = "30px";
+      let rareWantedSpan = document.createElement("span");
+      rareWantedSpan.innerHTML = `<i>~${chanceBoosterRareWanted} chance next booster has ${wantedText} rare.</i>`;
+      rareWantedSpan.style.fontSize = "13px";
+      rareWantedIcon.appendChild(rareWantedSpan);
+      rareWantedDiv.appendChild(rareWantedIcon);
+      substats.appendChild(rareWantedDiv);
+    }
 
     // chance that the next booster opened contains a mythic missing from one of our decks
     let possibleMythics =
       setStats["mythic"].unique - setStats["mythic"].complete;
-    let chanceBoosterMythicWanted = (
-      (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted) /
-      possibleMythics
-    ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
-    let mythicWantedDiv = createDiv(["stats_set_completion"]);
-    let mythicWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
-    mythicWantedIcon.style.height = "30px";
-    let mythicWantedSpan = document.createElement("span");
-    mythicWantedSpan.innerHTML = `<i>~${chanceBoosterMythicWanted} chance next booster has ${wantedText} mythic.</i>`;
-    mythicWantedSpan.style.fontSize = "13px";
-    mythicWantedIcon.appendChild(mythicWantedSpan);
-    mythicWantedDiv.appendChild(mythicWantedIcon);
-    substats.appendChild(mythicWantedDiv);
+    if (possibleMythics && setStats["mythic"].uniqueWanted) {
+      let chanceBoosterMythicWanted = (
+        (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted) /
+        possibleMythics
+      ).toLocaleString([], { style: "percent", maximumSignificantDigits: 2 });
+      let mythicWantedDiv = createDiv(["stats_set_completion"]);
+      let mythicWantedIcon = createDiv(["stats_set_icon", "bo_explore_cost"]);
+      mythicWantedIcon.style.height = "30px";
+      let mythicWantedSpan = document.createElement("span");
+      mythicWantedSpan.innerHTML = `<i>~${chanceBoosterMythicWanted} chance next booster has ${wantedText} mythic.</i>`;
+      mythicWantedSpan.style.fontSize = "13px";
+      mythicWantedIcon.appendChild(mythicWantedSpan);
+      mythicWantedDiv.appendChild(mythicWantedIcon);
+      substats.appendChild(mythicWantedDiv);
+    }
   }
 }
 
