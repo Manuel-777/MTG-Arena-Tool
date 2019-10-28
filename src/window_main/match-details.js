@@ -6,8 +6,7 @@ import _ from "lodash";
 import { MANA, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
 import pd from "../shared/player-data";
-import { createSelect } from "../shared/select";
-import { createDiv, createInput, queryElements as $$ } from "../shared/dom-fns";
+import { createDiv, queryElements as $$ } from "../shared/dom-fns";
 import * as deckDrawer from "../shared/deck-drawer";
 import {
   get_deck_export,
@@ -26,11 +25,11 @@ import {
   drawCardList,
   drawDeck,
   ipcSend,
-  openDialog,
   openActionLog,
   showLoadingBars,
   toggleVisibility
 } from "./renderer-util";
+import createShareButton from "./createShareButton";
 
 const byId = id => document.getElementById(id);
 
@@ -82,42 +81,10 @@ function openMatch(id) {
     flc.appendChild(actionLogButton);
 
     if (!pd.offline) {
-      const actionLogShareButton = createDiv([
-        "list_log_share",
-        match.id + "al"
-      ]);
-      actionLogShareButton.addEventListener("click", e => {
-        e.stopPropagation();
-        const cont = createDiv(["dialog_content"]);
-        cont.style.width = "500px";
-
-        cont.append(createDiv(["share_title"], "Link for sharing:"));
-        const icd = createDiv(["share_input_container"]);
-        const linkInput = createInput([], "", {
-          id: "share_input",
-          autocomplete: "off"
-        });
-        linkInput.addEventListener("click", () => linkInput.select());
-        icd.appendChild(linkInput);
-        const but = createDiv(["button_simple"], "Copy");
-        but.addEventListener("click", function() {
-          ipcSend("set_clipboard", byId("share_input").value);
-        });
-        icd.appendChild(but);
-        cont.appendChild(icd);
-
-        cont.appendChild(createDiv(["share_subtitle"], "<i>Expires in: </i>"));
-        createSelect(
-          cont,
-          ["One day", "One week", "One month", "Never"],
-          "",
-          () => logShareLink(match.id),
-          "expire_select"
-        );
-
-        openDialog(cont);
-        logShareLink(match.id);
-      });
+      const actionLogShareButton = createShareButton(
+        ["list_log_share", match.id + "al"],
+        () => logShareLink(match.id)
+      );
       flc.appendChild(actionLogShareButton);
     } else {
       const actionLogCantShare = createDiv(["list_log_cant_share"]);

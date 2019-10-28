@@ -1,0 +1,22 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": ["plugin:@typescript-eslint/recommended", "plugin:react/recommended", "prettier/@typescript-eslint"],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "@typescript-eslint/camelcase": "warn",
+    "@typescript-eslint/no-use-before-define": "warn",
+    "prefer-const": "warn",
+    "no-var": "warn",
+    "@typescript-eslint/no-var-requires": "warn",
+    "@typescript-eslint/class-name-casing": "warn",
+    "@typescript-eslint/adjacent-overload-signatures": "warn",
+    "@typescript-eslint/ban-types": "warn"
+  }
+}

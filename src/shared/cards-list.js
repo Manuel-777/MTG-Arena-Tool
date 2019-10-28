@@ -204,7 +204,7 @@ class CardsList {
     this._list.forEach(function(card) {
       var quantity = card.quantity;
       card = db.card(card.id);
-      if (quantity > 0) {
+      if (card && quantity > 0) {
         if (
           card.type.indexOf("Land") != -1 ||
           card.type.indexOf("land") != -1

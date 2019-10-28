@@ -144,9 +144,7 @@ export function attachDraftRatings(card, ratingsContainer) {
   let rank = card.rank;
   let rankValues = card.rank_values;
   let rankControversy = card.rank_controversy;
-
-  let maxValue = Math.max.apply(Math, card.rank_values);
-
+  let maxValue = Math.max(...rankValues);
   let valuesContainer = createDiv([`rank_values_main_container`]);
 
   let rankCont = createDiv(

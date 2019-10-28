@@ -724,3 +724,7 @@ export function formatRank(rank) {
   }
   return `${rank.rank} ${rank.tier}`;
 }
+
+export function roundWinrate(x) {
+  return Math.round(x * 100) / 100;
+}

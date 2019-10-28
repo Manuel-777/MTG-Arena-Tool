@@ -49,6 +49,7 @@ exports.EVENT_TO_NAME = {
   QuickDraft_GRN_20190829: "Ranked Draft GRN 08/19",
   QuickDraft_RNA_20190913: "Ranked Draft RNA 09/19",
   QuickDraft_ELD_20191011: "Ranked Draft ELD 10/19",
+  QuickDraft_WAR_20191025: "Ranked Draft WAR 10/19",
   Cascade_Constructed_20190516: "Cascade Constructed",
   Omniscience_Draft_20190830: "Omniscience Draft",
 
@@ -110,6 +111,7 @@ exports.EVENT_TO_FORMAT = {
   QuickDraft_GRN_20190829: "Draft GRN",
   QuickDraft_RNA_20190913: "Draft RNA",
   QuickDraft_ELD_20191011: "Draft ELD",
+  QuickDraft_WAR_20191025: "Draft WAR",
 
   Cascade_Constructed_20190516: "Cascade Constructed",
   Omniscience_Draft_20190830: "Draft M20",
@@ -141,7 +143,8 @@ exports.LIMITED_RANKED_EVENTS = [
   "QuickDraft_M20_20190719",
   "QuickDraft_GRN_20190829",
   "QuickDraft_RNA_20190913",
-  "QuickDraft_ELD_20191011"
+  "QuickDraft_ELD_20191011",
+  "QuickDraft_WAR_20191025"
 ];
 
 exports.STANDARD_RANKED_EVENTS = ["Ladder", "Traditional_Ladder"];

@@ -1,3 +1,35 @@
+## <small>2.12.6 (2019-10-28)</small>
+
+* ormat, removed trailing ), marked function as export and removed from export block ([c293348](https://github.com/Manuel-777/MTG-Arena-Tool/commit/c293348))
+* Add cards from delta updates ([e32ba25](https://github.com/Manuel-777/MTG-Arena-Tool/commit/e32ba25))
+* add React rules ([845e6b4](https://github.com/Manuel-777/MTG-Arena-Tool/commit/845e6b4))
+* Added helper functions ([de11bb8](https://github.com/Manuel-777/MTG-Arena-Tool/commit/de11bb8))
+* adds react ([8da9d92](https://github.com/Manuel-777/MTG-Arena-Tool/commit/8da9d92))
+* Calculate winrate and winrate-interval for decks in explore tab and display values ([e94d87a](https://github.com/Manuel-777/MTG-Arena-Tool/commit/e94d87a))
+* check card ([ba3200d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/ba3200d))
+* consolidate all the share dialog cases ([771174e](https://github.com/Manuel-777/MTG-Arena-Tool/commit/771174e))
+* default hover cards size ([4cb3a52](https://github.com/Manuel-777/MTG-Arena-Tool/commit/4cb3a52))
+* fix mastery orbs in economy ([a66759d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/a66759d))
+* fixed name ([6803393](https://github.com/Manuel-777/MTG-Arena-Tool/commit/6803393))
+* format ([d50958c](https://github.com/Manuel-777/MTG-Arena-Tool/commit/d50958c))
+* further cleanup ([32cfcc5](https://github.com/Manuel-777/MTG-Arena-Tool/commit/32cfcc5))
+* minimal eslint changes to enable typescript lint ([0fd1da6](https://github.com/Manuel-777/MTG-Arena-Tool/commit/0fd1da6))
+* move the button in too, why not ([7076a8e](https://github.com/Manuel-777/MTG-Arena-Tool/commit/7076a8e))
+* no more need to disable that rule ([2339f1b](https://github.com/Manuel-777/MTG-Arena-Tool/commit/2339f1b))
+* npm format ([46cb141](https://github.com/Manuel-777/MTG-Arena-Tool/commit/46cb141))
+* react pt 1 ([2c3bb60](https://github.com/Manuel-777/MTG-Arena-Tool/commit/2c3bb60))
+* should be a div not an input ([c18f894](https://github.com/Manuel-777/MTG-Arena-Tool/commit/c18f894))
+* test shoudl only test src ([92e03a7](https://github.com/Manuel-777/MTG-Arena-Tool/commit/92e03a7))
+* typescript + react :) ([ef323ce](https://github.com/Manuel-777/MTG-Arena-Tool/commit/ef323ce))
+* update new items ([9706a57](https://github.com/Manuel-777/MTG-Arena-Tool/commit/9706a57))
+* Update src/shared/card-hover.js ([0a36138](https://github.com/Manuel-777/MTG-Arena-Tool/commit/0a36138))
+* updates ([32fe0f6](https://github.com/Manuel-777/MTG-Arena-Tool/commit/32fe0f6))
+* Use previously introduced helper function ([d1a8b18](https://github.com/Manuel-777/MTG-Arena-Tool/commit/d1a8b18))
+* WAR Draft ([446dca0](https://github.com/Manuel-777/MTG-Arena-Tool/commit/446dca0))
+* yet more economy contexts ([e70d331](https://github.com/Manuel-777/MTG-Arena-Tool/commit/e70d331))
+
+
+
 ## <small>2.12.5 (2019-10-26)</small>
 
 * Add sourcemaps ([62b6de9](https://github.com/Manuel-777/MTG-Arena-Tool/commit/62b6de9))

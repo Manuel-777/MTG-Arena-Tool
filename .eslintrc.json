@@ -1,6 +1,5 @@
 {
   "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-  "plugins": ["prettier"],
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 9
@@ -20,6 +19,7 @@
     "no-global-assign": "warn",
     "no-empty": "warn",
     "complexity": ["warn", 40],
-    "max-statements": ["warn", 100]
+    "max-statements": ["warn", 100],
+    "prettier/prettier": "warn"
   }
 }

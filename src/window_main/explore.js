@@ -11,13 +11,15 @@ import {
 } from "../shared/constants";
 import db from "../shared/database";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
-import { createSelect } from "../shared/select";
+import { createSelect } from "../shared/createSelect";
 import {
   getCardArtCrop,
   get_rank_index_16,
   removeDuplicates,
   compare_cards,
-  getBoosterCountEstimate
+  getBoosterCountEstimate,
+  roundWinrate,
+  get_deck_missing
 } from "../shared/util";
 import {
   addCheckbox,
@@ -27,9 +29,12 @@ import {
   ipcSend,
   resetMainContainer,
   setLocalState,
-  showLoadingBars
+  showLoadingBars,
+  formatPercent,
+  formatWinrateInterval
 } from "./renderer-util";
 import { openDeck } from "./deck-details";
+import { normalApproximationInterval } from "../shared/stats-fns";
 
 // default values for cached local state
 const defaultData = {
@@ -613,13 +618,25 @@ function deckLoad(_deck, index) {
     flb.appendChild(manaIcon);
   });
 
-  let colClass = getWinrateClass((1 / _deck.mt) * _deck.mw);
+  let deckWinrate = normalApproximationInterval(_deck.mt, _deck.mw);
+
+  let colClass = getWinrateClass(deckWinrate.winrate);
   d = createDiv(
     ["list_deck_record"],
-    `${_deck.mw}:${_deck.ml} <span class="${colClass}_bright">(${Math.round(
-      (100 / _deck.mt) * _deck.mw
-    )}%)</span>`
+    `${_deck.mw}:${_deck.ml} <span class="${colClass}_bright">(${formatPercent(
+      deckWinrate.winrate
+    )})</span>`
   );
+  if (_deck.mt >= 20) {
+    // sample Size is large enough to use Wald Interval
+    d.title = formatWinrateInterval(
+      roundWinrate(deckWinrate.winrate - deckWinrate.interval),
+      roundWinrate(deckWinrate.winrate + deckWinrate.interval)
+    );
+    d.innerHTML += `<i style="opacity:0.6;"> &plusmn; ${formatPercent(
+      roundWinrate(deckWinrate.interval)
+    )}</i>`;
+  }
 
   flr.appendChild(d);
 

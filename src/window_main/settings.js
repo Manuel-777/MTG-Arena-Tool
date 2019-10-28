@@ -35,7 +35,7 @@ import {
 } from "../shared/dom-fns";
 import * as deckDrawer from "../shared/deck-drawer";
 import { showWhatsNew } from "./whats-new";
-import { createSelect } from "../shared/select";
+import { createSelect } from "../shared/createSelect";
 import { getCardImage } from "../shared/util";
 const byId = id => document.getElementById(id);
 

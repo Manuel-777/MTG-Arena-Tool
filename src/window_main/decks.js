@@ -16,6 +16,7 @@ import StatsPanel from "./stats-panel";
 import { openDeck } from "./deck-details";
 import {
   formatPercent,
+  formatWinrateInterval,
   getTagColor,
   getWinrateClass,
   hideLoadingBars,
@@ -212,10 +213,10 @@ export function openDecksTab(_filters = {}, scrollTop = 0) {
       if (dwr.total >= 20) {
         // sample Size is large enough to use Wald Interval
         interval = formatPercent(dwr.interval);
-        tooltip = `${formatPercent(dwr.winrateLow)} to ${formatPercent(
-          dwr.winrateHigh
-        )} with 95% confidence
-(estimated actual winrate bounds, assuming a normal distribution)`;
+        tooltip = formatWinrateInterval(
+          formatPercent(dwr.winrateLow),
+          formatPercent(dwr.winrateHigh)
+        );
       } else {
         // sample size is too small (garbage results)
         interval = "???";

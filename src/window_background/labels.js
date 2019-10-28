@@ -868,6 +868,10 @@ function onLabelInventoryUpdated(entry, transaction) {
   // Add missing data
   transaction.date = parseWotcTimeFallback(entry.timestamp);
 
+  // Add delta to our current values
+  if (transaction.delta) {
+    inventoryAddDelta(transaction.delta);
+  }
   // Reduce the size for storage
   transaction.delta = minifiedDelta(transaction.delta);
 
@@ -885,8 +889,41 @@ function onLabelInventoryUpdated(entry, transaction) {
   return;
 }
 
+function inventoryAddDelta(delta) {
+  const economy = playerData.economy;
+  economy.gems += delta.gemsDelta;
+  economy.gold += delta.goldDelta;
+
+  // Update new cards obtained.
+  let cardsNew = playerData.cardsNew;
+  let cards = playerData.cards;
+  delta.cardsAdded.forEach(grpId => {
+    // Add to inventory
+    if (cards.cards[grpId] === undefined) {
+      cards.cards[grpId] = 1;
+    } else {
+      cards.cards[grpId] += 1;
+    }
+    // Add to newly aquired
+    if (cardsNew[grpId] === undefined) {
+      cardsNew[grpId] = 1;
+    } else {
+      cardsNew[grpId] += 1;
+    }
+  });
+
+  economy.vault += delta.vaultProgressDelta;
+  economy.wcCommon += delta.wcCommonDelta;
+  economy.wcUncommon += delta.wcUncommonDelta;
+  economy.wcRare += delta.wcRareDelta;
+  economy.wcMythic += delta.wcMythicDelta;
+  console.log("cardsNew", cardsNew);
+  setData({ economy, cardsNew, cards });
+}
+
 function inventoryUpdate(entry, update) {
   // combine sub-context with parent context
+  console.log("inventoryUpdate", entry, update);
   let context = "PostMatch.Update";
   if (update.context && update.context.source) {
     // combine sub-context with parent context
@@ -900,6 +937,10 @@ function inventoryUpdate(entry, update) {
     context += "." + update.context.subSource;
   }
 
+  if (update.delta) {
+    inventoryAddDelta(update.delta);
+  }
+
   // We use the original time string for the ID to ensure parsing does not alter it
   // This will make the ID the same if parsing either changes or breaks
   let id = sha1(entry.timestamp + context + JSON.stringify(update.delta));
@@ -910,7 +951,7 @@ function inventoryUpdate(entry, update) {
     // Add missing data
     date: parseWotcTimeFallback(entry.timestamp),
     // Reduce the size for storage
-    delta: minifiedDelta(update.delta),
+    delta: update.delta ? minifiedDelta(update.delta) : {},
     context,
     subContext: update.context, // preserve sub-context object data
     id: id
@@ -921,7 +962,7 @@ function inventoryUpdate(entry, update) {
 
 function trackUpdate(entry, trackUpdate) {
   if (!trackUpdate) return;
-  const { trackName, trackTier, trackDiff, orbDiff } = trackUpdate;
+  const { trackName, trackTier, trackDiff, orbCountDiff } = trackUpdate;
 
   if (trackDiff && trackDiff.inventoryUpdates) {
     trackDiff.inventoryUpdates.forEach(update => {
@@ -937,12 +978,12 @@ function trackUpdate(entry, trackUpdate) {
 
   // For some reason, orbs live separately from all other inventory
   if (
-    orbDiff &&
-    orbDiff.oldOrbCount &&
-    orbDiff.currentOrbCount &&
-    orbDiff.currentOrbCount - orbDiff.oldOrbCount
+    orbCountDiff &&
+    orbCountDiff.oldOrbCount &&
+    orbCountDiff.currentOrbCount &&
+    orbCountDiff.currentOrbCount - orbCountDiff.oldOrbCount
   ) {
-    const data = { trackName, trackTier, orbDiff };
+    const data = { trackName, trackTier, orbCountDiff };
     inventoryUpdate(entry, data);
   }
 }

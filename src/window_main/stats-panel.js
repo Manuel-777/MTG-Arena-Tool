@@ -1,6 +1,6 @@
 import { MANA, RANKS } from "../shared/constants";
 import { createDiv, createLabel } from "../shared/dom-fns";
-import { createSelect } from "../shared/select";
+import { createSelect } from "../shared/createSelect";
 import { get_rank_index, toDDHHMMSS, toMMSS } from "../shared/util";
 import {
   compareWinrates,

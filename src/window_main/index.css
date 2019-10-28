@@ -1,5 +1,21 @@
 @import '../../node_modules/pikaday/css/pikaday.css';
 
+.button_reset {
+    font-family: inherit; /* 1 */
+    font-size: 100%; /* 1 */
+    line-height: 1.15; /* 1 */
+    margin: 0; /* 2 */
+    overflow: visible;
+    text-transform: none;
+    -webkit-appearance: button;
+    background: none;
+    border: none;
+}
+
+.button_reset:focus {
+    /* not very accessable */
+    outline: none;
+}
 
 :root {
   --wc_common_png: url('../images/wc_common.png');
@@ -2450,6 +2466,7 @@ a:hover {
 }
 
 .select_button {
+    display: flex;
     color: var(--color-light);
     overflow: hidden;
     line-height: 32px;
@@ -2461,6 +2478,11 @@ a:hover {
     background-color: var(--color-mid-20);
     border: 1px solid var(--color-light-50);
     -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0;
 }
 
 .select_button:after {
@@ -2491,7 +2513,6 @@ a:hover {
 }
 
 .select_options_container {
-    display: none;
     color: var(--color-light);
     cursor: pointer;
     position: absolute;
@@ -2521,6 +2542,7 @@ a:hover {
     padding: 0 12px;
     border-top: 1px solid var(--color-mid-50);
     -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    width: 100%;
 }
 
 .select_option:hover {
@@ -3086,7 +3108,7 @@ a:hover {
 }
 
 .tou_list_player_name {
-    color: var(--color-light-75));
+    color: var(--color-light-75);
     font-size: 14px;
     text-align: center;
     margin-bottom: 2px;
@@ -3153,7 +3175,7 @@ a:hover {
 }
 
 .tournament_title {
-    color: var(--color-light-75));
+    color: var(--color-light-75);
     text-align: center;
     margin-top: 16px;
     font-family: Beleren;

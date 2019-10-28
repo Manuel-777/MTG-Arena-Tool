@@ -8,7 +8,7 @@ import {
 } from "../shared/constants";
 import pd from "../shared/player-data";
 import { createDiv, createLabel } from "../shared/dom-fns";
-import { createSelect } from "../shared/select";
+import { createSelect } from "../shared/createSelect";
 import {
   getReadableEvent,
   getReadableFormat,
@@ -17,6 +17,7 @@ import {
 } from "../shared/util";
 import { getTagColor, ipcSend, showDatepicker } from "./renderer-util";
 import Aggregator from "./aggregator";
+import * as React from 'react';
 
 class FilterPanel {
   constructor(
@@ -58,13 +59,22 @@ class FilterPanel {
     if (tag === Aggregator.DEFAULT_ARCH) return tag;
     const color = getTagColor(tag);
     const margins = "margin: 5px; margin-right: 30px;";
-    const style = `white-space: nowrap; background-color:${color}; color: black; padding-right: 12px; ${margins}`;
+    const style = {
+      whiteSpace: 'nowrap',
+      backgroundColor: color,
+      color: 'black',
+      paddingRight: '12px',
+      margin: '5px',
+      marginRight: '30px',
+    }
     let tagString = getReadableFormat(tag);
     if (showCount && tag in this.archCounts) {
       tagString += ` (${this.archCounts[tag]})`;
     }
     if (tag === Aggregator.NO_ARCH) return tagString;
-    return `<div class="deck_tag" style="${style}">${tagString}</div>`;
+    return (
+      <div className={"deck_tag"} style={style}>{tagString}</div>
+    );
   }
 
   getDeckString(deckId) {
@@ -75,34 +85,35 @@ class FilterPanel {
 
     const deckExists = pd.deckExists(deckId);
 
-    let deckName = deckExists ? getRecentDeckName(deckId) : deck.name;
+    let deckName = [deckExists ? getRecentDeckName(deckId) : deck.name];
     let maxChars = 10;
     if (deckExists && deck.colors) {
       maxChars = 16 - 2 * deck.colors.length;
     }
 
     if (deckName.length > maxChars) {
-      deckName = `<abbr title="${deckName}">${deckName.slice(
+      // eslint-disable-next-line react/jsx-key
+      deckName = [(<abbr title={deckName}>{deckName.slice(
         0,
         maxChars
-      )}...</abbr>`;
+      )}...</abbr>)];
     }
 
     if (deckExists) {
-      let colorsString = "";
+      let colorsString = [];
       if (deck.colors) {
         deck.colors.forEach(color => {
-          colorsString += `<div class="mana_s16 mana_${
+          colorsString.push(<div className={"mana_s16 mana_" +
             COLORS_ALL[color - 1]
-          }"></div>`;
+          } />);
         });
       }
       if (deck.archived) {
-        deckName += "<small><i> (archived)</i></small>";
+        deckName.push(<small><i>(archived)</i></small>);
       }
-      deckName += `<div class="flex_item">${colorsString}</div>`;
+      deckName.push(<div className={"flex_item"}>{colorsString}</div>);
     } else {
-      deckName += "<small><i> (deleted)</i></small>";
+      deckName.push(<small><i>(deleted)</i></small>);
     }
 
     return deckName;

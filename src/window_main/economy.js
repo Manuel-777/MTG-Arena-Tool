@@ -5,7 +5,7 @@ import compareAsc from "date-fns/compareAsc";
 import db from "../shared/database";
 import pd from "../shared/player-data";
 import { createDiv } from "../shared/dom-fns";
-import { createSelect } from "../shared/select";
+import { createSelect } from "../shared/createSelect";
 import { addCardHover } from "../shared/card-hover";
 import {
   collectionSortRarity,
@@ -59,6 +59,7 @@ const economyTransactionContextsMap = {
   "Booster.Open": "Booster Open",
   "Booster.Open.BoosterOpen": "Booster Open",
   "Event.GrantCardPool": "Event Card Pool",
+  "Event.GrantCardPool.ModifyPlayerInventory": "Event Card Pool",
   "Event.PayEntry": "Pay Event Entry",
   "Event.PayEntry.EventPayEntry": "Pay Event Entry",
   "Event.Season.Constructed.Payout": "Constructed Season Rewards",
@@ -68,6 +69,7 @@ const economyTransactionContextsMap = {
   "Quest Completed": "Match Rewards: Quest Reward",
   Store: "Store Transaction",
   "PlayerInventory.RedeemBulkWildcards": "Redeem Wildcard",
+  "PlayerInventory.RedeemBulkWildcards.WildCardRedemption": "Redeem Wildcard",
   "WildCard.Redeem": "Redeem Wildcard",
   "Vault.Complete": "Vault Opening",
   "PlayerReward.OnMatchCompletedWeekly": "Match Rewards: Weekly Wins",
@@ -897,7 +899,7 @@ function createEconomyUI(mainDiv) {
   const selectdiv = createDiv();
   selectdiv.style.margin = "auto auto auto 0px";
   selectdiv.style.display = "flex";
-  const select = createSelect(
+  createSelect(
     selectdiv,
     [...topSelectItems, ...selectItems],
     filterEconomy,
