@@ -66,6 +66,7 @@ import {
   OVERLAY_DRAFT_MODES
 } from "../shared/constants.js";
 import Clock from "../overlay/Clock";
+import SampleSizePanel from "../overlay/SampleSizePanel";
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -97,7 +98,6 @@ setRenderer(1);
 let playerSeat = 0;
 let oppName = "";
 let turnPriority = 0;
-let oddsSampleSize = 1;
 
 let actionLog = [];
 
@@ -482,11 +482,13 @@ function updateMatchView(index) {
     deckToDraw = currentMatch.playerCardsLeft;
   } else if (overlayMode === OVERLAY_ODDS || overlayMode === OVERLAY_MIXED) {
     // Next Draw Odds Mode
-    let cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
+    const cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
+    const cardOdds = currentMatch.playerCardsOdds;
+    const sampleSize = cardOdds.sampleSize || 1;
     deckListDiv.appendChild(
       createDiv(
         ["decklist_title"],
-        `Next Draw: ${oddsSampleSize}/${cardsLeft} cards`
+        `Next Draw: ${sampleSize}/${cardsLeft} cards`
       )
     );
     deckToDraw = currentMatch.playerCardsLeft;
@@ -680,103 +682,21 @@ function attachLandOdds(tile, odds) {
 }
 
 function drawDeckOdds(index) {
-  let deckListDom = `#overlay_${index + 1} .overlay_decklist`;
-  let deckListDiv = queryElements(deckListDom)[0];
+  const deckListDiv = queryElements(
+    `#overlay_${index + 1} .overlay_decklist`
+  )[0];
 
-  const navCont = createDiv(["overlay_samplesize_container"]);
+  // not sure this wrapper is necessary, just imitating createSelect for now
+  const container = createDiv([]);
+  deckListDiv.appendChild(container);
 
-  let oddsPrev = createDiv(["odds_prev", "click-on"]);
-  let oddsNext = createDiv(["odds_next", "click-on"]);
+  const props = {
+    cardOdds: currentMatch.playerCardsOdds,
+    cardsLeft: currentMatch.playerCardsLeft.mainboard.count(),
+    setOddsCallback: sampleSize => ipcSend("set_odds_samplesize", sampleSize)
+  };
 
-  navCont.appendChild(oddsPrev);
-  navCont.appendChild(
-    createDiv(["odds_number"], "Sample size: " + oddsSampleSize)
-  );
-  navCont.appendChild(oddsNext);
-
-  deckListDiv.appendChild(navCont);
-
-  deckListDiv.appendChild(createDiv(["chance_title"])); // Add some space
-
-  let cardOdds = currentMatch.playerCardsOdds;
-
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Creature: " +
-        (cardOdds.chanceCre != undefined ? cardOdds.chanceCre : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Instant: " +
-        (cardOdds.chanceIns != undefined ? cardOdds.chanceIns : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Sorcery: " +
-        (cardOdds.chanceSor != undefined ? cardOdds.chanceSor : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Artifact: " +
-        (cardOdds.chanceArt != undefined ? cardOdds.chanceArt : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Enchantment: " +
-        (cardOdds.chanceEnc != undefined ? cardOdds.chanceEnc : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Planeswalker: " +
-        (cardOdds.chancePla != undefined ? cardOdds.chancePla : "0") +
-        "%"
-    )
-  );
-  deckListDiv.appendChild(
-    createDiv(
-      ["chance_title"],
-      "Land: " +
-        (cardOdds.chanceLan != undefined ? cardOdds.chanceLan : "0") +
-        "%"
-    )
-  );
-
-  let oddNextDom = `#overlay_${index + 1} .odds_next`;
-  let oddPrevDom = `#overlay_${index + 1} .odds_prev`;
-  //
-  queryElements(oddPrevDom)[0].addEventListener("click", function() {
-    let cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
-    oddsSampleSize -= 1;
-    if (oddsSampleSize < 1) {
-      oddsSampleSize = cardsLeft - 1;
-    }
-    ipcSend("set_odds_samplesize", oddsSampleSize);
-  });
-  //
-  queryElements(oddNextDom)[0].addEventListener("click", function() {
-    let cardsLeft = currentMatch.playerCardsLeft.mainboard.count();
-    oddsSampleSize += 1;
-    if (oddsSampleSize > cardsLeft - 1) {
-      oddsSampleSize = 1;
-    }
-    ipcSend("set_odds_samplesize", oddsSampleSize);
-  });
+  ReactDOM.render(<SampleSizePanel {...props} />, container);
 }
 
 var currentDraft;
