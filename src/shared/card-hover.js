@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 import db from "./database";
-import { queryElements as $$ } from "./dom-fns";
+import { createDiv, queryElements as $$ } from "./dom-fns";
 import { getCardImage } from "./util";
 import { FACE_DFC_BACK, FACE_DFC_FRONT } from "./constants";
 import DraftRatings from "./DraftRatings";
