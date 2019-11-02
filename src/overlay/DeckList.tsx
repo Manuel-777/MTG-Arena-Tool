@@ -13,9 +13,10 @@ import {
   compare_cards as compareCards,
   get_card_type_sort as getCardTypeSort
 } from "../shared/util";
-import CardsList from "../shared/cards-list";
 import CardTile from "../shared/CardTile";
 import Colors from "../shared/colors";
+import DeckManaCurve from "../shared/DeckManaCurve";
+import DeckTypesStats from "../shared/DeckTypesStats";
 import OwnershipStars from "../shared/OwnershipStars";
 
 import SampleSizePanel from "./SampleSizePanel";
@@ -216,6 +217,8 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     });
   }
 
+  const arenaDeck = deck.getSave();
+
   return (
     <div className="overlay_decklist click-on">
       <div className="decklist_title">{subTitle}</div>
@@ -224,8 +227,8 @@ export default function DeckList(props: DeckListProps): JSX.Element {
         <div className="card_tile_separator">Sideboard</div>
       )}
       {settings.sideboard && sideboardCardTiles}
-      {/* {settings.type_counts && <TypeStats deck={deck} />} */}
-      {/* {settings.mana_curve && <ManaCurve deck={deck} />} */}
+      {settings.type_counts && <DeckTypesStats deck={arenaDeck} />}
+      {settings.mana_curve && <DeckManaCurve deck={arenaDeck} />}
       {settings.draw_odds &&
         (settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED) && (
           <SampleSizePanel
