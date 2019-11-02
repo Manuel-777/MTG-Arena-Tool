@@ -20,58 +20,91 @@ export const setRenderer = value => {
 
 let lastHoverStart = null;
 
-export function addCardHover(element, card) {
-  if (!card || !card.images || card.type == "Special") return;
+export function addCardHover(element, card, odds) {
+  if (!card || !card.images) return;
+
+  // This is hackish.. the way we insert our custom elements in the
+  // array of cards is wrong in the first place :()
+  const isCardGroupedLands = card && card.id === 100 && odds;
+  let landsDiv;
+  if (isCardGroupedLands) {
+    landsDiv = createDiv(["lands_div"]);
+
+    const createManaChanceDiv = function(odds, color) {
+      const cont = createDiv(["mana_cont"], odds + "%");
+      const div = createDiv(["mana_s16", "flex_end", "mana_" + color]);
+      cont.appendChild(div);
+      landsDiv.appendChild(cont);
+    };
+
+    if (odds.landW) createManaChanceDiv(odds.landW, "w");
+    if (odds.landU) createManaChanceDiv(odds.landU, "u");
+    if (odds.landB) createManaChanceDiv(odds.landB, "b");
+    if (odds.landR) createManaChanceDiv(odds.landR, "r");
+    if (odds.landG) createManaChanceDiv(odds.landG, "g");
+  }
 
   const hideHover = () => {
     $$(
       ".hover_card_quantity, .main_hover, .main_hover_ratings, .main_hover_dfc, .loader, .loader_dfc"
     ).forEach(element => (element.style.opacity = 0));
+    $$(".lands_div").forEach(div => {
+      if (div) {
+        $$(".overlay_hover_container")[0].removeChild(div);
+      }
+    });
     lastHoverStart = null;
   };
 
   element.addEventListener("mouseover", () => {
     $$(".loader, .main_hover").forEach(element => (element.style.opacity = 1));
 
-    // Split cards are readable both halves, no problem
-    if (
-      (card.dfc == FACE_DFC_BACK || card.dfc == FACE_DFC_FRONT) &&
-      renderer == 0
-    ) {
-      $$(".loader_dfc, .main_hover_dfc").forEach(el => {
-        show(el);
-        el.style.opacity = 1;
+    if (isCardGroupedLands && landsDiv) {
+      $$(
+        ".hover_card_quantity, .main_hover, .main_hover_ratings, .main_hover_dfc, .loader, .loader_dfc"
+      ).forEach(element => (element.style.opacity = 0));
+      $$(".overlay_hover_container")[0].appendChild(landsDiv);
+    } else {
+      // Split cards are readable both halves, no problem
+      if (
+        (card.dfc == FACE_DFC_BACK || card.dfc == FACE_DFC_FRONT) &&
+        renderer == 0
+      ) {
+        $$(".loader_dfc, .main_hover_dfc").forEach(el => {
+          show(el);
+          el.style.opacity = 1;
+        });
+
+        var dfcCard = db.card(card.dfcId);
+        var dfcCardImage = getCardImage(dfcCard);
+
+        var dfcImageElement = $$(".main_hover_dfc")[0];
+        dfcImageElement.src = dfcCardImage;
+        dfcImageElement.addEventListener("load", () => {
+          $$(".loader_dfc").forEach(el => (el.style.opacity = 0));
+        });
+      } else {
+        $$(".main_hover_dfc, .loader_dfc").forEach(hide);
+      }
+
+      var mainImageElement = $$(".main_hover")[0];
+      mainImageElement.src = getCardImage(card);
+      mainImageElement.addEventListener("load", () => {
+        $$(".loader").forEach(el => (el.style.opacity = 0));
       });
 
-      var dfcCard = db.card(card.dfcId);
-      var dfcCardImage = getCardImage(dfcCard);
+      // show card quantity
+      if (renderer == 0) {
+        attachOwnerhipStars(card, $$(".hover_card_quantity")[0]);
+      }
 
-      var dfcImageElement = $$(".main_hover_dfc")[0];
-      dfcImageElement.src = dfcCardImage;
-      dfcImageElement.addEventListener("load", () => {
-        $$(".loader_dfc").forEach(el => (el.style.opacity = 0));
-      });
-    } else {
-      $$(".main_hover_dfc, .loader_dfc").forEach(hide);
-    }
-
-    var mainImageElement = $$(".main_hover")[0];
-    mainImageElement.src = getCardImage(card);
-    mainImageElement.addEventListener("load", () => {
-      $$(".loader").forEach(el => (el.style.opacity = 0));
-    });
-
-    // show card quantity
-    if (renderer == 0) {
-      attachOwnerhipStars(card, $$(".hover_card_quantity")[0]);
-    }
-
-    if (renderer == 2) {
-      attachDraftRatings(card, $$(".main_hover_ratings")[0]);
-    } else {
-      $$(".main_hover_ratings").forEach(
-        element => (element.style.display = "none")
-      );
+      if (renderer == 2) {
+        attachDraftRatings(card, $$(".main_hover_ratings")[0]);
+      } else {
+        $$(".main_hover_ratings").forEach(
+          element => (element.style.display = "none")
+        );
+      }
     }
 
     lastHoverStart = Date.now();
