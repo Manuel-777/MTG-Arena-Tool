@@ -16,7 +16,7 @@ import {
 import Deck from "../shared/deck";
 
 import Clock from "./Clock";
-// import ActionLog from "./ActionLog";
+import ActionLog from "./ActionLog";
 import DeckList from "./DeckList";
 
 const packSizeMap: { [key: string]: number } = PACK_SIZES;
@@ -182,7 +182,9 @@ export default function Overlay(props: OverlayProps): JSX.Element {
           ))}
         </div>
       )}
-      {/* {settings.mode === OVERLAY_LOG && <ActionLog actionLog={actionLog} />} */}
+      {settings.mode === OVERLAY_LOG && (
+        <ActionLog actionLog={actionLog} index={index} />
+        )}
       {settings.deck && visibleDeck && (
         <DeckList
           deck={visibleDeck}
