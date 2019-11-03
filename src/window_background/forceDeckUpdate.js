@@ -48,7 +48,8 @@ const forceDeckUpdate = function(removeUsed = true) {
     typeSor = main.countType("Sorcery");
     typePla = main.countType("Planeswalker");
 
-    let chancesObj = {};
+    const chancesObj = { sampleSize: globals.odds_sample_size };
+
     let landsCount = main.getLandsAmounts();
     chancesObj.landW = chanceType(
       landsCount.w,
