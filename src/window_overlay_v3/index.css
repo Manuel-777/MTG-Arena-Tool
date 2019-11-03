@@ -85,7 +85,7 @@ body {
 
 .overlay_deckname {
     background-color: rgba(0,0,0,0.75);
-    padding: 4px 0 0 0;
+    padding: 6px 0 9px 0;
     text-align: center;
     color: #fae5d2;
 }
