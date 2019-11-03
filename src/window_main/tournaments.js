@@ -1,6 +1,6 @@
 import anime from "animejs";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
-import { createSelect } from "../shared/createSelect";
+import createSelect from "./createSelect";
 import * as deckDrawer from "../shared/deck-drawer";
 import { EASING_DEFAULT } from "../shared/constants.js";
 import {
@@ -16,7 +16,6 @@ import {
 } from "../shared/util";
 import pd from "../shared/player-data";
 import Aggregator from "./aggregator";
-import FilterPanel from "./filter-panel";
 import {
   pop,
   changeBackground,
@@ -24,6 +23,7 @@ import {
   drawDeckVisual,
   ipcSend
 } from "./renderer-util";
+import { getDeckComponentForwarded } from "./getDeckComponent";
 
 let tournamentDeck = null;
 let currentDeck = null;
@@ -204,16 +204,13 @@ function showTournamentRegister(mainDiv, tou) {
       .filter(deck => getBoosterCountEstimate(get_deck_missing(deck)) === 0);
 
     validDecks.sort(new Aggregator({ onlyCurrentDecks: true }).compareDecks);
-    // hack to make pretty deck names
-    // TODO move getDeckString out of FilterPanel
-    const filterPanel = new FilterPanel("unused", null, {}, [], [], validDecks);
     const deckSelect = createSelect(
       deckSelectContainer,
       validDecks.map(deck => deck.id),
       -1,
       selectTourneyDeck,
       "tou_deck_select",
-      filterPanel.getDeckString
+      getDeckComponentForwarded(validDecks)
     );
 
     deckSelect.style.width = "300px";

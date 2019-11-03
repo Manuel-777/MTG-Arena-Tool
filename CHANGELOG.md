@@ -1,3 +1,31 @@
+## <small>2.12.9 (2019-11-02)</small>
+
+* add last touch to decks page ([42dde20](https://github.com/Manuel-777/MTG-Arena-Tool/commit/42dde20))
+* addDevToolsExtension ([70002d3](https://github.com/Manuel-777/MTG-Arena-Tool/commit/70002d3))
+* amend ([1bffacf](https://github.com/Manuel-777/MTG-Arena-Tool/commit/1bffacf))
+* bugfix 2 ([2c5cca4](https://github.com/Manuel-777/MTG-Arena-Tool/commit/2c5cca4))
+* bugfix aggregator handles invalid date comparison ([dc8960b](https://github.com/Manuel-777/MTG-Arena-Tool/commit/dc8960b))
+* bugfix and fragment clean up ([56e9421](https://github.com/Manuel-777/MTG-Arena-Tool/commit/56e9421))
+* Clock optimizations based on review feedback ([3623627](https://github.com/Manuel-777/MTG-Arena-Tool/commit/3623627))
+* convert Clock into function component ([359df90](https://github.com/Manuel-777/MTG-Arena-Tool/commit/359df90))
+* Custom react dev tools path ([4b46756](https://github.com/Manuel-777/MTG-Arena-Tool/commit/4b46756))
+* disable prop-types check ([dbee01f](https://github.com/Manuel-777/MTG-Arena-Tool/commit/dbee01f))
+* i am dum ([0b885b3](https://github.com/Manuel-777/MTG-Arena-Tool/commit/0b885b3))
+* lint and use opponent name in label ([0ad1f7d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/0ad1f7d))
+* now ignore it ([c0bc675](https://github.com/Manuel-777/MTG-Arena-Tool/commit/c0bc675))
+* port react overlay clock ([12dceda](https://github.com/Manuel-777/MTG-Arena-Tool/commit/12dceda))
+* refactor overlay to use react clock ([0772001](https://github.com/Manuel-777/MTG-Arena-Tool/commit/0772001))
+* remove deprecated IPC and state ([26d37fa](https://github.com/Manuel-777/MTG-Arena-Tool/commit/26d37fa))
+* rename Clock to tsx ([ab4b14d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/ab4b14d))
+* rename overlay jsx ([a83429d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/a83429d))
+* simplify Clock state ([63738f2](https://github.com/Manuel-777/MTG-Arena-Tool/commit/63738f2))
+* Simplify if clauses ([81a2055](https://github.com/Manuel-777/MTG-Arena-Tool/commit/81a2055))
+* Update main.js ([003f4bc](https://github.com/Manuel-777/MTG-Arena-Tool/commit/003f4bc))
+* use Fragment instead of array ([60d4cb1](https://github.com/Manuel-777/MTG-Arena-Tool/commit/60d4cb1))
+* we have .env, duh ([fb58ee6](https://github.com/Manuel-777/MTG-Arena-Tool/commit/fb58ee6))
+
+
+
 ## <small>2.12.8 (2019-10-30)</small>
 
 * bugfix labels.trackUpdate handles zero orbs ([fe55218](https://github.com/Manuel-777/MTG-Arena-Tool/commit/fe55218))

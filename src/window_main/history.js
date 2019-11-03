@@ -12,7 +12,7 @@ import { createDiv, createInput } from "../shared/dom-fns";
 import { makeId } from "../shared/util";
 import Aggregator from "./aggregator";
 import DataScroller from "./data-scroller";
-import FilterPanel from "./filter-panel";
+import FilterPanel from "./FilterPanel";
 import ListItem from "./list-item";
 import StatsPanel from "./stats-panel";
 import {
@@ -28,6 +28,7 @@ import {
 } from "./renderer-util";
 import { openDraft } from "./draft-details";
 import { openMatch } from "./match-details";
+import mountReactComponent from "./mountReactComponent";
 
 const byId = id => document.getElementById(id);
 const {
@@ -156,8 +157,7 @@ export function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
     matchesInEvent.archCounts,
     true
   );
-  const historyTopFilter = filterPanel.render();
-  historyTop.appendChild(historyTopFilter);
+  mountReactComponent(filterPanel.render(), historyTop);
   wrap_l.appendChild(historyTop);
 
   mainDiv.appendChild(wrap_l);

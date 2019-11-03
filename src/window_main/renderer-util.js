@@ -40,6 +40,7 @@ import {
   toMMSS,
   openScryfallCard
 } from "../shared/util";
+import ReactDOM from "react-dom";
 import createShareButton from "./createShareButton";
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
@@ -47,6 +48,7 @@ const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 const byId = id => document.getElementById(id);
 let popTimeout = null;
 let dialogHandler = null;
+let unmountPoints = [];
 // quick and dirty shared state object for main renderer process
 // (for state shared across processes, use database or player-data)
 const localState = {
@@ -154,8 +156,12 @@ function makeResizable(div, resizeCallback, finalCallback) {
   );
 }
 
-function resetMainContainer() {
+export function resetMainContainer() {
   const container = byId("ux_0");
+  if (unmountPoints.length > 0) {
+    unmountPoints.forEach(node => ReactDOM.unmountComponentAtNode(node));
+  }
+  unmountPoints = [];
   container.innerHTML = "";
   container.classList.remove("flex_item");
   const { lastScrollHandler } = getLocalState();
@@ -164,6 +170,10 @@ function resetMainContainer() {
     setLocalState({ lastScrollHandler: null });
   }
   return container;
+}
+
+export function addNodeToUnmountReact(node) {
+  unmountPoints.push(node);
 }
 
 function drawDeck(div, deck, showWildcards = false) {
@@ -1034,7 +1044,6 @@ export {
   toggleArchived,
   getTagColor,
   makeResizable,
-  resetMainContainer,
   drawDeck,
   drawCardList,
   drawDeckVisual,

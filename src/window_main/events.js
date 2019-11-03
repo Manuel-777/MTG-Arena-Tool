@@ -8,7 +8,7 @@ import { createDiv, queryElementsByClass } from "../shared/dom-fns";
 import { getReadableEvent, toMMSS } from "../shared/util";
 import Aggregator from "./aggregator";
 import DataScroller from "./data-scroller";
-import FilterPanel from "./filter-panel";
+import FilterPanel from "./FilterPanel";
 import ListItem from "./list-item";
 import StatsPanel from "./stats-panel";
 import {
@@ -21,6 +21,7 @@ import {
 } from "./renderer-util";
 import { openMatch } from "./match-details";
 import { openDraft } from "./draft-details";
+import mountReactComponent from "./mountReactComponent";
 
 let filters = Aggregator.getDefaultFilters();
 filters.eventId = Aggregator.ALL_EVENT_TRACKS;
@@ -57,8 +58,7 @@ export function openEventsTab(_filters, dataIndex = 25, scrollTop = 0) {
     true
   );
 
-  const eventsTopFilter = filterPanel.render();
-  eventsTop.appendChild(eventsTopFilter);
+  mountReactComponent(filterPanel.render(), eventsTop);
 
   const statsPanel = new StatsPanel("events_top", filteredMatches);
   const eventsTopWinrate = statsPanel.render();

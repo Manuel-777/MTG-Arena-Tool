@@ -11,15 +11,14 @@ import {
 } from "../shared/constants";
 import db from "../shared/database";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
-import { createSelect } from "../shared/createSelect";
+import createSelect from "./createSelect";
 import {
   getCardArtCrop,
   get_rank_index_16,
   removeDuplicates,
   compare_cards,
   getBoosterCountEstimate,
-  roundWinrate,
-  get_deck_missing
+  roundWinrate
 } from "../shared/util";
 import {
   addCheckbox,
