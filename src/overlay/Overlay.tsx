@@ -25,6 +25,7 @@ const manaColorMap: { [key: number]: string } = MANA;
 export interface OverlayProps {
   actionLog: any;
   draft: any;
+  draftState: { packN: number; pickN: number };
   index: number;
   match: any;
   playerSeat: number;
@@ -32,20 +33,22 @@ export interface OverlayProps {
   tileStyle: number;
   turnPriority: number;
   setOddsCallback: (sampleSize: number) => void;
+  setDraftStateCallback: (state: { packN: number; pickN: number }) => void;
 }
 
 export default function Overlay(props: OverlayProps): JSX.Element {
-  const [draftState, setDraftState] = useState({ packN: 0, pickN: 0 });
   const {
     actionLog,
     draft,
+    draftState,
     index,
     match,
     playerSeat,
     settings,
     tileStyle,
     turnPriority,
-    setOddsCallback
+    setOddsCallback,
+    setDraftStateCallback
   } = props;
 
   let visibleDeck = null;
@@ -71,7 +74,7 @@ export default function Overlay(props: OverlayProps): JSX.Element {
       pickN = draft.pickNumber;
       packN = draft.packNumber;
     }
-    setDraftState({ packN, pickN });
+    setDraftStateCallback({ packN, pickN });
   }, [draftState, draft]);
 
   const handleDraftNext = useCallback((): void => {
@@ -92,7 +95,7 @@ export default function Overlay(props: OverlayProps): JSX.Element {
       packN = draft.packNumber;
       pickN = draft.pickNumber;
     }
-    setDraftState({ packN, pickN });
+    setDraftStateCallback({ packN, pickN });
   }, [draftState, draft]);
 
   const { packN, pickN } = draftState;

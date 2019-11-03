@@ -51,6 +51,7 @@ let arenaState = ARENA_MODE_IDLE;
 let editMode = false;
 let currentMatch = null;
 let currentDraft;
+let draftState = { packN: 0, pickN: 0 };
 let playerSeat = 0;
 let turnPriority = 0;
 
@@ -75,23 +76,36 @@ ipc.on("edit", () => {
   toggleEditMode();
 });
 
-function recreateOverlay(index) {
+function recreateOverlay(index, _draftState) {
   const elementsDiv = queryElements(
     `#overlay_${index + 1} .elements_wrapper`
   )[0];
+  if (_draftState) {
+    draftState = _draftState;
+  } else if (currentDraft) {
+    draftState = {
+      packN: currentDraft.packNumber,
+      pickN: currentDraft.pickNumber
+    };
+  }
   const setOddsCallback = sampleSize => {
     ipcSend("set_odds_samplesize", sampleSize);
+  };
+  const setDraftStateCallback = _draftState => {
+    recreateOverlay(index, _draftState);
   };
   const props = {
     actionLog,
     draft: currentDraft,
+    draftState,
     index,
     match: currentMatch,
     playerSeat,
     settings: pd.settings.overlays[index],
     tileStyle: parseInt(pd.settings.card_tile_style),
     turnPriority,
-    setOddsCallback
+    setOddsCallback,
+    setDraftStateCallback
   };
   ReactDOM.render(<Overlay {...props} />, elementsDiv);
 }
