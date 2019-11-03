@@ -116,7 +116,7 @@ export default function Overlay(props: OverlayProps): JSX.Element {
     }
 
     if (settings.mode === OVERLAY_DRAFT) {
-      visibleDeck = new Deck({ pickName }, pack);
+      visibleDeck = new Deck({ name: pickName }, pack);
       cardsCount = visibleDeck.mainboard.count();
       mainTitle = visibleDeck.name;
       subTitle = "Cards Left: " + cardsCount + " cards";
@@ -184,7 +184,7 @@ export default function Overlay(props: OverlayProps): JSX.Element {
       )}
       {settings.mode === OVERLAY_LOG && (
         <ActionLog actionLog={actionLog} index={index} />
-        )}
+      )}
       {settings.deck && visibleDeck && (
         <DeckList
           deck={visibleDeck}
@@ -192,7 +192,7 @@ export default function Overlay(props: OverlayProps): JSX.Element {
           highlightCardId={pick}
           settings={settings}
           tileStyle={tileStyle}
-          cardOdds={match.playerCardsOdds}
+          cardOdds={match ? match.playerCardsOdds : {}}
           setOddsCallback={setOddsCallback}
         />
       )}

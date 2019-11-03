@@ -52,12 +52,21 @@ function compareQuantity(a: any, b: any) {
 }
 
 function compareDraftPicks(a: any, b: any) {
-  const aCard = db.card(a);
-  const bCard = db.card(b);
+  const aCard = db.card(a.id);
+  const bCard = db.card(b.id);
+  if (!bCard) {
+    return -1;
+  } else if (!aCard) {
+    return 1;
+  }
   const aColors = new Colors();
-  aColors.addFromCost(aCard.cost);
+  if (aCard.cost) {
+    aColors.addFromCost(aCard.cost);
+  }
   const bColors = new Colors();
-  bColors.addFromCost(bCard.cost);
+  if (bCard.cost) {
+    bColors.addFromCost(bCard.cost);
+  }
   const aType = getCardTypeSort(aCard.type);
   const bType = getCardTypeSort(bCard.type);
   return (
@@ -147,10 +156,6 @@ export default function DeckList(props: DeckListProps): JSX.Element {
       quantity = DRAFT_RANKS[rank];
     }
 
-    if (settings.mode === OVERLAY_DRAFT) {
-      mainCardTiles.push(<OwnershipStars card={card} />);
-    }
-
     // This is hackish.. the way we insert our custom elements in the
     // array of cards is wrong in the first place :()
     const isCardGroupedLands =
@@ -163,6 +168,16 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     let dfcCard = null;
     if (card && card.dfcId) {
       dfcCard = db.card(card.dfcId);
+    }
+    if (settings.mode === OVERLAY_DRAFT) {
+      mainCardTiles.push(
+        <div
+          className="overlay_card_quantity"
+          key={"maincardtile_owned_" + card.id}
+        >
+          <OwnershipStars card={fullCard} />
+        </div>
+      );
     }
     mainCardTiles.push(
       <CardTile
