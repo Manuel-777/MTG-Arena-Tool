@@ -57,14 +57,15 @@ export function addCardHover(element, card, odds) {
   };
 
   element.addEventListener("mouseover", () => {
-    $$(".loader, .main_hover").forEach(element => (element.style.opacity = 1));
-
     if (isCardGroupedLands && landsDiv) {
       $$(
         ".hover_card_quantity, .main_hover, .main_hover_ratings, .main_hover_dfc, .loader, .loader_dfc"
       ).forEach(element => (element.style.opacity = 0));
       $$(".overlay_hover_container")[0].appendChild(landsDiv);
     } else {
+      $$(".loader, .main_hover").forEach(
+        element => (element.style.opacity = 1)
+      );
       // Split cards are readable both halves, no problem
       if (
         (card.dfc == FACE_DFC_BACK || card.dfc == FACE_DFC_FRONT) &&
