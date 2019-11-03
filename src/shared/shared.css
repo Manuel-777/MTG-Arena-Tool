@@ -677,12 +677,12 @@ label {
 
 .tile_wr { -webkit-border-image: url(../images/wr.png) 0 15 0 15 stretch;}
 .tile_wb { -webkit-border-image: url(../images/wb.png) 0 15 0 15 stretch;}
-.tile_uw { -webkit-border-image: url(../images/uw.png) 0 15 0 15 stretch;}
+.tile_wu { -webkit-border-image: url(../images/uw.png) 0 15 0 15 stretch;}
 .tile_ur { -webkit-border-image: url(../images/ur.png) 0 15 0 15 stretch;}
 .tile_ug { -webkit-border-image: url(../images/ug.png) 0 15 0 15 stretch;}
 .tile_ub { -webkit-border-image: url(../images/ub.png) 0 15 0 15 stretch;}
 .tile_rg { -webkit-border-image: url(../images/rg.png) 0 15 0 15 stretch;}
-.tile_gw { -webkit-border-image: url(../images/gw.png) 0 15 0 15 stretch;}
+.tile_wg { -webkit-border-image: url(../images/gw.png) 0 15 0 15 stretch;}
 .tile_br { -webkit-border-image: url(../images/br.png) 0 15 0 15 stretch;}
 .tile_bg { -webkit-border-image: url(../images/bg.png) 0 15 0 15 stretch;}
 
