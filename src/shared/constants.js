@@ -656,21 +656,22 @@ export const ARENA_MODE_IDLE = 0;
 export const ARENA_MODE_MATCH = 1;
 export const ARENA_MODE_DRAFT = 2;
 
-const DRAFT_RANKS = [];
-DRAFT_RANKS[12] = "A+";
-DRAFT_RANKS[11] = "A";
-DRAFT_RANKS[10] = "A-";
-DRAFT_RANKS[9] = "B+";
-DRAFT_RANKS[8] = "B";
-DRAFT_RANKS[7] = "B-";
-DRAFT_RANKS[6] = "C+";
-DRAFT_RANKS[5] = "C";
-DRAFT_RANKS[4] = "C-";
-DRAFT_RANKS[3] = "D+";
-DRAFT_RANKS[2] = "D";
-DRAFT_RANKS[1] = "D-";
-DRAFT_RANKS[0] = "F";
-export { DRAFT_RANKS };
+export const DRAFT_RANKS = [
+  "F",
+  "D-",
+  "D",
+  "D+",
+  "C-",
+  "C",
+  "C+",
+  "B-",
+  "B",
+  "B+",
+  "A-",
+  "A",
+  "A+"
+];
+
 export const CARD_TYPE_CODES = [
   "cre",
   "lan",
