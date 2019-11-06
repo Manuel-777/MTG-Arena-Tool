@@ -5,7 +5,7 @@ import compareAsc from "date-fns/compareAsc";
 import db from "../shared/database";
 import pd from "../shared/player-data";
 import { createDiv } from "../shared/dom-fns";
-import { createSelect } from "../shared/createSelect";
+import createSelect from "./createSelect";
 import { addCardHover } from "../shared/card-hover";
 import {
   collectionSortRarity,

@@ -73,7 +73,6 @@ function processLog(filename, callback) {
 
       case "set_player_data":
       case "set_active_events":
-      case "set_priority_timer":
       case "action_log":
       case "set_match":
         // ignore

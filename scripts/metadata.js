@@ -20,7 +20,7 @@ const {
 let metagameData = {};
 let ranksData = {};
 
-const VERSION = 26;
+const VERSION = 27;
 
 const LANGUAGES = [
   "EN",

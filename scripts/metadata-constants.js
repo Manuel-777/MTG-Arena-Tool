@@ -59,6 +59,8 @@ exports.EVENT_TO_NAME = {
   PlayAnyDeck_20190926: "Play Any Deck - Standard",
   WinEveryCard_20191005: "Win Every Card - Standard",
   CompCons_Metagame_Challenge_20191004: "Metagame Challenge 10/19",
+  ExtraLife_2019_20191101: "Extra Life",
+  FestivalFae_Std_Artisan_20191103: "Artisan Standard",
 
   Brawl_Launch_20191024: "Brawl Launch",
   Precon_Brawl_ELD: "Precon Brawl",
@@ -122,6 +124,8 @@ exports.EVENT_TO_FORMAT = {
   PlayAnyDeck_20190926: "Standard",
   WinEveryCard_20191005: "Standard",
   CompCons_Metagame_Challenge_20191004: "Traditional Standard",
+  ExtraLife_2019_20191101: "Pauper",
+  FestivalFae_Std_Artisan_20191103: "Artisan",
 
   Brawl_Launch_20191024: "Brawl",
   Precon_Brawl_ELD: "Brawl",

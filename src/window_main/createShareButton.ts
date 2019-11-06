@@ -6,7 +6,7 @@ import {
     openDialog,
     ipcSend,
 } from "./renderer-util";
-import { createSelect } from "../shared/createSelect";
+import createSelect from "./createSelect";
 
 const byId = (id: string) => document.querySelector<HTMLInputElement>("input#" + id);
 

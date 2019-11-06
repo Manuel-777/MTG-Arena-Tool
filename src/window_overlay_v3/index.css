@@ -383,7 +383,7 @@ body {
 }
 
 .lands_div {
-    max-width: 120px;
+    width: 100px;
     margin: 64px 0 32px 0;
     padding: 16px;
     border-radius: 6px;

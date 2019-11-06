@@ -163,15 +163,12 @@ function processMatch(json, matchBeginTime) {
   globals.instanceToCardIdMap = {};
 
   ipc_send("ipc_log", "vs " + match.opponent.name);
-  ipc_send("set_timer", match.beginTime, IPC_OVERLAY);
 
   if (match.eventId == "DirectGame" && globals.currentDeck) {
     let str = globals.currentDeck.getSave();
     const httpApi = require("./http-api");
     httpApi.httpTournamentCheck(str, match.opponent.name, true);
   }
-
-  ipc_send("set_priority_timer", match.priorityTimers, IPC_OVERLAY);
 
   return match;
 }
@@ -250,7 +247,6 @@ function saveMatch(id, matchEndTime) {
     const httpApi = require("./http-api");
     httpApi.httpSetMatch(match);
   }
-  ipc_send("set_timer", 0, IPC_OVERLAY);
   ipc_send("popup", { text: "Match saved!", time: 3000 });
 }
 
@@ -979,8 +975,8 @@ function trackUpdate(entry, trackUpdate) {
   // For some reason, orbs live separately from all other inventory
   if (
     orbCountDiff &&
-    orbCountDiff.oldOrbCount &&
-    orbCountDiff.currentOrbCount &&
+    orbCountDiff.oldOrbCount !== undefined &&
+    orbCountDiff.currentOrbCount !== undefined &&
     orbCountDiff.currentOrbCount - orbCountDiff.oldOrbCount
   ) {
     const data = { trackName, trackTier, orbCountDiff };

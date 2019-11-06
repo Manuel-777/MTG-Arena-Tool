@@ -9,8 +9,8 @@ import {
   getBoosterCountEstimate,
   getReadableFormat
 } from "../shared/util";
-import Aggregator from "./aggregator";
-import FilterPanel from "./filter-panel";
+import Aggregator, { dateMaxValid } from "./aggregator";
+import FilterPanel from "./FilterPanel";
 import ListItem from "./list-item";
 import StatsPanel from "./stats-panel";
 import { openDeck } from "./deck-details";
@@ -21,15 +21,19 @@ import {
   getWinrateClass,
   hideLoadingBars,
   ipcSend,
+  localTimeSince,
   makeResizable,
   resetMainContainer,
   setLocalState,
   showColorpicker
 } from "./renderer-util";
+import mountReactComponent from "./mountReactComponent";
 
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
 const tagPrompt = "Add";
+
+const cleanupReact = null;
 
 function setFilters(selected = {}) {
   if (selected.eventId || selected.date) {
@@ -104,7 +108,7 @@ export function openDecksTab(_filters = {}, scrollTop = 0) {
     true,
     true
   );
-  decksTop.appendChild(filterPanel.render());
+  mountReactComponent(filterPanel.render(), decksTop);
   wrap_l.appendChild(decksTop);
 
   const decks = [...pd.deckList];
@@ -143,20 +147,21 @@ export function openDecksTab(_filters = {}, scrollTop = 0) {
         openDeckCallback(id, filters)
       );
     }
-    listItem.center.classList.add("deck_tags_container");
     listItem.divideLeft();
+    listItem.divideCenter();
     listItem.divideRight();
 
-    createTag(listItem.center, deck.id, null, false);
+    listItem.centerTop.classList.add("deck_tags_container");
+    createTag(listItem.centerTop, deck.id, null, false);
     if (deck.format) {
       const fText = getReadableFormat(deck.format);
-      const t = createTag(listItem.center, deck.id, fText, false);
+      const t = createTag(listItem.centerTop, deck.id, fText, false);
       t.style.fontStyle = "italic";
     }
     if (deck.tags) {
       deck.tags.forEach(tag => {
         if (tag !== getReadableFormat(deck.format)) {
-          createTag(listItem.center, deck.id, tag);
+          createTag(listItem.centerTop, deck.id, tag);
         }
       });
     }
@@ -205,6 +210,18 @@ export function openDecksTab(_filters = {}, scrollTop = 0) {
       const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
       listItem.leftBottom.appendChild(m);
     });
+
+    const lastUpdated = new Date(deck.lastUpdated);
+    const lastPlayed = new Date(aggregator.deckLastPlayed[deck.id]);
+    const lastTouch = dateMaxValid(lastUpdated, lastPlayed);
+    const deckLastTouchedDiv = createDiv(
+      ["list_deck_winrate"],
+      `<i style="opacity:0.6">updated/played:</i> ${localTimeSince(lastTouch)}`
+    );
+    deckLastTouchedDiv.style.marginLeft = "18px";
+    deckLastTouchedDiv.style.marginRight = "auto";
+    deckLastTouchedDiv.style.lineHeight = "18px";
+    listItem.centerBottom.appendChild(deckLastTouchedDiv);
 
     const dwr = aggregator.deckStats[deck.id];
     if (dwr && dwr.total > 0) {

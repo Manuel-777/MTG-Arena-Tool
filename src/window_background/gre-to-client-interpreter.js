@@ -36,13 +36,6 @@ function changePriority(previous, current, time) {
     globals.currentMatch.lastPriorityChangeTime;
 
   globals.currentMatch.currentPriority = current;
-  //console.log(priorityTimers);
-  //console.log("since match begin:", time - matchBeginTime);
-  ipc_send(
-    "set_priority_timer",
-    globals.currentMatch.priorityTimers,
-    IPC_OVERLAY
-  );
 }
 
 const actionLogGenerateLink = function(grpId) {

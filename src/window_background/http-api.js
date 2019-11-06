@@ -492,7 +492,7 @@ export function httpBasic() {
         console.log(req);
         ipc_send("popup", {
           text: `Request error. (${e.message})`,
-          time: 0,
+          time: 20000,
           progress: -1
         });
 

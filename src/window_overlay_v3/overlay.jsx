@@ -1,4 +1,6 @@
 import { ipcRenderer as ipc, webFrame, remote } from "electron";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import interact from "interactjs";
 import format from "date-fns/format";
 
@@ -63,6 +65,7 @@ import {
   OVERLAY_DRAFT_BREW,
   OVERLAY_DRAFT_MODES
 } from "../shared/constants.js";
+import Clock from "../overlay/Clock";
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -89,9 +92,6 @@ let landsCard = {
   dfcId: 0
 };
 
-let matchBeginTime = Date.now();
-let priorityTimers = [];
-const clockMode = pd.settings.overlays.map(() => 0);
 setRenderer(1);
 
 let playerSeat = 0;
@@ -118,21 +118,6 @@ ipc.on("set_arena_state", function(event, arg) {
     setRenderer(2);
   }
   settingsUpdated();
-});
-
-ipc.on("set_timer", function(event, arg) {
-  if (arg == -1) {
-    matchBeginTime = Date.now();
-  } else if (arg !== 0) {
-    //matchBeginTime = arg == 0 ? 0 : Date.parse(arg);
-    matchBeginTime = Date.parse(arg);
-  }
-});
-
-ipc.on("set_priority_timer", function(event, arg) {
-  if (arg) {
-    priorityTimers = arg;
-  }
 });
 
 ipc.on("edit", () => {
@@ -375,17 +360,7 @@ ipc.on("set_turn", (event, arg) => {
   //turnDecision = _decision;
 
   pd.settings.overlays.forEach((_overlay, index) => {
-    let clockTurnDom = `#overlay_${index + 1} .clock_turn`;
-    if (clockMode[index] === 0) {
-      recreateClock(index);
-    }
-    if (clockMode[index] > 0) {
-      if (turnPriority === playerSeat) {
-        queryElements(clockTurnDom)[0].innerHTML = "You have priority.";
-      } else {
-        queryElements(clockTurnDom)[0].innerHTML = `${oppName} has priority.`;
-      }
-    }
+    recreateClock(index);
   });
 });
 
@@ -969,103 +944,25 @@ function updateDraftView(index, _packN = -1, _pickN = -1) {
   }
 }
 
-window.setInterval(() => {
-  pd.settings.overlays.forEach((_overlay, index) => {
-    updateClock(index);
-  });
-  //if (fix) fix.registerWindow();
-}, 250);
-
-function updateClock(index) {
-  let hh, mm, ss;
-  let clockPriority1Dom = `#overlay_${index + 1} .clock_priority_1`;
-  let clockPriority2Dom = `#overlay_${index + 1} .clock_priority_2`;
-  let clockElapsedDom = `#overlay_${index + 1} .clock_elapsed`;
-
-  if (matchBeginTime === 0) {
-    hh = 0;
-    mm = 0;
-    ss = 0;
-  } else if (clockMode[index] === 0) {
-    let time = priorityTimers[1] / 1000;
-    const now = new Date();
-    if (turnPriority === 1 && time > 0) {
-      time += (now - new Date(priorityTimers[0])) / 1000;
-    }
-
-    mm = Math.floor((time % 3600) / 60);
-    mm = ("0" + mm).slice(-2);
-    ss = Math.floor(time % 60);
-    ss = ("0" + ss).slice(-2);
-    queryElements(clockPriority1Dom)[0].innerHTML = mm + ":" + ss;
-
-    time = priorityTimers[2] / 1000;
-    if (turnPriority === 2 && time > 0) {
-      time += (now - new Date(priorityTimers[0])) / 1000;
-    }
-
-    mm = Math.floor((time % 3600) / 60);
-    mm = ("0" + mm).slice(-2);
-    ss = Math.floor(time % 60);
-    ss = ("0" + ss).slice(-2);
-    queryElements(clockPriority2Dom)[0].innerHTML = mm + ":" + ss;
-  } else if (clockMode[index] === 1) {
-    const diff = Math.floor((Date.now() - matchBeginTime) / 1000);
-    hh = Math.floor(diff / 3600);
-    mm = Math.floor((diff % 3600) / 60);
-    ss = Math.floor(diff % 60);
-    hh = ("0" + hh).slice(-2);
-    mm = ("0" + mm).slice(-2);
-    ss = ("0" + ss).slice(-2);
-    queryElements(clockElapsedDom)[0].innerHTML = hh + ":" + mm + ":" + ss;
-  } else if (clockMode[index] === 2) {
-    queryElements(
-      clockElapsedDom
-    )[0].innerHTML = new Date().toLocaleTimeString();
-  }
-}
-
 function recreateClock(index) {
-  let clockTurnDom = `#overlay_${index + 1} .clock_turn`;
-  let clockElapsedDom = `#overlay_${index + 1} .clock_elapsed`;
+  const clockDiv = queryElements(
+    `#overlay_${index + 1} .overlay_clock_container`
+  )[0];
+  if (!clockDiv) return;
 
-  const clockTurn = queryElements(clockTurnDom)[0];
-  const clockElapsed = queryElements(clockElapsedDom)[0];
-
-  if (clockMode[index] === 0) {
-    const p1 = createDiv(["clock_priority_1"]);
-    const p2 = createDiv(["clock_priority_2"]);
-    let p1name = oppName;
-    let p2name = "You";
-    if (playerSeat == 1) {
-      p1name = "You";
-      p2name = oppName;
-    }
-    clockTurn.innerHTML = `<div class="clock_pname1 ${
-      turnPriority == 1 ? "pname_priority" : ""
-    }">${p1name}</div><div class="clock_pname2 ${
-      turnPriority == 2 ? "pname_priority" : ""
-    }">${p2name}</div>`;
-
-    clockElapsed.innerHTML = "";
-    clockElapsed.appendChild(p1);
-    clockElapsed.appendChild(p2);
-  } else {
-    clockTurn.innerHTML = "";
-    clockElapsed.innerHTML = "";
-
-    if (turnPriority == playerSeat) {
-      clockTurn.innerHTML = "You have priority.";
-    } else {
-      clockTurn.innerHTML = `${oppName} has priority.`;
-    }
-  }
-
-  if (OVERLAY_DRAFT_MODES.includes(pd.settings.overlays[index].mode)) {
-    clockTurn.innerHTML = "";
-  }
-
-  updateClock(index);
+  const props = {
+    key: "overlay_clock_" + index,
+    matchBeginTime: currentMatch
+      ? new Date(currentMatch.beginTime)
+      : new Date(),
+    oppName: currentMatch ? currentMatch.opponent.name : "Opponent",
+    playerSeat: playerSeat,
+    priorityTimers: currentMatch
+      ? currentMatch.priorityTimers
+      : [Date.now(), 0, 0],
+    turnPriority: turnPriority
+  };
+  ReactDOM.render(<Clock {...props} />, clockDiv);
 }
 
 function change_background(index, arg = "default") {
@@ -1132,12 +1029,7 @@ ready(function() {
         <div class="overlay_deckname"></div>
         <div class="overlay_deckcolors"></div>
         <div class="overlay_decklist click-on"></div>
-        <div class="overlay_clock_container">
-            <div class="clock_prev click-on"></div>
-            <div class="clock_turn"></div>
-            <div class="clock_elapsed"></div>
-            <div class="clock_next click-on"></div>
-        </div>
+        <div class="overlay_clock_container"></div>
         <div class="overlay_message click-on"></div>
       </div>
       <div class="outer_wrapper top_nav_wrapper">
@@ -1156,8 +1048,6 @@ ready(function() {
       const iconDom = `#overlay_${index + 1} .overlay_icon`;
       const settingsDom = `#overlay_${index + 1} .settings`;
       const closeDom = `#overlay_${index + 1} .close`;
-      const clockPrevDom = `#overlay_${index + 1} .clock_prev`;
-      const clockNextDom = `#overlay_${index + 1} .clock_next`;
       const deckListDom = `#overlay_${index + 1} .overlay_decklist`;
 
       const deckListDiv = queryElements(deckListDom)[0];
@@ -1173,24 +1063,6 @@ ready(function() {
         } else {
           queryElements(mainHoverDom)[0].style.display = "none";
         }
-      });
-
-      const clockPrevDiv = queryElements(clockPrevDom)[0];
-      clockPrevDiv.addEventListener("click", function() {
-        clockMode[index] -= 1;
-        if (clockMode[index] < 0) {
-          clockMode[index] = 2;
-        }
-        recreateClock(index);
-      });
-
-      const clockNextDiv = queryElements(clockNextDom)[0];
-      clockNextDiv.addEventListener("click", function() {
-        clockMode[index] += 1;
-        if (clockMode[index] > 2) {
-          clockMode[index] = 0;
-        }
-        recreateClock(index);
       });
 
       const iconDiv = queryElements(iconDom)[0];

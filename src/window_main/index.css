@@ -3692,3 +3692,46 @@ a:hover {
 .completion_table_card.wanted {
     opacity: 0.5;
 }
+
+.filter_panel_root {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filter_panel_select_margin {
+    margin-bottom: 8px;
+}
+
+.dateCont {
+    display: flex;
+}
+
+.deckFiltersCont {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.spacer180 {
+    width: 180px;
+}
+
+.sortDiv {
+    display: flex;
+}
+
+.sortLabel {
+    margin-top: 7px;
+}
+
+.sortSelect {
+    width: 150px;
+}
+
+.archive_label {
+    margin-top: 4px;
+}

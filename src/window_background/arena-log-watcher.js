@@ -191,13 +191,8 @@ function onLogEntryFound(entry) {
     return;
   } else {
     //console.log("Entry:", entry.label, entry, entry.json());
-    if (globals.firstPass) {
-      updateLoading(entry);
-    }
-    if (
-      (globals.firstPass && !playerData.settings.skip_firstpass) ||
-      !globals.firstPass
-    ) {
+    updateLoading(entry);
+    if (!(globals.firstPass && playerData.settings.skip_firstpass)) {
       try {
         entrySwitch(entry, json);
         if (entry.timestamp) {

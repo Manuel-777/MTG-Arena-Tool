@@ -52,14 +52,11 @@ export function openScryfallCard(cardObj) {
     cardObj = db.card(cardObj);
   }
 
+  const { cid, set } = cardObj;
+
   try {
     shell.openExternal(
-      "https://scryfall.com/card/" +
-        db.sets[cardObj.set].scryfall +
-        "/" +
-        cardObj.cid +
-        "/" +
-        cardObj.name
+      "https://scryfall.com/card/" + db.sets[set].scryfall + "/" + cid
     );
   } catch (e) {
     console.log("Cant open scryfall card: ", cardObj);
