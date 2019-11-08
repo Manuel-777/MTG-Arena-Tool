@@ -18,7 +18,12 @@ function getOpponentDeck() {
   ) {
     // console.log(_deck);
     // console.log(_deck.colors);
-    globals.currentMatch.oppArchetype = getColorArchetype(_deck.colors);
+    if (globals.currentMatch.opponent.commanderGrpIds) {
+      const card = db.card(globals.currentMatch.opponent.commanderGrpIds[0]);
+      globals.currentMatch.oppArchetype = card ? card.name : "";
+    } else {
+      globals.currentMatch.oppArchetype = getColorArchetype(_deck.colors);
+    }
   }
   deckSave.archetype = globals.currentMatch.oppArchetype;
 

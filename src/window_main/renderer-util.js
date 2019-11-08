@@ -180,21 +180,24 @@ function drawDeck(div, deck, showWildcards = false) {
   div.innerHTML = "";
   const unique = makeId(4);
 
-  if (deck.commandZoneGRPId) {
-    let commander = deck.commandZoneGRPId;
+  if (deck.commandZoneGRPIds) {
     let separator = deckDrawer.cardSeparator(`Commander`);
     div.appendChild(separator);
 
-    const tile = deckDrawer.cardTile(
-      pd.settings.card_tile_style,
-      commander,
-      unique + "a",
-      1,
-      showWildcards,
-      deck,
-      false
-    );
-    div.appendChild(tile);
+    deck.commandZoneGRPIds.forEach((id, index) => {
+      if (index % 2 == 0) {
+        const tile = deckDrawer.cardTile(
+          pd.settings.card_tile_style,
+          id,
+          unique + "a",
+          deck.commandZoneGRPIds[index + 1],
+          showWildcards,
+          deck,
+          false
+        );
+        div.appendChild(tile);
+      }
+    });
   }
 
   // draw maindeck grouped by cardType

@@ -56,6 +56,7 @@ export interface PlayerMatchData {
   percentile?: number,
   leaderboardPlace?: number,
   cards?: any[],
+  commanderGrpIds: any
 }
 
 export interface ExtendedPlayerMatchData {
@@ -68,6 +69,7 @@ export interface ExtendedPlayerMatchData {
   rank: string,
   percentile?: number,
   leaderboardPlace?: number,
+  commanderGrpIds: any
 }
 
 export interface MatchData {
@@ -159,7 +161,8 @@ const matchDataDefault: MatchData = {
     name: "",
     id: "",
     rank: "",
-    tier: 1
+    tier: 1,
+    commanderGrpIds: null
   },
   opponent: {
     seat: 2,
@@ -169,7 +172,8 @@ const matchDataDefault: MatchData = {
     name: "",
     id: "",
     rank: "",
-    tier: 1
+    tier: 1,
+    commanderGrpIds: null
   }
 };
 
@@ -182,9 +186,12 @@ export function createMatch(json: MatchCreatedEvent, matchBeginTime: number): Ma
     match.playerCardsLeft = globals.originalDeck.clone();
   }
 
+  match.player.commanderGrpIds = json.commanderGrpIds;
+
   match.opponent.name = json.opponentScreenName;
   match.opponent.rank = json.opponentRankingClass;
   match.opponent.tier = json.opponentRankingTier;
+  match.opponent.commanderGrpIds = json.opponentCommanderGrpIds;
 
   match.opponent.percentile = json.opponentMythicPercentile;
   match.opponent.leaderboardPlace = json.opponentMythicLeaderboardPlace;
@@ -265,7 +272,8 @@ export function completeMatch(match: ExtendedMatchData, matchData: MatchData, ma
     leaderboardPlace: matchData.opponent.leaderboardPlace,
     userid: matchData.opponent.id,
     seat: matchData.opponent.seat,
-    win: opponentWins
+    win: opponentWins,
+    commanderGrpIds: matchData.opponent.commanderGrpIds
   };
 
   match.player = {
@@ -277,7 +285,8 @@ export function completeMatch(match: ExtendedMatchData, matchData: MatchData, ma
     leaderboardPlace: playerData.rank[mode].leaderboardPlace,
     userid: playerData.arenaId,
     seat: matchData.player.seat,
-    win: playerWins
+    win: playerWins,
+    commanderGrpIds: matchData.player.commanderGrpIds
   };
   match.draws = draws;
 

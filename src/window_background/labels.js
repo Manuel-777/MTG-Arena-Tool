@@ -256,7 +256,7 @@ function select_deck(arg) {
   } else {
     globals.currentDeck = new Deck(arg);
   }
-  // console.log("Select deck: ", globals.currentDeck, arg);
+   console.log("Select deck: ", globals.currentDeck, arg);
   globals.originalDeck = globals.currentDeck.clone();
   ipc_send("set_deck", globals.currentDeck.getSave(), IPC_OVERLAY);
 }

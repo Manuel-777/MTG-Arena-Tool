@@ -17,6 +17,6 @@ export interface MatchCreatedEvent {
     petSelection:                   string;
     petModSelections:               string[];
     battlefield:                    string;
-    opponentCommanderGrpId:         number;
-    commanderGrpId:                 number;
+    opponentCommanderGrpIds:        Array<number>;
+    commanderGrpIds:                Array<number>;
 }

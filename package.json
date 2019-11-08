@@ -65,7 +65,7 @@
     "test:jest": "jest src/",
     "dist": "npm run babel && build --x64",
     "version": "node -p \"require('./package.json').version\"",
-    "load-logs": "electron \"./scripts/load-logs.js\"",
+    "load-logs": "npm run babel && electron \"./scripts/load-logs.js\"",
     "metadata": "electron \"./scripts/metadata.js\"",
     "babel": "npm run tsc && babel src --extensions \".ts,.tsx,.js,.jsx\" --out-dir lib --copy-files",
     "tsc": "tsc"

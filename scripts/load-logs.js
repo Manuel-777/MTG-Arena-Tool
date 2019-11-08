@@ -4,7 +4,8 @@
 // Usage: Edit `batch_load_files.json` to contain the absolute
 // paths to all backed up log files
 // Run `npm run load-logs` and watch the text scroll by for a few hours.
-// Backup your config file before you do this.
+
+// IMPORTANT: Backup your config file before you do this.
 
 // The code below works by instantiating the background process and
 // sending the minimal necesary IPC calls so it thinks it's starting up as normal.
@@ -13,15 +14,19 @@
 // At the time of writing there are several backward compatibility issues
 // with very old logs.
 
+// To generate a file of logs, from a directory of saved logs, use something like this:
+// $ python -c "import glob, os, json; print(json.dumps(sorted(glob.glob(r'<<<path to logs>>>\*'), key=os.path.getmtime), indent=4))" > ./batch_load_files.json
+
 const { app, BrowserWindow, ipcMain: ipc } = require("electron");
 const path = require("path");
+const DEBUG = true;
 
 function createBackgroundWindow() {
   const win = new BrowserWindow({
     frame: false,
     x: 0,
     y: 0,
-    show: false,
+    show: DEBUG,
     width: 640,
     height: 480,
     title: "Background",
@@ -30,11 +35,12 @@ function createBackgroundWindow() {
       nodeIntegration: true
     }
   });
-  win.loadURL(`file://${__dirname}/../window_background/index.html`);
+  win.loadURL(`file://${__dirname}/../lib/window_background/index.html`);
   return win;
 }
 
 var background;
+var lastMessageTime = Date.now();
 
 function processLog(filename, callback) {
   process.env.LOGFILE = filename;
@@ -51,7 +57,22 @@ function processLog(filename, callback) {
     background.webContents.send("start_background");
   });
 
+  function endLog() {
+    console.log("LOG LOADER --- DETACHING IPC");
+    ipc.removeListener("ipc_switch", switchHandler);
+    console.log("LOG LOADER --- SENDING CLOSE");
+
+    // background.close();
+    // console.log('LOG LOADER --- calling', callback);
+    // console.log('LOG LOADER --- SENDING DESTROY');
+    // background.destroy();
+
+    setTimeout(callback, 1000);
+  }
+
   function switchHandler(event, method, from, arg, to) {
+    lastMessageTime = Date.now();
+
     switch (method) {
       case "show_login":
         console.log("LOG LOADER --- SENDING OFFLINE LOGIN");
@@ -59,16 +80,7 @@ function processLog(filename, callback) {
         break;
 
       case "initialize":
-        console.log("LOG LOADER --- DETACHING IPC");
-        ipc.removeListener("ipc_switch", switchHandler);
-        console.log("LOG LOADER --- SENDING CLOSE");
-
-        // background.close();
-        // console.log('LOG LOADER --- calling', callback);
-        // console.log('LOG LOADER --- SENDING DESTROY');
-        // background.destroy();
-
-        setTimeout(callback, 1000);
+        endLog();
         break;
 
       case "set_player_data":
@@ -79,6 +91,10 @@ function processLog(filename, callback) {
         break;
 
       case "popup":
+        if (arg.text.includes("Detailed logs disabled")) {
+          endLog();
+        }
+
         if (!arg.progress) {
           //
         }
@@ -113,10 +129,29 @@ app.setName(appName);
 const appData = app.getPath("appData");
 app.setPath("userData", path.join(appData, appName));
 
+function terminateStall() {
+  const timeSinceLastMessage = Date.now() - lastMessageTime;
+  // if thirty seconds have passed then trigger a
+  // termination using a false initialize event
+
+  if (timeSinceLastMessage > 30000) {
+    ipc.send("ipc_switch", {
+      event: "Timeout - exiting",
+      method: "initialize"
+    });
+  }
+}
+
 app.on("ready", () => {
   const log_files = require("./batch_load_files.json");
+
+  var tsInterval = setInterval(terminateStall, 1000);
+
   nextLog(log_files, _ => {
-    background.close();
+    if (!DEBUG) {
+      background.close();
+    }
+    clearTimeout(tsInterval);
     console.log("LOG LOADER --- Done!");
   });
 });
