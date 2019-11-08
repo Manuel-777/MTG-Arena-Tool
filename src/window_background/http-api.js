@@ -89,10 +89,8 @@ function syncUserData(data) {
     const seasonal = { ...playerData.seasonal, [id]: doc };
     setData({ seasonal });
 
-    if (globals.debugLog || !globals.firstPass) {
-      globals.store.set("seasonal." + id, doc);
-      globals.store.set("seasonal_rank", seasonal_rank);
-    }
+    playerDb.upsert("seasonal", id, doc, null, globals);
+    playerDb.upsert("", "seasonal_rank", seasonal_rank, null, globals);
   });
 
   if (data.settings.tags_colors) {
