@@ -212,7 +212,7 @@ class PlayerData {
       "email",
       "token"
     ];
-    data.settings = _.omit(data.settings, settingsBlacklistKeys);
+    data.settings = _.omit(this.settings, settingsBlacklistKeys);
 
     // console.log(data);
     return data;

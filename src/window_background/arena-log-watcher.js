@@ -460,7 +460,6 @@ function finishLoading() {
       progress: 2
     });
     globals.firstPass = false;
-    playerDb.upsertAll(playerData.data);
     logReadEnd = new Date();
     let logReadElapsed = (logReadEnd - globals.logReadStart) / 1000;
     ipc_send("ipc_log", `Log read in ${logReadElapsed}s`);

@@ -501,18 +501,10 @@ class MigrationDb {
   }
 }
 
-// Uncomment this to test "pure" refactor
-//
-// export const appDb = new ElectronStoreDb();
-// export const playerDb = new ElectronStoreDb();
+// "pure" refactor
+// only necessary for loadPlayerConfig migration logic
+export const appDbLegacy = new ElectronStoreDb();
+export const playerDbLegacy = new ElectronStoreDb();
 
-// Uncomment this to migrate to NeDb
-// (should still behave as before, but copies over data)
-//
-export const appDb = new MigrationDb();
-export const playerDb = new MigrationDb();
-
-// After migration, uncomment this to experience the new hotness
-//
-// export const appDb = new NeDb();
-// export const playerDb = new NeDb();
+export const appDb = new MigrationDb(); // TODO should eventually be NeDb
+export const playerDb = new NeDb();
