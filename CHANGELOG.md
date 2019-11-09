@@ -1,3 +1,68 @@
+## <small>2.12.14 (2019-11-09)</small>
+
+* again ([479afba](https://github.com/Manuel-777/MTG-Arena-Tool/commit/479afba))
+
+
+
+## <small>2.12.13 (2019-11-09)</small>
+
+* revert builder ([9d26271](https://github.com/Manuel-777/MTG-Arena-Tool/commit/9d26271))
+
+
+
+## <small>2.12.12 (2019-11-09)</small>
+
+* Update package-lock.json ([61093aa](https://github.com/Manuel-777/MTG-Arena-Tool/commit/61093aa))
+
+
+
+## <small>2.12.11 (2019-11-09)</small>
+
+* revert, update just build and updater ([4d4036e](https://github.com/Manuel-777/MTG-Arena-Tool/commit/4d4036e))
+
+
+
+## <small>2.12.10 (2019-11-09)</small>
+
+* a few more types ([8b04578](https://github.com/Manuel-777/MTG-Arena-Tool/commit/8b04578))
+* another fencepost ([2b02536](https://github.com/Manuel-777/MTG-Arena-Tool/commit/2b02536))
+* bugfix arena tile style ([a231805](https://github.com/Manuel-777/MTG-Arena-Tool/commit/a231805))
+* bugfix grouped lands hacks ([fb33070](https://github.com/Manuel-777/MTG-Arena-Tool/commit/fb33070))
+* bugfix useEffect and unique keys ([89ae3ee](https://github.com/Manuel-777/MTG-Arena-Tool/commit/89ae3ee))
+* Create CardTile.tsx ([23c43dd](https://github.com/Manuel-777/MTG-Arena-Tool/commit/23c43dd))
+* Create DraftRatings.jsx ([0c03d86](https://github.com/Manuel-777/MTG-Arena-Tool/commit/0c03d86))
+* Create OwnershipStars.jsx ([357608f](https://github.com/Manuel-777/MTG-Arena-Tool/commit/357608f))
+* detect commander of opponent ([59574a5](https://github.com/Manuel-777/MTG-Arena-Tool/commit/59574a5))
+* fix for archive value ([3341d13](https://github.com/Manuel-777/MTG-Arena-Tool/commit/3341d13))
+* Fix for new babel compilation ([956b9d7](https://github.com/Manuel-777/MTG-Arena-Tool/commit/956b9d7))
+* Fix overlay multi displays ([a2c7f8e](https://github.com/Manuel-777/MTG-Arena-Tool/commit/a2c7f8e)), closes [#683](https://github.com/Manuel-777/MTG-Arena-Tool/issues/683)
+* fix player deck commander ([2f4aeeb](https://github.com/Manuel-777/MTG-Arena-Tool/commit/2f4aeeb))
+* Fix to break out of stall. ([a08ecab](https://github.com/Manuel-777/MTG-Arena-Tool/commit/a08ecab))
+* formaaaaaat ([52f1719](https://github.com/Manuel-777/MTG-Arena-Tool/commit/52f1719))
+* format ([fd0a56d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/fd0a56d))
+* http error popup timeout ([46a3217](https://github.com/Manuel-777/MTG-Arena-Tool/commit/46a3217))
+* little fix ([21c8d7f](https://github.com/Manuel-777/MTG-Arena-Tool/commit/21c8d7f))
+* Make the filter panel react-y ([dd95b03](https://github.com/Manuel-777/MTG-Arena-Tool/commit/dd95b03))
+* metadata ([f6b1912](https://github.com/Manuel-777/MTG-Arena-Tool/commit/f6b1912))
+* nothing is easy ([d65be1d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/d65be1d))
+* optimize frameClassName ([4f2bcdc](https://github.com/Manuel-777/MTG-Arena-Tool/commit/4f2bcdc))
+* prettier ([261ead2](https://github.com/Manuel-777/MTG-Arena-Tool/commit/261ead2))
+* Prettier ([41c0a92](https://github.com/Manuel-777/MTG-Arena-Tool/commit/41c0a92))
+* remove circular dependency ([40a5539](https://github.com/Manuel-777/MTG-Arena-Tool/commit/40a5539))
+* remove id from needed card properties ([eac2dfb](https://github.com/Manuel-777/MTG-Arena-Tool/commit/eac2dfb))
+* review feedback ([feea7f1](https://github.com/Manuel-777/MTG-Arena-Tool/commit/feea7f1))
+* review feedback ([f73d41a](https://github.com/Manuel-777/MTG-Arena-Tool/commit/f73d41a))
+* Run babel before script ([7fc8a18](https://github.com/Manuel-777/MTG-Arena-Tool/commit/7fc8a18))
+* style ([b8c6c10](https://github.com/Manuel-777/MTG-Arena-Tool/commit/b8c6c10))
+* thanks travis ([e48e5ab](https://github.com/Manuel-777/MTG-Arena-Tool/commit/e48e5ab))
+* unmount react ([507a4ff](https://github.com/Manuel-777/MTG-Arena-Tool/commit/507a4ff))
+* Update card-hover.js ([86c9328](https://github.com/Manuel-777/MTG-Arena-Tool/commit/86c9328))
+* Update deck-drawer.js ([806bcd0](https://github.com/Manuel-777/MTG-Arena-Tool/commit/806bcd0))
+* update packages ([0b1b428](https://github.com/Manuel-777/MTG-Arena-Tool/commit/0b1b428))
+* util function, minor refactor ([3c75fbb](https://github.com/Manuel-777/MTG-Arena-Tool/commit/3c75fbb))
+
+
+
 ## <small>2.12.9 (2019-11-02)</small>
 
 * add last touch to decks page ([42dde20](https://github.com/Manuel-777/MTG-Arena-Tool/commit/42dde20))

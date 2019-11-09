@@ -211,7 +211,7 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
     }
   }, [card, landOdds]);
 
-  const [ww, ll, quantityElement] = getArenaQuantityDisplay(props);
+  const [ww, ll, quantityElement] = getArenaQuantityDisplay(quantity);
 
   return (
     <div
