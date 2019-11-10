@@ -171,8 +171,10 @@ function CardPoolAddedEconomyValueRecord(props: CardPoolAddedEconomyValueRecordP
 
   if (addedCardIds) {
     return AddedCardEconomyValueRecord(addedCardIds);
-  } else {
+  } else if(aetherizedCardIds) {
     return AetherizedCardEnonomyValueRecord(aetherizedCardIds);
+  }else{
+    return (<> </>);
   }
 }
 
