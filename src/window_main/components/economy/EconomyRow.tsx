@@ -24,7 +24,7 @@ function EconomyRowDate(date: Date) {
 }
 
 interface BoosterDeltaProps {
-  booster: { collationId: string, count: number};
+  booster: { collationId: string, count: number };
 }
 
 function BoosterDelta(props: BoosterDeltaProps) {
@@ -75,24 +75,24 @@ function getThingsToCheck(fullContext: string, change: any): PossibleModifiedEco
         fullContext.includes("Store") ||
         fullContext.includes("Purchase")
       ) ? {
-        checkGemsEarnt: (change.delta.gemsDelta > 0),
-        checkGemsPaid: (change.delta.gemsDelta < 0),
-        checkGoldEarnt: (change.delta.goldDelta > 0),
-        checkGoldPaid: (change.delta.goldDelta < 0),
-        checkBoosterAdded: true,
-        checkCardsAdded: true,
-        checkAetherized: true,
-        checkWildcardsAdded: true,
-        checkSkinsAdded: true,
-      } : {
-        checkGemsEarnt: true,
-        checkGoldEarnt: true,
-        checkBoosterAdded: true,
-        checkCardsAdded: true,
-        checkAetherized: true,
-        checkWildcardsAdded: true,
-        checkSkinsAdded: true,
-      }
+          checkGemsEarnt: (change.delta.gemsDelta > 0),
+          checkGemsPaid: (change.delta.gemsDelta < 0),
+          checkGoldEarnt: (change.delta.goldDelta > 0),
+          checkGoldPaid: (change.delta.goldDelta < 0),
+          checkBoosterAdded: true,
+          checkCardsAdded: true,
+          checkAetherized: true,
+          checkWildcardsAdded: true,
+          checkSkinsAdded: true,
+        } : {
+          checkGemsEarnt: true,
+          checkGoldEarnt: true,
+          checkBoosterAdded: true,
+          checkCardsAdded: true,
+          checkAetherized: true,
+          checkWildcardsAdded: true,
+          checkSkinsAdded: true,
+        }
   }
 }
 
@@ -159,7 +159,7 @@ interface CardPoolAddedEconomyValueRecordProps {
 }
 
 function countDupesArray(array: string[]): Record<string, number> {
-  const counted: Record<string, number> =  {};
+  const counted: Record<string, number> = {};
   array.forEach((value) => {
     counted[value] = counted[value] ? counted[value] + 1 : 1;
   });
@@ -168,15 +168,35 @@ function countDupesArray(array: string[]): Record<string, number> {
 
 function CardPoolAddedEconomyValueRecord(props: CardPoolAddedEconomyValueRecordProps) {
   const { addedCardIds, aetherizedCardIds } = props;
-  const addedUniques = (addedCardIds.length > 0) ? countDupesArray(addedCardIds) : undefined;
-  const aetherUniques = (aetherizedCardIds.length > 0) ? countDupesArray(aetherizedCardIds) : undefined;
+
+  if (addedCardIds) {
+    return AddedCardEconomyValueRecord(addedCardIds);
+  } else {
+    return AetherizedCardEnonomyValueRecord(aetherizedCardIds);
+  }
+}
+
+function AddedCardEconomyValueRecord(addedCardIds: string[]) {
+  const addedUniques = countDupesArray(addedCardIds);
+
   return (
     <>
       {addedUniques && Object.entries(addedUniques).map((entry: [string, number]) => <InventoryCard key={entry[0]} card={db.card(entry[0])} quantity={entry[1]} />)}
-      {aetherUniques && Object.entries(aetherUniques).map((entry: [string, number]) => <InventoryCard key={entry[0]} card={db.card(entry[0])} quantity={entry[1]} isAetherized={true}/>)}
+    </>
+  )
+
+}
+
+function AetherizedCardEnonomyValueRecord(aetherizedCardIds: string[]) {
+  const aetherUniques = countDupesArray(aetherizedCardIds);
+
+  return (
+    <>
+      {aetherUniques && Object.entries(aetherUniques).map((entry: [string, number]) => <InventoryCard key={entry[0]} card={db.card(entry[0])} quantity={entry[1]} isAetherized={true} />)}
     </>
   )
 }
+
 
 interface FlexRightProps {
   fullContext: string;
@@ -195,7 +215,7 @@ function FlexRight(props: FlexRightProps) {
 
   const orbDelta = change.orbCountDiff && Math.abs(
     (change.orbCountDiff.currentOrbCount || 0) -
-      (change.orbCountDiff.oldOrbCount || 0)
+    (change.orbCountDiff.oldOrbCount || 0)
   );
 
   const checkCards = checkCardsAdded && change.delta.cardsAdded && change.delta.cardsAdded.length > 0;
@@ -218,7 +238,7 @@ function FlexRight(props: FlexRightProps) {
       }
       return aggregator;
     }
-  , []) : [];
+    , []) : [];
 
   const checkSkins = checkSkinsAdded && change.delta.artSkinsAdded !== undefined;
   const skinsToCards = checkSkins ? change.delta.artSkinsAdded.map((obj: { artId: string }) => db.cardFromArt(obj.artId)) : undefined;
@@ -234,7 +254,7 @@ function FlexRight(props: FlexRightProps) {
       {!!xpGainedNumber && <EconomyValueRecord iconClassName={"economy_exp"} title={"Experience"} deltaContent={formatNumber(xpGainedNumber)} />}
       {checkBoosterAdded && change.delta.boosterDelta && change.delta.boosterDelta.map((booster: any) => <BoosterDelta booster={booster} key={booster.collationId} />)}
       {checkWildcardsAdded && <AllWildcardsEconomyValueRecord delta={change.delta} />}
-      {(checkCards || checkAether) && <CardPoolAddedEconomyValueRecord addedCardIds={change.delta.cardsAdded} aetherizedCardIds={aetherCards}/>}
+      {(checkCards || checkAether) && <CardPoolAddedEconomyValueRecord addedCardIds={change.delta.cardsAdded} aetherizedCardIds={aetherCards} />}
       {skinsToCards && skinsToCards.map((card: any) => <EconomyIcon key={card.name} title={card.name + " Skin"} className={"economy_skin_art"} url={`url("${getCardArtCrop(card)}")`} />)}
     </div>
   )
@@ -258,7 +278,7 @@ function InventoryCard(props: InventoryCardProps) {
   const tooltip = isAetherized ? computeAetherizedTooltip(card, quantity) : card.name;
   return (
     <div className={"inventory_card small"} onClick={onCardClick}>
-      <img className={"inventory_card_img 39px" + (isAetherized ? " inventory_card_aetherized" : "")} src={getCardImage(card)} title={tooltip}/>
+      <img className={"inventory_card_img 39px" + (isAetherized ? " inventory_card_aetherized" : "")} src={getCardImage(card)} title={tooltip} />
       {(quantity && quantity > 1) && <div className={"inventory_card_quantity_container"}>
         <span className={"inventory_card_quantity"}>{"x" + quantity}</span>
       </div>}
@@ -319,7 +339,7 @@ function DeleteButton(props: DeleteButtonProps) {
   const title = change.archived
     ? "restore"
     : "archive (will not delete data)";
-  
+
   const archiveCallback = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (!change.archived) {
@@ -371,7 +391,7 @@ function ChangeRow(props: ChangeRowProps) {
         <FlexBottom {...flexBottomProps} />
       </div>
       <FlexRight {...flexRightProps} />
-      <DeleteButton change={change} economyId={economyId} hideRowCallback={hideRowCallback}/>
+      <DeleteButton change={change} economyId={economyId} hideRowCallback={hideRowCallback} />
     </div>
   )
 }
