@@ -486,6 +486,7 @@ label {
 
 
 .button {
+    border-radius: 50%;
     -webkit-app-region: no-drag;
     cursor:pointer;
     align-self: center;
@@ -494,18 +495,20 @@ label {
     margin-right: 12px;
     width: 24px;
     height: 24px;
-    opacity: 0.5;
+    opacity: 0.8;
     background-size: contain;
     -webkit-transition: all .33s ease-in-out;
 }
 
 .button:hover {
     opacity: 1;
+    background-color: rgba(231, 202, 142, 0.25);
     -webkit-transform: rotate(-90deg);
 }
 
 .button.minimize:hover {
     opacity: 1;
+    background-color: rgba(231, 202, 142, 0.25);
     -webkit-transform: rotate(0deg);
 }
 
@@ -513,6 +516,12 @@ label {
     opacity: 1;
     -webkit-transform: rotate(0deg);
     left: -8px;
+}
+
+.button.close:hover {
+    opacity: 1;
+    background-color: var(--color-r);
+    -webkit-transform: rotate(-90deg);
 }
 
 .button.settings {

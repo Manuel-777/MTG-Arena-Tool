@@ -86,6 +86,7 @@ body {
 .overlay_deckname {
     background-color: rgba(0,0,0,0.75);
     padding: 4px 0 0 0;
+    height: 28px;
     text-align: center;
     color: #fae5d2;
 }
@@ -563,6 +564,7 @@ body {
 }
 
 .top_nav_wrapper {
+    z-index: 2 !important;
     flex-direction: row !important;
     height: 32px !important;
     justify-content: flex-end !important;
