@@ -12,7 +12,10 @@ import {
   openScryfallCard,
   getCardArtCrop,
 } from "../../../shared/util";
-import React from "react";
+
+import { addCardHover } from "../../../shared/card-hover";
+
+import React, { useState } from "react";
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
 import ReactDOM from "react-dom";
 import LocalTime from "../../../shared/time-components/LocalTime";
@@ -248,16 +251,22 @@ interface InventoryCardProps {
 
 function InventoryCard(props: InventoryCardProps) {
   const { card, isAetherized, quantity } = props;
-  // addCardHover(inventoryCard, card);
+  const inventoryCardRef = React.useRef(null);
   const onCardClick = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const lookupCard = card.dfc == "SplitHalf" ? db.card(card.dfcId) : card;
     openScryfallCard(lookupCard);
   }, [card]);
   // inventoryCard.style.width = "39px";
 
+  React.useEffect(() => {
+    if (inventoryCardRef) {
+      addCardHover(inventoryCardRef.current, card);
+    }
+  });
+
   const tooltip = isAetherized ? computeAetherizedTooltip(card, quantity) : card.name;
   return (
-    <div className={"inventory_card small"} onClick={onCardClick}>
+    <div ref={inventoryCardRef} className={"inventory_card small"} onClick={onCardClick}>
       <img className={"inventory_card_img 39px" + (isAetherized ? " inventory_card_aetherized" : "")} src={getCardImage(card)} title={tooltip}/>
       {(quantity && quantity > 1) && <div className={"inventory_card_quantity_container"}>
         <span className={"inventory_card_quantity"}>{"x" + quantity}</span>
