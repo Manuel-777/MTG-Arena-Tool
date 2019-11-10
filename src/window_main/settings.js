@@ -453,9 +453,12 @@ function appendArenaData(section) {
   );
 
   setTimeout(() => {
-    $$(".parse_link")[0].addEventListener("click", () => {
-      shell.openExternal("https://date-fns.org/v2.2.1/docs/parse");
-    });
+    const parseLink = $$(".parse_link")[0];
+    if (parseLink) {
+      parseLink.addEventListener("click", () => {
+        shell.openExternal("https://date-fns.org/v2.2.1/docs/parse");
+      });
+    }
   }, 100);
 }
 
@@ -1254,14 +1257,16 @@ function appendAbout(section) {
     shell.openExternal("https://mtgatool.com/release-notes/");
   });
   about.appendChild(versionLink);
-  const metadataVersion = createDiv(
-    ["message_sub_15", "white"],
-    `Metadata: version ${db.data.version || "???"}, updated ${format(
-      db.data.updated ? fromUnixTime(db.data.updated / 1000) : "???",
-      "Pp"
-    )}`
-  );
-  about.appendChild(metadataVersion);
+  if (db.data) {
+    const metadataVersion = createDiv(
+      ["message_sub_15", "white"],
+      `Metadata: version ${db.data.version || "???"}, updated ${format(
+        db.data.updated ? fromUnixTime(db.data.updated / 1000) : "???",
+        "Pp"
+      )}`
+    );
+    about.appendChild(metadataVersion);
+  }
   about.appendChild(createDiv(["message_updates", "green"], updateState + "."));
   const updateButton = createDiv(
     ["button_simple", "centered"],
