@@ -191,6 +191,8 @@ const nonDocFields = [
   "static_events"
 ];
 
+const USER_DATA_DIR = (app || remote.app).getPath("userData");
+
 function defaultCallback(err, data, verb) {
   if (err) {
     console.error("Local database: ERROR", err);
@@ -210,6 +212,12 @@ class ElectronStoreDb {
     this.upsert = this.upsert.bind(this);
     this.find = this.find.bind(this);
     this.remove = this.remove.bind(this);
+  }
+
+  get filePath() {
+    // not bothering to return "settings" store as well
+    const fileName = this.dbName === "application" ? "remember" : this.dbName;
+    return path.join(USER_DATA_DIR, fileName + ".json" || "");
   }
 
   // maps table-key to fields on electron-store JSON file
@@ -316,6 +324,10 @@ class NeDb {
     // whether or not to imitate old electron-store bulk-write
     // behavior during the first pass of the log (deprecated workaround)
     this.useBulkFirstpass = useBulkFirstpass;
+  }
+
+  get filePath() {
+    return path.join(USER_DATA_DIR, this.dbName + ".db");
   }
 
   static getCleanDoc(doc) {
@@ -463,6 +475,10 @@ class MigrationDb {
     this.upsert = this.upsert.bind(this);
     this.find = this.find.bind(this);
     this.remove = this.remove.bind(this);
+  }
+
+  get filePath() {
+    return this.oldDb ? this.oldDb.filePath : "";
   }
 
   init(dbName, arenaName) {
