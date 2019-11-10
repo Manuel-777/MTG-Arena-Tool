@@ -154,8 +154,8 @@ function FlexBottom(props: FlexBottomProps) {
 }
 
 interface CardPoolAddedEconomyValueRecordProps {
-  addedCardIds: string[];
-  aetherizedCardIds: string[];
+  addedCardIds?: string[];
+  aetherizedCardIds?: string[];
 }
 
 function countDupesArray(array: string[]): Record<string, number> {
@@ -168,8 +168,8 @@ function countDupesArray(array: string[]): Record<string, number> {
 
 function CardPoolAddedEconomyValueRecord(props: CardPoolAddedEconomyValueRecordProps) {
   const { addedCardIds, aetherizedCardIds } = props;
-  const addedUniques = (addedCardIds.length > 0) ? countDupesArray(addedCardIds) : undefined;
-  const aetherUniques = (aetherizedCardIds.length > 0) ? countDupesArray(aetherizedCardIds) : undefined;
+  const addedUniques = addedCardIds && addedCardIds.length > 0 ? countDupesArray(addedCardIds) : undefined;
+  const aetherUniques = aetherizedCardIds && aetherizedCardIds.length > 0 ? countDupesArray(aetherizedCardIds) : undefined;
   return (
     <>
       {addedUniques && Object.entries(addedUniques).map((entry: [string, number]) => <InventoryCard key={entry[0]} card={db.card(entry[0])} quantity={entry[1]} />)}
