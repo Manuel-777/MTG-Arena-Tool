@@ -175,10 +175,18 @@ function countDupesArray(array: string[] | undefined): Record<string, number> {
 function CardPoolAddedEconomyValueRecord(props: CardPoolAddedEconomyValueRecordProps) {
   const { addedCardIds, aetherizedCardIds } = props;
 
-  return (<>{mapToInventoryCard(addedCardIds, false)}{mapToInventoryCard(aetherizedCardIds, true)}</>);
+  return (<>{AddedCardList(addedCardIds)}{AetherizedCardList(aetherizedCardIds)}</>);
 }
 
-function mapToInventoryCard(cardsList: string[], isAetherized: boolean) {
+function AddedCardList(addedCardIds:string[]){
+  return InventoryCardList(addedCardIds, false);
+}
+
+function AetherizedCardList(aetherizedCardIds:string[]){
+  return InventoryCardList(aetherizedCardIds, false);
+}
+
+function InventoryCardList(cardsList: string[], isAetherized: boolean) {
   let uniqueCardList = countDupesArray(cardsList);
 
   return (
