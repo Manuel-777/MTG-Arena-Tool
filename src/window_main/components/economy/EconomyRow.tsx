@@ -172,21 +172,22 @@ function countDupesArray(array: string[] | undefined): Record<string, number> {
   return counted;
 }
 
+interface InventoryCardListProps {
+  cardsList: string[];
+  isAetherized: boolean;
+}
+
 function CardPoolAddedEconomyValueRecord(props: CardPoolAddedEconomyValueRecordProps) {
   const { addedCardIds, aetherizedCardIds } = props;
 
-  return (<>{AddedCardList(addedCardIds)}{AetherizedCardList(aetherizedCardIds)}</>);
+  return (<>
+    <InventoryCardList cardsList={addedCardIds} isAetherized={false} />
+    <InventoryCardList cardsList={aetherizedCardIds} isAetherized={true} />
+  </>);
 }
 
-function AddedCardList(addedCardIds:string[]){
-  return InventoryCardList(addedCardIds, false);
-}
-
-function AetherizedCardList(aetherizedCardIds:string[]){
-  return InventoryCardList(aetherizedCardIds, false);
-}
-
-function InventoryCardList(cardsList: string[], isAetherized: boolean) {
+function InventoryCardList(props: InventoryCardListProps) {
+  const { cardsList, isAetherized } = props;
   let uniqueCardList = countDupesArray(cardsList);
 
   return (
