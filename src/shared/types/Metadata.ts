@@ -30,7 +30,7 @@ export interface Card {
   collectible: boolean,
   craftable: boolean,
   booster: boolean,
-  dfcId: number | boolean,
+  dfcId: number | false,
   rank: number,
   rank_values: number[],
   rank_controversy: string,

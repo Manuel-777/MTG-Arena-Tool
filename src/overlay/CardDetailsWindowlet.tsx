@@ -69,7 +69,7 @@ export default function CardDetailsWindowlet(
   const fullCard = card && !isCardGroupedLands ? db.card(card.id) : null;
   // TODO support split cards
   let name = "";
-  let images = [];
+  let images = {};
   if (fullCard) {
     name = fullCard.name;
     images = fullCard.images;
