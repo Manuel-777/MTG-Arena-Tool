@@ -188,7 +188,7 @@ function CardPoolAddedEconomyValueRecord(props: CardPoolAddedEconomyValueRecordP
 
 function InventoryCardList(props: InventoryCardListProps) {
   const { cardsList, isAetherized } = props;
-  let uniqueCardList = countDupesArray(cardsList);
+  const uniqueCardList = countDupesArray(cardsList);
 
   return (
     <>
