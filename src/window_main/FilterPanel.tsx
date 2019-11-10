@@ -129,7 +129,7 @@ class FilterPanel {
         </div>)}
         {(this.archs.length || this.showOppManaFilter || this.showSortOption) && (
           <div className={"columnC"}>
-            {this.archs.length && <WrappedReactSelect className={this.prefixId + "_query_optag filter_panel_select_margin spacer180"} options={this.archs} current={this.filters.arch} callback={this.filterCallback('arch')} optionFormatter={(tag: string) => <TagOption tag={tag} showCount={true} archCounts={this.archCounts} />} />}
+            {!!this.archs.length && <WrappedReactSelect className={this.prefixId + "_query_optag filter_panel_select_margin spacer180"} options={this.archs} current={this.filters.arch} callback={this.filterCallback('arch')} optionFormatter={(tag: string) => <TagOption tag={tag} showCount={true} archCounts={this.archCounts} />} />}
             {this.showOppManaFilter ? (
               <ManaFilter prefixId={this.prefixId} filterKey={"oppColors"} filters={this.filters} onFilterChanged={this.filterCallback("oppColors")} />
             ) : this.showSortOption ? (
