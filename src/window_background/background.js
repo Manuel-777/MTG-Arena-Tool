@@ -15,7 +15,11 @@ import globals from "./globals";
 import addCustomDeck from "./addCustomDeck";
 import forceDeckUpdate from "./forceDeckUpdate";
 import arenaLogWatcher from "./arena-log-watcher";
-import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
+import {
+  backportNeDbToElectronStore,
+  loadPlayerConfig,
+  syncSettings
+} from "./loadPlayerConfig";
 import update_deck from "./updateDeck";
 
 if (!remote.app.isPackaged) {
@@ -102,9 +106,12 @@ function downloadMetadata() {
 
 ipc.on("download_metadata", downloadMetadata);
 
+ipc.on("backport_all_data", backportNeDbToElectronStore);
+
 //
 ipc.on("start_background", function() {
   appDb.init("application"); // TODO is this redundant with init call in main?
+  setData({ appDbPath: appDb.filePath }, false);
   fixBadSettingsData();
 
   appDb.find("", "logUri", (err, logUri) => {
@@ -136,10 +143,7 @@ ipc.on("start_background", function() {
           // start http
           httpApi.httpBasic();
           httpApi.httpGetDatabaseVersion(settings.metadata_lang);
-          ipc_send("popup", {
-            text: `Downloading metadata ${settings.metadata_lang}`,
-            time: 0
-          });
+          ipc_send("ipc_log", `Downloading metadata ${settings.metadata_lang}`);
 
           // Check if it is the first time we open this version
           if (

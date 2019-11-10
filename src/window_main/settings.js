@@ -25,6 +25,7 @@ import {
   SETTINGS_LOGIN
 } from "../shared/constants";
 import db from "../shared/database";
+import { playerDefaults } from "../shared/local-database";
 import pd from "../shared/player-data";
 import {
   createDiv,
@@ -460,6 +461,47 @@ function appendArenaData(section) {
       });
     }
   }, 100);
+
+  section.appendChild(createDiv(["settings_title"], "Local Data"));
+  section.appendChild(
+    createDiv(
+      ["settings_note"],
+      `<p>Current application settings:
+           <a class="link app_db_link"></a></p>
+       <p>Current player settings and history:
+           <a class="link player_db_link"></a></p>`
+    )
+  );
+  setTimeout(() => {
+    const appDbLink = $$(".app_db_link")[0];
+    if (appDbLink) {
+      appDbLink.innerHTML = pd.appDbPath;
+      appDbLink.addEventListener("click", () => {
+        shell.showItemInFolder(pd.appDbPath);
+      });
+    }
+    const playerDbLink = $$(".player_db_link")[0];
+    if (playerDbLink) {
+      playerDbLink.innerHTML = pd.playerDbPath;
+      playerDbLink.addEventListener("click", () => {
+        shell.showItemInFolder(pd.playerDbPath);
+      });
+    }
+  }, 500);
+  const exportButton = createDiv(
+    ["button_simple", "centered"],
+    "Backport Data to Legacy JSON"
+  );
+  exportButton.style.width = "300px";
+  exportButton.addEventListener("click", function() {
+    ipcSend("popup", {
+      text: "Backporting all player data...",
+      time: 0,
+      progress: 2
+    });
+    ipcSend("backport_all_data");
+  });
+  section.appendChild(exportButton);
 }
 
 function appendOverlay(section) {
@@ -924,7 +966,7 @@ function appendOverlay(section) {
       ipcSend("save_overlay_settings", {
         index,
         bounds: {
-          ...pd.defaultCfg.settings.overlays[0].bounds
+          ...playerDefaults.settings.overlays[0].bounds
         }
       });
     });

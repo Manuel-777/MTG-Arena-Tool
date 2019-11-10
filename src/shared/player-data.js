@@ -14,7 +14,9 @@ const playerDataDefault = {
   patreon: false,
   patreon_tier: -1,
   last_log_timestamp: null,
-  last_log_format: ""
+  last_log_format: "",
+  appDbPath: "",
+  playerDbPath: ""
 };
 
 const defaultDeck = JSON.parse(
@@ -137,8 +139,7 @@ class PlayerData {
 
     Object.assign(this, {
       ...playerDataDefault,
-      ...playerDefaults,
-      defaultCfg: { ...playerDefaults }
+      ...playerDefaults
     });
 
     PlayerData.instance = this;
