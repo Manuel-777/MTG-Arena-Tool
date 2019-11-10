@@ -3,7 +3,7 @@
 import { cardType } from "../card-types";
 
 import _ from "lodash";
-import db from "../database.js";
+import db from "../database";
 const cardsByName = _.keyBy(db.cards, "name");
 
 describe("card-types", () => {
