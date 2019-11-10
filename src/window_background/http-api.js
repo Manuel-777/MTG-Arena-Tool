@@ -329,44 +329,46 @@ export function httpBasic() {
                     serverData.seasonal = parsedResult.seasonal;
                   }
                   setData(data, false);
-                  loadPlayerConfig(playerData.arenaId);
-
-                  const requestSync = {};
-                  requestSync.courses = serverData.courses.filter(
-                    id => !(id in playerData)
-                  );
-                  requestSync.matches = serverData.matches.filter(
-                    id => !(id in playerData)
-                  );
-                  requestSync.drafts = serverData.drafts.filter(
-                    id => !(id in playerData)
-                  );
-                  requestSync.economy = serverData.economy.filter(
-                    id => !(id in playerData)
-                  );
-                  requestSync.seasonal = serverData.seasonal.filter(
-                    id => !(id in playerData.seasonal)
-                  );
-
-                  const itemCount =
-                    requestSync.courses.length +
-                    requestSync.matches.length +
-                    requestSync.drafts.length +
-                    requestSync.economy.length +
-                    requestSync.seasonal.length;
-
-                  if (requestSync) {
-                    ipc_send("ipc_log", "Fetch remote player items");
-                    console.log(requestSync);
-                    httpSyncRequest(requestSync);
-                  } else {
-                    ipc_send(
-                      "ipc_log",
-                      "No need to fetch remote player items."
+                  loadPlayerConfig(playerData.arenaId, () => {
+                    ipc_send("ipc_log", "...called back to http-api.");
+                    ipc_send("ipc_log", "Checking for sync requests...");
+                    const requestSync = {};
+                    requestSync.courses = serverData.courses.filter(
+                      id => !(id in playerData)
                     );
-                  }
+                    requestSync.matches = serverData.matches.filter(
+                      id => !(id in playerData)
+                    );
+                    requestSync.drafts = serverData.drafts.filter(
+                      id => !(id in playerData)
+                    );
+                    requestSync.economy = serverData.economy.filter(
+                      id => !(id in playerData)
+                    );
+                    requestSync.seasonal = serverData.seasonal.filter(
+                      id => !(id in playerData.seasonal)
+                    );
+
+                    const itemCount =
+                      requestSync.courses.length +
+                      requestSync.matches.length +
+                      requestSync.drafts.length +
+                      requestSync.economy.length +
+                      requestSync.seasonal.length;
+
+                    if (requestSync) {
+                      ipc_send("ipc_log", "Fetch remote player items");
+                      console.log(requestSync);
+                      httpSyncRequest(requestSync);
+                    } else {
+                      ipc_send(
+                        "ipc_log",
+                        "No need to fetch remote player items."
+                      );
+                    }
+                    httpNotificationsPull();
+                  });
                   ipc_send("set_discord_tag", parsedResult.discord_tag);
-                  httpNotificationsPull();
                 }
                 if (
                   _headers.method == "tou_join" ||
@@ -406,11 +408,7 @@ export function httpBasic() {
                   //resetLogLoop(100);
                   metadataState = true;
                   delete parsedResult.ok;
-                  ipc_send("popup", {
-                    text: "Metadata: Ok",
-                    time: 1000,
-                    progress: -1
-                  });
+                  ipc_send("ipc_log", "Metadata: Ok");
                   db.handleSetDb(null, results);
                   db.updateCache(results);
                   ipc_send("set_db", results);
