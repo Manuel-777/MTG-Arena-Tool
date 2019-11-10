@@ -20,7 +20,7 @@ const {
 let metagameData = {};
 let ranksData = {};
 
-const VERSION = 27;
+const VERSION = 28;
 
 const LANGUAGES = [
   "EN",
@@ -43,7 +43,7 @@ app.on("ready", () => {
   // obtain it from somewhere automatically, like a settings
   // file or the output log itself.
   manifestParser
-    .getManifestFiles("1805.734606")
+    .getManifestFiles("1864.739803")
     .then(checkSetsAvailable)
     .then(getRanksData)
     .then(getScryfallCards)
@@ -114,7 +114,7 @@ function getRanksData() {
           try {
             ranksData[rank.setCode.toUpperCase()] = processRanksData(str);
           } catch (e) {
-            console.log(e);
+            console.log("Error processing " + rank.setCode, e);
           }
         });
       });
