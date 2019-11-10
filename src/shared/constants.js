@@ -656,21 +656,22 @@ export const ARENA_MODE_IDLE = 0;
 export const ARENA_MODE_MATCH = 1;
 export const ARENA_MODE_DRAFT = 2;
 
-const DRAFT_RANKS = [];
-DRAFT_RANKS[12] = "A+";
-DRAFT_RANKS[11] = "A";
-DRAFT_RANKS[10] = "A-";
-DRAFT_RANKS[9] = "B+";
-DRAFT_RANKS[8] = "B";
-DRAFT_RANKS[7] = "B-";
-DRAFT_RANKS[6] = "C+";
-DRAFT_RANKS[5] = "C";
-DRAFT_RANKS[4] = "C-";
-DRAFT_RANKS[3] = "D+";
-DRAFT_RANKS[2] = "D";
-DRAFT_RANKS[1] = "D-";
-DRAFT_RANKS[0] = "F";
-export { DRAFT_RANKS };
+export const DRAFT_RANKS = [
+  "F",
+  "D-",
+  "D",
+  "D+",
+  "C-",
+  "C",
+  "C+",
+  "B-",
+  "B",
+  "B+",
+  "A-",
+  "A",
+  "A+"
+];
+
 export const CARD_TYPE_CODES = [
   "cre",
   "lan",
@@ -734,6 +735,7 @@ export const DEFAULT_TILE = 67003;
 export const CARD_TILE_ARENA = 0;
 export const CARD_TILE_FLAT = 1;
 export const EASING_DEFAULT = "cubicBezier(0.570, 0.165, 0.210, 0.990)";
+
 export const MAIN_LOGIN = -2;
 export const MAIN_HOME = -1;
 export const MAIN_DECKS = 0;
@@ -744,6 +746,8 @@ export const MAIN_ECONOMY = 4;
 export const MAIN_COLLECTION = 5;
 export const MAIN_SETTINGS = 6;
 export const MAIN_UPDATE = 9;
+export const MAIN_CONSTRUCTED = 10;
+export const MAIN_LIMITED = 11;
 
 export const SHORTCUT_NAMES = {
   shortcut_overlay_1: "Toggle Overlay 1",

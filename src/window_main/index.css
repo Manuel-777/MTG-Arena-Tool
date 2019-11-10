@@ -29,7 +29,7 @@ span i {
     margin-left: 4px;
 }
 
-relative-time, local-time {
+time, local-time, relative-time {
   margin-right: 8px;
   margin-left: 8px;
   font-size: 16px;
@@ -305,31 +305,61 @@ relative-time, local-time {
     cursor: default;
 }
 
-
 .top_constructed_rank {
-    -webkit-app-region: no-drag;
-    align-self: center;
-    width: 48px;
-    height: 48px;
     background: url(../images/ranks_constructed_48.png);
-    background-position: 0px 0px;
 }
 
 .top_limited_rank {
+    background: url(../images/ranks_limited_48.png);
+}
+
+.top_constructed_rank, .top_limited_rank {
+    /* Align leaderboard indicator to center and add text border*/
+    display: flex;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
     -webkit-app-region: no-drag;
     align-self: center;
     width: 48px;
     height: 48px;
-    background: url(../images/ranks_limited_48.png);
     background-position: 0px 0px;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
-.top_constructed_rank, .top_limited_rank {
-  /* Align leaderboard indicator to center and add text border*/
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+.top_userdata_container {
+    display: flex;
+    margin-left: auto;
+}
+
+.it10, .it11 {
+    width: 60px;
+}
+
+.icon_7 {
+    -webkit-app-region: no-drag;
+    align-self: center;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    background-position: 0px 0px;
+    background: url(../images/ranks_constructed_48.png);
+}
+
+.icon_8 {
+    -webkit-app-region: no-drag;
+    align-self: center;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    background-position: 0px 0px;
+    background: url(../images/ranks_limited_48.png);
 }
 
 .top_patreon {
@@ -373,8 +403,7 @@ relative-time, local-time {
 }
 
 .top_nav_icon {
-    display: none;
-    opacity: 0;
+    opacity: 1;
     position: absolute;
     left: calc(50% - 16px);
     top: 16px;
@@ -389,30 +418,26 @@ relative-time, local-time {
 }
 
 .icon_0 {
-    background: url(../images/tab_tourneys.png);
-}
-
-.icon_1 {
     background: url(../images/tab_my_decks.png);
 }
 
-.icon_2 {
+.icon_1 {
     background: url(../images/tab_history.png);
 }
 
-.icon_3 {
+.icon_2 {
     background: url(../images/tab_events.png);
 }
 
-.icon_4 {
+.icon_3 {
     background: url(../images/tab_explore.png);
 }
 
-.icon_5 {
+.icon_4 {
     background: url(../images/tab_economy.png);
 }
 
-.icon_6 {
+.icon_5 {
     background: url(../images/tab_collection.png);
 }
 
@@ -432,6 +457,11 @@ span.top_nav_item_text {
     overflow: hidden;
     display: inline-block;
     -webkit-transition: all .5s ease-in-out;
+}
+
+.top_nav_item_no_label {
+    max-width: 60px !important;
+    min-width: 60px !important;
 }
 
 .top_nav_item {
@@ -459,7 +489,7 @@ span.top_nav_item_text {
     display: inline-grid;
 }
 
-.it7, .it8 {
+.icon_7, .icon_8 {
     opacity: 1;
 }
 
@@ -468,11 +498,10 @@ span.top_nav_item_text {
     opacity: 1;
 }
 
-.ith_icon {
+.icon_-1 {
     width: 32px;
     height: 32px;
     opacity: 1;
-    margin: 16px auto;
     background-repeat: no-repeat;
     background-image: url(../images/tab_home.png);
 }
@@ -710,6 +739,8 @@ font-family:  var(--main-font-name);
 
 .list_economy_top {
     margin-right: 16px;
+    height: 64px;
+    line-height: 64px;
     justify-content: center;
 }
 
@@ -754,6 +785,10 @@ font-family:  var(--main-font-name);
     overflow: -webkit-paged-x;
     display: flex;
     max-width: calc(100% - 300px);
+}
+
+.list_economy_awarded > * {
+    flex-shrink: 0;
 }
 
 .list_event_expand {
@@ -1280,6 +1315,15 @@ a:hover {
     width: 140px;
     display: inline-block;
     margin: 6px;
+    position: relative;
+}
+
+.inventory_card.small {
+    width: 39px;
+}
+
+.inventory_card.small img {
+    width: 39px;
 }
 
 .inventory_card_settings {
@@ -1629,9 +1673,10 @@ a:hover {
     background-repeat: no-repeat;
     width: 36px;
     margin: auto 4px;
-    height: 36px;
+    height: 100%;
     cursor: pointer;
     background-size: contain;
+    background-position-y: center;
 }
 
 .set_filter {
@@ -1673,6 +1718,7 @@ a:hover {
     display: flex;
     justify-content: flex-end;
     margin: 0 6px;
+    line-height: 64px;
 }
 
 .economy_up {
@@ -1709,6 +1755,11 @@ a:hover {
     margin-left: 2px;
     font-family: var(--sub-font-name);
     color: var(--color-light);
+    margin: auto 0;
+}
+
+.economy_sub.small {
+    line-height: 32px;
 }
 
 .economy_wc {
@@ -1746,15 +1797,6 @@ a:hover {
     background-size: contain;
 }
 
-.economy_gems_med {
-    background-repeat: no-repeat;
-    margin: auto 4px;
-    width: 28px;
-    height: 28px;
-    background-image: url(../images/gem.png);
-    background-size: contain;
-}
-
 .economy_wc_med {
     background-repeat: no-repeat;
     margin: auto 8px;
@@ -1773,14 +1815,8 @@ a:hover {
     background-size: contain;
 }
 
-.economy_gold_med {
-    background-repeat: no-repeat;
-    margin: auto 4px;
+.economy_gold.marginLeft {
     margin-left: 16px;
-    width: 28px;
-    height: 28px;
-    background-image: url(../images/gold.png);
-    background-size: contain;
 }
 
 .economy_mastery_med {
@@ -2082,6 +2118,14 @@ a:hover {
 
 .flex_end {
     justify-content: flex-end;
+}
+
+.flex_top {
+    line-height: 32px;
+}
+
+.flexLeft {
+    flex-direction: column;
 }
 
 .draft_title {
@@ -3693,6 +3737,21 @@ a:hover {
     opacity: 0.5;
 }
 
+.economyDateSelect {
+    margin: auto auto auto 0px;
+    display: flex;
+    align-items: center;
+}
+
+.economyIconMargin {
+    margin-left: 24px;
+}
+
+.economy_row_hidden {
+    height: 0px;
+    display: none;
+}
+
 .filter_panel_root {
     display: flex;
     width: 100%;
@@ -3702,6 +3761,10 @@ a:hover {
 
 .filter_panel_select_margin {
     margin-bottom: 8px;
+}
+
+.filter_column {
+    height: 100%;
 }
 
 .dateCont {
@@ -3734,4 +3797,17 @@ a:hover {
 
 .archive_label {
     margin-top: 4px;
+}
+
+.inventory_card_quantity_container {
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    text-align: center;
+    width: 100%;
+    pointer-events: none;
+}
+
+.inventory_card_quantity {
+    color: var(--color-light);
 }

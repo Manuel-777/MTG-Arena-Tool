@@ -1,19 +1,14 @@
 import formatDistanceStrict from "date-fns/formatDistanceStrict";
 import { shell } from "electron";
-import {
-  FORMATS,
-  BLACK,
-  BLUE,
-  GREEN,
-  RED,
-  WHITE,
-  MANA_COLORS,
-  CARD_TYPES,
-  CARD_TYPE_CODES
-} from "./constants";
+import React from "react";
+import ReactDOM from "react-dom";
+
+import { FORMATS, BLACK, BLUE, GREEN, RED, WHITE } from "./constants";
 import db from "./database";
 import pd from "./player-data";
-import { createDiv, createSpan } from "./dom-fns";
+import { createDiv } from "./dom-fns";
+import DeckManaCurve from "./DeckManaCurve";
+import DeckTypesStats from "./DeckTypesStats";
 
 export function getCardArtCrop(cardObj) {
   if (typeof cardObj !== "object") {
@@ -60,6 +55,30 @@ export function openScryfallCard(cardObj) {
     );
   } catch (e) {
     console.log("Cant open scryfall card: ", cardObj);
+  }
+}
+
+export function getRankColorClass(rank) {
+  switch (rank) {
+    case "A+":
+    case "A":
+      return "blue";
+    case "A-":
+    case "B+":
+    case "B":
+      return "green";
+    case "B-":
+    case "C+":
+    case "C":
+    default:
+      return "white";
+    case "C-":
+    case "D+":
+    case "D":
+      return "orange";
+    case "D-":
+    case "F":
+      return "red";
   }
 }
 
@@ -376,72 +395,6 @@ export function getBoosterCountEstimate(neededWildcards) {
   return Math.round(boosterCost);
 }
 
-export function get_deck_types_ammount(deck) {
-  const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
-  if (!deck.mainDeck) return types;
-
-  deck.mainDeck.forEach(function(card) {
-    // This is hackish.. the way we insert our custom elements in the
-    // array of cards is wrong in the first place :()
-    if (card.id.id && card.id.id == 100) {
-      types.lan += card.quantity;
-      return;
-    }
-    const c = db.card(card.id);
-    if (c) {
-      if (c.type.includes("Land", 0)) types.lan += card.quantity;
-      else if (c.type.includes("Creature", 0)) types.cre += card.quantity;
-      else if (c.type.includes("Artifact", 0)) types.art += card.quantity;
-      else if (c.type.includes("Enchantment", 0)) types.enc += card.quantity;
-      else if (c.type.includes("Instant", 0)) types.ins += card.quantity;
-      else if (c.type.includes("Sorcery", 0)) types.sor += card.quantity;
-      else if (c.type.includes("Planeswalker", 0)) types.pla += card.quantity;
-    }
-  });
-
-  return types;
-}
-
-export function get_deck_curve(deck) {
-  const curve = [];
-  if (!deck.mainDeck) return curve;
-
-  deck.mainDeck.forEach(card => {
-    const cardObj = db.card(card.id);
-    if (!cardObj) return;
-
-    const cmc = cardObj.cmc;
-    if (!curve[cmc]) curve[cmc] = [0, 0, 0, 0, 0, 0];
-
-    if (!cardObj.type.includes("Land")) {
-      cardObj.cost.forEach(c => {
-        if (c.includes("w")) curve[cmc][1] += card.quantity;
-        if (c.includes("u")) curve[cmc][2] += card.quantity;
-        if (c.includes("b")) curve[cmc][3] += card.quantity;
-        if (c.includes("r")) curve[cmc][4] += card.quantity;
-        if (c.includes("g")) curve[cmc][5] += card.quantity;
-      });
-
-      curve[cmc][0] += card.quantity;
-    }
-  });
-  /*
-  // Do not account sideboard?
-  deck.sideboard.forEach(function(card) {
-    var grpid = card.id;
-    var cmc = db.card(grpid).cmc;
-    if (curve[cmc] == undefined)  curve[cmc] = 0;
-    curve[cmc] += card.quantity
-
-    if (db.card(grpid).rarity !== 'land') {
-      curve[cmc] += card.quantity
-    }
-  });
-  */
-  //console.log(curve);
-  return curve;
-}
-
 export function get_deck_export(deck) {
   let str = "";
   deck.mainDeck = removeDuplicates(deck.mainDeck);
@@ -646,69 +599,15 @@ export function objectClone(originalObject) {
 }
 
 export function deckManaCurve(deck) {
-  const manaCounts = get_deck_curve(deck);
-  const curveMax = Math.max(
-    ...manaCounts
-      .filter(v => {
-        if (v == undefined) return false;
-        return true;
-      })
-      .map(v => v[0] || 0)
-  );
-  // console.log("deckManaCurve", manaCounts, curveMax);
-
-  const container = createDiv(["mana_curve_container"]);
-  const curve = createDiv(["mana_curve"]);
-  const numbers = createDiv(["mana_curve_numbers"]);
-
-  manaCounts.forEach((cost, i) => {
-    const total = cost[0];
-    const manaTotal = cost.reduce(add, 0) - total;
-
-    const curveCol = createDiv(["mana_curve_column"]);
-    curveCol.style.height = (total * 100) / curveMax + "%";
-
-    const curveNum = createDiv(["mana_curve_number"], total > 0 ? total : "");
-    curveCol.appendChild(curveNum);
-
-    MANA_COLORS.forEach((mc, ind) => {
-      if (ind < 5 && cost[ind + 1] > 0) {
-        const col = createDiv(["mana_curve_column_color"]);
-        col.style.height = Math.round((cost[ind + 1] / manaTotal) * 100) + "%";
-        col.style.backgroundColor = mc;
-        curveCol.appendChild(col);
-      }
-    });
-
-    curve.appendChild(curveCol);
-
-    const colNum = createDiv(["mana_curve_column_number"]);
-    const numDiv = createDiv(["mana_s16", "mana_" + i]);
-    numDiv.style.margin = "auto";
-    colNum.appendChild(numDiv);
-    numbers.appendChild(colNum);
-  });
-
-  container.appendChild(curve);
-  container.appendChild(numbers);
-
-  return container;
+  const wrap = createDiv([]);
+  ReactDOM.render(<DeckManaCurve deck={deck} />, wrap);
+  return wrap;
 }
 
 export function deckTypesStats(deck) {
-  const cardTypes = get_deck_types_ammount(deck);
-  const typesContainer = createDiv(["types_container"]);
-  CARD_TYPE_CODES.forEach((cardTypeKey, index) => {
-    const type = createDiv(["type_icon_cont"]);
-    type.appendChild(
-      createDiv(["type_icon", "type_" + cardTypeKey], "", {
-        title: CARD_TYPES[index]
-      })
-    );
-    type.appendChild(createSpan([], cardTypes[cardTypeKey]));
-    typesContainer.appendChild(type);
-  });
-  return typesContainer;
+  const wrap = createDiv([]);
+  ReactDOM.render(<DeckTypesStats deck={deck} />, wrap);
+  return wrap;
 }
 
 // pass in playerData.constructed / limited / historic objects

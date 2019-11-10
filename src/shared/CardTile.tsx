@@ -11,6 +11,7 @@ import Deck from "./deck";
 import {
   get_wc_missing as getWildcardsMissing,
   getCardArtCrop,
+  getRankColorClass,
   openScryfallCard
 } from "./util";
 import { addCardHover } from "./card-hover";
@@ -22,8 +23,8 @@ export interface CardTileProps {
   indent: string;
   isHighlighted: boolean;
   isSideboard: boolean;
-  landOdds: any;
   quantity: { quantity: string; odds: number } | number | string; // TODO clean this up?
+  setHoverCardCallback?: (card: any) => void;
   showWildcards: boolean;
   style: number;
 }
@@ -44,38 +45,12 @@ function frameClassName(card: any): string {
   }
 }
 
-function rankingClassName(ranking: number | string): string {
-  // TODO after #685 and #686 land: extract this and DraftRankValue into a util
-  switch (ranking) {
-    case "A+":
-    case "A":
-      return "blue";
-
-    case "A-":
-    case "B+":
-    case "B":
-      return "green";
-
-    case "C-":
-    case "D+":
-    case "D":
-      return "orange";
-
-    case "D-":
-    case "F":
-      return "red";
-
-    default:
-      return "white";
-  }
-}
-
 function getArenaQuantityDisplay(quantity: any): [number, number, JSX.Element] {
   let ww, ll, quantityElement;
   if (typeof quantity === "object") {
     ww = 64;
     ll = 48;
-    const rankClass = rankingClassName(quantity.quantity);
+    const rankClass = getRankColorClass(quantity.quantity);
     quantityElement = (
       <div className={"card_tile_odds " + rankClass}>
         <span>{quantity.quantity}</span>
@@ -84,7 +59,7 @@ function getArenaQuantityDisplay(quantity: any): [number, number, JSX.Element] {
   } else if (!isNumber(quantity)) {
     ww = 64;
     ll = 48;
-    const rankClass = rankingClassName(quantity);
+    const rankClass = getRankColorClass(quantity);
     quantityElement = (
       <div className={"card_tile_odds " + rankClass}>
         <span>{quantity}</span>
@@ -187,14 +162,20 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
     indent,
     isHighlighted,
     isSideboard,
-    landOdds,
     quantity,
+    setHoverCardCallback,
     showWildcards
   } = props;
 
   const [isMouseHovering, setMouseHovering] = useState(false);
-  const handleMouseEnter = useCallback((): void => setMouseHovering(true), []);
-  const handleMouseLeave = useCallback((): void => setMouseHovering(false), []);
+  const handleMouseEnter = useCallback((): void => {
+    setMouseHovering(true);
+    setHoverCardCallback && setHoverCardCallback(card);
+  }, [setHoverCardCallback]);
+  const handleMouseLeave = useCallback((): void => {
+    setMouseHovering(false);
+    setHoverCardCallback && setHoverCardCallback(null);
+  }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = card;
     if (card.dfc === FACE_SPLIT_FULL) {
@@ -205,11 +186,15 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
 
   const containerEl = useRef(null);
   useEffect(() => {
+    if (setHoverCardCallback) {
+      return; // React handles hover
+    }
+    // Legacy code support
     const containerDiv = containerEl.current;
     if (containerDiv) {
-      addCardHover(containerDiv, card, landOdds);
+      addCardHover(containerDiv, card);
     }
-  }, [card, landOdds]);
+  }, [card, setHoverCardCallback]);
 
   const [ww, ll, quantityElement] = getArenaQuantityDisplay(quantity);
 
@@ -275,7 +260,7 @@ function FlatQuantityDisplay(props: { quantity: any }): JSX.Element {
     );
   } else if (!isNumber(quantity)) {
     // Text quantity
-    const rankClass = rankingClassName(quantity);
+    const rankClass = getRankColorClass(quantity);
     return <div className={"card_tile_odds_flat " + rankClass}>{quantity}</div>;
   } else if (quantity === 9999) {
     // Undefined Quantity
@@ -319,13 +304,19 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
     indent,
     isHighlighted,
     isSideboard,
-    landOdds,
     quantity,
+    setHoverCardCallback,
     showWildcards
   } = props;
   const [isMouseHovering, setMouseHovering] = useState(false);
-  const handleMouseEnter = useCallback((): void => setMouseHovering(true), []);
-  const handleMouseLeave = useCallback((): void => setMouseHovering(false), []);
+  const handleMouseEnter = useCallback((): void => {
+    setMouseHovering(true);
+    setHoverCardCallback && setHoverCardCallback(card);
+  }, [setHoverCardCallback]);
+  const handleMouseLeave = useCallback((): void => {
+    setMouseHovering(false);
+    setHoverCardCallback && setHoverCardCallback(null);
+  }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = card;
     if (card.dfc === FACE_SPLIT_FULL) {
@@ -336,11 +327,15 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
 
   const containerEl = useRef(null);
   useEffect(() => {
+    if (setHoverCardCallback) {
+      return; // React handles hover
+    }
+    // Legacy code support
     const containerDiv = containerEl.current;
     if (containerDiv) {
-      addCardHover(containerDiv, card, landOdds);
+      addCardHover(containerDiv, card);
     }
-  }, [card, landOdds]);
+  }, [card, setHoverCardCallback]);
 
   const cardTileStyle = { backgroundImage: "", borderImage: "" };
   try {

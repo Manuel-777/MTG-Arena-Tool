@@ -86,6 +86,7 @@ body {
 .overlay_deckname {
     background-color: rgba(0,0,0,0.75);
     padding: 4px 0 0 0;
+    height: 28px;
     text-align: center;
     color: #fae5d2;
 }
@@ -113,6 +114,26 @@ body {
     padding: 4px;
     height: 16px;
     background: url(../images/separator_spr.png) center no-repeat;
+}
+
+.hover_fade-enter {
+  opacity: 0;
+}
+
+.hover_fade-enter-active {
+  opacity: 1;
+  -webkit-transition: opacity 0.2s ease-in;
+  transition: opacity 0.2s ease-in;
+}
+
+.hover_fade-exit {
+  opacity: 1;
+}
+
+.hover_fade-exit-active {
+  opacity: 0;
+  -webkit-transition: opacity 0.2s ease-in;
+  transition: opacity 0.2s ease-in;
 }
 
 .main_hover {
@@ -543,6 +564,7 @@ body {
 }
 
 .top_nav_wrapper {
+    z-index: 2 !important;
     flex-direction: row !important;
     height: 32px !important;
     justify-content: flex-end !important;

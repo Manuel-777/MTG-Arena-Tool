@@ -52,6 +52,8 @@ Please read about [our Privacy Policy and How we use your data here](./PRIVACY.m
 
 [vanilla-picker by Andreas Borgen, Adam Brooks](https://vanilla-picker.js.org/)
 
+[howler.js by James Simpson and GoldFire Studios, Inc.](https://github.com/goldfire/howler.js)
+
 [Draft ranking by Magic Community Set Reviews](https://www.mtgcommunityreview.com/)
 
 [Scryfall.com](http://scryfall.com) in particular, for making an absolutely stunning database of every single card in the multiverse.

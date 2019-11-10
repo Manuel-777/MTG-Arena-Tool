@@ -109,12 +109,12 @@ class FilterPanel {
 
     return (
       <div className={this.prefixId + "_filter filter_panel_root"}>
-        <div className={"columnA"}>
+        <div className={"filter_column"}>
           <DateFilter showArchivedValue={this.filters.showArchived} prefixId={this.prefixId} options={dateOptions} current={dateSelected} callback={this.dateSelectCallback} showArchivedFilter={this.showArchivedFilter} onArchiveClick={this.filterCallback('showArchived')} />
           <WrappedReactSelect className={this.prefixId + "_query_event"} options={this.events} current={this.filters.eventId} callback={this.filterCallback('eventId')} optionFormatter={getReadableEvent} />
         </div>
         {(this.tags.length || this.showManaFilter) &&
-          (<div className={"columnB"}>
+          (<div className={"filter_column"}>
             {(this.tags.length || this.decks.length) && (
               <div className={"deckFiltersCont"}>
                 {this.tags.length && <WrappedReactSelect className={this.prefixId + "_query_tag spacer180"} options={this.tags} current={this.filters.tag} callback={this.filterCallback('tag')} optionFormatter={(tag: string) => <TagOption tag={tag}/>} />}
@@ -127,9 +127,9 @@ class FilterPanel {
               <ManaFilter prefixId={this.prefixId} filterKey={"colors"} filters={this.filters} onFilterChanged={this.filterCallback("colors")} />
             )}
         </div>)}
-        {(this.archs.length || this.showOppManaFilter) && (
-          <div className={"columnC"}>
-            {this.archs.length && <WrappedReactSelect className={this.prefixId + "_query_optag filter_panel_select_margin spacer180"} options={this.archs} current={this.filters.arch} callback={this.filterCallback('arch')} optionFormatter={(tag: string) => <TagOption tag={tag} showCount={true} archCounts={this.archCounts} />} />}
+        {(this.archs.length || this.showOppManaFilter || this.showSortOption) && (
+          <div className={"filter_column"}>
+            {!!this.archs.length && <WrappedReactSelect className={this.prefixId + "_query_optag filter_panel_select_margin spacer180"} options={this.archs} current={this.filters.arch} callback={this.filterCallback('arch')} optionFormatter={(tag: string) => <TagOption tag={tag} showCount={true} archCounts={this.archCounts} />} />}
             {this.showOppManaFilter ? (
               <ManaFilter prefixId={this.prefixId} filterKey={"oppColors"} filters={this.filters} onFilterChanged={this.filterCallback("oppColors")} />
             ) : this.showSortOption ? (

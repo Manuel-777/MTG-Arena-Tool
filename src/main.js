@@ -415,6 +415,7 @@ function updateOverlayVisibility() {
   const shouldDisplayOverlay = settings.overlays.some(getOverlayVisible);
   const isOverlayVisible = isEntireOverlayVisible();
 
+  //console.log("shouldDisplayOverlay: ", shouldDisplayOverlay, "isOverlayVisible: ", isOverlayVisible);
   if (!shouldDisplayOverlay && isOverlayVisible) {
     // hide entire overlay window
     // Add a 1 second timeout for animations
@@ -425,15 +426,15 @@ function updateOverlayVisibility() {
     // display entire overlay window
     clearTimeout(overlayHideTimeout);
     overlayHideTimeout = undefined;
-  }
 
-  const { bounds } =
-    electron.screen
-      .getAllDisplays()
-      .find(d => d.id == settings.overlay_display) ||
-    electron.screen.getPrimaryDisplay();
-  overlay.show();
-  overlay.setBounds(bounds);
+    const { bounds } =
+      electron.screen
+        .getAllDisplays()
+        .find(d => d.id == settings.overlay_display) ||
+      electron.screen.getPrimaryDisplay();
+    overlay.show();
+    overlay.setBounds(bounds);
+  }
 }
 
 function isEntireOverlayVisible() {
@@ -573,7 +574,7 @@ function createOverlayWindow() {
       nodeIntegration: true
     }
   });
-  overlay.loadURL(`file://${__dirname}/window_overlay_v3/index.html`);
+  overlay.loadURL(`file://${__dirname}/overlay/index.html`);
 
   if (process.platform !== "linux") {
     // https://electronjs.org/docs/api/browser-window#winsetignoremouseeventsignore-options

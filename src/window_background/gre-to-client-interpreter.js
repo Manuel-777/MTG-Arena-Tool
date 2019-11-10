@@ -150,7 +150,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
     actionLog(
       ann.affectorId,
       globals.logTime,
-      `${playerName} played ${actionLogGenerateLink(grpId)}`
+      `${playerName} played ${actionLogGenerateLink(grpId)}`,
+      grpId
     );
   }
 
@@ -164,7 +165,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
       actionLog(
         zone.ownerSeatId,
         globals.logTime,
-        `${playerName} drew ${actionLogGenerateLink(grpId)}`
+        `${playerName} drew ${actionLogGenerateLink(grpId)}`,
+        grpId
       );
     } else {
       actionLog(zone.ownerSeatId, globals.logTime, `${playerName} drew a card`);
@@ -188,7 +190,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
     actionLog(
       seat,
       globals.logTime,
-      `${playerName} cast ${actionLogGenerateLink(grpId)}`
+      `${playerName} cast ${actionLogGenerateLink(grpId)}`,
+      grpId
     );
   }
 
@@ -201,7 +204,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
     actionLog(
       seat,
       globals.logTime,
-      `${playerName} discarded ${actionLogGenerateLink(grpId)}`
+      `${playerName} discarded ${actionLogGenerateLink(grpId)}`,
+      grpId
     );
   }
 
@@ -224,7 +228,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
     actionLog(
       seat,
       globals.logTime,
-      `${text} put ${actionLogGenerateLink(grpId)} in ${zone}`
+      `${text} put ${actionLogGenerateLink(grpId)} in ${zone}`,
+      grpId
     );
   }
 
@@ -248,7 +253,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
     actionLog(
       seat,
       globals.logTime,
-      `${text} returned ${actionLogGenerateLink(affected.grpId)} to ${zone}`
+      `${text} returned ${actionLogGenerateLink(affected.grpId)} to ${zone}`,
+      affected.grpId
     );
   }
 
@@ -271,7 +277,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
     actionLog(
       seat,
       globals.logTime,
-      `${text} exiled ${actionLogGenerateLink(affected.grpId)}`
+      `${text} exiled ${actionLogGenerateLink(affected.grpId)}`,
+      affected.grpId
     );
   }
 
@@ -299,7 +306,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
     actionLog(
       seat,
       globals.logTime,
-      `${text} countered ${actionLogGenerateLink(affected.grpId)}`
+      `${text} countered ${actionLogGenerateLink(affected.grpId)}`,
+      affected.grpId
     );
   }
 
@@ -342,7 +350,8 @@ annotationFunctions.AnnotationType_ResolutionStart = function(ann, details) {
       globals.logTime,
       `${actionLogGenerateLink(
         affected.objectSourceGrpId
-      )}'s ${actionLogGenerateAbilityLink(grpId)}`
+      )}'s ${actionLogGenerateAbilityLink(grpId)}`,
+      grpId
     );
   }
 };
@@ -364,7 +373,8 @@ annotationFunctions.AnnotationType_DamageDealt = function(ann, details) {
     globals.logTime,
     `${actionLogGenerateLink(
       affector.grpId
-    )} dealt ${dmg} damage to ${recipient}`
+    )} dealt ${dmg} damage to ${recipient}`,
+    affector.grpId
   );
 };
 
@@ -435,7 +445,8 @@ annotationFunctions.AnnotationType_Scry = function(ann, details) {
         actionLog(
           affector,
           globals.logTime,
-          ` ${actionLogGenerateLink(grpId)} to the top`
+          ` ${actionLogGenerateLink(grpId)} to the top`,
+          grpId
         );
       });
     }
@@ -445,7 +456,8 @@ annotationFunctions.AnnotationType_Scry = function(ann, details) {
         actionLog(
           affector,
           globals.logTime,
-          ` ${actionLogGenerateLink(grpId)} to the bottom`
+          ` ${actionLogGenerateLink(grpId)} to the bottom`,
+          grpId
         );
       });
     }
@@ -462,7 +474,8 @@ annotationFunctions.AnnotationType_CardRevealed = function(ann, details) {
   actionLog(
     owner,
     globals.logTime,
-    `revealed ${actionLogGenerateLink(grpId)} from ${zone.type}`
+    `revealed ${actionLogGenerateLink(grpId)} from ${zone.type}`,
+    grpId
   );
 };
 

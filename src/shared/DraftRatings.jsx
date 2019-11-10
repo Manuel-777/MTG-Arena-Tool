@@ -1,38 +1,13 @@
 import * as React from "react";
 import { DRAFT_RANKS } from "./constants";
+import { getRankColorClass } from "./util";
 
 function DraftRankValue(_props) {
   const { index, rankValue, maxValue } = _props;
   const rv = 12 - index;
   // TODO properly type this after #684 lands
   const rank = DRAFT_RANKS[rv];
-  let colorClass;
-  switch (rank) {
-    case "A+":
-    case "A":
-      colorClass = "blue";
-      break;
-    case "A-":
-    case "B+":
-    case "B":
-      colorClass = "green";
-      break;
-    case "B-":
-    case "C+":
-    case "C":
-    default:
-      colorClass = "white";
-      break;
-    case "C-":
-    case "D+":
-    case "D":
-      colorClass = "orange";
-      break;
-    case "D-":
-    case "F":
-      colorClass = "red";
-      break;
-  }
+  const colorClass = getRankColorClass(rank);
   return (
     <div className="rank_value_container">
       <div className={"rank_value_title " + colorClass}>{rank}</div>
