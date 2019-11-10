@@ -382,12 +382,24 @@ class NeDb {
 
   // callback: (err, num) => {}
   upsertAll(data, callback) {
-    // TODO figure out a way to implement callback or remove entirely
-    if (this.useBulkFirstpass) {
-      Object.entries(data).forEach(([key, value]) => {
-        this.upsert("", key, value);
-      });
-    }
+    const allData = Object.entries(data);
+    allData.reverse();
+    const recursiveHelper = (dataToUpsert, total, upsert) => {
+      if (dataToUpsert.length) {
+        const [key, value] = dataToUpsert.pop();
+        upsert("", key, value, (err, num) => {
+          if (num) {
+            total += num;
+          } else if (err) {
+            console.log(err);
+          }
+          recursiveHelper(dataToUpsert, total, upsert);
+        });
+      } else {
+        callback(null, total);
+      }
+    };
+    recursiveHelper(allData, 0, this.upsert);
   }
 
   // callback: (err, num) => {}
