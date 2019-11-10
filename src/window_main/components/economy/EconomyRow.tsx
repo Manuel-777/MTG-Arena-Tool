@@ -158,7 +158,10 @@ interface CardPoolAddedEconomyValueRecordProps {
   aetherizedCardIds: string[];
 }
 
-function countDupesArray(array: string[]): Record<string, number> {
+function countDupesArray(array: string[] | undefined): Record<string, number> {
+  if (!array) {
+    return {};
+  }
   const counted: Record<string, number> = {};
   array.forEach((value) => {
     counted[value] = counted[value] ? counted[value] + 1 : 1;
@@ -169,32 +172,15 @@ function countDupesArray(array: string[]): Record<string, number> {
 function CardPoolAddedEconomyValueRecord(props: CardPoolAddedEconomyValueRecordProps) {
   const { addedCardIds, aetherizedCardIds } = props;
 
-  if (addedCardIds) {
-    return AddedCardEconomyValueRecord(addedCardIds);
-  } else if(aetherizedCardIds) {
-    return AetherizedCardEnonomyValueRecord(aetherizedCardIds);
-  }else{
-    return (<> </>);
-  }
+  return (<>{mapToInventoryCard(addedCardIds, false)}{mapToInventoryCard(aetherizedCardIds, true)}</>);
 }
 
-function AddedCardEconomyValueRecord(addedCardIds: string[]) {
-  const addedUniques = countDupesArray(addedCardIds);
+function mapToInventoryCard(cardsList: string[], isAetherized: boolean) {
+  let uniqueCardList = countDupesArray(cardsList);
 
   return (
     <>
-      {addedUniques && Object.entries(addedUniques).map((entry: [string, number]) => <InventoryCard key={entry[0]} card={db.card(entry[0])} quantity={entry[1]} />)}
-    </>
-  )
-
-}
-
-function AetherizedCardEnonomyValueRecord(aetherizedCardIds: string[]) {
-  const aetherUniques = countDupesArray(aetherizedCardIds);
-
-  return (
-    <>
-      {aetherUniques && Object.entries(aetherUniques).map((entry: [string, number]) => <InventoryCard key={entry[0]} card={db.card(entry[0])} quantity={entry[1]} isAetherized={true} />)}
+      {Object.entries(uniqueCardList).map((entry: [string, number]) => <InventoryCard key={entry[0]} card={db.card(entry[0])} quantity={entry[1]} isAetherized={isAetherized} />)}
     </>
   )
 }
