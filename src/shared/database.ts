@@ -1,9 +1,9 @@
 import path from "path";
 import { app, remote, ipcRenderer as ipc } from "electron";
 import fs from "fs";
-import _ from "lodash";
+import _, { Dictionary } from "lodash";
 import { Metadata, Archetype, Card, CardSet, RewardsDate } from "./types/Metadata";
-import { Season , Rank, RankClassInfo} from "./types/Season";
+import { Season, Rank, RankClassInfo } from "./types/Season";
 import { Deck } from "./types/Deck";
 
 const cachePath: string | null =
@@ -201,9 +201,9 @@ class Database {
     return new Date(this.season.currentSeason.seasonEndTime);
   }
 
-  get sets() {
+  get sets(): Dictionary<CardSet> {
     if (!this.metadata) {
-      return [] as CardSet[];
+      return {};
     }
 
     return _.pickBy(

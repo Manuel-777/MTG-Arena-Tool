@@ -6,7 +6,7 @@ export interface Metadata {
   updated: number,
   events: { [id: string]: string },
   events_format: { [id: string]: string },
-  sets: CardSet[],
+  sets: { [id: string]: CardSet },
   abilities: { [id: number]: string },
   limited_ranked_events: string[],
   standard_ranked_events: string[],
