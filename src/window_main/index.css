@@ -739,6 +739,8 @@ font-family:  var(--main-font-name);
 
 .list_economy_top {
     margin-right: 16px;
+    height: 64px;
+    line-height: 64px;
     justify-content: center;
 }
 
@@ -1671,9 +1673,10 @@ a:hover {
     background-repeat: no-repeat;
     width: 36px;
     margin: auto 4px;
-    height: 36px;
+    height: 100%;
     cursor: pointer;
     background-size: contain;
+    background-position-y: center;
 }
 
 .set_filter {
@@ -1752,7 +1755,7 @@ a:hover {
     margin-left: 2px;
     font-family: var(--sub-font-name);
     color: var(--color-light);
-    line-height: 64px;
+    margin: auto 0;
 }
 
 .economy_sub.small {
