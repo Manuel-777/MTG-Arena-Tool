@@ -3760,6 +3760,10 @@ a:hover {
     margin-bottom: 8px;
 }
 
+.filter_column {
+    height: 100%;
+}
+
 .dateCont {
     display: flex;
 }
