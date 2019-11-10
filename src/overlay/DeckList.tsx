@@ -74,13 +74,25 @@ function compareDraftPicks(a: CardData, b: CardData): -1 | 0 | 1 {
   }
   const aType = getCardTypeSort(aCard.type);
   const bType = getCardTypeSort(bCard.type);
-  return (
-    bCard.rank - aCard.rank ||
-    aColors.length - bColors.length ||
-    aCard.cmc - bCard.cmc ||
-    aType - bType ||
-    aCard.name.localeCompare(bCard.name)
-  );
+
+  let rankDiff = bCard.rank - aCard.rank;
+  let colorsLengthDiff = aColors.length - bColors.length;
+  let cmcDiff = aCard.cmc - bCard.cmc;
+  let typeDiff = aType - bType;
+  let localeCompare = aCard.name.localeCompare(bCard.name);
+  const compare = rankDiff ||
+    colorsLengthDiff ||
+    cmcDiff ||
+    typeDiff ||
+    localeCompare;
+
+  if (compare < 0) {
+    return -1;
+  }
+  if (compare > 0) {
+    return 1;
+  }
+  return 0;
 }
 
 export interface DeckListProps {
@@ -220,7 +232,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     const sideCards = deckClone.sideboard;
     sideCards.removeDuplicates();
     sideCards.get().sort(sortFunc);
-    sideCards.get().forEach((card: CardData) => {
+    sideCards.get().forEach((card: any) => {
       const quantity =
         settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED
           ? "0%"

@@ -1,5 +1,5 @@
 export interface Metadata {
-  cards: { [id: number]: Card },
+  cards: { [id: number]: DbCardData },
   ok: boolean,
   version: number,
   language: string,
@@ -14,7 +14,7 @@ export interface Metadata {
   archetypes: { [id: number]: Archetype }
 }
 
-export interface Card {
+export interface DbCardData {
   id: number,
   name: string,
   set: string,

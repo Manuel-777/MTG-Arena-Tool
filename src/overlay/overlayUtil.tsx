@@ -5,7 +5,7 @@ import interact from "interactjs";
 import Deck from "../shared/deck";
 
 export interface CardData {
-  id: number;
+  id: string;
   quantity: number;
   chance?: number;
   dfcId?: string;

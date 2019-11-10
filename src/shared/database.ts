@@ -2,7 +2,7 @@ import path from "path";
 import { app, remote, ipcRenderer as ipc } from "electron";
 import fs from "fs";
 import _ from "lodash";
-import { Metadata, Archetype, Card, CardSet, RewardsDate } from "./types/Metadata";
+import { Metadata, Archetype, DbCardData, CardSet, RewardsDate } from "./types/Metadata";
 import { Season, Rank, RankClassInfo } from "./types/Season";
 import { Deck } from "./types/Deck";
 
@@ -151,7 +151,7 @@ class Database {
     return this.metadata ? this.metadata.archetypes : {};
   }
 
-  get cards(): { [id: number]: Card } {
+  get cards(): { [id: number]: DbCardData } {
     return this.metadata !== undefined ? this.metadata.cards : {};
   }
 
@@ -159,8 +159,8 @@ class Database {
     return this.cards ? Object.keys(this.cards).map(k => parseInt(k)) : [] as number[];
   }
 
-  get cardList(): Card[] {
-    return this.cards ? Object.values(this.cards) : [] as Card[];
+  get cardList(): DbCardData[] {
+    return this.cards ? Object.values(this.cards) : [] as DbCardData[];
   }
 
   get events(): { [id: string]: string } {
