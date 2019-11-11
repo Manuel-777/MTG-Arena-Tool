@@ -211,7 +211,9 @@ function drawFilters() {
     buttonsTop,
     eventFilters,
     filterEvent || eventFilters[0],
-    () => null,
+    value => {
+      exploreData.filterEvent = value;
+    },
     "explore_query_event"
   );
 
@@ -228,7 +230,9 @@ function drawFilters() {
     buttonsTop,
     sortFilters,
     filterSort,
-    () => null,
+    value => {
+      exploreData.filterSort = value;
+    },
     "explore_query_sort"
   );
   sortSelect.style.width = "130px";
@@ -241,7 +245,9 @@ function drawFilters() {
     buttonsTop,
     sortDirection,
     filterSortDir,
-    () => null,
+    value => {
+      exploreData.filterSortDir = value;
+    },
     "explore_query_sortdir"
   );
   sortDirSelect.style.width = "130px";

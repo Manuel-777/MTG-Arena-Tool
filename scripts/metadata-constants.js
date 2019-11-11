@@ -50,8 +50,11 @@ exports.EVENT_TO_NAME = {
   QuickDraft_RNA_20190913: "Ranked Draft RNA 09/19",
   QuickDraft_ELD_20191011: "Ranked Draft ELD 10/19",
   QuickDraft_WAR_20191025: "Ranked Draft WAR 10/19",
+  QuickDraft_GRN_20191108: "Ranked Draft GRN 11/19",
+
   Cascade_Constructed_20190516: "Cascade Constructed",
-  Omniscience_Draft_20190830: "Omniscience Draft",
+  Omniscience_Draft_20190830: "Omniscience Draft M20",
+  Omniscience_Draft_20191107: "Omniscience Draft ELD",
 
   Esports_Qualifier_20190525: "Mythic Qualifier Weekend 05/19",
   Esports_Qualifier_20190817: "Mythic Qualifier Weekend 08/19",
@@ -61,6 +64,7 @@ exports.EVENT_TO_NAME = {
   CompCons_Metagame_Challenge_20191004: "Metagame Challenge 10/19",
   ExtraLife_2019_20191101: "Extra Life",
   FestivalFae_Std_Artisan_20191103: "Artisan Standard",
+  FestivalFae_OkosMadness_20191110: "Okos Madness",
 
   Brawl_Launch_20191024: "Brawl Launch",
   Precon_Brawl_ELD: "Precon Brawl",
@@ -114,9 +118,11 @@ exports.EVENT_TO_FORMAT = {
   QuickDraft_RNA_20190913: "Draft RNA",
   QuickDraft_ELD_20191011: "Draft ELD",
   QuickDraft_WAR_20191025: "Draft WAR",
+  QuickDraft_GRN_20191108: "Draft GRN",
 
   Cascade_Constructed_20190516: "Cascade Constructed",
   Omniscience_Draft_20190830: "Draft M20",
+  Omniscience_Draft_20191107: "Draft ELD",
 
   Esports_Qualifier_20190525: "Traditional Standard",
   Esports_Qualifier_20190817: "Traditional Standard",
@@ -126,6 +132,7 @@ exports.EVENT_TO_FORMAT = {
   CompCons_Metagame_Challenge_20191004: "Traditional Standard",
   ExtraLife_2019_20191101: "Pauper",
   FestivalFae_Std_Artisan_20191103: "Artisan",
+  FestivalFae_OkosMadness_20191110: "Momir",
 
   Brawl_Launch_20191024: "Brawl",
   Precon_Brawl_ELD: "Brawl",
