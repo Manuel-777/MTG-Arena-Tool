@@ -193,7 +193,7 @@ const nonDocFields = [
 
 const USER_DATA_DIR = (app || remote.app).getPath("userData");
 
-function defaultCallback(err, data, verb) {
+function defaultCallback(err: Error | null, data: any, verb: string): void {
   if (err) {
     console.error("Local database: ERROR", err);
   } else if (typeof data === "number" && data > 1) {
@@ -203,8 +203,50 @@ function defaultCallback(err, data, verb) {
   }
 }
 
-class ElectronStoreDb {
+class DatabaseNotInitializedError extends Error {
   constructor() {
+    super("LocalDatabase has not been initialized.");
+    this.name = "DatabaseNotInitializedError";
+  }
+}
+
+export interface LocalDb {
+  dbName: string;
+  filePath: string;
+  find(
+    table: string,
+    key: string,
+    callback?: (err: Error | null, data: any) => void
+  ): void;
+  findAll(callback?: (err: Error | null, data: any) => void): void;
+  init(dbName: string, arenaName?: string): void;
+  upsert(
+    table: string,
+    key: string,
+    data: any,
+    callback?: (err: Error | null, num: number) => void,
+    globals?: any
+  ): void;
+  upsertAll(
+    data: any,
+    callback?: (err: Error | null, num: number) => void,
+    intermediateCallback?: (err: Error | null, num: number) => void
+  ): void;
+  remove(
+    table: string,
+    key: string,
+    callback?: (err: Error | null, num: number) => void
+  ): void;
+}
+
+class ElectronStoreDb implements LocalDb {
+  dbName: string;
+  rememberStore?: Store<any>;
+  settingsStore?: Store<any>;
+  playerStore?: Store<any>;
+
+  constructor() {
+    this.dbName = "";
     this.init = this.init.bind(this);
     this.getStore = this.getStore.bind(this);
     this.findAll = this.findAll.bind(this);
@@ -214,18 +256,18 @@ class ElectronStoreDb {
     this.remove = this.remove.bind(this);
   }
 
-  get filePath() {
+  get filePath(): string {
     // not bothering to return "settings" store as well
     const fileName = this.dbName === "application" ? "remember" : this.dbName;
     return path.join(USER_DATA_DIR, fileName + ".json" || "");
   }
 
   // maps table-key to fields on electron-store JSON file
-  static getElectronStoreField(table, key) {
+  static getElectronStoreField(table: string, key: string): string {
     return table ? table + "." + key : key;
   }
 
-  init(dbName) {
+  init(dbName: string): void {
     this.dbName = dbName;
 
     if (dbName === "application") {
@@ -246,7 +288,7 @@ class ElectronStoreDb {
   }
 
   // maps table-key edge cases to special electron-stores
-  getStore(key) {
+  getStore(key?: string): Store<any> | undefined {
     if (this.dbName === "application") {
       if (key === "logUri") {
         return this.settingsStore;
@@ -256,15 +298,23 @@ class ElectronStoreDb {
     return this.playerStore;
   }
 
-  // callback: (err, data) => {}
-  findAll(callback) {
-    callback(null, this.getStore().get());
+  findAll(callback: (err: Error | null, data: any) => void) {
+    const store = this.getStore();
+    if (!store) {
+      throw new DatabaseNotInitializedError();
+    }
+    callback(null, store.store);
   }
 
-  // callback: (err, num) => {}
-  upsertAll(data, callback) {
-    this.getStore().set(data);
+  upsertAll(data: any, callback: (err: Error | null, num: number) => void) {
+    const store = this.getStore();
+    if (!store) {
+      throw new DatabaseNotInitializedError();
+    }
     const docCount = Object.keys(data).length;
+    if (store) {
+      store.set(data);
+    }
     if (callback) {
       callback(null, docCount);
     } else {
@@ -272,8 +322,17 @@ class ElectronStoreDb {
     }
   }
 
-  // callback: (err, num) => {}
-  upsert(table, key, data, callback, globals) {
+  upsert(
+    table: string,
+    key: string,
+    data: any,
+    callback: (err: Error | null, num: number) => void,
+    globals?: any
+  ) {
+    const store = this.getStore(key);
+    if (!store) {
+      throw new DatabaseNotInitializedError();
+    }
     if (
       globals &&
       !globals.debugLog &&
@@ -286,7 +345,7 @@ class ElectronStoreDb {
     }
 
     const field = ElectronStoreDb.getElectronStoreField(table, key);
-    this.getStore(key).set(field, data);
+    store.set(field, data);
     if (callback) {
       callback(null, 1);
     } else {
@@ -294,17 +353,31 @@ class ElectronStoreDb {
     }
   }
 
-  // callback: (err, doc) => {}
-  find(table, key, callback) {
+  find(
+    table: string,
+    key: string,
+    callback: (err: Error | null, data: any) => void
+  ) {
+    const store = this.getStore(key);
+    if (!store) {
+      throw new DatabaseNotInitializedError();
+    }
     const field = ElectronStoreDb.getElectronStoreField(table, key);
-    callback(null, this.getStore(key).get(field));
+    callback(null, store.get(field));
   }
 
-  // callback: (err, num) => {}
-  remove(table, key, callback) {
+  remove(
+    table: string,
+    key: string,
+    callback: (err: Error | null, num: number) => void
+  ) {
+    const store = this.getStore(key);
+    if (!store) {
+      throw new DatabaseNotInitializedError();
+    }
     // Note: we must always run delete, regardless of firstpass
     const field = ElectronStoreDb.getElectronStoreField(table, key);
-    this.getStore(key).delete(field);
+    store.delete(field);
     if (callback) {
       callback(null, 1);
     } else {
@@ -313,24 +386,31 @@ class ElectronStoreDb {
   }
 }
 
-class NeDb {
-  constructor(useBulkFirstpass) {
+class NeDb implements LocalDb {
+  dbName: string;
+  useBulkFirstpass: boolean;
+  appStore?: Datastore;
+  playerStore?: Datastore;
+
+  constructor(useBulkFirstpass?: boolean) {
+    this.dbName = "";
+    // whether or not to imitate old electron-store bulk-write
+    // behavior during the first pass of the log (deprecated workaround)
+    this.useBulkFirstpass = useBulkFirstpass || false;
+
     this.init = this.init.bind(this);
     this.findAll = this.findAll.bind(this);
     this.upsertAll = this.upsertAll.bind(this);
     this.upsert = this.upsert.bind(this);
     this.find = this.find.bind(this);
     this.remove = this.remove.bind(this);
-    // whether or not to imitate old electron-store bulk-write
-    // behavior during the first pass of the log (deprecated workaround)
-    this.useBulkFirstpass = useBulkFirstpass;
   }
 
   get filePath() {
     return path.join(USER_DATA_DIR, this.dbName + ".db");
   }
 
-  static getCleanDoc(doc) {
+  static getCleanDoc(doc: any) {
     if (doc && doc._id) {
       const clean = { ...doc };
       delete clean._id;
@@ -343,7 +423,7 @@ class NeDb {
     return this.dbName === "application" ? this.appStore : this.playerStore;
   }
 
-  init(dbName, arenaName) {
+  init(dbName: string, arenaName: string) {
     const userDir = (app || remote.app).getPath("userData");
     this.dbName = arenaName ? arenaName : dbName;
 
@@ -364,14 +444,16 @@ class NeDb {
     }
   }
 
-  // callback: (err, data) => {}
-  findAll(callback) {
-    this.datastore.find({}, (err, docs) => {
+  findAll(callback: (err: Error | null, data: any) => void) {
+    if (!this.datastore) {
+      throw new DatabaseNotInitializedError();
+    }
+    this.datastore.find({}, (err: Error, docs: any[]) => {
       if (err) {
-        callback(err);
+        callback(err, null);
         return;
       }
-      const data = {};
+      const data: { [key: string]: any } = {};
       docs.forEach(doc => {
         const key = doc._id;
         if (nonDocFields.includes(key)) {
@@ -384,15 +466,24 @@ class NeDb {
     });
   }
 
-  // callback: (err, num) => {}
-  // intermediateCallback: (err, num) => {}
-  upsertAll(data, callback, intermediateCallback) {
+  upsertAll(
+    data: any,
+    callback: (err: Error | null, num: number) => void,
+    intermediateCallback: (err: Error | null, num: number) => void
+  ) {
+    if (!this.datastore) {
+      throw new DatabaseNotInitializedError();
+    }
     const allData = Object.entries(data);
     allData.reverse();
-    const recursiveHelper = (dataToUpsert, total, upsert) => {
+    const recursiveHelper = (
+      dataToUpsert: any[],
+      total: number,
+      upsert: Function
+    ) => {
       if (dataToUpsert.length) {
         const [key, value] = dataToUpsert.pop();
-        upsert("", key, value, (err, num) => {
+        upsert("", key, value, (err: Error, num: number) => {
           if (num) {
             total += num;
           } else if (err) {
@@ -410,8 +501,16 @@ class NeDb {
     recursiveHelper(allData, 0, this.upsert);
   }
 
-  // callback: (err, num) => {}
-  upsert(table, key, data, callback, globals) {
+  upsert(
+    table: string,
+    key: string,
+    data: any,
+    callback: (err: Error | null, num: number) => void,
+    globals: any
+  ) {
+    if (!this.datastore) {
+      throw new DatabaseNotInitializedError();
+    }
     if (
       this.useBulkFirstpass &&
       globals &&
@@ -448,8 +547,14 @@ class NeDb {
     }
   }
 
-  // callback: (err, doc) => {}
-  find(table, key, callback) {
+  find(
+    table: string,
+    key: string,
+    callback: (err: Error | null, data: any) => void
+  ) {
+    if (!this.datastore) {
+      throw new DatabaseNotInitializedError();
+    }
     let _id = key;
     let subKey = "";
     if (table) {
@@ -460,7 +565,7 @@ class NeDb {
     }
     this.datastore.findOne({ _id }, (err, doc) => {
       if (err) {
-        callback(err);
+        callback(err, null);
       } else if (subKey && doc && doc[subKey]) {
         callback(null, doc[subKey]);
       } else {
@@ -469,8 +574,14 @@ class NeDb {
     });
   }
 
-  // callback: (err, num) => {}
-  remove(table, key, callback) {
+  remove(
+    table: string,
+    key: string,
+    callback: (err: Error | null, num: number) => void
+  ) {
+    if (!this.datastore) {
+      throw new DatabaseNotInitializedError();
+    }
     // Note: we must always run delete, regardless of firstpass
     if (table) {
       // handle deleting sub-document
@@ -487,7 +598,10 @@ class NeDb {
   }
 }
 
-class MigrationDb {
+class MigrationDb implements LocalDb {
+  oldDb?: LocalDb;
+  newDb?: LocalDb;
+
   constructor() {
     this.init = this.init.bind(this);
     this.findAll = this.findAll.bind(this);
@@ -497,50 +611,82 @@ class MigrationDb {
     this.remove = this.remove.bind(this);
   }
 
+  get dbName() {
+    return this.oldDb ? this.oldDb.dbName : "";
+  }
+
   get filePath() {
     return this.oldDb ? this.oldDb.filePath : "";
   }
 
-  init(dbName, arenaName) {
+  init(dbName: string, arenaName: string) {
     this.oldDb = new ElectronStoreDb();
     this.oldDb.init(dbName);
     this.newDb = new NeDb(true);
     this.newDb.init(dbName, arenaName);
   }
 
-  // callback: (err, data) => {}
-  findAll(callback) {
+  findAll(callback: (err: Error | null, data: any) => void) {
+    if (!this.oldDb || !this.newDb) {
+      throw new DatabaseNotInitializedError();
+    }
     this.oldDb.findAll(callback);
   }
 
-  // callback: (err, num) => {}
-  upsertAll(data, callback) {
-    this.oldDb.upsertAll(data, callback);
+  upsertAll(
+    data: any,
+    callback: (err: Error | null, num: number) => void,
+    intermediateCallback: (err: Error | null, num: number) => void
+  ) {
+    if (!this.oldDb || !this.newDb) {
+      throw new DatabaseNotInitializedError();
+    }
+    this.oldDb.upsertAll(data, callback, intermediateCallback);
     this.newDb.upsertAll(data);
   }
 
-  // callback: (err, num) => {}
-  upsert(table, key, data, callback, globals) {
+  upsert(
+    table: string,
+    key: string,
+    data: any,
+    callback: (err: Error | null, num: number) => void,
+    globals: any
+  ) {
+    if (!this.oldDb || !this.newDb) {
+      throw new DatabaseNotInitializedError();
+    }
     this.oldDb.upsert(table, key, data, callback, globals);
-    this.newDb.upsert(table, key, data, null, globals);
+    this.newDb.upsert(table, key, data, undefined, globals);
   }
 
-  // callback: (err, doc) => {}
-  find(table, key, callback) {
+  find(
+    table: string,
+    key: string,
+    callback: (err: Error | null, data: any) => void
+  ) {
+    if (!this.oldDb || !this.newDb) {
+      throw new DatabaseNotInitializedError();
+    }
     this.oldDb.find(table, key, callback);
   }
 
-  // callback: (err, num) => {}
-  remove(table, key, callback) {
+  remove(
+    table: string,
+    key: string,
+    callback: (err: Error | null, num: number) => void
+  ) {
+    if (!this.oldDb || !this.newDb) {
+      throw new DatabaseNotInitializedError();
+    }
     this.oldDb.remove(table, key, callback);
-    this.newDb.remove(table, key, null);
+    this.newDb.remove(table, key);
   }
 }
 
 // "pure" refactor
 // only necessary for loadPlayerConfig migration logic
-export const appDbLegacy = new ElectronStoreDb();
-export const playerDbLegacy = new ElectronStoreDb();
+export const appDbLegacy: LocalDb = new ElectronStoreDb();
+export const playerDbLegacy: LocalDb = new ElectronStoreDb();
 
-export const appDb = new MigrationDb(); // TODO should eventually be NeDb
-export const playerDb = new NeDb();
+export const appDb: LocalDb = new MigrationDb(); // TODO should eventually be NeDb
+export const playerDb: LocalDb = new NeDb();

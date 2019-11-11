@@ -18,7 +18,7 @@ const addCustomDeck = function(customDeck: Deck): void {
   };
 
   setData({ decks: { ...playerData.decks, [customDeck.id]: deckData } });
-  playerDb.upsert("decks", id, deckData, null, globals);
+  playerDb.upsert("decks", id, deckData, undefined, globals);
 };
 
 export default addCustomDeck;
