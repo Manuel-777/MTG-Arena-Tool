@@ -352,11 +352,15 @@ class NeDb {
         filename: path.join(userDir, "application.db"),
         autoload: true
       });
+      // auto-compact once per minute
+      this.appStore.persistence.setAutocompactionInterval(60000);
     } else {
       this.playerStore = new Datastore({
         filename: path.join(userDir, this.dbName + ".db"),
         autoload: true
       });
+      // auto-compact once per minute
+      this.playerStore.persistence.setAutocompactionInterval(60000);
     }
   }
 
