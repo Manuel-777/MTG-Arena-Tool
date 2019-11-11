@@ -67,11 +67,6 @@ function finishLoadingConfig(callback) {
 
 function migrateElectronStoreToNeDb(callback) {
   ipcSend("ipc_log", "Upgrading player database...");
-  ipcSend("popup", {
-    text: "Upgrading database (happens once, could take minutes)...",
-    time: 0,
-    progress: 2
-  });
   ipcSend("save_app_settings", {}, IPC_BACKGROUND); // ensure app db migrates
   playerDbLegacy.findAll((err, savedData) => {
     if (savedData) {
@@ -82,20 +77,44 @@ function migrateElectronStoreToNeDb(callback) {
       setData(__playerData, false);
       syncSettings(settings, false);
       ipcSend("save_user_settings", { skip_refresh: true }, IPC_BACKGROUND);
-      playerDb.upsertAll(playerData.data, (err, num) => {
-        if (num) {
-          ipcSend(
-            "ipc_log",
-            `...migrated ${num} records from electron-store to nedb`
-          );
-          finishLoadingConfig(callback);
-        } else {
-          if (err) {
+      const dataToMigrate = playerData.data;
+      const totalDocs = Object.values(dataToMigrate).length;
+      ipcSend("popup", {
+        text: "Migrating player data: 0% (happens once, could take minutes)",
+        time: 0,
+        progress: 0
+      });
+      playerDb.upsertAll(
+        dataToMigrate,
+        (err, num) => {
+          if (num) {
+            ipcSend(
+              "ipc_log",
+              `...migrated ${num} records from electron-store to nedb`
+            );
+            finishLoadingConfig(callback);
+          } else {
+            if (err) {
+              console.log(err);
+            }
+            finishLoadingConfig(callback);
+          }
+        },
+        (err, num) => {
+          if (num) {
+            const completion = num / totalDocs;
+            ipcSend("popup", {
+              text: `Migrating player data: ${Math.round(
+                100 * completion
+              )}% (happens once, could take minutes)`,
+              time: 0,
+              progress: completion
+            });
+          } else if (err) {
             console.log(err);
           }
-          finishLoadingConfig(callback);
         }
-      });
+      );
     } else {
       if (err) {
         console.log(err);

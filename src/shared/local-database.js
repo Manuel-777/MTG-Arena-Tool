@@ -381,7 +381,8 @@ class NeDb {
   }
 
   // callback: (err, num) => {}
-  upsertAll(data, callback) {
+  // intermediateCallback: (err, num) => {}
+  upsertAll(data, callback, intermediateCallback) {
     const allData = Object.entries(data);
     allData.reverse();
     const recursiveHelper = (dataToUpsert, total, upsert) => {
@@ -392,6 +393,9 @@ class NeDb {
             total += num;
           } else if (err) {
             console.log(err);
+          }
+          if (intermediateCallback) {
+            intermediateCallback(err, total);
           }
           recursiveHelper(dataToUpsert, total, upsert);
         });
