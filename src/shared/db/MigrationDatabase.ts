@@ -1,8 +1,8 @@
-import { LocalDatabase, DatabaseNotInitializedError } from "./databaseUtil";
 import { ElectronStoreDatabase } from "./ElectronStoreDatabase";
 import { NeDbDatabase } from "./NeDbDatabase";
+import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
-class MigrationDatabase implements LocalDatabase {
+export class MigrationDatabase implements LocalDatabase {
   oldDb?: LocalDatabase;
   newDb?: LocalDatabase;
 
@@ -86,11 +86,3 @@ class MigrationDatabase implements LocalDatabase {
     this.newDb.remove(table, key);
   }
 }
-
-// "pure" refactor
-// only necessary for loadPlayerConfig migration logic
-export const appDbLegacy: LocalDatabase = new ElectronStoreDatabase();
-export const playerDbLegacy: LocalDatabase = new ElectronStoreDatabase();
-
-export const appDb: LocalDatabase = new MigrationDatabase(); // TODO should eventually be NeDb
-export const playerDb: LocalDatabase = new NeDbDatabase();

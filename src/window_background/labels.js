@@ -8,7 +8,7 @@ import {
   CONSTRUCTED_EVENTS
 } from "../shared/constants";
 import db from "../shared/database";
-import { playerDb } from "../shared/LocalDatabase";
+import { playerDb } from "../shared/db/LocalDatabase";
 import CardsList from "../shared/cards-list";
 import { get_deck_colors, objectClone, replaceAll } from "../shared/util";
 import * as greToClientInterpreter from "./gre-to-client-interpreter";

@@ -1,6 +1,6 @@
 import { setData } from "./background-util";
 import globals from "./globals";
-import { playerDb } from "../shared/LocalDatabase";
+import { playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/player-data";
 
 export interface Deck {

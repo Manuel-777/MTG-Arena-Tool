@@ -5,7 +5,7 @@ import { makeId } from "../shared/util";
 import { ipc_send, setData } from "./background-util";
 import playerData from "../shared/player-data";
 import db from "../shared/database";
-import { appDb, playerDb } from "../shared/LocalDatabase";
+import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import globals from "./globals";
 import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 

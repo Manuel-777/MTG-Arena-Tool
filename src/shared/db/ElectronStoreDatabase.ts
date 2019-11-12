@@ -1,14 +1,13 @@
 import path from "path";
 import Store from "electron-store";
 import {
-  LocalDatabase,
   USER_DATA_DIR,
   rememberDefaults,
   settingsDefaults,
   playerDefaults,
-  DatabaseNotInitializedError,
   defaultCallback
 } from "./databaseUtil";
+import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
 export class ElectronStoreDatabase implements LocalDatabase {
   dbName: string;

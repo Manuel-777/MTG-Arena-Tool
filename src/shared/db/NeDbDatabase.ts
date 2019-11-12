@@ -1,12 +1,8 @@
 import { app, remote } from "electron";
 import path from "path";
 import Datastore from "nedb";
-import {
-  LocalDatabase,
-  USER_DATA_DIR,
-  DatabaseNotInitializedError,
-  nonDocFields
-} from "./databaseUtil";
+import { USER_DATA_DIR, nonDocFields } from "./databaseUtil";
+import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
 export class NeDbDatabase implements LocalDatabase {
   dbName: string;

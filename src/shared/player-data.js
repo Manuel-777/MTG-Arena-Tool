@@ -3,7 +3,7 @@ const ipc = electron.ipcRenderer;
 import _ from "lodash";
 import { DEFAULT_TILE, BLACK, BLUE, GREEN, RED, WHITE } from "./constants";
 import db from "./database";
-import { playerDefaults } from "./databaseUtil";
+import { playerDefaults } from "./db/databaseUtil";
 
 const playerDataDefault = {
   name: "",
