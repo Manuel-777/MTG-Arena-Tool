@@ -36,7 +36,7 @@ const SCALAR = 0.71808510638; // ???
 
 export interface CardDetailsWindowletProps {
   arenaState: number;
-  card?: DbCardData | any;
+  card?: DbCardData | any; // TODO remove group lands hack
   cardsSizeHoverCard: number;
   editMode: boolean;
   odds?: OddsData;
@@ -63,8 +63,7 @@ export default function CardDetailsWindowlet(
     overlayScale
   } = props;
 
-  // This is hackish.. the way we insert our custom elements in the
-  // array of cards is wrong in the first place :()
+  // TODO remove group lands hack
   const isCardGroupedLands = card && card.id === 100 && odds;
   // TODO support split cards
   let name = "";

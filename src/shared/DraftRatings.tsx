@@ -12,7 +12,6 @@ interface DraftRankValueProps {
 function DraftRankValue(props: DraftRankValueProps) {
   const { index, rankValue, maxValue } = props;
   const rv = 12 - index;
-  // TODO properly type this after #684 lands
   const rank = DRAFT_RANKS[rv];
   const colorClass = getRankColorClass(rank);
   return (

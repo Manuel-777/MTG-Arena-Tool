@@ -18,7 +18,7 @@ import { addCardHover } from "./card-hover";
 import { DbCardData } from "./types/Metadata";
 
 export interface CardTileProps {
-  card: DbCardData | any;
+  card: DbCardData | any; // TODO remove group lands hack
   deck?: Deck;
   dfcCard?: DbCardData;
   indent: string;
@@ -403,8 +403,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
 
 export default function CardTile(props: CardTileProps): JSX.Element {
   const { card, quantity } = props;
-  // This is hackish.. the way we insert our custom elements in the
-  // array of cards is wrong in the first place :()
+  // TODO remove group lands hack
   const haxxorProps = { ...props };
   if (card.id && typeof card.id === "object" && card.id.name) {
     haxxorProps.card = card.id;

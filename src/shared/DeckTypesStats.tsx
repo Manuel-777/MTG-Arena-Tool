@@ -10,8 +10,7 @@ function getDeckTypesAmount(deck: DeckData): { [key: string]: number } {
   if (!deck.mainDeck) return types;
 
   deck.mainDeck.forEach(function(card: CardData | any) {
-    // This is hackish.. the way we insert our custom elements in the
-    // array of cards is wrong in the first place :()
+    // TODO remove group lands hack
     if (card.id.id && card.id.id == 100) {
       types.lan += card.quantity;
       return;

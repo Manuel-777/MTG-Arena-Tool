@@ -180,8 +180,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
       quantity = DRAFT_RANKS[rank];
     }
 
-    // This is hackish.. the way we insert our custom elements in the
-    // array of cards is wrong in the first place :()
+    // TODO remove group lands hack
     const isCardGroupedLands =
       card && card.id && card.id.id && card.id.id === 100;
 
