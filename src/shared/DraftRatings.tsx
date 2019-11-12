@@ -1,9 +1,16 @@
 import * as React from "react";
 import { DRAFT_RANKS } from "./constants";
 import { getRankColorClass } from "./util";
+import { DbCardData } from "./types/Metadata";
 
-function DraftRankValue(_props) {
-  const { index, rankValue, maxValue } = _props;
+interface DraftRankValueProps {
+  index: number;
+  rankValue: number;
+  maxValue: number;
+}
+
+function DraftRankValue(props: DraftRankValueProps) {
+  const { index, rankValue, maxValue } = props;
   const rv = 12 - index;
   // TODO properly type this after #684 lands
   const rank = DRAFT_RANKS[rv];
@@ -19,8 +26,8 @@ function DraftRankValue(_props) {
   );
 }
 
-export default function DraftRatings(_props) {
-  const { card } = _props;
+export default function DraftRatings(props: { card: DbCardData }) {
+  const { card } = props;
   const { rank } = card;
   const rankValues = card.rank_values || [];
   const rankControversy = card.rank_controversy;
