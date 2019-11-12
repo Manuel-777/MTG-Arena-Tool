@@ -1,9 +1,34 @@
 import { app, remote } from "electron";
 import path from "path";
 import Datastore from "nedb";
-import { USER_DATA_DIR, nonDocFields } from "./databaseUtil";
+import { USER_DATA_DIR } from "./databaseUtil";
 import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
+// manually maintained list of non-document (non-object) fields
+// we need this to migrate to nedb since it can only store documents
+const nonDocFields = [
+  "email",
+  "token",
+  "logUri",
+  "economy_index",
+  "deck_changes_index",
+  "courses_index",
+  "matches_index",
+  "draft_index",
+  "decks_last_used",
+  "static_decks",
+  "static_events"
+];
+
+/**
+ * This style of database uses nedb:
+ *   https://github.com/louischatriot/nedb
+ * This class gives it a thin wrapper that also allows us to:
+ *   - call upsertAll (horrid recursive nested upsert)
+ *   - use hacky logic to wrap "bare" values in proper documents
+ *   - use hacky logic to combine together settings.json and remember.json
+ *   - sanitize certain MongoDb fields (only _id so far)
+ */
 export class NeDbDatabase implements LocalDatabase {
   dbName: string;
   useBulkFirstpass: boolean;

@@ -172,22 +172,6 @@ export const playerDefaults = {
   tags_colors: {}
 };
 
-// manually maintained list of non-document (non-object) fields
-// we need this to migrate to nedb since it can only store documents
-export const nonDocFields = [
-  "email",
-  "token",
-  "logUri",
-  "economy_index",
-  "deck_changes_index",
-  "courses_index",
-  "matches_index",
-  "draft_index",
-  "decks_last_used",
-  "static_decks",
-  "static_events"
-];
-
 export const USER_DATA_DIR = (app || remote.app).getPath("userData");
 
 export function defaultCallback(

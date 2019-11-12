@@ -2,6 +2,13 @@ import { ElectronStoreDatabase } from "./ElectronStoreDatabase";
 import { NeDbDatabase } from "./NeDbDatabase";
 import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
+/**
+ * This style of database helps provide a smooth transition between 2 different
+ * LocalDatabases by running them simultaneously. The oldDb is the "golden"
+ * data source used for all reads. All writes go to both databases. Since this
+ * class does not attempt to bulk synchronize by itself, it is mostly a tool
+ * for keeping all future changes synchronized during the transition.
+ */
 export class MigrationDatabase implements LocalDatabase {
   oldDb?: LocalDatabase;
   newDb?: LocalDatabase;

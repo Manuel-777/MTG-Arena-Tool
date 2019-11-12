@@ -9,6 +9,10 @@ export class DatabaseNotInitializedError extends Error {
   }
 }
 
+/**
+ * This represents a common API for any of the ways we know how to read and
+ * write to the file system.
+ */
 export interface LocalDatabase {
   dbName: string;
   filePath: string;

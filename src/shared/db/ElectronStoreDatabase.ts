@@ -9,6 +9,13 @@ import {
 } from "./databaseUtil";
 import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
+/**
+ * This style of database uses electron-store:
+ *   https://github.com/sindresorhus/electron-store
+ * It was our original persistence tier and better suited for synchronous
+ * writes of smaller amounts of data. This class simply wraps it to provide
+ * a standard MongoDb-like API.
+ */
 export class ElectronStoreDatabase implements LocalDatabase {
   dbName: string;
   rememberStore?: Store<any>;
