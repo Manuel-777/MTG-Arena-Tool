@@ -525,6 +525,7 @@ function resetWindows() {
   });
   // reset main to primary
   mainWindow.setBounds({ ...bounds, width: 800, height: 600 });
+  mainWindow.show();
   mainWindow.moveTop();
   saveWindowPos();
 }
