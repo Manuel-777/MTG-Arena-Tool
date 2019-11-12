@@ -134,7 +134,7 @@ export function openSettingsTab(
     createDiv(["settings_nav", "sn" + SETTINGS_BEHAVIOUR], "Behaviour")
   );
   wrap_l.appendChild(
-    createDiv(["settings_nav", "sn" + SETTINGS_ARENA_DATA], "Arena Data")
+    createDiv(["settings_nav", "sn" + SETTINGS_ARENA_DATA], "Data")
   );
   wrap_l.appendChild(
     createDiv(["settings_nav", "sn" + SETTINGS_OVERLAY], "Overlay")
@@ -212,7 +212,7 @@ export function openSettingsTab(
 
   // DATA
   section = createDiv(["settings_section", "ss" + SETTINGS_ARENA_DATA]);
-  appendArenaData(section);
+  appendDataSection(section);
   div.appendChild(section);
 
   // OVERLAY
@@ -348,7 +348,7 @@ function appendBehaviour(section) {
   section.appendChild(textDiv);
 }
 
-function appendArenaData(section) {
+function appendDataSection(section) {
   section.appendChild(createDiv(["settings_title"], "Arena Data"));
 
   let label = createLabel(["but_container_label"], "Cards language:");
@@ -460,6 +460,33 @@ function appendArenaData(section) {
       });
     }
   }, 100);
+
+  section.appendChild(createDiv(["settings_title"], "Local Data"));
+  section.appendChild(
+    createDiv(
+      ["settings_note"],
+      `<p>Current application settings:
+           <a class="link app_db_link"></a></p>
+       <p>Current player settings and history:
+           <a class="link player_db_link"></a></p>`
+    )
+  );
+  setTimeout(() => {
+    const appDbLink = $$(".app_db_link")[0];
+    if (appDbLink) {
+      appDbLink.innerHTML = pd.appDbPath;
+      appDbLink.addEventListener("click", () => {
+        shell.showItemInFolder(pd.appDbPath);
+      });
+    }
+    const playerDbLink = $$(".player_db_link")[0];
+    if (playerDbLink) {
+      playerDbLink.innerHTML = pd.playerDbPath;
+      playerDbLink.addEventListener("click", () => {
+        shell.showItemInFolder(pd.playerDbPath);
+      });
+    }
+  }, 500);
 }
 
 function appendOverlay(section) {

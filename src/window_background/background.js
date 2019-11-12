@@ -123,6 +123,7 @@ ipc.on("download_metadata", downloadMetadata);
 
 //
 ipc.on("start_background", function() {
+  setData({ appDbPath: globals.rStore.path }, false);
   fixBadSettingsData();
 
   // first time during bootstrapping that we load
