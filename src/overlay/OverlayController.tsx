@@ -21,6 +21,7 @@ import {
 } from "./overlayUtil";
 import CardDetailsWindowlet from "./CardDetailsWindowlet";
 import OverlayWindowlet from "./OverlayWindowlet";
+import { DbCardData } from "../shared/types/Metadata";
 
 const sound = new Howl({ src: ["../sounds/blip.mp3"] });
 
@@ -75,7 +76,7 @@ export default function OverlayController(): JSX.Element {
   };
   const [settings, setSettings] = useState(playerData.settings as SettingsData);
   const [lastBeep, setLastBeep] = useState(Date.now());
-  const [hoverCard, setHoverCard] = useState(undefined);
+  const [hoverCard, setHoverCard] = useState(undefined as undefined | DbCardData);
 
   const {
     overlay_scale: overlayScale,
@@ -254,7 +255,7 @@ export default function OverlayController(): JSX.Element {
     match,
     settings,
     setDraftStateCallback: setDraftState,
-    setHoverCardCallback: (card: any): void => setHoverCard(card),
+    setHoverCardCallback: (card?: DbCardData): void => setHoverCard(card),
     setOddsCallback,
     turnPriority
   };

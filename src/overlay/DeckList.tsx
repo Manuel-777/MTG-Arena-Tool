@@ -23,6 +23,7 @@ import OwnershipStars from "../shared/OwnershipStars";
 
 import { CardData, OddsData, OverlaySettingsData } from "./overlayUtil";
 import SampleSizePanel from "./SampleSizePanel";
+import { DbCardData } from "../shared/types/Metadata";
 
 const landsCard = {
   id: 100,
@@ -102,7 +103,7 @@ export interface DeckListProps {
   settings: OverlaySettingsData;
   tileStyle: number;
   cardOdds?: OddsData;
-  setHoverCardCallback: (card: any) => void;
+  setHoverCardCallback: (card?: DbCardData) => void;
   setOddsCallback?: (sampleSize: number) => void;
 }
 
@@ -188,9 +189,9 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     if (card && card.id && !isCardGroupedLands) {
       fullCard = db.card(card.id);
     }
-    let dfcCard = null;
+    let dfcCard;
     if (card && card.dfcId) {
-      dfcCard = db.card(card.dfcId);
+      dfcCard = db.card(card.dfcId) || undefined;
     }
     if (settings.mode === OVERLAY_DRAFT) {
       mainCardTiles.push(
@@ -239,11 +240,11 @@ export default function DeckList(props: DeckListProps): JSX.Element {
           : card.quantity;
       let fullCard = card;
       if (card && card.id) {
-        fullCard = db.card(card.id);
+        fullCard = db.card(card.id) || undefined;
       }
       let dfcCard;
       if (card && card.dfcId) {
-        dfcCard = db.card(card.dfcId);
+        dfcCard = db.card(card.dfcId) || undefined;
       }
       sideboardCardTiles.push(
         <CardTile

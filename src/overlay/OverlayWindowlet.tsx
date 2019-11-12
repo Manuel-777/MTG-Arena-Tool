@@ -18,6 +18,7 @@ import {
 } from "./overlayUtil";
 import DraftElements from "./DraftElements";
 import MatchElements from "./MatchElements";
+import { DbCardData } from "../shared/types/Metadata";
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -34,7 +35,7 @@ export interface OverlayWindowletProps {
   match?: MatchData;
   settings: SettingsData;
   setDraftStateCallback: (state: DraftState) => void;
-  setHoverCardCallback: (card: any) => void;
+  setHoverCardCallback: (card?: DbCardData) => void;
   setOddsCallback: (sampleSize: number) => void;
   turnPriority: number;
 }

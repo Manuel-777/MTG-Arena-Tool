@@ -7,6 +7,7 @@ import { getCardImage } from "../shared/util";
 import DraftRatings from "../shared/DraftRatings";
 
 import { getEditModeClass, useEditModeOnRef, OddsData } from "./overlayUtil";
+import { DbCardData } from "../shared/types/Metadata";
 
 const NO_IMG_URL = "./images/nocard.png";
 
@@ -35,7 +36,7 @@ const SCALAR = 0.71808510638; // ???
 
 export interface CardDetailsWindowletProps {
   arenaState: number;
-  card?: any;
+  card?: DbCardData | any;
   cardsSizeHoverCard: number;
   editMode: boolean;
   odds?: OddsData;
@@ -65,19 +66,17 @@ export default function CardDetailsWindowlet(
   // This is hackish.. the way we insert our custom elements in the
   // array of cards is wrong in the first place :()
   const isCardGroupedLands = card && card.id === 100 && odds;
-
-  const fullCard = card && !isCardGroupedLands ? db.card(card.id) : null;
   // TODO support split cards
   let name = "";
   let images = {};
-  if (fullCard) {
-    name = fullCard.name;
-    images = fullCard.images;
+  if (card) {
+    name = card.name;
+    images = card.images;
   }
   const imgProps = {
     alt: name,
     className: "main_hover",
-    src: images ? getCardImage(fullCard) : NO_IMG_URL,
+    src: images ? getCardImage(card) : NO_IMG_URL,
     style: {
       width: cardsSizeHoverCard + "px",
       height: cardsSizeHoverCard / SCALAR + "px"
@@ -113,10 +112,10 @@ export default function CardDetailsWindowlet(
           unmountOnExit
         >
           <div style={{ display: "flex" }}>
-            {!!fullCard && <img {...imgProps} />}
-            {!!fullCard && arenaState === ARENA_MODE_DRAFT && (
+            {!!card && <img {...imgProps} />}
+            {!!card && arenaState === ARENA_MODE_DRAFT && (
               <div className="main_hover_ratings">
-                <DraftRatings card={fullCard} />
+                <DraftRatings card={card} />
               </div>
             )}
             {isCardGroupedLands && odds && <GroupedLandsDetails odds={odds} />}

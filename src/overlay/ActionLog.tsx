@@ -5,11 +5,12 @@ import db from "../shared/database";
 import { openScryfallCard } from "../shared/util";
 
 import { LogData } from "./overlayUtil";
+import { DbCardData } from "../shared/types/Metadata";
 
 interface LogEntryProps {
   initialTime: Date;
   log: LogData;
-  setHoverCardCallback: (card: any) => void;
+  setHoverCardCallback: (card?: DbCardData) => void;
 }
 
 function LogEntry(props: LogEntryProps): JSX.Element {
@@ -26,7 +27,7 @@ function LogEntry(props: LogEntryProps): JSX.Element {
   }, [fullCard, setHoverCardCallback]);
   const handleMouseLeave = useCallback((): void => {
     setMouseHovering(false);
-    setHoverCardCallback(null);
+    setHoverCardCallback();
   }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = fullCard;
@@ -75,7 +76,7 @@ function LogEntry(props: LogEntryProps): JSX.Element {
 
 export default function ActionLog(props: {
   actionLog: LogData[];
-  setHoverCardCallback: (card: any) => void;
+  setHoverCardCallback: (card?: DbCardData) => void;
 }): JSX.Element {
   const { actionLog, setHoverCardCallback } = props;
   const containerRef = useRef(null);
