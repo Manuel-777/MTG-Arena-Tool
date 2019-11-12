@@ -10,7 +10,7 @@ import {
   ARENA_MODE_DRAFT,
   OVERLAY_DRAFT_MODES
 } from "./shared/constants";
-import { appDb } from "./shared/local-database";
+import { appDb } from "./shared/LocalDatabase";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 

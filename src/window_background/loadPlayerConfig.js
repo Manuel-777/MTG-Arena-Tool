@@ -5,7 +5,7 @@ import { IPC_BACKGROUND } from "../shared/constants";
 
 import { ipc_send as ipcSend, setData } from "./background-util";
 import globals from "./globals";
-import { appDb, playerDb, playerDbLegacy } from "../shared/local-database";
+import { appDb, playerDb, playerDbLegacy } from "../shared/LocalDatabase";
 import playerData from "../shared/player-data";
 import arenaLogWatcher from "./arena-log-watcher";
 
