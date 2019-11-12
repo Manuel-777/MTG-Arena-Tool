@@ -502,11 +502,16 @@ label {
 
 .button:hover {
     opacity: 1;
-    background-color: rgba(231, 202, 142, 0.25);
     -webkit-transform: rotate(-90deg);
 }
 
 .button.minimize:hover {
+    opacity: 1;
+    background-color: rgba(231, 202, 142, 0.25);
+    -webkit-transform: rotate(0deg);
+}
+
+.button.settings:hover {
     opacity: 1;
     background-color: rgba(231, 202, 142, 0.25);
     -webkit-transform: rotate(0deg);
