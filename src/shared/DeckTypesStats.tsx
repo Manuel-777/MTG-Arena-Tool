@@ -2,12 +2,14 @@ import * as React from "react";
 
 import { CARD_TYPES, CARD_TYPE_CODES } from "./constants";
 import db from "./database";
+import { DeckData } from "../window_background/data";
+import { CardData } from "../overlay/overlayUtil";
 
-function getDeckTypesAmount(deck: any): { [key: string]: number } {
+function getDeckTypesAmount(deck: DeckData): { [key: string]: number } {
   const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
   if (!deck.mainDeck) return types;
 
-  deck.mainDeck.forEach(function(card: any) {
+  deck.mainDeck.forEach(function(card: CardData | any) {
     // This is hackish.. the way we insert our custom elements in the
     // array of cards is wrong in the first place :()
     if (card.id.id && card.id.id == 100) {
@@ -29,7 +31,7 @@ function getDeckTypesAmount(deck: any): { [key: string]: number } {
   return types;
 }
 
-export default function DeckTypesStats(props: { deck: any }): JSX.Element {
+export default function DeckTypesStats(props: { deck: DeckData }): JSX.Element {
   const { deck } = props;
   const cardTypes = getDeckTypesAmount(deck);
   return (
