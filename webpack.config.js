@@ -1,12 +1,13 @@
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
+const path = require("path");
+const nodeExternals = require("webpack-node-externals");
 
-const isProduction = typeof NODE_ENV !== 'undefined' && NODE_ENV === 'production';
-const mode = isProduction ? 'production' : 'development';
-const devtool = isProduction ? false : 'inline-source-map';
+const isProduction =
+  typeof NODE_ENV !== "undefined" && NODE_ENV === "production";
+const mode = isProduction ? "production" : "development";
+const devtool = isProduction ? false : "inline-source-map";
 
 const baseConfig = {
-  target: 'node',
+  target: "node",
   mode,
   devtool,
   externals: [nodeExternals()],
@@ -14,8 +15,8 @@ const baseConfig = {
     rules: [
       {
         test: /\.ts$/,
-        enforce: 'pre',
-        loader: 'tslint-loader',
+        enforce: "pre",
+        loader: "tslint-loader",
         exclude: /node_modules/,
         options: {
           typeCheck: true,
@@ -24,42 +25,46 @@ const baseConfig = {
       },
       {
         test: /\.tsx?$/,
-        loader: 'ts-loader'
+        loader: "ts-loader"
       }
     ]
   },
   resolve: {
-    extensions: ['.js', '.ts', '.tsx', '.jsx', '.json']
+    extensions: [".js", ".ts", ".tsx", ".jsx", ".json"]
   }
 };
 
 module.exports = [
-  {...baseConfig,
-    entry: './src/main.js',
+  {
+    ...baseConfig,
+    entry: "./src/main.js",
     output: {
-      filename: 'main.js',
-      path: path.join(__dirname, 'dist')
+      filename: "main.js",
+      path: path.join(__dirname, "dist")
     }
   },
-  {...baseConfig,
-    entry: './src/window_background/background.js',
+  {
+    ...baseConfig,
+    entry: "./src/window_background/background.js",
     output: {
-      filename: 'background.js',
-      path: path.join(__dirname, 'dist')
+      filename: "background.js",
+      path: path.join(__dirname, "dist")
     }
   },
-  {...baseConfig,
-    entry: './src/window_main/renderer.js',
+  {
+    ...baseConfig,
+    entry: "./src/window_main/renderer.js",
     output: {
-      filename: 'renderer.js',
-      path: path.join(__dirname, 'dist')
+      filename: "renderer.js",
+      path: path.join(__dirname, "dist")
     }
   },
-  {...baseConfig,
-    entry: './src/overlay/overlay.tsx',
+  {
+    ...baseConfig,
+    entry: "./src/overlay/index.tsx",
     output: {
-      filename: 'overlay.tsx',
-      path: path.join(__dirname, 'dist')
+      filename: "overlay.tsx",
+      path: path.join(__dirname, "dist")
     }
   }
 ];
