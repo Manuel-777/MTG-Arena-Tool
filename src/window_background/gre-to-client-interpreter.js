@@ -65,9 +65,9 @@ const cardTypes = [
 
 const gameObjectCardTypes = [
   "GameObjectType_Card",
-  "GameObjectType_SplitCard",
-  "GameObjectType_SplitLeft",
-  "GameObjectType_SplitRight"
+  "GameObjectType_SplitCard"
+  // "GameObjectType_SplitLeft",
+  // "GameObjectType_SplitRight"
 ];
 
 function isObjectACard(card) {
