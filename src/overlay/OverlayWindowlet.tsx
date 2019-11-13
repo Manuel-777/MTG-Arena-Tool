@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import {
   ARENA_MODE_MATCH,
   ARENA_MODE_DRAFT,
+  ARENA_MODE_IDLE,
   COLORS_ALL,
   OVERLAY_DRAFT_MODES
 } from "../shared/constants";
@@ -93,7 +94,8 @@ export default function OverlayWindowlet(
     (OVERLAY_DRAFT_MODES.includes(overlaySettings.mode) &&
       arenaState === ARENA_MODE_DRAFT) ||
     (!OVERLAY_DRAFT_MODES.includes(overlaySettings.mode) &&
-      arenaState === ARENA_MODE_MATCH);
+      arenaState === ARENA_MODE_MATCH) ||
+      (editMode && arenaState === ARENA_MODE_IDLE);
   const isVisible =
     overlaySettings.show && (currentModeApplies || overlaySettings.show_always);
   const tileStyle = parseInt(settings.card_tile_style + "");

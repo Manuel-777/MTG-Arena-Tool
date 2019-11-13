@@ -191,12 +191,8 @@ export default function OverlayController(): JSX.Element {
   );
 
   const handleSettingsUpdated = useCallback((): void => {
-    // mid-match Arena updates can make edit-mode difficult
-    // temporarily allow the overlays to go stale during editing
-    // (should be okay since ending edit-mode causes a refresh)
-    if (editMode) return;
     setSettings({ ...playerData.settings });
-  }, [editMode]);
+  }, []);
 
   const handleSetMatch = useCallback((event: unknown, arg: string): void => {
     const newMatch = JSON.parse(arg);

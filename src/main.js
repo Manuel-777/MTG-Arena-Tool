@@ -44,6 +44,7 @@ let mainLoaded = false;
 let backLoaded = false;
 let overlayLoaded = false;
 let arenaState = ARENA_MODE_IDLE;
+let isEditMode = false;
 
 const singleLock = app.requestSingleInstanceLock();
 
@@ -225,6 +226,12 @@ function startApp() {
           // set progress to >1 for indeterminate time
           mainWindow.setProgressBar(arg.progress);
         }
+        break;
+
+      case "edit":
+        isEditMode = !isEditMode;
+        updateOverlayVisibility();
+        overlay.webContents.send("edit");
         break;
 
       case "renderer_window_minimize":
@@ -447,7 +454,8 @@ function getOverlayVisible(settings) {
     (OVERLAY_DRAFT_MODES.includes(settings.mode) &&
       arenaState === ARENA_MODE_DRAFT) ||
     (!OVERLAY_DRAFT_MODES.includes(settings.mode) &&
-      arenaState === ARENA_MODE_MATCH);
+      arenaState === ARENA_MODE_MATCH) ||
+    (isEditMode && arenaState === ARENA_MODE_IDLE);
 
   return settings.show && (currentModeApplies || settings.show_always);
 }
@@ -618,7 +626,7 @@ function createMainWindow() {
       }
     },
     {
-      label: "Edit Mode",
+      label: "Edit Overlay Positions",
       click: () => {
         overlay.webContents.send("edit");
       }
