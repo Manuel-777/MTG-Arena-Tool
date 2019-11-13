@@ -276,6 +276,11 @@ export default function OverlayController(): JSX.Element {
       {!!overlays &&
         overlays.map((overlaySettings: OverlaySettingsData, index: number) => {
           const overlayProps = {
+            handleHoverEditToggle: (): void => {
+              if (pd.name === "Manuel777#63494") {
+                handleBeep();
+              }
+            },
             handleClickSettings: (): void => {
               ipcSend("renderer_show");
               ipcSend("force_open_overlay_settings", index, IPC_MAIN);

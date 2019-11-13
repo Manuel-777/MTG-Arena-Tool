@@ -30,6 +30,7 @@ export interface OverlayWindowletProps {
   editMode: boolean;
   handleClickClose: () => void;
   handleClickSettings: () => void;
+  handleHoverEditToggle: () => void;
   handleToggleEditMode: () => void;
   index: number;
   match?: MatchData;
@@ -57,6 +58,7 @@ export default function OverlayWindowlet(
     editMode,
     handleClickClose,
     handleClickSettings,
+    handleHoverEditToggle,
     handleToggleEditMode,
     index,
     match,
@@ -161,6 +163,7 @@ export default function OverlayWindowlet(
           <div
             className="flex_item overlay_icon click-on"
             onClick={handleToggleEditMode}
+            onMouseEnter={handleHoverEditToggle}
             style={{ backgroundColor: `var(--color-${COLORS_ALL[index]})` }}
           />
           <div
