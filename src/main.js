@@ -44,7 +44,7 @@ let mainLoaded = false;
 let backLoaded = false;
 let overlayLoaded = false;
 let arenaState = ARENA_MODE_IDLE;
-let isEditMode = false;
+let editMode = false;
 
 const singleLock = app.requestSingleInstanceLock();
 
@@ -373,8 +373,8 @@ function setArenaState(state) {
 }
 
 function toggleEditMode() {
-  isEditMode = !isEditMode;
-  overlay.webContents.send("set_edit_mode", isEditMode);
+  editMode = !editMode;
+  overlay.webContents.send("set_edit_mode", editMode);
   updateOverlayVisibility();
 }
 
@@ -451,15 +451,25 @@ function isEntireOverlayVisible() {
   return overlay.isVisible();
 }
 
+/**
+ * Computes whether an Overlay windowlet should be visible based on the
+ * specified current overlay settings and Arena state. For example, given
+ * overlay settings for a draft-mode overlay, it will return true iff Arena
+ * is currently in a draft or idle.
+ *
+ * @param OverlaySettingsData settings
+ */
 function getOverlayVisible(settings) {
   if (!settings) return false;
 
+  // Note: ensure this logic matches the logic in OverlayWindowlet
+  // TODO: extract a common utility?
   const currentModeApplies =
     (OVERLAY_DRAFT_MODES.includes(settings.mode) &&
       arenaState === ARENA_MODE_DRAFT) ||
     (!OVERLAY_DRAFT_MODES.includes(settings.mode) &&
       arenaState === ARENA_MODE_MATCH) ||
-    (isEditMode && arenaState === ARENA_MODE_IDLE);
+    (editMode && arenaState === ARENA_MODE_IDLE);
 
   return settings.show && (currentModeApplies || settings.show_always);
 }

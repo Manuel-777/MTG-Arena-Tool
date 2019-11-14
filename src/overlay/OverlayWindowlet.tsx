@@ -90,6 +90,8 @@ export default function OverlayWindowlet(
   //   xhr.send();
   // }, [backgroundImage]);
   const overlaySettings = settings.overlays[index];
+  // Note: ensure this logic matches the logic in main.getOverlayVisible
+  // TODO: extract a common utility?
   const currentModeApplies =
     (OVERLAY_DRAFT_MODES.includes(overlaySettings.mode) &&
       arenaState === ARENA_MODE_DRAFT) ||

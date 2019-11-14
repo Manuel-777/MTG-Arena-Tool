@@ -465,9 +465,7 @@ function appendArenaData(section) {
 function appendOverlay(section) {
   section.appendChild(createDiv(["settings_title"], "Overlays"));
 
-  const displayControls = createDiv([]);
-  displayControls.style.display = "inline-flex";
-  displayControls.style.marginLeft = "16px";
+  const displayControls = createDiv(["settings_row"]);
   // Toggle Edit Mode Button
   const editModeButton = createDiv(
     ["button_simple"],
