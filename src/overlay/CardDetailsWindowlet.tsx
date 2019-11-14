@@ -6,7 +6,12 @@ import db from "../shared/database";
 import { getCardImage } from "../shared/util";
 import DraftRatings from "../shared/DraftRatings";
 
-import { getEditModeClass, useEditModeOnRef, OddsData } from "./overlayUtil";
+import {
+  getEditModeClass,
+  useEditModeOnRef,
+  OddsData,
+  SettingsData
+} from "./overlayUtil";
 import { DbCardData } from "../shared/types/Metadata";
 
 const NO_IMG_URL = "./images/nocard.png";
@@ -39,9 +44,11 @@ export interface CardDetailsWindowletProps {
   card?: DbCardData | any; // TODO remove group lands hack
   cardsSizeHoverCard: number;
   editMode: boolean;
+  handleToggleEditMode: () => void;
   odds?: OddsData;
   overlayHover: { x: number; y: number };
   overlayScale: number;
+  settings: SettingsData;
 }
 
 /**
@@ -57,10 +64,12 @@ export default function CardDetailsWindowlet(
     arenaState,
     card,
     cardsSizeHoverCard,
+    handleToggleEditMode,
     editMode,
     odds,
     overlayHover,
-    overlayScale
+    overlayScale,
+    settings
   } = props;
 
   // TODO remove group lands hack
@@ -100,7 +109,11 @@ export default function CardDetailsWindowlet(
       }}
     >
       {editMode ? (
-        <div>
+        <div
+          onDoubleClick={handleToggleEditMode}
+          title={`${settings.shortcut_editmode} or double click me
+to stop editing overlay positions`}
+        >
           <img {...imgProps} />
         </div>
       ) : (

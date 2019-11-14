@@ -266,9 +266,11 @@ export default function OverlayController(): JSX.Element {
     card: hoverCard,
     cardsSizeHoverCard,
     editMode,
+    handleToggleEditMode,
     odds: match ? match.playerCardsOdds : undefined,
     overlayHover,
-    overlayScale
+    overlayScale,
+    settings
   };
 
   return (
