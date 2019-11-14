@@ -41,6 +41,10 @@ export interface OverlayWindowletProps {
   turnPriority: number;
 }
 
+function isOverlayDraftMode(mode: number) {
+  return OVERLAY_DRAFT_MODES.some(draftMode => draftMode === mode);
+}
+
 /**
  * This is a display component that renders one of the numbered overlay
  * window widgets. This only renders the outer chrome display and delegates
@@ -93,11 +97,11 @@ export default function OverlayWindowlet(
   // Note: ensure this logic matches the logic in main.getOverlayVisible
   // TODO: extract a common utility?
   const currentModeApplies =
-    (OVERLAY_DRAFT_MODES.includes(overlaySettings.mode) &&
+    (isOverlayDraftMode(overlaySettings.mode) &&
       arenaState === ARENA_MODE_DRAFT) ||
-    (!OVERLAY_DRAFT_MODES.includes(overlaySettings.mode) &&
+    (!isOverlayDraftMode(overlaySettings.mode) &&
       arenaState === ARENA_MODE_MATCH) ||
-      (editMode && arenaState === ARENA_MODE_IDLE);
+    (editMode && arenaState === ARENA_MODE_IDLE);
   const isVisible =
     overlaySettings.show && (currentModeApplies || overlaySettings.show_always);
   const tileStyle = parseInt(settings.card_tile_style + "");
@@ -108,7 +112,7 @@ export default function OverlayWindowlet(
     setHoverCardCallback,
     tileStyle
   };
-  if (draft && OVERLAY_DRAFT_MODES.includes(overlaySettings.mode)) {
+  if (draft && isOverlayDraftMode(overlaySettings.mode)) {
     const props = {
       ...commonProps,
       draft,
