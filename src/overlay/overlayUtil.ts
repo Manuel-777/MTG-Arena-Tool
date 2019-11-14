@@ -5,10 +5,11 @@ import interact from "interactjs";
 import Deck from "../shared/deck";
 
 export interface CardData {
-  id: string;
+  id: number;
   quantity: number;
   chance?: number;
   dfcId?: string;
+  measurable?: boolean;
 }
 
 export interface LogData {
