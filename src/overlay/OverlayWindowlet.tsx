@@ -161,9 +161,13 @@ export default function OverlayWindowlet(
       {overlaySettings.top && (
         <div className="outer_wrapper top_nav_wrapper">
           <div
-            className="flex_item overlay_icon click-on"
+            className="button overlay_icon click-on"
             onClick={handleToggleEditMode}
-            style={{ backgroundColor: `var(--color-${COLORS_ALL[index]})` }}
+            style={{
+              backgroundColor: `var(--color-${COLORS_ALL[index]})`,
+              marginRight: "auto"
+            }}
+            title={settings.shortcut_editmode}
           />
           <div
             className="button settings click-on"
