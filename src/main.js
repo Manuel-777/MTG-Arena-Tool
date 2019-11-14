@@ -228,10 +228,8 @@ function startApp() {
         }
         break;
 
-      case "edit":
-        isEditMode = !isEditMode;
-        updateOverlayVisibility();
-        overlay.webContents.send("edit");
+      case "toggle_edit_mode":
+        toggleEditMode();
         break;
 
       case "renderer_window_minimize":
@@ -374,6 +372,12 @@ function setArenaState(state) {
   updateOverlayVisibility();
 }
 
+function toggleEditMode() {
+  isEditMode = !isEditMode;
+  overlay.webContents.send("set_edit_mode", isEditMode);
+  updateOverlayVisibility();
+}
+
 function setSettings(_settings) {
   try {
     settings = JSON.parse(_settings);
@@ -393,7 +397,7 @@ function setSettings(_settings) {
       openOverlayDevTools
     );
     globalShortcut.register(settings.shortcut_editmode, () => {
-      overlay.webContents.send("edit");
+      toggleEditMode();
     });
     settings.overlays.forEach((_settings, index) => {
       let short = "shortcut_overlay_" + (index + 1);
@@ -438,8 +442,8 @@ function updateOverlayVisibility() {
         .getAllDisplays()
         .find(d => d.id == settings.overlay_display) ||
       electron.screen.getPrimaryDisplay();
-    overlay.show();
     overlay.setBounds(bounds);
+    overlay.show();
   }
 }
 
@@ -628,7 +632,7 @@ function createMainWindow() {
     {
       label: "Edit Overlay Positions",
       click: () => {
-        overlay.webContents.send("edit");
+        toggleEditMode();
       }
     },
     {

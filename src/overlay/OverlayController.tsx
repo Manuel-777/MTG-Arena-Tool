@@ -103,10 +103,15 @@ export default function OverlayController(): JSX.Element {
     }
   }, [lastBeep, soundPriorityVolume]);
 
+  const handleToggleEditMode = useCallback(() => ipcSend("toggle_edit_mode"), []);
+
   // Note: no useCallback because of dependency on deep overlays state
-  const handleToggleEditMode = (): void => {
+  const handleSetEditMode = (
+    event: unknown,
+    _editMode: boolean
+  ) => {
     // Save current windowlet dimensions before we leave edit mode
-    if (editMode) {
+    if (editMode && !_editMode) {
       // Compute current dimensions of overlay windowlets in DOM
       const newOverlays = overlays.map(
         (overlay: OverlaySettingsData, index: number) => {
@@ -141,8 +146,7 @@ export default function OverlayController(): JSX.Element {
         skip_refresh: true
       });
     }
-    // Always toggle edit mode
-    setEditMode(!editMode);
+    setEditMode(_editMode);
   };
 
   const handleActionLog = useCallback(
@@ -220,7 +224,7 @@ export default function OverlayController(): JSX.Element {
   // register all IPC listeners
   useEffect(() => {
     ipc.on("action_log", handleActionLog);
-    ipc.on("edit", handleToggleEditMode);
+    ipc.on("set_edit_mode", handleSetEditMode);
     ipc.on("close", handleClose);
     ipc.on("set_arena_state", handleSetArenaState);
     ipc.on("set_draft_cards", handleSetDraftCards);
@@ -231,7 +235,7 @@ export default function OverlayController(): JSX.Element {
     return (): void => {
       // unregister all IPC listeners
       ipc.removeListener("action_log", handleActionLog);
-      ipc.removeListener("edit", handleToggleEditMode);
+      ipc.removeListener("set_edit_mode", handleSetEditMode);
       ipc.removeListener("close", handleClose);
       ipc.removeListener("set_arena_state", handleSetArenaState);
       ipc.removeListener("set_draft_cards", handleSetDraftCards);

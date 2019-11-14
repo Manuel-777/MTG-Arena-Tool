@@ -22,8 +22,7 @@ import {
   SETTINGS_SHORTCUTS,
   SETTINGS_PRIVACY,
   SETTINGS_ABOUT,
-  SETTINGS_LOGIN,
-  IPC_OVERLAY
+  SETTINGS_LOGIN
 } from "../shared/constants";
 import db from "../shared/database";
 import pd from "../shared/player-data";
@@ -476,7 +475,7 @@ function appendOverlay(section) {
     { title: pd.settings.shortcut_editmode }
   );
   editModeButton.addEventListener("click", function() {
-    ipcSend("edit", null, IPC_OVERLAY);
+    ipcSend("toggle_edit_mode");
   });
   displayControls.appendChild(editModeButton);
   // Set Overlay Display Screen
