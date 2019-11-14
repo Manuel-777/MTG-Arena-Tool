@@ -25,16 +25,18 @@ Toggle Edit mode (default `Alt + Shift + E`) or toggle an overlay.
 This is probably caused by an error reading the user configuration, probably due to an unhandled exception or new data added from MTGA that mtgatool is not handling properly. Bear in mind this issue is **not** because of a bad or improper installation, so reinstalling will make no difference. Altrough, you can roll back to a previous version safely if an update caused it.
 
 Locate your log and config files;
+- Go to the MTG Arena Tool "Settings" page (gear icon), then click on "Data"
+- copy the path to the "Arena Log"
 - Close MTG Arena and MTG Arena Tool.
-- Go to `%APPDATA%\..\LocalLow\Wizards Of The Coast\MTGA\`
+- open the "Arena Log" path in a file browser
 - Rename `output_log.txt`, do not delete it!
 - Run MTG Arena, once open, run MTG Arena Tool again.
 
 If this works, send the the old log file file to [mtgatool@gmail.com](mailto:mtgatool@gmail.com) to analyze the error.
 
 If that does not work;
-- Proceed to `%APPDATA%\mtg-arena-tool`
-- Locate your *user-data file* (the .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`)
+- Go to the MTG Arena Tool "Settings" page (gear icon), then click on "Data"
+- In the bottom section called "Local Data", click on the link next to "Current player settings and history" (the .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`)
 - Rename the file, adding something to the end. **Do not delete it!**
 - Run MTG Arena Tool again.
 

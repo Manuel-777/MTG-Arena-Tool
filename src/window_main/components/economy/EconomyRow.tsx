@@ -27,7 +27,7 @@ function EconomyRowDate(date: Date) {
 }
 
 interface BoosterDeltaProps {
-  booster: { collationId: string, count: number };
+  booster: { collationId: number, count: number };
 }
 
 function BoosterDelta(props: BoosterDeltaProps) {

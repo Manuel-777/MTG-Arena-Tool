@@ -1206,11 +1206,8 @@ export function onLabelEventMatchCreated(entry, json) {
 export function onLabelOutDirectGameChallenge(entry, json) {
   if (!json) return;
   var deck = json.params.deck;
-
-  deck = replaceAll(deck, '"Id"', '"id"');
-  deck = replaceAll(deck, '"Quantity"', '"quantity"');
   deck = JSON.parse(deck);
-  select_deck(deck);
+  select_deck(convert_deck_from_v3(deck));
 
   const httpApi = require("./http-api");
   httpApi.httpTournamentCheck(
@@ -1225,11 +1222,8 @@ export function onLabelOutDirectGameChallenge(entry, json) {
 export function onLabelOutEventAIPractice(entry, json) {
   if (!json) return;
   var deck = json.params.deck;
-
-  deck = replaceAll(deck, '"Id"', '"id"');
-  deck = replaceAll(deck, '"Quantity"', '"quantity"');
   deck = JSON.parse(deck);
-  select_deck(deck);
+  select_deck(convert_deck_from_v3(deck));
 }
 
 function getDraftSet(eventName) {

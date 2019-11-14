@@ -755,7 +755,7 @@ export const SHORTCUT_NAMES = {
   shortcut_overlay_3: "Toggle Overlay 3",
   shortcut_overlay_4: "Toggle Overlay 4",
   shortcut_overlay_5: "Toggle Overlay 5",
-  shortcut_editmode: "Toggle Overlay Move/Resize",
+  shortcut_editmode: "Toggle Edit Overlay Positions",
   shortcut_devtools_main: "Toggle Developer Tools (main)",
   shortcut_devtools_overlay: "Toggle Developer Tools (overlays)"
 };

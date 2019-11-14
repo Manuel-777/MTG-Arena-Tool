@@ -108,7 +108,7 @@ function getReadableQuest(questCode: string) {
   return `#${questCode.substring(0, 6)}`;
 }
 
-export function getCollationSet(collationid: string) {
+export function getCollationSet(collationid: number) {
   for (let name in db.sets) {
     if (db.sets[name].collation === collationid) {
       return name;

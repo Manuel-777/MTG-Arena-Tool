@@ -1,3 +1,10 @@
+## <small>2.12.15 (2019-11-10)</small>
+
+* bugfix-settings (#707) ([9d161ae](https://github.com/Manuel-777/MTG-Arena-Tool/commit/9d161ae)), closes [#707](https://github.com/Manuel-777/MTG-Arena-Tool/issues/707)
+* overlays visibility fix (#708) ([4b5b15d](https://github.com/Manuel-777/MTG-Arena-Tool/commit/4b5b15d)), closes [#708](https://github.com/Manuel-777/MTG-Arena-Tool/issues/708)
+
+
+
 ## <small>2.12.14 (2019-11-09)</small>
 
 * again ([479afba](https://github.com/Manuel-777/MTG-Arena-Tool/commit/479afba))

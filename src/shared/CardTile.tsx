@@ -15,16 +15,17 @@ import {
   openScryfallCard
 } from "./util";
 import { addCardHover } from "./card-hover";
+import { DbCardData } from "./types/Metadata";
 
 export interface CardTileProps {
-  card: any;
-  deck: Deck | null;
-  dfcCard: any;
+  card: DbCardData | any; // TODO remove group lands hack
+  deck?: Deck;
+  dfcCard?: DbCardData;
   indent: string;
   isHighlighted: boolean;
   isSideboard: boolean;
   quantity: { quantity: string; odds: number } | number | string; // TODO clean this up?
-  setHoverCardCallback?: (card: any) => void;
+  setHoverCardCallback?: (card?: DbCardData) => void;
   showWildcards: boolean;
   style: number;
 }
@@ -33,7 +34,7 @@ function isNumber(n: number | string): boolean {
   return !isNaN(parseFloat(n as string)) && isFinite(parseFloat(n as string));
 }
 
-function frameClassName(card: any): string {
+function frameClassName(card: DbCardData): string {
   const frame = card ? card.frame.concat().sort() : [];
   if (frame.length === 0) {
     return "tile_c";
@@ -92,7 +93,7 @@ function getArenaQuantityDisplay(quantity: any): [number, number, JSX.Element] {
   return [ww, ll, quantityElement];
 }
 
-function CostSymbols(props: { card: any; dfcCard: any }): JSX.Element {
+function CostSymbols(props: { card: DbCardData; dfcCard?: DbCardData }): JSX.Element {
   const { card, dfcCard } = props;
   const costSymbols: JSX.Element[] = [];
   let prevc = true;
@@ -128,7 +129,7 @@ function CostSymbols(props: { card: any; dfcCard: any }): JSX.Element {
 }
 
 function ArenaWildcardsNeeded(props: {
-  card: any;
+  card: DbCardData;
   deck: Deck;
   isSideboard: boolean;
   ww: number;
@@ -174,7 +175,7 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
   }, [setHoverCardCallback]);
   const handleMouseLeave = useCallback((): void => {
     setMouseHovering(false);
-    setHoverCardCallback && setHoverCardCallback(null);
+    setHoverCardCallback && setHoverCardCallback();
   }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = card;
@@ -272,7 +273,7 @@ function FlatQuantityDisplay(props: { quantity: any }): JSX.Element {
 }
 
 function FlatWildcardsNeeded(props: {
-  card: any;
+  card: DbCardData;
   deck: Deck;
   isSideboard: boolean;
 }): JSX.Element {
@@ -315,7 +316,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
   }, [setHoverCardCallback]);
   const handleMouseLeave = useCallback((): void => {
     setMouseHovering(false);
-    setHoverCardCallback && setHoverCardCallback(null);
+    setHoverCardCallback && setHoverCardCallback();
   }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = card;
@@ -402,8 +403,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
 
 export default function CardTile(props: CardTileProps): JSX.Element {
   const { card, quantity } = props;
-  // This is hackish.. the way we insert our custom elements in the
-  // array of cards is wrong in the first place :()
+  // TODO remove group lands hack
   const haxxorProps = { ...props };
   if (card.id && typeof card.id === "object" && card.id.name) {
     haxxorProps.card = card.id;

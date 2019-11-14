@@ -10,6 +10,7 @@ import Deck from "../shared/deck";
 
 import { DraftData, DraftState, OverlaySettingsData } from "./overlayUtil";
 import DeckList from "./DeckList";
+import { DbCardData } from "../shared/types/Metadata";
 
 const packSizeMap: { [key: string]: number } = PACK_SIZES;
 const manaColorMap: { [key: number]: string } = MANA;
@@ -20,7 +21,7 @@ export interface DraftElementsProps {
   index: number;
   settings: OverlaySettingsData;
   setDraftStateCallback: (state: DraftState) => void;
-  setHoverCardCallback: (card: any) => void;
+  setHoverCardCallback: (card?: DbCardData) => void;
   tileStyle: number;
 }
 

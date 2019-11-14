@@ -23,6 +23,7 @@ import OwnershipStars from "../shared/OwnershipStars";
 
 import { CardData, OddsData, OverlaySettingsData } from "./overlayUtil";
 import SampleSizePanel from "./SampleSizePanel";
+import { DbCardData } from "../shared/types/Metadata";
 
 const landsCard = {
   id: 100,
@@ -74,13 +75,25 @@ function compareDraftPicks(a: CardData, b: CardData): -1 | 0 | 1 {
   }
   const aType = getCardTypeSort(aCard.type);
   const bType = getCardTypeSort(bCard.type);
-  return (
-    bCard.rank - aCard.rank ||
-    aColors.length - bColors.length ||
-    aCard.cmc - bCard.cmc ||
-    aType - bType ||
-    aCard.name.localeCompare(bCard.name)
-  );
+
+  let rankDiff = bCard.rank - aCard.rank;
+  let colorsLengthDiff = aColors.length - bColors.length;
+  let cmcDiff = aCard.cmc - bCard.cmc;
+  let typeDiff = aType - bType;
+  let localeCompare = aCard.name.localeCompare(bCard.name);
+  const compare = rankDiff ||
+    colorsLengthDiff ||
+    cmcDiff ||
+    typeDiff ||
+    localeCompare;
+
+  if (compare < 0) {
+    return -1;
+  }
+  if (compare > 0) {
+    return 1;
+  }
+  return 0;
 }
 
 export interface DeckListProps {
@@ -90,7 +103,7 @@ export interface DeckListProps {
   settings: OverlaySettingsData;
   tileStyle: number;
   cardOdds?: OddsData;
-  setHoverCardCallback: (card: any) => void;
+  setHoverCardCallback: (card?: DbCardData) => void;
   setOddsCallback?: (sampleSize: number) => void;
 }
 
@@ -167,8 +180,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
       quantity = DRAFT_RANKS[rank];
     }
 
-    // This is hackish.. the way we insert our custom elements in the
-    // array of cards is wrong in the first place :()
+    // TODO remove group lands hack
     const isCardGroupedLands =
       card && card.id && card.id.id && card.id.id === 100;
 
@@ -176,9 +188,9 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     if (card && card.id && !isCardGroupedLands) {
       fullCard = db.card(card.id);
     }
-    let dfcCard = null;
+    let dfcCard;
     if (card && card.dfcId) {
-      dfcCard = db.card(card.dfcId);
+      dfcCard = db.card(card.dfcId) || undefined;
     }
     if (settings.mode === OVERLAY_DRAFT) {
       mainCardTiles.push(
@@ -220,18 +232,18 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     const sideCards = deckClone.sideboard;
     sideCards.removeDuplicates();
     sideCards.get().sort(sortFunc);
-    sideCards.get().forEach((card: CardData) => {
+    sideCards.get().forEach((card: any) => {
       const quantity =
         settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED
           ? "0%"
           : card.quantity;
       let fullCard = card;
       if (card && card.id) {
-        fullCard = db.card(card.id);
+        fullCard = db.card(card.id) || undefined;
       }
       let dfcCard;
       if (card && card.dfcId) {
-        dfcCard = db.card(card.dfcId);
+        dfcCard = db.card(card.dfcId) || undefined;
       }
       sideboardCardTiles.push(
         <CardTile
