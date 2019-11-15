@@ -14,6 +14,7 @@ import { LogData, MatchData, OverlaySettingsData } from "./overlayUtil";
 import ActionLog from "./ActionLog";
 import Clock from "./Clock";
 import DeckList from "./DeckList";
+import { DbCardData } from "../shared/types/Metadata";
 
 const manaColorMap: { [key: number]: string } = MANA;
 
@@ -21,7 +22,7 @@ export interface MatchElementsProps {
   actionLog: LogData[];
   index: number;
   match: MatchData;
-  setHoverCardCallback: (card: any) => void;
+  setHoverCardCallback: (card?: DbCardData) => void;
   setOddsCallback: (sampleSize: number) => void;
   settings: OverlaySettingsData;
   tileStyle: number;

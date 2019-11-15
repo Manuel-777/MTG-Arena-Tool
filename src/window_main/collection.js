@@ -818,30 +818,49 @@ function openSetStats(setStats, setName) {
   // Draw completion table for this set
   if (setName != "Complete collection") {
     let table = createDiv(["completion_table"]);
-    for (var c = 0; c < 7; c++) {
+    for (var color = 0; color < 7; color++) {
       let tile = "";
-      if (c + 1 == MULTI) tile = "mana_multi";
-      if (c + 1 == COLORLESS) tile = "mana_colorless";
-      if (c + 1 == WHITE) tile = "mana_white";
-      if (c + 1 == BLUE) tile = "mana_blue";
-      if (c + 1 == BLACK) tile = "mana_black";
-      if (c + 1 == RED) tile = "mana_red";
-      if (c + 1 == GREEN) tile = "mana_green";
+      switch (color + 1) {
+        case WHITE:
+          tile = "mana_white";
+          break;
+        case BLUE:
+          tile = "mana_blue";
+          break;
+        case BLACK:
+          tile = "mana_black";
+          break;
+        case RED:
+          tile = "mana_red";
+          break;
+        case GREEN:
+          tile = "mana_green";
+          break;
+        case COLORLESS:
+          tile = "mana_colorless";
+          break;
+        case MULTI:
+          tile = "mana_multi";
+          break;
+      }
 
       let cell = createDiv(["completion_table_color_title", tile]);
-      cell.style.gridArea = `1 / ${c * 5 + 1} / auto / ${c * 5 + 6}`;
+      cell.style.gridArea = `1 / ${color * 5 + 1} / auto / ${color * 5 + 6}`;
       table.appendChild(cell);
 
-      for (var r = 0; r < 4; r++) {
-        let rarity = CARD_RARITIES[r];
+      CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(rarity => {
+        var rarityIndex = CARD_RARITIES.indexOf(rarity);
+        rarity = rarity.toLowerCase();
         let cell = createDiv(["completion_table_rarity_title", rarity]);
         cell.title = rarity;
-        cell.style.gridArea = `2 / ${c * 5 + 1 + r} / auto / ${c * 5 + 1 + r}`;
+        cell.style.gridArea = `2 / ${color * 5 +
+          1 +
+          rarityIndex} / auto / ${color * 5 + 1 + rarityIndex}`;
         table.appendChild(cell);
 
         // A little hacky to use "c + 1"..
-        if (setStats.cards[c + 1]) {
-          let cardsArray = setStats.cards[c + 1][rarity];
+        if (setStats.cards[color + 1]) {
+          let cardsArray = setStats.cards[color + 1][rarity];
           if (cardsArray) {
             cardsArray.forEach((card, index) => {
               let dbCard = db.card(card.id);
@@ -853,9 +872,9 @@ function openSetStats(setStats, setName) {
                 let classes = ["completion_table_card", "n" + card.owned];
                 if (card.wanted > 0) classes.push("wanted");
                 let cell = createDiv(classes, card.owned);
-                cell.style.gridArea = `${index + 3} / ${c * 5 +
+                cell.style.gridArea = `${index + 3} / ${color * 5 +
                   1 +
-                  r} / auto / ${c * 5 + 1 + r}`;
+                  rarityIndex} / auto / ${color * 5 + 1 + rarityIndex}`;
                 table.appendChild(cell);
 
                 addCardHover(cell, dbCard);
@@ -863,14 +882,15 @@ function openSetStats(setStats, setName) {
             });
           }
         }
-      }
+      });
     }
     substats.appendChild(table);
   }
 
   let wanted = {};
   let missing = {};
-  CARD_RARITIES.forEach(rarity => {
+  CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(rarity => {
+    rarity = rarity.toLowerCase();
     const countStats = setStats[rarity];
     if (countStats.total > 0) {
       const capitalizedRarity = rarity[0].toUpperCase() + rarity.slice(1) + "s";

@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import {
   ARENA_MODE_MATCH,
   ARENA_MODE_DRAFT,
+  ARENA_MODE_IDLE,
   COLORS_ALL,
   OVERLAY_DRAFT_MODES
 } from "../shared/constants";
@@ -18,6 +19,7 @@ import {
 } from "./overlayUtil";
 import DraftElements from "./DraftElements";
 import MatchElements from "./MatchElements";
+import { DbCardData } from "../shared/types/Metadata";
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -34,9 +36,13 @@ export interface OverlayWindowletProps {
   match?: MatchData;
   settings: SettingsData;
   setDraftStateCallback: (state: DraftState) => void;
-  setHoverCardCallback: (card: any) => void;
+  setHoverCardCallback: (card?: DbCardData) => void;
   setOddsCallback: (sampleSize: number) => void;
   turnPriority: number;
+}
+
+function isOverlayDraftMode(mode: number) {
+  return OVERLAY_DRAFT_MODES.some(draftMode => draftMode === mode);
 }
 
 /**
@@ -88,11 +94,14 @@ export default function OverlayWindowlet(
   //   xhr.send();
   // }, [backgroundImage]);
   const overlaySettings = settings.overlays[index];
+  // Note: ensure this logic matches the logic in main.getOverlayVisible
+  // TODO: extract a common utility?
   const currentModeApplies =
-    (OVERLAY_DRAFT_MODES.includes(overlaySettings.mode) &&
+    (isOverlayDraftMode(overlaySettings.mode) &&
       arenaState === ARENA_MODE_DRAFT) ||
-    (!OVERLAY_DRAFT_MODES.includes(overlaySettings.mode) &&
-      arenaState === ARENA_MODE_MATCH);
+    (!isOverlayDraftMode(overlaySettings.mode) &&
+      arenaState === ARENA_MODE_MATCH) ||
+    (editMode && arenaState === ARENA_MODE_IDLE);
   const isVisible =
     overlaySettings.show && (currentModeApplies || overlaySettings.show_always);
   const tileStyle = parseInt(settings.card_tile_style + "");
@@ -103,7 +112,7 @@ export default function OverlayWindowlet(
     setHoverCardCallback,
     tileStyle
   };
-  if (draft && OVERLAY_DRAFT_MODES.includes(overlaySettings.mode)) {
+  if (draft && isOverlayDraftMode(overlaySettings.mode)) {
     const props = {
       ...commonProps,
       draft,
@@ -158,9 +167,13 @@ export default function OverlayWindowlet(
       {overlaySettings.top && (
         <div className="outer_wrapper top_nav_wrapper">
           <div
-            className="flex_item overlay_icon click-on"
+            className="button overlay_icon click-on"
             onClick={handleToggleEditMode}
-            style={{ backgroundColor: `var(--color-${COLORS_ALL[index]})` }}
+            style={{
+              backgroundColor: `var(--color-${COLORS_ALL[index]})`,
+              marginRight: "auto"
+            }}
+            title={settings.shortcut_editmode}
           />
           <div
             className="button settings click-on"

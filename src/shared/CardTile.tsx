@@ -15,16 +15,17 @@ import {
   openScryfallCard
 } from "./util";
 import { addCardHover } from "./card-hover";
+import { DbCardData, Rarity } from "./types/Metadata";
 
 export interface CardTileProps {
-  card: any;
-  deck: Deck | null;
-  dfcCard: any;
+  card: DbCardData | any; // TODO remove group lands hack
+  deck?: Deck;
+  dfcCard?: DbCardData;
   indent: string;
   isHighlighted: boolean;
   isSideboard: boolean;
   quantity: { quantity: string; odds: number } | number | string; // TODO clean this up?
-  setHoverCardCallback?: (card: any) => void;
+  setHoverCardCallback?: (card?: DbCardData) => void;
   showWildcards: boolean;
   style: number;
 }
@@ -33,7 +34,7 @@ function isNumber(n: number | string): boolean {
   return !isNaN(parseFloat(n as string)) && isFinite(parseFloat(n as string));
 }
 
-function frameClassName(card: any): string {
+function frameClassName(card: DbCardData): string {
   const frame = card ? card.frame.concat().sort() : [];
   if (frame.length === 0) {
     return "tile_c";
@@ -92,7 +93,7 @@ function getArenaQuantityDisplay(quantity: any): [number, number, JSX.Element] {
   return [ww, ll, quantityElement];
 }
 
-function CostSymbols(props: { card: any; dfcCard: any }): JSX.Element {
+function CostSymbols(props: { card: DbCardData; dfcCard?: DbCardData }): JSX.Element {
   const { card, dfcCard } = props;
   const costSymbols: JSX.Element[] = [];
   let prevc = true;
@@ -127,33 +128,6 @@ function CostSymbols(props: { card: any; dfcCard: any }): JSX.Element {
   return <>{costSymbols}</>;
 }
 
-function ArenaWildcardsNeeded(props: {
-  card: any;
-  deck: Deck;
-  isSideboard: boolean;
-  ww: number;
-}): JSX.Element {
-  const { card, deck, isSideboard, ww } = props;
-  if (card.type.indexOf("Basic Land") === -1) {
-    const missing = getWildcardsMissing(deck, card.id, isSideboard);
-    if (missing > 0) {
-      const xoff = CARD_RARITIES.indexOf(card.rarity) * -24;
-      const yoff = missing * -24;
-      return (
-        <div
-          className="not_owned_sprite"
-          title={missing + " missing"}
-          style={{
-            backgroundPosition: `${xoff}px ${yoff}px`,
-            left: `calc(0px - 100% + ${ww - 14}px)`
-          }}
-        />
-      );
-    }
-  }
-  return <></>;
-}
-
 function ArenaCardTile(props: CardTileProps): JSX.Element {
   const {
     card,
@@ -174,7 +148,7 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
   }, [setHoverCardCallback]);
   const handleMouseLeave = useCallback((): void => {
     setMouseHovering(false);
-    setHoverCardCallback && setHoverCardCallback(null);
+    setHoverCardCallback && setHoverCardCallback();
   }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = card;
@@ -237,10 +211,11 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
         }}
       />
       {showWildcards && deck && (
-        <ArenaWildcardsNeeded
+        <WildcardsNeeded
           card={card}
           deck={deck}
           isSideboard={isSideboard}
+          listStyle="arena"
           ww={ww}
         />
       )}
@@ -271,29 +246,59 @@ function FlatQuantityDisplay(props: { quantity: any }): JSX.Element {
   }
 }
 
-function FlatWildcardsNeeded(props: {
-  card: any;
-  deck: Deck;
-  isSideboard: boolean;
-}): JSX.Element {
-  const { card, deck, isSideboard } = props;
+interface WildcardsNeededProps{
+  card:DbCardData;
+  deck:Deck;
+  isSideboard:boolean;
+  listStyle:"flat"|"arena";
+  ww?:number;
+}
+
+interface MissingCardsProps{
+  missing:number;
+  cardRarity:Rarity;
+  listStyle:"flat"|"arena";
+  ww?:number;
+}
+
+function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
+  const { card, deck, isSideboard, listStyle, ww } = props;
   if (card.type.indexOf("Basic Land") === -1) {
     const missing = getWildcardsMissing(deck, card.id, isSideboard);
+    const cardRarity = card.rarity;
+
+
     if (missing > 0) {
-      const xoff = CARD_RARITIES.indexOf(card.rarity) * -24;
-      const yoff = missing * -24;
-      return (
-        <div
-          className="not_owned_sprite_flat"
-          title={missing + " missing"}
-          style={{
-            backgroundPosition: `${xoff}px ${yoff}px`
-          }}
-        />
-      );
+      return MissingCardSprite({missing, cardRarity, listStyle, ww});
     }
   }
   return <></>;
+}
+
+function MissingCardSprite(props:MissingCardsProps):JSX.Element{
+  const{missing, cardRarity, listStyle, ww} = props;
+
+  const xoff = CARD_RARITIES.indexOf(cardRarity) * -24;
+  const yoff = missing * -24;
+
+  var className = "not_owned_sprite";
+  if(listStyle === "flat"){
+    className += "_flat";
+  }
+
+  const style:React.CSSProperties =
+  {backgroundPosition: `${xoff}px ${yoff}px`};
+  if(ww){
+    style.left = `calc(0px - 100% + ${ww - 14}px)`;
+  }
+
+  return (
+    <div
+    className={className}
+    title={missing + " missing"}
+    style={style}
+    />
+    );
 }
 
 function FlatCardTile(props: CardTileProps): JSX.Element {
@@ -315,7 +320,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
   }, [setHoverCardCallback]);
   const handleMouseLeave = useCallback((): void => {
     setMouseHovering(false);
-    setHoverCardCallback && setHoverCardCallback(null);
+    setHoverCardCallback && setHoverCardCallback();
   }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = card;
@@ -390,10 +395,11 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
         <CostSymbols card={card} dfcCard={dfcCard} />
       </div>
       {showWildcards && deck && (
-        <FlatWildcardsNeeded
+        <WildcardsNeeded
           card={card}
           deck={deck}
           isSideboard={isSideboard}
+          listStyle = "flat"
         />
       )}
     </div>
@@ -402,8 +408,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
 
 export default function CardTile(props: CardTileProps): JSX.Element {
   const { card, quantity } = props;
-  // This is hackish.. the way we insert our custom elements in the
-  // array of cards is wrong in the first place :()
+  // TODO remove group lands hack
   const haxxorProps = { ...props };
   if (card.id && typeof card.id === "object" && card.id.name) {
     haxxorProps.card = card.id;

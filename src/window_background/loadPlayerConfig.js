@@ -28,6 +28,7 @@ export function loadPlayerConfig(playerId) {
     name: playerId,
     defaults: playerData.defaultCfg
   });
+  setData({ playerDbPath: globals.store.path }, false);
 
   const savedData = globals.store.get();
   const savedOverlays = savedData.settings.overlays || [];

@@ -2,9 +2,10 @@ import * as React from "react";
 
 import pd from "./player-data";
 import { cardHasType } from "./card-types";
+import { DbCardData } from "./types/Metadata";
 
-function OwnershipInfinity(_props) {
-  const { owned, acquired } = _props;
+function OwnershipInfinity(props: { owned: number; acquired: number }) {
+  const { owned, acquired } = props;
   let title = "";
   // Show infinity for basics
   if (owned > 0) title = `∞ copies in collection`;
@@ -18,8 +19,15 @@ function OwnershipInfinity(_props) {
   return <div className={`inventory_card_infinity_${color}`} title={title} />;
 }
 
-function OwnershipStar(_props) {
-  const { owned, acquired, copyIndex, title } = _props;
+interface OwnershipStarProps {
+  owned: number;
+  acquired: number;
+  copyIndex: number;
+  title: string;
+}
+
+function OwnershipStar(props: OwnershipStarProps) {
+  const { owned, acquired, copyIndex, title } = props;
   let color = "gray"; // default unowned
   if (copyIndex < owned) {
     color = "green"; // owned copy
@@ -30,8 +38,8 @@ function OwnershipStar(_props) {
   return <div className={`inventory_card_quantity_${color}`} title={title} />;
 }
 
-function MultiCardOwnership(_props) {
-  const { owned, acquired } = _props;
+function MultiCardOwnership(props: { owned: number; acquired: number }) {
+  const { owned, acquired } = props;
   let title = `${owned || 0}/4 copies in collection`;
   if (acquired) {
     title += ` (${acquired} recent)`;
@@ -52,14 +60,15 @@ function MultiCardOwnership(_props) {
   );
 }
 
-export default function OwnershipStars(_props) {
-  const { card } = _props;
+export default function OwnershipStars(props: { card: DbCardData }) {
+  const { card } = props;
   if (!card || !card.type) {
     return <></>;
   }
   const isbasic = cardHasType(card, "Basic Land");
-  const owned = pd.cards.cards[card.id];
-  const acquired = pd.cardsNew[card.id];
+  const playerData = pd as any;
+  const owned = playerData.cards.cards[card.id];
+  const acquired = playerData.cardsNew[card.id];
   // TODO add custom logic to handle rats and petitioners
   if (isbasic) {
     return <OwnershipInfinity owned={owned} acquired={acquired} />;

@@ -88,6 +88,7 @@ export interface SettingsData {
   overlay_scale: number;
   overlays: OverlaySettingsData[];
   overlayHover: { x: number; y: number };
+  shortcut_editmode: string;
 }
 
 const restrictMinSize =

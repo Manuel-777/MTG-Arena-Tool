@@ -2741,6 +2741,11 @@ a:hover {
     margin: 0px 64px 20px 16px;
 }
 
+.settings_row {
+    display: inline-flex;
+    margin-left: 16px;
+}
+
 .deck_visual_stats {
     padding: 0 !important;
     margin: 32px !important;
