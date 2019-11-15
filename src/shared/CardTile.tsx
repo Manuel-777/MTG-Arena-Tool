@@ -15,7 +15,7 @@ import {
   openScryfallCard
 } from "./util";
 import { addCardHover } from "./card-hover";
-import { DbCardData } from "./types/Metadata";
+import { DbCardData, Rarity } from "./types/Metadata";
 
 export interface CardTileProps {
   card: DbCardData | any; // TODO remove group lands hack
@@ -128,32 +128,17 @@ function CostSymbols(props: { card: DbCardData; dfcCard?: DbCardData }): JSX.Ele
   return <>{costSymbols}</>;
 }
 
-function ArenaWildcardsNeeded(props: {
-  card: DbCardData;
-  deck: Deck;
-  isSideboard: boolean;
-  ww: number;
-}): JSX.Element {
-  const { card, deck, isSideboard, ww } = props;
-  if (card.type.indexOf("Basic Land") === -1) {
-    const missing = getWildcardsMissing(deck, card.id, isSideboard);
-    if (missing > 0) {
-      const xoff = CARD_RARITIES.indexOf(card.rarity) * -24;
-      const yoff = missing * -24;
-      return (
-        <div
-          className="not_owned_sprite"
-          title={missing + " missing"}
-          style={{
-            backgroundPosition: `${xoff}px ${yoff}px`,
-            left: `calc(0px - 100% + ${ww - 14}px)`
-          }}
-        />
-      );
-    }
-  }
-  return <></>;
-}
+// function ArenaWildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
+//   const { card, deck, isSideboard, ww } = props;
+//   if (card.type.indexOf("Basic Land") === -1) {
+//     const missing = getWildcardsMissing(deck, card.id, isSideboard);
+//     if (missing > 0) {
+//       const cardRarity = card.rarity;
+//       return MissingCardSprite({missing, cardRarity, ww});
+//     }
+//   }
+//   return <></>;
+// }
 
 function ArenaCardTile(props: CardTileProps): JSX.Element {
   const {
@@ -238,7 +223,7 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
         }}
       />
       {showWildcards && deck && (
-        <ArenaWildcardsNeeded
+        <WildcardsNeeded
           card={card}
           deck={deck}
           isSideboard={isSideboard}
@@ -272,29 +257,50 @@ function FlatQuantityDisplay(props: { quantity: any }): JSX.Element {
   }
 }
 
-function FlatWildcardsNeeded(props: {
-  card: DbCardData;
-  deck: Deck;
-  isSideboard: boolean;
-}): JSX.Element {
-  const { card, deck, isSideboard } = props;
+interface WildcardsNeededProps{
+  card:DbCardData;
+  deck:Deck;
+  isSideboard:boolean;
+  ww?:number;
+}
+
+interface MissingCardsProps{
+  missing:number;
+  cardRarity:Rarity;
+  ww?:number;
+}
+
+function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
+  const { card, deck, isSideboard, ww } = props;
   if (card.type.indexOf("Basic Land") === -1) {
     const missing = getWildcardsMissing(deck, card.id, isSideboard);
-    if (missing > 0) {
-      const xoff = CARD_RARITIES.indexOf(card.rarity) * -24;
-      const yoff = missing * -24;
-      return (
-        <div
-          className="not_owned_sprite_flat"
-          title={missing + " missing"}
-          style={{
-            backgroundPosition: `${xoff}px ${yoff}px`
-          }}
-        />
-      );
+    const cardRarity = card.rarity;
+    if (missing > 0 && cardRarity !== "Land") {
+      return MissingCardSprite({missing, cardRarity, ww});
     }
   }
   return <></>;
+}
+
+function MissingCardSprite(props:MissingCardsProps):JSX.Element{
+  const{missing, cardRarity, ww} = props;
+
+  const xoff = CARD_RARITIES.indexOf(cardRarity) * -24;
+  const yoff = missing * -24;
+
+  const style:React.CSSProperties =
+  {backgroundPosition: `${xoff}px ${yoff}px`};
+  if(ww){
+    style.left = `calc(0px - 100% + ${ww - 14}px)`;
+  }
+
+  return (
+    <div
+    className="not_owned_sprite_flat"
+    title={missing + " missing"}
+    style={style}
+    />
+    );
 }
 
 function FlatCardTile(props: CardTileProps): JSX.Element {
@@ -391,7 +397,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
         <CostSymbols card={card} dfcCard={dfcCard} />
       </div>
       {showWildcards && deck && (
-        <FlatWildcardsNeeded
+        <WildcardsNeeded
           card={card}
           deck={deck}
           isSideboard={isSideboard}

@@ -832,8 +832,7 @@ function openSetStats(setStats, setName) {
       cell.style.gridArea = `1 / ${c * 5 + 1} / auto / ${c * 5 + 6}`;
       table.appendChild(cell);
 
-      for (var r = 0; r < 4; r++) {
-        let rarity = CARD_RARITIES[r];
+      CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(rarity => {
         let cell = createDiv(["completion_table_rarity_title", rarity]);
         cell.title = rarity;
         cell.style.gridArea = `2 / ${c * 5 + 1 + r} / auto / ${c * 5 + 1 + r}`;
@@ -863,14 +862,14 @@ function openSetStats(setStats, setName) {
             });
           }
         }
-      }
+      });
     }
     substats.appendChild(table);
   }
 
   let wanted = {};
   let missing = {};
-  CARD_RARITIES.forEach(rarity => {
+  CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(rarity => {
     const countStats = setStats[rarity];
     if (countStats.total > 0) {
       const capitalizedRarity = rarity[0].toUpperCase() + rarity.slice(1) + "s";
