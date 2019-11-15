@@ -182,7 +182,7 @@ function drawDeck(div, deck, showWildcards = false) {
   div.innerHTML = "";
   const unique = makeId(4);
 
-  if (deck.commandZoneGRPIds) {
+  if (deck.commandZoneGRPIds && deck.commandZoneGRPIds.length > 0) {
     let separator = deckDrawer.cardSeparator(`Commander`);
     div.appendChild(separator);
 

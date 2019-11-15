@@ -268,7 +268,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
   return (
     <div className="overlay_decklist click-on">
       <div className="decklist_title">{subTitle}</div>
-      {mainCardTiles}
+      {!!settings.deck && mainCardTiles}
       {!!settings.sideboard && sideboardCardTiles.length && (
         <div className="card_tile_separator">Sideboard</div>
       )}
