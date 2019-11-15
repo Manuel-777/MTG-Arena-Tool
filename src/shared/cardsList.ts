@@ -1,6 +1,6 @@
 import _ from "lodash";
 import db from "./database.js";
-import Colors from "./colors.js";
+import Colors from "./colors";
 import { DbCardData } from "./types/Metadata.js";
 import { CardData } from "../overlay/overlayUtil";
 

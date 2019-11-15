@@ -14,33 +14,33 @@ class Colors {
    * Colors can be set by propierties matching the colors (w, u, b, r, g)
    **/
   constructor() {
-    this._w = false;
-    this._u = false;
-    this._b = false;
-    this._r = false;
-    this._g = false;
+    this.w = 0;
+    this.u = 0;
+    this.b = 0;
+    this.r = 0;
+    this.g = 0;
 
     return this;
   }
 
-  set w(number) {
-    this._w = number;
+  set w(number: number) {
+    this.w = number;
   }
 
-  set u(number) {
-    this._u = number;
+  set u(number: number) {
+    this.u = number;
   }
 
-  set b(number) {
-    this._b = number;
+  set b(number: number) {
+    this.b = number;
   }
 
-  set r(number) {
-    this._r = number;
+  set r(number: number) {
+    this.r = number;
   }
 
-  set g(number) {
-    this._g = number;
+  set g(number: number) {
+    this.g = number;
   }
 
   /**
@@ -49,11 +49,11 @@ class Colors {
    */
   get() {
     let _arr = [];
-    if (this._w) _arr.push(WHITE);
-    if (this._u) _arr.push(BLUE);
-    if (this._b) _arr.push(BLACK);
-    if (this._r) _arr.push(RED);
-    if (this._g) _arr.push(GREEN);
+    if (this.w) _arr.push(WHITE);
+    if (this.u) _arr.push(BLUE);
+    if (this.b) _arr.push(BLACK);
+    if (this.r) _arr.push(RED);
+    if (this.g) _arr.push(GREEN);
 
     return _arr;
   }
@@ -75,11 +75,11 @@ class Colors {
    */
   get length() {
     let ret = 0;
-    if (this._w > 0) ret += 1;
-    if (this._u > 0) ret += 1;
-    if (this._b > 0) ret += 1;
-    if (this._r > 0) ret += 1;
-    if (this._g > 0) ret += 1;
+    if (this.w > 0) ret += 1;
+    if (this.u > 0) ret += 1;
+    if (this.b > 0) ret += 1;
+    if (this.r > 0) ret += 1;
+    if (this.g > 0) ret += 1;
 
     return ret;
   }
@@ -87,20 +87,26 @@ class Colors {
   /**
    * Adds a string mana cost to this class.
    */
-  addFromCost(cost) {
-    cost.forEach(_c => {
-      if (_c == "w") {
-        this._w += 1;
-      } else if (_c == "u") {
-        this._u += 1;
-      } else if (_c == "b") {
-        this._b += 1;
-      } else if (_c == "r") {
-        this._r += 1;
-      } else if (_c == "g") {
-        this._g += 1;
+  addFromCost(cost: string[]) {
+    for (var c of cost) {
+      switch (c) {
+        case "w":
+          this.w += 1;
+          break;
+        case "u":
+          this.u += 1;
+          break;
+        case "b":
+          this.b += 1;
+          break;
+        case "r":
+          this.r += 1;
+          break;
+        case "g":
+          this.g += 1;
+          break;
       }
-    });
+    }
 
     return this;
   }
@@ -108,18 +114,24 @@ class Colors {
   /**
    * Adds an array mana cost to this one.
    */
-  addFromArray(cost) {
+  addFromArray(cost: number[]) {
     cost.forEach(color => {
-      if (color === WHITE) {
-        this._w += 1;
-      } else if (color === BLUE) {
-        this._u += 1;
-      } else if (color === BLACK) {
-        this._b += 1;
-      } else if (color === RED) {
-        this._r += 1;
-      } else if (color === GREEN) {
-        this._g += 1;
+      switch (color) {
+        case WHITE:
+          this.w += 1
+          break;
+        case BLUE:
+          this.u += 1;
+          break;
+        case BLACK:
+          this.b += 1;
+          break;
+        case RED:
+          this.r += 1;
+          break;
+        case GREEN:
+          this.g += 1;
+          break;
       }
     });
 
@@ -129,12 +141,12 @@ class Colors {
   /**
    * Merges another instance of Colors into this one.
    */
-  addFromColor(color) {
-    this._w += color.w;
-    this._u += color.u;
-    this._b += color.b;
-    this._r += color.r;
-    this._g += color.g;
+  addFromColor(color: Colors) {
+    this.w += color.w;
+    this.u += color.u;
+    this.b += color.b;
+    this.r += color.r;
+    this.g += color.g;
 
     return this;
   }
@@ -142,37 +154,34 @@ class Colors {
   /**
    * Checks if this color is equal to another
    */
-  equalTo(color) {
-    if (
-      this._w == color.w &&
-      this._u == color.u &&
-      this._b == color.b &&
-      this._r == color.r &&
-      this._g == color.g
-    )
-      return true;
-
-    return false;
+  equalTo(color: Colors) {
+    return (
+      this.w == color.w &&
+      this.u == color.u &&
+      this.b == color.b &&
+      this.r == color.r &&
+      this.g == color.g
+    );
   }
 
   get w() {
-    return this._w;
+    return this.w;
   }
 
   get u() {
-    return this._u;
+    return this.u;
   }
 
   get b() {
-    return this._b;
+    return this.b;
   }
 
   get r() {
-    return this._r;
+    return this.r;
   }
 
   get g() {
-    return this._g;
+    return this.g;
   }
 }
 
