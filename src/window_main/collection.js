@@ -294,7 +294,7 @@ export function openCollectionTab() {
   icd.appendChild(input);
   fllt.appendChild(icd);
 
-  input.addEventListener("keydown", function(e) {
+  input.addEventListener("keydown", function (e) {
     if (e.keyCode == 13) {
       printCollectionPage();
     }
@@ -386,7 +386,7 @@ export function openCollectionTab() {
     let setbutton = createDiv(["set_filter", "set_filter_on"]);
     setbutton.style.backgroundImage = `url(../images/sets/${
       db.sets[set].code
-    }.png)`;
+      }.png)`;
     setbutton.title = set;
 
     sets.appendChild(setbutton);
@@ -405,7 +405,7 @@ export function openCollectionTab() {
 
   let manas = createDiv(["sets_container"]);
   let ms = ["w", "u", "b", "r", "g"];
-  ms.forEach(function(s, i) {
+  ms.forEach(function (s, i) {
     let mi = [1, 2, 3, 4, 5];
     let manabutton = createDiv(["mana_filter_search", "mana_filter_on"]);
     manabutton.style.backgroundImage = `url(../images/${s}64.png)`;
@@ -620,7 +620,7 @@ function expandFilters() {
   } else {
     div.style.height = "calc(100% - 122px)";
     div.style.opacity = 1;
-    setTimeout(function() {
+    setTimeout(function () {
       $$(".inventory")[0].style.display = "none";
     }, 200);
   }
@@ -818,29 +818,54 @@ function openSetStats(setStats, setName) {
   // Draw completion table for this set
   if (setName != "Complete collection") {
     let table = createDiv(["completion_table"]);
-    for (var c = 0; c < 7; c++) {
+    for (var color = 0; color < 7; color++) {
       let tile = "";
-      if (c + 1 == MULTI) tile = "mana_multi";
-      if (c + 1 == COLORLESS) tile = "mana_colorless";
-      if (c + 1 == WHITE) tile = "mana_white";
-      if (c + 1 == BLUE) tile = "mana_blue";
-      if (c + 1 == BLACK) tile = "mana_black";
-      if (c + 1 == RED) tile = "mana_red";
-      if (c + 1 == GREEN) tile = "mana_green";
+      switch (color + 1) {
+        case WHITE:
+          tile = "mana_white";
+          break;
+        case BLUE:
+          tile = "mana_blue";
+          break;
+        case BLACK:
+          tile = "mana_black";
+          break;
+        case RED:
+          tile = "mana_red";
+          break;
+        case GREEN:
+          tile = "mana_green";
+          break;
+        case COLORLESS:
+          tile = "mana_colorless";
+          break;
+        case MULTI:
+          tile = "mana_multi";
+          break;
+      }
+      // if (color + 1 == MULTI) tile = "mana_multi";
+      // if (color + 1 == COLORLESS) tile = "mana_colorless";
+      // if (color + 1 == WHITE) tile = "mana_white";
+      // if (color + 1 == BLUE) tile = "mana_blue";
+      // if (color + 1 == BLACK) tile = "mana_black";
+      // if (color + 1 == RED) tile = "mana_red";
+      // if (color + 1 == GREEN) tile = "mana_green";
 
       let cell = createDiv(["completion_table_color_title", tile]);
-      cell.style.gridArea = `1 / ${c * 5 + 1} / auto / ${c * 5 + 6}`;
+      cell.style.gridArea = `1 / ${color * 5 + 1} / auto / ${color * 5 + 6}`;
       table.appendChild(cell);
 
       CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(rarity => {
+        var rarityIndex = CARD_RARITIES.indexOf(rarity);
+        rarity = rarity.toLowerCase();
         let cell = createDiv(["completion_table_rarity_title", rarity]);
         cell.title = rarity;
-        cell.style.gridArea = `2 / ${c * 5 + 1 + r} / auto / ${c * 5 + 1 + r}`;
+        cell.style.gridArea = `2 / ${color * 5 + 1 + rarityIndex} / auto / ${color * 5 + 1 + rarityIndex}`;
         table.appendChild(cell);
 
         // A little hacky to use "c + 1"..
-        if (setStats.cards[c + 1]) {
-          let cardsArray = setStats.cards[c + 1][rarity];
+        if (setStats.cards[color + 1]) {
+          let cardsArray = setStats.cards[color + 1][rarity];
           if (cardsArray) {
             cardsArray.forEach((card, index) => {
               let dbCard = db.card(card.id);
@@ -852,9 +877,9 @@ function openSetStats(setStats, setName) {
                 let classes = ["completion_table_card", "n" + card.owned];
                 if (card.wanted > 0) classes.push("wanted");
                 let cell = createDiv(classes, card.owned);
-                cell.style.gridArea = `${index + 3} / ${c * 5 +
+                cell.style.gridArea = `${index + 3} / ${color * 5 +
                   1 +
-                  r} / auto / ${c * 5 + 1 + r}`;
+                  rarityIndex} / auto / ${color * 5 + 1 + rarityIndex}`;
                 table.appendChild(cell);
 
                 addCardHover(cell, dbCard);
@@ -870,6 +895,7 @@ function openSetStats(setStats, setName) {
   let wanted = {};
   let missing = {};
   CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(rarity => {
+    rarity = rarity.toLowerCase();
     const countStats = setStats[rarity];
     if (countStats.total > 0) {
       const capitalizedRarity = rarity[0].toUpperCase() + rarity.slice(1) + "s";
@@ -1174,7 +1200,7 @@ function printCards() {
       }
       if (filteredMana.length > 0) {
         let su = 0;
-        filteredMana.forEach(function(m) {
+        filteredMana.forEach(function (m) {
           if (s[m] == 1) {
             su++;
           }

@@ -210,6 +210,7 @@ function deckStatsSection(deck) {
   const costSection = createDiv(["wildcards_cost"]);
   costSection.appendChild(createSpan([], "Wildcards you have/need"));
   CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(cardRarity => {
+    cardRarity = cardRarity.toLowerCase();
     const wcText =
       (ownedWildcards[cardRarity] > 0
         ? ownedWildcards[cardRarity] + " / "
