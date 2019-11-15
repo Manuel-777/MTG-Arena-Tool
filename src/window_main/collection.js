@@ -294,7 +294,7 @@ export function openCollectionTab() {
   icd.appendChild(input);
   fllt.appendChild(icd);
 
-  input.addEventListener("keydown", function (e) {
+  input.addEventListener("keydown", function(e) {
     if (e.keyCode == 13) {
       printCollectionPage();
     }
@@ -386,7 +386,7 @@ export function openCollectionTab() {
     let setbutton = createDiv(["set_filter", "set_filter_on"]);
     setbutton.style.backgroundImage = `url(../images/sets/${
       db.sets[set].code
-      }.png)`;
+    }.png)`;
     setbutton.title = set;
 
     sets.appendChild(setbutton);
@@ -405,7 +405,7 @@ export function openCollectionTab() {
 
   let manas = createDiv(["sets_container"]);
   let ms = ["w", "u", "b", "r", "g"];
-  ms.forEach(function (s, i) {
+  ms.forEach(function(s, i) {
     let mi = [1, 2, 3, 4, 5];
     let manabutton = createDiv(["mana_filter_search", "mana_filter_on"]);
     manabutton.style.backgroundImage = `url(../images/${s}64.png)`;
@@ -620,7 +620,7 @@ function expandFilters() {
   } else {
     div.style.height = "calc(100% - 122px)";
     div.style.opacity = 1;
-    setTimeout(function () {
+    setTimeout(function() {
       $$(".inventory")[0].style.display = "none";
     }, 200);
   }
@@ -843,13 +843,6 @@ function openSetStats(setStats, setName) {
           tile = "mana_multi";
           break;
       }
-      // if (color + 1 == MULTI) tile = "mana_multi";
-      // if (color + 1 == COLORLESS) tile = "mana_colorless";
-      // if (color + 1 == WHITE) tile = "mana_white";
-      // if (color + 1 == BLUE) tile = "mana_blue";
-      // if (color + 1 == BLACK) tile = "mana_black";
-      // if (color + 1 == RED) tile = "mana_red";
-      // if (color + 1 == GREEN) tile = "mana_green";
 
       let cell = createDiv(["completion_table_color_title", tile]);
       cell.style.gridArea = `1 / ${color * 5 + 1} / auto / ${color * 5 + 6}`;
@@ -860,7 +853,9 @@ function openSetStats(setStats, setName) {
         rarity = rarity.toLowerCase();
         let cell = createDiv(["completion_table_rarity_title", rarity]);
         cell.title = rarity;
-        cell.style.gridArea = `2 / ${color * 5 + 1 + rarityIndex} / auto / ${color * 5 + 1 + rarityIndex}`;
+        cell.style.gridArea = `2 / ${color * 5 +
+          1 +
+          rarityIndex} / auto / ${color * 5 + 1 + rarityIndex}`;
         table.appendChild(cell);
 
         // A little hacky to use "c + 1"..
@@ -1200,7 +1195,7 @@ function printCards() {
       }
       if (filteredMana.length > 0) {
         let su = 0;
-        filteredMana.forEach(function (m) {
+        filteredMana.forEach(function(m) {
           if (s[m] == 1) {
             su++;
           }

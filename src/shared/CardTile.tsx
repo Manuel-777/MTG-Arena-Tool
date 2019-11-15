@@ -128,18 +128,6 @@ function CostSymbols(props: { card: DbCardData; dfcCard?: DbCardData }): JSX.Ele
   return <>{costSymbols}</>;
 }
 
-// function ArenaWildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
-//   const { card, deck, isSideboard, ww } = props;
-//   if (card.type.indexOf("Basic Land") === -1) {
-//     const missing = getWildcardsMissing(deck, card.id, isSideboard);
-//     if (missing > 0) {
-//       const cardRarity = card.rarity;
-//       return MissingCardSprite({missing, cardRarity, ww});
-//     }
-//   }
-//   return <></>;
-// }
-
 function ArenaCardTile(props: CardTileProps): JSX.Element {
   const {
     card,
