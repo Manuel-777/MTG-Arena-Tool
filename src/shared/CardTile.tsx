@@ -227,6 +227,7 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
           card={card}
           deck={deck}
           isSideboard={isSideboard}
+          listStyle="arena"
           ww={ww}
         />
       )}
@@ -261,32 +262,41 @@ interface WildcardsNeededProps{
   card:DbCardData;
   deck:Deck;
   isSideboard:boolean;
+  listStyle:"flat"|"arena";
   ww?:number;
 }
 
 interface MissingCardsProps{
   missing:number;
   cardRarity:Rarity;
+  listStyle:"flat"|"arena";
   ww?:number;
 }
 
 function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
-  const { card, deck, isSideboard, ww } = props;
+  const { card, deck, isSideboard, listStyle, ww } = props;
   if (card.type.indexOf("Basic Land") === -1) {
     const missing = getWildcardsMissing(deck, card.id, isSideboard);
     const cardRarity = card.rarity;
-    if (missing > 0 && cardRarity !== "Land") {
-      return MissingCardSprite({missing, cardRarity, ww});
+
+
+    if (missing > 0) {
+      return MissingCardSprite({missing, cardRarity, listStyle, ww});
     }
   }
   return <></>;
 }
 
 function MissingCardSprite(props:MissingCardsProps):JSX.Element{
-  const{missing, cardRarity, ww} = props;
+  const{missing, cardRarity, listStyle, ww} = props;
 
   const xoff = CARD_RARITIES.indexOf(cardRarity) * -24;
   const yoff = missing * -24;
+
+  var className = "not_owned_sprite";
+  if(listStyle === "flat"){
+    className += "_flat";
+  }
 
   const style:React.CSSProperties =
   {backgroundPosition: `${xoff}px ${yoff}px`};
@@ -296,7 +306,7 @@ function MissingCardSprite(props:MissingCardsProps):JSX.Element{
 
   return (
     <div
-    className="not_owned_sprite_flat"
+    className={className}
     title={missing + " missing"}
     style={style}
     />
@@ -401,6 +411,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
           card={card}
           deck={deck}
           isSideboard={isSideboard}
+          listStyle = "flat"
         />
       )}
     </div>
