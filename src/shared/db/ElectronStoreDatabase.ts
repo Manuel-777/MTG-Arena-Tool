@@ -5,7 +5,9 @@ import {
   rememberDefaults,
   settingsDefaults,
   playerDefaults,
-  defaultCallback
+  showBusy,
+  wrapCallback,
+  logInfo
 } from "./databaseUtil";
 import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
@@ -14,7 +16,8 @@ import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
  *   https://github.com/sindresorhus/electron-store
  * It was our original persistence tier and better suited for synchronous
  * writes of smaller amounts of data. This class simply wraps it to provide
- * a standard MongoDb-like API.
+ * a standard MongoDb-like API and use hacky logic to combine together
+ * settings.json and remember.json
  */
 export class ElectronStoreDatabase implements LocalDatabase {
   dbName: string;
@@ -79,30 +82,30 @@ export class ElectronStoreDatabase implements LocalDatabase {
     if (!store) {
       throw new DatabaseNotInitializedError();
     }
-    callback(null, store.store);
+    showBusy("Loading all data...");
+    const wrappedCallback = wrapCallback("Loading all data", true, callback);
+    wrappedCallback(null, store.store);
   }
 
-  upsertAll(data: any, callback: (err: Error | null, num: number) => void) {
+  upsertAll(data: any, callback?: (err: Error | null, num: number) => void) {
     const store = this.getStore();
     if (!store) {
       throw new DatabaseNotInitializedError();
     }
+    showBusy("Saving all data...");
+    const wrappedCallback = wrapCallback("Saving all data", true, callback);
     const docCount = Object.keys(data).length;
     if (store) {
       store.set(data);
     }
-    if (callback) {
-      callback(null, docCount);
-    } else {
-      defaultCallback(null, docCount, "upserted");
-    }
+    wrappedCallback(null, docCount);
   }
 
   upsert(
     table: string,
     key: string,
     data: any,
-    callback: (err: Error | null, num: number) => void,
+    callback?: (err: Error | null, num: number) => void,
     globals?: any
   ) {
     const store = this.getStore(key);
@@ -119,13 +122,11 @@ export class ElectronStoreDatabase implements LocalDatabase {
       // skip persisting changes until final bulk upsertAll call
       return;
     }
+    logInfo("Saving data...")
+    const wrappedCallback = wrapCallback("Saving data", false, callback);
     const field = ElectronStoreDatabase.getElectronStoreField(table, key);
     store.set(field, data);
-    if (callback) {
-      callback(null, 1);
-    } else {
-      defaultCallback(null, 1, "upserted");
-    }
+    wrappedCallback(null, 1);
   }
 
   find(
@@ -137,26 +138,27 @@ export class ElectronStoreDatabase implements LocalDatabase {
     if (!store) {
       throw new DatabaseNotInitializedError();
     }
+    showBusy("Loading data...");
+    const wrappedCallback = wrapCallback("Loading data", true, callback);
     const field = ElectronStoreDatabase.getElectronStoreField(table, key);
-    callback(null, store.get(field));
+    const data = store.get(field);
+    wrappedCallback(null, data);
   }
 
   remove(
     table: string,
     key: string,
-    callback: (err: Error | null, num: number) => void
+    callback?: (err: Error | null, num: number) => void
   ) {
     const store = this.getStore(key);
     if (!store) {
       throw new DatabaseNotInitializedError();
     }
+    logInfo("Deleting data...")
+    const wrappedCallback = wrapCallback("Deleting data", false, callback);
     // Note: we must always run delete, regardless of firstpass
     const field = ElectronStoreDatabase.getElectronStoreField(table, key);
     store.delete(field);
-    if (callback) {
-      callback(null, 1);
-    } else {
-      defaultCallback(null, 1, "removed");
-    }
+    wrappedCallback(null, 1);
   }
 }

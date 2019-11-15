@@ -1,7 +1,6 @@
-import { app, remote } from "electron";
 import path from "path";
 import Datastore from "nedb";
-import { USER_DATA_DIR } from "./databaseUtil";
+import { USER_DATA_DIR, showBusy, wrapCallback, logInfo } from "./databaseUtil";
 import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
 // manually maintained list of non-document (non-object) fields
@@ -26,20 +25,14 @@ const nonDocFields = [
  * This class gives it a thin wrapper that also allows us to:
  *   - call upsertAll (horrid recursive nested upsert)
  *   - use hacky logic to wrap "bare" values in proper documents
- *   - use hacky logic to combine together settings.json and remember.json
  *   - sanitize certain MongoDb fields (only _id so far)
  */
 export class NeDbDatabase implements LocalDatabase {
   dbName: string;
-  useBulkFirstpass: boolean;
-  appStore?: Datastore;
-  playerStore?: Datastore;
+  datastore?: Datastore;
 
   constructor(useBulkFirstpass = false) {
     this.dbName = "";
-    // whether or not to imitate old electron-store bulk-write
-    // behavior during the first pass of the log (deprecated workaround)
-    this.useBulkFirstpass = useBulkFirstpass;
     this.init = this.init.bind(this);
     this.findAll = this.findAll.bind(this);
     this.upsertAll = this.upsertAll.bind(this);
@@ -61,117 +54,97 @@ export class NeDbDatabase implements LocalDatabase {
     return doc;
   }
 
-  get datastore() {
-    return this.dbName === "application" ? this.appStore : this.playerStore;
-  }
-
-  init(dbName: string, arenaName: string) {
-    const userDir = (app || remote.app).getPath("userData");
+  init(dbName: string, arenaName?: string) {
     this.dbName = arenaName ? arenaName : dbName;
-    if (dbName === "application") {
-      this.appStore = new Datastore({
-        filename: path.join(userDir, "application.db"),
-        autoload: true
-      });
-      // auto-compact once per minute
-      this.appStore.persistence.setAutocompactionInterval(60000);
-    } else {
-      this.playerStore = new Datastore({
-        filename: path.join(userDir, this.dbName + ".db"),
-        autoload: true
-      });
-      // auto-compact once per minute
-      this.playerStore.persistence.setAutocompactionInterval(60000);
-    }
+    this.datastore = new Datastore({
+      filename: path.join(USER_DATA_DIR, this.dbName + ".db"),
+      autoload: true
+    });
+    // auto-compact once per minute
+    this.datastore.persistence.setAutocompactionInterval(60000);
   }
 
   findAll(callback: (err: Error | null, data: any) => void) {
     if (!this.datastore) {
       throw new DatabaseNotInitializedError();
     }
+    showBusy("Loading all data...");
+    const wrappedCallback = wrapCallback("Loading all data", true, callback);
     this.datastore.find({}, (err: Error, docs: any[]) => {
-      if (err) {
-        callback(err, null);
-        return;
-      }
       const data: {
         [key: string]: any;
       } = {};
-      docs.forEach(doc => {
-        const key = doc._id;
-        if (nonDocFields.includes(key)) {
-          data[key] = doc.data;
-        } else {
-          data[key] = NeDbDatabase.getCleanDoc(doc);
-        }
-      });
-      callback(null, data);
+      if (docs) {
+        docs.forEach(doc => {
+          const key = doc._id;
+          if (nonDocFields.includes(key)) {
+            data[key] = doc.data;
+          } else {
+            data[key] = NeDbDatabase.getCleanDoc(doc);
+          }
+        });
+      }
+      wrappedCallback(err, err ? null : data);
     });
   }
 
   upsertAll(
     data: any,
-    callback: (err: Error | null, num: number) => void,
-    intermediateCallback: (err: Error | null, num: number) => void
+    callback?: (err: Error | null, num: number) => void,
+    intermediateCallback?: (err: Error | null, num: number) => void
   ) {
     if (!this.datastore) {
       throw new DatabaseNotInitializedError();
     }
+    showBusy("Saving all data...");
+    const wrappedCallback = wrapCallback("Saving all data", true, callback);
     const allData = Object.entries(data);
     allData.reverse();
     const recursiveHelper = (
       dataToUpsert: any[],
-      total: number,
+      errorCount: number,
+      successCount: number,
       upsert: Function
     ) => {
       if (dataToUpsert.length) {
         const [key, value] = dataToUpsert.pop();
         upsert("", key, value, (err: Error, num: number) => {
           if (num) {
-            total += num;
+            successCount += num;
           } else if (err) {
-            console.log(err);
+            errorCount += 1;
+            console.error("Local DB: ERROR ${errorCount} during Saving all data!", err);
           }
           if (intermediateCallback) {
-            intermediateCallback(err, total);
+            intermediateCallback(err, successCount);
           }
-          recursiveHelper(dataToUpsert, total, upsert);
+          recursiveHelper(dataToUpsert, errorCount, successCount, upsert);
         });
       } else {
-        callback(null, total);
+        wrappedCallback(null, successCount);
       }
     };
-    recursiveHelper(allData, 0, this.upsert);
+    recursiveHelper(allData, 0, 0, this.upsert);
   }
 
   upsert(
     table: string,
     key: string,
     data: any,
-    callback: (err: Error | null, num: number) => void,
-    globals: any
+    callback?: (err: Error | null, num: number) => void
   ) {
     if (!this.datastore) {
       throw new DatabaseNotInitializedError();
     }
-    if (
-      this.useBulkFirstpass &&
-      globals &&
-      !globals.debugLog &&
-      globals.firstPass &&
-      table !== "application"
-    ) {
-      // special optimization to handle initial log read
-      // skip persisting changes until final bulk upsertAll call
-      return;
-    }
+    logInfo("Saving data...")
+    const wrappedCallback = wrapCallback("Saving data", false, callback);
     if (table) {
       // handle updating sub-document
       this.datastore.update(
         { _id: table },
         { $set: { [key]: data } },
         { upsert: true },
-        callback
+        wrappedCallback
       );
     } else {
       let doc = data;
@@ -184,7 +157,7 @@ export class NeDbDatabase implements LocalDatabase {
         { _id: key },
         { ...doc, _id: key },
         { upsert: true },
-        callback
+        wrappedCallback
       );
     }
   }
@@ -197,6 +170,8 @@ export class NeDbDatabase implements LocalDatabase {
     if (!this.datastore) {
       throw new DatabaseNotInitializedError();
     }
+    showBusy("Loading data...");
+    const wrappedCallback = wrapCallback("Loading data", true, callback);
     let _id = key;
     let subKey = "";
     if (table) {
@@ -207,11 +182,11 @@ export class NeDbDatabase implements LocalDatabase {
     }
     this.datastore.findOne({ _id }, (err, doc) => {
       if (err) {
-        callback(err, null);
+        wrappedCallback(err, 0);
       } else if (subKey && doc && doc[subKey]) {
-        callback(null, doc[subKey]);
+        wrappedCallback(null, doc[subKey]);
       } else {
-        callback(null, NeDbDatabase.getCleanDoc(doc));
+        wrappedCallback(null, NeDbDatabase.getCleanDoc(doc));
       }
     });
   }
@@ -219,11 +194,13 @@ export class NeDbDatabase implements LocalDatabase {
   remove(
     table: string,
     key: string,
-    callback: (err: Error | null, num: number) => void
+    callback?: (err: Error | null, num: number) => void
   ) {
     if (!this.datastore) {
       throw new DatabaseNotInitializedError();
     }
+    logInfo("Deleting data...")
+    const wrappedCallback = wrapCallback("Deleting data", false, callback);
     // Note: we must always run delete, regardless of firstpass
     if (table) {
       // handle deleting sub-document
@@ -231,11 +208,11 @@ export class NeDbDatabase implements LocalDatabase {
         { _id: table },
         { $unset: { [key]: true } },
         { upsert: true },
-        callback
+        wrappedCallback
       );
     } else {
       // remove entire document
-      this.datastore.remove({ _id: key }, {}, callback);
+      this.datastore.remove({ _id: key }, {}, wrappedCallback);
     }
   }
 }

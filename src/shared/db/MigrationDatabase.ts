@@ -46,8 +46,8 @@ export class MigrationDatabase implements LocalDatabase {
 
   upsertAll(
     data: any,
-    callback: (err: Error | null, num: number) => void,
-    intermediateCallback: (err: Error | null, num: number) => void
+    callback?: (err: Error | null, num: number) => void,
+    intermediateCallback?: (err: Error | null, num: number) => void
   ) {
     if (!this.oldDb || !this.newDb) {
       throw new DatabaseNotInitializedError();
@@ -60,8 +60,8 @@ export class MigrationDatabase implements LocalDatabase {
     table: string,
     key: string,
     data: any,
-    callback: (err: Error | null, num: number) => void,
-    globals: any
+    callback?: (err: Error | null, num: number) => void,
+    globals?: any
   ) {
     if (!this.oldDb || !this.newDb) {
       throw new DatabaseNotInitializedError();
@@ -84,7 +84,7 @@ export class MigrationDatabase implements LocalDatabase {
   remove(
     table: string,
     key: string,
-    callback: (err: Error | null, num: number) => void
+    callback?: (err: Error | null, num: number) => void
   ) {
     if (!this.oldDb || !this.newDb) {
       throw new DatabaseNotInitializedError();

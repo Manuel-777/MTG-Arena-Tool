@@ -20,10 +20,10 @@ export interface LocalDatabase {
   find(
     table: string,
     key: string,
-    callback?: (err: Error | null, data: any) => void
+    callback: (err: Error | null, data: any) => void
   ): void;
 
-  findAll(callback?: (err: Error | null, data: any) => void): void;
+  findAll(callback: (err: Error | null, data: any) => void): void;
 
   init(dbName: string, arenaName?: string): void;
 
