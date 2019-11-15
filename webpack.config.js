@@ -14,18 +14,16 @@ const baseConfig = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.jsx?$/,
+        loader: "babel-loader",
         enforce: "pre",
-        loader: "tslint-loader",
-        exclude: /node_modules/,
-        options: {
-          typeCheck: true,
-          emitErrors: true
-        }
+        exclude: /node_modules/
       },
       {
         test: /\.tsx?$/,
-        loader: "ts-loader"
+        loader: "ts-loader",
+        enforce: "pre",
+        exclude: /node_modules/
       }
     ]
   },

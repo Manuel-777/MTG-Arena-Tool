@@ -6,7 +6,7 @@ import {
   GREEN,
   MULTI,
   COLORLESS
-} from "./constants.js";
+} from "./constants";
 
 class Colors {
   /**
