@@ -1,15 +1,39 @@
 import _ from "lodash";
 import db from "./database.js";
 import Colors from "./colors.js";
+import { v2cardsList, v3cardsList, anyCardsList } from "./types/Deck";
+import { DbCardData } from "./types/Metadata.js";
+
+interface cardTypesCount {
+  art:number,
+  cre:number,
+  enc:number,
+  ins:number,
+  lan:number,
+  pla:number,
+  sor:number
+}
+
+interface colorsCount {
+  total:number,
+  w:number,
+  u:number,
+  b:number,
+  r:number,
+  g:number,
+  c:number
+}
 
 class CardsList {
+  private _list:v2cardsList;
   /**
    * Creates a list of cards based on an array of objects with the form
    * {quantity, id}
    * If an array of IDs is given it sets each quantity to the number of adjacent
    * repetitions
    **/
-  constructor(list = []) {
+
+  constructor(list:any[] = []) {
     if (!list || list.length === 0) {
       this._list = [];
     } else if (typeof list[0] === "object") {
@@ -23,7 +47,7 @@ class CardsList {
       });
     } else {
       this._list = [];
-      let lastId = null;
+      let lastId:number = 0;
       list.forEach(id => {
         if (id === lastId) {
           this._list[this._list.length - 1].quantity++;
@@ -35,14 +59,14 @@ class CardsList {
     }
   }
 
-  get() {
+  get():v2cardsList {
     return this._list;
   }
 
   /**
    * Adds a card to the list
    **/
-  add(grpId, quantity = 1, merge = false) {
+  add(grpId:number, quantity:number = 1, merge:boolean = false) {
     if (typeof quantity !== "number") {
       throw new Error("quantity must be a number");
     }
@@ -66,15 +90,14 @@ class CardsList {
   /**
    * Removes a card from the list.
    **/
-  remove(grpId, quantity = 1, byName = false) {
+  remove(grpId:number, quantity:number = 1, byName:boolean = false) {
     if (typeof quantity !== "number") {
       throw new Error("quantity must be a number");
     }
     if (byName) {
-      let removed = 0;
-      let cardToFind = db.card(grpId);
+      let cardToFind = db.card(grpId) as DbCardData;
       this._list.forEach(function(card) {
-        let cardInList = db.card(card.id);
+        let cardInList = db.card(card.id) as DbCardData;
         if (cardToFind.name == cardInList.name) {
           let remove = Math.min(card.quantity, quantity);
           card.quantity -= remove;
@@ -82,8 +105,7 @@ class CardsList {
         }
       });
     } else {
-      let removed = 0;
-      this._list.forEach(function(card) {
+      this._list.forEach(card => {
         if (grpId == card.id) {
           let remove = Math.min(card.quantity, quantity);
           card.quantity -= remove;
@@ -97,14 +119,14 @@ class CardsList {
    * Counts all cards in the list, if provided it only counts
    * for the given propierty.
    **/
-  count(prop = "quantity") {
+  count(prop:string = "quantity") {
     return _.sumBy(this._list, prop);
   }
 
   /**
    * Same as count(), but here we can apply a filter function to the list.
    **/
-  countFilter(prop = "quantity", func) {
+  countFilter(prop:string = "quantity", func:any) {
     return _(this._list)
       .filter(func)
       .sumBy(prop);
@@ -113,7 +135,7 @@ class CardsList {
   /**
    * Creates a n object containing how many of each type the list has
    **/
-  countTypesAll() {
+  countTypesAll():cardTypesCount {
     let types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
 
     this._list.forEach(function(card) {
@@ -142,7 +164,7 @@ class CardsList {
   /**
    * Counts how many cards of a given type the list has.
    **/
-  countType(type) {
+  countType(type:string):number {
     let types = this.countTypesAll();
     if (type.includes("Land", 0)) return types.lan;
     else if (type.includes("Creature", 0)) return types.cre;
@@ -158,12 +180,12 @@ class CardsList {
   /**
    * Creates an object containing the colors distribution of the list.
    **/
-  getColorsAmmounts() {
+  getColorsAmmounts():colorsCount {
     let colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
     this._list.forEach(function(card) {
       if (card.quantity > 0) {
-        db.card(card.id).cost.forEach(function(c) {
+        (db.card(card.id) as DbCardData).cost.forEach(function(c) {
           if (c.indexOf("w") !== -1) {
             colors.w += card.quantity;
             colors.total += card.quantity;
@@ -198,12 +220,12 @@ class CardsList {
   /**
    * Creates an object containing the lands color distribution of the list.
    **/
-  getLandsAmounts() {
+  getLandsAmounts():colorsCount {
     var colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
-    this._list.forEach(function(card) {
-      var quantity = card.quantity;
-      card = db.card(card.id);
+    this._list.forEach(cardObj => {
+      var quantity = cardObj.quantity;
+      let card = db.card(cardObj.id) as DbCardData;
       if (card && quantity > 0) {
         if (
           card.type.indexOf("Land") != -1 ||
@@ -245,18 +267,9 @@ class CardsList {
   }
 
   /**
-   * Inserts a new propierty to each card in the list.
-   **/
-  addProperty(_prop, _default = 0) {
-    this._list.forEach(obj => {
-      obj[_prop] = _default(obj);
-    });
-  }
-
-  /**
    * Get all colors in the list as a Colors object.
    **/
-  getColors() {
+  getColors():Colors {
     let colors = new Colors();
     this._list.forEach(card => {
       let cardData = db.card(card.id);
@@ -277,12 +290,12 @@ class CardsList {
    * If ReplaceList is set, replaces the _list with the new one.
    * Returns the new list (not a cardsList object)
    **/
-  removeDuplicates(replaceList = true) {
-    var newList = [];
+  removeDuplicates(replaceList:boolean = true):v2cardsList {
+    var newList:v2cardsList = [];
 
     this._list.forEach(function(card) {
-      let cardObj = db.card(card.id);
-      let found = newList.find(c => db.card(c.id).name === cardObj.name);
+      let cardObj = db.card(card.id) as DbCardData;
+      let found = newList.find(c => (db.card(c.id) as DbCardData).name === cardObj.name);
       if (found) {
         if (found.measurable) {
           found.quantity += card.quantity;

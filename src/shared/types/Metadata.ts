@@ -38,7 +38,7 @@ export interface DbCardData {
   reprints: boolean | number[]
 }
 
-type Rarity = "Land" | "Common" | "Uncommon" | "Rare" | "Mythic";
+type Rarity = "land" | "common" | "uncommon" | "rare" | "mythic";
 
 interface ImageLinks {
   small: string,
