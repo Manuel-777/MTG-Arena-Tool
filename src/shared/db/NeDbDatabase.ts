@@ -121,6 +121,9 @@ export class NeDbDatabase implements LocalDatabase {
           recursiveHelper(dataToUpsert, errorCount, successCount, upsert);
         });
       } else {
+        if (this.datastore) {
+          this.datastore.persistence.compactDatafile();
+        }
         wrappedCallback(null, successCount);
       }
     };
