@@ -1,5 +1,5 @@
 import db from "./database.js";
-import CardsList from "./cardsList.js";
+import CardsList from "./cardsList";
 import Colors from "./colors.js";
 import {
   compare_cards,
