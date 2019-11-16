@@ -67,9 +67,6 @@ class CardsList {
    * Adds a card to the list
    **/
   add(grpId:number, quantity:number = 1, merge:boolean = false) {
-    if (typeof quantity !== "number") {
-      throw new Error("quantity must be a number");
-    }
     if (merge) {
       this._list.forEach((card, index) => {
         if (card.id == grpId) {
@@ -91,9 +88,6 @@ class CardsList {
    * Removes a card from the list.
    **/
   remove(grpId:number, quantity:number = 1, byName:boolean = false) {
-    if (typeof quantity !== "number") {
-      throw new Error("quantity must be a number");
-    }
     if (byName) {
       let cardToFind = db.card(grpId) as DbCardData;
       this._list.forEach(function(card) {
