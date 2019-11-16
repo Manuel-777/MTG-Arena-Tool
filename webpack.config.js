@@ -14,13 +14,13 @@ const baseConfig = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.(js|jsx)$/,
         loader: "babel-loader",
         enforce: "pre",
         exclude: /node_modules/
       },
       {
-        test: /\.tsx?$/,
+        test: /\.(ts|tsx)$/,
         loader: "ts-loader",
         enforce: "pre",
         exclude: /node_modules/
