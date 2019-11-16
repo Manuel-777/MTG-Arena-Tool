@@ -15,15 +15,13 @@ const baseConfig = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        loader: "babel-loader",
-        enforce: "pre",
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        loader: "babel-loader"
       },
       {
         test: /\.(ts|tsx)$/,
-        loader: "ts-loader",
-        enforce: "pre",
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        loader: "ts-loader"
       }
     ]
   },
@@ -37,32 +35,36 @@ module.exports = [
     ...baseConfig,
     entry: "./src/main.js",
     output: {
-      filename: "main.js",
-      path: path.join(__dirname, "dist")
+      path: path.resolve(__dirname, "dist"),
+      filename: "[name].js",
+      chunkFilename: "[chunkhash].js"
     }
   },
   {
     ...baseConfig,
     entry: "./src/window_background/background.js",
     output: {
-      filename: "background.js",
-      path: path.join(__dirname, "dist")
+      path: path.resolve(__dirname, "dist"),
+      filename: "[name].js",
+      chunkFilename: "[chunkhash].js"
     }
   },
   {
     ...baseConfig,
     entry: "./src/window_main/renderer.js",
     output: {
-      filename: "renderer.js",
-      path: path.join(__dirname, "dist")
+      path: path.resolve(__dirname, "dist"),
+      filename: "[name].js",
+      chunkFilename: "[chunkhash].js"
     }
   },
   {
     ...baseConfig,
     entry: "./src/overlay/index.tsx",
     output: {
-      filename: "overlay.tsx",
-      path: path.join(__dirname, "dist")
+      path: path.resolve(__dirname, "dist"),
+      filename: "[name].js",
+      chunkFilename: "[chunkhash].js"
     }
   }
 ];

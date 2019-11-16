@@ -27,7 +27,7 @@
   "repository": "https://github.com/Manuel-777/MTG-Arena-Tool",
   "bugs": "https://github.com/Manuel-777/MTG-Arena-Tool/issues",
   "version": "2.12.14",
-  "main": "lib/main.js",
+  "main": "dist/main.js",
   "build": {
     "appId": "com.github.manuel777.mtgatool",
     "files": [
@@ -55,7 +55,7 @@
     "clean:modules": "rm -fr node_modules",
     "clean:lock": "rm -f package-lock.json",
     "postclean": "npm install",
-    "start": "webpack --config webpack.config.js && npm run babel && electron .",
+    "start": "webpack --config webpack.config.js && electron .",
     "postinstall": "install-app-deps",
     "format": "prettier --write \"src/**/*.js\"",
     "test": "npm run --silent test:eslint && npm run --silent test:prettier && npm run --silent test:jest",
@@ -63,7 +63,7 @@
     "eslint:fix": "eslint . --quiet --ext .js,.ts,.jsx,.tsx --fix",
     "test:prettier": "prettier --list-different \"src/**/*.js\"",
     "test:jest": "jest src/",
-    "dist": "npm run babel && build --x64",
+    "dist": "webpack --config webpack.config.js && build --x64",
     "version": "node -p \"require('./package.json').version\"",
     "load-logs": "npm run babel && electron \"./scripts/load-logs.js\"",
     "metadata": "electron \"./scripts/metadata.js\"",
