@@ -47,7 +47,7 @@ class CardsList {
       });
     } else {
       this._list = [];
-      let lastId:number = 0;
+      let lastId = 0;
       list.forEach(id => {
         if (id === lastId) {
           this._list[this._list.length - 1].quantity++;
@@ -66,7 +66,7 @@ class CardsList {
   /**
    * Adds a card to the list
    **/
-  add(grpId:number, quantity:number = 1, merge:boolean = false) {
+  add(grpId:number, quantity = 1, merge = false) {
     if (merge) {
       this._list.forEach((card, index) => {
         if (card.id == grpId) {
@@ -87,7 +87,7 @@ class CardsList {
   /**
    * Removes a card from the list.
    **/
-  remove(grpId:number, quantity:number = 1, byName:boolean = false) {
+  remove(grpId:number, quantity = 1, byName = false) {
     if (byName) {
       let cardToFind = db.card(grpId) as DbCardData;
       this._list.forEach(function(card) {
@@ -113,14 +113,14 @@ class CardsList {
    * Counts all cards in the list, if provided it only counts
    * for the given propierty.
    **/
-  count(prop:string = "quantity") {
+  count(prop = "quantity") {
     return _.sumBy(this._list, prop);
   }
 
   /**
    * Same as count(), but here we can apply a filter function to the list.
    **/
-  countFilter(prop:string = "quantity", func:any) {
+  countFilter(prop = "quantity", func:any) {
     return _(this._list)
       .filter(func)
       .sumBy(prop);
@@ -284,7 +284,7 @@ class CardsList {
    * If ReplaceList is set, replaces the _list with the new one.
    * Returns the new list (not a cardsList object)
    **/
-  removeDuplicates(replaceList:boolean = true):v2cardsList {
+  removeDuplicates(replaceList = true):v2cardsList {
     var newList:v2cardsList = [];
 
     this._list.forEach(function(card) {

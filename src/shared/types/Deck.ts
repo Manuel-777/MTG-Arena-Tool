@@ -24,9 +24,9 @@ interface cardObject {
   id: number
 }
 
-export interface v2cardsList extends Array<cardObject>{}
+export type v2cardsList = Array<cardObject>;
 
-export interface v3cardsList extends Array<number>{}
+export type v3cardsList = Array<number>;
 
 export type anyCardsList = v2cardsList | v3cardsList
 

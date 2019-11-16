@@ -18,7 +18,7 @@ type returnableElements = HTMLDivElement | HTMLImageElement | HTMLInputElement |
 function createElement(
     el: returnableElements,
     classNames:string[] = [],
-    innerHTML:string = "",
+    innerHTML = "",
     attrs = {}
   ):any {
   // Adds class, InnerHTML and attrs to the given element.
@@ -28,27 +28,27 @@ function createElement(
   return el;
 }
 
-export function createDiv(classNames:string[], innerHTML:string = "", attrs = {}):HTMLDivElement {
+export function createDiv(classNames:string[], innerHTML = "", attrs = {}):HTMLDivElement {
   const el = document.createElement("div");
   return createElement(el, classNames, innerHTML, attrs);
 }
 
-export function createImg(classNames:string[], innerHTML:string = "", attrs = {}):HTMLImageElement {
+export function createImg(classNames:string[], innerHTML = "", attrs = {}):HTMLImageElement {
   const el = document.createElement("img");
   return createElement(el, classNames, innerHTML, attrs);
 }
 
-export function createInput(classNames:string[], innerHTML:string = "", attrs = {}):HTMLInputElement {
+export function createInput(classNames:string[], innerHTML = "", attrs = {}):HTMLInputElement {
   const el = document.createElement("input");
   return createElement(el, classNames, innerHTML, attrs);
 }
 
-export function createLabel(classNames:string[], innerHTML:string = "", attrs = {}):HTMLLabelElement {
+export function createLabel(classNames:string[], innerHTML = "", attrs = {}):HTMLLabelElement {
   const el = document.createElement("label");
   return createElement(el, classNames, innerHTML, attrs);
 }
 
-export function createSpan(classNames:string[], innerHTML:string = "", attrs = {}):HTMLSpanElement {
+export function createSpan(classNames:string[], innerHTML = "", attrs = {}):HTMLSpanElement {
   const el = document.createElement("span");
   return createElement(el, classNames, innerHTML, attrs);
 }

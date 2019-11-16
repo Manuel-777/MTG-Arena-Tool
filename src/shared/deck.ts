@@ -8,7 +8,7 @@ import {
 
   objectClone
 } from "./util";
-import { DEFAULT_TILE } from "./constants.js";
+import { DEFAULT_TILE } from "./constants";
 
 import { anyCardsList } from "./types/Deck";
 import { DbCardData } from "./types/Metadata.js";
@@ -105,7 +105,7 @@ class Deck {
    * the mainboard or, if specified, the sideboard.
    * By default it only return the mainboard.
    **/
-  getColors(countMainboard:boolean = true, countSideboard:boolean = false):Colors {
+  getColors(countMainboard = true, countSideboard = false):Colors {
     this._colors = new Colors();
 
     if (countMainboard) {
@@ -124,7 +124,7 @@ class Deck {
   /**
    * Return how many of each wildcard we need to complete this deck.
    **/
-  getMissingWildcards(countMainboard:boolean = true, countSideboard:boolean = true) {
+  getMissingWildcards(countMainboard = true, countSideboard = true) {
     let missing = {
       rare: 0,
       common: 0,
@@ -249,7 +249,7 @@ class Deck {
     };
   }
 
-  getUniqueString(checkSide:boolean = true) {
+  getUniqueString(checkSide = true) {
     this.sortMainboard(compare_cards);
     this.sortSideboard(compare_cards);
 
