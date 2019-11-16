@@ -791,7 +791,7 @@ export function onLabelInDeckUpdateDeck(entry, json) {
     (deltaDeck.changesMain.length || deltaDeck.changesSide.length);
 
   if (foundNewDeckChange) {
-    playerDb.upsert("deckChanges", changeId, deltaDeck, null, globals);
+    playerDb.upsert("deck_changes", changeId, deltaDeck, null, globals);
     const deck_changes = { ...playerData.deck_changes, [changeId]: deltaDeck };
     const deck_changes_index = [...playerData.deck_changes_index];
     if (!deck_changes_index.includes(changeId)) {
