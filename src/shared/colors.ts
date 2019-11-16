@@ -9,44 +9,24 @@ import {
 } from "./constants";
 
 class Colors {
-  private _w: number;
-  private _u: number;
-  private _b: number;
-  private _r: number;
-  private _g: number;
+  private w: number;
+  private u: number;
+  private b: number;
+  private r: number;
+  private g: number;
 
   /**
    * Creates a new colors object
-   * Colors can be set by propierties matching the colors (w, u, b, r, g)
+   * Colors can be set by properties matching the colors (w, u, b, r, g)
    **/
   constructor() {
-    this._w = 0;
-    this._u = 0;
-    this._b = 0;
-    this._r = 0;
-    this._g = 0;
+    this.w = 0;
+    this.u = 0;
+    this.b = 0;
+    this.r = 0;
+    this.g = 0;
 
     return this;
-  }
-
-  set w(number) {
-    this._w = number;
-  }
-
-  set u(number) {
-    this._u = number;
-  }
-
-  set b(number) {
-    this._b = number;
-  }
-
-  set r(number) {
-    this._r = number;
-  }
-
-  set g(number) {
-    this._g = number;
   }
 
   /**
@@ -55,11 +35,11 @@ class Colors {
    */
   get() {
     let _arr = [];
-    if (this._w) _arr.push(WHITE);
-    if (this._u) _arr.push(BLUE);
-    if (this._b) _arr.push(BLACK);
-    if (this._r) _arr.push(RED);
-    if (this._g) _arr.push(GREEN);
+    if (this.w !== 0) _arr.push(WHITE);
+    if (this.u !== 0) _arr.push(BLUE);
+    if (this.b !== 0) _arr.push(BLACK);
+    if (this.r !== 0) _arr.push(RED);
+    if (this.g !== 0) _arr.push(GREEN);
 
     return _arr;
   }
@@ -70,7 +50,7 @@ class Colors {
   getBaseColor() {
     if (this.length > 1) {
       return MULTI;
-    } else if (this.length == 0) {
+    } else if (this.length === 0) {
       return COLORLESS;
     }
     return this.get()[0];
@@ -81,11 +61,11 @@ class Colors {
    */
   get length() {
     let ret = 0;
-    if (this._w > 0) ret += 1;
-    if (this._u > 0) ret += 1;
-    if (this._b > 0) ret += 1;
-    if (this._r > 0) ret += 1;
-    if (this._g > 0) ret += 1;
+    if (this.w > 0) ret += 1;
+    if (this.u > 0) ret += 1;
+    if (this.b > 0) ret += 1;
+    if (this.r > 0) ret += 1;
+    if (this.g > 0) ret += 1;
 
     return ret;
   }
@@ -94,17 +74,23 @@ class Colors {
    * Adds a string mana cost to this class.
    */
   addFromCost(cost: string[]) {
-    cost.forEach(_c => {
-      if (_c == "w") {
-        this._w += 1;
-      } else if (_c == "u") {
-        this._u += 1;
-      } else if (_c == "b") {
-        this._b += 1;
-      } else if (_c == "r") {
-        this._r += 1;
-      } else if (_c == "g") {
-        this._g += 1;
+    cost.forEach(c => {
+      switch (c) {
+        case "w":
+          this.w += 1;
+          break;
+        case "u":
+          this.u += 1;
+          break;
+        case "b":
+          this.b += 1;
+          break;
+        case "r":
+          this.r += 1;
+          break;
+        case "g":
+          this.g += 1;
+          break;
       }
     });
 
@@ -116,16 +102,22 @@ class Colors {
    */
   addFromArray(cost: number[]) {
     cost.forEach(color => {
-      if (color === WHITE) {
-        this._w += 1;
-      } else if (color === BLUE) {
-        this._u += 1;
-      } else if (color === BLACK) {
-        this._b += 1;
-      } else if (color === RED) {
-        this._r += 1;
-      } else if (color === GREEN) {
-        this._g += 1;
+      switch (color) {
+        case WHITE:
+          this.w += 1;
+          break;
+        case BLUE:
+          this.u += 1;
+          break;
+        case BLACK:
+          this.b += 1;
+          break;
+        case RED:
+          this.r += 1;
+          break;
+        case GREEN:
+          this.g += 1;
+          break;
       }
     });
 
@@ -136,11 +128,11 @@ class Colors {
    * Merges another instance of Colors into this one.
    */
   addFromColor(color: Colors) {
-    this._w += color.w;
-    this._u += color.u;
-    this._b += color.b;
-    this._r += color.r;
-    this._g += color.g;
+    this.w += color.w;
+    this.u += color.u;
+    this.b += color.b;
+    this.r += color.r;
+    this.g += color.g;
 
     return this;
   }
@@ -149,36 +141,13 @@ class Colors {
    * Checks if this color is equal to another
    */
   equalTo(color: Colors) {
-    if (
-      this._w == color.w &&
-      this._u == color.u &&
-      this._b == color.b &&
-      this._r == color.r &&
-      this._g == color.g
+    return (
+      this.w == color.w &&
+      this.u == color.u &&
+      this.b == color.b &&
+      this.r == color.r &&
+      this.g == color.g
     )
-      return true;
-
-    return false;
-  }
-
-  get w() {
-    return this._w;
-  }
-
-  get u() {
-    return this._u;
-  }
-
-  get b() {
-    return this._b;
-  }
-
-  get r() {
-    return this._r;
-  }
-
-  get g() {
-    return this._g;
   }
 }
 
