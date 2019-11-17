@@ -52,8 +52,8 @@ const forceDeckUpdate = function (removeUsed = true) {
   globals.currentMatch.playerCardsLeft = globals.currentMatch.player.deck.clone();
 
   if (globals.debugLog || !globals.firstPass) {
-    globals.currentMatch.playerCardsLeft.mainboard.get().forEach((card: any) => {
-      card.total = card.quantity;
+    globals.currentMatch.playerCardsLeft.mainboard.get().forEach((card: CardObject) => {
+      //card.total = card.quantity;
       decksize += card.quantity;
       cardsleft += card.quantity;
     });
