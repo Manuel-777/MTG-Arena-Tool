@@ -220,6 +220,7 @@ function drawDeck(div, deck, showWildcards = false) {
         case "Artifact":
           return "Artifacts";
         case "Land":
+        case "Basic Land":
           return "Lands";
         default:
           throw new Error(`Unexpected card type: ${type}`);

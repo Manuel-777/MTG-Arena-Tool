@@ -4,6 +4,7 @@ import { DbCardData } from "./types/Metadata";
 //
 // this order matters because things like Artifact Creatures exist
 export const cardTypes = [
+  "Basic Land",
   "Land",
   "Creature",
   "Artifact",

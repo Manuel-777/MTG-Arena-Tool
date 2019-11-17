@@ -65,7 +65,7 @@ export default function OwnershipStars(props: { card: DbCardData }) {
   if (!card || !card.type) {
     return <></>;
   }
-  const isbasic = cardHasType(card, "Land");
+  const isbasic = cardHasType(card, "Basic Land");
   const playerData = pd as any;
   const owned = playerData.cards.cards[card.id];
   const acquired = playerData.cardsNew[card.id];
