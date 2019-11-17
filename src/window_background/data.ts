@@ -293,6 +293,7 @@ export function completeMatch(match: ExtendedMatchData, matchData: MatchData, ma
   match.eventId = matchData.eventId;
   match.playerDeck = matchData.player.originalDeck.getSave();
   match.oppDeck = getOpponentDeck();
+  match.oppDeck.commandZoneGRPIds = matchData.opponent.commanderGrpIds;
 
   if (
     (!match.tags || !match.tags.length) &&

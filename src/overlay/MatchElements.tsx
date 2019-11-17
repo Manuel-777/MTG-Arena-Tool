@@ -114,7 +114,7 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
           setHoverCardCallback={setHoverCardCallback}
         />
       )}
-      {!!settings.deck && !!visibleDeck && (
+      {!!visibleDeck && (
         <DeckList
           deck={visibleDeck}
           subTitle={subTitle}

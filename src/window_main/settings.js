@@ -134,7 +134,7 @@ export function openSettingsTab(
     createDiv(["settings_nav", "sn" + SETTINGS_BEHAVIOUR], "Behaviour")
   );
   wrap_l.appendChild(
-    createDiv(["settings_nav", "sn" + SETTINGS_ARENA_DATA], "Arena Data")
+    createDiv(["settings_nav", "sn" + SETTINGS_ARENA_DATA], "Data")
   );
   wrap_l.appendChild(
     createDiv(["settings_nav", "sn" + SETTINGS_OVERLAY], "Overlay")
@@ -212,7 +212,7 @@ export function openSettingsTab(
 
   // DATA
   section = createDiv(["settings_section", "ss" + SETTINGS_ARENA_DATA]);
-  appendArenaData(section);
+  appendDataSection(section);
   div.appendChild(section);
 
   // OVERLAY
@@ -348,7 +348,7 @@ function appendBehaviour(section) {
   section.appendChild(textDiv);
 }
 
-function appendArenaData(section) {
+function appendDataSection(section) {
   section.appendChild(createDiv(["settings_title"], "Arena Data"));
 
   let label = createLabel(["but_container_label"], "Cards language:");
@@ -460,10 +460,74 @@ function appendArenaData(section) {
       });
     }
   }, 100);
+
+  section.appendChild(createDiv(["settings_title"], "Local Data"));
+  section.appendChild(
+    createDiv(
+      ["settings_note"],
+      `<p>Current application settings:
+           <a class="link app_db_link"></a></p>
+       <p>Current player settings and history:
+           <a class="link player_db_link"></a></p>`
+    )
+  );
+  setTimeout(() => {
+    const appDbLink = $$(".app_db_link")[0];
+    if (appDbLink) {
+      appDbLink.innerHTML = pd.appDbPath;
+      appDbLink.addEventListener("click", () => {
+        shell.showItemInFolder(pd.appDbPath);
+      });
+    }
+    const playerDbLink = $$(".player_db_link")[0];
+    if (playerDbLink) {
+      playerDbLink.innerHTML = pd.playerDbPath;
+      playerDbLink.addEventListener("click", () => {
+        shell.showItemInFolder(pd.playerDbPath);
+      });
+    }
+  }, 500);
 }
 
 function appendOverlay(section) {
   section.appendChild(createDiv(["settings_title"], "Overlays"));
+
+  const displayControls = createDiv(["settings_row"]);
+  // Toggle Edit Mode Button
+  const editModeButton = createDiv(
+    ["button_simple"],
+    "Edit Overlay Positions",
+    { title: pd.settings.shortcut_editmode }
+  );
+  editModeButton.addEventListener("click", function() {
+    ipcSend("toggle_edit_mode");
+  });
+  displayControls.appendChild(editModeButton);
+  // Set Overlay Display Screen
+  const overlayDisplay = pd.settings.overlay_display
+    ? pd.settings.overlay_display
+    : remote.screen.getPrimaryDisplay().id;
+  const label = createLabel(["but_container_label"], "Overlay Display:");
+  label.style.marginTop = "auto";
+  const displaySelect = createSelect(
+    label,
+    remote.screen.getAllDisplays().map(display => display.id),
+    overlayDisplay,
+    filter => ipcSend("save_user_settings", { overlay_display: filter }),
+    "overlay_display",
+    filter => {
+      const displayNumber = remote.screen
+        .getAllDisplays()
+        .findIndex(d => d.id == filter);
+      const primary = filter == remote.screen.getPrimaryDisplay().id;
+
+      return `Display ${displayNumber} ${primary ? "(primary)" : ""}`;
+    }
+  );
+  displaySelect.style.width = "180px";
+  displaySelect.style.marginLeft = "32px";
+  displayControls.appendChild(label);
+  section.appendChild(displayControls);
 
   const sliderScale = createDiv(["slidecontainer_settings"]);
   const sliderScaleLabel = createLabel(
@@ -492,6 +556,17 @@ function appendOverlay(section) {
 
   addCheckbox(
     section,
+    "Always on top when shown",
+    `overlay_ontop`,
+    pd.settings.overlay_ontop,
+    () =>
+      ipcSend("save_user_settings", {
+        overlay_ontop: byId(`overlay_ontop`).checked
+      })
+  );
+
+  const soundPriorityBox = addCheckbox(
+    section,
     "Sound when priority changes",
     "settings_soundpriority",
     pd.settings.sound_priority,
@@ -500,13 +575,15 @@ function appendOverlay(section) {
         sound_priority: byId("settings_soundpriority").checked
       })
   );
+  soundPriorityBox.style.marginTop = "24px";
 
   const sliderSoundVolume = createDiv(["slidecontainer_settings"]);
+  sliderSoundVolume.style.marginLeft = "52px";
   const sliderSoundVolumeLabel = createLabel(
     [],
     "Volume: " + Math.round(pd.settings.sound_priority_volume * 100) + "%"
   );
-  sliderSoundVolumeLabel.style.width = "400px";
+  sliderSoundVolumeLabel.style.width = "348px";
   sliderSoundVolume.appendChild(sliderSoundVolumeLabel);
 
   const sliderSoundVolumeInput = createInput(
@@ -540,50 +617,12 @@ function appendOverlay(section) {
   const helpDiv = createDiv(
     ["settings_note"],
     `You can enable up to 5 independent overlay windows. Customize each overlay
-    using the settings below.</br>
-    To edit the overlay's position and size press ${
-      pd.settings.shortcut_editmode
-    }`
+    using the settings below.</br>`
   );
   helpDiv.style.margin = "24px 64px 0px 16px";
   section.appendChild(helpDiv);
 
   const topCont = createDiv(["overlay_section_selector_cont", "top_nav_icons"]);
-
-  let overlayDisplay = pd.settings.overlay_display
-    ? pd.settings.overlay_display
-    : remote.screen.getPrimaryDisplay().id;
-
-  addCheckbox(
-    section,
-    "Always on top when shown",
-    `overlay_ontop`,
-    pd.settings.overlay_ontop,
-    () =>
-      ipcSend("save_user_settings", {
-        overlay_ontop: byId(`overlay_ontop`).checked
-      })
-  );
-
-  const label = createLabel(["but_container_label"], "Overlay Display:");
-  const displaySelect = createSelect(
-    label,
-    remote.screen.getAllDisplays().map(display => display.id),
-    overlayDisplay,
-    filter => ipcSend("save_user_settings", { overlay_display: filter }),
-    "overlay_display",
-    filter => {
-      let displayNumber = remote.screen
-        .getAllDisplays()
-        .findIndex(d => d.id == filter);
-      let primary = filter == remote.screen.getPrimaryDisplay().id;
-
-      return `Display ${displayNumber} ${primary ? "(primary)" : ""}`;
-    }
-  );
-  displaySelect.style.width = "180px";
-  displaySelect.style.marginLeft = "32px";
-  section.appendChild(label);
 
   pd.settings.overlays.forEach((settings, index) => {
     const overlaySettingsNav = createDiv([
@@ -1257,11 +1296,11 @@ function appendAbout(section) {
     shell.openExternal("https://mtgatool.com/release-notes/");
   });
   about.appendChild(versionLink);
-  if (db.data) {
+  if (db.metadata) {
     const metadataVersion = createDiv(
       ["message_sub_15", "white"],
-      `Metadata: version ${db.data.version || "???"}, updated ${format(
-        db.data.updated ? fromUnixTime(db.data.updated / 1000) : "???",
+      `Metadata: version ${db.metadata.version || "???"}, updated ${format(
+        db.metadata.updated ? fromUnixTime(db.metadata.updated / 1000) : "???",
         "Pp"
       )}`
     );

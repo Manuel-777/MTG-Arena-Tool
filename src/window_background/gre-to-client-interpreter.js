@@ -63,6 +63,17 @@ const cardTypes = [
   //"CardType_Vanguard",
 ];
 
+const gameObjectCardTypes = [
+  "GameObjectType_Card",
+  "GameObjectType_SplitCard"
+  // "GameObjectType_SplitLeft",
+  // "GameObjectType_SplitRight"
+];
+
+function isObjectACard(card) {
+  return gameObjectCardTypes.includes(card.type);
+}
+
 function keyValuePair(obj, addTo) {
   // I found some times we get f as the value array.. *shrug*
   if (obj.f) {
@@ -222,7 +233,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
         affector.objectSourceGrpId
       )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
     }
-    if (affector.type == "GameObjectType_Card") {
+    if (isObjectACard(affector)) {
       text = actionLogGenerateLink(affector.grpId);
     }
     actionLog(
@@ -245,7 +256,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
         affector.objectSourceGrpId
       )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
     }
-    if (affector.type == "GameObjectType_Card") {
+    if (isObjectACard(affector)) {
       text = actionLogGenerateLink(affector.grpId);
     }
 
@@ -269,7 +280,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
         affector.objectSourceGrpId
       )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
     }
-    if (affector.type == "GameObjectType_Card") {
+    if (isObjectACard(affector)) {
       text = actionLogGenerateLink(affector.grpId);
     }
 
@@ -298,7 +309,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(ann, details) {
         affector.objectSourceGrpId
       )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
     }
-    if (affector.type == "GameObjectType_Card") {
+    if (isObjectACard(affector)) {
       text = actionLogGenerateLink(affector.grpId);
     }
 
@@ -408,7 +419,7 @@ annotationFunctions.AnnotationType_TargetSpec = function(ann) {
       affector.objectSourceGrpId
     )}'s ${actionLogGenerateAbilityLink(affector.grpId)}`;
   }
-  if (affector.type == "GameObjectType_Card") {
+  if (isObjectACard(affector)) {
     text = actionLogGenerateLink(affector.grpId);
   }
   actionLog(seat, globals.logTime, `${text} targetted ${target}`);
@@ -539,7 +550,7 @@ function getOppUsedCards() {
           let obj = globals.currentMatch.gameObjs[id];
           if (
             obj.ownerSeatId == globals.currentMatch.opponent.seat &&
-            obj.type == "GameObjectType_Card"
+            isObjectACard(obj)
           ) {
             grpId = obj.grpId;
             //cardsUsed.push(db.card(grpId).name+" - "+zone.type);
@@ -564,8 +575,9 @@ function getCardsTypeZone() {
       zone.objectInstanceIds.forEach(id => {
         try {
           let obj = globals.currentMatch.gameObjs[id];
-          if (obj.type == "GameObjectType_Card" && obj.grpId !== 3) {
-            obj.cardTypes
+          if (isObjectACard(obj) && obj.grpId !== 3) {
+            const cardTypes = [...new Set(obj.cardTypes)];
+            cardTypes
               .filter(cardType => cardTypes.includes(cardType))
               .forEach(cardType => {
                 let grpId;
@@ -605,7 +617,7 @@ function getPlayerUsedCards() {
           let obj = globals.currentMatch.gameObjs[id];
           if (
             obj.ownerSeatId == globals.currentMatch.player.seat &&
-            obj.type == "GameObjectType_Card"
+            isObjectACard(obj)
           ) {
             grpId = obj.grpId;
             //cardsUsed.push(db.card(grpId).name+" - "+zone.type);

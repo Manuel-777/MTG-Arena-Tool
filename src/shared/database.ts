@@ -42,7 +42,7 @@ class Database {
   rewards_weekly_ends: Date;
   activeEvents: string[];
   preconDecks: { [id: string]: Deck };
-  private metadata: Metadata | undefined;
+  public metadata: Metadata | undefined;
   season: Season | undefined;
 
   private constructor() {

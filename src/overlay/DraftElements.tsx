@@ -138,7 +138,7 @@ export default function DraftElements(props: DraftElementsProps): JSX.Element {
           ))}
         </div>
       )}
-      {!!settings.deck && !!visibleDeck && (
+      {!!visibleDeck && (
         <DeckList
           deck={visibleDeck}
           subTitle={subTitle}

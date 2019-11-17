@@ -27,7 +27,9 @@ const playerDataDefault = {
   patreon: false,
   patreon_tier: -1,
   last_log_timestamp: null,
-  last_log_format: ""
+  last_log_format: "",
+  appDbPath: "",
+  playerDbPath: ""
 };
 
 const overlayCfg = {

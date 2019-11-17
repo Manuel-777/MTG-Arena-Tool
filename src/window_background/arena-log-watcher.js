@@ -48,7 +48,11 @@ import {
   setData,
   updateLoading
 } from "./background-util";
-import { ARENA_MODE_MATCH, ARENA_MODE_DRAFT } from "../shared/constants";
+import {
+  ARENA_MODE_MATCH,
+  ARENA_MODE_DRAFT,
+  ARENA_MODE_IDLE
+} from "../shared/constants";
 import update_deck from "./updateDeck";
 import globals from "./globals";
 
@@ -475,6 +479,8 @@ function finishLoading() {
       update_deck(false);
     } else if (globals.duringDraft) {
       ipc_send("set_arena_state", ARENA_MODE_DRAFT);
+    } else {
+      ipc_send("set_arena_state", ARENA_MODE_IDLE);
     }
 
     ipc_send("set_settings", JSON.stringify(playerData.settings));
