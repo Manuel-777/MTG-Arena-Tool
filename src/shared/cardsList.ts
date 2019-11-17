@@ -221,7 +221,7 @@ class CardsList {
   /**
    * Creates an object containing the lands color distribution of the list.
    **/
-  getLandsAmounts():colorsCount {
+  getLandsAmounts():ColorsCount {
     var colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
     this.list.forEach(function (cardEntry) {

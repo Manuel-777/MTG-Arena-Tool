@@ -143,7 +143,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     let landsNumber = 0;
     let landsChance = 0;
     const landsColors = new Colors();
-    mainCards.get().forEach((card: cardObject) => {
+    mainCards.get().forEach((card: CardObject) => {
       const cardObj = db.card(card.id);
       if (cardObj && cardObj.type.includes("Land", 0)) {
         landsNumber += card.quantity;
