@@ -3,13 +3,13 @@ import * as React from "react";
 import { CARD_TYPES, CARD_TYPE_CODES } from "./constants";
 import db from "./database";
 import { DeckData } from "../window_background/data";
-import { CardData } from "../overlay/overlayUtil";
+import { cardObject } from "../shared/types/Deck";
 
 function getDeckTypesAmount(deck: DeckData): { [key: string]: number } {
   const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
   if (!deck.mainDeck) return types;
 
-  deck.mainDeck.forEach(function(card: CardData | any) {
+  deck.mainDeck.forEach(function(card: cardObject | any) {
     // TODO remove group lands hack
     if (card.id.id && card.id.id == 100) {
       types.lan += card.quantity;

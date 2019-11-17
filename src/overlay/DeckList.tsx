@@ -21,7 +21,8 @@ import DeckManaCurve from "../shared/DeckManaCurve";
 import DeckTypesStats from "../shared/DeckTypesStats";
 import OwnershipStars from "../shared/OwnershipStars";
 
-import { CardData, OddsData, OverlaySettingsData } from "./overlayUtil";
+import { cardObject } from "../shared/types/Deck";
+import { OddsData, OverlaySettingsData } from "./overlayUtil";
 import SampleSizePanel from "./SampleSizePanel";
 import { DbCardData } from "../shared/types/Metadata";
 
@@ -51,13 +52,13 @@ function getRank(cardId: string): number {
   return (cardObj && cardObj.rank) || 0;
 }
 
-function compareQuantity(a: CardData, b: CardData): -1 | 0 | 1 {
+function compareQuantity(a: cardObject, b: cardObject): -1 | 0 | 1 {
   if (b.quantity - a.quantity < 0) return -1;
   if (b.quantity - a.quantity > 0) return 1;
   return 0;
 }
 
-function compareDraftPicks(a: CardData, b: CardData): -1 | 0 | 1 {
+function compareDraftPicks(a: cardObject, b: cardObject): -1 | 0 | 1 {
   const aCard = db.card(a.id);
   const bCard = db.card(b.id);
   if (!bCard) {
@@ -142,7 +143,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     let landsNumber = 0;
     let landsChance = 0;
     const landsColors = new Colors();
-    mainCards.get().forEach(card => {
+    mainCards.get().forEach((card: cardObject) => {
       const cardObj = db.card(card.id);
       if (cardObj && cardObj.type.includes("Land", 0)) {
         landsNumber += card.quantity;

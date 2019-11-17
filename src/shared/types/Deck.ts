@@ -16,12 +16,13 @@ export interface Deck {
   lastUpdated: Date
 }
 
-interface cardObject {
-  grpId?: number,
-  quantity: number,
-  measurable?: boolean,
-  chance?: number,
+export interface cardObject {
   id: number
+  quantity: number,
+  chance?: number,
+  dfcId?: string,
+  grpId?: number,
+  measurable?: boolean,
 }
 
 export type v2cardsList = Array<cardObject>;
