@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import pd from "./player-data";
-import { cardHasType } from "./card-types";
+import { cardHasType } from "./cardTypes";
 import { DbCardData } from "./types/Metadata";
 
 function OwnershipInfinity(props: { owned: number; acquired: number }) {
@@ -65,7 +65,7 @@ export default function OwnershipStars(props: { card: DbCardData }) {
   if (!card || !card.type) {
     return <></>;
   }
-  const isbasic = cardHasType(card, "Basic Land");
+  const isbasic = cardHasType(card, "Land");
   const playerData = pd as any;
   const owned = playerData.cards.cards[card.id];
   const acquired = playerData.cardsNew[card.id];
