@@ -44,8 +44,8 @@ class Deck {
   constructor(mtgaDeck:internalDeck = {}, main:anyCardsList = [], side:anyCardsList = []) {
     if (!mtgaDeck.mainDeck) mtgaDeck.mainDeck = [];
     if (!mtgaDeck.sideboard) mtgaDeck.sideboard = [];
-    if (main) mtgaDeck.mainDeck = main;
-    if (side) mtgaDeck.sideboard = side;
+    if (main.length > 0) mtgaDeck.mainDeck = main;
+    if (side.length > 0) mtgaDeck.sideboard = side;
 
     this.mainboard = new CardsList(mtgaDeck.mainDeck);
     this.sideboard = new CardsList(mtgaDeck.sideboard);
