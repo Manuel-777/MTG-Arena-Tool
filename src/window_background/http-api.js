@@ -268,14 +268,14 @@ export function httpBasic() {
               if (_headers.method == "get_database_version") {
                 let lang = playerData.settings.metadata_lang;
                 if (
-                  db.data.language &&
+                  db.metadata.language &&
                   parsedResult.lang.toLowerCase() !==
-                    db.data.language.toLowerCase()
+                    db.metadata.language.toLowerCase()
                 ) {
                   // compare language
                   console.log(
                     `Downloading database (had lang ${
-                      db.data.language
+                      db.metadata.language
                     }, needed ${parsedResult.lang})`
                   );
                   httpGetDatabase(lang);

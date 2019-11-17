@@ -1296,11 +1296,11 @@ function appendAbout(section) {
     shell.openExternal("https://mtgatool.com/release-notes/");
   });
   about.appendChild(versionLink);
-  if (db.data) {
+  if (db.metadata) {
     const metadataVersion = createDiv(
       ["message_sub_15", "white"],
-      `Metadata: version ${db.data.version || "???"}, updated ${format(
-        db.data.updated ? fromUnixTime(db.data.updated / 1000) : "???",
+      `Metadata: version ${db.metadata.version || "???"}, updated ${format(
+        db.metadata.updated ? fromUnixTime(db.metadata.updated / 1000) : "???",
         "Pp"
       )}`
     );

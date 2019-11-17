@@ -40,7 +40,7 @@ class CardsList {
   }
 
   private isCardDataList(list: number[] | CardData[]): list is CardData[] {
-    return (<CardData[]>list).every(item => item.id !== undefined);
+    return (list as CardData[]).every(item => item.id !== undefined);
   }
 
   get() {
@@ -75,7 +75,7 @@ class CardsList {
   /**
    * Removes a card from the list.
    **/
-  remove(grpId: number, quantity: number = 1, byName = false) {
+  remove(grpId: number, quantity = 1, byName = false) {
     if (byName) {
       const cardToFind = db.card(grpId);
       this.list.forEach(function (card) {
@@ -302,7 +302,7 @@ class CardsList {
 
     this.list.forEach(function (card) {
       let cardObj = db.card(card.id);
-      let found = newList.find((c: CardData) => { let dbCard = db.card(c.id); return dbCard && cardObj && dbCard.name === (<DbCardData>cardObj).name });
+      let found = newList.find((c: CardData) => { let dbCard = db.card(c.id); return dbCard && cardObj && dbCard.name === (cardObj as DbCardData).name });
       if (found) {
         if (found.measurable) {
           found.quantity += card.quantity;

@@ -6,12 +6,18 @@ import {
   GREEN,
   MULTI,
   COLORLESS
-} from "./constants.js";
+} from "./constants";
 
 class Colors {
+  private w: number;
+  private u: number;
+  private b: number;
+  private r: number;
+  private g: number;
+
   /**
    * Creates a new colors object
-   * Colors can be set by propierties matching the colors (w, u, b, r, g)
+   * Colors can be set by properties matching the colors (w, u, b, r, g)
    **/
   constructor() {
     this.w = 0;
@@ -23,37 +29,17 @@ class Colors {
     return this;
   }
 
-  set w(number: number) {
-    this.w = number;
-  }
-
-  set u(number: number) {
-    this.u = number;
-  }
-
-  set b(number: number) {
-    this.b = number;
-  }
-
-  set r(number: number) {
-    this.r = number;
-  }
-
-  set g(number: number) {
-    this.g = number;
-  }
-
   /**
    * Returns an array containing the colors as non-repeating constants
    * inside an array.
    */
   get() {
     let _arr = [];
-    if (this.w) _arr.push(WHITE);
-    if (this.u) _arr.push(BLUE);
-    if (this.b) _arr.push(BLACK);
-    if (this.r) _arr.push(RED);
-    if (this.g) _arr.push(GREEN);
+    if (this.w !== 0) _arr.push(WHITE);
+    if (this.u !== 0) _arr.push(BLUE);
+    if (this.b !== 0) _arr.push(BLACK);
+    if (this.r !== 0) _arr.push(RED);
+    if (this.g !== 0) _arr.push(GREEN);
 
     return _arr;
   }
@@ -64,7 +50,7 @@ class Colors {
   getBaseColor() {
     if (this.length > 1) {
       return MULTI;
-    } else if (this.length == 0) {
+    } else if (this.length === 0) {
       return COLORLESS;
     }
     return this.get()[0];
@@ -88,7 +74,7 @@ class Colors {
    * Adds a string mana cost to this class.
    */
   addFromCost(cost: string[]) {
-    for (var c of cost) {
+    cost.forEach(c => {
       switch (c) {
         case "w":
           this.w += 1;
@@ -106,7 +92,7 @@ class Colors {
           this.g += 1;
           break;
       }
-    }
+    });
 
     return this;
   }
@@ -118,7 +104,7 @@ class Colors {
     cost.forEach(color => {
       switch (color) {
         case WHITE:
-          this.w += 1
+          this.w += 1;
           break;
         case BLUE:
           this.u += 1;
@@ -161,27 +147,7 @@ class Colors {
       this.b == color.b &&
       this.r == color.r &&
       this.g == color.g
-    );
-  }
-
-  get w() {
-    return this.w;
-  }
-
-  get u() {
-    return this.u;
-  }
-
-  get b() {
-    return this.b;
-  }
-
-  get r() {
-    return this.r;
-  }
-
-  get g() {
-    return this.g;
+    )
   }
 }
 
