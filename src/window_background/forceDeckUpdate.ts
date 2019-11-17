@@ -157,7 +157,7 @@ const forceDeckUpdate = function (removeUsed = true) {
     globals.currentMatch.playerChances = chancesObj;
   } else {
     let main = globals.currentMatch.playerCardsLeft.mainboard;
-    main.addProperty("chance", () => 1);
+    main.addChance((card: cardObject) => 1);
 
     let chancesObj = new Chances();
     globals.currentMatch.playerChances = chancesObj;
