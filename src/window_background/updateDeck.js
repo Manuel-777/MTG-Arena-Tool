@@ -1,5 +1,5 @@
 import globals from "./globals";
-import { IPC_OVERLAY } from "../shared/constants.js";
+import { IPC_OVERLAY } from "../shared/constants";
 import { ipc_send } from "./background-util";
 import forceDeckUpdate from "./forceDeckUpdate";
 import getOpponentDeck from "./getOpponentDeck";

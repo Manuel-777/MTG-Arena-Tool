@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require('webpack');
 const nodeExternals = require("webpack-node-externals");
 
 const isProduction =
@@ -6,8 +7,7 @@ const isProduction =
 const mode = isProduction ? "production" : "development";
 const devtool = isProduction ? false : "inline-source-map";
 
-const baseConfig = {
-  target: "node",
+module.exports = {
   mode,
   devtool,
   externals: [nodeExternals()],
@@ -22,49 +22,34 @@ const baseConfig = {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
         loader: "ts-loader"
+      },
+      {
+        test: /\.(html)$/,
+        use: {
+          loader: "html-loader",
+          options: {
+            attrs: ["':data-src"]
+          }
+        }
       }
     ]
   },
+  target: "electron-main",
+  entry: {
+    main: "./src/main.js"
+  },
+  devServer: {
+    contentBase: "./dist",
+    hot: true,
+    port: 8082
+  },
+  plugins: [new webpack.HotModuleReplacementPlugin()],
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".jsx", ".json"]
+  },
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].bundle.js",
+    publicPath: "/"
   }
 };
-
-module.exports = [
-  {
-    ...baseConfig,
-    entry: "./src/main.js",
-    output: {
-      path: path.resolve(__dirname, "dist"),
-      filename: "[name].js",
-      chunkFilename: "[chunkhash].js"
-    }
-  },
-  {
-    ...baseConfig,
-    entry: "./src/window_background/background.js",
-    output: {
-      path: path.resolve(__dirname, "dist"),
-      filename: "[name].js",
-      chunkFilename: "[chunkhash].js"
-    }
-  },
-  {
-    ...baseConfig,
-    entry: "./src/window_main/renderer.js",
-    output: {
-      path: path.resolve(__dirname, "dist"),
-      filename: "[name].js",
-      chunkFilename: "[chunkhash].js"
-    }
-  },
-  {
-    ...baseConfig,
-    entry: "./src/overlay/index.tsx",
-    output: {
-      path: path.resolve(__dirname, "dist"),
-      filename: "[name].js",
-      chunkFilename: "[chunkhash].js"
-    }
-  }
-];
