@@ -1,6 +1,6 @@
-import db from "./database.js";
+import db from "./database";
 import CardsList from "./cardsList";
-import Colors from "./colors.js";
+import Colors from "./colors";
 import {
   compare_cards,
   get_set_code,
@@ -11,7 +11,7 @@ import {
 import { DEFAULT_TILE } from "./constants";
 
 import { anyCardsList } from "./types/Deck";
-import { DbCardData } from "./types/Metadata.js";
+import { DbCardData } from "./types/Metadata";
 
 interface internalDeck {
   mainDeck?: anyCardsList,

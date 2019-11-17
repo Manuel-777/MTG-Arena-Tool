@@ -1,3 +1,5 @@
+import { CARD_RARITIES } from "../constants";
+
 export interface Metadata {
   cards: { [id: number]: DbCardData },
   ok: boolean,
@@ -38,7 +40,7 @@ export interface DbCardData {
   reprints: boolean | number[]
 }
 
-type Rarity = "land" | "common" | "uncommon" | "rare" | "mythic";
+export type Rarity = (typeof CARD_RARITIES)[number];
 
 interface ImageLinks {
   small: string,

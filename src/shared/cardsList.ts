@@ -1,8 +1,8 @@
 import _ from "lodash";
 import db from "./database.js";
-import Colors from "./colors.js";
+import Colors from "./colors";
 import { v2cardsList } from "./types/Deck";
-import { DbCardData } from "./types/Metadata.js";
+import { DbCardData } from "./types/Metadata";
 
 interface cardTypesCount {
   art:number,
