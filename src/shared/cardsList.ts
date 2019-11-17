@@ -1,7 +1,7 @@
 import _ from "lodash";
 import db from "./database.js";
 import Colors from "./colors";
-import { CardObject, v2cardsList, v3cardsList } from "./types/Deck";
+import { CardObject, v2cardsList, v3cardsList, isV2CardsList } from "./types/Deck";
 import { DbCardData } from "./types/Metadata";
 
 interface CardTypesCount {
@@ -36,12 +36,7 @@ class CardsList {
   // This should take anyCardsList as an argument?
   constructor(newList: any[]) {
     this.list = [];
-    if (newList as v3cardsList) {
-      newList.forEach(id => {
-        this.list.push({ quantity: 1, id: id, measurable: true, chance: 0 });
-      });
-      this.removeDuplicates(true);
-    } else if (newList as v2cardsList) {
+    if (isV2CardsList(newList)) {
       this.list = newList.map((obj: CardObject) => {
         return {
           ...obj,
@@ -51,6 +46,11 @@ class CardsList {
           chance: obj.chance || 0
         };
       });
+    } else {
+      newList.forEach(id => {
+        this.list.push({ quantity: 1, id: id, measurable: true, chance: 0 });
+      });
+      this.removeDuplicates(true);
     }
   }
 
