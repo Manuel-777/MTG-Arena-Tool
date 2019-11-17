@@ -1200,7 +1200,7 @@ export function onLabelInEventDeckSubmit(entry, json) {
 }
 
 export function onLabelInEventDeckSubmitV3(entry, json) {
-  if (!json) return;onLabelInEventDeckSubmitV3
+  if (!json) return;
   onLabelInEventDeckSubmit(entry, convertDeckFromV3(json.CourseDeck));
 }
 

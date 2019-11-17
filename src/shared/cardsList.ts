@@ -31,7 +31,7 @@ class CardsList {
    * If an array of IDs is given it sets each quantity to the number of adjacent
    * repetitions
    **/
-  public list: v2cardsList;
+  private list: v2cardsList;
 
   // This should take anyCardsList as an argument?
   constructor(newList: any[]) {
@@ -303,7 +303,7 @@ class CardsList {
       let cardObj = db.card(card.id);
       let found = newList.find((c: CardObject) => {
         let dbCard = db.card(c.id);
-        return dbCard && cardObj && dbCard.name === (cardObj as DbCardData).name
+        return dbCard && cardObj && dbCard.name === (cardObj as DbCardData).name;
       });
       if (found) {
         if (found.measurable) {

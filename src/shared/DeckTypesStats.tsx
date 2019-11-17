@@ -9,7 +9,7 @@ function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
   const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
   if (!deck.mainboard) return types;
 
-  deck.mainboard.list.forEach(function(card: CardObject | any) {
+  deck.mainboard.get().forEach(function(card: CardObject | any) {
     // TODO remove group lands hack
     // PLEASE
     if (card.id.id && card.id.id == 100) {

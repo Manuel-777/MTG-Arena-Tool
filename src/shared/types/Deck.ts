@@ -30,7 +30,7 @@ export type v2cardsList = Array<CardObject>;
 export type v3cardsList = Array<number>;
 
 export function isV2CardsList(list: v2cardsList | v3cardsList): list is v2cardsList {
-  const first = (<v2cardsList>list)[0];
+  const first = (list as v2cardsList)[0];
   return first && first.quantity !== undefined;
 }
 
