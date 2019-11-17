@@ -2,15 +2,16 @@ import * as React from "react";
 
 import { CARD_TYPES, CARD_TYPE_CODES } from "./constants";
 import db from "./database";
-import { DeckData } from "../window_background/data";
+import Deck from "../shared/deck";
 import { CardObject } from "../shared/types/Deck";
 
-function getDeckTypesAmount(deck: DeckData): { [key: string]: number } {
+function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
   const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
-  if (!deck.mainDeck) return types;
+  if (!deck.mainboard) return types;
 
-  deck.mainDeck.forEach(function(card: CardObject | any) {
+  deck.mainboard.list.forEach(function(card: CardObject | any) {
     // TODO remove group lands hack
+    // PLEASE
     if (card.id.id && card.id.id == 100) {
       types.lan += card.quantity;
       return;
@@ -30,7 +31,7 @@ function getDeckTypesAmount(deck: DeckData): { [key: string]: number } {
   return types;
 }
 
-export default function DeckTypesStats(props: { deck: DeckData }): JSX.Element {
+export default function DeckTypesStats(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
   const cardTypes = getDeckTypesAmount(deck);
   return (

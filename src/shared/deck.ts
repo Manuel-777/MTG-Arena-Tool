@@ -25,19 +25,21 @@ interface internalDeck {
   id?:string,
   commandZoneGRPIds?: number[],
   colors?: number[]
+  archetype?: string;
 }
 
 class Deck { 
   public mainboard: CardsList;
   public sideboard: CardsList;
-  private commandZoneGRPIds: number[];
+  public commandZoneGRPIds: number[];
   public name: string;
-  private id: string;
-  private lastUpdated: string;
-  private tile: number;
-  private _colors: Colors;
-  private tags: string[];
-  private custom: boolean;
+  public id: string;
+  public lastUpdated: string;
+  public tile: number;
+  public _colors: Colors;
+  public tags: string[];
+  public custom: boolean;
+  public archetype: string;
 
   constructor(mtgaDeck:internalDeck = {}, main:anyCardsList = [], side:anyCardsList = []) {
     if (!mtgaDeck.mainDeck) mtgaDeck.mainDeck = [];
@@ -55,6 +57,7 @@ class Deck {
     this._colors = new Colors();
     this.tags = mtgaDeck.tags || [mtgaDeck.format as string];
     this.custom = mtgaDeck.custom || false;
+    this.archetype = mtgaDeck.archetype || "";
 
     //this.sortMainboard(compare_cards);
     //this.sortSideboard(compare_cards);
@@ -234,7 +237,7 @@ class Deck {
     return str;
   }
 
-  getSave() {
+  getSave():Deck {
     return objectClone(this.getSaveRaw());
   }
 

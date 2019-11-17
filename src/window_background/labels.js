@@ -266,20 +266,24 @@ function select_deck(arg) {
   ipc_send("set_deck", globals.currentDeck.getSave(), IPC_OVERLAY);
 }
 
-//
-function convert_deck_from_v3(deck) {
-  return JSON.parse(JSON.stringify(deck), (key, value) => {
-    if (key === "mainDeck" || key === "sideboard") {
-      let ret = [];
-      for (let i = 0; i < value.length; i += 2) {
-        if (value[i + 1] > 0) {
-          ret.push({ id: value[i], quantity: value[i + 1] });
-        }
-      }
-      return ret;
+function convertV3ToV2(v3List) {
+  const ret = [];
+  for (let i = 0; i < v3List.length; i += 2) {
+    if (v3List[i + 1] > 0) {
+      ret.push({ id: v3List[i], quantity: v3List[i + 1] });
     }
-    return value;
-  });
+  }
+  return ret;
+}
+
+function convertDeckFromV3(deck) {
+  if (deck.mainDeck) {
+    deck.mainDeck = convertV3ToV2(deck.mainDeck);
+  }
+  if (deck.sideboard) {
+    deck.sideboard = convertV3ToV2(deck.sideboard);
+  }
+  return deck;
 }
 
 export function onLabelOutLogInfo(entry, json) {
@@ -661,7 +665,7 @@ export function onLabelInDeckGetDeckLists(entry, json) {
 
 export function onLabelInDeckGetDeckListsV3(entry, json) {
   if (!json) return;
-  onLabelInDeckGetDeckLists(entry, json.map(d => convert_deck_from_v3(d)));
+  onLabelInDeckGetDeckLists(entry, json.map(d => convertDeckFromV3(d)));
 }
 
 export function onLabelInDeckGetPreconDecks(entry, json) {
@@ -692,7 +696,7 @@ export function onLabelInEventGetPlayerCoursesV2(entry, json) {
   if (!json) return;
   json.forEach(course => {
     if (course.CourseDeck) {
-      course.CourseDeck = convert_deck_from_v3(course.CourseDeck);
+      course.CourseDeck = convertDeckFromV3(course.CourseDeck);
     }
   });
   onLabelInEventGetPlayerCourses(entry, json);
@@ -722,7 +726,7 @@ export function onLabelInEventGetPlayerCourse(entry, json) {
 export function onLabelInEventGetPlayerCourseV2(entry, json) {
   if (!json) return;
   if (json.CourseDeck) {
-    json.CourseDeck = convert_deck_from_v3(json.CourseDeck);
+    json.CourseDeck = convertDeckFromV3(json.CourseDeck);
   }
   onLabelInEventGetPlayerCourse(entry, json);
 }
@@ -827,7 +831,7 @@ export function onLabelInDeckUpdateDeck(entry, json) {
 
 export function onLabelInDeckUpdateDeckV3(entry, json) {
   if (!json) return;
-  onLabelInDeckUpdateDeck(entry, convert_deck_from_v3(json));
+  onLabelInDeckUpdateDeck(entry, convertDeckFromV3(json));
 }
 
 // Given a shallow object of numbers and lists return a
@@ -1196,8 +1200,8 @@ export function onLabelInEventDeckSubmit(entry, json) {
 }
 
 export function onLabelInEventDeckSubmitV3(entry, json) {
-  if (!json) return;
-  onLabelInEventDeckSubmit(entry, convert_deck_from_v3(json));
+  if (!json) return;onLabelInEventDeckSubmitV3
+  onLabelInEventDeckSubmit(entry, convertDeckFromV3(json.CourseDeck));
 }
 
 export function onLabelEventMatchCreated(entry, json) {
@@ -1220,13 +1224,13 @@ export function onLabelEventMatchCreated(entry, json) {
 
 export function onLabelOutDirectGameChallenge(entry, json) {
   if (!json) return;
-  var deck = json.params.deck;
-  deck = JSON.parse(deck);
-  select_deck(convert_deck_from_v3(deck));
+  const deck = json.params.deck;
+  const parsedDeck = JSON.parse(deck);
+  select_deck(convertDeckFromV3(parsedDeck));
 
   const httpApi = require("./http-api");
   httpApi.httpTournamentCheck(
-    deck,
+    parsedDeck,
     json.params.opponentDisplayName,
     false,
     json.params.playFirst,
@@ -1236,9 +1240,9 @@ export function onLabelOutDirectGameChallenge(entry, json) {
 
 export function onLabelOutEventAIPractice(entry, json) {
   if (!json) return;
-  var deck = json.params.deck;
-  deck = JSON.parse(deck);
-  select_deck(convert_deck_from_v3(deck));
+  const deck = json.params.deck;
+  const parsedDeck = JSON.parse(deck);
+  select_deck(convertDeckFromV3(parsedDeck));
 }
 
 function getDraftSet(eventName) {

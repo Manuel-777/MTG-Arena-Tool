@@ -1,5 +1,6 @@
 import Deck from "../shared/deck";
 import { defaultLogUri } from "./mtga-log";
+import CardsList from "../shared/cardsList";
 
 // Hey! If you're here, you might be thinking of adding stuff to this file.
 // Don't. This is a shadowy place. You must never go here.
@@ -10,7 +11,7 @@ let actionLogDir = "";
 
 let logUri = defaultLogUri();
 
-let currentDeck = new Deck();
+let currentDeck:Deck = new Deck();
 
 let currentMatch: any = null;
 
@@ -40,7 +41,7 @@ let matchCompletedOnGameNumber = 0;
 
 let matchGameStats: any[] = [];
 
-let originalDeck: any = undefined;
+let originalDeck:Deck = new Deck();
 
 let odds_sample_size = 1;
 

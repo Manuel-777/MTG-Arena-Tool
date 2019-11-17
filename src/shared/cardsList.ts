@@ -31,7 +31,7 @@ class CardsList {
    * If an array of IDs is given it sets each quantity to the number of adjacent
    * repetitions
    **/
-  private list: v2cardsList;
+  public list: v2cardsList;
 
   // This should take anyCardsList as an argument?
   constructor(newList: any[]) {
