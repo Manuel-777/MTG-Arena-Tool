@@ -16,7 +16,7 @@ export interface Deck {
   lastUpdated: Date
 }
 
-export interface cardObject {
+export interface CardObject {
   id: number
   quantity: number,
   chance?: number,
@@ -25,7 +25,7 @@ export interface cardObject {
   measurable?: boolean,
 }
 
-export type v2cardsList = Array<cardObject>;
+export type v2cardsList = Array<CardObject>;
 
 export type v3cardsList = Array<number>;
 

@@ -1,10 +1,10 @@
 import _ from "lodash";
 import db from "./database.js";
 import Colors from "./colors";
-import { cardObject, v2cardsList, v3cardsList } from "./types/Deck";
+import { CardObject, v2cardsList, v3cardsList } from "./types/Deck";
 import { DbCardData } from "./types/Metadata";
 
-interface cardTypesCount {
+interface CardTypesCount {
   art:number,
   cre:number,
   enc:number,
@@ -14,7 +14,7 @@ interface cardTypesCount {
   sor:number
 }
 
-interface colorsCount {
+interface ColorsCount {
   total:number,
   w:number,
   u:number,
@@ -37,7 +37,7 @@ class CardsList {
   constructor(list: any[]) {
     this.list = [];
     if (list as v2cardsList) {
-      this.list = list.map((obj: cardObject) => {
+      this.list = list.map((obj: CardObject) => {
         return {
           ...obj,
           quantity: obj.quantity || 1,
@@ -66,7 +66,7 @@ class CardsList {
   /**
    * Adds a card to the list
    **/
-  add(grpId: number, quantity = 1, merge = false):cardObject {
+  add(grpId: number, quantity = 1, merge = false):CardObject {
     if (typeof quantity !== "number") {
       throw new Error("quantity must be a number");
     }
@@ -133,7 +133,7 @@ class CardsList {
   /**
    * Creates a n object containing how many of each type the list has
    **/
-  countTypesAll():cardTypesCount {
+  countTypesAll():CardTypesCount {
     let types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
 
     this.list.forEach(function (card) {
@@ -178,7 +178,7 @@ class CardsList {
   /**
    * Creates an object containing the colors distribution of the list.
    **/
-  getColorsAmounts():colorsCount {
+  getColorsAmounts():ColorsCount {
     let colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
     this.list.forEach(function (card) {
@@ -270,7 +270,7 @@ class CardsList {
   /**
    * Inserts a chance property to each card in the list.
    **/
-  addChance(fn: (item?: cardObject) => number):void {
+  addChance(fn: (item?: CardObject) => number):void {
     this.list.forEach(card => {
       card.chance = fn(card);
     });
@@ -306,7 +306,7 @@ class CardsList {
 
     this.list.forEach(function (card) {
       let cardObj = db.card(card.id);
-      let found = newList.find((c: cardObject) => { let dbCard = db.card(c.id); return dbCard && cardObj && dbCard.name === (cardObj as DbCardData).name });
+      let found = newList.find((c: CardObject) => { let dbCard = db.card(c.id); return dbCard && cardObj && dbCard.name === (cardObj as DbCardData).name });
       if (found) {
         if (found.measurable) {
           found.quantity += card.quantity;

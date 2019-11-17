@@ -1,6 +1,6 @@
 import globals from "./globals";
 import { hypergeometricRange } from "../shared/stats-fns";
-import { cardObject } from "../shared/types/Deck";
+import { CardObject } from "../shared/types/Deck";
 
 class Chances {
   sampleSize: number;
@@ -66,7 +66,7 @@ const forceDeckUpdate = function (removeUsed = true) {
     }
     let main = globals.currentMatch.playerCardsLeft.mainboard;
     //main.addProperty("chance", card =>
-    main.addChance((card: cardObject) =>
+    main.addChance((card: CardObject) =>
       Math.round(
         hypergeometricRange(
           1,
@@ -157,7 +157,7 @@ const forceDeckUpdate = function (removeUsed = true) {
     globals.currentMatch.playerChances = chancesObj;
   } else {
     let main = globals.currentMatch.playerCardsLeft.mainboard;
-    main.addChance((card: cardObject) => 1);
+    main.addChance((card: CardObject) => 1);
 
     let chancesObj = new Chances();
     globals.currentMatch.playerChances = chancesObj;

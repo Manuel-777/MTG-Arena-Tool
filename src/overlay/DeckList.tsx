@@ -21,7 +21,7 @@ import DeckManaCurve from "../shared/DeckManaCurve";
 import DeckTypesStats from "../shared/DeckTypesStats";
 import OwnershipStars from "../shared/OwnershipStars";
 
-import { cardObject } from "../shared/types/Deck";
+import { CardObject } from "../shared/types/Deck";
 import { OddsData, OverlaySettingsData } from "./overlayUtil";
 import SampleSizePanel from "./SampleSizePanel";
 import { DbCardData } from "../shared/types/Metadata";
@@ -52,13 +52,13 @@ function getRank(cardId: string): number {
   return (cardObj && cardObj.rank) || 0;
 }
 
-function compareQuantity(a: cardObject, b: cardObject): -1 | 0 | 1 {
+function compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
   if (b.quantity - a.quantity < 0) return -1;
   if (b.quantity - a.quantity > 0) return 1;
   return 0;
 }
 
-function compareDraftPicks(a: cardObject, b: cardObject): -1 | 0 | 1 {
+function compareDraftPicks(a: CardObject, b: CardObject): -1 | 0 | 1 {
   const aCard = db.card(a.id);
   const bCard = db.card(b.id);
   if (!bCard) {
