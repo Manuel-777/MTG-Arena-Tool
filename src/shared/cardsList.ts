@@ -34,10 +34,15 @@ class CardsList {
   private list: v2cardsList;
 
   // This should take anyCardsList as an argument?
-  constructor(list: any[]) {
+  constructor(newList: any[]) {
     this.list = [];
-    if (list as v2cardsList) {
-      this.list = list.map((obj: CardObject) => {
+    if (newList as v3cardsList) {
+      newList.forEach(id => {
+        this.list.push({ quantity: 1, id: id, measurable: true, chance: 0 });
+      });
+      this.removeDuplicates(true);
+    } else if (newList as v2cardsList) {
+      this.list = newList.map((obj: CardObject) => {
         return {
           ...obj,
           quantity: obj.quantity || 1,
@@ -45,16 +50,6 @@ class CardsList {
           measurable: true,
           chance: obj.chance || 0
         };
-      });
-    } else if (list as v3cardsList) {
-      let lastId = 0;
-      list.forEach(id => {
-        if (id === lastId) {
-          this.list[this.list.length - 1].quantity++;
-        } else {
-          lastId = id;
-          this.list.push({ quantity: 1, id: id, measurable: true, chance: 0 });
-        }
       });
     }
   }
@@ -306,7 +301,10 @@ class CardsList {
 
     this.list.forEach(function (card) {
       let cardObj = db.card(card.id);
-      let found = newList.find((c: CardObject) => { let dbCard = db.card(c.id); return dbCard && cardObj && dbCard.name === (cardObj as DbCardData).name });
+      let found = newList.find((c: CardObject) => {
+        let dbCard = db.card(c.id);
+        return dbCard && cardObj && dbCard.name === (cardObj as DbCardData).name
+      });
       if (found) {
         if (found.measurable) {
           found.quantity += card.quantity;

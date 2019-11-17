@@ -138,10 +138,12 @@ class Deck {
       this.mainboard.get().forEach(cardObj => {
         let grpid = cardObj.id;
         let quantity = cardObj.quantity;
-        let rarity = (db.card(grpid) as DbCardData).rarity;
-        let add = get_wc_missing(grpid, quantity);
-
-        missing[rarity] += add;
+        let card = db.card(grpid);
+        if (card as DbCardData) {
+          let rarity = (card as DbCardData).rarity;
+          let add = get_wc_missing(grpid, quantity);
+          missing[rarity] += add;
+        }
       });
     }
 
@@ -149,10 +151,12 @@ class Deck {
       this.sideboard.get().forEach(cardObj => {
         let grpid = cardObj.id;
         let quantity = cardObj.quantity;
-        let rarity = (db.card(grpid) as DbCardData).rarity;
-        let add = get_wc_missing(grpid, quantity);
-
-        missing[rarity] += add;
+        let card = db.card(grpid);
+        if (card as DbCardData) {
+          let rarity = (card as DbCardData).rarity;
+          let add = get_wc_missing(grpid, quantity);
+          missing[rarity] += add;
+        }
       });
     }
 
