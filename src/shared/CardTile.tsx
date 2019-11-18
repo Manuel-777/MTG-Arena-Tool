@@ -16,6 +16,7 @@ import {
 } from "./util";
 import { addCardHover } from "./card-hover";
 import { DbCardData, Rarity } from "./types/Metadata";
+import _ from "lodash";
 
 export interface CardTileProps {
   card: DbCardData | any; // TODO remove group lands hack
@@ -278,7 +279,10 @@ function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
 function MissingCardSprite(props:MissingCardsProps):JSX.Element{
   const{missing, cardRarity, listStyle, ww} = props;
 
-  const xoff = CARD_RARITIES.indexOf(cardRarity) * -24;
+  //serious hack
+  const cr = _.upperFirst(cardRarity) as Rarity;
+
+  const xoff = CARD_RARITIES.indexOf(cr) * -24;
   const yoff = missing * -24;
 
   var className = "not_owned_sprite";
