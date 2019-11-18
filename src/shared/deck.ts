@@ -54,7 +54,7 @@ class Deck {
     this.id = mtgaDeck.id || "";
     this.lastUpdated = mtgaDeck.lastUpdated || "";
     this.tile = mtgaDeck.deckTileId ? mtgaDeck.deckTileId : DEFAULT_TILE;
-    this._colors = new Colors();
+    this._colors = this.getColors();
     this.tags = mtgaDeck.tags || [mtgaDeck.format as string];
     this.custom = mtgaDeck.custom || false;
     this.archetype = mtgaDeck.archetype || "";
@@ -70,7 +70,7 @@ class Deck {
    * if not defined yet.
    **/
   get colors():Colors {
-    return this._colors || this.getColors();
+    return this._colors;
   }
 
   sortMainboard(func:any):void {
