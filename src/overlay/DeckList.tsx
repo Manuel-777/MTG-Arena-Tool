@@ -131,7 +131,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
   }
 
   const mainCardTiles: JSX.Element[] = [];
-  const mainCards = deckClone.mainboard;
+  const mainCards = deckClone.getMainboard();
   mainCards.removeDuplicates();
 
   const shouldDoGroupLandsHack =
@@ -229,8 +229,8 @@ export default function DeckList(props: DeckListProps): JSX.Element {
   });
 
   const sideboardCardTiles: JSX.Element[] = [];
-  if (settings.sideboard && deckClone.sideboard.count() > 0) {
-    const sideCards = deckClone.sideboard;
+  if (settings.sideboard && deckClone.getSideboard().count() > 0) {
+    const sideCards = deckClone.getSideboard();
     sideCards.removeDuplicates();
     sideCards.get().sort(sortFunc);
     sideCards.get().forEach((card: any) => {
@@ -282,7 +282,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
         setOddsCallback && (
           <SampleSizePanel
             cardOdds={cardOdds}
-            cardsLeft={deck.mainboard.count()}
+            cardsLeft={deck.getMainboard().count()}
             setOddsCallback={setOddsCallback}
           />
         )}

@@ -29,10 +29,10 @@ interface internalDeck {
 }
 
 class Deck { 
-  public mainboard: CardsList;
-  public sideboard: CardsList;
+  private mainboard: CardsList;
+  private sideboard: CardsList;
   public commandZoneGRPIds: number[];
-  public name: string;
+  private name: string;
   public id: string;
   public lastUpdated: string;
   public tile: number;
@@ -79,6 +79,18 @@ class Deck {
 
   sortSideboard(func:any):void {
     this.sideboard.get().sort(func);
+  }
+
+  getMainboard():CardsList {
+    return this.mainboard;
+  }
+
+  getSideboard():CardsList {
+    return this.sideboard;
+  }
+
+  getName():string {
+    return this.name;
   }
 
   /**

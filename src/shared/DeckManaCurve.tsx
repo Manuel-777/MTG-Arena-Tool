@@ -12,9 +12,9 @@ function add(a: number, b: number): number {
 
 function getDeckCurve(deck: Deck): any[] {
   const curve: any[] = [];
-  if (!deck.mainboard) return curve;
+  if (!deck.getMainboard()) return curve;
 
-  deck.mainboard.get().forEach((card: CardObject) => {
+  deck.getMainboard().get().forEach((card: CardObject) => {
     const cardObj = db.card(card.id);
     if (!cardObj) return;
 
