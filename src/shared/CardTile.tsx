@@ -279,10 +279,7 @@ function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
 function MissingCardSprite(props:MissingCardsProps):JSX.Element{
   const{missing, cardRarity, listStyle, ww} = props;
 
-  //serious hack
-  const cr = _.upperFirst(cardRarity) as Rarity;
-
-  const xoff = CARD_RARITIES.indexOf(cr) * -24;
+  const xoff = CARD_RARITIES.indexOf(cardRarity) * -24;
   const yoff = missing * -24;
 
   var className = "not_owned_sprite";
