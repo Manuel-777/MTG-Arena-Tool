@@ -529,6 +529,30 @@ function appendOverlay(section) {
   displayControls.appendChild(label);
   section.appendChild(displayControls);
 
+  // Copy pasta with bolognesa!
+  const pickerLabel = createLabel(
+    ["but_container_label"],
+    "<span style='margin-right: 32px;'>Background color <i>(0,0,0,0 to use default background)</i>:</span>"
+  );
+  const colorPick = createInput(["color_picker"], "", {
+    id: "flat",
+    type: "text",
+    value: "Example Content"
+  });
+  colorPick.style.backgroundColor = pd.settings.overlay_back_color;
+  colorPick.addEventListener("click", function(e) {
+    e.stopPropagation();
+    showColorpicker(
+      pd.settings.overlay_back_color,
+      color => (colorPick.style.backgroundColor = color.rgbaString),
+      color => ipcSend("save_user_settings", { overlay_back_color: color.rgbaString }),
+      () => (colorPick.style.backgroundColor = pd.settings.overlay_back_color),
+      { alpha: true }
+    );
+  });
+  pickerLabel.appendChild(colorPick);
+  section.appendChild(pickerLabel);
+
   const sliderScale = createDiv(["slidecontainer_settings"]);
   const sliderScaleLabel = createLabel(
     ["card_size_container"],

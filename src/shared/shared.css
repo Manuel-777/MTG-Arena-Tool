@@ -57,6 +57,13 @@ body {
     overflow: hidden;
 }
 
+input#flat.color_picker {
+    border: 1px solid rgba(140, 140, 140, 0.8);
+    border-radius: 4px;
+    text-align: center;
+    font-family: var(--sub-font-name);
+}
+
 label {
     font-family: var(--main-font-name);
     color: var(--color-light);
@@ -388,7 +395,7 @@ label {
     opacity: 0;
 }
 
-.main_bg_image, .overlay_bg_image {
+.main_bg_image {
     background: url(../images/Bedevil-Art.jpg);
 }
 
@@ -453,6 +460,10 @@ label {
     /* opacity: 0.9; */
     z-index: -4;
     /* filter: hue-rotate(200deg); */
+}
+
+.overlay_wrapper.after_hidden:after {
+    opacity: 0;
 }
 
 .top {

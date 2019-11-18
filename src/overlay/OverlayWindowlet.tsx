@@ -75,12 +75,6 @@ export default function OverlayWindowlet(
   const containerRef = useRef(null);
   useEditModeOnRef(editMode, containerRef, settings.overlay_scale);
 
-  const backgroundImage =
-    "url(" +
-    (settings.back_url && settings.back_url !== "default"
-      ? settings.back_url
-      : DEFAULT_BACKGROUND) +
-    ")";
   // useEffect(() => {
   //   const xhr = new XMLHttpRequest();
   //   xhr.open("HEAD", arg);
@@ -141,6 +135,27 @@ export default function OverlayWindowlet(
       </div>
     );
   }
+
+  const backgroundImage =
+    "url(" +
+    (settings.back_url && settings.back_url !== "default"
+      ? settings.back_url
+      : DEFAULT_BACKGROUND) +
+    ")";
+  
+  const backgroundColor = settings.overlay_back_color;
+
+  const bgStyle:any = {
+    opacity: overlaySettings.alpha_back.toString()
+  }
+
+  // This needs its own setting, like a checkbox or something
+  const solidBg:boolean = backgroundColor !== "rgba(0,0,0,0)";
+  if (!solidBg)
+    bgStyle.backgroundImage = backgroundImage;
+  else
+    bgStyle.backgroundColor = backgroundColor;
+
   return (
     <div
       className={"overlay_container " + getEditModeClass(editMode)}
@@ -157,11 +172,8 @@ export default function OverlayWindowlet(
     >
       <div className="outer_wrapper">
         <div
-          className="overlay_wrapper overlay_bg_image"
-          style={{
-            backgroundImage,
-            opacity: overlaySettings.alpha_back.toString()
-          }}
+          className={"overlay_wrapper overlay_bg_image " + (solidBg ? "after_hidden" : "")}
+          style={bgStyle}
         />
       </div>
       {overlaySettings.top && (
