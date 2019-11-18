@@ -545,7 +545,8 @@ function appendOverlay(section) {
     showColorpicker(
       pd.settings.overlay_back_color,
       color => (colorPick.style.backgroundColor = color.rgbaString),
-      color => ipcSend("save_user_settings", { overlay_back_color: color.rgbaString }),
+      color =>
+        ipcSend("save_user_settings", { overlay_back_color: color.rgbaString }),
       () => (colorPick.style.backgroundColor = pd.settings.overlay_back_color),
       { alpha: true }
     );
