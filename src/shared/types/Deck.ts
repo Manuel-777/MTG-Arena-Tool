@@ -1,3 +1,4 @@
+// Might conflict with the class?
 export interface Deck {
   commandZoneGRPIds: null | number[],
   mainDeck: number[],
@@ -14,6 +15,21 @@ export interface Deck {
   deckTileId: number,
   cardBack: null | string,
   lastUpdated: Date
+}
+
+export interface internalDeck {
+  mainDeck?: anyCardsList,
+  sideboard?: anyCardsList,
+  lastUpdated?: string,
+  name?: string,
+  deckTileId?: number,
+  format?: string,
+  custom?: boolean,
+  tags?: string[],
+  id?:string,
+  commandZoneGRPIds?: number[],
+  colors?: number[]
+  archetype?: string;
 }
 
 export interface CardObject {

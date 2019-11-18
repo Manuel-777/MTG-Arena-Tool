@@ -508,7 +508,7 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
     let newDeck = globals.currentMatch.player.deck.clone();
     newDeck.mainboard = tempMain;
     newDeck.sideboard = tempSide;
-    newDeck.getColors();
+    newDeck.colors();
 
     globals.currentMatch.player.deck = newDeck;
     console.log("> ", globals.currentMatch.player.deck);

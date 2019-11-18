@@ -10,28 +10,13 @@ import {
 } from "./util";
 import { DEFAULT_TILE } from "./constants";
 
-import { anyCardsList } from "./types/Deck";
+import { anyCardsList, internalDeck } from "./types/Deck";
 import { DbCardData } from "./types/Metadata";
-
-interface internalDeck {
-  mainDeck?: anyCardsList,
-  sideboard?: anyCardsList,
-  lastUpdated?: string,
-  name?: string,
-  deckTileId?: number,
-  format?: string,
-  custom?: boolean,
-  tags?: string[],
-  id?:string,
-  commandZoneGRPIds?: number[],
-  colors?: number[]
-  archetype?: string;
-}
 
 class Deck { 
   private mainboard: CardsList;
   private sideboard: CardsList;
-  public commandZoneGRPIds: number[];
+  private commandZoneGRPIds: number[];
   private name: string;
   public id: string;
   public lastUpdated: string;
@@ -72,11 +57,19 @@ class Deck {
   get colors():Colors {
     return this._colors;
   }
-
+  
+  /**
+   * Sort the mainboard of this deck.
+   * @param func sort function.
+   */
   sortMainboard(func:any):void {
     this.mainboard.get().sort(func);
   }
 
+  /**
+   * Sort the sideboard of this deck.
+   * @param func sort function.
+   */
   sortSideboard(func:any):void {
     this.sideboard.get().sort(func);
   }
@@ -91,6 +84,28 @@ class Deck {
 
   getName():string {
     return this.name;
+  }
+  
+  /**
+   * Returns if this deck has a commander (0) or the number of commanders it has.
+   */
+  hasCommander():number {
+    return this.commandZoneGRPIds.length / 2;
+  }
+
+  /**
+   * Get the commander GrpId
+   * @param pos position (default is first)
+   */
+  getCommanderId(pos: number = 0):number {
+    return this.commandZoneGRPIds[pos * 2];
+  }
+
+  /**
+   * Return the raw commandZoneGRPIds array for later use.
+   */
+  getCommanders() {
+    return this.commandZoneGRPIds;
   }
 
   /**
@@ -116,10 +131,12 @@ class Deck {
   }
 
   /**
-   * returns a color object based on the colors of the cards within
+   * Returns a Color class based on the colors of the cards within
    * the mainboard or, if specified, the sideboard.
-   * By default it only return the mainboard.
-   **/
+   * By default it only counts the mainboard.
+   * @param countMainboard weter or not to count the mainboard cards.
+   * @param countSideboard weter or not to count the sideboard cards.
+   */
   getColors(countMainboard = true, countSideboard = false):Colors {
     this._colors = new Colors();
 
@@ -138,7 +155,10 @@ class Deck {
 
   /**
    * Return how many of each wildcard we need to complete this deck.
-   **/
+   * By default it only counts the mainboard cards.
+   * @param countMainboard weter or not to count the mainboard cards.
+   * @param countSideboard weter or not to count the sideboard cards.
+   */
   getMissingWildcards(countMainboard = true, countSideboard = true) {
     let missing = {
       rare: 0,
@@ -204,6 +224,9 @@ class Deck {
     return str;
   }
 
+  /**
+   * Returns a string to import in MTG Arena
+   */
   getExportArena():string {
     let str = "";
     let listMain = this.mainboard.removeDuplicates(false);
@@ -248,11 +271,17 @@ class Deck {
 
     return str;
   }
-
-  getSave():Deck {
+  
+  /**
+   * Returns a copy of this deck as an object.
+   */
+  getSave():internalDeck {
     return objectClone(this.getSaveRaw());
   }
-
+  
+  /**
+   * Returns a copy of this deck as an object, but maintains variables references.
+   */
   getSaveRaw():internalDeck {
     return {
       mainDeck: this.mainboard.get(),
@@ -267,7 +296,11 @@ class Deck {
       commandZoneGRPIds: this.commandZoneGRPIds
     };
   }
-
+  
+  /**
+   * Returns a unique string for this deck. (not hashed)
+   * @param checkSide weter or not to use the sideboard (default: true)
+   */
   getUniqueString(checkSide = true) {
     this.sortMainboard(compare_cards);
     this.sortSideboard(compare_cards);

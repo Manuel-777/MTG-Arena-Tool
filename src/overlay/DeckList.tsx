@@ -264,8 +264,6 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     });
   }
 
-  const arenaDeck = deck.getSave();
-
   return (
     <div className="overlay_decklist click-on">
       <div className="decklist_title">{subTitle}</div>
@@ -274,8 +272,8 @@ export default function DeckList(props: DeckListProps): JSX.Element {
         <div className="card_tile_separator">Sideboard</div>
       )}
       {!!settings.sideboard && sideboardCardTiles}
-      {!!settings.type_counts && <DeckTypesStats deck={arenaDeck} />}
-      {!!settings.mana_curve && <DeckManaCurve deck={arenaDeck} />}
+      {!!settings.type_counts && <DeckTypesStats deck={deck} />}
+      {!!settings.mana_curve && <DeckManaCurve deck={deck} />}
       {!!settings.draw_odds &&
         (settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED) &&
         cardOdds &&
