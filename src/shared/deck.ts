@@ -97,7 +97,7 @@ class Deck {
    * Get the commander GrpId
    * @param pos position (default is first)
    */
-  getCommanderId(pos: number = 0):number {
+  getCommanderId(pos = 0):number {
     return this.commandZoneGRPIds[pos * 2];
   }
 
