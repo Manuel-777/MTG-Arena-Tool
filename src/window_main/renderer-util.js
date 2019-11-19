@@ -43,7 +43,7 @@ import {
 } from "../shared/util";
 import ReactDOM from "react-dom";
 import createShareButton from "./createShareButton";
-import { force_open_settings } from "./tabControl";
+import { forceOpenSettings } from "./tabControl";
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -1027,7 +1027,7 @@ function showOfflineSplash() {
     <div class="message_sub_16 white">If you need an account, you can <a class="signup_link">sign up here</a>.</div>
   </div>`;
   $$(".privacy_link")[0].addEventListener("click", function() {
-    force_open_settings(SETTINGS_PRIVACY);
+    forceOpenSettings(SETTINGS_PRIVACY);
   });
   $$(".launch_login_link")[0].addEventListener("click", function() {
     const clearAppSettings = {
