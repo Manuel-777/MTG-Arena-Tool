@@ -4,9 +4,18 @@ import path from "path";
 import fs from "fs";
 import { autoUpdater } from "electron-updater";
 import Store from "electron-store";
-import { format as formatUrl } from "url";
 
-var rememberStore = new Store({
+import iconPng from "../icons/icon.png";
+import iconTrayPng from "../icons/icon-tray.png";
+import iconTray8xPng from "../icons/icon-tray8x.png";
+import icon256Png from "../icons/icon-256.png";
+
+import updaterHtml from "./window_updater/index.html";
+import overlayHtml from "./overlay/index.html";
+import backgroundrHtml from "./window_backgroundr/index.html";
+import mainHtml from "./window_main/index.html";
+
+const rememberStore = new Store({
   name: "remember",
   defaults: {}
 });
@@ -27,16 +36,16 @@ console.log(process.platform);
 const debugBack = false;
 const debugIPC = false;
 
-var mainWindow = null;
-var updaterWindow = null;
-var background = null;
-var overlay = null;
-var mainTimeout = null;
+let mainWindow = null;
+let updaterWindow = null;
+let background = null;
+let overlay = null;
+let mainTimeout = null;
 let settings = {
   close_to_tray: false,
   launch_to_tray: false
 };
-var tray = null;
+let tray = null;
 
 const ipc = electron.ipcMain;
 
@@ -77,7 +86,9 @@ app.on("ready", () => {
     require("devtron").install();
     const dotenv = require("dotenv");
     dotenv.config();
-    electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
+    if (process.env.REACTDEVTOOLSEXT) {
+      electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
+    }
   }
 });
 
@@ -563,12 +574,12 @@ function createUpdaterWindow() {
     width: 320,
     height: 240,
     title: "Updater",
-    icon: "icons/icon.png",
+    icon: iconPng,
     webPreferences: {
       nodeIntegration: true
     }
   });
-  win.loadURL(`file://${__dirname}/window_updater/index.html`);
+  win.loadURL(updaterHtml);
 
   return win;
 }
@@ -582,12 +593,12 @@ function createBackgroundWindow() {
     width: 640,
     height: 480,
     title: "Background",
-    icon: "icons/icon.png",
+    icon: iconPng,
     webPreferences: {
       nodeIntegration: true
     }
   });
-  win.loadURL(`file://${__dirname}/window_background/index.html`);
+  win.loadURL(backgroundrHtml);
   win.on("closed", onBackClosed);
 
   return win;
@@ -611,7 +622,7 @@ function createOverlayWindow() {
       nodeIntegration: true
     }
   });
-  overlay.loadURL(`file://${__dirname}/overlay/index.html`);
+  overlay.loadURL(overlayHtml);
 
   if (process.platform !== "linux") {
     // https://electronjs.org/docs/api/browser-window#winsetignoremouseeventsignore-options
@@ -630,20 +641,20 @@ function createMainWindow() {
     width: 800,
     height: 600,
     title: "MTG Arena Tool",
-    icon: "icons/icon.png",
+    icon: iconPng,
     webPreferences: {
       nodeIntegration: true
     }
   });
-  win.loadURL(`file://${__dirname}/window_main/index.html`);
+  win.loadURL(mainHtml);
   win.on("closed", onMainClosed);
 
-  let iconPath = path.join(__dirname, "../icons/icon-tray.png");
+  let iconPath = iconTrayPng;
   if (process.platform == "linux") {
-    iconPath = path.join(__dirname, "../icons/icon-tray@8x.png");
+    iconPath = iconTray8xPng;
   }
   if (process.platform == "win32") {
-    iconPath = path.join(__dirname, "../icons/icon-256.png");
+    iconPath = icon256Png;
   }
 
   tray = new Tray(iconPath);
