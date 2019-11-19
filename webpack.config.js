@@ -2,12 +2,14 @@ const path = require("path");
 const nodeExternals = require("webpack-node-externals");
 const CopyPlugin = require("copy-webpack-plugin");
 
+// TODO be sure that "production" is used for npm run dist
 const isProduction =
   // eslint-disable-next-line no-undef
   typeof NODE_ENV !== "undefined" && NODE_ENV === "production";
 const mode = isProduction ? "production" : "development";
 const devtool = isProduction ? false : "inline-source-map";
 
+// https://webpack.js.org/configuration/
 const envConfig = {
   mode,
   devtool,
@@ -26,6 +28,8 @@ const envConfig = {
       }
     ]
   },
+  // https://webpack.js.org/configuration/node/#node__dirname
+  // https://codeburst.io/use-webpack-with-dirname-correctly-4cad3b265a92
   node: { __dirname: false, __filename: false },
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"]
@@ -36,6 +40,9 @@ module.exports = [
   {
     ...envConfig,
     plugins: [
+      // https://github.com/webpack-contrib/copy-webpack-plugin
+      // moves all of our non-compiled assets to lib (replaces babel --copy-files)
+      // TODO move static assets into webpack
       new CopyPlugin([
         { from: "src", to: "", ignore: ["*.js", "*.jsx", "*.ts", "*.tsx"] }
       ])
