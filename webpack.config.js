@@ -7,7 +7,7 @@ const isProduction =
 const mode = isProduction ? "production" : "development";
 const devtool = isProduction ? false : "inline-source-map";
 
-module.exports = {
+const defaultConfig = {
   mode,
   devtool,
   externals: [nodeExternals()],
@@ -34,10 +34,7 @@ module.exports = {
       }
     ]
   },
-  target: "electron-main",
-  entry: {
-    main: "./src/main.js"
-  },
+  target: "electron-renderer",
   devServer: {
     contentBase: "./dist",
     hot: true,
@@ -53,3 +50,18 @@ module.exports = {
     publicPath: "/"
   }
 };
+
+module.exports = [
+  {
+    ...defaultConfig,
+    entry: {
+      main: "./src/window_main/renderer.js"
+    }
+  },
+  {
+    ...defaultConfig,
+    entry: {
+      background: "./src/window_background/background.js"
+    }
+  }
+]
