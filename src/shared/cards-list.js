@@ -1,5 +1,5 @@
 import _ from "lodash";
-import db from "./database.js";
+import db from "./database";
 import Colors from "./colors";
 
 class CardsList {

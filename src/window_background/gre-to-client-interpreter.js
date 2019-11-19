@@ -1,4 +1,4 @@
-import { IPC_OVERLAY } from "../shared/constants.js";
+import { IPC_OVERLAY } from "../shared/constants";
 import { objectClone } from "../shared/util";
 import { ipc_send } from "./background-util";
 import Deck from "../shared/deck";

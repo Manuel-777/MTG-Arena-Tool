@@ -29,7 +29,7 @@ import {
   BLACK,
   GREEN,
   RED
-} from "../shared/constants.js";
+} from "../shared/constants";
 import {
   hideLoadingBars,
   changeBackground,

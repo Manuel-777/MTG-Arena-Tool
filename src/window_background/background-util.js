@@ -4,8 +4,8 @@ import { ipcRenderer as ipc } from "electron";
 import _ from "lodash";
 import parse from "date-fns/parse";
 import isValid from "date-fns/isValid";
-import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY } from "../shared/constants.js";
-import playerData from "../shared/player-data.js";
+import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY } from "../shared/constants";
+import playerData from "../shared/player-data";
 import globals from "./globals";
 
 // These were tested briefly
