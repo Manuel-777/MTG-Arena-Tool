@@ -54,14 +54,21 @@ const defaultConfig = {
 module.exports = [
   {
     ...defaultConfig,
+    target: "electron-main",
     entry: {
-      main: "./src/window_main/renderer.js"
+      main: "./src/main.js"
     }
   },
   {
     ...defaultConfig,
     entry: {
-      background: "./src/window_background/background.js"
+      window_main: "./src/window_main/renderer.js"
+    }
+  },
+  {
+    ...defaultConfig,
+    entry: {
+      window_background: "./src/window_background/background.js"
     }
   }
 ]

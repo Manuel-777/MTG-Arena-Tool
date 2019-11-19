@@ -27,7 +27,7 @@
   "repository": "https://github.com/Manuel-777/MTG-Arena-Tool",
   "bugs": "https://github.com/Manuel-777/MTG-Arena-Tool/issues",
   "version": "2.13.0",
-  "main": "dist/main.js",
+  "main": "dist/main.bundle.js",
   "build": {
     "appId": "com.github.manuel777.mtgatool",
     "files": [
