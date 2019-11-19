@@ -12,7 +12,7 @@ import icon256Png from "../icons/icon-256.png";
 
 import updaterHtml from "./window_updater/index.html";
 import overlayHtml from "./overlay/index.html";
-import backgroundrHtml from "./window_backgroundr/index.html";
+import backgroundHtml from "./window_background/index.html";
 import mainHtml from "./window_main/index.html";
 
 const rememberStore = new Store({
@@ -598,7 +598,7 @@ function createBackgroundWindow() {
       nodeIntegration: true
     }
   });
-  win.loadURL(backgroundrHtml);
+  win.loadURL(backgroundHtml);
   win.on("closed", onBackClosed);
 
   return win;
