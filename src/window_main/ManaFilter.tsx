@@ -1,6 +1,7 @@
 import React from 'react';
 import {
     COLORS_BRIEF,
+    COLORS_LONG
 } from "../shared/constants";
 
 export type ManaFilterKeys = "w" | "u" | "b" | "r" | "g" | "multi";
@@ -39,7 +40,7 @@ export default function ManaFilter(props: ManaFilterProps) {
     }, [props.onFilterChanged]);
 
     const allFilters: ManaFilterKeys[] = [...COLORS_BRIEF, "multi"];
-
+    const allFiltersLong = [...COLORS_LONG, "multi"];
     const manasStyles = {
         display: "flex",
         margin: "8px",
@@ -49,11 +50,10 @@ export default function ManaFilter(props: ManaFilterProps) {
 
     return (
         <div className={prefixId + "_query_mana"} style={manasStyles}>
-            {allFilters.map(code => {
-                const classNamesList = "mana_filter" + (code === "multi" ? " icon_search_inclusive" : "") + (colors[code] ? "" : " mana_filter_on");
+            {allFilters.map((code, index) => {
+                const classNamesList = "mana_" + allFiltersLong[index] + " mana_filter" + (code === "multi" ? " icon_search_inclusive" : "") + (colors[code] ? "" : " mana_filter_on");
                 const additionalStyles = {
-                    width: "30px",
-                    backgroundImage: code === "multi" ? undefined : `url(../images/${code}20.png)`,
+                    width: "30px"
                 }
                 return <div key={code} onClick={onClickColorFilter(code)} className={classNamesList} style={additionalStyles} title={filterLabels[code]}/>
             })}
