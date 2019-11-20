@@ -1,6 +1,6 @@
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
-const CopyPlugin = require("copy-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 // TODO be sure that "production" is used for npm run dist
 const isProduction =
@@ -25,6 +25,18 @@ const envConfig = {
         test: /\.(ts|tsx)$/,
         include: /src/,
         loader: "ts-loader"
+      },
+      {
+        test: /\.(scss|css)$/,
+        use: ["style-loader", "css-loader"]
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: ["file-loader"]
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: ["file-loader"]
       }
     ]
   },
@@ -39,14 +51,6 @@ const envConfig = {
 module.exports = [
   {
     ...envConfig,
-    plugins: [
-      // https://github.com/webpack-contrib/copy-webpack-plugin
-      // moves all of our non-compiled assets to lib (replaces babel --copy-files)
-      // TODO move static assets into webpack
-      new CopyPlugin([
-        { from: "src", to: "", ignore: ["*.js", "*.jsx", "*.ts", "*.tsx"] }
-      ])
-    ],
     target: "electron-main",
     entry: {
       main: "./src/main.js"
@@ -65,7 +69,12 @@ module.exports = [
     output: {
       path: path.resolve(__dirname, "lib", "window_main"),
       filename: "renderer.js"
-    }
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, "./src/window_main/index.html")
+      })
+    ]
   },
   {
     ...envConfig,
@@ -76,7 +85,12 @@ module.exports = [
     output: {
       path: path.resolve(__dirname, "lib", "window_background"),
       filename: "background.js"
-    }
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, "./src/window_background/index.html")
+      })
+    ]
   },
   {
     ...envConfig,
@@ -87,7 +101,12 @@ module.exports = [
     output: {
       path: path.resolve(__dirname, "lib", "overlay"),
       filename: "index.js"
-    }
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, "./src/overlay/index.html")
+      })
+    ]
   },
   {
     ...envConfig,
@@ -98,6 +117,11 @@ module.exports = [
     output: {
       path: path.resolve(__dirname, "lib", "window_updater"),
       filename: "updater.js"
-    }
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, "./src/window_updater/index.html")
+      })
+    ]
   }
 ];

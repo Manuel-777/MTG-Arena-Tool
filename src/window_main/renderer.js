@@ -67,6 +67,10 @@ import { setExploreDecks } from "./explore";
 import { openTab, forceOpenAbout, forceOpenSettings } from "./tabControl";
 import { updateTopBar } from "./topNav";
 
+import "./index.css";
+import "./flags.min.css";
+import "../shared/shared.css";
+
 const byId = id => document.getElementById(id);
 let loggedIn = false;
 let canLogin = false;

@@ -6,6 +6,9 @@ import { createDiv } from "../shared/dom-fns";
 
 import OverlayController from "../overlay/OverlayController";
 
+import "./index.css";
+import "../shared/shared.css";
+
 const TransparencyMouseFix = require("electron-transparency-mouse-fix");
 
 if (!remote.app.isPackaged) {
