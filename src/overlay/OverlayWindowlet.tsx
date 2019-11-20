@@ -156,12 +156,14 @@ export default function OverlayWindowlet(
   else
     bgStyle.backgroundColor = backgroundColor;
 
+  const borderAlpha = (overlaySettings.alpha_back * 1.5).toString();
   return (
     <div
       className={"overlay_container " + getEditModeClass(editMode)}
       id={"overlay_" + (index + 1)}
       ref={containerRef}
       style={{
+        border: "1px solid rgba(128, 128, 128, " + borderAlpha + ")",
         opacity: isVisible ? "1" : "0",
         visibility: isVisible ? "visible" : "hidden",
         height: overlaySettings.bounds.height + "px",
