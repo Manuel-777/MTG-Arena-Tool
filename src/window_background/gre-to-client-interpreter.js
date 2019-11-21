@@ -70,6 +70,8 @@ const gameObjectCardTypes = [
   // "GameObjectType_SplitRight"
 ];
 
+const FACE_DOWN_CARD = 3;
+
 function isObjectACard(card) {
   return gameObjectCardTypes.includes(card.type);
 }
@@ -540,22 +542,22 @@ export function GREMessage(message, time) {
 }
 
 function getOppUsedCards() {
-  let cardsUsed = [];
+  const cardsUsed = [];
   Object.keys(globals.currentMatch.zones).forEach(key => {
-    let zone = globals.currentMatch.zones[key];
-    if (zone.objectInstanceIds && zone.type !== "ZoneType_Limbo") {
+    const zone = globals.currentMatch.zones[key];
+    const zoneType = zone.type.trim();
+    if (zone.objectInstanceIds && zoneType !== "ZoneType_Limbo") {
       zone.objectInstanceIds.forEach(id => {
         let grpId;
         try {
-          let obj = globals.currentMatch.gameObjs[id];
+          const obj = globals.currentMatch.gameObjs[id];
           if (
             obj.ownerSeatId == globals.currentMatch.opponent.seat &&
             isObjectACard(obj)
           ) {
             grpId = obj.grpId;
-            //cardsUsed.push(db.card(grpId).name+" - "+zone.type);
-            // 3 is the code for "Face down card", apparently
-            if (grpId !== 3) cardsUsed.push(grpId);
+            // console.log(zone.type, db.card(grpId).name, obj);
+            if (grpId !== FACE_DOWN_CARD) cardsUsed.push(grpId);
           }
         } catch (e) {
           //
@@ -575,7 +577,7 @@ function getCardsTypeZone() {
       zone.objectInstanceIds.forEach(id => {
         try {
           let obj = globals.currentMatch.gameObjs[id];
-          if (isObjectACard(obj) && obj.grpId !== 3) {
+          if (isObjectACard(obj) && obj.grpId !== FACE_DOWN_CARD) {
             const cardTypes = [...new Set(obj.cardTypes)];
             cardTypes
               .filter(cardType => cardTypes.includes(cardType))
@@ -602,26 +604,27 @@ function getCardsTypeZone() {
 }
 
 function getPlayerUsedCards() {
-  let cardsUsed = [];
+  const cardsUsed = [];
   Object.keys(globals.currentMatch.zones).forEach(key => {
-    let zone = globals.currentMatch.zones[key];
-    if (
-      zone.objectInstanceIds &&
-      zone.type !== "ZoneType_Limbo" &&
-      zone.type !== "ZoneType_Library" &&
-      zone.type !== "ZoneType_Revealed"
-    ) {
+    const zone = globals.currentMatch.zones[key];
+    const zoneType = zone.type.trim();
+    const ignoreZones = [
+      "ZoneType_Limbo",
+      "ZoneType_Library",
+      "ZoneType_Revealed"
+    ];
+    if (zone.objectInstanceIds && !ignoreZones.includes(zoneType)) {
       zone.objectInstanceIds.forEach(id => {
         let grpId;
         try {
-          let obj = globals.currentMatch.gameObjs[id];
+          const obj = globals.currentMatch.gameObjs[id];
           if (
             obj.ownerSeatId == globals.currentMatch.player.seat &&
             isObjectACard(obj)
           ) {
             grpId = obj.grpId;
-            //cardsUsed.push(db.card(grpId).name+" - "+zone.type);
-            if (grpId !== 3) cardsUsed.push(grpId);
+            // console.log(zone.type, db.card(grpId).name, obj);
+            if (grpId !== FACE_DOWN_CARD) cardsUsed.push(grpId);
           }
         } catch (e) {
           //
