@@ -51,12 +51,12 @@
     }
   },
   "scripts": {
-    "clean": "npm run clean:modules || npm run clean:lib || npm run clean:dist",
+    "clean": "npm run clean:lib || npm run clean:dist || npm run clean:modules",
     "clean:modules": "rimraf node_modules",
     "clean:lib": "rimraf lib",
     "clean:dist": "rimraf dist",
     "prebuild": "npm run clean:lib",
-    "build": "webpack --progress --colors",
+    "build": "node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --progress --colors",
     "start": "npm run build && electron .",
     "postinstall": "install-app-deps",
     "format": "prettier --write \"src/**/*.js\"",
