@@ -2,15 +2,14 @@ import _ from "lodash";
 import nthLastIndexOf from "./nth-last-index-of";
 import * as jsonText from "./json-text";
 
-const CONNECTION_JSON_PATTERN = /\[(?:UnityCrossThreadLogger|Client GRE)\]WebSocketClient (?<client>.*) WebSocketSharp\.WebSocket connecting to .*: (?<socket>.*)(?:\r\n|\n)/;
+const CONNECTION_JSON_PATTERN = /\[(?:UnityCrossThreadLogger|Client GRE)\]WebSocketClient (?<client>.*) WebSocketSharp\.WebSocket connecting to .*: (?<socket>.*)(?:\r\n|\n)*/;
 
 const LABEL_JSON_PATTERNS = [
   /\[UnityCrossThreadLogger\](?<timestamp>.*): (?:Match to )?(?<playerId>\w*)(?: to Match)?: (?<label>.*)(?:\r\n|\n)/,
-  /\[UnityCrossThreadLogger\](?<timestamp>.*)(?:\r\n|\n){0,}\(.*\) Incoming (?<label>.*) /,
-  /\[UnityCrossThreadLogger\]Received unhandled GREMessageType: (?<label>.*)(?:\r\n|\n)/
+  /\[UnityCrossThreadLogger\]Received unhandled GREMessageType: (?<label>.*)(?:\r\n|\n)*/
 ];
 
-const LABEL_ARROW_JSON_PATTERN = /\[UnityCrossThreadLogger\](?<timestamp>.*)(?:\r\n|\n)(?<arrow>[<=]=[=>]) (?<label>.*)\(.*\):?(?:\r\n|\n)/;
+const LABEL_ARROW_JSON_PATTERN = /\[UnityCrossThreadLogger\](?<arrow>[<=]=[=>]) (?<label>.*) /;
 
 const ALL_PATTERNS = [
   CONNECTION_JSON_PATTERN,
@@ -122,7 +121,8 @@ function parseLogEntry(text, matchText, position) {
         ..._.mapValues(rematches.groups, unleakString),
         json: () => {
           try {
-            return JSON.parse(text.substr(jsonStart, jsonLen));
+            const json = JSON.parse(text.substr(jsonStart, jsonLen));
+            return json.payload || json.request || json;
           } catch (e) {
             console.log(e, {
               input: rematches.input,
@@ -167,7 +167,8 @@ function parseLogEntry(text, matchText, position) {
         ..._.mapValues(rematches.groups, unleakString),
         json: () => {
           try {
-            return JSON.parse(text.substr(jsonStart, jsonLen));
+            const json = JSON.parse(text.substr(jsonStart, jsonLen));
+            return json.payload || json.request || json;
           } catch (e) {
             console.log(e, {
               input: rematches.input,
