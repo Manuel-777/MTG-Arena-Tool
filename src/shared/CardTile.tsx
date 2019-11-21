@@ -19,7 +19,7 @@ import { DbCardData, Rarity } from "./types/Metadata";
 import _ from "lodash";
 
 export interface CardTileProps {
-  card: DbCardData | any; // TODO remove group lands hack
+  card: DbCardData;
   deck?: Deck;
   dfcCard?: DbCardData;
   indent: string;
@@ -409,16 +409,11 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
 
 export default function CardTile(props: CardTileProps): JSX.Element {
   const { card, quantity } = props;
-  // TODO remove group lands hack
-  const haxxorProps = { ...props };
-  if (card.id && typeof card.id === "object" && card.id.name) {
-    haxxorProps.card = card.id;
-  }
   if (!card || quantity === 0) {
     return <></>;
   }
-  if (haxxorProps.style === CARD_TILE_FLAT) {
-    return FlatCardTile(haxxorProps);
+  if (props.style === CARD_TILE_FLAT) {
+    return FlatCardTile(props);
   }
-  return ArenaCardTile(haxxorProps);
+  return ArenaCardTile(props);
 }

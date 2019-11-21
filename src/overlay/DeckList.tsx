@@ -160,6 +160,12 @@ export default function DeckList(props: DeckListProps): JSX.Element {
   }
   mainCards.get().sort(sortFunc);
   mainCards.get().forEach((card: any, index: number) => {
+    // TODO remove group lands hack
+    const isCardGroupedLands =
+      card && card.id && card.id.id && card.id.id === 100;
+    if (isCardGroupedLands) {
+      card = card.id;
+    }
     let quantity = card.quantity;
     if (settings.mode === OVERLAY_MIXED) {
       const odds = (card.chance !== undefined ? card.chance : "0") + "%";
@@ -179,10 +185,6 @@ export default function DeckList(props: DeckListProps): JSX.Element {
       const rank = getRank(card.id);
       quantity = DRAFT_RANKS[rank];
     }
-
-    // TODO remove group lands hack
-    const isCardGroupedLands =
-      card && card.id && card.id.id && card.id.id === 100;
 
     let fullCard = card;
     if (card && card.id && !isCardGroupedLands) {
