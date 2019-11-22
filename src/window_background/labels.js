@@ -877,7 +877,6 @@ export function onLabelInventoryUpdatedV4(entry) {
   });
 }
 
-// 2019-10-24 DEPRECATED as of Arena client 1857.738996
 function onLabelInventoryUpdated(transaction) {
   if (!transaction) return;
 
@@ -939,7 +938,7 @@ function inventoryAddDelta(delta) {
 
 function inventoryUpdate(entry, update) {
   // combine sub-context with parent context
-  console.log("inventoryUpdate", entry, update);
+  // console.log("inventoryUpdate", entry, update);
   let context = "PostMatch.Update";
   if (update.context && update.context.source) {
     // combine sub-context with parent context
@@ -978,8 +977,7 @@ function inventoryUpdate(entry, update) {
   saveEconomyTransaction(transaction);
 }
 
-function trackUpdate(entry) {
-  const json = entry.json();
+function trackUpdate(entry, trackUpdate) {
   if (!trackUpdate) return;
   const { trackName, trackTier, trackDiff, orbCountDiff } = trackUpdate;
 
