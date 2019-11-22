@@ -325,7 +325,9 @@ function entrySwitch(entry) {
       break;
 
     case "PostMatch.Update":
-      onLabelPostMatchUpdate(entry);
+      if (entry.arrow == "==>") {
+        onLabelPostMatchUpdate(entry);
+      }
       break;
 
     case "PlayerInventory.GetPlayerInventory":
@@ -344,10 +346,6 @@ function entrySwitch(entry) {
       if (entry.arrow == "<==") {
         onLabelInProgressionGetPlayerProgress(entry);
       }
-      break;
-
-    case "TrackProgress.Updated":
-      onLabelTrackProgressUpdated(entry);
       break;
 
     case "TrackRewardTier.Updated":

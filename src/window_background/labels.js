@@ -897,7 +897,7 @@ function onLabelInventoryUpdated(transaction) {
   // We use the original time string for the ID to ensure parsing does not alter it
   // This will make the ID the same if parsing either changes or breaks
   transaction.id = sha1(
-    transaction.timestamp + context + JSON.stringify(transaction.delta)
+    transaction.date + context + JSON.stringify(transaction.delta)
   );
 
   // Do not modify the context from now on.
@@ -937,8 +937,7 @@ function inventoryAddDelta(delta) {
   setData({ economy, cardsNew, cards });
 }
 
-function inventoryUpdate(entry) {
-  const update = entry.json();
+function inventoryUpdate(entry, update) {
   // combine sub-context with parent context
   console.log("inventoryUpdate", entry, update);
   let context = "PostMatch.Update";
@@ -1099,63 +1098,6 @@ export function onLabelInProgressionGetPlayerProgress(entry) {
     currentExp: activeTrack.currentExp,
     currentOrbCount: activeTrack.currentOrbCount
   };
-  setData({ economy });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("economy", economy);
-}
-
-// 2019-10-24 DEPRECATED as of Arena client version 1857.738996
-export function onLabelTrackProgressUpdated(entry) {
-  const json = entry.json();
-  if (!json) return;
-  // console.log(json);
-  const economy = { ...playerData.economy };
-  json.forEach(track => {
-    if (!track.trackDiff) return; // ignore rewardWebDiff updates for now
-
-    const transaction = {
-      context: "Track.Progress." + (track.trackName || ""),
-      timestamp: json.timestamp,
-      date: parseWotcTimeFallback(json.timestamp),
-      delta: {},
-      ...track
-    };
-
-    const trackDiff = minifiedDelta(transaction.trackDiff);
-    if (trackDiff.inventoryDelta) {
-      // this is redundant data, removing to save space
-      delete trackDiff.inventoryDelta;
-    }
-    transaction.trackDiff = trackDiff;
-
-    if (track.trackName) {
-      economy.trackName = track.trackName;
-    }
-    if (track.trackTier !== undefined) {
-      economy.trackTier = track.trackTier;
-    }
-    if (trackDiff.currentLevel !== undefined) {
-      economy.currentLevel = trackDiff.currentLevel;
-    }
-    if (trackDiff.currentExp !== undefined) {
-      economy.currentExp = trackDiff.currentExp;
-    }
-
-    if (transaction.orbDiff) {
-      const orbDiff = minifiedDelta(transaction.orbDiff);
-      transaction.orbDiff = orbDiff;
-      if (orbDiff.currentOrbCount !== undefined) {
-        economy.currentOrbCount = orbDiff.currentOrbCount;
-      }
-    }
-
-    // Construct a unique ID
-    transaction.id = sha1(
-      json.timestamp + JSON.stringify(transaction.trackDiff)
-    );
-    saveEconomyTransaction(transaction);
-  });
-  // console.log(economy);
   setData({ economy });
   if (globals.debugLog || !globals.firstPass)
     globals.store.set("economy", economy);
@@ -1407,7 +1349,7 @@ export function onLabelMatchGameRoomStateChangedEvent(entry) {
     globals.matchCompletedOnGameNumber =
       json.finalMatchResult.resultList.length - 1;
 
-    var matchEndTime = parseWotcTimeFallback(json.timestamp);
+    var matchEndTime = parseWotcTimeFallback(entry.timestamp);
     saveMatch(
       json.finalMatchResult.matchId + "-" + playerData.arenaId,
       matchEndTime
