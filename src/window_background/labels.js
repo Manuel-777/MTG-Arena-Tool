@@ -728,7 +728,7 @@ export function onLabelInEventGetPlayerCourse(entry) {
       httpApi.httpSubmitCourse(json);
       saveCourse(json);
     }
-    select_deck(json);
+    select_deck(convert_deck_from_v3(json));
   }
 }
 
@@ -748,7 +748,7 @@ export function onLabelInEventJoin(entry) {
   if (json.CourseDeck) {
     json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
     addCustomDeck(json.CourseDeck);
-    select_deck(json);
+    select_deck(convert_deck_from_v3(json));
   }
 }
 
@@ -1132,7 +1132,7 @@ export function onLabelTrackRewardTierUpdated(entry) {
 export function onLabelInEventDeckSubmit(entry) {
   const json = entry.json();
   if (!json) return;
-  select_deck(json);
+  select_deck(convert_deck_from_v3(json));
 }
 
 export function onLabelInEventDeckSubmitV3(entry) {
