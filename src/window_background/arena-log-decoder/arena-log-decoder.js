@@ -7,7 +7,7 @@ const LABEL_JSON_PATTERNS = [
   /\[UnityCrossThreadLogger\]Received unhandled GREMessageType: (?<label>.*)(?:\r\n|\n)*/
 ];
 
-const LABEL_ARROW_JSON_PATTERN = /\[UnityCrossThreadLogger\](?<arrow>[<=]=[=>]) (?<label>.*) /;
+const LABEL_ARROW_JSON_PATTERN = /\[UnityCrossThreadLogger\](?<arrow>[<=]=[=>]) (?<label>.*?) /;
 
 const ALL_PATTERNS = [...LABEL_JSON_PATTERNS, LABEL_ARROW_JSON_PATTERN];
 
@@ -152,6 +152,7 @@ function parseLogEntry(text, matchText, position) {
         json: () => {
           try {
             const json = JSON.parse(text.substr(jsonStart, jsonLen));
+            );
             return json.payload || json.request || json;
           } catch (e) {
             console.log(e, {
