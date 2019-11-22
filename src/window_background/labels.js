@@ -574,7 +574,7 @@ export function onLabelRankUpdated(entry) {
   const json = entry.json();
   if (!json) return;
   json.date = json.timestamp;
-  json.timestamp = parseWotcTimeFallback(json.timestamp).getTime();
+  json.timestamp = globals.logTime;
   json.lastMatchId = globals.currentMatch.matchId;
   json.eventId = globals.currentMatch.eventId;
   const rank = { ...playerData.rank };
@@ -760,7 +760,7 @@ export function onLabelInEventJoin(entry) {
 export function onLabelInDeckUpdateDeck(entry, json = false) {
   if (!json && entry.json) json = entry.json();
   if (!json) return;
-  const logTime = parseWotcTimeFallback(json.timestamp);
+  const logTime = globals.logTime;
   const _deck = playerData.deck(json.id);
 
   const changeId = sha1(json.id + "-" + logTime);
