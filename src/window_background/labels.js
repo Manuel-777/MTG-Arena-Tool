@@ -443,11 +443,11 @@ export function onLabelOutLogInfo(entry) {
       game.landsInLibrary = landsInLibrary;
       game.libraryLands = libraryLands;
 
+      globals.matchGameStats[globals.gameNumberCompleted - 1] = game;
       globals.currentMatch.matchTime = globals.matchGameStats.reduce(
         (acc, cur) => acc + cur.time,
         0
       );
-      globals.matchGameStats[globals.gameNumberCompleted - 1] = game;
 
       saveMatch(mid);
     }
@@ -1144,7 +1144,7 @@ export function onLabelInEventDeckSubmitV3(entry) {
 export function onLabelEventMatchCreated(entry) {
   const json = entry.json();
   if (!json) return;
-  const matchBeginTime = globals.logTime;
+  const matchBeginTime = globals.logTime || new Date();
 
   if (json.opponentRankingClass == "Mythic") {
     const httpApi = require("./http-api");
