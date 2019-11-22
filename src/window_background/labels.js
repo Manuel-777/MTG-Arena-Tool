@@ -757,8 +757,8 @@ export function onLabelInEventJoin(entry) {
   }
 }
 
-export function onLabelInDeckUpdateDeck(entry) {
-  const json = entry.json();
+export function onLabelInDeckUpdateDeck(entry, json = false) {
+  if (!json && entry.json) json = entry.json();
   if (!json) return;
   const logTime = parseWotcTimeFallback(json.timestamp);
   const _deck = playerData.deck(json.id);
