@@ -182,15 +182,7 @@ function onLogEntryFound(entry) {
       // sleep
     }
   }
-  if (entry.type == "connection") {
-    // TODO find where this is in the new log format
-    const data = {
-      arenaId: entry.socket.PlayerId,
-      arenaVersion: entry.socket.ClientVersion,
-      name: entry.socket.PlayerScreenName
-    };
-    setData(data);
-  } else if (entry.playerId && entry.playerId !== playerData.arenaId) {
+  if (entry.playerId && entry.playerId !== playerData.arenaId) {
     return;
   } else {
     //console.log("Entry:", entry.label, entry, entry.json());

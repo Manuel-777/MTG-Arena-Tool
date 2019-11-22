@@ -2,8 +2,6 @@ import _ from "lodash";
 import nthLastIndexOf from "./nth-last-index-of";
 import * as jsonText from "./json-text";
 
-const CONNECTION_JSON_PATTERN = /\[(?:UnityCrossThreadLogger|Client GRE)\]WebSocketClient (?<client>.*) WebSocketSharp\.WebSocket connecting to .*: (?<socket>.*)(?:\r\n|\n)*/;
-
 const LABEL_JSON_PATTERNS = [
   /\[UnityCrossThreadLogger\](?<timestamp>.*): (?:Match to )?(?<playerId>\w*)(?: to Match)?: (?<label>.*)(?:\r\n|\n)/,
   /\[UnityCrossThreadLogger\]Received unhandled GREMessageType: (?<label>.*)(?:\r\n|\n)*/
@@ -11,11 +9,7 @@ const LABEL_JSON_PATTERNS = [
 
 const LABEL_ARROW_JSON_PATTERN = /\[UnityCrossThreadLogger\](?<arrow>[<=]=[=>]) (?<label>.*) /;
 
-const ALL_PATTERNS = [
-  CONNECTION_JSON_PATTERN,
-  ...LABEL_JSON_PATTERNS,
-  LABEL_ARROW_JSON_PATTERN
-];
+const ALL_PATTERNS = [...LABEL_JSON_PATTERNS, LABEL_ARROW_JSON_PATTERN];
 
 const maxLinesOfAnyPattern = Math.max(
   ...ALL_PATTERNS.map(regex => occurrences(regex.source, /\\n/g))
@@ -80,16 +74,6 @@ export default function ArenaLogDecoder() {
 
 function parseLogEntry(text, matchText, position) {
   let rematches;
-  if ((rematches = matchText.match(CONNECTION_JSON_PATTERN))) {
-    return [
-      "full",
-      matchText.length,
-      {
-        type: "connection",
-        ..._.mapValues(rematches.groups, JSON.parse)
-      }
-    ];
-  }
 
   if ((rematches = matchText.match(LABEL_ARROW_JSON_PATTERN))) {
     const jsonStart = position + matchText.length;
