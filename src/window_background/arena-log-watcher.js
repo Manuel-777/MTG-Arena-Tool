@@ -193,7 +193,7 @@ function onLogEntryFound(entry) {
         let timestamp = entry.timestamp;
         if (entry.json) {
           const json = entry.json();
-          if (json.timestamp) {
+          if (json && json.timestamp) {
             timestamp = json.timestamp;
           }
         }

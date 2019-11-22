@@ -715,7 +715,7 @@ export function onLabelInEventGetPlayerCourse(entry) {
   if (!json) return;
 
   if (json.Id != "00000000-0000-0000-0000-000000000000") {
-    json.date = parseWotcTimeFallback(json.timestamp);
+    json.date = globals.logTime;
     json._id = json.Id;
     delete json.Id;
 

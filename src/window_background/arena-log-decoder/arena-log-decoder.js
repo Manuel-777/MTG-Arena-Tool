@@ -107,7 +107,9 @@ function parseLogEntry(text, matchText, position) {
           try {
             // console.log(text.substr(jsonStart, jsonLen), jsonStart, jsonLen);
             const json = JSON.parse(text.substr(jsonStart, jsonLen));
-            return json.payload || JSON.parse(json.request) || json;
+            return (
+              json.payload || (json.request && JSON.parse(json.request)) || json
+            );
           } catch (e) {
             console.log(e, {
               input: rematches.input,
@@ -152,8 +154,11 @@ function parseLogEntry(text, matchText, position) {
         ..._.mapValues(rematches.groups, unleakString),
         json: () => {
           try {
+            // console.log(text.substr(jsonStart, jsonLen), jsonStart, jsonLen);
             const json = JSON.parse(text.substr(jsonStart, jsonLen));
-            return json.payload || JSON.parse(json.request) || json;
+            return (
+              json.payload || (json.request && JSON.parse(json.request)) || json
+            );
           } catch (e) {
             console.log(e, {
               input: rematches.input,
