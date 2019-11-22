@@ -319,7 +319,7 @@ function entrySwitch(entry) {
       break;
 
     case "Inventory.Updated":
-      if (entry.arrow == "<==") {
+      if (entry.arrow == "==>") {
         onLabelInventoryUpdatedV4(entry);
       }
       break;

@@ -957,14 +957,17 @@ function inventoryUpdate(entry, update) {
     inventoryAddDelta(update.delta);
   }
 
+  // TODO find a better timestamp
+  const timestamp = new Date();
+
   // We use the original time string for the ID to ensure parsing does not alter it
   // This will make the ID the same if parsing either changes or breaks
-  let id = sha1(update.timestamp + context + JSON.stringify(update.delta));
+  const id = sha1(timestamp + context + JSON.stringify(update.delta));
 
   let transaction = {
     ...update,
     // Add missing data
-    date: parseWotcTimeFallback(update.timestamp),
+    date: timestamp,
     // Reduce the size for storage
     delta: update.delta ? minifiedDelta(update.delta) : {},
     context,
