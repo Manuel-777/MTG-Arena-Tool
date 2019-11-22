@@ -198,6 +198,7 @@ function onLogEntryFound(entry) {
           }
         }
         if (timestamp) {
+          // TODO should we always set globals.logTime here?
           setData({
             last_log_timestamp: timestamp,
             last_log_format: getDateFormat(timestamp)
@@ -216,7 +217,7 @@ function onLogEntryFound(entry) {
 // (in my testing)
 /* eslint-disable-next-line complexity */
 function entrySwitch(entry) {
-  console.log(entry, entry.json());
+  // console.log(entry, entry.json());
   switch (entry.label) {
     case "Log.BI":
       if (entry.arrow == "==>") {

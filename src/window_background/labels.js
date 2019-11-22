@@ -9,7 +9,7 @@ import {
 } from "../shared/constants";
 import db from "../shared/database";
 import CardsList from "../shared/cards-list";
-import { get_deck_colors, objectClone, replaceAll } from "../shared/util";
+import { get_deck_colors, objectClone } from "../shared/util";
 import * as greToClientInterpreter from "./gre-to-client-interpreter";
 import playerData from "../shared/player-data";
 import sha1 from "js-sha1";
@@ -182,7 +182,7 @@ function saveCourse(json) {
   delete json._id;
   json.id = id;
   const eventData = {
-    date: new Date(),
+    date: globals.logTime,
     // preserve custom fields if possible
     ...(playerData.event(id) || {}),
     ...json
@@ -286,7 +286,7 @@ function convert_deck_from_v3(deck) {
 export function onLabelOutLogInfo(entry) {
   const json = entry.json();
   if (!json) return;
-  globals.logTime = parseWotcTimeFallback(json.timestamp);
+  // console.log(json);
 
   if (json.params.messageName == "Client.UserDeviceSpecs") {
     let payload = {
@@ -879,26 +879,16 @@ export function onLabelInventoryUpdatedV4(entry) {
 
 function onLabelInventoryUpdated(transaction) {
   if (!transaction) return;
-
+  // Construct a unique ID
+  transaction.id = sha1(JSON.stringify(transaction));
   // Add missing data
-  transaction.date = new Date();
-
+  transaction.date = globals.logTime;
   // Add delta to our current values
   if (transaction.delta) {
     inventoryAddDelta(transaction.delta);
   }
   // Reduce the size for storage
   transaction.delta = minifiedDelta(transaction.delta);
-
-  // Construct a unique ID
-  let context = transaction.context;
-  //let milliseconds = transaction.date.getTime();
-  // We use the original time string for the ID to ensure parsing does not alter it
-  // This will make the ID the same if parsing either changes or breaks
-  transaction.id = sha1(
-    transaction.date + context + JSON.stringify(transaction.delta)
-  );
-
   // Do not modify the context from now on.
   saveEconomyTransaction(transaction);
   return;
@@ -956,23 +946,17 @@ function inventoryUpdate(entry, update) {
     inventoryAddDelta(update.delta);
   }
 
-  // TODO find a better timestamp
-  const timestamp = new Date();
-
-  // We use the original time string for the ID to ensure parsing does not alter it
-  // This will make the ID the same if parsing either changes or breaks
-  const id = sha1(timestamp + context + JSON.stringify(update.delta));
-
-  let transaction = {
+  const transaction = {
     ...update,
-    // Add missing data
-    date: timestamp,
     // Reduce the size for storage
     delta: update.delta ? minifiedDelta(update.delta) : {},
     context,
-    subContext: update.context, // preserve sub-context object data
-    id: id
+    subContext: update.context // preserve sub-context object data
   };
+  // Construct a unique ID
+  transaction.id = sha1(JSON.stringify(transaction));
+  // Add missing data
+  transaction.date = globals.logTime;
 
   saveEconomyTransaction(transaction);
 }
@@ -1136,9 +1120,7 @@ export function onLabelTrackRewardTierUpdated(entry) {
   }
 
   // Construct a unique ID
-  transaction.id = sha1(
-    json.timestamp + transaction.oldTier + transaction.newTier
-  );
+  transaction.id = sha1(JSON.stringify(transaction));
   saveEconomyTransaction(transaction);
 
   // console.log(economy);
@@ -1162,7 +1144,7 @@ export function onLabelInEventDeckSubmitV3(entry) {
 export function onLabelEventMatchCreated(entry) {
   const json = entry.json();
   if (!json) return;
-  const matchBeginTime = new Date();
+  const matchBeginTime = globals.logTime;
 
   if (json.opponentRankingClass == "Mythic") {
     const httpApi = require("./http-api");
