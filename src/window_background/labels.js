@@ -262,7 +262,7 @@ function select_deck(arg) {
   } else {
     globals.currentDeck = new Deck(arg);
   }
-  // console.log("Select deck: ", globals.currentDeck, arg);
+  console.log("Select deck: ", globals.currentDeck, arg);
   globals.originalDeck = globals.currentDeck.clone();
   ipc_send("set_deck", globals.currentDeck.getSave(), IPC_OVERLAY);
 }
@@ -278,11 +278,14 @@ function convertV3ToV2(v3List) {
 }
 
 function convertDeckFromV3(deck) {
-  if (deck.mainDeck) {
-    deck.mainDeck = convertV3ToV2(deck.mainDeck);
-  }
-  if (deck.sideboard) {
-    deck.sideboard = convertV3ToV2(deck.sideboard);
+  if (deck.CourseDeck) {
+    if (deck.CourseDeck.mainDeck)
+      deck.CourseDeck.mainDeck = convertV3ToV2(deck.CourseDeck.mainDeck);
+    if (deck.CourseDeck.sideboard)
+      deck.CourseDeck.sideboard = convertV3ToV2(deck.CourseDeck.sideboard);
+  } else {
+    if (deck.mainDeck) deck.mainDeck = convertV3ToV2(deck.mainDeck);
+    if (deck.sideboard) deck.sideboard = convertV3ToV2(deck.sideboard);
   }
   return deck;
 }
