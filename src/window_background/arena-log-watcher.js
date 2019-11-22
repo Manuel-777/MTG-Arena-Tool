@@ -218,7 +218,6 @@ function onLogEntryFound(entry) {
 function entrySwitch(entry) {
   switch (entry.label) {
     case "Log.BI":
-    case "Log.Info":
       if (entry.arrow == "==>") {
         onLabelOutLogInfo(entry);
       }
@@ -311,9 +310,8 @@ function entrySwitch(entry) {
       break;
 
     case "Inventory.Updated":
-      if (entry.arrow == "==>") {
-        onLabelInventoryUpdatedV4(entry);
-      }
+      // handler works for both out and in arrows
+      onLabelInventoryUpdatedV4(entry);
       break;
 
     case "PostMatch.Update":
