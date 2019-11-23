@@ -1176,7 +1176,13 @@ export function onLabelInDraftDraftStatus(entry) {
   if (!json) return;
 
   startDraft();
-  const { draftId, eventName, packNumber, pickNumber, PickedCards } = json;
+  const {
+    DraftId: draftId,
+    EventName: eventName,
+    PackNumber: packNumber,
+    PickNumber: pickNumber,
+    PickedCards
+  } = json;
   if (packNumber === 0 && pickNumber === 0 && PickedCards.length === 0) {
     // ensure new drafts have clear working-space
     clearDraftData(draftId);
@@ -1196,11 +1202,21 @@ export function onLabelInDraftMakePick(entry) {
   const json = entry.json();
   // console.log("LABEL:  Make pick > ", json);
   if (!json) return;
-  const { DraftId, eventName } = json;
+  const {
+    DraftId: draftId,
+    EventName: eventName,
+    PackNumber: packNumber,
+    PickNumber: pickNumber,
+    PickedCards: pickedCards
+  } = json;
   startDraft();
   const data = {
-    ...getDraftData(DraftId, entry),
-    ...json,
+    ...getDraftData(draftId, entry),
+    draftId,
+    eventName,
+    packNumber,
+    pickNumber,
+    pickedCards,
     currentPack: (json.DraftPack || []).slice(0)
   };
   data.draftId = data.id;
