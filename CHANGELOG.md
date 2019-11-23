@@ -1,3 +1,10 @@
+## <small>2.13.3 (2019-11-21)</small>
+
+* bugfix DeckList sorting in react (#740) ([d2fb638](https://github.com/Manuel-777/MTG-Arena-Tool/commit/d2fb638)), closes [#740](https://github.com/Manuel-777/MTG-Arena-Tool/issues/740)
+* bugfix renderer.forceOpenSettings (#739) ([b1559b0](https://github.com/Manuel-777/MTG-Arena-Tool/commit/b1559b0)), closes [#739](https://github.com/Manuel-777/MTG-Arena-Tool/issues/739)
+
+
+
 ## <small>2.13.2 (2019-11-18)</small>
 
 * fix the wildcards fix (#735) ([c841e62](https://github.com/Manuel-777/MTG-Arena-Tool/commit/c841e62)), closes [#735](https://github.com/Manuel-777/MTG-Arena-Tool/issues/735)

@@ -45,6 +45,7 @@ import {
 import {
   ipc_send,
   getDateFormat,
+  parseWotcTimeFallback,
   setData,
   updateLoading
 } from "./background-util";
@@ -177,31 +178,31 @@ function startWatchingLog() {
 
 function onLogEntryFound(entry) {
   if (globals.debugLog) {
-    let currentTime = new Date().getTime();
+    const currentTime = new Date().getTime();
     while (currentTime + debugLogSpeed >= new Date().getTime()) {
       // sleep
     }
   }
-  let json;
-  if (entry.type == "connection") {
-    const data = {
-      arenaId: entry.socket.PlayerId,
-      arenaVersion: entry.socket.ClientVersion,
-      name: entry.socket.PlayerScreenName
-    };
-    setData(data);
-  } else if (entry.playerId && entry.playerId !== playerData.arenaId) {
+  if (entry.playerId && entry.playerId !== playerData.arenaId) {
     return;
   } else {
     //console.log("Entry:", entry.label, entry, entry.json());
     updateLoading(entry);
     if (!(globals.firstPass && playerData.settings.skip_firstpass)) {
       try {
-        entrySwitch(entry, json);
-        if (entry.timestamp) {
+        entrySwitch(entry);
+        let timestamp = entry.timestamp;
+        if (entry.json) {
+          const json = entry.json();
+          if (json && json.timestamp) {
+            timestamp = json.timestamp;
+          }
+        }
+        if (timestamp) {
+          globals.logTime = parseWotcTimeFallback(timestamp);
           setData({
-            last_log_timestamp: entry.timestamp,
-            last_log_format: getDateFormat(entry.timestamp)
+            last_log_timestamp: timestamp,
+            last_log_format: getDateFormat(timestamp)
           });
         }
       } catch (err) {
@@ -215,238 +216,204 @@ function onLogEntryFound(entry) {
 // I want to reduce the complexity for jsPrettier here
 // But using strings to call functions is slower than a switch.
 // (in my testing)
-function entrySwitch(entry, json) {
+/* eslint-disable-next-line complexity */
+function entrySwitch(entry) {
+  // console.log(entry, entry.json());
   switch (entry.label) {
     case "Log.BI":
-    case "Log.Info":
       if (entry.arrow == "==>") {
-        json = entry.json();
-        onLabelOutLogInfo(entry, json);
+        onLabelOutLogInfo(entry);
       }
       break;
 
     case "GreToClientEvent":
-      json = entry.json();
-      onLabelGreToClient(entry, json);
+      onLabelGreToClient(entry);
       break;
 
     case "ClientToMatchServiceMessageType_ClientToGREMessage":
-      json = entry.json();
-      onLabelClientToMatchServiceMessageTypeClientToGREMessage(entry, json);
+      onLabelClientToMatchServiceMessageTypeClientToGREMessage(entry);
       break;
 
     case "Event.GetPlayerCourse":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventGetPlayerCourse(entry, json);
+        onLabelInEventGetPlayerCourse(entry);
       }
       break;
 
     case "Event.GetPlayerCourseV2":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventGetPlayerCourseV2(entry, json);
+        onLabelInEventGetPlayerCourseV2(entry);
       }
       break;
 
     case "Event.Join":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventJoin(entry, json);
+        onLabelInEventJoin(entry);
       }
       break;
 
     case "Event.GetCombinedRankInfo":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventGetCombinedRankInfo(entry, json);
+        onLabelInEventGetCombinedRankInfo(entry);
       }
       break;
 
     case "Rank.Updated":
       {
-        json = entry.json();
-        onLabelRankUpdated(entry, json);
+        onLabelRankUpdated(entry);
       }
       break;
 
     case "MythicRating.Updated":
       {
-        json = entry.json();
-        onLabelMythicRatingUpdated(entry, json);
+        onLabelMythicRatingUpdated(entry);
       }
       break;
 
     case "Event.GetPlayerCourses":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventGetPlayerCourses(entry, json);
+        onLabelInEventGetPlayerCourses(entry);
       }
       break;
 
     case "Event.GetPlayerCoursesV2":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventGetPlayerCoursesV2(entry, json);
+        onLabelInEventGetPlayerCoursesV2(entry);
       }
       break;
 
     case "Deck.GetDeckLists":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInDeckGetDeckLists(entry, json);
+        onLabelInDeckGetDeckLists(entry);
       }
       break;
 
     case "Deck.GetDeckListsV3":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInDeckGetDeckListsV3(entry, json);
+        onLabelInDeckGetDeckListsV3(entry);
       }
       break;
 
     case "Deck.GetPreconDecks":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInDeckGetPreconDecks(entry, json);
+        onLabelInDeckGetPreconDecks(entry);
       }
       break;
 
     case "Deck.UpdateDeck":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInDeckUpdateDeck(entry, json);
+        onLabelInDeckUpdateDeck(entry);
       }
       break;
 
     case "Deck.UpdateDeckV3":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInDeckUpdateDeckV3(entry, json);
+        onLabelInDeckUpdateDeckV3(entry);
       }
       break;
 
     case "Inventory.Updated":
-      json = entry.json();
-      onLabelInventoryUpdatedV4(entry, json);
+      // handler works for both out and in arrows
+      onLabelInventoryUpdatedV4(entry);
       break;
 
     case "PostMatch.Update":
-      json = entry.json();
-      onLabelPostMatchUpdate(entry, json);
+      if (entry.arrow == "==>") {
+        onLabelPostMatchUpdate(entry);
+      }
       break;
 
     case "PlayerInventory.GetPlayerInventory":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInPlayerInventoryGetPlayerInventory(entry, json);
+        onLabelInPlayerInventoryGetPlayerInventory(entry);
       }
       break;
 
     case "PlayerInventory.GetPlayerCardsV3":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInPlayerInventoryGetPlayerCardsV3(entry, json);
+        onLabelInPlayerInventoryGetPlayerCardsV3(entry);
       }
       break;
 
     case "Progression.GetPlayerProgress":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInProgressionGetPlayerProgress(entry, json);
+        onLabelInProgressionGetPlayerProgress(entry);
       }
       break;
 
-    case "TrackProgress.Updated":
-      json = entry.json();
-      onLabelTrackProgressUpdated(entry, json);
-      break;
-
     case "TrackRewardTier.Updated":
-      json = entry.json();
-      onLabelTrackRewardTierUpdated(entry, json);
+      onLabelTrackRewardTierUpdated(entry);
       break;
 
     case "Event.DeckSubmit":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventDeckSubmit(entry, json);
+        onLabelInEventDeckSubmit(entry);
       }
       break;
 
     case "Event.DeckSubmitV3":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventDeckSubmitV3(entry, json);
+        onLabelInEventDeckSubmitV3(entry);
       }
       break;
 
     case "Event.MatchCreated":
-      json = entry.json();
-      onLabelEventMatchCreated(entry, json);
+      if (entry.arrow == "==>") {
+        onLabelEventMatchCreated(entry);
+      }
       break;
 
     case "Event.AIPractice":
       if (entry.arrow == "==>") {
-        json = entry.json();
-        onLabelOutEventAIPractice(entry, json);
+        onLabelOutEventAIPractice(entry);
       }
       break;
 
     case "DirectGame.Challenge":
       if (entry.arrow == "==>") {
-        json = entry.json();
-        onLabelOutDirectGameChallenge(entry, json);
+        onLabelOutDirectGameChallenge(entry);
       }
       break;
 
     case "Draft.DraftStatus":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInDraftDraftStatus(entry, json);
+        onLabelInDraftDraftStatus(entry);
       }
       break;
 
     case "Draft.MakePick":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInDraftMakePick(entry, json);
+        onLabelInDraftMakePick(entry);
       } else {
-        json = entry.json();
-        onLabelOutDraftMakePick(entry, json);
+        onLabelOutDraftMakePick(entry);
       }
       break;
 
     case "Event.CompleteDraft":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventCompleteDraft(entry, json);
+        onLabelInEventCompleteDraft(entry);
       }
       break;
 
     case "Event.GetActiveEventsV2":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventGetActiveEvents(entry, json);
+        onLabelInEventGetActiveEvents(entry);
       }
       break;
 
     case "MatchGameRoomStateChangedEvent":
-      json = entry.json();
-      onLabelMatchGameRoomStateChangedEvent(entry, json);
+      onLabelMatchGameRoomStateChangedEvent(entry);
       break;
 
     case "Event.GetSeasonAndRankDetail":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelInEventGetSeasonAndRankDetail(entry, json);
+        onLabelInEventGetSeasonAndRankDetail(entry);
       }
       break;
 
     case "PlayerInventory.GetRewardSchedule":
       if (entry.arrow == "<==") {
-        json = entry.json();
-        onLabelGetPlayerInventoryGetRewardSchedule(entry, json);
+        onLabelGetPlayerInventoryGetRewardSchedule(entry);
       }
       break;
 

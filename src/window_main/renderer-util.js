@@ -205,6 +205,7 @@ function drawDeck(div, deck, showWildcards = false) {
   // draw maindeck grouped by cardType
   const cardsByGroup = _(deck.mainDeck)
     .map(card => ({ data: db.card(card.id), ...card }))
+    .filter(card => card.data.type)
     .groupBy(card => {
       const type = cardType(card.data);
       switch (type) {

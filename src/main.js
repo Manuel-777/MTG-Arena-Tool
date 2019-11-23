@@ -437,12 +437,15 @@ function updateOverlayVisibility() {
     clearTimeout(overlayHideTimeout);
     overlayHideTimeout = undefined;
 
-    const { bounds } =
-      electron.screen
-        .getAllDisplays()
-        .find(d => d.id == settings.overlay_display) ||
-      electron.screen.getPrimaryDisplay();
-    overlay.setBounds(bounds);
+    const newBounds = { x: 0, y: 0, width: 0, height: 0 };
+    electron.screen.getAllDisplays().forEach(display => {
+      newBounds.x = Math.min(newBounds.x, display.bounds.x);
+      newBounds.y = Math.min(newBounds.y, display.bounds.y);
+      newBounds.width += display.bounds.width;
+      newBounds.height = Math.max(newBounds.height, display.bounds.height);
+    });
+
+    overlay.setBounds(newBounds);
     overlay.show();
   }
 }
