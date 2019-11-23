@@ -9,7 +9,7 @@ import {
 } from "../shared/constants";
 import db from "../shared/database";
 import CardsList from "../shared/cards-list";
-import { get_deck_colors, objectClone, replaceAll } from "../shared/util";
+import { get_deck_colors, objectClone } from "../shared/util";
 import * as greToClientInterpreter from "./gre-to-client-interpreter";
 import playerData from "../shared/player-data";
 import sha1 from "js-sha1";
@@ -97,12 +97,13 @@ function startDraft() {
 }
 
 function getDraftData(id, entry) {
-  var data = playerData.draft(id) || createDraft(id, entry);
+  const json = entry.json();
+  const data = playerData.draft(id) || createDraft(id, entry);
 
-  if (!data.date && entry.timestamp) {
+  if (!data.date && json.timestamp) {
     // the first event we see we set the date.
-    data.timestamp = entry.timestamp;
-    data.date = parseWotcTimeFallback(entry.timestamp);
+    data.timestamp = json.timestamp;
+    data.date = parseWotcTimeFallback(json.timestamp);
   }
 
   return data;
@@ -146,7 +147,7 @@ function endDraft(data) {
 
 // Create a match from data, set globals and trigger ipc
 function processMatch(json, matchBeginTime) {
-  actionLog(-99, new Date(), "");
+  actionLog(-99, globals.logTime, "");
 
   if (globals.debugLog || !globals.firstPass) {
     ipc_send("set_arena_state", ARENA_MODE_MATCH);
@@ -181,7 +182,7 @@ function saveCourse(json) {
   delete json._id;
   json.id = id;
   const eventData = {
-    date: new Date(),
+    date: globals.logTime,
     // preserve custom fields if possible
     ...(playerData.event(id) || {}),
     ...json
@@ -261,30 +262,38 @@ function select_deck(arg) {
   } else {
     globals.currentDeck = new Deck(arg);
   }
-  // console.log("Select deck: ", globals.currentDeck, arg);
+  console.log("Select deck: ", globals.currentDeck, arg);
   globals.originalDeck = globals.currentDeck.clone();
   ipc_send("set_deck", globals.currentDeck.getSave(), IPC_OVERLAY);
 }
 
-//
-function convert_deck_from_v3(deck) {
-  return JSON.parse(JSON.stringify(deck), (key, value) => {
-    if (key === "mainDeck" || key === "sideboard") {
-      let ret = [];
-      for (let i = 0; i < value.length; i += 2) {
-        if (value[i + 1] > 0) {
-          ret.push({ id: value[i], quantity: value[i + 1] });
-        }
-      }
-      return ret;
+function convertV3ToV2(v3List) {
+  const ret = [];
+  for (let i = 0; i < v3List.length; i += 2) {
+    if (v3List[i + 1] > 0) {
+      ret.push({ id: v3List[i], quantity: v3List[i + 1] });
     }
-    return value;
-  });
+  }
+  return ret;
 }
 
-export function onLabelOutLogInfo(entry, json) {
+function convertDeckFromV3(deck) {
+  if (deck.CourseDeck) {
+    if (deck.CourseDeck.mainDeck)
+      deck.CourseDeck.mainDeck = convertV3ToV2(deck.CourseDeck.mainDeck);
+    if (deck.CourseDeck.sideboard)
+      deck.CourseDeck.sideboard = convertV3ToV2(deck.CourseDeck.sideboard);
+  } else {
+    if (deck.mainDeck) deck.mainDeck = convertV3ToV2(deck.mainDeck);
+    if (deck.sideboard) deck.sideboard = convertV3ToV2(deck.sideboard);
+  }
+  return deck;
+}
+
+export function onLabelOutLogInfo(entry) {
+  const json = entry.json();
   if (!json) return;
-  globals.logTime = parseWotcTimeFallback(entry.timestamp);
+  // console.log(json);
 
   if (json.params.messageName == "Client.UserDeviceSpecs") {
     let payload = {
@@ -441,11 +450,11 @@ export function onLabelOutLogInfo(entry, json) {
       game.landsInLibrary = landsInLibrary;
       game.libraryLands = libraryLands;
 
+      globals.matchGameStats[globals.gameNumberCompleted - 1] = game;
       globals.currentMatch.matchTime = globals.matchGameStats.reduce(
         (acc, cur) => acc + cur.time,
         0
       );
-      globals.matchGameStats[globals.gameNumberCompleted - 1] = game;
 
       saveMatch(mid);
     }
@@ -461,13 +470,15 @@ export function onLabelOutLogInfo(entry, json) {
   }
 }
 
-export function onLabelGreToClient(entry, json) {
+export function onLabelGreToClient(entry) {
+  const json = entry.json();
   if (!json) return;
   if (skipMatch) return;
+  // Note: one of the only places we still depend on entry.timestamp
   globals.logTime = parseWotcTimeFallback(entry.timestamp);
 
-  json = json.greToClientEvent.greToClientMessages;
-  json.forEach(function(msg) {
+  const message = json.greToClientEvent.greToClientMessages;
+  message.forEach(function(msg) {
     let msgId = msg.msgId;
     greToClientInterpreter.GREMessage(msg, globals.logTime);
     /*
@@ -479,10 +490,9 @@ export function onLabelGreToClient(entry, json) {
 }
 
 export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
-  entry,
-  json
+  entry
 ) {
-  //
+  const json = entry.json();
   if (!json) return;
   if (skipMatch) return;
   if (json.Payload) {
@@ -493,6 +503,7 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
   if (typeof json.payload == "string") {
     json.payload = decodePayload(json);
     json.payload = normaliseFields(json.payload);
+    console.log("Client To GRE: ", json.payload);
   }
 
   if (json.payload.submitdeckresp) {
@@ -511,7 +522,8 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
   }
 }
 
-export function onLabelInEventGetCombinedRankInfo(entry, json) {
+export function onLabelInEventGetCombinedRankInfo(entry) {
+  const json = entry.json();
   if (!json) return;
   const rank = { constructed: {}, limited: {} };
 
@@ -553,17 +565,19 @@ export function onLabelInEventGetCombinedRankInfo(entry, json) {
   }
 }
 
-export function onLabelInEventGetActiveEvents(entry, json) {
+export function onLabelInEventGetActiveEvents(entry) {
+  const json = entry.json();
   if (!json) return;
 
   let activeEvents = json.map(event => event.InternalEventName);
   ipc_send("set_active_events", JSON.stringify(activeEvents));
 }
 
-export function onLabelRankUpdated(entry, json) {
+export function onLabelRankUpdated(entry) {
+  const json = entry.json();
   if (!json) return;
-  json.date = entry.timestamp;
-  json.timestamp = parseWotcTimeFallback(entry.timestamp).getTime();
+  json.date = json.timestamp;
+  json.timestamp = globals.logTime;
   json.lastMatchId = globals.currentMatch.matchId;
   json.eventId = globals.currentMatch.eventId;
   const rank = { ...playerData.rank };
@@ -597,7 +611,8 @@ export function onLabelRankUpdated(entry, json) {
   }
 }
 
-export function onLabelMythicRatingUpdated(entry, json) {
+export function onLabelMythicRatingUpdated(entry) {
+  const json = entry.json();
   // This is exclusive to constructed?
   // Not sure what the limited event is called.
 
@@ -610,8 +625,8 @@ export function onLabelMythicRatingUpdated(entry, json) {
   // }
 
   if (!json) return;
-  json.date = entry.timestamp;
-  json.timestamp = parseWotcTimeFallback(entry.timestamp).getTime();
+  json.date = json.timestamp;
+  json.timestamp = parseWotcTimeFallback(json.timestamp).getTime();
   json.lastMatchId = globals.currentMatch.matchId;
   json.eventId = globals.currentMatch.eventId;
 
@@ -641,7 +656,8 @@ export function onLabelMythicRatingUpdated(entry, json) {
   }
 }
 
-export function onLabelInDeckGetDeckLists(entry, json) {
+export function onLabelInDeckGetDeckLists(entry, json = false) {
+  if (!json && entry) json = entry.json();
   if (!json) return;
 
   const decks = { ...playerData.decks };
@@ -659,18 +675,21 @@ export function onLabelInDeckGetDeckLists(entry, json) {
     globals.store.set("static_decks", static_decks);
 }
 
-export function onLabelInDeckGetDeckListsV3(entry, json) {
+export function onLabelInDeckGetDeckListsV3(entry) {
+  const json = entry.json();
   if (!json) return;
-  onLabelInDeckGetDeckLists(entry, json.map(d => convert_deck_from_v3(d)));
+  onLabelInDeckGetDeckLists(entry, json.map(d => convertDeckFromV3(d)));
 }
 
-export function onLabelInDeckGetPreconDecks(entry, json) {
+export function onLabelInDeckGetPreconDecks(entry) {
+  const json = entry.json();
   if (!json) return;
   ipc_send("set_precon_decks", json);
   // console.log(json);
 }
 
-export function onLabelInEventGetPlayerCourses(entry, json) {
+export function onLabelInEventGetPlayerCourses(entry, json = false) {
+  json = json || entry.json();
   if (!json) return;
 
   const static_events = [];
@@ -688,21 +707,23 @@ export function onLabelInEventGetPlayerCourses(entry, json) {
     globals.store.set("static_events", static_events);
 }
 
-export function onLabelInEventGetPlayerCoursesV2(entry, json) {
+export function onLabelInEventGetPlayerCoursesV2(entry) {
+  const json = entry.json();
   if (!json) return;
   json.forEach(course => {
     if (course.CourseDeck) {
-      course.CourseDeck = convert_deck_from_v3(course.CourseDeck);
+      course.CourseDeck = convertDeckFromV3(course.CourseDeck);
     }
   });
   onLabelInEventGetPlayerCourses(entry, json);
 }
 
-export function onLabelInEventGetPlayerCourse(entry, json) {
+export function onLabelInEventGetPlayerCourse(entry, json = false) {
+  json = json || entry.json();
   if (!json) return;
 
   if (json.Id != "00000000-0000-0000-0000-000000000000") {
-    json.date = parseWotcTimeFallback(entry.timestamp);
+    json.date = globals.logTime;
     json._id = json.Id;
     delete json.Id;
 
@@ -715,38 +736,41 @@ export function onLabelInEventGetPlayerCourse(entry, json) {
       httpApi.httpSubmitCourse(json);
       saveCourse(json);
     }
-    select_deck(json);
+    select_deck(convertDeckFromV3(json));
   }
 }
 
-export function onLabelInEventGetPlayerCourseV2(entry, json) {
+export function onLabelInEventGetPlayerCourseV2(entry) {
+  const json = entry.json();
   if (!json) return;
   if (json.CourseDeck) {
-    json.CourseDeck = convert_deck_from_v3(json.CourseDeck);
+    json.CourseDeck = convertDeckFromV3(json.CourseDeck);
   }
   onLabelInEventGetPlayerCourse(entry, json);
 }
 
-export function onLabelInEventJoin(entry, json) {
+export function onLabelInEventJoin(entry) {
+  const json = entry.json();
   if (!json) return;
 
   if (json.CourseDeck) {
     json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
     addCustomDeck(json.CourseDeck);
-    select_deck(json);
+    select_deck(convertDeckFromV3(json));
   }
 }
 
-export function onLabelInDeckUpdateDeck(entry, json) {
+export function onLabelInDeckUpdateDeck(entry, json = false) {
+  if (!json && entry.json) json = entry.json();
   if (!json) return;
-  const logTime = parseWotcTimeFallback(entry.timestamp);
+
   const _deck = playerData.deck(json.id);
 
-  const changeId = sha1(json.id + "-" + logTime);
+  const changeId = sha1(json.id + "-" + json.lastUpdated);
   const deltaDeck = {
     id: changeId,
     deckId: _deck.id,
-    date: logTime,
+    date: json.lastUpdated,
     changesMain: [],
     changesSide: [],
     previousMain: _deck.mainDeck,
@@ -825,9 +849,10 @@ export function onLabelInDeckUpdateDeck(entry, json) {
   setData({ decks });
 }
 
-export function onLabelInDeckUpdateDeckV3(entry, json) {
+export function onLabelInDeckUpdateDeckV3(entry) {
+  const json = entry.json();
   if (!json) return;
-  onLabelInDeckUpdateDeck(entry, convert_deck_from_v3(json));
+  onLabelInDeckUpdateDeck(entry, convertDeckFromV3(json));
 }
 
 // Given a shallow object of numbers and lists return a
@@ -845,52 +870,33 @@ function minifiedDelta(delta) {
 }
 
 // Called for all "Inventory.Updated" labels
-export function onLabelInventoryUpdatedV4(entry, transaction) {
+export function onLabelInventoryUpdatedV4(entry) {
+  const transaction = entry.json();
   if (!transaction) return;
 
-  if (transaction.updates) {
-    // 2019-10-24 this section handles the log format released in Arena client 1857.738996
-    transaction.updates.forEach(update => {
-      const delta = { ...update };
-      if (update.context && update.context.source) {
-        // combine sub-context with parent context
-        delta.subContext = update.context; // preserve sub-context object data
-        delta.context = transaction.context + "." + update.context.source;
-      }
-      onLabelInventoryUpdated(entry, delta);
-    });
-  } else if (transaction.delta) {
-    // 2019-10-24 this section handles the log format prior to Arena client 1857.738996
-    onLabelInventoryUpdated(entry, transaction);
-  }
+  transaction.updates.forEach(update => {
+    const delta = { ...update };
+    if (update.context && update.context.source) {
+      // combine sub-context with parent context
+      delta.subContext = update.context; // preserve sub-context object data
+      delta.context = transaction.context + "." + update.context.source;
+    }
+    onLabelInventoryUpdated(delta);
+  });
 }
 
-// 2019-10-24 DEPRECATED as of Arena client 1857.738996
-function onLabelInventoryUpdated(entry, transaction) {
+function onLabelInventoryUpdated(transaction) {
   if (!transaction) return;
-
-  // Store this in case there are any future date parsing issues
-  transaction.timestamp = entry.timestamp;
-
+  // Construct a unique ID
+  transaction.id = sha1(JSON.stringify(transaction));
   // Add missing data
-  transaction.date = parseWotcTimeFallback(entry.timestamp);
-
+  transaction.date = globals.logTime;
   // Add delta to our current values
   if (transaction.delta) {
     inventoryAddDelta(transaction.delta);
   }
   // Reduce the size for storage
   transaction.delta = minifiedDelta(transaction.delta);
-
-  // Construct a unique ID
-  let context = transaction.context;
-  //let milliseconds = transaction.date.getTime();
-  // We use the original time string for the ID to ensure parsing does not alter it
-  // This will make the ID the same if parsing either changes or breaks
-  transaction.id = sha1(
-    entry.timestamp + context + JSON.stringify(transaction.delta)
-  );
-
   // Do not modify the context from now on.
   saveEconomyTransaction(transaction);
   return;
@@ -930,7 +936,7 @@ function inventoryAddDelta(delta) {
 
 function inventoryUpdate(entry, update) {
   // combine sub-context with parent context
-  console.log("inventoryUpdate", entry, update);
+  // console.log("inventoryUpdate", entry, update);
   let context = "PostMatch.Update";
   if (update.context && update.context.source) {
     // combine sub-context with parent context
@@ -948,21 +954,17 @@ function inventoryUpdate(entry, update) {
     inventoryAddDelta(update.delta);
   }
 
-  // We use the original time string for the ID to ensure parsing does not alter it
-  // This will make the ID the same if parsing either changes or breaks
-  let id = sha1(entry.timestamp + context + JSON.stringify(update.delta));
-
-  let transaction = {
+  const transaction = {
     ...update,
-    timestamp: entry.timestamp,
-    // Add missing data
-    date: parseWotcTimeFallback(entry.timestamp),
     // Reduce the size for storage
     delta: update.delta ? minifiedDelta(update.delta) : {},
     context,
-    subContext: update.context, // preserve sub-context object data
-    id: id
+    subContext: update.context // preserve sub-context object data
   };
+  // Construct a unique ID
+  transaction.id = sha1(JSON.stringify(transaction));
+  // Add missing data
+  transaction.date = globals.logTime;
 
   saveEconomyTransaction(transaction);
 }
@@ -995,7 +997,8 @@ function trackUpdate(entry, trackUpdate) {
   }
 }
 
-export function onLabelPostMatchUpdate(entry, json) {
+export function onLabelPostMatchUpdate(entry) {
+  const json = entry.json();
   if (!json) return;
 
   json.questUpdate.forEach(quest => {
@@ -1016,9 +1019,9 @@ export function onLabelPostMatchUpdate(entry, json) {
   trackUpdate(entry, json.battlePassUpdate);
 }
 
-export function onLabelInPlayerInventoryGetPlayerInventory(entry, json) {
+export function onLabelInPlayerInventoryGetPlayerInventory(entry) {
+  const json = entry.json();
   if (!json) return;
-  globals.logTime = parseWotcTimeFallback(entry.timestamp);
   const economy = {
     ...playerData.economy,
     gold: json.gold,
@@ -1036,7 +1039,8 @@ export function onLabelInPlayerInventoryGetPlayerInventory(entry, json) {
     globals.store.set("economy", economy);
 }
 
-export function onLabelInPlayerInventoryGetPlayerCardsV3(entry, json) {
+export function onLabelInPlayerInventoryGetPlayerCardsV3(entry) {
+  const json = entry.json();
   if (!json) return;
   const now = new Date();
 
@@ -1075,9 +1079,9 @@ export function onLabelInPlayerInventoryGetPlayerCardsV3(entry, json) {
 }
 
 //
-export function onLabelInProgressionGetPlayerProgress(entry, json) {
+export function onLabelInProgressionGetPlayerProgress(entry) {
+  const json = entry.json();
   if (!json || !json.activeBattlePass) return;
-  globals.logTime = parseWotcTimeFallback(entry.timestamp);
   const activeTrack = json.activeBattlePass;
   const economy = {
     ...playerData.economy,
@@ -1092,72 +1096,17 @@ export function onLabelInProgressionGetPlayerProgress(entry, json) {
     globals.store.set("economy", economy);
 }
 
-// 2019-10-24 DEPRECATED as of Arena client version 1857.738996
-export function onLabelTrackProgressUpdated(entry, json) {
-  if (!json) return;
-  // console.log(json);
-  const economy = { ...playerData.economy };
-  json.forEach(track => {
-    if (!track.trackDiff) return; // ignore rewardWebDiff updates for now
-
-    const transaction = {
-      context: "Track.Progress." + (track.trackName || ""),
-      timestamp: entry.timestamp,
-      date: parseWotcTimeFallback(entry.timestamp),
-      delta: {},
-      ...track
-    };
-
-    const trackDiff = minifiedDelta(transaction.trackDiff);
-    if (trackDiff.inventoryDelta) {
-      // this is redundant data, removing to save space
-      delete trackDiff.inventoryDelta;
-    }
-    transaction.trackDiff = trackDiff;
-
-    if (track.trackName) {
-      economy.trackName = track.trackName;
-    }
-    if (track.trackTier !== undefined) {
-      economy.trackTier = track.trackTier;
-    }
-    if (trackDiff.currentLevel !== undefined) {
-      economy.currentLevel = trackDiff.currentLevel;
-    }
-    if (trackDiff.currentExp !== undefined) {
-      economy.currentExp = trackDiff.currentExp;
-    }
-
-    if (transaction.orbDiff) {
-      const orbDiff = minifiedDelta(transaction.orbDiff);
-      transaction.orbDiff = orbDiff;
-      if (orbDiff.currentOrbCount !== undefined) {
-        economy.currentOrbCount = orbDiff.currentOrbCount;
-      }
-    }
-
-    // Construct a unique ID
-    transaction.id = sha1(
-      entry.timestamp + JSON.stringify(transaction.trackDiff)
-    );
-    saveEconomyTransaction(transaction);
-  });
-  // console.log(economy);
-  setData({ economy });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("economy", economy);
-}
-
 //
-export function onLabelTrackRewardTierUpdated(entry, json) {
+export function onLabelTrackRewardTierUpdated(entry) {
+  const json = entry.json();
   if (!json) return;
   // console.log(json);
   const economy = { ...playerData.economy };
 
   const transaction = {
     context: "Track.RewardTier.Updated",
-    timestamp: entry.timestamp,
-    date: parseWotcTimeFallback(entry.timestamp),
+    timestamp: json.timestamp,
+    date: parseWotcTimeFallback(json.timestamp),
     delta: {},
     ...json
   };
@@ -1179,9 +1128,7 @@ export function onLabelTrackRewardTierUpdated(entry, json) {
   }
 
   // Construct a unique ID
-  transaction.id = sha1(
-    entry.timestamp + transaction.oldTier + transaction.newTier
-  );
+  transaction.id = sha1(JSON.stringify(transaction));
   saveEconomyTransaction(transaction);
 
   // console.log(economy);
@@ -1190,19 +1137,22 @@ export function onLabelTrackRewardTierUpdated(entry, json) {
     globals.store.set("economy", economy);
 }
 
-export function onLabelInEventDeckSubmit(entry, json) {
+export function onLabelInEventDeckSubmit(entry) {
+  const json = entry.json();
   if (!json) return;
-  select_deck(json);
+  select_deck(convertDeckFromV3(json));
 }
 
-export function onLabelInEventDeckSubmitV3(entry, json) {
+export function onLabelInEventDeckSubmitV3(entry) {
+  const json = entry.json();
   if (!json) return;
-  onLabelInEventDeckSubmit(entry, convert_deck_from_v3(json));
+  onLabelInEventDeckSubmit(entry, convertDeckFromV3(json));
 }
 
-export function onLabelEventMatchCreated(entry, json) {
+export function onLabelEventMatchCreated(entry) {
+  const json = entry.json();
   if (!json) return;
-  var matchBeginTime = parseWotcTimeFallback(entry.timestamp);
+  const matchBeginTime = globals.logTime || new Date();
 
   if (json.opponentRankingClass == "Mythic") {
     const httpApi = require("./http-api");
@@ -1218,11 +1168,12 @@ export function onLabelEventMatchCreated(entry, json) {
   }
 }
 
-export function onLabelOutDirectGameChallenge(entry, json) {
+export function onLabelOutDirectGameChallenge(entry) {
+  const json = entry.json();
   if (!json) return;
   var deck = json.params.deck;
   deck = JSON.parse(deck);
-  select_deck(convert_deck_from_v3(deck));
+  select_deck(convertDeckFromV3(deck));
 
   const httpApi = require("./http-api");
   httpApi.httpTournamentCheck(
@@ -1234,11 +1185,12 @@ export function onLabelOutDirectGameChallenge(entry, json) {
   );
 }
 
-export function onLabelOutEventAIPractice(entry, json) {
+export function onLabelOutEventAIPractice(entry) {
+  const json = entry.json();
   if (!json) return;
   var deck = json.params.deck;
   deck = JSON.parse(deck);
-  select_deck(convert_deck_from_v3(deck));
+  select_deck(convertDeckFromV3(deck));
 }
 
 function getDraftSet(eventName) {
@@ -1252,20 +1204,21 @@ function getDraftSet(eventName) {
   return "";
 }
 
-export function onLabelInDraftDraftStatus(entry, json) {
+export function onLabelInDraftDraftStatus(entry) {
+  const json = entry.json();
   // console.log("LABEL:  Draft status ", json);
   if (!json) return;
 
   startDraft();
-  const { draftId, eventName, packNumber, pickNumber, pickedCards } = json;
-  if (packNumber === 0 && pickNumber === 0 && pickedCards.length === 0) {
+  const { draftId, eventName, packNumber, pickNumber, PickedCards } = json;
+  if (packNumber === 0 && pickNumber === 0 && PickedCards.length === 0) {
     // ensure new drafts have clear working-space
     clearDraftData(draftId);
   }
   const data = {
     ...getDraftData(draftId, entry),
     ...json,
-    currentPack: (json.draftPack || []).slice(0)
+    currentPack: (json.DraftPack || []).slice(0)
   };
   data.draftId = data.id;
   data.set = getDraftSet(eventName) || data.set;
@@ -1273,22 +1226,24 @@ export function onLabelInDraftDraftStatus(entry, json) {
   setDraftData(data);
 }
 
-export function onLabelInDraftMakePick(entry, json) {
+export function onLabelInDraftMakePick(entry) {
+  const json = entry.json();
   // console.log("LABEL:  Make pick > ", json);
   if (!json) return;
-  const { draftId, eventName } = json;
+  const { DraftId, eventName } = json;
   startDraft();
   const data = {
-    ...getDraftData(draftId, entry),
+    ...getDraftData(DraftId, entry),
     ...json,
-    currentPack: (json.draftPack || []).slice(0)
+    currentPack: (json.DraftPack || []).slice(0)
   };
   data.draftId = data.id;
   data.set = getDraftSet(eventName) || data.set;
   setDraftData(data);
 }
 
-export function onLabelOutDraftMakePick(entry, json) {
+export function onLabelOutDraftMakePick(entry) {
+  const json = entry.json();
   // console.log("LABEL:  Make pick < ", json);
   if (!json || !json.params) return;
   const { draftId, packNumber, pickNumber, cardId } = json.params;
@@ -1301,7 +1256,8 @@ export function onLabelOutDraftMakePick(entry, json) {
   setDraftData(data);
 }
 
-export function onLabelInEventCompleteDraft(entry, json) {
+export function onLabelInEventCompleteDraft(entry) {
+  const json = entry.json();
   // console.log("LABEL:  Complete draft ", json);
   if (!json) return;
   const toolId = json.Id + "-draft";
@@ -1320,7 +1276,8 @@ export function onLabelInEventCompleteDraft(entry, json) {
   endDraft(data);
 }
 
-export function onLabelMatchGameRoomStateChangedEvent(entry, json) {
+export function onLabelMatchGameRoomStateChangedEvent(entry) {
+  let json = entry.json();
   if (!json) return;
 
   json = json.matchGameRoomStateChangedEvent.gameRoomInfo;
@@ -1351,7 +1308,8 @@ export function onLabelMatchGameRoomStateChangedEvent(entry, json) {
         eventId: eventId,
         matchId: json.gameRoomConfig.matchId
       };
-      var matchBeginTime = parseWotcTimeFallback(entry.timestamp);
+      // Note: one of the only places we still depend on entry.timestamp
+      const matchBeginTime = parseWotcTimeFallback(entry.timestamp);
       processMatch(arg, matchBeginTime);
     }
     json.gameRoomConfig.reservedPlayers.forEach(player => {
@@ -1400,13 +1358,15 @@ export function onLabelMatchGameRoomStateChangedEvent(entry, json) {
   }
 }
 
-export function onLabelInEventGetSeasonAndRankDetail(entry, json) {
+export function onLabelInEventGetSeasonAndRankDetail(entry) {
+  const json = entry.json();
   if (!json) return;
   db.handleSetSeason(null, json);
   ipc_send("set_season", json);
 }
 
-export function onLabelGetPlayerInventoryGetRewardSchedule(entry, json) {
+export function onLabelGetPlayerInventoryGetRewardSchedule(entry) {
+  const json = entry.json();
   if (!json) return;
 
   const data = {

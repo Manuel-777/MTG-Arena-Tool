@@ -718,7 +718,7 @@ export const CARD_TYPES = [
   "Planeswalkers"
 ] as const;
 
-export const CARD_RARITIES = ["Common", "Uncommon", "Rare", "Mythic", "Land"] as const;
+export const CARD_RARITIES = ["common", "uncommon", "rare", "mythic", "land"] as const;
 
 export const MANA_COLORS = [
   "#E7CA8E",

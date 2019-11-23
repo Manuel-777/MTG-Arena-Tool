@@ -17,7 +17,7 @@ describe("arena-log-decoder", () => {
       const decoder = ArenaLogDecoder();
       const logEntries = [];
       decoder.append(text, logEntry => logEntries.push(logEntry));
-      expect(logEntries.length).toEqual(63);
+      expect(logEntries.length).toEqual(78);
     });
 
     it("finds the same log entries when reading the file in arbitrary chunks", () => {

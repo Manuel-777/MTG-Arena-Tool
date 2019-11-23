@@ -179,7 +179,7 @@ export function openDecksTab(_filters = {}, scrollTop = 0) {
     let wc;
     let n = 0;
     let boosterCost = getBoosterCountEstimate(missingWildcards);
-    CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(cardRarity => {
+    CARD_RARITIES.filter(rarity => rarity !== "land").forEach(cardRarity => {
       cardRarity = cardRarity.toLowerCase();
       if (missingWildcards[cardRarity]) {
         n++;
