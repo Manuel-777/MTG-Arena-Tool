@@ -1,6 +1,7 @@
 import _ from "lodash";
 import nthLastIndexOf from "./nth-last-index-of";
 import * as jsonText from "./json-text";
+import sha1 from "js-sha1";
 
 const LABEL_JSON_PATTERNS = [
   /\[UnityCrossThreadLogger\](?<timestamp>.*): (?:Match to )?(?<playerId>\w*)(?: to Match)?: (?<label>.*)(?:\r\n|\n)/,
@@ -97,23 +98,25 @@ function parseLogEntry(text, matchText, position) {
       }
     }
 
+    const jsonString = text.substr(jsonStart, jsonLen);
     return [
       "full",
       matchText.length + jsonLen + textAfterJson.length,
       {
         type: "label_arrow_json",
         ..._.mapValues(rematches.groups, unleakString),
+        hash: sha1(jsonString),
         json: () => {
           try {
-            // console.log(text.substr(jsonStart, jsonLen), jsonStart, jsonLen);
-            const json = JSON.parse(text.substr(jsonStart, jsonLen));
+            // console.log(jsonString, jsonStart, jsonLen);
+            const json = JSON.parse(jsonString);
             return (
               json.payload || (json.request && JSON.parse(json.request)) || json
             );
           } catch (e) {
             console.log(e, {
               input: rematches.input,
-              string: text.substr(jsonStart, jsonLen)
+              string: jsonString
             });
           }
         }
@@ -146,23 +149,26 @@ function parseLogEntry(text, matchText, position) {
       }
     }
 
+    const jsonString = text.substr(jsonStart, jsonLen);
     return [
       "full",
       matchText.length + jsonLen + textAfterJson.length,
       {
         type: "label_json",
         ..._.mapValues(rematches.groups, unleakString),
+        hash: sha1(jsonString),
+        text: jsonString,
         json: () => {
           try {
-            // console.log(text.substr(jsonStart, jsonLen), jsonStart, jsonLen);
-            const json = JSON.parse(text.substr(jsonStart, jsonLen));
+            // console.log(jsonString, jsonStart, jsonLen);
+            const json = JSON.parse(jsonString);
             return (
               json.payload || (json.request && JSON.parse(json.request)) || json
             );
           } catch (e) {
             console.log(e, {
               input: rematches.input,
-              string: text.substr(jsonStart, jsonLen)
+              string: jsonString
             });
           }
         }
