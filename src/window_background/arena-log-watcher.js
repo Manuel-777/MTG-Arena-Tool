@@ -45,6 +45,7 @@ import {
 import {
   ipc_send,
   getDateFormat,
+  parseWotcTimeFallback,
   setData,
   updateLoading
 } from "./background-util";
@@ -198,7 +199,7 @@ function onLogEntryFound(entry) {
           }
         }
         if (timestamp) {
-          // TODO should we always set globals.logTime here?
+          globals.logTime = parseWotcTimeFallback(timestamp);
           setData({
             last_log_timestamp: timestamp,
             last_log_format: getDateFormat(timestamp)

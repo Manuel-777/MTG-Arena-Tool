@@ -147,7 +147,7 @@ function endDraft(data) {
 
 // Create a match from data, set globals and trigger ipc
 function processMatch(json, matchBeginTime) {
-  actionLog(-99, new Date(), "");
+  actionLog(-99, globals.logTime, "");
 
   if (globals.debugLog || !globals.firstPass) {
     ipc_send("set_arena_state", ARENA_MODE_MATCH);
