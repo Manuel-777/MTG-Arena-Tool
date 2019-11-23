@@ -90,7 +90,7 @@ function startUpdater() {
     updaterWindow.moveTop();
   });
 
-  autoUpdater.allowDowngrade = true;
+  //autoUpdater.allowDowngrade = true;
   let betaChannel = rememberStore.get("settings.beta_channel");
   if (betaChannel) {
     autoUpdater.allowPrerelease = true;
