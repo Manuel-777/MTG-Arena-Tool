@@ -11,7 +11,7 @@ function getDeckTypesAmount(deck: DeckData): { [key: string]: number } {
 
   deck.mainDeck.forEach(function(card: CardData | any) {
     // TODO remove group lands hack
-    if (card.id.id && card.id.id == 100) {
+    if (card.id && card.id.id && card.id.id == 100) {
       types.lan += card.quantity;
       return;
     }

@@ -688,8 +688,8 @@ export function onLabelInDeckGetPreconDecks(entry) {
   // console.log(json);
 }
 
-export function onLabelInEventGetPlayerCourses(entry) {
-  const json = entry.json();
+export function onLabelInEventGetPlayerCourses(entry, json = false) {
+  json = json || entry.json();
   if (!json) return;
 
   const static_events = [];
