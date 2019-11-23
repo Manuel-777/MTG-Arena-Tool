@@ -502,8 +502,8 @@ function appendOverlay(section) {
   editModeButton.addEventListener("click", function() {
     ipcSend("toggle_edit_mode");
   });
-  /*
   displayControls.appendChild(editModeButton);
+  /*
   // Set Overlay Display Screen
   const overlayDisplay = pd.settings.overlay_display
     ? pd.settings.overlay_display
@@ -528,8 +528,8 @@ function appendOverlay(section) {
   displaySelect.style.width = "180px";
   displaySelect.style.marginLeft = "32px";
   displayControls.appendChild(label);
-  section.appendChild(displayControls);
   */
+  section.appendChild(displayControls);
 
   // Copy pasta with bolognesa!
   const pickerLabel = createLabel(
