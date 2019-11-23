@@ -1,22 +1,16 @@
 import _ from "lodash";
 import nthLastIndexOf from "./nth-last-index-of";
 import * as jsonText from "./json-text";
-
-const CONNECTION_JSON_PATTERN = /\[(?:UnityCrossThreadLogger|Client GRE)\]WebSocketClient (?<client>.*) WebSocketSharp\.WebSocket connecting to .*: (?<socket>.*)(?:\r\n|\n)/;
+import sha1 from "js-sha1";
 
 const LABEL_JSON_PATTERNS = [
   /\[UnityCrossThreadLogger\](?<timestamp>.*): (?:Match to )?(?<playerId>\w*)(?: to Match)?: (?<label>.*)(?:\r\n|\n)/,
-  /\[UnityCrossThreadLogger\](?<timestamp>.*)(?:\r\n|\n){0,}\(.*\) Incoming (?<label>.*) /,
-  /\[UnityCrossThreadLogger\]Received unhandled GREMessageType: (?<label>.*)(?:\r\n|\n)/
+  /\[UnityCrossThreadLogger\]Received unhandled GREMessageType: (?<label>.*)(?:\r\n|\n)*/
 ];
 
-const LABEL_ARROW_JSON_PATTERN = /\[UnityCrossThreadLogger\](?<timestamp>.*)(?:\r\n|\n)(?<arrow>[<=]=[=>]) (?<label>.*)\(.*\):?(?:\r\n|\n)/;
+const LABEL_ARROW_JSON_PATTERN = /\[UnityCrossThreadLogger\](?<arrow>[<=]=[=>]) (?<label>.*?) /;
 
-const ALL_PATTERNS = [
-  CONNECTION_JSON_PATTERN,
-  ...LABEL_JSON_PATTERNS,
-  LABEL_ARROW_JSON_PATTERN
-];
+const ALL_PATTERNS = [...LABEL_JSON_PATTERNS, LABEL_ARROW_JSON_PATTERN];
 
 const maxLinesOfAnyPattern = Math.max(
   ...ALL_PATTERNS.map(regex => occurrences(regex.source, /\\n/g))
@@ -81,16 +75,6 @@ export default function ArenaLogDecoder() {
 
 function parseLogEntry(text, matchText, position) {
   let rematches;
-  if ((rematches = matchText.match(CONNECTION_JSON_PATTERN))) {
-    return [
-      "full",
-      matchText.length,
-      {
-        type: "connection",
-        ..._.mapValues(rematches.groups, JSON.parse)
-      }
-    ];
-  }
 
   if ((rematches = matchText.match(LABEL_ARROW_JSON_PATTERN))) {
     const jsonStart = position + matchText.length;
@@ -114,19 +98,25 @@ function parseLogEntry(text, matchText, position) {
       }
     }
 
+    const jsonString = text.substr(jsonStart, jsonLen);
     return [
       "full",
       matchText.length + jsonLen + textAfterJson.length,
       {
         type: "label_arrow_json",
         ..._.mapValues(rematches.groups, unleakString),
+        hash: sha1(jsonString),
         json: () => {
           try {
-            return JSON.parse(text.substr(jsonStart, jsonLen));
+            // console.log(jsonString, jsonStart, jsonLen);
+            const json = JSON.parse(jsonString);
+            return (
+              json.payload || (json.request && JSON.parse(json.request)) || json
+            );
           } catch (e) {
             console.log(e, {
               input: rematches.input,
-              string: text.substr(jsonStart, jsonLen)
+              string: jsonString
             });
           }
         }
@@ -159,19 +149,26 @@ function parseLogEntry(text, matchText, position) {
       }
     }
 
+    const jsonString = text.substr(jsonStart, jsonLen);
     return [
       "full",
       matchText.length + jsonLen + textAfterJson.length,
       {
         type: "label_json",
         ..._.mapValues(rematches.groups, unleakString),
+        hash: sha1(jsonString),
+        text: jsonString,
         json: () => {
           try {
-            return JSON.parse(text.substr(jsonStart, jsonLen));
+            // console.log(jsonString, jsonStart, jsonLen);
+            const json = JSON.parse(jsonString);
+            return (
+              json.payload || (json.request && JSON.parse(json.request)) || json
+            );
           } catch (e) {
             console.log(e, {
               input: rematches.input,
-              string: text.substr(jsonStart, jsonLen)
+              string: jsonString
             });
           }
         }

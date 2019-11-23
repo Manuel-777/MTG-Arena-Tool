@@ -116,29 +116,10 @@ export function useEditModeOnRef(
   containerRef: React.MutableRefObject<any>,
   uiScaleFactor: number
 ): void {
-  const bounds = remote.getCurrentWindow().getBounds();
-  const scaledBounds = {
-    x: (bounds.x * 100) / uiScaleFactor,
-    y: (bounds.y * 100) / uiScaleFactor,
-    width: (bounds.width * 100) / uiScaleFactor,
-    height: (bounds.height * 100) / uiScaleFactor
-  };
-  const outerBounds = {
-    left: scaledBounds.x,
-    right: scaledBounds.x + scaledBounds.width,
-    bottom: scaledBounds.y + scaledBounds.height,
-    top: scaledBounds.y
-  };
   const restrictDragBounds: any =
     interact.modifiers &&
     interact.modifiers.restrict({
-      elementRect: { left: 0, right: 1, top: 0, bottom: 1 } as any,
-      restriction: scaledBounds as any
-    });
-  const restrictMaxEdges: any =
-    interact.modifiers &&
-    interact.modifiers.restrictEdges({
-      outer: outerBounds as any
+      elementRect: { left: 0, right: 1, top: 0, bottom: 1 } as any
     });
   useEffect(() => {
     const container = containerRef.current;
@@ -155,7 +136,7 @@ export function useEditModeOnRef(
           })
           .resizable({
             edges: { left: true, right: true, bottom: true, top: true },
-            modifiers: [restrictMinSize, restrictMaxEdges],
+            modifiers: [restrictMinSize],
             inertia: true
           } as any)
           .on("resizemove", function(event) {

@@ -159,7 +159,13 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     mainCards.add(groupedLandsCard, landsNumber, true);
   }
   mainCards.get().sort(sortFunc);
-  mainCards.get().forEach((card: any) => {
+  mainCards.get().forEach((card: any, index: number) => {
+    // TODO remove group lands hack
+    const isCardGroupedLands =
+      card && card.id && card.id.id && card.id.id === 100;
+    if (isCardGroupedLands) {
+      card = card.id;
+    }
     let quantity = card.quantity;
     if (settings.mode === OVERLAY_MIXED) {
       const odds = (card.chance !== undefined ? card.chance : "0") + "%";
@@ -180,10 +186,6 @@ export default function DeckList(props: DeckListProps): JSX.Element {
       quantity = DRAFT_RANKS[rank];
     }
 
-    // TODO remove group lands hack
-    const isCardGroupedLands =
-      card && card.id && card.id.id && card.id.id === 100;
-
     let fullCard = card;
     if (card && card.id && !isCardGroupedLands) {
       fullCard = db.card(card.id);
@@ -196,7 +198,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
       mainCardTiles.push(
         <div
           className="overlay_card_quantity"
-          key={"maincardtile_owned_" + card.id}
+          key={"maincardtile_owned_" + index + "_" + card.id}
         >
           <OwnershipStars card={fullCard} />
         </div>
@@ -232,7 +234,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     const sideCards = deckClone.sideboard;
     sideCards.removeDuplicates();
     sideCards.get().sort(sortFunc);
-    sideCards.get().forEach((card: any) => {
+    sideCards.get().forEach((card: any, index: number) => {
       const quantity =
         settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED
           ? "0%"
@@ -250,7 +252,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
           style={tileStyle}
           card={fullCard}
           dfcCard={dfcCard}
-          key={"sideboardcardtile_" + card.id}
+          key={"sideboardcardtile_" + index + "_" + card.id}
           indent="a"
           isSideboard={true}
           quantity={quantity}

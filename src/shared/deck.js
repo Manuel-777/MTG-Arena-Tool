@@ -1,6 +1,6 @@
 import db from "./database.js";
 import CardsList from "./cards-list.js";
-import Colors from "./colors.js";
+import Colors from "./colors";
 import {
   compare_cards,
   get_set_code,

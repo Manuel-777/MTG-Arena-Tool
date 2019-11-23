@@ -38,7 +38,7 @@ export default function ManaFilter(props: ManaFilterProps) {
           props.onFilterChanged(colors);
     }, [props.onFilterChanged]);
 
-    const allFilters: ManaFilterKeys[] = [...COLORS_BRIEF as ManaFilterKeys[], "multi"];
+    const allFilters: ManaFilterKeys[] = [...COLORS_BRIEF, "multi"];
 
     const manasStyles = {
         display: "flex",

@@ -563,6 +563,11 @@ body {
     background-image: url(../images/edit_icon.png);
 }
 
+.button.overlay_icon {
+    width: 16px;
+    height: 16px;
+}
+
 .top_nav_wrapper {
     z-index: 2 !important;
     flex-direction: row !important;

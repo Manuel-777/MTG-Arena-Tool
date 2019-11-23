@@ -517,6 +517,7 @@ function appendOverlay(section) {
   editModeButton.addEventListener("click", function() {
     ipcSend("toggle_edit_mode");
   });
+  /*
   displayControls.appendChild(editModeButton);
   // Set Overlay Display Screen
   const overlayDisplay = pd.settings.overlay_display
@@ -543,6 +544,7 @@ function appendOverlay(section) {
   displaySelect.style.marginLeft = "32px";
   displayControls.appendChild(label);
   section.appendChild(displayControls);
+  */
 
   const sliderScale = createDiv(["slidecontainer_settings"]);
   const sliderScaleLabel = createLabel(

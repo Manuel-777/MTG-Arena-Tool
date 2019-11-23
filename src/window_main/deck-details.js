@@ -209,7 +209,8 @@ function deckStatsSection(deck) {
   const boosterCost = getBoosterCountEstimate(missingWildcards);
   const costSection = createDiv(["wildcards_cost"]);
   costSection.appendChild(createSpan([], "Wildcards you have/need"));
-  CARD_RARITIES.forEach(cardRarity => {
+  CARD_RARITIES.filter(rarity => rarity !== "land").forEach(cardRarity => {
+    cardRarity = cardRarity.toLowerCase();
     const wcText =
       (ownedWildcards[cardRarity] > 0
         ? ownedWildcards[cardRarity] + " / "
@@ -422,9 +423,11 @@ function setChangesTimeline(deckId) {
         innerCn + cn,
         Math.abs(c.quantity)
       );
-      dd.appendChild(tile);
-      data.appendChild(dd);
-      innerCn++;
+      if (tile) {
+        dd.appendChild(tile);
+        data.appendChild(dd);
+        innerCn++;
+      }
     };
 
     if (change.changesMain.length > 0) {
@@ -446,7 +449,7 @@ function setChangesTimeline(deckId) {
 
     if (change.label) {
       title.innerHTML = change.label;
-    } else {
+    } else if (change.date) {
       title.innerHTML =
         nc + " changes, " + timeSince(Date.parse(change.date)) + " ago.";
     }
