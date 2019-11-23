@@ -1,5 +1,4 @@
-import electron from "electron";
-const ipc = electron.ipcRenderer;
+import { ipcRenderer as ipc, remote } from "electron";
 import _ from "lodash";
 import {
   CARD_TILE_FLAT,
@@ -53,6 +52,8 @@ const overlayCfg = {
   type_counts: false
 };
 
+const primaryBounds = remote.screen.getPrimaryDisplay().bounds;
+
 const defaultCfg = {
   windowBounds: { width: 800, height: 600, x: 0, y: 0 },
   cards: { cards_time: 0, cards_before: {}, cards: {} },
@@ -90,33 +91,42 @@ const defaultCfg = {
     overlays: [
       {
         ...overlayCfg,
-        bounds: { width: 300, height: 600, x: 0, y: 0 },
+        bounds: {
+          ...primaryBounds,
+          width: 300,
+          height: 600
+        },
         mode: OVERLAY_LEFT,
         clock: true
       },
       {
         ...overlayCfg,
-        bounds: { width: 300, height: 600, x: 310, y: 0 },
+        bounds: {
+          ...primaryBounds,
+          width: 300,
+          height: 600,
+          x: primaryBounds.x + 310
+        },
         mode: OVERLAY_SEEN,
         clock: false
       },
       {
         ...overlayCfg,
-        bounds: { width: 300, height: 600, x: 0, y: 0 },
+        bounds: { ...primaryBounds, width: 300, height: 600 },
         mode: OVERLAY_DRAFT,
         clock: false,
         show: false
       },
       {
         ...overlayCfg,
-        bounds: { width: 300, height: 600, x: 0, y: 0 },
+        bounds: { ...primaryBounds, width: 300, height: 600 },
         mode: OVERLAY_LOG,
         clock: false,
         show: false
       },
       {
         ...overlayCfg,
-        bounds: { width: 300, height: 600, x: 0, y: 0 },
+        bounds: { ...primaryBounds, width: 300, height: 600 },
         mode: OVERLAY_FULL,
         show: false
       }
