@@ -565,7 +565,7 @@ export function onLabelInEventGetCombinedRankInfo(entry) {
   }
 }
 
-export function onLabelInEventGetActiveEvents(entry) {
+export function onLabelInEventGetActiveEventsV2(entry) {
   const json = entry.json();
   if (!json) return;
 
@@ -688,12 +688,15 @@ export function onLabelInDeckGetPreconDecks(entry) {
   // console.log(json);
 }
 
-export function onLabelInEventGetPlayerCourses(entry, json = false) {
-  json = json || entry.json();
+export function onLabelInEventGetPlayerCoursesV2(entry) {
+  const json = entry.json();
   if (!json) return;
 
   const static_events = [];
   json.forEach(course => {
+    if (course.CourseDeck) {
+      course.CourseDeck = convertDeckFromV3(course.CourseDeck);
+    }
     if (course.CurrentEventState != "PreMatch") {
       if (course.CourseDeck != null) {
         addCustomDeck(course.CourseDeck);
@@ -707,46 +710,26 @@ export function onLabelInEventGetPlayerCourses(entry, json = false) {
     globals.store.set("static_events", static_events);
 }
 
-export function onLabelInEventGetPlayerCoursesV2(entry) {
-  const json = entry.json();
-  if (!json) return;
-  json.forEach(course => {
-    if (course.CourseDeck) {
-      course.CourseDeck = convertDeckFromV3(course.CourseDeck);
-    }
-  });
-  onLabelInEventGetPlayerCourses(entry, json);
-}
-
-export function onLabelInEventGetPlayerCourse(entry, json = false) {
-  json = json || entry.json();
-  if (!json) return;
-
-  if (json.Id != "00000000-0000-0000-0000-000000000000") {
-    json.date = globals.logTime;
-    json._id = json.Id;
-    delete json.Id;
-
-    if (json.CourseDeck) {
-      json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
-      addCustomDeck(json.CourseDeck);
-      //json.date = timestamp();
-      //console.log(json.CourseDeck, json.CourseDeck.colors)
-      const httpApi = require("./http-api");
-      httpApi.httpSubmitCourse(json);
-      saveCourse(json);
-    }
-    select_deck(convertDeckFromV3(json));
-  }
-}
-
 export function onLabelInEventGetPlayerCourseV2(entry) {
   const json = entry.json();
   if (!json) return;
+  if (json.Id == "00000000-0000-0000-0000-000000000000") return;
+
+  json.date = globals.logTime;
+  json._id = json.Id;
+  delete json.Id;
+
   if (json.CourseDeck) {
     json.CourseDeck = convertDeckFromV3(json.CourseDeck);
+    json.CourseDeck.colors = get_deck_colors(json.CourseDeck);
+    addCustomDeck(json.CourseDeck);
+    //json.date = timestamp();
+    //console.log(json.CourseDeck, json.CourseDeck.colors)
+    const httpApi = require("./http-api");
+    httpApi.httpSubmitCourse(json);
+    saveCourse(json);
+    select_deck(json);
   }
-  onLabelInEventGetPlayerCourse(entry, json);
 }
 
 export function onLabelInEventJoin(entry) {
@@ -760,10 +743,11 @@ export function onLabelInEventJoin(entry) {
   }
 }
 
-export function onLabelInDeckUpdateDeck(entry, json = false) {
-  if (!json && entry.json) json = entry.json();
+export function onLabelInDeckUpdateDeckV3(entry) {
+  let json = entry.json();
   if (!json) return;
 
+  json = convertDeckFromV3(json);
   const _deck = playerData.deck(json.id);
 
   const changeId = sha1(json.id + "-" + json.lastUpdated);
@@ -849,12 +833,6 @@ export function onLabelInDeckUpdateDeck(entry, json = false) {
   setData({ decks });
 }
 
-export function onLabelInDeckUpdateDeckV3(entry) {
-  const json = entry.json();
-  if (!json) return;
-  onLabelInDeckUpdateDeck(entry, convertDeckFromV3(json));
-}
-
 // Given a shallow object of numbers and lists return a
 // new object which doesn't contain 0s or empty lists.
 function minifiedDelta(delta) {
@@ -870,7 +848,7 @@ function minifiedDelta(delta) {
 }
 
 // Called for all "Inventory.Updated" labels
-export function onLabelInventoryUpdatedV4(entry) {
+export function onLabelInventoryUpdated(entry) {
   const transaction = entry.json();
   if (!transaction) return;
 
@@ -881,25 +859,19 @@ export function onLabelInventoryUpdatedV4(entry) {
       delta.subContext = update.context; // preserve sub-context object data
       delta.context = transaction.context + "." + update.context.source;
     }
-    onLabelInventoryUpdated(delta);
+    // Construct a unique ID
+    delta.id = sha1(JSON.stringify(delta));
+    // Add missing data
+    delta.date = globals.logTime;
+    // Add delta to our current values
+    if (delta.delta) {
+      inventoryAddDelta(delta.delta);
+    }
+    // Reduce the size for storage
+    delta.delta = minifiedDelta(delta.delta);
+    // Do not modify the context from now on.
+    saveEconomyTransaction(delta);
   });
-}
-
-function onLabelInventoryUpdated(transaction) {
-  if (!transaction) return;
-  // Construct a unique ID
-  transaction.id = sha1(JSON.stringify(transaction));
-  // Add missing data
-  transaction.date = globals.logTime;
-  // Add delta to our current values
-  if (transaction.delta) {
-    inventoryAddDelta(transaction.delta);
-  }
-  // Reduce the size for storage
-  transaction.delta = minifiedDelta(transaction.delta);
-  // Do not modify the context from now on.
-  saveEconomyTransaction(transaction);
-  return;
 }
 
 function inventoryAddDelta(delta) {
@@ -1137,16 +1109,10 @@ export function onLabelTrackRewardTierUpdated(entry) {
     globals.store.set("economy", economy);
 }
 
-export function onLabelInEventDeckSubmit(entry) {
-  const json = entry.json();
-  if (!json) return;
-  select_deck(convertDeckFromV3(json));
-}
-
 export function onLabelInEventDeckSubmitV3(entry) {
   const json = entry.json();
   if (!json) return;
-  onLabelInEventDeckSubmit(entry, convertDeckFromV3(json));
+  select_deck(convertDeckFromV3(json));
 }
 
 export function onLabelEventMatchCreated(entry) {
