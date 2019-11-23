@@ -763,14 +763,14 @@ export function onLabelInEventJoin(entry) {
 export function onLabelInDeckUpdateDeck(entry, json = false) {
   if (!json && entry.json) json = entry.json();
   if (!json) return;
-  const logTime = globals.logTime;
+
   const _deck = playerData.deck(json.id);
 
-  const changeId = sha1(json.id + "-" + logTime);
+  const changeId = sha1(json.id + "-" + json.lastUpdated);
   const deltaDeck = {
     id: changeId,
     deckId: _deck.id,
-    date: logTime,
+    date: json.lastUpdated,
     changesMain: [],
     changesSide: [],
     previousMain: _deck.mainDeck,
