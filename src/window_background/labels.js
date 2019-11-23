@@ -902,7 +902,7 @@ function inventoryAddDelta(delta) {
   economy.wcUncommon += delta.wcUncommonDelta;
   economy.wcRare += delta.wcRareDelta;
   economy.wcMythic += delta.wcMythicDelta;
-  console.log("cardsNew", cardsNew);
+  // console.log("cardsNew", cardsNew);
   setData({ economy, cardsNew, cards });
 }
 
