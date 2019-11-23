@@ -50,11 +50,9 @@ function clearDraftData(draftId) {
   }
 }
 
-function decodePayload(json) {
+function decodePayload(payload, msgType) {
   const messages = require("./messages_pb");
-
-  const msgType = json.clientToMatchServiceMessageType.split("_")[1],
-    binaryMsg = new Buffer.from(json.payload, "base64");
+  const binaryMsg = new Buffer.from(payload, "base64");
 
   try {
     let msgDeserialiser;
@@ -76,8 +74,6 @@ function decodePayload(json) {
       return;
     }
     const msg = msgDeserialiser.deserializeBinary(binaryMsg);
-    //console.log(json.msgType);
-    //console.log(msg.toObject());
     return msg.toObject();
   } catch (e) {
     console.log(e.message);
@@ -495,24 +491,25 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
   const json = entry.json();
   if (!json) return;
   if (skipMatch) return;
+  let payload = json;
   if (json.Payload) {
-    json.payload = json.Payload;
-  }
-  if (!json.payload) return;
-
-  if (typeof json.payload == "string") {
-    json.payload = decodePayload(json);
-    json.payload = normaliseFields(json.payload);
-    console.log("Client To GRE: ", json.payload);
+    payload = json.Payload;
   }
 
-  if (json.payload.submitdeckresp) {
+  if (typeof payload == "string") {
+    const msgType = entry.label.split("_")[1];
+    payload = decodePayload(payload, msgType);
+    payload = normaliseFields(payload);
+    //console.log("Client To GRE: ", payload);
+  }
+
+  if (payload.submitdeckresp) {
     // Get sideboard changes
-    let deckResp = json.payload.submitdeckresp.deck;
+    const deckResp = payload.submitdeckresp.deck;
 
-    let tempMain = new CardsList(deckResp.deckcards);
-    let tempSide = new CardsList(deckResp.sideboardcards);
-    let newDeck = globals.currentMatch.player.deck.clone();
+    const tempMain = new CardsList(deckResp.deckcards);
+    const tempSide = new CardsList(deckResp.sideboardcards);
+    const newDeck = globals.currentMatch.player.deck.clone();
     newDeck.mainboard = tempMain;
     newDeck.sideboard = tempSide;
     newDeck.getColors();
