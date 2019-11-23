@@ -718,8 +718,8 @@ export function onLabelInEventGetPlayerCoursesV2(entry) {
   onLabelInEventGetPlayerCourses(entry, json);
 }
 
-export function onLabelInEventGetPlayerCourse(entry) {
-  const json = entry.json();
+export function onLabelInEventGetPlayerCourse(entry, json = false) {
+  json = json || entry.json();
   if (!json) return;
 
   if (json.Id != "00000000-0000-0000-0000-000000000000") {
