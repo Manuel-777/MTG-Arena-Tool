@@ -441,8 +441,14 @@ function updateOverlayVisibility() {
     electron.screen.getAllDisplays().forEach(display => {
       newBounds.x = Math.min(newBounds.x, display.bounds.x);
       newBounds.y = Math.min(newBounds.y, display.bounds.y);
-      newBounds.width += display.bounds.width;
-      newBounds.height = Math.max(newBounds.height, display.bounds.height);
+      newBounds.width = Math.max(
+        newBounds.width,
+        display.bounds.x + display.bounds.width
+      );
+      newBounds.height = Math.max(
+        newBounds.height,
+        display.bounds.y + display.bounds.height
+      );
     });
 
     overlay.setBounds(newBounds);
