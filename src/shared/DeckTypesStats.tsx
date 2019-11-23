@@ -11,9 +11,10 @@ function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
 
   deck.getMainboard().get().forEach(function(card: CardObject | any) {
     // TODO remove group lands hack
-    // PLEASE
+    // develop merge conflict 23/11/19
+    //if (card.id && card.id.id && card.id.id == 100) {
+    //  types.lan += card.quantity;
     if (card.id.id && card.id.id == 100) {
-      types.lan += card.quantity;
       return;
     }
     const c = db.card(card.id);

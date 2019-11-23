@@ -21,20 +21,14 @@ export const cardTile = function(
 ) {
   if (quantity === 0) return false;
 
-  let card;
-  if (grpId && typeof grpId == "object" && grpId.name) {
-    // TODO remove group lands hack
-    card = grpId;
-    grpId = grpId.id;
-  } else {
-    card = db.card(grpId);
-  }
+  const card = db.card(grpId);
   let dfcCard;
   if (card && card.dfcId) {
     dfcCard = db.card(card.dfcId);
   }
 
   const wrap = createDiv([]);
+  wrap.style.width = "-webkit-fill-available";
   const props = {
     card,
     deck,

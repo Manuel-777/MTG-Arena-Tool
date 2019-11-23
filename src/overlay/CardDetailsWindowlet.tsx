@@ -41,7 +41,7 @@ const SCALAR = 0.71808510638; // ???
 
 export interface CardDetailsWindowletProps {
   arenaState: number;
-  card?: DbCardData | any; // TODO remove group lands hack
+  card?: DbCardData;
   cardsSizeHoverCard: number;
   editMode: boolean;
   handleToggleEditMode: () => void;
@@ -124,7 +124,7 @@ to stop editing overlay positions`}
           unmountOnExit
         >
           <div style={{ display: "flex" }}>
-            {!!card && <img {...imgProps} />}
+            {!!card && !isCardGroupedLands && <img {...imgProps} />}
             {!!card && arenaState === ARENA_MODE_DRAFT && (
               <div className="main_hover_ratings">
                 <DraftRatings card={card} />

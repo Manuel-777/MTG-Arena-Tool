@@ -848,7 +848,7 @@ function openSetStats(setStats, setName) {
       cell.style.gridArea = `1 / ${color * 5 + 1} / auto / ${color * 5 + 6}`;
       table.appendChild(cell);
 
-      CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(rarity => {
+      CARD_RARITIES.filter(rarity => rarity !== "land").forEach(rarity => {
         var rarityIndex = CARD_RARITIES.indexOf(rarity);
         rarity = rarity.toLowerCase();
         let cell = createDiv(["completion_table_rarity_title", rarity]);
@@ -889,7 +889,7 @@ function openSetStats(setStats, setName) {
 
   let wanted = {};
   let missing = {};
-  CARD_RARITIES.filter(rarity => rarity !== "Land").forEach(rarity => {
+  CARD_RARITIES.filter(rarity => rarity !== "land").forEach(rarity => {
     rarity = rarity.toLowerCase();
     const countStats = setStats[rarity];
     if (countStats.total > 0) {

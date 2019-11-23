@@ -65,7 +65,9 @@ exports.EVENT_TO_NAME = {
   ExtraLife_2019_20191101: "Extra Life",
   FestivalFae_Std_Artisan_20191103: "Artisan Standard",
   FestivalFae_OkosMadness_20191110: "Okos Madness",
+  FestivalFae_Cascade_20191117: "Standard Cascade",
 
+  Historic_Launch_20191121: "Historic Launch",
   Brawl_Launch_20191024: "Brawl Launch",
   Precon_Brawl_ELD: "Precon Brawl",
   Lore_WAR1_Momir: "Ravnica at War I - Momir",
@@ -133,7 +135,9 @@ exports.EVENT_TO_FORMAT = {
   ExtraLife_2019_20191101: "Pauper",
   FestivalFae_Std_Artisan_20191103: "Artisan",
   FestivalFae_OkosMadness_20191110: "Momir",
+  FestivalFae_Cascade_20191117: "Cascade",
 
+  Historic_Launch_20191121: "Historic",
   Brawl_Launch_20191024: "Brawl",
   Precon_Brawl_ELD: "Brawl",
   Lore_WAR1_Momir: "Momir",

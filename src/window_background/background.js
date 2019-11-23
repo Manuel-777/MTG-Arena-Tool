@@ -516,23 +516,23 @@ async function logLoop() {
     }
 
     // Get player Id
-    strCheck = '"playerId": "';
+    strCheck = '\\"playerId\\": \\"';
     if (value.includes(strCheck)) {
       parsedData.arenaId = debugArenaID
         ? debugArenaID
-        : unleakString(dataChop(value, strCheck, '"'));
+        : unleakString(dataChop(value, strCheck, '\\"'));
     }
 
     // Get User name
-    strCheck = '"screenName": "';
+    strCheck = '\\"screenName\\": \\"';
     if (value.includes(strCheck)) {
-      parsedData.name = unleakString(dataChop(value, strCheck, '"'));
+      parsedData.name = unleakString(dataChop(value, strCheck, '\\"'));
     }
 
     // Get Client Version
-    strCheck = '"clientVersion": "';
+    strCheck = '\\"clientVersion\\": "\\';
     if (value.includes(strCheck)) {
-      parsedData.arenaVersion = unleakString(dataChop(value, strCheck, '"'));
+      parsedData.arenaVersion = unleakString(dataChop(value, strCheck, '\\"'));
     }
     /*
     if (globals.firstPass) {
