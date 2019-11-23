@@ -423,9 +423,11 @@ function setChangesTimeline(deckId) {
         innerCn + cn,
         Math.abs(c.quantity)
       );
-      dd.appendChild(tile);
-      data.appendChild(dd);
-      innerCn++;
+      if (tile) {
+        dd.appendChild(tile);
+        data.appendChild(dd);
+        innerCn++;
+      }
     };
 
     if (change.changesMain.length > 0) {
@@ -447,7 +449,7 @@ function setChangesTimeline(deckId) {
 
     if (change.label) {
       title.innerHTML = change.label;
-    } else {
+    } else if (change.date) {
       title.innerHTML =
         nc + " changes, " + timeSince(Date.parse(change.date)) + " ago.";
     }
