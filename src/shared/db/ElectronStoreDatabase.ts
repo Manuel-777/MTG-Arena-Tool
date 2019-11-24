@@ -4,7 +4,6 @@ import {
   USER_DATA_DIR,
   rememberDefaults,
   settingsDefaults,
-  playerDefaults,
   showBusy,
   wrapCallback,
   logInfo
@@ -59,9 +58,10 @@ export class ElectronStoreDatabase implements LocalDatabase {
         defaults: settingsDefaults
       });
     } else {
+      const playerData = require("../player-data") as any;
       this.playerStore = new Store({
         name: dbName,
-        defaults: playerDefaults
+        defaults: playerData.defaultCfg
       });
     }
   }

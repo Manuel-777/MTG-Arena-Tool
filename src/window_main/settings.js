@@ -25,7 +25,6 @@ import {
   SETTINGS_LOGIN
 } from "../shared/constants";
 import db from "../shared/database";
-import { playerDefaults } from "../shared/db/databaseUtil";
 import pd from "../shared/player-data";
 import {
   createDiv,
@@ -977,7 +976,7 @@ function appendOverlay(section) {
       ipcSend("save_overlay_settings", {
         index,
         bounds: {
-          ...playerDefaults.settings.overlays[0].bounds
+          ...pd.defaultCfg.settings.overlays[0].bounds
         }
       });
     });
