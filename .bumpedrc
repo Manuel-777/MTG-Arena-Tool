@@ -3,9 +3,19 @@ files: [
 ]
 
 plugins:
+  prerelease:
+    Clean up build and dist artifacts:
+      plugin: bumped-terminal
+      command: 'rm -fr lib || rm -fr dist'
+    Build and test one last time:
+      plugin: bumped-terminal
+      command: 'npm install && npm run babel && npm test'
   postrelease:
     Generating CHANGELOG file:
       plugin: bumped-changelog
+    Updating package-lock.json:
+      plugin: bumped-terminal
+      command: 'npm install && git add package-lock.json'
     Committing new version:
       plugin: bumped-terminal
       command: 'git add CHANGELOG.md package.json && git commit -m "Release $newVersion"'
