@@ -71,7 +71,12 @@ app.on("ready", () => {
     require("devtron").install();
     const dotenv = require("dotenv");
     dotenv.config();
-    electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
+    if (process.env.REACTDEVTOOLSEXT) {
+      // To enable REACT dev tools createa an .env file
+      // and add REACTDEVTOOLSEXT="path"
+      // where path is the path to your chrome extension folder
+      electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
+    }
   }
 });
 
@@ -94,7 +99,7 @@ function startUpdater() {
       updaterWindow.moveTop();
     });
 
-    autoUpdater.allowDowngrade = true;
+    //autoUpdater.allowDowngrade = true;
     autoUpdater.allowPrerelease = allowBeta;
     autoUpdater.checkForUpdatesAndNotify();
   });
@@ -442,8 +447,14 @@ function updateOverlayVisibility() {
     electron.screen.getAllDisplays().forEach(display => {
       newBounds.x = Math.min(newBounds.x, display.bounds.x);
       newBounds.y = Math.min(newBounds.y, display.bounds.y);
-      newBounds.width += display.bounds.width;
-      newBounds.height = Math.max(newBounds.height, display.bounds.height);
+      newBounds.width = Math.max(
+        newBounds.width,
+        display.bounds.x + display.bounds.width
+      );
+      newBounds.height = Math.max(
+        newBounds.height,
+        display.bounds.y + display.bounds.height
+      );
     });
 
     overlay.setBounds(newBounds);

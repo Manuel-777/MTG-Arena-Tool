@@ -5,41 +5,35 @@ import queue from "queue";
 import ArenaLogDecoder from "./arena-log-decoder/arena-log-decoder";
 import playerData from "../shared/player-data";
 import {
-  onLabelOutLogInfo,
-  onLabelGreToClient,
   onLabelClientToMatchServiceMessageTypeClientToGREMessage,
-  onLabelInEventGetPlayerCourse,
-  onLabelInEventGetPlayerCourseV2,
-  onLabelInEventJoin,
+  onLabelEventMatchCreated,
+  onLabelGetPlayerInventoryGetRewardSchedule,
+  onLabelGreToClient,
   onLabelInEventGetCombinedRankInfo,
-  onLabelInDeckGetDeckLists,
+  onLabelInEventGetPlayerCourseV2,
+  onLabelInEventGetPlayerCoursesV2,
+  onLabelInEventJoin,
   onLabelInDeckGetDeckListsV3,
   onLabelInDeckGetPreconDecks,
-  onLabelInEventGetPlayerCourses,
-  onLabelInEventGetPlayerCoursesV2,
-  onLabelInDeckUpdateDeck,
   onLabelInDeckUpdateDeckV3,
-  onLabelInventoryUpdatedV4,
-  onLabelPostMatchUpdate,
+  onLabelInventoryUpdated,
   onLabelInPlayerInventoryGetPlayerInventory,
   onLabelInPlayerInventoryGetPlayerCardsV3,
   onLabelInProgressionGetPlayerProgress,
-  onLabelInEventDeckSubmit,
   onLabelInEventDeckSubmitV3,
-  onLabelInEventGetActiveEvents,
-  onLabelEventMatchCreated,
-  onLabelOutDirectGameChallenge,
-  onLabelOutEventAIPractice,
+  onLabelInEventGetActiveEventsV2,
   onLabelInDraftDraftStatus,
   onLabelInDraftMakePick,
   onLabelOutDraftMakePick,
   onLabelInEventCompleteDraft,
-  onLabelMatchGameRoomStateChangedEvent,
   onLabelInEventGetSeasonAndRankDetail,
-  onLabelGetPlayerInventoryGetRewardSchedule,
-  onLabelRankUpdated,
+  onLabelMatchGameRoomStateChangedEvent,
   onLabelMythicRatingUpdated,
-  onLabelTrackProgressUpdated,
+  onLabelOutLogInfo,
+  onLabelOutDirectGameChallenge,
+  onLabelOutEventAIPractice,
+  onLabelPostMatchUpdate,
+  onLabelRankUpdated,
   onLabelTrackRewardTierUpdated
 } from "./labels";
 import {
@@ -192,7 +186,7 @@ function onLogEntryFound(entry) {
       try {
         entrySwitch(entry);
         let timestamp = entry.timestamp;
-        if (entry.json) {
+        if (!timestamp && entry.json) {
           const json = entry.json();
           if (json && json.timestamp) {
             timestamp = json.timestamp;
@@ -234,12 +228,6 @@ function entrySwitch(entry) {
       onLabelClientToMatchServiceMessageTypeClientToGREMessage(entry);
       break;
 
-    case "Event.GetPlayerCourse":
-      if (entry.arrow == "<==") {
-        onLabelInEventGetPlayerCourse(entry);
-      }
-      break;
-
     case "Event.GetPlayerCourseV2":
       if (entry.arrow == "<==") {
         onLabelInEventGetPlayerCourseV2(entry);
@@ -270,21 +258,9 @@ function entrySwitch(entry) {
       }
       break;
 
-    case "Event.GetPlayerCourses":
-      if (entry.arrow == "<==") {
-        onLabelInEventGetPlayerCourses(entry);
-      }
-      break;
-
     case "Event.GetPlayerCoursesV2":
       if (entry.arrow == "<==") {
         onLabelInEventGetPlayerCoursesV2(entry);
-      }
-      break;
-
-    case "Deck.GetDeckLists":
-      if (entry.arrow == "<==") {
-        onLabelInDeckGetDeckLists(entry);
       }
       break;
 
@@ -300,12 +276,6 @@ function entrySwitch(entry) {
       }
       break;
 
-    case "Deck.UpdateDeck":
-      if (entry.arrow == "<==") {
-        onLabelInDeckUpdateDeck(entry);
-      }
-      break;
-
     case "Deck.UpdateDeckV3":
       if (entry.arrow == "<==") {
         onLabelInDeckUpdateDeckV3(entry);
@@ -314,7 +284,7 @@ function entrySwitch(entry) {
 
     case "Inventory.Updated":
       // handler works for both out and in arrows
-      onLabelInventoryUpdatedV4(entry);
+      onLabelInventoryUpdated(entry);
       break;
 
     case "PostMatch.Update":
@@ -343,12 +313,6 @@ function entrySwitch(entry) {
 
     case "TrackRewardTier.Updated":
       onLabelTrackRewardTierUpdated(entry);
-      break;
-
-    case "Event.DeckSubmit":
-      if (entry.arrow == "<==") {
-        onLabelInEventDeckSubmit(entry);
-      }
       break;
 
     case "Event.DeckSubmitV3":
@@ -397,7 +361,7 @@ function entrySwitch(entry) {
 
     case "Event.GetActiveEventsV2":
       if (entry.arrow == "<==") {
-        onLabelInEventGetActiveEvents(entry);
+        onLabelInEventGetActiveEventsV2(entry);
       }
       break;
 
