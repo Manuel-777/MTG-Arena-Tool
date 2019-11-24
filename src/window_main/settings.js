@@ -492,7 +492,6 @@ function appendDataSection(section) {
 function appendOverlay(section) {
   section.appendChild(createDiv(["settings_title"], "Overlays"));
 
-  const displayControls = createDiv(["settings_row"]);
   // Toggle Edit Mode Button
   const editModeButton = createDiv(
     ["button_simple"],
@@ -502,36 +501,7 @@ function appendOverlay(section) {
   editModeButton.addEventListener("click", function() {
     ipcSend("toggle_edit_mode");
   });
-  /*
-  displayControls.appendChild(editModeButton);
-  /*
-  // Set Overlay Display Screen
-  const overlayDisplay = pd.settings.overlay_display
-    ? pd.settings.overlay_display
-    : remote.screen.getPrimaryDisplay().id;
-  const label = createLabel(["but_container_label"], "Overlay Display:");
-  label.style.marginTop = "auto";
-  const displaySelect = createSelect(
-    label,
-    remote.screen.getAllDisplays().map(display => display.id),
-    overlayDisplay,
-    filter => ipcSend("save_user_settings", { overlay_display: filter }),
-    "overlay_display",
-    filter => {
-      const displayNumber = remote.screen
-        .getAllDisplays()
-        .findIndex(d => d.id == filter);
-      const primary = filter == remote.screen.getPrimaryDisplay().id;
-
-      return `Display ${displayNumber} ${primary ? "(primary)" : ""}`;
-    }
-  );
-  displaySelect.style.width = "180px";
-  displaySelect.style.marginLeft = "32px";
-  displayControls.appendChild(label);
-  */
-  section.appendChild(displayControls);
-  */
+  section.appendChild(editModeButton);
 
   // Copy pasta with bolognesa!
   const pickerLabel = createLabel(
