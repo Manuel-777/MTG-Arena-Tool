@@ -105,22 +105,11 @@ export class ElectronStoreDatabase implements LocalDatabase {
     table: string,
     key: string,
     data: any,
-    callback?: (err: Error | null, num: number) => void,
-    globals?: any
+    callback?: (err: Error | null, num: number) => void
   ) {
     const store = this.getStore(key);
     if (!store) {
       throw new DatabaseNotInitializedError();
-    }
-    if (
-      globals &&
-      !globals.debugLog &&
-      globals.firstPass &&
-      table !== "application"
-    ) {
-      // special optimization to handle initial log read
-      // skip persisting changes until final bulk upsertAll call
-      return;
     }
     logInfo("Saving data...")
     const wrappedCallback = wrapCallback("Saving data", false, callback);

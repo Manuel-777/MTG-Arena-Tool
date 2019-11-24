@@ -201,7 +201,7 @@ ipc.on("request_deck_link", function(event, obj) {
 ipc.on("windowBounds", (event, windowBounds) => {
   if (globals.firstPass) return;
   setData({ windowBounds }, false);
-  playerDb.upsert("", "windowBounds", windowBounds, null, globals);
+  playerDb.upsert("", "windowBounds", windowBounds);
 });
 
 //
@@ -213,7 +213,7 @@ ipc.on("overlayBounds", (event, index, bounds) => {
   };
   overlays[index] = newOverlay;
   setData({ settings: { ...playerData.settings, overlays } }, false);
-  playerDb.upsert("settings", "overlays", overlays, null, globals);
+  playerDb.upsert("settings", "overlays", overlays);
 });
 
 //
@@ -233,7 +233,7 @@ ipc.on("save_overlay_settings", function(event, settings) {
   });
 
   const updated = { ...playerData.settings, overlays };
-  playerDb.upsert("settings", "overlays", overlays, null, globals);
+  playerDb.upsert("settings", "overlays", overlays);
   syncSettings(updated);
   ipc_send("hide_loading");
 });
@@ -248,7 +248,7 @@ ipc.on("save_user_settings", function(event, settings) {
     refresh = false;
   }
   syncSettings(settings, refresh);
-  playerDb.upsert("", "settings", playerData.data.settings, null, globals);
+  playerDb.upsert("", "settings", playerData.data.settings);
   ipc_send("hide_loading");
 });
 
@@ -282,7 +282,7 @@ ipc.on("toggle_deck_archived", function(event, arg) {
   const decks = { ...playerData.decks, [id]: deckData };
 
   setData({ decks });
-  playerDb.upsert("decks", id, deckData, null, globals);
+  playerDb.upsert("decks", id, deckData);
   ipc_send("hide_loading");
 });
 
@@ -296,7 +296,7 @@ ipc.on("toggle_archived", function(event, arg) {
   data.archived = !data.archived;
 
   setData({ [id]: data });
-  playerDb.upsert("", id, data, null, globals);
+  playerDb.upsert("", id, data);
   ipc_send("hide_loading");
 });
 
@@ -336,7 +336,7 @@ ipc.on("edit_tag", (event, arg) => {
   const { tag, color } = arg;
   const tags_colors = { ...playerData.tags_colors, [tag]: color };
   setData({ tags_colors });
-  playerDb.upsert("", "tags_colors", tags_colors, null, globals);
+  playerDb.upsert("", "tags_colors", tags_colors);
   sendSettings();
 });
 
@@ -351,7 +351,7 @@ ipc.on("delete_tag", (event, arg) => {
 
   const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
   setData({ decks_tags });
-  playerDb.upsert("", "decks_tags", decks_tags, null, globals);
+  playerDb.upsert("", "decks_tags", decks_tags);
 });
 
 ipc.on("add_tag", (event, arg) => {
@@ -365,7 +365,7 @@ ipc.on("add_tag", (event, arg) => {
 
   const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
   setData({ decks_tags });
-  playerDb.upsert("", "decks_tags", decks_tags, null, globals);
+  playerDb.upsert("", "decks_tags", decks_tags);
 });
 
 ipc.on("delete_history_tag", (event, arg) => {
@@ -380,7 +380,7 @@ ipc.on("delete_history_tag", (event, arg) => {
   const matchData = { ...match, tags };
 
   setData({ [matchid]: matchData });
-  playerDb.upsert(matchid, "tags", tags, null, globals);
+  playerDb.upsert(matchid, "tags", tags);
 });
 
 ipc.on("add_history_tag", (event, arg) => {
@@ -392,7 +392,7 @@ ipc.on("add_history_tag", (event, arg) => {
   const tags = [...(match.tags || []), tag];
 
   setData({ [matchid]: { ...match, tags } });
-  playerDb.upsert(matchid, "tags", tags, null, globals);
+  playerDb.upsert(matchid, "tags", tags);
   httpApi.httpSetDeckTag(tag, match.oppDeck.mainDeck, match.eventId);
 });
 

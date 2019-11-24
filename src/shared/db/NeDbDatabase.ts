@@ -31,7 +31,7 @@ export class NeDbDatabase implements LocalDatabase {
   dbName: string;
   datastore?: Datastore;
 
-  constructor(useBulkFirstpass = false) {
+  constructor() {
     this.dbName = "";
     this.init = this.init.bind(this);
     this.findAll = this.findAll.bind(this);

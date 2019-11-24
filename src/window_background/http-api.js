@@ -26,10 +26,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       courses_index.push(id);
-      playerDb.upsert("", id, doc, null, globals);
+      playerDb.upsert("", id, doc);
       setData({ [id]: doc }, false);
     });
-  playerDb.upsert("", "courses_index", courses_index, null, globals);
+  playerDb.upsert("", "courses_index", courses_index);
 
   // Sync Matches
   const matches_index = [...playerData.matches_index];
@@ -40,10 +40,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       matches_index.push(id);
-      playerDb.upsert("", id, doc, null, globals);
+      playerDb.upsert("", id, doc);
       setData({ [id]: doc }, false);
     });
-  playerDb.upsert("", "matches_index", matches_index, null, globals);
+  playerDb.upsert("", "matches_index", matches_index);
 
   // Sync Economy
   const economy_index = [...playerData.economy_index];
@@ -54,10 +54,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       economy_index.push(id);
-      playerDb.upsert("", id, doc, null, globals);
+      playerDb.upsert("", id, doc);
       setData({ [id]: doc }, false);
     });
-  playerDb.upsert("", "economy_index", economy_index, null, globals);
+  playerDb.upsert("", "economy_index", economy_index);
 
   // Sync Drafts
   const draft_index = [...playerData.draft_index];
@@ -68,10 +68,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       draft_index.push(id);
-      playerDb.upsert("", id, doc, null, globals);
+      playerDb.upsert("", id, doc);
       setData({ [id]: doc }, false);
     });
-  playerDb.upsert("", "draft_index", draft_index, null, globals);
+  playerDb.upsert("", "draft_index", draft_index);
 
   // Sync seasonal
   data.seasonal.forEach(doc => {
@@ -89,14 +89,14 @@ function syncUserData(data) {
     const seasonal = { ...playerData.seasonal, [id]: doc };
     setData({ seasonal });
 
-    playerDb.upsert("seasonal", id, doc, null, globals);
-    playerDb.upsert("", "seasonal_rank", seasonal_rank, null, globals);
+    playerDb.upsert("seasonal", id, doc);
+    playerDb.upsert("", "seasonal_rank", seasonal_rank);
   });
 
   if (data.settings.tags_colors) {
     let newTags = data.settings.tags_colors;
     setData({ tags_colors: { ...newTags } });
-    playerDb.upsert("", "tags_colors", newTags, null, globals);
+    playerDb.upsert("", "tags_colors", newTags);
   }
 
   setData({ courses_index, draft_index, economy_index, matches_index });

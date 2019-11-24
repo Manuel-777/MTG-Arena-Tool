@@ -1,5 +1,4 @@
 import { setData } from "./background-util";
-import globals from "./globals";
 import { playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/player-data";
 
@@ -18,7 +17,7 @@ const addCustomDeck = function(customDeck: Deck): void {
   };
 
   setData({ decks: { ...playerData.decks, [customDeck.id]: deckData } });
-  playerDb.upsert("decks", id, deckData, undefined, globals);
+  playerDb.upsert("decks", id, deckData);
 };
 
 export default addCustomDeck;

@@ -31,8 +31,7 @@ export interface LocalDatabase {
     table: string,
     key: string,
     data: any,
-    callback?: (err: Error | null, num: number) => void,
-    globals?: any
+    callback?: (err: Error | null, num: number) => void
   ): void;
 
   upsertAll(
@@ -48,6 +47,6 @@ export interface LocalDatabase {
   ): void;
 }
 
-export const appDb: LocalDatabase = new MigrationDatabase(); // TODO should eventually be NeDb
+export const appDb: LocalDatabase = new MigrationDatabase(new ElectronStoreDatabase(), new NeDbDatabase());
 export const playerDb: LocalDatabase = new NeDbDatabase();
 export const playerDbLegacy: LocalDatabase = new ElectronStoreDatabase();

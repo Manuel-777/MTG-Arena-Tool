@@ -1,6 +1,4 @@
-import { ElectronStoreDatabase } from "./ElectronStoreDatabase";
-import { NeDbDatabase } from "./NeDbDatabase";
-import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
+import { LocalDatabase } from "./LocalDatabase";
 
 /**
  * This style of database helps provide a smooth transition between 2 different
@@ -10,10 +8,12 @@ import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
  * for keeping all future changes synchronized during the transition.
  */
 export class MigrationDatabase implements LocalDatabase {
-  oldDb?: LocalDatabase;
-  newDb?: LocalDatabase;
+  oldDb: LocalDatabase;
+  newDb: LocalDatabase;
 
-  constructor() {
+  constructor(oldDb: LocalDatabase, newDb: LocalDatabase) {
+    this.oldDb = oldDb;
+    this.newDb = newDb;
     this.init = this.init.bind(this);
     this.findAll = this.findAll.bind(this);
     this.upsertAll = this.upsertAll.bind(this);
@@ -23,24 +23,19 @@ export class MigrationDatabase implements LocalDatabase {
   }
 
   get dbName() {
-    return this.oldDb ? this.oldDb.dbName : "";
+    return this.oldDb.dbName;
   }
 
   get filePath() {
-    return this.oldDb ? this.oldDb.filePath : "";
+    return this.oldDb.filePath;
   }
 
   init(dbName: string, arenaName: string) {
-    this.oldDb = new ElectronStoreDatabase();
-    this.oldDb.init(dbName);
-    this.newDb = new NeDbDatabase(true);
+    this.oldDb.init(dbName, arenaName);
     this.newDb.init(dbName, arenaName);
   }
 
   findAll(callback: (err: Error | null, data: any) => void) {
-    if (!this.oldDb || !this.newDb) {
-      throw new DatabaseNotInitializedError();
-    }
     this.oldDb.findAll(callback);
   }
 
@@ -49,25 +44,18 @@ export class MigrationDatabase implements LocalDatabase {
     callback?: (err: Error | null, num: number) => void,
     intermediateCallback?: (err: Error | null, num: number) => void
   ) {
-    if (!this.oldDb || !this.newDb) {
-      throw new DatabaseNotInitializedError();
-    }
     this.oldDb.upsertAll(data, callback, intermediateCallback);
-    this.newDb.upsertAll(data);
+    this.newDb.upsertAll(data, undefined, intermediateCallback);
   }
 
   upsert(
     table: string,
     key: string,
     data: any,
-    callback?: (err: Error | null, num: number) => void,
-    globals?: any
+    callback?: (err: Error | null, num: number) => void
   ) {
-    if (!this.oldDb || !this.newDb) {
-      throw new DatabaseNotInitializedError();
-    }
-    this.oldDb.upsert(table, key, data, callback, globals);
-    this.newDb.upsert(table, key, data, undefined, globals);
+    this.oldDb.upsert(table, key, data, callback);
+    this.newDb.upsert(table, key, data, undefined);
   }
 
   find(
@@ -75,9 +63,6 @@ export class MigrationDatabase implements LocalDatabase {
     key: string,
     callback: (err: Error | null, data: any) => void
   ) {
-    if (!this.oldDb || !this.newDb) {
-      throw new DatabaseNotInitializedError();
-    }
     this.oldDb.find(table, key, callback);
   }
 
@@ -86,9 +71,6 @@ export class MigrationDatabase implements LocalDatabase {
     key: string,
     callback?: (err: Error | null, num: number) => void
   ) {
-    if (!this.oldDb || !this.newDb) {
-      throw new DatabaseNotInitializedError();
-    }
     this.oldDb.remove(table, key, callback);
     this.newDb.remove(table, key);
   }
