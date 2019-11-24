@@ -1,3 +1,14 @@
+## <small>2.13.4 (2019-11-23)</small>
+
+* bugfix grouped lands (#742) ([a257a18](https://github.com/Manuel-777/MTG-Arena-Tool/commit/a257a18)), closes [#742](https://github.com/Manuel-777/MTG-Arena-Tool/issues/742)
+* bugfix handle whitespace in zone.type (#741) ([48b9d03](https://github.com/Manuel-777/MTG-Arena-Tool/commit/48b9d03)), closes [#741](https://github.com/Manuel-777/MTG-Arena-Tool/issues/741)
+* bugfix initial log pass player detection (#744) ([4c04a5b](https://github.com/Manuel-777/MTG-Arena-Tool/commit/4c04a5b)), closes [#744](https://github.com/Manuel-777/MTG-Arena-Tool/issues/744)
+* first attempt to parse new logs (#745) ([f30d653](https://github.com/Manuel-777/MTG-Arena-Tool/commit/f30d653)), closes [#745](https://github.com/Manuel-777/MTG-Arena-Tool/issues/745)
+* full displays overlay (#730) ([70afc98](https://github.com/Manuel-777/MTG-Arena-Tool/commit/70afc98)), closes [#730](https://github.com/Manuel-777/MTG-Arena-Tool/issues/730)
+* wildcards fix(es) - v2.13.2 (#736) ([325645b](https://github.com/Manuel-777/MTG-Arena-Tool/commit/325645b)), closes [#736](https://github.com/Manuel-777/MTG-Arena-Tool/issues/736) [#699](https://github.com/Manuel-777/MTG-Arena-Tool/issues/699) [#700](https://github.com/Manuel-777/MTG-Arena-Tool/issues/700) [#704](https://github.com/Manuel-777/MTG-Arena-Tool/issues/704) [#706](https://github.com/Manuel-777/MTG-Arena-Tool/issues/706) [#702](https://github.com/Manuel-777/MTG-Arena-Tool/issues/702) [#701](https://github.com/Manuel-777/MTG-Arena-Tool/issues/701) [#705](https://github.com/Manuel-777/MTG-Arena-Tool/issues/705) [#703](https://github.com/Manuel-777/MTG-Arena-Tool/issues/703) [#709](https://github.com/Manuel-777/MTG-Arena-Tool/issues/709) [#717](https://github.com/Manuel-777/MTG-Arena-Tool/issues/717) [#716](https://github.com/Manuel-777/MTG-Arena-Tool/issues/716) [#714](https://github.com/Manuel-777/MTG-Arena-Tool/issues/714) [#713](https://github.com/Manuel-777/MTG-Arena-Tool/issues/713) [#712](https://github.com/Manuel-777/MTG-Arena-Tool/issues/712) [#722](https://github.com/Manuel-777/MTG-Arena-Tool/issues/722) [#723](https://github.com/Manuel-777/MTG-Arena-Tool/issues/723) [#724](https://github.com/Manuel-777/MTG-Arena-Tool/issues/724) [#720](https://github.com/Manuel-777/MTG-Arena-Tool/issues/720) [#734](https://github.com/Manuel-777/MTG-Arena-Tool/issues/734) [#735](https://github.com/Manuel-777/MTG-Arena-Tool/issues/735)
+
+
+
 ## <small>2.13.3 (2019-11-21)</small>
 
 * bugfix DeckList sorting in react (#740) ([d2fb638](https://github.com/Manuel-777/MTG-Arena-Tool/commit/d2fb638)), closes [#740](https://github.com/Manuel-777/MTG-Arena-Tool/issues/740)

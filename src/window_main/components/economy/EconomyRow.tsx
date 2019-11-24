@@ -255,7 +255,7 @@ function FlexRight(props: FlexRightProps) {
       {checkBoosterAdded && change.delta.boosterDelta && change.delta.boosterDelta.map((booster: any) => <BoosterDelta booster={booster} key={booster.collationId} />)}
       {checkWildcardsAdded && <AllWildcardsEconomyValueRecord delta={change.delta} />}
       {(checkCards || checkAether) && <CardPoolAddedEconomyValueRecord addedCardIds={change.delta.cardsAdded} aetherizedCardIds={aetherCards} />}
-      {skinsToCards && skinsToCards.map((card: any) => <EconomyIcon key={card.name} title={card.name + " Skin"} className={"economy_skin_art"} url={`url("${getCardArtCrop(card)}")`} />)}
+      {skinsToCards && skinsToCards.map((card: any) => <EconomyIcon key={economyId + "_" + card.id} title={card.name + " Skin"} className={"economy_skin_art"} url={`url("${getCardArtCrop(card)}")`} />)}
     </div>
   )
 }

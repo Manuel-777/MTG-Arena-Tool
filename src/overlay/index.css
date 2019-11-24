@@ -39,6 +39,7 @@ body {
 }
 
 .overlay_container {
+    border: 1px solid gray;
     background-position: center;
     border-radius: 4px;
     background-size: cover;
@@ -63,7 +64,7 @@ body {
 */
 
 .editable {
-    border: 2px var(--color-g) dashed;
+    border: 2px var(--color-g) dashed !important;
     -webkit-transition: none !important;
 }
 
