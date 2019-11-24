@@ -5,9 +5,12 @@ import { IPC_BACKGROUND } from "../shared/constants";
 
 import { ipc_send as ipcSend, setData } from "./background-util";
 import globals from "./globals";
-import { appDb, playerDb, playerDbLegacy } from "../shared/db/LocalDatabase";
+import { playerDb, playerDbLegacy } from "../shared/db/LocalDatabase";
 import playerData from "../shared/player-data";
 import arenaLogWatcher from "./arena-log-watcher";
+
+const ipcLog = message => ipcSend("ipc_log", message);
+const ipcPop = args => ipcSend("popup", args);
 
 // Merges settings and updates singletons across processes
 // (essentially fancy setData for settings field only)
@@ -23,8 +26,8 @@ export function syncSettings(
 
 // Loads this player's configuration file
 export function loadPlayerConfig(playerId, callback) {
-  ipcSend("ipc_log", "Load player ID: " + playerId);
-  ipcSend("popup", {
+  ipcLog("Load player ID: " + playerId);
+  ipcPop({
     text: "Loading player history...",
     time: 0,
     progress: 2
@@ -32,15 +35,15 @@ export function loadPlayerConfig(playerId, callback) {
   playerDb.init(playerId, playerData.name);
   playerDbLegacy.init(playerId, playerData.name);
   setData({ playerDbPath: playerDb.filePath }, false);
-  ipcSend("ipc_log", "Player database: " + playerDb.filePath);
+  ipcLog("Player database: " + playerDb.filePath);
   migrationDispatcher(callback);
 }
 
 function finishLoadingConfig(callback) {
-  ipcSend("ipc_log", "Finding all documents in player database...");
+  ipcLog("Finding all documents in player database...");
   playerDb.findAll((err, savedData) => {
     if (err) {
-      console.log(err);
+      console.error(err);
       savedData = {};
     }
     const __playerData = _.defaultsDeep(savedData, playerData);
@@ -49,28 +52,38 @@ function finishLoadingConfig(callback) {
     setData(__playerData, true);
     ipcSend("renderer_set_bounds", __playerData.windowBounds);
     syncSettings(settings, true);
-    ipcSend("ipc_log", "...found all documents in player database.");
-    ipcSend("popup", {
+    ipcLog("...found all documents in player database.");
+    ipcPop({
       text: "Player history loaded.",
       time: 3000,
       progress: -1
     });
     if (callback) {
-      ipcSend("ipc_log", "Calling back to http-api...");
+      ipcLog("Calling back to http-api...");
       callback();
     }
     globals.watchingLog = true;
-    ipcSend("ipc_log", "Starting Arena Log Watcher: " + settings.logUri);
+    ipcLog("Starting Arena Log Watcher: " + settings.logUri);
     globals.stopWatchingLog = arenaLogWatcher.startWatchingLog(settings.logUri);
   });
 }
 
+function ipcProgress(completion) {
+  const text = `Upgrading player database... ${Math.round(
+    100 * completion
+  )}% (happens once, could take minutes)`;
+  ipcPop({
+    text,
+    time: 0,
+    progress: completion
+  });
+}
+
 function migrateElectronStoreToNeDb(callback) {
-  ipcSend("ipc_log", "Upgrading player database...");
+  ipcLog("Upgrading player database...");
   ipcSend("save_app_settings", {}, IPC_BACKGROUND); // ensure app db migrates
   playerDbLegacy.findAll((err, savedData) => {
     if (savedData) {
-      ipcSend("ipc_log", "Migrating player data...");
       const __playerData = _.defaultsDeep(savedData, playerData);
       const { settings } = __playerData;
       // ensure blended user settings migrate
@@ -79,45 +92,29 @@ function migrateElectronStoreToNeDb(callback) {
       ipcSend("save_user_settings", { skip_refresh: true }, IPC_BACKGROUND);
       const dataToMigrate = playerData.data;
       const totalDocs = Object.values(dataToMigrate).length;
-      ipcSend("popup", {
-        text: "Migrating player data: 0% (happens once, could take minutes)",
-        time: 0,
-        progress: 0
-      });
+      ipcProgress(0);
       playerDb.upsertAll(
         dataToMigrate,
         (err, num) => {
-          if (num) {
-            ipcSend(
-              "ipc_log",
-              `...migrated ${num} records from electron-store to nedb`
-            );
-            finishLoadingConfig(callback);
-          } else {
-            if (err) {
-              console.log(err);
-            }
-            finishLoadingConfig(callback);
+          if (err) {
+            console.error(err);
           }
+          if (num) {
+            ipcLog(`...migrated ${num} records from electron-store to nedb`);
+          }
+          finishLoadingConfig(callback);
         },
         (err, num) => {
-          if (num) {
-            const completion = num / totalDocs;
-            ipcSend("popup", {
-              text: `Migrating player data: ${Math.round(
-                100 * completion
-              )}% (happens once, could take minutes)`,
-              time: 0,
-              progress: completion
-            });
-          } else if (err) {
-            console.log(err);
+          if (err) {
+            console.error(err);
+          } else if (num) {
+            ipcProgress(num / totalDocs);
           }
         }
       );
     } else {
       if (err) {
-        console.log(err);
+        console.error(err);
       }
       finishLoadingConfig(callback);
     }
@@ -125,32 +122,24 @@ function migrateElectronStoreToNeDb(callback) {
 }
 
 function migrationDispatcher(callback) {
-  ipcSend("ipc_log", "Checking if database requires upgrade...");
+  ipcLog("Checking if database requires upgrade...");
   playerDbLegacy.find("", "cards", (err, legacyData) => {
     if (legacyData) {
-      ipcSend(
-        "ipc_log",
-        `...found legacy JSON database, last cards_time:${
-          legacyData.cards_time
-        }`
-      );
+      ipcLog(`...found legacy JSON data, cards_time:${legacyData.cards_time}`);
       playerDb.find("", "cards", (err, data) => {
         if (data) {
-          ipcSend(
-            "ipc_log",
-            `...found NeDb database, last cards_time:${data.cards_time}`
-          );
+          ipcLog(`...found NeDb data, cards_time:${data.cards_time}`);
           finishLoadingConfig(callback);
         } else {
           if (err) {
-            console.log(err);
+            console.error(err);
           }
           migrateElectronStoreToNeDb(callback);
         }
       });
     } else {
       if (err) {
-        console.log(err);
+        console.error(err);
       }
       finishLoadingConfig(callback);
     }
@@ -158,13 +147,10 @@ function migrationDispatcher(callback) {
 }
 
 export function backportNeDbToElectronStore() {
-  ipcSend("ipc_log", "Backporting player database...");
+  ipcLog("Backporting player database...");
   playerDbLegacy.upsertAll(playerData.data, (err, num) => {
-    ipcSend(
-      "ipc_log",
-      `...backported ${num} records from nedb to electron-store`
-    );
-    ipcSend("popup", {
+    ipcLog(`...backported ${num} records from nedb to electron-store`);
+    ipcPop({
       text: "Successfully backported all player data to JSON.",
       time: 3000,
       progress: -1
