@@ -502,6 +502,7 @@ function appendOverlay(section) {
   editModeButton.addEventListener("click", function() {
     ipcSend("toggle_edit_mode");
   });
+  /*
   displayControls.appendChild(editModeButton);
   /*
   // Set Overlay Display Screen
@@ -530,6 +531,7 @@ function appendOverlay(section) {
   displayControls.appendChild(label);
   */
   section.appendChild(displayControls);
+  */
 
   // Copy pasta with bolognesa!
   const pickerLabel = createLabel(

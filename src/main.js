@@ -77,7 +77,12 @@ app.on("ready", () => {
     require("devtron").install();
     const dotenv = require("dotenv");
     dotenv.config();
-    electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
+    if (process.env.REACTDEVTOOLSEXT) {
+      // To enable REACT dev tools createa an .env file
+      // and add REACTDEVTOOLSEXT="path"
+      // where path is the path to your chrome extension folder
+      electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
+    }
   }
 });
 
