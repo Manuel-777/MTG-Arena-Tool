@@ -201,7 +201,11 @@ export default function OverlayController(): JSX.Element {
   const handleSetMatch = useCallback((event: unknown, arg: string): void => {
     const newMatch = JSON.parse(arg);
     newMatch.oppCards = new Deck(newMatch.oppCards);
+    // WARNING: this hack to circumvent the Deck object is required!
+    // TODO do something other than this hack
+    const temp = newMatch.playerCardsLeft.mainDeck;
     newMatch.playerCardsLeft = new Deck(newMatch.playerCardsLeft);
+    newMatch.playerCardsLeft.mainboard._list = temp;
     newMatch.player.deck = new Deck(newMatch.player.deck);
     newMatch.player.originalDeck = new Deck(newMatch.player.originalDeck);
     setMatch(newMatch);
