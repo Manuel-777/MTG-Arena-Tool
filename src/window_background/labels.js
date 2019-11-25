@@ -500,7 +500,7 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
     const msgType = entry.label.split("_")[1];
     payload = decodePayload(payload, msgType);
     payload = normaliseFields(payload);
-    console.log("Client To GRE: ", payload);
+    // console.log("Client To GRE: ", payload);
   }
 
   if (payload.submitdeckresp) {
