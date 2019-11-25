@@ -5,8 +5,9 @@ import { makeId } from "../shared/util";
 import { ipc_send, setData } from "./background-util";
 import playerData from "../shared/player-data";
 import db from "../shared/database";
+import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import globals from "./globals";
-import { loadPlayerConfig } from "./loadPlayerConfig";
+import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 
 let metadataState = false;
 
@@ -25,11 +26,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       courses_index.push(id);
-      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      playerDb.upsert("", id, doc);
       setData({ [id]: doc }, false);
     });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("courses_index", courses_index);
+  playerDb.upsert("", "courses_index", courses_index);
 
   // Sync Matches
   const matches_index = [...playerData.matches_index];
@@ -40,11 +40,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       matches_index.push(id);
-      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      playerDb.upsert("", id, doc);
       setData({ [id]: doc }, false);
     });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("matches_index", matches_index);
+  playerDb.upsert("", "matches_index", matches_index);
 
   // Sync Economy
   const economy_index = [...playerData.economy_index];
@@ -55,11 +54,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       economy_index.push(id);
-      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      playerDb.upsert("", id, doc);
       setData({ [id]: doc }, false);
     });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("economy_index", economy_index);
+  playerDb.upsert("", "economy_index", economy_index);
 
   // Sync Drafts
   const draft_index = [...playerData.draft_index];
@@ -70,11 +68,10 @@ function syncUserData(data) {
       doc.id = id;
       delete doc._id;
       draft_index.push(id);
-      if (globals.debugLog || !globals.firstPass) globals.store.set(id, doc);
+      playerDb.upsert("", id, doc);
       setData({ [id]: doc }, false);
     });
-  if (globals.debugLog || !globals.firstPass)
-    globals.store.set("draft_index", draft_index);
+  playerDb.upsert("", "draft_index", draft_index);
 
   // Sync seasonal
   data.seasonal.forEach(doc => {
@@ -92,16 +89,14 @@ function syncUserData(data) {
     const seasonal = { ...playerData.seasonal, [id]: doc };
     setData({ seasonal });
 
-    if (globals.debugLog || !globals.firstPass) {
-      globals.store.set("seasonal." + id, doc);
-      globals.store.set("seasonal_rank", seasonal_rank);
-    }
+    playerDb.upsert("seasonal", id, doc);
+    playerDb.upsert("", "seasonal_rank", seasonal_rank);
   });
 
   if (data.settings.tags_colors) {
     let newTags = data.settings.tags_colors;
     setData({ tags_colors: { ...newTags } });
-    globals.store.set("tags_colors", newTags);
+    playerDb.upsert("", "tags_colors", newTags);
   }
 
   setData({ courses_index, draft_index, economy_index, matches_index });
@@ -131,7 +126,7 @@ export function httpBasic() {
         return;
       }
 
-      _headers.token = globals.tokenAuth;
+      _headers.token = playerData.settings.token;
 
       var http = require("https");
       var options;
@@ -307,13 +302,13 @@ export function httpBasic() {
               }
               if (parsedResult && parsedResult.ok) {
                 if (_headers.method == "auth") {
-                  globals.tokenAuth = parsedResult.token;
+                  syncSettings({ token: parsedResult.token }, false);
 
                   ipc_send("auth", parsedResult);
                   //ipc_send("auth", parsedResult.arenaids);
                   if (playerData.settings.remember_me) {
-                    globals.rStore.set("token", globals.tokenAuth);
-                    globals.rStore.set("email", playerData.userName);
+                    appDb.upsert("", "token", parsedResult.token);
+                    appDb.upsert("", "email", playerData.userName);
                   }
                   const data = {};
                   data.patreon = parsedResult.patreon;
@@ -334,44 +329,46 @@ export function httpBasic() {
                     serverData.seasonal = parsedResult.seasonal;
                   }
                   setData(data, false);
-                  loadPlayerConfig(playerData.arenaId);
-
-                  const requestSync = {};
-                  requestSync.courses = serverData.courses.filter(
-                    id => !(id in playerData)
-                  );
-                  requestSync.matches = serverData.matches.filter(
-                    id => !(id in playerData)
-                  );
-                  requestSync.drafts = serverData.drafts.filter(
-                    id => !(id in playerData)
-                  );
-                  requestSync.economy = serverData.economy.filter(
-                    id => !(id in playerData)
-                  );
-                  requestSync.seasonal = serverData.seasonal.filter(
-                    id => !(id in playerData.seasonal)
-                  );
-
-                  const itemCount =
-                    requestSync.courses.length +
-                    requestSync.matches.length +
-                    requestSync.drafts.length +
-                    requestSync.economy.length +
-                    requestSync.seasonal.length;
-
-                  if (requestSync) {
-                    ipc_send("ipc_log", "Fetch remote player items");
-                    console.log(requestSync);
-                    httpSyncRequest(requestSync);
-                  } else {
-                    ipc_send(
-                      "ipc_log",
-                      "No need to fetch remote player items."
+                  loadPlayerConfig(playerData.arenaId).then(() => {
+                    ipc_send("ipc_log", "...called back to http-api.");
+                    ipc_send("ipc_log", "Checking for sync requests...");
+                    const requestSync = {};
+                    requestSync.courses = serverData.courses.filter(
+                      id => !(id in playerData)
                     );
-                  }
+                    requestSync.matches = serverData.matches.filter(
+                      id => !(id in playerData)
+                    );
+                    requestSync.drafts = serverData.drafts.filter(
+                      id => !(id in playerData)
+                    );
+                    requestSync.economy = serverData.economy.filter(
+                      id => !(id in playerData)
+                    );
+                    requestSync.seasonal = serverData.seasonal.filter(
+                      id => !(id in playerData.seasonal)
+                    );
+
+                    const itemCount =
+                      requestSync.courses.length +
+                      requestSync.matches.length +
+                      requestSync.drafts.length +
+                      requestSync.economy.length +
+                      requestSync.seasonal.length;
+
+                    if (requestSync) {
+                      ipc_send("ipc_log", "Fetch remote player items");
+                      console.log(requestSync);
+                      httpSyncRequest(requestSync);
+                    } else {
+                      ipc_send(
+                        "ipc_log",
+                        "No need to fetch remote player items."
+                      );
+                    }
+                    httpNotificationsPull();
+                  });
                   ipc_send("set_discord_tag", parsedResult.discord_tag);
-                  httpNotificationsPull();
                 }
                 if (
                   _headers.method == "tou_join" ||
@@ -411,11 +408,7 @@ export function httpBasic() {
                   //resetLogLoop(100);
                   metadataState = true;
                   delete parsedResult.ok;
-                  ipc_send("popup", {
-                    text: "Metadata: Ok",
-                    time: 1000,
-                    progress: -1
-                  });
+                  ipc_send("ipc_log", "Metadata: Ok");
                   db.handleSetDb(null, results);
                   db.updateCache(results);
                   ipc_send("set_db", results);
@@ -449,9 +442,9 @@ export function httpBasic() {
                   });
                 }
                 if (_headers.method == "auth") {
-                  globals.tokenAuth = undefined;
-                  globals.rStore.set("email", "");
-                  globals.rStore.set("token", "");
+                  syncSettings({ token: "" }, false);
+                  appDb.upsert("", "email", "");
+                  appDb.upsert("", "token", "");
                   ipc_send("auth", {});
                   ipc_send("toggle_login", true);
                   ipc_send("clear_pwd", 1);

@@ -1,6 +1,6 @@
 import { setData } from "./background-util";
-import globals from "./globals";
-import playerData from "../shared/player-data.js";
+import { playerDb } from "../shared/db/LocalDatabase";
+import playerData from "../shared/player-data";
 
 export interface Deck {
   id: string;
@@ -17,9 +17,7 @@ const addCustomDeck = function(customDeck: Deck): void {
   };
 
   setData({ decks: { ...playerData.decks, [customDeck.id]: deckData } });
-  if ((globals.debugLog || !globals.firstPass) && globals.store) {
-     ((globals.store as unknown) as StoreShim).set("decks." + id, deckData);
-  }
+  playerDb.upsert("decks", id, deckData);
 };
 
 export default addCustomDeck;
