@@ -258,7 +258,7 @@ function select_deck(arg) {
   } else {
     globals.currentDeck = new Deck(arg);
   }
-  console.log("Select deck: ", globals.currentDeck, arg);
+  // console.log("Select deck: ", globals.currentDeck, arg);
   globals.originalDeck = globals.currentDeck.clone();
   ipc_send("set_deck", globals.currentDeck.getSave(), IPC_OVERLAY);
 }
@@ -500,7 +500,7 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
     const msgType = entry.label.split("_")[1];
     payload = decodePayload(payload, msgType);
     payload = normaliseFields(payload);
-    //console.log("Client To GRE: ", payload);
+    console.log("Client To GRE: ", payload);
   }
 
   if (payload.submitdeckresp) {
