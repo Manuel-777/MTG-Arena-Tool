@@ -66,7 +66,6 @@
     "dist": "npm run babel && build --x64",
     "version": "node -p \"require('./package.json').version\"",
     "load-logs": "npm run babel && electron \"./scripts/load-logs.js\"",
-    "metadata": "electron \"./scripts/metadata.js\"",
     "babel": "npm run tsc && babel src --extensions \".ts,.tsx,.js,.jsx\" --out-dir lib --copy-files",
     "tsc": "tsc",
     "breaking": "bumped release breaking",
@@ -89,7 +88,6 @@
     "electron-updater": "^4.2.0",
     "electron-util": "^0.11.0",
     "google-protobuf": "^3.8.0",
-    "gunzip-file": "^0.1.1",
     "howler": "^2.1.2",
     "interactjs": "1.6.3",
     "js-sha1": "^0.6.0",
@@ -104,8 +102,7 @@
     "react-transition-group": "^4.3.0",
     "striptags": "^3.1.1",
     "time-elements": "^2.0.2",
-    "vanilla-picker": "^2.10.0",
-    "xmlhttprequest": "^1.8.0"
+    "vanilla-picker": "^2.10.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
