@@ -960,7 +960,10 @@ function createDraftRares(draft) {
 }
 
 function createDraftTimeDiv(draft) {
-  return createDiv(["list_match_time"], localTimeSince(new Date(draft.date)));
+  return createDiv(
+    ["list_match_time"],
+    draft.date ? localTimeSince(new Date(draft.date)) : "Unknown"
+  );
 }
 
 function createReplayDiv(draft) {

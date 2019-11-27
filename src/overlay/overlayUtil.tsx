@@ -81,6 +81,7 @@ export interface SettingsData {
   cards_quality: string;
   cards_size: number;
   cards_size_hover_card: number;
+  overlay_back_color: string;
   back_color: string;
   back_url: string;
   card_tile_style: number | string;

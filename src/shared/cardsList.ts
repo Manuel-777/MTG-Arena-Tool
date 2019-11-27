@@ -39,11 +39,10 @@ class CardsList {
     if (isV2CardsList(newList)) {
       this.list = newList.map((obj: CardObject) => {
         return {
+          quantity: 1, // TODO remove group lands hack
+          id: obj, // TODO remove group lands hack
           ...obj,
-          quantity: obj.quantity || 1,
-          id: obj.id,
-          measurable: true,
-          chance: obj.chance || 0
+          measurable: true
         };
       });
     } else {

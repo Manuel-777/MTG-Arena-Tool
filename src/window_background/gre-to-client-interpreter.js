@@ -611,6 +611,7 @@ function getPlayerUsedCards() {
     const ignoreZones = [
       "ZoneType_Limbo",
       "ZoneType_Library",
+      "ZoneType_Sideboard",
       "ZoneType_Revealed"
     ];
     if (zone.objectInstanceIds && !ignoreZones.includes(zoneType)) {
