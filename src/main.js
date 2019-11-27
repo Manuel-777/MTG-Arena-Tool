@@ -77,7 +77,12 @@ app.on("ready", () => {
     require("devtron").install();
     const dotenv = require("dotenv");
     dotenv.config();
-    electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
+    if (process.env.REACTDEVTOOLSEXT) {
+      // To enable REACT dev tools createa an .env file
+      // and add REACTDEVTOOLSEXT="path"
+      // where path is the path to your chrome extension folder
+      electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
+    }
   }
 });
 
@@ -90,7 +95,7 @@ function startUpdater() {
     updaterWindow.moveTop();
   });
 
-  autoUpdater.allowDowngrade = true;
+  //autoUpdater.allowDowngrade = true;
   let betaChannel = rememberStore.get("settings.beta_channel");
   if (betaChannel) {
     autoUpdater.allowPrerelease = true;
@@ -437,12 +442,21 @@ function updateOverlayVisibility() {
     clearTimeout(overlayHideTimeout);
     overlayHideTimeout = undefined;
 
-    const { bounds } =
-      electron.screen
-        .getAllDisplays()
-        .find(d => d.id == settings.overlay_display) ||
-      electron.screen.getPrimaryDisplay();
-    overlay.setBounds(bounds);
+    const newBounds = { x: 0, y: 0, width: 0, height: 0 };
+    electron.screen.getAllDisplays().forEach(display => {
+      newBounds.x = Math.min(newBounds.x, display.bounds.x);
+      newBounds.y = Math.min(newBounds.y, display.bounds.y);
+      newBounds.width = Math.max(
+        newBounds.width,
+        display.bounds.x + display.bounds.width
+      );
+      newBounds.height = Math.max(
+        newBounds.height,
+        display.bounds.y + display.bounds.height
+      );
+    });
+
+    overlay.setBounds(newBounds);
     overlay.show();
   }
 }

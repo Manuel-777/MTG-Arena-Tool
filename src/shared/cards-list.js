@@ -15,9 +15,9 @@ class CardsList {
     } else if (typeof list[0] === "object") {
       this._list = list.map(obj => {
         return {
+          quantity: 1, // TODO remove group lands hack
+          id: obj, // TODO remove group lands hack
           ...obj,
-          quantity: obj.quantity || 1,
-          id: obj.id || obj,
           measurable: true
         };
       });

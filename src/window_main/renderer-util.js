@@ -43,7 +43,7 @@ import {
 } from "../shared/util";
 import ReactDOM from "react-dom";
 import createShareButton from "./createShareButton";
-import { force_open_settings } from "./tabControl";
+import { forceOpenSettings } from "./tabControl";
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -205,6 +205,7 @@ function drawDeck(div, deck, showWildcards = false) {
   // draw maindeck grouped by cardType
   const cardsByGroup = _(deck.mainDeck)
     .map(card => ({ data: db.card(card.id), ...card }))
+    .filter(card => card.data.type)
     .groupBy(card => {
       const type = cardType(card.data);
       switch (type) {
@@ -960,7 +961,10 @@ function createDraftRares(draft) {
 }
 
 function createDraftTimeDiv(draft) {
-  return createDiv(["list_match_time"], localTimeSince(new Date(draft.date)));
+  return createDiv(
+    ["list_match_time"],
+    draft.date ? localTimeSince(new Date(draft.date)) : "Unknown"
+  );
 }
 
 function createReplayDiv(draft) {
@@ -1028,7 +1032,7 @@ function showOfflineSplash() {
     <div class="message_sub_16 white">If you need an account, you can <a class="signup_link">sign up here</a>.</div>
   </div>`;
   $$(".privacy_link")[0].addEventListener("click", function() {
-    force_open_settings(SETTINGS_PRIVACY);
+    forceOpenSettings(SETTINGS_PRIVACY);
   });
   $$(".launch_login_link")[0].addEventListener("click", function() {
     const clearAppSettings = {
