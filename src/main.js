@@ -442,21 +442,22 @@ function updateOverlayVisibility() {
     clearTimeout(overlayHideTimeout);
     overlayHideTimeout = undefined;
 
-    const newBounds = { x: 0, y: 0, width: 0, height: 0 };
+    let minX = 0;
+    let minY = 0;
+    let maxX = 0;
+    let maxY = 0;
     electron.screen.getAllDisplays().forEach(display => {
-      newBounds.x = Math.min(newBounds.x, display.bounds.x);
-      newBounds.y = Math.min(newBounds.y, display.bounds.y);
+      minX = Math.min(minX, display.bounds.x);
+      minY = Math.min(minY, display.bounds.y);
+      maxX = Math.max(maxX, display.bounds.x + display.bounds.width);
+      maxY = Math.max(maxY, display.bounds.y + display.bounds.height);
     });
-    electron.screen.getAllDisplays().forEach(display => {
-      newBounds.width = Math.max(
-        newBounds.width,
-        Math.abs(newBounds.x) + display.bounds.x + display.bounds.width
-      );
-      newBounds.height = Math.max(
-        newBounds.height,
-        Math.abs(newBounds.y) + display.bounds.y + display.bounds.height
-      );
-    });
+    const newBounds = {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY
+    };
 
     console.log(
       "Overlay bounds: ",
