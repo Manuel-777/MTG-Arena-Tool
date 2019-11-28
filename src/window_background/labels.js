@@ -1115,7 +1115,7 @@ export function onLabelOutDirectGameChallenge(entry) {
 
   const httpApi = require("./httpApi");
   httpApi.httpTournamentCheck(
-    deck,
+    globals.currentDeck.getSave(),
     json.params.opponentDisplayName,
     false,
     json.params.playFirst,

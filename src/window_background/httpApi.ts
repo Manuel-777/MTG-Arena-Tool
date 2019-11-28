@@ -1,20 +1,28 @@
 import electron from "electron";
 import async from "async";
 import qs from "qs";
+import http from "https";
+
 import { makeId } from "../shared/util";
-import { ipc_send, setData } from "./background-util";
 import pd from "../shared/player-data";
 import db from "../shared/database";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
+
 import globals from "./globals";
+import { ipc_send, setData } from "./background-util";
 import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
-
-let metadataState = false;
-
-let httpAsync: any[] = [];
+import { DeckData } from "./data";
 
 const serverAddress = "mtgatool.com";
 const playerData = pd as any;
+let httpAsync: async.AsyncQueue<HttpTask>;
+
+interface HttpTask {
+  reqId: string;
+  method: string;
+  method_path: string;
+  [key: string]: string;
+}
 
 function syncUserData(data: any) {
   // console.log(data);
@@ -103,428 +111,379 @@ function syncUserData(data: any) {
   setData({ courses_index, draft_index, economy_index, matches_index });
 }
 
-export function httpBasic() {
-  var httpAsyncNew = httpAsync.slice(0);
-  //var str = ""; httpAsync.forEach( function(h) {str += h.reqId+", "; }); console.log("httpAsync: ", str);
-  async.forEachOfSeries(
-    httpAsyncNew,
-    function(value, index, callback) {
-      var _headers = value;
+function asyncWorker(task: HttpTask, callback: any) {
+  const _headers: any = { ...task };
 
-      if (
-        (playerData.settings.send_data == false ||
-          playerData.offline == true) &&
-        _headers.method != "auth" &&
-        _headers.method != "delete_data" &&
-        _headers.method != "get_database" &&
-        globals.debugLog == false
-      ) {
-        if (!playerData.offline) setData({ offline: true });
-        callback({
-          name: "Error",
-          message: "Settings dont allow sending data! > " + _headers.method
-        });
-        removeFromHttp(_headers.reqId);
-        return;
-      }
+  if (
+    (playerData.settings.send_data == false || playerData.offline == true) &&
+    _headers.method != "auth" &&
+    _headers.method != "delete_data" &&
+    _headers.method != "get_database" &&
+    globals.debugLog == false
+  ) {
+    if (!playerData.offline) setData({ offline: true });
+    callback({
+      name: "Error",
+      message: "Settings dont allow sending data! > " + _headers.method
+    });
+    return;
+  }
 
-      _headers.token = playerData.settings.token;
+  _headers.token = playerData.settings.token;
 
-      var http = require("https");
-      var options: any;
-      if (_headers.method == "get_database") {
-        options = {
-          protocol: "https:",
-          port: 443,
-          hostname: serverAddress,
-          path: "/database/" + _headers.lang,
-          method: "GET"
-        };
-        ipc_send("popup", {
-          text: "Downloading metadata...",
-          time: 0,
-          progress: 2
-        });
-      } else if (_headers.method == "get_ladder_decks") {
-        options = {
-          protocol: "https:",
-          port: 443,
-          hostname: serverAddress,
-          path: "/top_ladder.json",
-          method: "GET"
-        };
-      } else if (_headers.method == "get_ladder_traditional_decks") {
-        options = {
-          protocol: "https:",
-          port: 443,
-          hostname: serverAddress,
-          path: "/top_ladder_traditional.json",
-          method: "GET"
-        };
-      } else if (_headers.method_path !== undefined) {
-        options = {
-          protocol: "https:",
-          port: 443,
-          hostname: serverAddress,
-          path: _headers.method_path,
-          method: "POST"
-        };
-      } else {
-        options = {
-          protocol: "https:",
-          port: 443,
-          hostname: serverAddress,
-          path: "/api.php",
-          method: "POST"
-        };
-      }
+  let options: any;
+  if (_headers.method == "get_database") {
+    options = {
+      protocol: "https:",
+      port: 443,
+      hostname: serverAddress,
+      path: "/database/" + _headers.lang,
+      method: "GET"
+    };
+    ipc_send("popup", {
+      text: "Downloading metadata...",
+      time: 0,
+      progress: 2
+    });
+  } else if (_headers.method == "get_ladder_decks") {
+    options = {
+      protocol: "https:",
+      port: 443,
+      hostname: serverAddress,
+      path: "/top_ladder.json",
+      method: "GET"
+    };
+  } else if (_headers.method == "get_ladder_traditional_decks") {
+    options = {
+      protocol: "https:",
+      port: 443,
+      hostname: serverAddress,
+      path: "/top_ladder_traditional.json",
+      method: "GET"
+    };
+  } else if (_headers.method_path !== undefined) {
+    options = {
+      protocol: "https:",
+      port: 443,
+      hostname: serverAddress,
+      path: _headers.method_path,
+      method: "POST"
+    };
+  } else {
+    options = {
+      protocol: "https:",
+      port: 443,
+      hostname: serverAddress,
+      path: "/api.php",
+      method: "POST"
+    };
+  }
 
-      if (globals.debugNet && _headers.method !== "notifications") {
-        console.log(
-          "SEND >> " + index + ", " + _headers.method,
-          _headers,
-          options
-        );
-        ipc_send(
-          "ipc_log",
-          "SEND >> " +
-            index +
-            ", " +
-            _headers.method +
-            ", " +
-            _headers.reqId +
-            ", " +
-            _headers.token
-        );
-      }
+  if (globals.debugNet && _headers.method !== "notifications") {
+    console.log("SEND >> " + _headers.method, _headers, options);
+    ipc_send(
+      "ipc_log",
+      "SEND >> " +
+        _headers.method +
+        ", " +
+        _headers.reqId +
+        ", " +
+        _headers.token
+    );
+  }
 
-      // console.log("POST", _headers);
-      var post_data = qs.stringify(_headers);
-      options.headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": post_data.length
-      };
+  // console.log("POST", _headers);
+  let post_data = qs.stringify(_headers);
+  options.headers = {
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Content-Length": post_data.length
+  };
 
-      var results = "";
-      var req = http.request(options, function(res: any) {
-        if (res.statusCode < 200 || res.statusCode > 299) {
-          ipc_send("popup", {
-            text: `Error with request. (${_headers.method}: ${res.statusCode})`,
-            time: 2000,
-            progress: -1
-          });
-        } else {
-          res.on("data", function(chunk: any) {
-            results = results + chunk;
-          });
-          res.on("end", function() {
+  let results = "";
+  let req = http.request(options, function(res: any) {
+    if (res.statusCode < 200 || res.statusCode > 299) {
+      ipc_send("popup", {
+        text: `Error with request. (${_headers.method}: ${res.statusCode})`,
+        time: 2000,
+        progress: -1
+      });
+    } else {
+      res.on("data", function(chunk: any) {
+        results = results + chunk;
+      });
+      res.on("end", function() {
+        if (globals.debugNet) {
+          if (_headers.method !== "notifications") {
+            ipc_send(
+              "ipc_log",
+              "RECV << " + _headers.method + ", " + results.slice(0, 100)
+            );
+            console.log(
+              "RECV << " + _headers.method,
+              _headers.method,
+              _headers.method == "auth" ? results : results.slice(0, 500)
+            );
+          }
+        }
+        if (_headers.method == "notifications") {
+          notificationSetTimeout();
+        }
+        try {
+          let parsedResult = null;
+          try {
+            parsedResult = JSON.parse(results);
+          } catch (e) {
             if (globals.debugNet) {
-              if (_headers.method !== "notifications") {
-                ipc_send(
-                  "ipc_log",
-                  "RECV << " +
-                    index +
-                    ", " +
-                    _headers.method +
-                    ", " +
-                    results.slice(0, 100)
-                );
-                console.log(
-                  "RECV << " + index,
-                  _headers.method,
-                  _headers.method == "auth" ? results : results.slice(0, 500)
-                );
-              }
+              console.log(results);
             }
-            if (_headers.method == "notifications") {
-              notificationSetTimeout();
-            }
-            try {
-              var parsedResult = null;
-              try {
-                parsedResult = JSON.parse(results);
-              } catch (e) {
-                if (globals.debugNet) {
-                  console.log(results);
-                }
-                ipc_send("popup", {
-                  text: `Error parsing response. (${_headers.method})`,
-                  time: 2000,
-                  progress: -1
-                });
-              }
+            ipc_send("popup", {
+              text: `Error parsing response. (${_headers.method})`,
+              time: 2000,
+              progress: -1
+            });
+          }
 
-              if (_headers.method == "discord_unlink") {
-                ipc_send("popup", {
-                  text: "Unlink Ok",
-                  time: 1000,
-                  progress: -1
-                });
-                ipc_send("set_discord_tag", "");
+          if (_headers.method == "discord_unlink") {
+            ipc_send("popup", {
+              text: "Unlink Ok",
+              time: 1000,
+              progress: -1
+            });
+            ipc_send("set_discord_tag", "");
+          }
+          if (_headers.method == "get_database_version") {
+            let lang = playerData.settings.metadata_lang;
+            if (
+              db.metadata &&
+              db.metadata.language &&
+              parsedResult.lang.toLowerCase() !==
+                db.metadata.language.toLowerCase()
+            ) {
+              // compare language
+              console.log(
+                `Downloading database (had lang ${
+                  db.metadata.language
+                }, needed ${parsedResult.lang})`
+              );
+              httpGetDatabase(lang);
+            } else if (parsedResult.latest > db.version) {
+              // Compare parsedResult.version with stored version
+              console.log(
+                `Downloading latest database (had v${db.version}, found v${
+                  parsedResult.latest
+                })`
+              );
+              httpGetDatabase(lang);
+            } else {
+              console.log(
+                `Database up to date (${db.version}), skipping download.`
+              );
+            }
+          }
+          if (_headers.method == "notifications") {
+            notificationProcess(parsedResult);
+          }
+          if (_headers.method == "get_explore") {
+            ipc_send("set_explore_decks", parsedResult);
+          }
+          if (_headers.method == "get_ladder_decks") {
+            ipc_send("set_ladder_decks", parsedResult);
+          }
+          if (_headers.method == "get_ladder_traditional_decks") {
+            ipc_send("set_ladder_traditional_decks", parsedResult);
+          }
+          if (parsedResult && parsedResult.ok) {
+            if (_headers.method == "auth") {
+              syncSettings({ token: parsedResult.token }, false);
+
+              ipc_send("auth", parsedResult);
+              //ipc_send("auth", parsedResult.arenaids);
+              if (playerData.settings.remember_me) {
+                appDb.upsert("", "token", parsedResult.token);
+                appDb.upsert("", "email", playerData.userName);
               }
-              if (_headers.method == "get_database_version") {
-                let lang = playerData.settings.metadata_lang;
-                if (
-                  db.metadata &&
-                  db.metadata.language &&
-                  parsedResult.lang.toLowerCase() !==
-                    db.metadata.language.toLowerCase()
-                ) {
-                  // compare language
-                  console.log(
-                    `Downloading database (had lang ${
-                      db.metadata.language
-                    }, needed ${parsedResult.lang})`
-                  );
-                  httpGetDatabase(lang);
-                } else if (parsedResult.latest > db.version) {
-                  // Compare parsedResult.version with stored version
-                  console.log(
-                    `Downloading latest database (had v${db.version}, found v${
-                      parsedResult.latest
-                    })`
-                  );
-                  httpGetDatabase(lang);
+              const data: any = {};
+              data.patreon = parsedResult.patreon;
+              data.patreon_tier = parsedResult.patreon_tier;
+
+              let serverData = {
+                matches: [],
+                courses: [],
+                drafts: [],
+                economy: [],
+                seasonal: []
+              };
+              if (data.patreon) {
+                serverData.matches = parsedResult.matches;
+                serverData.courses = parsedResult.courses;
+                serverData.drafts = parsedResult.drafts;
+                serverData.economy = parsedResult.economy;
+                serverData.seasonal = parsedResult.seasonal;
+              }
+              setData(data, false);
+              loadPlayerConfig(playerData.arenaId).then(() => {
+                ipc_send("ipc_log", "...called back to http-api.");
+                ipc_send("ipc_log", "Checking for sync requests...");
+                const requestSync = {
+                  courses: serverData.courses.filter(id => !(id in playerData)),
+                  matches: serverData.matches.filter(id => !(id in playerData)),
+                  drafts: serverData.drafts.filter(id => !(id in playerData)),
+                  economy: serverData.economy.filter(id => !(id in playerData)),
+                  seasonal: serverData.seasonal.filter(
+                    id => !(id in playerData.seasonal)
+                  )
+                };
+
+                if (requestSync) {
+                  ipc_send("ipc_log", "Fetch remote player items");
+                  console.log(requestSync);
+                  httpSyncRequest(requestSync);
                 } else {
-                  console.log(
-                    `Database up to date (${db.version}), skipping download.`
-                  );
+                  ipc_send("ipc_log", "No need to fetch remote player items.");
                 }
-              }
-              if (_headers.method == "notifications") {
-                notificationProcess(parsedResult);
-              }
-              if (_headers.method == "get_explore") {
-                ipc_send("set_explore_decks", parsedResult);
-              }
-              if (_headers.method == "get_ladder_decks") {
-                ipc_send("set_ladder_decks", parsedResult);
-              }
-              if (_headers.method == "get_ladder_traditional_decks") {
-                ipc_send("set_ladder_traditional_decks", parsedResult);
-              }
-              if (parsedResult && parsedResult.ok) {
-                if (_headers.method == "auth") {
-                  syncSettings({ token: parsedResult.token }, false);
-
-                  ipc_send("auth", parsedResult);
-                  //ipc_send("auth", parsedResult.arenaids);
-                  if (playerData.settings.remember_me) {
-                    appDb.upsert("", "token", parsedResult.token);
-                    appDb.upsert("", "email", playerData.userName);
-                  }
-                  const data: any = {};
-                  data.patreon = parsedResult.patreon;
-                  data.patreon_tier = parsedResult.patreon_tier;
-
-                  let serverData = {
-                    matches: [],
-                    courses: [],
-                    drafts: [],
-                    economy: [],
-                    seasonal: []
-                  };
-                  if (data.patreon) {
-                    serverData.matches = parsedResult.matches;
-                    serverData.courses = parsedResult.courses;
-                    serverData.drafts = parsedResult.drafts;
-                    serverData.economy = parsedResult.economy;
-                    serverData.seasonal = parsedResult.seasonal;
-                  }
-                  setData(data, false);
-                  loadPlayerConfig(playerData.arenaId).then(() => {
-                    ipc_send("ipc_log", "...called back to http-api.");
-                    ipc_send("ipc_log", "Checking for sync requests...");
-                    const requestSync: any = {};
-                    requestSync.courses = serverData.courses.filter(
-                      id => !(id in playerData)
-                    );
-                    requestSync.matches = serverData.matches.filter(
-                      id => !(id in playerData)
-                    );
-                    requestSync.drafts = serverData.drafts.filter(
-                      id => !(id in playerData)
-                    );
-                    requestSync.economy = serverData.economy.filter(
-                      id => !(id in playerData)
-                    );
-                    requestSync.seasonal = serverData.seasonal.filter(
-                      id => !(id in playerData.seasonal)
-                    );
-
-                    const itemCount =
-                      requestSync.courses.length +
-                      requestSync.matches.length +
-                      requestSync.drafts.length +
-                      requestSync.economy.length +
-                      requestSync.seasonal.length;
-
-                    if (requestSync) {
-                      ipc_send("ipc_log", "Fetch remote player items");
-                      console.log(requestSync);
-                      httpSyncRequest(requestSync);
-                    } else {
-                      ipc_send(
-                        "ipc_log",
-                        "No need to fetch remote player items."
-                      );
-                    }
-                    httpNotificationsPull();
-                  });
-                  ipc_send("set_discord_tag", parsedResult.discord_tag);
-                }
-                if (
-                  _headers.method == "tou_join" ||
-                  _headers.method == "tou_drop"
-                ) {
-                  httpTournamentGet(parsedResult.id);
-                }
-                if (_headers.method == "get_top_decks") {
-                  ipc_send("set_explore", parsedResult.result);
-                }
-                if (_headers.method == "get_course") {
-                  ipc_send("open_course_deck", parsedResult.result);
-                }
-                if (_headers.method == "share_draft") {
-                  ipc_send("set_draft_link", parsedResult.url);
-                }
-                if (_headers.method == "share_log") {
-                  ipc_send("set_log_link", parsedResult.url);
-                }
-                if (_headers.method == "share_deck") {
-                  ipc_send("set_deck_link", parsedResult.url);
-                }
-                if (_headers.method == "home_get") {
-                  ipc_send("set_home", parsedResult);
-                }
-                if (_headers.method == "tou_get") {
-                  ipc_send("tou_set", parsedResult.result);
-                }
-                if (_headers.method == "tou_check") {
-                  //ipc_send("tou_set_game", parsedResult.result);
-                }
-                if (_headers.method == "get_sync") {
-                  syncUserData(parsedResult.data);
-                }
-
-                if (_headers.method == "get_database") {
-                  //resetLogLoop(100);
-                  metadataState = true;
-                  delete parsedResult.ok;
-                  ipc_send("ipc_log", "Metadata: Ok");
-                  db.handleSetDb(null, results);
-                  db.updateCache(results);
-                  ipc_send("set_db", results);
-                  // autologin users may beat the metadata request
-                  // manually trigger a UI refresh just in case
-                  ipc_send("player_data_refresh");
-                }
-              } else if (_headers.method == "tou_join") {
-                ipc_send("popup", {
-                  text: parsedResult.error,
-                  time: 10000
-                });
-              } else if (_headers.method == "tou_check") {
-                let notif = new Notification("MTG Arena Tool", {
-                  body: parsedResult.state
-                });
-                //ipc_send("popup", {"text": parsedResult.state, "time": 10000});
-              } else if (
-                parsedResult &&
-                parsedResult.ok == false &&
-                parsedResult.error != undefined
-              ) {
-                if (
-                  _headers.method == "share_draft" ||
-                  _headers.method == "share_log" ||
-                  _headers.method == "share_deck"
-                ) {
-                  ipc_send("popup", {
-                    text: parsedResult.error,
-                    time: 3000
-                  });
-                }
-                if (_headers.method == "auth") {
-                  syncSettings({ token: "" }, false);
-                  appDb.upsert("", "email", "");
-                  appDb.upsert("", "token", "");
-                  ipc_send("auth", {});
-                  ipc_send("toggle_login", true);
-                  ipc_send("clear_pwd", 1);
-                  ipc_send("popup", {
-                    text: `Error: ${parsedResult.error}`,
-                    time: 3000,
-                    progress: -1
-                  });
-                }
-                // errors here
-              } else if (!parsedResult && _headers.method == "auth") {
-                ipc_send("auth", {});
-                ipc_send("popup", {
-                  text: "Something went wrong, please try again",
-                  time: 5000,
-                  progress: -1
-                });
-              }
-            } catch (e) {
-              console.error(e);
-            }
-            try {
-              callback();
-            } catch (e) {
-              //
-            }
-
-            removeFromHttp(_headers.reqId);
-            if (globals.debugNet && _headers.method !== "notifications") {
-              var str = "";
-              httpAsync.forEach(function(h) {
-                str += h.reqId + ", ";
+                httpNotificationsPull();
               });
-              ipc_send("ipc_log", "httpAsync: " + str);
+              ipc_send("set_discord_tag", parsedResult.discord_tag);
             }
-          });
+            if (
+              _headers.method == "tou_join" ||
+              _headers.method == "tou_drop"
+            ) {
+              httpTournamentGet(parsedResult.id);
+            }
+            if (_headers.method == "get_top_decks") {
+              ipc_send("set_explore", parsedResult.result);
+            }
+            if (_headers.method == "get_course") {
+              ipc_send("open_course_deck", parsedResult.result);
+            }
+            if (_headers.method == "share_draft") {
+              ipc_send("set_draft_link", parsedResult.url);
+            }
+            if (_headers.method == "share_log") {
+              ipc_send("set_log_link", parsedResult.url);
+            }
+            if (_headers.method == "share_deck") {
+              ipc_send("set_deck_link", parsedResult.url);
+            }
+            if (_headers.method == "home_get") {
+              ipc_send("set_home", parsedResult);
+            }
+            if (_headers.method == "tou_get") {
+              ipc_send("tou_set", parsedResult.result);
+            }
+            if (_headers.method == "tou_check") {
+              //ipc_send("tou_set_game", parsedResult.result);
+            }
+            if (_headers.method == "get_sync") {
+              syncUserData(parsedResult.data);
+            }
+
+            if (_headers.method == "get_database") {
+              //resetLogLoop(100);
+              delete parsedResult.ok;
+              ipc_send("ipc_log", "Metadata: Ok");
+              db.handleSetDb(null, results);
+              db.updateCache(results);
+              ipc_send("set_db", results);
+              // autologin users may beat the metadata request
+              // manually trigger a UI refresh just in case
+              ipc_send("player_data_refresh");
+            }
+          } else if (_headers.method == "tou_join") {
+            ipc_send("popup", {
+              text: parsedResult.error,
+              time: 10000
+            });
+          } else if (_headers.method == "tou_check") {
+            let notif = new Notification("MTG Arena Tool", {
+              body: parsedResult.state
+            });
+            //ipc_send("popup", {"text": parsedResult.state, "time": 10000});
+          } else if (
+            parsedResult &&
+            parsedResult.ok == false &&
+            parsedResult.error != undefined
+          ) {
+            if (
+              _headers.method == "share_draft" ||
+              _headers.method == "share_log" ||
+              _headers.method == "share_deck"
+            ) {
+              ipc_send("popup", {
+                text: parsedResult.error,
+                time: 3000
+              });
+            }
+            if (_headers.method == "auth") {
+              syncSettings({ token: "" }, false);
+              appDb.upsert("", "email", "");
+              appDb.upsert("", "token", "");
+              ipc_send("auth", {});
+              ipc_send("toggle_login", true);
+              ipc_send("clear_pwd", 1);
+              ipc_send("popup", {
+                text: `Error: ${parsedResult.error}`,
+                time: 3000,
+                progress: -1
+              });
+            }
+            // errors here
+          } else if (!parsedResult && _headers.method == "auth") {
+            ipc_send("auth", {});
+            ipc_send("popup", {
+              text: "Something went wrong, please try again",
+              time: 5000,
+              progress: -1
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+        try {
+          callback();
+        } catch (e) {
+          //
+        }
+
+        if (globals.debugNet && _headers.method !== "notifications") {
+          ipc_send("ipc_log", "httpAsync: " + _headers.method);
         }
       });
-      req.on("error", function(e: Error) {
-        console.error(`problem with request ${_headers.method}: ${e.message}`);
-        console.log(req);
-        ipc_send("popup", {
-          text: `Request error. (${e.message})`,
-          time: 20000,
-          progress: -1
-        });
-
-        callback(e);
-        removeFromHttp(_headers.reqId);
-        ipc_send("ipc_log", e.message);
-      });
-      req.write(post_data);
-      // console.log(req);
-      req.end();
-    },
-    function(err) {
-      if (err) {
-        ipc_send("ipc_log", "httpBasic() Error: " + err.message);
-      }
-      // do it again
-      setTimeout(function() {
-        httpBasic();
-      }, 250);
     }
-  );
+  });
+  req.on("error", function(e: Error) {
+    console.error(`problem with request ${_headers.method}: ${e.message}`);
+    console.log(req);
+    ipc_send("popup", {
+      text: `Request error. (${e.message})`,
+      time: 20000,
+      progress: -1
+    });
+
+    callback(e);
+    ipc_send("ipc_log", e.message);
+  });
+  req.write(post_data);
+  // console.log(req);
+  req.end();
 }
 
-function removeFromHttp(req: any) {
-  httpAsync.forEach(function(h, i) {
-    if (h.reqId == req) {
-      httpAsync.splice(i, 1);
+export function initHttpQueue() {
+  httpAsync = async.queue(asyncWorker);
+  httpAsync.error(function(err, task) {
+    if (err) {
+      ipc_send("ipc_log", "httpBasic() Error: " + err.message);
     }
+    // do it again
+    setTimeout(function() {
+      httpAsync.push(task);
+    }, 250);
   });
 }
 
 export function httpNotificationsPull() {
-  var _id = makeId(6);
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "notifications",
@@ -563,7 +522,7 @@ function notificationSetTimeout() {
 }
 
 export function httpAuth(userName: string, pass: string) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   setData({ userName }, false);
   httpAsync.push({
     reqId: _id,
@@ -579,7 +538,7 @@ export function httpAuth(userName: string, pass: string) {
 }
 
 export function httpSubmitCourse(course: any) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   if (playerData.settings.anon_explore == true) {
     course.PlayerId = "000000000000000";
     course.PlayerName = "Anonymous";
@@ -594,14 +553,8 @@ export function httpSubmitCourse(course: any) {
   });
 }
 
-export function httpSetPlayer() {
-  // useless I think
-  //var _id = makeId(6);
-  //httpAsync.push({'reqId': _id, 'method': 'set_player', 'name': name, 'rank': rank, 'tier': tier});
-}
-
 export function httpGetExplore(query: any) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
     method: "get_explore",
@@ -623,7 +576,7 @@ export function httpGetExplore(query: any) {
 }
 
 export function httpGetTopLadderDecks() {
-  var _id = makeId(6);
+  const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
     method: "get_ladder_decks",
@@ -632,7 +585,7 @@ export function httpGetTopLadderDecks() {
 }
 
 export function httpGetTopLadderTraditionalDecks() {
-  var _id = makeId(6);
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "get_ladder_traditional_decks",
@@ -640,8 +593,8 @@ export function httpGetTopLadderTraditionalDecks() {
   });
 }
 
-export function httpGetCourse(courseId: any) {
-  var _id = makeId(6);
+export function httpGetCourse(courseId: string) {
+  const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
     method: "get_course",
@@ -651,7 +604,7 @@ export function httpGetCourse(courseId: any) {
 }
 
 export function httpSetMatch(match: any) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   if (playerData.settings.anon_explore == true) {
     match.player.userid = "000000000000000";
     match.player.name = "Anonymous";
@@ -666,7 +619,7 @@ export function httpSetMatch(match: any) {
 }
 
 export function httpSetDraft(draft: any) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   draft = JSON.stringify(draft);
   httpAsync.push({
     reqId: _id,
@@ -677,7 +630,7 @@ export function httpSetDraft(draft: any) {
 }
 
 export function httpSetEconomy(change: any) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   change = JSON.stringify(change);
   httpAsync.push({
     reqId: _id,
@@ -688,7 +641,7 @@ export function httpSetEconomy(change: any) {
 }
 
 export function httpSetSeasonal(change: any) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   change = JSON.stringify(change);
   httpAsync.push({
     reqId: _id,
@@ -699,7 +652,7 @@ export function httpSetSeasonal(change: any) {
 }
 
 export function httpSetSettings(settings: any) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   settings = JSON.stringify(settings);
   httpAsync.push({
     reqId: _id,
@@ -710,7 +663,7 @@ export function httpSetSettings(settings: any) {
 }
 
 export function httpDeleteData() {
-  var _id = makeId(6);
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "delete_data",
@@ -718,13 +671,18 @@ export function httpDeleteData() {
   });
 }
 
-export function httpGetDatabase(lang: any) {
-  var _id = makeId(6);
-  httpAsync.push({ reqId: _id, method: "get_database", lang: lang });
+export function httpGetDatabase(lang: string) {
+  const _id = makeId(6);
+  httpAsync.push({
+    reqId: _id,
+    method: "get_database",
+    method_path: "/database/" + lang,
+    lang: lang
+  });
 }
 
-export function httpGetDatabaseVersion(lang: any) {
-  var _id = makeId(6);
+export function httpGetDatabaseVersion(lang: string) {
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "get_database_version",
@@ -732,8 +690,8 @@ export function httpGetDatabaseVersion(lang: any) {
   });
 }
 
-export function httpDraftShareLink(did: any, exp: any, draftData: any) {
-  var _id = makeId(6);
+export function httpDraftShareLink(did: string, exp: any, draftData: any) {
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "share_draft",
@@ -744,8 +702,8 @@ export function httpDraftShareLink(did: any, exp: any, draftData: any) {
   });
 }
 
-export function httpLogShareLink(lid: any, log: any, exp: any) {
-  var _id = makeId(6);
+export function httpLogShareLink(lid: string, log: any, exp: any) {
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "share_log",
@@ -757,7 +715,7 @@ export function httpLogShareLink(lid: any, log: any, exp: any) {
 }
 
 export function httpDeckShareLink(deck: any, exp: any) {
-  var _id = makeId(6);
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "share_deck",
@@ -767,8 +725,8 @@ export function httpDeckShareLink(deck: any, exp: any) {
   });
 }
 
-export function httpHomeGet(set: any) {
-  var _id = makeId(6);
+export function httpHomeGet(set: string) {
+  const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
     method: "home_get",
@@ -777,8 +735,8 @@ export function httpHomeGet(set: any) {
   });
 }
 
-export function httpTournamentGet(tid: any) {
-  var _id = makeId(6);
+export function httpTournamentGet(tid: string) {
+  const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
     method: "tou_get",
@@ -787,9 +745,9 @@ export function httpTournamentGet(tid: any) {
   });
 }
 
-export function httpTournamentJoin(tid: any, _deck: any, pass: any) {
-  let _id = makeId(6);
-  let deck = JSON.stringify(playerData.deck(_deck));
+export function httpTournamentJoin(tid: string, deckId: string, pass: string) {
+  const _id = makeId(6);
+  const deck = JSON.stringify(playerData.deck(deckId));
   httpAsync.unshift({
     reqId: _id,
     method: "tou_join",
@@ -800,8 +758,8 @@ export function httpTournamentJoin(tid: any, _deck: any, pass: any) {
   });
 }
 
-export function httpTournamentDrop(tid: any) {
-  var _id = makeId(6);
+export function httpTournamentDrop(tid: string) {
+  const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
     method: "tou_drop",
@@ -811,28 +769,27 @@ export function httpTournamentDrop(tid: any) {
 }
 
 export function httpTournamentCheck(
-  deck: any,
-  opp: any,
-  setCheck: any,
-  bo3 = "",
-  playFirst = ""
+  deck: DeckData,
+  opp: string,
+  setCheck: boolean,
+  playFirst = "",
+  bo3 = ""
 ) {
-  var _id = makeId(6);
-  deck = JSON.stringify(deck);
+  const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
     method: "tou_check",
     method_path: "/api/check_match.php",
-    deck: deck,
+    deck: JSON.stringify(deck),
     opp: opp,
-    setcheck: setCheck,
+    setcheck: setCheck + "",
     bo3: bo3,
     play_first: playFirst
   });
 }
 
-export function httpSetMythicRank(opp: any, rank: any) {
-  var _id = makeId(6);
+export function httpSetMythicRank(opp: string, rank: string) {
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "mythicrank",
@@ -842,35 +799,44 @@ export function httpSetMythicRank(opp: any, rank: any) {
   });
 }
 
-export function httpSetDeckTag(tag: any, cards: any, format: any) {
-  var _id = makeId(6);
-  cards.forEach((card: any) => {
-    card.quantity = 1;
+export function httpSetDeckTag(tag: string, deck: DeckData, format: string) {
+  const _id = makeId(6);
+  const cards = deck.mainDeck.map((card: any) => {
+    return {
+      ...card,
+      quantity: 1
+    };
   });
-  cards = JSON.stringify(cards);
   httpAsync.push({
     reqId: _id,
     method: "set_deck_tag",
     method_path: "/api/send_deck_tag.php",
     tag: tag,
-    cards: cards,
+    cards: JSON.stringify(cards),
     format: format
   });
 }
 
-export function httpSyncRequest(data: any) {
-  var _id = makeId(6);
-  data = JSON.stringify(data);
+export interface SyncRequestData {
+  courses?: any[];
+  matches?: any[];
+  drafts?: any[];
+  economy?: any[];
+  seasonal?: any[];
+}
+
+export function httpSyncRequest(data: SyncRequestData) {
+  const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
     method: "get_sync",
     method_path: "/api/get_sync.php",
-    data: data
+    data: JSON.stringify(data)
   });
 }
 
 export function httpDiscordUnlink() {
-  var _id = makeId(6);
+  const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
     method: "discord_unlink",

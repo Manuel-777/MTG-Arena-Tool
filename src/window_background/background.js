@@ -141,7 +141,7 @@ ipc.on("start_background", async function() {
   logLoopInterval = window.setInterval(attemptLogLoop, 250);
 
   // start http
-  httpApi.httpBasic();
+  httpApi.initHttpQueue();
   httpApi.httpGetDatabaseVersion(settings.metadata_lang);
   ipc_send("ipc_log", `Downloading metadata ${settings.metadata_lang}`);
 
@@ -388,7 +388,7 @@ ipc.on("add_history_tag", (event, arg) => {
 
   setData({ [matchid]: { ...match, tags } });
   playerDb.upsert(matchid, "tags", tags);
-  httpApi.httpSetDeckTag(tag, match.oppDeck.mainDeck, match.eventId);
+  httpApi.httpSetDeckTag(tag, match.oppDeck, match.eventId);
 });
 
 ipc.on("set_odds_samplesize", function(event, state) {

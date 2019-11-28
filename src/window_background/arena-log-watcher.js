@@ -417,18 +417,6 @@ function finishLoading() {
     ipc_send("initialize");
     ipc_send("player_data_refresh");
 
-    if (playerData.name) {
-      // This needs to be triggered somewhere else
-      const httpApi = require("./httpApi");
-      httpApi.httpSetPlayer(
-        playerData.name,
-        playerData.rank.constructed.rank,
-        playerData.rank.constructed.tier,
-        playerData.rank.limited.rank,
-        playerData.rank.limited.tier
-      );
-    }
-
     ipc_send("popup", {
       text: "Initialized successfully!",
       time: 3000,
