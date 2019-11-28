@@ -45,7 +45,7 @@ import ReactDOM from "react-dom";
 import createShareButton from "./createShareButton";
 import { forceOpenSettings } from "./tabControl";
 
-const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
+import DEFAULT_BACKGROUND from "../images/Bedevil-Art.jpg";
 
 const byId = id => document.getElementById(id);
 let popTimeout = null;

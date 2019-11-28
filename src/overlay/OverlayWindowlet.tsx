@@ -21,7 +21,7 @@ import DraftElements from "./DraftElements";
 import MatchElements from "./MatchElements";
 import { DbCardData } from "../shared/types/Metadata";
 
-const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
+const DEFAULT_BACKGROUND = require("../images/Bedevil-Art.jpg");
 
 export interface OverlayWindowletProps {
   arenaState: number;
