@@ -9,7 +9,7 @@ import db from "../shared/database";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 
 import globals from "./globals";
-import { ipc_send, setData } from "./background-util";
+import { ipc_send as ipcSend, setData } from "./background-util";
 import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 import { DeckData } from "./data";
 
@@ -24,7 +24,7 @@ interface HttpTask {
   [key: string]: string;
 }
 
-function syncUserData(data: any) {
+function syncUserData(data: any): void {
   // console.log(data);
   // Sync Events
   const courses_index = [...playerData.courses_index];
@@ -88,7 +88,7 @@ function syncUserData(data: any) {
     doc.id = id;
     delete doc._id;
 
-    let seasonal_rank = playerData.addSeasonalRank(
+    const seasonal_rank = playerData.addSeasonalRank(
       doc,
       doc.seasonOrdinal,
       doc.rankUpdateType
@@ -103,7 +103,7 @@ function syncUserData(data: any) {
   });
 
   if (data.settings.tags_colors) {
-    let newTags = data.settings.tags_colors;
+    const newTags = data.settings.tags_colors;
     setData({ tags_colors: { ...newTags } });
     playerDb.upsert("", "tags_colors", newTags);
   }
@@ -111,7 +111,7 @@ function syncUserData(data: any) {
   setData({ courses_index, draft_index, economy_index, matches_index });
 }
 
-function asyncWorker(task: HttpTask, callback: any) {
+function asyncWorker(task: HttpTask, callback: any): void {
   const _headers: any = { ...task };
 
   if (
@@ -140,7 +140,7 @@ function asyncWorker(task: HttpTask, callback: any) {
       path: "/database/" + _headers.lang,
       method: "GET"
     };
-    ipc_send("popup", {
+    ipcSend("popup", {
       text: "Downloading metadata...",
       time: 0,
       progress: 2
@@ -181,7 +181,7 @@ function asyncWorker(task: HttpTask, callback: any) {
 
   if (globals.debugNet && _headers.method !== "notifications") {
     console.log("SEND >> " + _headers.method, _headers, options);
-    ipc_send(
+    ipcSend(
       "ipc_log",
       "SEND >> " +
         _headers.method +
@@ -193,16 +193,16 @@ function asyncWorker(task: HttpTask, callback: any) {
   }
 
   // console.log("POST", _headers);
-  let post_data = qs.stringify(_headers);
+  const postData = qs.stringify(_headers);
   options.headers = {
     "Content-Type": "application/x-www-form-urlencoded",
-    "Content-Length": post_data.length
+    "Content-Length": postData.length
   };
 
   let results = "";
-  let req = http.request(options, function(res: any) {
+  const req = http.request(options, function(res: any) {
     if (res.statusCode < 200 || res.statusCode > 299) {
-      ipc_send("popup", {
+      ipcSend("popup", {
         text: `Error with request. (${_headers.method}: ${res.statusCode})`,
         time: 2000,
         progress: -1
@@ -211,10 +211,11 @@ function asyncWorker(task: HttpTask, callback: any) {
       res.on("data", function(chunk: any) {
         results = results + chunk;
       });
+      /* eslint-disable-next-line complexity */
       res.on("end", function() {
         if (globals.debugNet) {
           if (_headers.method !== "notifications") {
-            ipc_send(
+            ipcSend(
               "ipc_log",
               "RECV << " + _headers.method + ", " + results.slice(0, 100)
             );
@@ -236,7 +237,7 @@ function asyncWorker(task: HttpTask, callback: any) {
             if (globals.debugNet) {
               console.log(results);
             }
-            ipc_send("popup", {
+            ipcSend("popup", {
               text: `Error parsing response. (${_headers.method})`,
               time: 2000,
               progress: -1
@@ -244,15 +245,15 @@ function asyncWorker(task: HttpTask, callback: any) {
           }
 
           if (_headers.method == "discord_unlink") {
-            ipc_send("popup", {
+            ipcSend("popup", {
               text: "Unlink Ok",
               time: 1000,
               progress: -1
             });
-            ipc_send("set_discord_tag", "");
+            ipcSend("set_discord_tag", "");
           }
           if (_headers.method == "get_database_version") {
-            let lang = playerData.settings.metadata_lang;
+            const lang = playerData.settings.metadata_lang;
             if (
               db.metadata &&
               db.metadata.language &&
@@ -284,19 +285,19 @@ function asyncWorker(task: HttpTask, callback: any) {
             notificationProcess(parsedResult);
           }
           if (_headers.method == "get_explore") {
-            ipc_send("set_explore_decks", parsedResult);
+            ipcSend("set_explore_decks", parsedResult);
           }
           if (_headers.method == "get_ladder_decks") {
-            ipc_send("set_ladder_decks", parsedResult);
+            ipcSend("set_ladder_decks", parsedResult);
           }
           if (_headers.method == "get_ladder_traditional_decks") {
-            ipc_send("set_ladder_traditional_decks", parsedResult);
+            ipcSend("set_ladder_traditional_decks", parsedResult);
           }
           if (parsedResult && parsedResult.ok) {
             if (_headers.method == "auth") {
               syncSettings({ token: parsedResult.token }, false);
 
-              ipc_send("auth", parsedResult);
+              ipcSend("auth", parsedResult);
               //ipc_send("auth", parsedResult.arenaids);
               if (playerData.settings.remember_me) {
                 appDb.upsert("", "token", parsedResult.token);
@@ -306,7 +307,7 @@ function asyncWorker(task: HttpTask, callback: any) {
               data.patreon = parsedResult.patreon;
               data.patreon_tier = parsedResult.patreon_tier;
 
-              let serverData = {
+              const serverData = {
                 matches: [],
                 courses: [],
                 drafts: [],
@@ -322,8 +323,8 @@ function asyncWorker(task: HttpTask, callback: any) {
               }
               setData(data, false);
               loadPlayerConfig(playerData.arenaId).then(() => {
-                ipc_send("ipc_log", "...called back to http-api.");
-                ipc_send("ipc_log", "Checking for sync requests...");
+                ipcSend("ipc_log", "...called back to http-api.");
+                ipcSend("ipc_log", "Checking for sync requests...");
                 const requestSync = {
                   courses: serverData.courses.filter(id => !(id in playerData)),
                   matches: serverData.matches.filter(id => !(id in playerData)),
@@ -335,15 +336,15 @@ function asyncWorker(task: HttpTask, callback: any) {
                 };
 
                 if (requestSync) {
-                  ipc_send("ipc_log", "Fetch remote player items");
+                  ipcSend("ipc_log", "Fetch remote player items");
                   console.log(requestSync);
                   httpSyncRequest(requestSync);
                 } else {
-                  ipc_send("ipc_log", "No need to fetch remote player items.");
+                  ipcSend("ipc_log", "No need to fetch remote player items.");
                 }
                 httpNotificationsPull();
               });
-              ipc_send("set_discord_tag", parsedResult.discord_tag);
+              ipcSend("set_discord_tag", parsedResult.discord_tag);
             }
             if (
               _headers.method == "tou_join" ||
@@ -352,25 +353,25 @@ function asyncWorker(task: HttpTask, callback: any) {
               httpTournamentGet(parsedResult.id);
             }
             if (_headers.method == "get_top_decks") {
-              ipc_send("set_explore", parsedResult.result);
+              ipcSend("set_explore", parsedResult.result);
             }
             if (_headers.method == "get_course") {
-              ipc_send("open_course_deck", parsedResult.result);
+              ipcSend("open_course_deck", parsedResult.result);
             }
             if (_headers.method == "share_draft") {
-              ipc_send("set_draft_link", parsedResult.url);
+              ipcSend("set_draft_link", parsedResult.url);
             }
             if (_headers.method == "share_log") {
-              ipc_send("set_log_link", parsedResult.url);
+              ipcSend("set_log_link", parsedResult.url);
             }
             if (_headers.method == "share_deck") {
-              ipc_send("set_deck_link", parsedResult.url);
+              ipcSend("set_deck_link", parsedResult.url);
             }
             if (_headers.method == "home_get") {
-              ipc_send("set_home", parsedResult);
+              ipcSend("set_home", parsedResult);
             }
             if (_headers.method == "tou_get") {
-              ipc_send("tou_set", parsedResult.result);
+              ipcSend("tou_set", parsedResult.result);
             }
             if (_headers.method == "tou_check") {
               //ipc_send("tou_set_game", parsedResult.result);
@@ -382,21 +383,21 @@ function asyncWorker(task: HttpTask, callback: any) {
             if (_headers.method == "get_database") {
               //resetLogLoop(100);
               delete parsedResult.ok;
-              ipc_send("ipc_log", "Metadata: Ok");
+              ipcSend("ipc_log", "Metadata: Ok");
               db.handleSetDb(null, results);
               db.updateCache(results);
-              ipc_send("set_db", results);
+              ipcSend("set_db", results);
               // autologin users may beat the metadata request
               // manually trigger a UI refresh just in case
-              ipc_send("player_data_refresh");
+              ipcSend("player_data_refresh");
             }
           } else if (_headers.method == "tou_join") {
-            ipc_send("popup", {
+            ipcSend("popup", {
               text: parsedResult.error,
               time: 10000
             });
           } else if (_headers.method == "tou_check") {
-            let notif = new Notification("MTG Arena Tool", {
+            new Notification("MTG Arena Tool", {
               body: parsedResult.state
             });
             //ipc_send("popup", {"text": parsedResult.state, "time": 10000});
@@ -410,7 +411,7 @@ function asyncWorker(task: HttpTask, callback: any) {
               _headers.method == "share_log" ||
               _headers.method == "share_deck"
             ) {
-              ipc_send("popup", {
+              ipcSend("popup", {
                 text: parsedResult.error,
                 time: 3000
               });
@@ -419,10 +420,10 @@ function asyncWorker(task: HttpTask, callback: any) {
               syncSettings({ token: "" }, false);
               appDb.upsert("", "email", "");
               appDb.upsert("", "token", "");
-              ipc_send("auth", {});
-              ipc_send("toggle_login", true);
-              ipc_send("clear_pwd", 1);
-              ipc_send("popup", {
+              ipcSend("auth", {});
+              ipcSend("toggle_login", true);
+              ipcSend("clear_pwd", 1);
+              ipcSend("popup", {
                 text: `Error: ${parsedResult.error}`,
                 time: 3000,
                 progress: -1
@@ -430,8 +431,8 @@ function asyncWorker(task: HttpTask, callback: any) {
             }
             // errors here
           } else if (!parsedResult && _headers.method == "auth") {
-            ipc_send("auth", {});
-            ipc_send("popup", {
+            ipcSend("auth", {});
+            ipcSend("popup", {
               text: "Something went wrong, please try again",
               time: 5000,
               progress: -1
@@ -447,7 +448,7 @@ function asyncWorker(task: HttpTask, callback: any) {
         }
 
         if (globals.debugNet && _headers.method !== "notifications") {
-          ipc_send("ipc_log", "httpAsync: " + _headers.method);
+          ipcSend("ipc_log", "httpAsync: " + _headers.method);
         }
       });
     }
@@ -455,25 +456,25 @@ function asyncWorker(task: HttpTask, callback: any) {
   req.on("error", function(e: Error) {
     console.error(`problem with request ${_headers.method}: ${e.message}`);
     console.log(req);
-    ipc_send("popup", {
+    ipcSend("popup", {
       text: `Request error. (${e.message})`,
       time: 20000,
       progress: -1
     });
 
     callback(e);
-    ipc_send("ipc_log", e.message);
+    ipcSend("ipc_log", e.message);
   });
-  req.write(post_data);
+  req.write(postData);
   // console.log(req);
   req.end();
 }
 
-export function initHttpQueue() {
+export function initHttpQueue(): void {
   httpAsync = async.queue(asyncWorker);
   httpAsync.error(function(err, task) {
     if (err) {
-      ipc_send("ipc_log", "httpBasic() Error: " + err.message);
+      ipcSend("ipc_log", "httpBasic() Error: " + err.message);
     }
     // do it again
     setTimeout(function() {
@@ -482,7 +483,7 @@ export function initHttpQueue() {
   });
 }
 
-export function httpNotificationsPull() {
+export function httpNotificationsPull(): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -491,7 +492,7 @@ export function httpNotificationsPull() {
   });
 }
 
-function notificationProcess(data: any) {
+function notificationProcess(data: any): void {
   if (!data || !data.notifications) return;
   data.notifications.forEach((str: any) => {
     console.log("notifications message:", str);
@@ -505,14 +506,14 @@ function notificationProcess(data: any) {
         if (str.task == "sync") {
           syncUserData(str.value);
         } else {
-          ipc_send(str.task, str.value);
+          ipcSend(str.task, str.value);
         }
       }
     }
   });
 }
 
-function notificationSetTimeout() {
+function notificationSetTimeout(): void {
   // Here we should probably do some "smarter" pull
   // Like, check if arena is open at all, if we are in a tourney, if we
   // just submitted some data that requires notification pull, etc
@@ -521,7 +522,7 @@ function notificationSetTimeout() {
   setTimeout(httpNotificationsPull, 10000);
 }
 
-export function httpAuth(userName: string, pass: string) {
+export function httpAuth(userName: string, pass: string): void {
   const _id = makeId(6);
   setData({ userName }, false);
   httpAsync.push({
@@ -537,7 +538,7 @@ export function httpAuth(userName: string, pass: string) {
   });
 }
 
-export function httpSubmitCourse(course: any) {
+export function httpSubmitCourse(course: any): void {
   const _id = makeId(6);
   if (playerData.settings.anon_explore == true) {
     course.PlayerId = "000000000000000";
@@ -553,7 +554,7 @@ export function httpSubmitCourse(course: any) {
   });
 }
 
-export function httpGetExplore(query: any) {
+export function httpGetExplore(query: any): void {
   const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -575,7 +576,7 @@ export function httpGetExplore(query: any) {
   });
 }
 
-export function httpGetTopLadderDecks() {
+export function httpGetTopLadderDecks(): void {
   const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -584,7 +585,7 @@ export function httpGetTopLadderDecks() {
   });
 }
 
-export function httpGetTopLadderTraditionalDecks() {
+export function httpGetTopLadderTraditionalDecks(): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -593,7 +594,7 @@ export function httpGetTopLadderTraditionalDecks() {
   });
 }
 
-export function httpGetCourse(courseId: string) {
+export function httpGetCourse(courseId: string): void {
   const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -603,7 +604,7 @@ export function httpGetCourse(courseId: string) {
   });
 }
 
-export function httpSetMatch(match: any) {
+export function httpSetMatch(match: any): void {
   const _id = makeId(6);
   if (playerData.settings.anon_explore == true) {
     match.player.userid = "000000000000000";
@@ -618,7 +619,7 @@ export function httpSetMatch(match: any) {
   });
 }
 
-export function httpSetDraft(draft: any) {
+export function httpSetDraft(draft: any): void {
   const _id = makeId(6);
   draft = JSON.stringify(draft);
   httpAsync.push({
@@ -629,7 +630,7 @@ export function httpSetDraft(draft: any) {
   });
 }
 
-export function httpSetEconomy(change: any) {
+export function httpSetEconomy(change: any): void {
   const _id = makeId(6);
   change = JSON.stringify(change);
   httpAsync.push({
@@ -640,7 +641,7 @@ export function httpSetEconomy(change: any) {
   });
 }
 
-export function httpSetSeasonal(change: any) {
+export function httpSetSeasonal(change: any): void {
   const _id = makeId(6);
   change = JSON.stringify(change);
   httpAsync.push({
@@ -651,7 +652,7 @@ export function httpSetSeasonal(change: any) {
   });
 }
 
-export function httpSetSettings(settings: any) {
+export function httpSetSettings(settings: any): void {
   const _id = makeId(6);
   settings = JSON.stringify(settings);
   httpAsync.push({
@@ -662,7 +663,7 @@ export function httpSetSettings(settings: any) {
   });
 }
 
-export function httpDeleteData() {
+export function httpDeleteData(): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -671,7 +672,7 @@ export function httpDeleteData() {
   });
 }
 
-export function httpGetDatabase(lang: string) {
+export function httpGetDatabase(lang: string): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -681,7 +682,7 @@ export function httpGetDatabase(lang: string) {
   });
 }
 
-export function httpGetDatabaseVersion(lang: string) {
+export function httpGetDatabaseVersion(lang: string): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -690,7 +691,11 @@ export function httpGetDatabaseVersion(lang: string) {
   });
 }
 
-export function httpDraftShareLink(did: string, exp: any, draftData: any) {
+export function httpDraftShareLink(
+  did: string,
+  exp: any,
+  draftData: any
+): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -702,7 +707,7 @@ export function httpDraftShareLink(did: string, exp: any, draftData: any) {
   });
 }
 
-export function httpLogShareLink(lid: string, log: any, exp: any) {
+export function httpLogShareLink(lid: string, log: any, exp: any): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -714,7 +719,7 @@ export function httpLogShareLink(lid: string, log: any, exp: any) {
   });
 }
 
-export function httpDeckShareLink(deck: any, exp: any) {
+export function httpDeckShareLink(deck: any, exp: any): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -725,7 +730,7 @@ export function httpDeckShareLink(deck: any, exp: any) {
   });
 }
 
-export function httpHomeGet(set: string) {
+export function httpHomeGet(set: string): void {
   const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -735,7 +740,7 @@ export function httpHomeGet(set: string) {
   });
 }
 
-export function httpTournamentGet(tid: string) {
+export function httpTournamentGet(tid: string): void {
   const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -745,7 +750,11 @@ export function httpTournamentGet(tid: string) {
   });
 }
 
-export function httpTournamentJoin(tid: string, deckId: string, pass: string) {
+export function httpTournamentJoin(
+  tid: string,
+  deckId: string,
+  pass: string
+): void {
   const _id = makeId(6);
   const deck = JSON.stringify(playerData.deck(deckId));
   httpAsync.unshift({
@@ -758,7 +767,7 @@ export function httpTournamentJoin(tid: string, deckId: string, pass: string) {
   });
 }
 
-export function httpTournamentDrop(tid: string) {
+export function httpTournamentDrop(tid: string): void {
   const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -774,7 +783,7 @@ export function httpTournamentCheck(
   setCheck: boolean,
   playFirst = "",
   bo3 = ""
-) {
+): void {
   const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -788,7 +797,7 @@ export function httpTournamentCheck(
   });
 }
 
-export function httpSetMythicRank(opp: string, rank: string) {
+export function httpSetMythicRank(opp: string, rank: string): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -799,7 +808,11 @@ export function httpSetMythicRank(opp: string, rank: string) {
   });
 }
 
-export function httpSetDeckTag(tag: string, deck: DeckData, format: string) {
+export function httpSetDeckTag(
+  tag: string,
+  deck: DeckData,
+  format: string
+): void {
   const _id = makeId(6);
   const cards = deck.mainDeck.map((card: any) => {
     return {
@@ -825,7 +838,7 @@ export interface SyncRequestData {
   seasonal?: any[];
 }
 
-export function httpSyncRequest(data: SyncRequestData) {
+export function httpSyncRequest(data: SyncRequestData): void {
   const _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -835,7 +848,7 @@ export function httpSyncRequest(data: SyncRequestData) {
   });
 }
 
-export function httpDiscordUnlink() {
+export function httpDiscordUnlink(): void {
   const _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
