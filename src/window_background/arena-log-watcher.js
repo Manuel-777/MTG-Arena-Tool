@@ -419,7 +419,7 @@ function finishLoading() {
 
     if (playerData.name) {
       // This needs to be triggered somewhere else
-      const httpApi = require("./http-api");
+      const httpApi = require("./httpApi");
       httpApi.httpSetPlayer(
         playerData.name,
         playerData.rank.constructed.rank,

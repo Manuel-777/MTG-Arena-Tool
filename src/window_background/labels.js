@@ -130,7 +130,7 @@ function endDraft(data) {
   if (globals.debugLog || !globals.firstPass)
     ipc_send("set_arena_state", ARENA_MODE_IDLE);
   if (!data) return;
-  const httpApi = require("./http-api");
+  const httpApi = require("./httpApi");
   httpApi.httpSetDraft(data);
   ipc_send("popup", { text: "Draft saved!", time: 3000 });
 }
@@ -159,7 +159,7 @@ function processMatch(json, matchBeginTime) {
 
   if (match.eventId == "DirectGame" && globals.currentDeck) {
     let str = globals.currentDeck.getSave();
-    const httpApi = require("./http-api");
+    const httpApi = require("./httpApi");
     httpApi.httpTournamentCheck(str, match.opponent.name, true);
   }
 
@@ -204,7 +204,7 @@ function saveEconomyTransaction(transaction) {
 
   playerDb.upsert("", id, txnData);
   setData({ [id]: txnData });
-  const httpApi = require("./http-api");
+  const httpApi = require("./httpApi");
   httpApi.httpSetEconomy(txnData);
 }
 
@@ -237,7 +237,7 @@ function saveMatch(id, matchEndTime) {
   playerDb.upsert("", id, match);
   setData({ [id]: match });
   if (globals.matchCompletedOnGameNumber === globals.gameNumberCompleted) {
-    const httpApi = require("./http-api");
+    const httpApi = require("./httpApi");
     httpApi.httpSetMatch(match);
   }
   ipc_send("popup", { text: "Match saved!", time: 3000 });
@@ -587,7 +587,7 @@ export function onLabelRankUpdated(entry) {
     updateType
   );
 
-  const httpApi = require("./http-api");
+  const httpApi = require("./httpApi");
   httpApi.httpSetSeasonal(json);
 
   setData({ rank, seasonal_rank });
@@ -704,7 +704,7 @@ export function onLabelInEventGetPlayerCourseV2(entry) {
     addCustomDeck(json.CourseDeck);
     //json.date = timestamp();
     //console.log(json.CourseDeck, json.CourseDeck.colors)
-    const httpApi = require("./http-api");
+    const httpApi = require("./httpApi");
     httpApi.httpSubmitCourse(json);
     saveCourse(json);
     select_deck(json);
@@ -1093,7 +1093,7 @@ export function onLabelEventMatchCreated(entry) {
   const matchBeginTime = globals.logTime || new Date();
 
   if (json.opponentRankingClass == "Mythic") {
-    const httpApi = require("./http-api");
+    const httpApi = require("./httpApi");
     httpApi.httpSetMythicRank(
       json.opponentScreenName,
       json.opponentMythicLeaderboardPlace
@@ -1113,7 +1113,7 @@ export function onLabelOutDirectGameChallenge(entry) {
   deck = JSON.parse(deck);
   select_deck(convertDeckFromV3(deck));
 
-  const httpApi = require("./http-api");
+  const httpApi = require("./httpApi");
   httpApi.httpTournamentCheck(
     deck,
     json.params.opponentDisplayName,

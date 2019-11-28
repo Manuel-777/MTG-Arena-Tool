@@ -3,7 +3,7 @@ import { app, remote, ipcRenderer as ipc } from "electron";
 import path from "path";
 import fs from "fs";
 import sha1 from "js-sha1";
-import * as httpApi from "./http-api";
+import * as httpApi from "./httpApi";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import { rememberDefaults } from "../shared/db/databaseUtil";
 import playerData from "../shared/player-data";
