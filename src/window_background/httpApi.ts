@@ -3,7 +3,7 @@ import async from "async";
 import qs from "qs";
 import { makeId } from "../shared/util";
 import { ipc_send, setData } from "./background-util";
-import playerData from "../shared/player-data";
+import pd from "../shared/player-data";
 import db from "../shared/database";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import globals from "./globals";
@@ -11,17 +11,18 @@ import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 
 let metadataState = false;
 
-var httpAsync = [];
+let httpAsync: any[] = [];
 
 const serverAddress = "mtgatool.com";
+const playerData = pd as any;
 
-function syncUserData(data) {
-  console.log(data);
+function syncUserData(data: any) {
+  // console.log(data);
   // Sync Events
   const courses_index = [...playerData.courses_index];
   data.courses
-    .filter(doc => !playerData.eventExists(doc._id))
-    .forEach(doc => {
+    .filter((doc: any) => !playerData.eventExists(doc._id))
+    .forEach((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
@@ -34,8 +35,8 @@ function syncUserData(data) {
   // Sync Matches
   const matches_index = [...playerData.matches_index];
   data.matches
-    .filter(doc => !playerData.matchExists(doc._id))
-    .forEach(doc => {
+    .filter((doc: any) => !playerData.matchExists(doc._id))
+    .forEach((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
@@ -48,8 +49,8 @@ function syncUserData(data) {
   // Sync Economy
   const economy_index = [...playerData.economy_index];
   data.economy
-    .filter(doc => !playerData.transactionExists(doc._id))
-    .forEach(doc => {
+    .filter((doc: any) => !playerData.transactionExists(doc._id))
+    .forEach((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
@@ -62,8 +63,8 @@ function syncUserData(data) {
   // Sync Drafts
   const draft_index = [...playerData.draft_index];
   data.drafts
-    .filter(doc => !playerData.draftExists(doc._id))
-    .forEach(doc => {
+    .filter((doc: any) => !playerData.draftExists(doc._id))
+    .forEach((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
@@ -74,7 +75,7 @@ function syncUserData(data) {
   playerDb.upsert("", "draft_index", draft_index);
 
   // Sync seasonal
-  data.seasonal.forEach(doc => {
+  data.seasonal.forEach((doc: any) => {
     const id = doc._id;
     doc.id = id;
     delete doc._id;
@@ -120,6 +121,7 @@ export function httpBasic() {
       ) {
         if (!playerData.offline) setData({ offline: true });
         callback({
+          name: "Error",
           message: "Settings dont allow sending data! > " + _headers.method
         });
         removeFromHttp(_headers.reqId);
@@ -129,7 +131,7 @@ export function httpBasic() {
       _headers.token = playerData.settings.token;
 
       var http = require("https");
-      var options;
+      var options: any;
       if (_headers.method == "get_database") {
         options = {
           protocol: "https:",
@@ -204,7 +206,7 @@ export function httpBasic() {
       };
 
       var results = "";
-      var req = http.request(options, function(res) {
+      var req = http.request(options, function(res: any) {
         if (res.statusCode < 200 || res.statusCode > 299) {
           ipc_send("popup", {
             text: `Error with request. (${_headers.method}: ${res.statusCode})`,
@@ -212,7 +214,7 @@ export function httpBasic() {
             progress: -1
           });
         } else {
-          res.on("data", function(chunk) {
+          res.on("data", function(chunk: any) {
             results = results + chunk;
           });
           res.on("end", function() {
@@ -263,6 +265,7 @@ export function httpBasic() {
               if (_headers.method == "get_database_version") {
                 let lang = playerData.settings.metadata_lang;
                 if (
+                  db.metadata &&
                   db.metadata.language &&
                   parsedResult.lang.toLowerCase() !==
                     db.metadata.language.toLowerCase()
@@ -310,7 +313,7 @@ export function httpBasic() {
                     appDb.upsert("", "token", parsedResult.token);
                     appDb.upsert("", "email", playerData.userName);
                   }
-                  const data = {};
+                  const data: any = {};
                   data.patreon = parsedResult.patreon;
                   data.patreon_tier = parsedResult.patreon_tier;
 
@@ -332,7 +335,7 @@ export function httpBasic() {
                   loadPlayerConfig(playerData.arenaId).then(() => {
                     ipc_send("ipc_log", "...called back to http-api.");
                     ipc_send("ipc_log", "Checking for sync requests...");
-                    const requestSync = {};
+                    const requestSync: any = {};
                     requestSync.courses = serverData.courses.filter(
                       id => !(id in playerData)
                     );
@@ -483,7 +486,7 @@ export function httpBasic() {
           });
         }
       });
-      req.on("error", function(e) {
+      req.on("error", function(e: Error) {
         console.error(`problem with request ${_headers.method}: ${e.message}`);
         console.log(req);
         ipc_send("popup", {
@@ -512,7 +515,7 @@ export function httpBasic() {
   );
 }
 
-function removeFromHttp(req) {
+function removeFromHttp(req: any) {
   httpAsync.forEach(function(h, i) {
     if (h.reqId == req) {
       httpAsync.splice(i, 1);
@@ -529,9 +532,9 @@ export function httpNotificationsPull() {
   });
 }
 
-function notificationProcess(data) {
+function notificationProcess(data: any) {
   if (!data || !data.notifications) return;
-  data.notifications.forEach(str => {
+  data.notifications.forEach((str: any) => {
     console.log("notifications message:", str);
     if (typeof str == "string") {
       //console.log("Notification string:", str);
@@ -559,7 +562,7 @@ function notificationSetTimeout() {
   setTimeout(httpNotificationsPull, 10000);
 }
 
-export function httpAuth(userName, pass) {
+export function httpAuth(userName: string, pass: string) {
   var _id = makeId(6);
   setData({ userName }, false);
   httpAsync.push({
@@ -575,7 +578,7 @@ export function httpAuth(userName, pass) {
   });
 }
 
-export function httpSubmitCourse(course) {
+export function httpSubmitCourse(course: any) {
   var _id = makeId(6);
   if (playerData.settings.anon_explore == true) {
     course.PlayerId = "000000000000000";
@@ -597,7 +600,7 @@ export function httpSetPlayer() {
   //httpAsync.push({'reqId': _id, 'method': 'set_player', 'name': name, 'rank': rank, 'tier': tier});
 }
 
-export function httpGetExplore(query) {
+export function httpGetExplore(query: any) {
   var _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -637,7 +640,7 @@ export function httpGetTopLadderTraditionalDecks() {
   });
 }
 
-export function httpGetCourse(courseId) {
+export function httpGetCourse(courseId: any) {
   var _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -647,7 +650,7 @@ export function httpGetCourse(courseId) {
   });
 }
 
-export function httpSetMatch(match) {
+export function httpSetMatch(match: any) {
   var _id = makeId(6);
   if (playerData.settings.anon_explore == true) {
     match.player.userid = "000000000000000";
@@ -662,7 +665,7 @@ export function httpSetMatch(match) {
   });
 }
 
-export function httpSetDraft(draft) {
+export function httpSetDraft(draft: any) {
   var _id = makeId(6);
   draft = JSON.stringify(draft);
   httpAsync.push({
@@ -673,7 +676,7 @@ export function httpSetDraft(draft) {
   });
 }
 
-export function httpSetEconomy(change) {
+export function httpSetEconomy(change: any) {
   var _id = makeId(6);
   change = JSON.stringify(change);
   httpAsync.push({
@@ -684,7 +687,7 @@ export function httpSetEconomy(change) {
   });
 }
 
-export function httpSetSeasonal(change) {
+export function httpSetSeasonal(change: any) {
   var _id = makeId(6);
   change = JSON.stringify(change);
   httpAsync.push({
@@ -695,7 +698,7 @@ export function httpSetSeasonal(change) {
   });
 }
 
-export function httpSetSettings(settings) {
+export function httpSetSettings(settings: any) {
   var _id = makeId(6);
   settings = JSON.stringify(settings);
   httpAsync.push({
@@ -715,12 +718,12 @@ export function httpDeleteData() {
   });
 }
 
-export function httpGetDatabase(lang) {
+export function httpGetDatabase(lang: any) {
   var _id = makeId(6);
   httpAsync.push({ reqId: _id, method: "get_database", lang: lang });
 }
 
-export function httpGetDatabaseVersion(lang) {
+export function httpGetDatabaseVersion(lang: any) {
   var _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -729,7 +732,7 @@ export function httpGetDatabaseVersion(lang) {
   });
 }
 
-export function httpDraftShareLink(did, exp, draftData) {
+export function httpDraftShareLink(did: any, exp: any, draftData: any) {
   var _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -741,7 +744,7 @@ export function httpDraftShareLink(did, exp, draftData) {
   });
 }
 
-export function httpLogShareLink(lid, log, exp) {
+export function httpLogShareLink(lid: any, log: any, exp: any) {
   var _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -753,7 +756,7 @@ export function httpLogShareLink(lid, log, exp) {
   });
 }
 
-export function httpDeckShareLink(deck, exp) {
+export function httpDeckShareLink(deck: any, exp: any) {
   var _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -764,7 +767,7 @@ export function httpDeckShareLink(deck, exp) {
   });
 }
 
-export function httpHomeGet(set) {
+export function httpHomeGet(set: any) {
   var _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -774,7 +777,7 @@ export function httpHomeGet(set) {
   });
 }
 
-export function httpTournamentGet(tid) {
+export function httpTournamentGet(tid: any) {
   var _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -784,7 +787,7 @@ export function httpTournamentGet(tid) {
   });
 }
 
-export function httpTournamentJoin(tid, _deck, pass) {
+export function httpTournamentJoin(tid: any, _deck: any, pass: any) {
   let _id = makeId(6);
   let deck = JSON.stringify(playerData.deck(_deck));
   httpAsync.unshift({
@@ -797,7 +800,7 @@ export function httpTournamentJoin(tid, _deck, pass) {
   });
 }
 
-export function httpTournamentDrop(tid) {
+export function httpTournamentDrop(tid: any) {
   var _id = makeId(6);
   httpAsync.unshift({
     reqId: _id,
@@ -808,9 +811,9 @@ export function httpTournamentDrop(tid) {
 }
 
 export function httpTournamentCheck(
-  deck,
-  opp,
-  setCheck,
+  deck: any,
+  opp: any,
+  setCheck: any,
   bo3 = "",
   playFirst = ""
 ) {
@@ -828,7 +831,7 @@ export function httpTournamentCheck(
   });
 }
 
-export function httpSetMythicRank(opp, rank) {
+export function httpSetMythicRank(opp: any, rank: any) {
   var _id = makeId(6);
   httpAsync.push({
     reqId: _id,
@@ -839,9 +842,9 @@ export function httpSetMythicRank(opp, rank) {
   });
 }
 
-export function httpSetDeckTag(tag, cards, format) {
+export function httpSetDeckTag(tag: any, cards: any, format: any) {
   var _id = makeId(6);
-  cards.forEach(card => {
+  cards.forEach((card: any) => {
     card.quantity = 1;
   });
   cards = JSON.stringify(cards);
@@ -855,7 +858,7 @@ export function httpSetDeckTag(tag, cards, format) {
   });
 }
 
-export function httpSyncRequest(data) {
+export function httpSyncRequest(data: any) {
   var _id = makeId(6);
   data = JSON.stringify(data);
   httpAsync.push({
