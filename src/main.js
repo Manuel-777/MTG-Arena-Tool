@@ -442,31 +442,7 @@ function updateOverlayVisibility() {
     clearTimeout(overlayHideTimeout);
     overlayHideTimeout = undefined;
 
-    const newBounds = { x: 0, y: 0, width: 0, height: 0 };
-    electron.screen.getAllDisplays().forEach(display => {
-      newBounds.x = Math.min(newBounds.x, display.bounds.x);
-      newBounds.y = Math.min(newBounds.y, display.bounds.y);
-    });
-    electron.screen.getAllDisplays().forEach(display => {
-      newBounds.width = Math.max(
-        newBounds.width,
-        Math.abs(newBounds.x) + display.bounds.x + display.bounds.width
-      );
-      newBounds.height = Math.max(
-        newBounds.height,
-        Math.abs(newBounds.y) + display.bounds.y + display.bounds.height
-      );
-    });
-
-    console.log(
-      "Overlay bounds: ",
-      newBounds.x,
-      newBounds.y,
-      newBounds.width,
-      newBounds.height
-    );
-
-    overlay.setBounds(newBounds);
+    overlaySetBounds();
     overlay.show();
   }
 }
@@ -496,6 +472,34 @@ function getOverlayVisible(settings) {
     (editMode && arenaState === ARENA_MODE_IDLE);
 
   return settings.show && (currentModeApplies || settings.show_always);
+}
+
+function overlaySetBounds() {
+  const newBounds = { x: 0, y: 0, width: 0, height: 0 };
+  electron.screen.getAllDisplays().forEach(display => {
+    newBounds.x = Math.min(newBounds.x, display.bounds.x);
+    newBounds.y = Math.min(newBounds.y, display.bounds.y);
+  });
+  electron.screen.getAllDisplays().forEach(display => {
+    newBounds.width = Math.max(
+      newBounds.width,
+      Math.abs(newBounds.x) + display.bounds.x + display.bounds.width
+    );
+    newBounds.height = Math.max(
+      newBounds.height,
+      Math.abs(newBounds.y) + display.bounds.y + display.bounds.height
+    );
+  });
+
+  console.log(
+    "Overlay bounds: ",
+    newBounds.x,
+    newBounds.y,
+    newBounds.width,
+    newBounds.height
+  );
+
+  overlay.setBounds(newBounds);
 }
 
 // Catch exceptions
@@ -562,13 +566,10 @@ function saveWindowPos() {
 
 function resetWindows() {
   const primary = electron.screen.getPrimaryDisplay();
-  const { bounds, id } = primary;
-  // reset overlay to primary
-  overlay.setBounds(bounds);
-  background.webContents.send("save_user_settings", {
-    overlay_display: id,
-    skip_refresh: true
-  });
+  const { bounds } = primary;
+  // reset overlay
+  overlaySetBounds();
+
   // reset main to primary
   mainWindow.setBounds({ ...bounds, width: 800, height: 600 });
   mainWindow.show();
