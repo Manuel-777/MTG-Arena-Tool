@@ -1,7 +1,7 @@
 import electron from "electron";
 import async from "async";
 import qs from "qs";
-import http from "https";
+import http, { RequestOptions } from "https";
 
 import { makeId } from "../shared/util";
 import pd from "../shared/player-data";
@@ -12,6 +12,7 @@ import globals from "./globals";
 import { ipc_send as ipcSend, setData } from "./background-util";
 import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 import { DeckData } from "./data";
+import { IncomingMessage } from "http";
 
 const serverAddress = "mtgatool.com";
 const playerData = pd as any;
@@ -23,6 +24,12 @@ interface HttpTask {
   method_path: string;
   [key: string]: string;
 }
+
+const ipcLog = (message: string): void => {
+  ipcSend("ipc_log", message);
+  console.log(message);
+};
+const ipcPop = (args: any): void => ipcSend("popup", args);
 
 function syncUserData(data: any): void {
   // console.log(data);
@@ -111,84 +118,216 @@ function syncUserData(data: any): void {
   setData({ courses_index, draft_index, economy_index, matches_index });
 }
 
-function asyncWorker(task: HttpTask, callback: any): void {
-  const _headers: any = { ...task };
+function getRequestOptions(task: HttpTask): RequestOptions {
+  let options: RequestOptions;
+  switch (task.method) {
+    case "get_database":
+      options = {
+        protocol: "https:",
+        port: 443,
+        hostname: serverAddress,
+        path: "/database/" + task.lang,
+        method: "GET"
+      };
+      ipcPop({
+        text: "Downloading metadata...",
+        time: 0,
+        progress: 2
+      });
+      break;
 
+    case "get_ladder_decks":
+      options = {
+        protocol: "https:",
+        port: 443,
+        hostname: serverAddress,
+        path: "/top_ladder.json",
+        method: "GET"
+      };
+      break;
+
+    case "get_ladder_traditional_decks":
+      options = {
+        protocol: "https:",
+        port: 443,
+        hostname: serverAddress,
+        path: "/top_ladder_traditional.json",
+        method: "GET"
+      };
+      break;
+
+    default:
+      options = {
+        protocol: "https:",
+        port: 443,
+        hostname: serverAddress,
+        path: task.method_path ? task.method_path : "/api.php",
+        method: "POST"
+      };
+  }
+  return options;
+}
+
+function handleSuccessResponse(
+  task: HttpTask,
+  results: string,
+  parsedResult: any
+): void {
+  switch (task.method) {
+    case "discord_unlink":
+      ipcPop({
+        text: "Unlink Ok",
+        time: 1000,
+        progress: -1
+      });
+      ipcSend("set_discord_tag", "");
+      break;
+
+    case "get_database_version":
+      handleGetDatabaseVersionResponse(parsedResult);
+      break;
+
+    case "notifications":
+      handleNotificationResponse(parsedResult);
+      break;
+
+    case "get_explore":
+      ipcSend("set_explore_decks", parsedResult);
+      break;
+
+    case "get_ladder_decks":
+      ipcSend("set_ladder_decks", parsedResult);
+      break;
+
+    case "get_ladder_traditional_decks":
+      ipcSend("set_ladder_traditional_decks", parsedResult);
+      break;
+
+    case "auth":
+      handleAuthResponse(parsedResult);
+      break;
+
+    case "tou_join":
+    case "tou_drop":
+      httpTournamentGet(parsedResult.id);
+      break;
+
+    case "get_top_decks":
+      ipcSend("set_explore", parsedResult.result);
+      break;
+
+    case "get_course":
+      ipcSend("open_course_deck", parsedResult.result);
+      break;
+
+    case "share_draft":
+      ipcSend("set_draft_link", parsedResult.url);
+      break;
+
+    case "share_log":
+      ipcSend("set_log_link", parsedResult.url);
+      break;
+
+    case "share_deck":
+      ipcSend("set_deck_link", parsedResult.url);
+      break;
+
+    case "home_get":
+      ipcSend("set_home", parsedResult);
+      break;
+
+    case "tou_get":
+      ipcSend("tou_set", parsedResult.result);
+      break;
+
+    case "tou_check":
+      //ipc_send("tou_set_game", parsedResult.result);
+      break;
+
+    case "get_sync":
+      syncUserData(parsedResult.data);
+      break;
+
+    case "get_database":
+      //resetLogLoop(100);
+      delete parsedResult.ok;
+      ipcLog("Metadata: Ok");
+      db.handleSetDb(null, results);
+      db.updateCache(results);
+      ipcSend("set_db", results);
+      // autologin users may beat the metadata request
+      // manually trigger a UI refresh just in case
+      ipcSend("player_data_refresh");
+      break;
+  }
+}
+
+function handleErrorResponse(
+  task: HttpTask,
+  results: string,
+  parsedResult: any
+): void {
+  switch (task.method) {
+    case "auth":
+      syncSettings({ token: "" }, false);
+      appDb.upsert("", "email", "");
+      appDb.upsert("", "token", "");
+      ipcSend("auth", {});
+      ipcSend("toggle_login", true);
+      ipcSend("clear_pwd", 1);
+      ipcPop({
+        text: `Error: ${parsedResult.error}`,
+        time: 3000,
+        progress: -1
+      });
+      break;
+
+    case "tou_join":
+      ipcPop({
+        text: parsedResult.error,
+        time: 10000
+      });
+      break;
+
+    case "tou_check":
+      new Notification("MTG Arena Tool", {
+        body: parsedResult.state
+      });
+      // ipcPop({"text": parsedResult.state, "time": 10000});
+      break;
+
+    default:
+    case "share_draft":
+    case "share_log":
+    case "share_deck":
+      ipcPop({
+        text: parsedResult.error,
+        time: 3000
+      });
+      break;
+  }
+}
+
+function asyncWorker(task: HttpTask, callback: any): void {
+  // list of requests that must always be sent, regardless of privacy settings
+  const nonPrivacyMethods = ["auth", "delete_data", "get_database"];
   if (
     (playerData.settings.send_data == false || playerData.offline == true) &&
-    _headers.method != "auth" &&
-    _headers.method != "delete_data" &&
-    _headers.method != "get_database" &&
+    !nonPrivacyMethods.includes(task.method) &&
     globals.debugLog == false
   ) {
     if (!playerData.offline) setData({ offline: true });
-    callback({
-      name: "Error",
-      message: "Settings dont allow sending data! > " + _headers.method
-    });
-    return;
+    ipcLog("Settings dont allow sending data! > " + task.method);
+    callback();
   }
 
+  const _headers: any = { ...task };
   _headers.token = playerData.settings.token;
+  const options = getRequestOptions(task);
 
-  let options: any;
-  if (_headers.method == "get_database") {
-    options = {
-      protocol: "https:",
-      port: 443,
-      hostname: serverAddress,
-      path: "/database/" + _headers.lang,
-      method: "GET"
-    };
-    ipcSend("popup", {
-      text: "Downloading metadata...",
-      time: 0,
-      progress: 2
-    });
-  } else if (_headers.method == "get_ladder_decks") {
-    options = {
-      protocol: "https:",
-      port: 443,
-      hostname: serverAddress,
-      path: "/top_ladder.json",
-      method: "GET"
-    };
-  } else if (_headers.method == "get_ladder_traditional_decks") {
-    options = {
-      protocol: "https:",
-      port: 443,
-      hostname: serverAddress,
-      path: "/top_ladder_traditional.json",
-      method: "GET"
-    };
-  } else if (_headers.method_path !== undefined) {
-    options = {
-      protocol: "https:",
-      port: 443,
-      hostname: serverAddress,
-      path: _headers.method_path,
-      method: "POST"
-    };
-  } else {
-    options = {
-      protocol: "https:",
-      port: 443,
-      hostname: serverAddress,
-      path: "/api.php",
-      method: "POST"
-    };
-  }
-
-  if (globals.debugNet && _headers.method !== "notifications") {
-    console.log("SEND >> " + _headers.method, _headers, options);
-    ipcSend(
-      "ipc_log",
-      "SEND >> " +
-        _headers.method +
-        ", " +
-        _headers.reqId +
-        ", " +
-        _headers.token
+  if (globals.debugNet && task.method !== "notifications") {
+    ipcLog(
+      "SEND >> " + task.method + ", " + _headers.reqId + ", " + _headers.token
     );
   }
 
@@ -200,36 +339,24 @@ function asyncWorker(task: HttpTask, callback: any): void {
   };
 
   let results = "";
-  const req = http.request(options, function(res: any) {
-    if (res.statusCode < 200 || res.statusCode > 299) {
-      ipcSend("popup", {
-        text: `Error with request. (${_headers.method}: ${res.statusCode})`,
+  const req = http.request(options, function(res: IncomingMessage) {
+    if (res.statusCode && (res.statusCode < 200 || res.statusCode > 299)) {
+      const text = `Error with request. (${task.method}: ${res.statusCode})`;
+      ipcPop({
+        text,
         time: 2000,
         progress: -1
       });
+      callback(new Error(text)); // TODO server error, try again?
     } else {
       res.on("data", function(chunk: any) {
         results = results + chunk;
       });
-      /* eslint-disable-next-line complexity */
       res.on("end", function() {
-        if (globals.debugNet) {
-          if (_headers.method !== "notifications") {
-            ipcSend(
-              "ipc_log",
-              "RECV << " + _headers.method + ", " + results.slice(0, 100)
-            );
-            console.log(
-              "RECV << " + _headers.method,
-              _headers.method,
-              _headers.method == "auth" ? results : results.slice(0, 500)
-            );
-          }
-        }
-        if (_headers.method == "notifications") {
-          notificationSetTimeout();
-        }
         try {
+          if (globals.debugNet && task.method !== "notifications") {
+            ipcLog("RECV << " + task.method + ", " + results.slice(0, 100));
+          }
           let parsedResult = null;
           try {
             parsedResult = JSON.parse(results);
@@ -237,236 +364,45 @@ function asyncWorker(task: HttpTask, callback: any): void {
             if (globals.debugNet) {
               console.log(results);
             }
-            ipcSend("popup", {
-              text: `Error parsing response. (${_headers.method})`,
+            ipcPop({
+              text: `Error parsing response. (${task.method})`,
               time: 2000,
               progress: -1
             });
+            // TODO parsing error, do not try again?
           }
-
-          if (_headers.method == "discord_unlink") {
-            ipcSend("popup", {
-              text: "Unlink Ok",
-              time: 1000,
-              progress: -1
-            });
-            ipcSend("set_discord_tag", "");
-          }
-          if (_headers.method == "get_database_version") {
-            const lang = playerData.settings.metadata_lang;
-            if (
-              db.metadata &&
-              db.metadata.language &&
-              parsedResult.lang.toLowerCase() !==
-                db.metadata.language.toLowerCase()
-            ) {
-              // compare language
-              console.log(
-                `Downloading database (had lang ${
-                  db.metadata.language
-                }, needed ${parsedResult.lang})`
-              );
-              httpGetDatabase(lang);
-            } else if (parsedResult.latest > db.version) {
-              // Compare parsedResult.version with stored version
-              console.log(
-                `Downloading latest database (had v${db.version}, found v${
-                  parsedResult.latest
-                })`
-              );
-              httpGetDatabase(lang);
-            } else {
-              console.log(
-                `Database up to date (${db.version}), skipping download.`
-              );
+          if (parsedResult) {
+            if (parsedResult.ok) {
+              handleSuccessResponse(task, results, parsedResult);
+            } else if (parsedResult.error !== undefined) {
+              handleErrorResponse(task, results, parsedResult);
             }
           }
-          if (_headers.method == "notifications") {
-            notificationProcess(parsedResult);
-          }
-          if (_headers.method == "get_explore") {
-            ipcSend("set_explore_decks", parsedResult);
-          }
-          if (_headers.method == "get_ladder_decks") {
-            ipcSend("set_ladder_decks", parsedResult);
-          }
-          if (_headers.method == "get_ladder_traditional_decks") {
-            ipcSend("set_ladder_traditional_decks", parsedResult);
-          }
-          if (parsedResult && parsedResult.ok) {
-            if (_headers.method == "auth") {
-              syncSettings({ token: parsedResult.token }, false);
-
-              ipcSend("auth", parsedResult);
-              //ipc_send("auth", parsedResult.arenaids);
-              if (playerData.settings.remember_me) {
-                appDb.upsert("", "token", parsedResult.token);
-                appDb.upsert("", "email", playerData.userName);
-              }
-              const data: any = {};
-              data.patreon = parsedResult.patreon;
-              data.patreon_tier = parsedResult.patreon_tier;
-
-              const serverData = {
-                matches: [],
-                courses: [],
-                drafts: [],
-                economy: [],
-                seasonal: []
-              };
-              if (data.patreon) {
-                serverData.matches = parsedResult.matches;
-                serverData.courses = parsedResult.courses;
-                serverData.drafts = parsedResult.drafts;
-                serverData.economy = parsedResult.economy;
-                serverData.seasonal = parsedResult.seasonal;
-              }
-              setData(data, false);
-              loadPlayerConfig(playerData.arenaId).then(() => {
-                ipcSend("ipc_log", "...called back to http-api.");
-                ipcSend("ipc_log", "Checking for sync requests...");
-                const requestSync = {
-                  courses: serverData.courses.filter(id => !(id in playerData)),
-                  matches: serverData.matches.filter(id => !(id in playerData)),
-                  drafts: serverData.drafts.filter(id => !(id in playerData)),
-                  economy: serverData.economy.filter(id => !(id in playerData)),
-                  seasonal: serverData.seasonal.filter(
-                    id => !(id in playerData.seasonal)
-                  )
-                };
-
-                if (requestSync) {
-                  ipcSend("ipc_log", "Fetch remote player items");
-                  console.log(requestSync);
-                  httpSyncRequest(requestSync);
-                } else {
-                  ipcSend("ipc_log", "No need to fetch remote player items.");
-                }
-                httpNotificationsPull();
-              });
-              ipcSend("set_discord_tag", parsedResult.discord_tag);
-            }
-            if (
-              _headers.method == "tou_join" ||
-              _headers.method == "tou_drop"
-            ) {
-              httpTournamentGet(parsedResult.id);
-            }
-            if (_headers.method == "get_top_decks") {
-              ipcSend("set_explore", parsedResult.result);
-            }
-            if (_headers.method == "get_course") {
-              ipcSend("open_course_deck", parsedResult.result);
-            }
-            if (_headers.method == "share_draft") {
-              ipcSend("set_draft_link", parsedResult.url);
-            }
-            if (_headers.method == "share_log") {
-              ipcSend("set_log_link", parsedResult.url);
-            }
-            if (_headers.method == "share_deck") {
-              ipcSend("set_deck_link", parsedResult.url);
-            }
-            if (_headers.method == "home_get") {
-              ipcSend("set_home", parsedResult);
-            }
-            if (_headers.method == "tou_get") {
-              ipcSend("tou_set", parsedResult.result);
-            }
-            if (_headers.method == "tou_check") {
-              //ipc_send("tou_set_game", parsedResult.result);
-            }
-            if (_headers.method == "get_sync") {
-              syncUserData(parsedResult.data);
-            }
-
-            if (_headers.method == "get_database") {
-              //resetLogLoop(100);
-              delete parsedResult.ok;
-              ipcSend("ipc_log", "Metadata: Ok");
-              db.handleSetDb(null, results);
-              db.updateCache(results);
-              ipcSend("set_db", results);
-              // autologin users may beat the metadata request
-              // manually trigger a UI refresh just in case
-              ipcSend("player_data_refresh");
-            }
-          } else if (_headers.method == "tou_join") {
-            ipcSend("popup", {
-              text: parsedResult.error,
-              time: 10000
-            });
-          } else if (_headers.method == "tou_check") {
-            new Notification("MTG Arena Tool", {
-              body: parsedResult.state
-            });
-            //ipc_send("popup", {"text": parsedResult.state, "time": 10000});
-          } else if (
-            parsedResult &&
-            parsedResult.ok == false &&
-            parsedResult.error != undefined
-          ) {
-            if (
-              _headers.method == "share_draft" ||
-              _headers.method == "share_log" ||
-              _headers.method == "share_deck"
-            ) {
-              ipcSend("popup", {
-                text: parsedResult.error,
-                time: 3000
-              });
-            }
-            if (_headers.method == "auth") {
-              syncSettings({ token: "" }, false);
-              appDb.upsert("", "email", "");
-              appDb.upsert("", "token", "");
-              ipcSend("auth", {});
-              ipcSend("toggle_login", true);
-              ipcSend("clear_pwd", 1);
-              ipcSend("popup", {
-                text: `Error: ${parsedResult.error}`,
-                time: 3000,
-                progress: -1
-              });
-            }
-            // errors here
-          } else if (!parsedResult && _headers.method == "auth") {
-            ipcSend("auth", {});
-            ipcSend("popup", {
-              text: "Something went wrong, please try again",
-              time: 5000,
-              progress: -1
-            });
+          if (task.method === "notifications") {
+            notificationSetTimeout();
           }
         } catch (e) {
-          console.error(e);
-        }
-        try {
+          console.error(
+            `problem handling response ${task.method}: ${e.message}`
+          );
+          // TODO unexpected code error, do not try again?
+        } finally {
           callback();
-        } catch (e) {
-          //
-        }
-
-        if (globals.debugNet && _headers.method !== "notifications") {
-          ipcSend("ipc_log", "httpAsync: " + _headers.method);
         }
       });
     }
   });
   req.on("error", function(e: Error) {
-    console.error(`problem with request ${_headers.method}: ${e.message}`);
+    console.error(`problem with request ${task.method}: ${e.message}`);
     console.log(req);
-    ipcSend("popup", {
+    ipcPop({
       text: `Request error. (${e.message})`,
       time: 20000,
       progress: -1
     });
-
-    callback(e);
-    ipcSend("ipc_log", e.message);
+    callback(e); // TODO server error, try again?
   });
   req.write(postData);
-  // console.log(req);
   req.end();
 }
 
@@ -474,7 +410,7 @@ export function initHttpQueue(): void {
   httpAsync = async.queue(asyncWorker);
   httpAsync.error(function(err, task) {
     if (err) {
-      ipcSend("ipc_log", "httpBasic() Error: " + err.message);
+      ipcLog("httpBasic() Error: " + err.message);
     }
     // do it again
     setTimeout(function() {
@@ -492,7 +428,7 @@ export function httpNotificationsPull(): void {
   });
 }
 
-function notificationProcess(data: any): void {
+function handleNotificationResponse(data: any): void {
   if (!data || !data.notifications) return;
   data.notifications.forEach((str: any) => {
     console.log("notifications message:", str);
@@ -514,7 +450,7 @@ function notificationProcess(data: any): void {
 }
 
 function notificationSetTimeout(): void {
-  // Here we should probably do some "smarter" pull
+  // TODO Here we should probably do some "smarter" pull
   // Like, check if arena is open at all, if we are in a tourney, if we
   // just submitted some data that requires notification pull, etc
   // Based on that adjust the timeout for the next pull or call
@@ -536,6 +472,57 @@ export function httpAuth(userName: string, pass: string): void {
     mtgaversion: playerData.arenaVersion,
     version: electron.remote.app.getVersion()
   });
+}
+
+function handleAuthResponse(parsedResult: any): void {
+  syncSettings({ token: parsedResult.token }, false);
+
+  ipcSend("auth", parsedResult);
+  //ipc_send("auth", parsedResult.arenaids);
+  if (playerData.settings.remember_me) {
+    appDb.upsert("", "token", parsedResult.token);
+    appDb.upsert("", "email", playerData.userName);
+  }
+  const data: any = {};
+  data.patreon = parsedResult.patreon;
+  data.patreon_tier = parsedResult.patreon_tier;
+
+  const serverData = {
+    matches: [],
+    courses: [],
+    drafts: [],
+    economy: [],
+    seasonal: []
+  };
+  if (data.patreon) {
+    serverData.matches = parsedResult.matches;
+    serverData.courses = parsedResult.courses;
+    serverData.drafts = parsedResult.drafts;
+    serverData.economy = parsedResult.economy;
+    serverData.seasonal = parsedResult.seasonal;
+  }
+  setData(data, false);
+  loadPlayerConfig(playerData.arenaId).then(() => {
+    ipcLog("...called back to http-api.");
+    ipcLog("Checking for sync requests...");
+    const requestSync = {
+      courses: serverData.courses.filter(id => !(id in playerData)),
+      matches: serverData.matches.filter(id => !(id in playerData)),
+      drafts: serverData.drafts.filter(id => !(id in playerData)),
+      economy: serverData.economy.filter(id => !(id in playerData)),
+      seasonal: serverData.seasonal.filter(id => !(id in playerData.seasonal))
+    };
+
+    if (requestSync) {
+      ipcLog("Fetch remote player items");
+      // console.log(requestSync);
+      httpSyncRequest(requestSync);
+    } else {
+      ipcLog("No need to fetch remote player items.");
+    }
+    httpNotificationsPull();
+  });
+  ipcSend("set_discord_tag", parsedResult.discord_tag);
 }
 
 export function httpSubmitCourse(course: any): void {
@@ -689,6 +676,33 @@ export function httpGetDatabaseVersion(lang: string): void {
     method: "get_database_version",
     method_path: "/database/latest/" + lang
   });
+}
+
+function handleGetDatabaseVersionResponse(parsedResult: any): void {
+  const lang = playerData.settings.metadata_lang;
+  if (
+    db.metadata &&
+    db.metadata.language &&
+    parsedResult.lang.toLowerCase() !== db.metadata.language.toLowerCase()
+  ) {
+    // compare language
+    ipcLog(
+      `Downloading database (had lang ${db.metadata.language}, needed ${
+        parsedResult.lang
+      })`
+    );
+    httpGetDatabase(lang);
+  } else if (parsedResult.latest > db.version) {
+    // Compare parsedResult.version with stored version
+    ipcLog(
+      `Downloading latest database (had v${db.version}, found v${
+        parsedResult.latest
+      })`
+    );
+    httpGetDatabase(lang);
+  } else {
+    ipcLog(`Database up to date (${db.version}), skipping download.`);
+  }
 }
 
 export function httpDraftShareLink(
