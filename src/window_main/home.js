@@ -263,13 +263,10 @@ export function openHomeTab(arg, opentab = true) {
 
     let setsContainer = createDiv(["top_wildcards_sets_cont"]);
     orderedSets.forEach(set => {
-      let setbutton = createDiv(["set_filter"]);
+      let setbutton = createDiv(["set_filter", "set_" + db.sets[set].code]);
       if (filteredWildcardsSet !== set) {
         setbutton.classList.add("set_filter_on");
       }
-      setbutton.style.backgroundImage = `url(../images/sets/${
-        db.sets[set].code
-      }.png)`;
       setbutton.title = set;
 
       setsContainer.appendChild(setbutton);
@@ -319,10 +316,7 @@ export function openHomeTab(arg, opentab = true) {
       cell.style.textAlign = "center";
       cont.appendChild(cell);
 
-      cell = createDiv(["top_wildcards_set_icon", ld]);
-      cell.style.backgroundImage = `url(../images/sets/${
-        db.sets[card.set].code
-      }.png)`;
+      cell = createDiv(["top_wildcards_set_icon", "set_" + db.sets[card.set].code, ld]);
       cell.title = card.set;
       cell.style.gridArea = `${index + 2} / 2 / auto / auto`;
       cont.appendChild(cell);
