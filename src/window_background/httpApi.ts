@@ -134,26 +134,23 @@ export function httpNotificationsPull(): void {
   );
 }
 
-function notificationSetTimeout(): void {
-  // TODO Here we should probably do some "smarter" pull
-  // Like, check if arena is open at all, if we are in a tourney, if we
-  // just submitted some data that requires notification pull, etc
-  // Based on that adjust the timeout for the next pull or call
-  // this function again if no pull is required.
-  setTimeout(httpNotificationsPull, 10000);
-}
-
 function handleNotificationsResponse(
   error?: Error | null,
   task?: HttpTask,
   results?: string,
   parsedResult?: any
 ): void {
-  notificationSetTimeout(); // always reschedule in queue
+  // TODO Here we should probably do some "smarter" pull
+  // Like, check if arena is open at all, if we are in a tourney, if we
+  // just submitted some data that requires notification pull, etc
+  // Based on that adjust the timeout for the next pull.
+  setTimeout(httpNotificationsPull, 10000);
+
   if (error) {
     handleError(error);
     return;
   }
+
   if (!parsedResult || !parsedResult.notifications) return;
   parsedResult.notifications.forEach((str: any) => {
     console.log("notifications message:", str);
@@ -207,7 +204,7 @@ function handleAuthResponse(
     ipcSend("toggle_login", true);
     ipcSend("clear_pwd", 1);
     ipcPop({
-      text: `Error: ${parsedResult.error}`,
+      text: error.message,
       time: 3000,
       progress: -1
     });
