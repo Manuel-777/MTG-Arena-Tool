@@ -48,9 +48,11 @@ function openDraft(id, draftPosition = 1) {
   container.classList.remove("flex_item");
   container.appendChild(createDiv(["list_fill"]));
 
-  const tileGrpid = db.sets[draft.set].tile;
-  if (db.card(tileGrpid)) {
-    changeBackground("", tileGrpid);
+  if (draft.set) {
+    const tileGrpid = db.sets[draft.set].tile;
+    if (db.card(tileGrpid)) {
+      changeBackground("", tileGrpid);
+    }
   }
 
   const packSize = PACK_SIZES[draft.set] || 14;
