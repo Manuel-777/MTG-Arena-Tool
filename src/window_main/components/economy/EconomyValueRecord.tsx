@@ -15,7 +15,11 @@ interface EconomyValueRecordProps {
 export default function EconomyValueRecord(props: EconomyValueRecordProps) {
   const contents = (
     <>
-      {props.iconClassName && <EconomyIcon className={props.iconClassName} title={props.title} url={props.iconUrl}/>}
+      {props.iconClassName && <EconomyIcon
+        className={props.iconClassName}
+        title={props.title}
+        url={props.iconUrl}
+      />}
       {props.deltaContent && (
         <DeltaLabel smallLabel={props.smallLabel} content={props.deltaContent} />
       )}
@@ -71,6 +75,6 @@ interface EconomyIconProps {
 
 export function EconomyIcon(props: EconomyIconProps) {
   return (
-    <div className={props.className} style={props.url ? { backgroundImage: props.url } : undefined }title={props.title} />
+    <div className={props.className} style={props.url ? { backgroundImage: props.url } : undefined } title={props.title} />
   )
 }
