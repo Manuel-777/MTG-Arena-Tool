@@ -118,7 +118,8 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
     if (!playerData.offline) {
       setData({ offline: true });
     }
-    callback(new Error(`Settings dont allow sending data! > (${task.method})`));
+    const text = `Settings dont allow sending data! > (${task.method})`;
+    callback(new Error(text), task);
   }
   const _headers: any = { ...task };
   _headers.token = playerData.settings.token;
@@ -140,7 +141,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
       const text = `Server error with request. (${task.method}: ${
         res.statusCode
       })`;
-      callback(new Error(text));
+      callback(new Error(text), task);
       return;
     } else {
       res.on("data", function(chunk: any) {
@@ -152,22 +153,25 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
             ipcLog("RECV << " + task.method + ", " + results.slice(0, 100));
           }
           const parsedResult = JSON.parse(results);
-          if (
-            parsedResult &&
-            (parsedResult.ok ||
-            task.method === "get_database_version" || // TODO remove this hack for get_database_version
-              (task.method.includes("set_") && parsedResult.error === 11000)) // TODO remove this hack for all of the set_foo methods
-          ) {
+          // TODO remove this hack for get_database_version
+          if (parsedResult && task.method === "get_database_version") {
+            parsedResult.ok = true;
+          }
+          if (parsedResult && parsedResult.ok) {
             callback(null, task, results, parsedResult);
             return;
           }
           if (parsedResult && parsedResult.error) {
-            throw new Error(parsedResult.error);
+            const text = `Server returned error code. (${task.method}: ${
+              parsedResult.error
+            })`;
+            callback(new Error(text), task, results, parsedResult);
+            return;
           }
           // should never get to this point
-          throw new Error(`Error parsing request. (${task.method})`);
+          throw new Error(`Error handling request. (${task.method})`);
         } catch (error) {
-          callback(error);
+          callback(error, task, results);
         }
       });
     }

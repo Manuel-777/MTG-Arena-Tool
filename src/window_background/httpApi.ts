@@ -279,7 +279,7 @@ export function httpSubmitCourse(course: any): void {
       method_path: "/api/send_course.php",
       course: course
     },
-    makeSimpleResponseHandler()
+    handleSetDataResponse
   );
 }
 
@@ -353,6 +353,21 @@ export function httpGetCourse(courseId: string): void {
   );
 }
 
+function handleSetDataResponse(
+  error?: Error | null,
+  task?: HttpTask,
+  results?: string,
+  parsedResult?: any
+): void {
+  const mongoDbDuplicateKeyErrorCode = 11000;
+  if (parsedResult && parsedResult.error === mongoDbDuplicateKeyErrorCode) {
+    return; // idempotent success case, just return
+  } else if (error) {
+    // handle all other errors
+    handleError(error);
+  }
+}
+
 export function httpSetMatch(match: any): void {
   const _id = makeId(6);
   if (playerData.settings.anon_explore == true) {
@@ -367,7 +382,7 @@ export function httpSetMatch(match: any): void {
       method_path: "/api/send_match.php",
       match: match
     },
-    makeSimpleResponseHandler()
+    handleSetDataResponse
   );
 }
 
@@ -381,7 +396,7 @@ export function httpSetDraft(draft: any): void {
       method_path: "/api/send_draft.php",
       draft: draft
     },
-    makeSimpleResponseHandler()
+    handleSetDataResponse
   );
 }
 
@@ -395,7 +410,7 @@ export function httpSetEconomy(change: any): void {
       method_path: "/api/send_economy.php",
       change: change
     },
-    makeSimpleResponseHandler()
+    handleSetDataResponse
   );
 }
 
@@ -409,7 +424,7 @@ export function httpSetSeasonal(change: any): void {
       method_path: "/api/send_seasonal.php",
       change: change
     },
-    makeSimpleResponseHandler()
+    handleSetDataResponse
   );
 }
 
@@ -423,7 +438,7 @@ export function httpSetSettings(settings: any): void {
       method_path: "/api/send_settings.php",
       settings: settings
     },
-    makeSimpleResponseHandler()
+    handleSetDataResponse
   );
 }
 
@@ -680,7 +695,7 @@ export function httpSetMythicRank(opp: string, rank: string): void {
       opp: opp,
       rank: rank
     },
-    makeSimpleResponseHandler()
+    handleSetDataResponse
   );
 }
 
@@ -705,7 +720,7 @@ export function httpSetDeckTag(
       cards: JSON.stringify(cards),
       format: format
     },
-    makeSimpleResponseHandler()
+    handleSetDataResponse
   );
 }
 
