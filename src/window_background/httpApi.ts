@@ -1,35 +1,39 @@
 import electron from "electron";
 import async from "async";
-import qs from "qs";
-import http, { RequestOptions } from "https";
 
 import { makeId } from "../shared/util";
 import pd from "../shared/player-data";
 import db from "../shared/database";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 
-import globals from "./globals";
 import { ipc_send as ipcSend, setData } from "./background-util";
 import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 import { DeckData } from "./data";
-import { IncomingMessage } from "http";
+import {
+  asyncWorker,
+  HttpTask,
+  handleError,
+  ipcLog,
+  ipcPop,
+  makeSimpleResponseHandler
+} from "./httpWorker";
+import globals from "./globals";
 
-const serverAddress = "mtgatool.com";
-const playerData = pd as any;
-let httpAsync: async.AsyncQueue<HttpTask>;
+export const playerData = pd as any;
+let httpQueue: async.AsyncQueue<HttpTask>;
 
-interface HttpTask {
-  reqId: string;
-  method: string;
-  method_path: string;
-  [key: string]: string;
+export function initHttpQueue(): void {
+  httpQueue = async.queue(asyncWorker);
+  if (globals.debugNet) {
+    httpQueue.drain(() => {
+      ipcLog("httpQueue empty, asyncWorker now idle");
+    });
+  }
 }
 
-const ipcLog = (message: string): void => {
-  ipcSend("ipc_log", message);
-  console.log(message);
-};
-const ipcPop = (args: any): void => ipcSend("popup", args);
+export function isIdle(): boolean {
+  return httpQueue ? httpQueue.idle() : false;
+}
 
 function syncUserData(data: any): void {
   // console.log(data);
@@ -118,319 +122,40 @@ function syncUserData(data: any): void {
   setData({ courses_index, draft_index, economy_index, matches_index });
 }
 
-function getRequestOptions(task: HttpTask): RequestOptions {
-  let options: RequestOptions;
-  switch (task.method) {
-    case "get_database":
-      options = {
-        protocol: "https:",
-        port: 443,
-        hostname: serverAddress,
-        path: "/database/" + task.lang,
-        method: "GET"
-      };
-      ipcPop({
-        text: "Downloading metadata...",
-        time: 0,
-        progress: 2
-      });
-      break;
-
-    case "get_ladder_decks":
-      options = {
-        protocol: "https:",
-        port: 443,
-        hostname: serverAddress,
-        path: "/top_ladder.json",
-        method: "GET"
-      };
-      break;
-
-    case "get_ladder_traditional_decks":
-      options = {
-        protocol: "https:",
-        port: 443,
-        hostname: serverAddress,
-        path: "/top_ladder_traditional.json",
-        method: "GET"
-      };
-      break;
-
-    default:
-      options = {
-        protocol: "https:",
-        port: 443,
-        hostname: serverAddress,
-        path: task.method_path ? task.method_path : "/api.php",
-        method: "POST"
-      };
-  }
-  return options;
-}
-
-function handleSuccessResponse(
-  task: HttpTask,
-  results: string,
-  parsedResult: any
-): void {
-  switch (task.method) {
-    case "discord_unlink":
-      ipcPop({
-        text: "Unlink Ok",
-        time: 1000,
-        progress: -1
-      });
-      ipcSend("set_discord_tag", "");
-      break;
-
-    case "get_database_version":
-      handleGetDatabaseVersionResponse(parsedResult);
-      break;
-
-    case "notifications":
-      handleNotificationResponse(parsedResult);
-      break;
-
-    case "get_explore":
-      ipcSend("set_explore_decks", parsedResult);
-      break;
-
-    case "get_ladder_decks":
-      ipcSend("set_ladder_decks", parsedResult);
-      break;
-
-    case "get_ladder_traditional_decks":
-      ipcSend("set_ladder_traditional_decks", parsedResult);
-      break;
-
-    case "auth":
-      handleAuthResponse(parsedResult);
-      break;
-
-    case "tou_join":
-    case "tou_drop":
-      httpTournamentGet(parsedResult.id);
-      break;
-
-    case "get_top_decks":
-      ipcSend("set_explore", parsedResult.result);
-      break;
-
-    case "get_course":
-      ipcSend("open_course_deck", parsedResult.result);
-      break;
-
-    case "share_draft":
-      ipcSend("set_draft_link", parsedResult.url);
-      break;
-
-    case "share_log":
-      ipcSend("set_log_link", parsedResult.url);
-      break;
-
-    case "share_deck":
-      ipcSend("set_deck_link", parsedResult.url);
-      break;
-
-    case "home_get":
-      ipcSend("set_home", parsedResult);
-      break;
-
-    case "tou_get":
-      ipcSend("tou_set", parsedResult.result);
-      break;
-
-    case "tou_check":
-      //ipc_send("tou_set_game", parsedResult.result);
-      break;
-
-    case "get_sync":
-      syncUserData(parsedResult.data);
-      break;
-
-    case "get_database":
-      //resetLogLoop(100);
-      delete parsedResult.ok;
-      ipcLog("Metadata: Ok");
-      db.handleSetDb(null, results);
-      db.updateCache(results);
-      ipcSend("set_db", results);
-      // autologin users may beat the metadata request
-      // manually trigger a UI refresh just in case
-      ipcSend("player_data_refresh");
-      break;
-  }
-}
-
-function handleErrorResponse(
-  task: HttpTask,
-  results: string,
-  parsedResult: any
-): void {
-  switch (task.method) {
-    case "auth":
-      syncSettings({ token: "" }, false);
-      appDb.upsert("", "email", "");
-      appDb.upsert("", "token", "");
-      ipcSend("auth", {});
-      ipcSend("toggle_login", true);
-      ipcSend("clear_pwd", 1);
-      ipcPop({
-        text: `Error: ${parsedResult.error}`,
-        time: 3000,
-        progress: -1
-      });
-      break;
-
-    case "tou_join":
-      ipcPop({
-        text: parsedResult.error,
-        time: 10000
-      });
-      break;
-
-    case "tou_check":
-      new Notification("MTG Arena Tool", {
-        body: parsedResult.state
-      });
-      // ipcPop({"text": parsedResult.state, "time": 10000});
-      break;
-
-    default:
-    case "share_draft":
-    case "share_log":
-    case "share_deck":
-      ipcPop({
-        text: parsedResult.error,
-        time: 3000
-      });
-      break;
-  }
-}
-
-function asyncWorker(task: HttpTask, callback: any): void {
-  // list of requests that must always be sent, regardless of privacy settings
-  const nonPrivacyMethods = ["auth", "delete_data", "get_database"];
-  if (
-    (playerData.settings.send_data == false || playerData.offline == true) &&
-    !nonPrivacyMethods.includes(task.method) &&
-    globals.debugLog == false
-  ) {
-    if (!playerData.offline) setData({ offline: true });
-    ipcLog("Settings dont allow sending data! > " + task.method);
-    callback();
-  }
-
-  const _headers: any = { ...task };
-  _headers.token = playerData.settings.token;
-  const options = getRequestOptions(task);
-
-  if (globals.debugNet && task.method !== "notifications") {
-    ipcLog(
-      "SEND >> " + task.method + ", " + _headers.reqId + ", " + _headers.token
-    );
-  }
-
-  // console.log("POST", _headers);
-  const postData = qs.stringify(_headers);
-  options.headers = {
-    "Content-Type": "application/x-www-form-urlencoded",
-    "Content-Length": postData.length
-  };
-
-  let results = "";
-  const req = http.request(options, function(res: IncomingMessage) {
-    if (res.statusCode && (res.statusCode < 200 || res.statusCode > 299)) {
-      const text = `Error with request. (${task.method}: ${res.statusCode})`;
-      ipcPop({
-        text,
-        time: 2000,
-        progress: -1
-      });
-      callback(new Error(text)); // TODO server error, try again?
-    } else {
-      res.on("data", function(chunk: any) {
-        results = results + chunk;
-      });
-      res.on("end", function() {
-        try {
-          if (globals.debugNet && task.method !== "notifications") {
-            ipcLog("RECV << " + task.method + ", " + results.slice(0, 100));
-          }
-          let parsedResult = null;
-          try {
-            parsedResult = JSON.parse(results);
-          } catch (e) {
-            if (globals.debugNet) {
-              console.log(results);
-            }
-            ipcPop({
-              text: `Error parsing response. (${task.method})`,
-              time: 2000,
-              progress: -1
-            });
-            // TODO parsing error, do not try again?
-          }
-          if (parsedResult) {
-            if (parsedResult.ok) {
-              handleSuccessResponse(task, results, parsedResult);
-            } else if (parsedResult.error !== undefined) {
-              handleErrorResponse(task, results, parsedResult);
-            }
-          }
-          if (task.method === "notifications") {
-            notificationSetTimeout();
-          }
-        } catch (e) {
-          console.error(
-            `problem handling response ${task.method}: ${e.message}`
-          );
-          // TODO unexpected code error, do not try again?
-        } finally {
-          callback();
-        }
-      });
-    }
-  });
-  req.on("error", function(e: Error) {
-    console.error(`problem with request ${task.method}: ${e.message}`);
-    console.log(req);
-    ipcPop({
-      text: `Request error. (${e.message})`,
-      time: 20000,
-      progress: -1
-    });
-    callback(e); // TODO server error, try again?
-  });
-  req.write(postData);
-  req.end();
-}
-
-export function initHttpQueue(): void {
-  httpAsync = async.queue(asyncWorker);
-  httpAsync.error(function(err, task) {
-    if (err) {
-      ipcLog("httpBasic() Error: " + err.message);
-    }
-    // do it again
-    setTimeout(function() {
-      httpAsync.push(task);
-    }, 250);
-  });
-}
-
 export function httpNotificationsPull(): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "notifications",
-    method_path: "/api/pull.php"
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "notifications",
+      method_path: "/api/pull.php"
+    },
+    handleNotificationsResponse
+  );
 }
 
-function handleNotificationResponse(data: any): void {
-  if (!data || !data.notifications) return;
-  data.notifications.forEach((str: any) => {
+function notificationSetTimeout(): void {
+  // TODO Here we should probably do some "smarter" pull
+  // Like, check if arena is open at all, if we are in a tourney, if we
+  // just submitted some data that requires notification pull, etc
+  // Based on that adjust the timeout for the next pull or call
+  // this function again if no pull is required.
+  setTimeout(httpNotificationsPull, 10000);
+}
+
+function handleNotificationsResponse(
+  error?: Error | null,
+  task?: HttpTask,
+  results?: string,
+  parsedResult?: any
+): void {
+  notificationSetTimeout(); // always reschedule in queue
+  if (error) {
+    handleError(error);
+    return;
+  }
+  if (!parsedResult || !parsedResult.notifications) return;
+  parsedResult.notifications.forEach((str: any) => {
     console.log("notifications message:", str);
     if (typeof str == "string") {
       //console.log("Notification string:", str);
@@ -449,32 +174,46 @@ function handleNotificationResponse(data: any): void {
   });
 }
 
-function notificationSetTimeout(): void {
-  // TODO Here we should probably do some "smarter" pull
-  // Like, check if arena is open at all, if we are in a tourney, if we
-  // just submitted some data that requires notification pull, etc
-  // Based on that adjust the timeout for the next pull or call
-  // this function again if no pull is required.
-  setTimeout(httpNotificationsPull, 10000);
-}
-
 export function httpAuth(userName: string, pass: string): void {
   const _id = makeId(6);
   setData({ userName }, false);
-  httpAsync.push({
-    reqId: _id,
-    method: "auth",
-    method_path: "/api/login.php",
-    email: userName,
-    password: pass,
-    playerid: playerData.arenaId,
-    playername: encodeURIComponent(playerData.name),
-    mtgaversion: playerData.arenaVersion,
-    version: electron.remote.app.getVersion()
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "auth",
+      method_path: "/api/login.php",
+      email: userName,
+      password: pass,
+      playerid: playerData.arenaId,
+      playername: encodeURIComponent(playerData.name),
+      mtgaversion: playerData.arenaVersion,
+      version: electron.remote.app.getVersion()
+    },
+    handleAuthResponse
+  );
 }
 
-function handleAuthResponse(parsedResult: any): void {
+function handleAuthResponse(
+  error?: Error | null,
+  task?: HttpTask,
+  results?: string,
+  parsedResult?: any
+): void {
+  if (error) {
+    syncSettings({ token: "" }, false);
+    appDb.upsert("", "email", "");
+    appDb.upsert("", "token", "");
+    ipcSend("auth", {});
+    ipcSend("toggle_login", true);
+    ipcSend("clear_pwd", 1);
+    ipcPop({
+      text: `Error: ${parsedResult.error}`,
+      time: 3000,
+      progress: -1
+    });
+    return;
+  }
+
   syncSettings({ token: parsedResult.token }, false);
 
   ipcSend("auth", parsedResult);
@@ -533,62 +272,85 @@ export function httpSubmitCourse(course: any): void {
   }
   course.playerRank = playerData.rank.limited.rank;
   course = JSON.stringify(course);
-  httpAsync.push({
-    reqId: _id,
-    method: "submit_course",
-    method_path: "/api/send_course.php",
-    course: course
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "submit_course",
+      method_path: "/api/send_course.php",
+      course: course
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export function httpGetExplore(query: any): void {
   const _id = makeId(6);
-  httpAsync.unshift({
-    reqId: _id,
-    method: "get_explore",
-    method_path: "/api/get_explore_v2.php",
-    filter_wcc: query.filterWCC,
-    filter_wcu: query.filterWCU,
-    filter_wcr: query.filterWCR,
-    filter_wcm: query.filterWCM,
-    filter_owned: query.onlyOwned,
-    filter_type: query.filterType,
-    filter_event: query.filterEvent,
-    filter_sort: query.filterSort,
-    filter_sortdir: query.filterSortDir,
-    filter_mana: query.filteredMana,
-    filter_ranks: query.filteredranks,
-    filter_skip: query.filterSkip,
-    collection: JSON.stringify(playerData.cards.cards)
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "get_explore",
+      method_path: "/api/get_explore_v2.php",
+      filter_wcc: query.filterWCC,
+      filter_wcu: query.filterWCU,
+      filter_wcr: query.filterWCR,
+      filter_wcm: query.filterWCM,
+      filter_owned: query.onlyOwned,
+      filter_type: query.filterType,
+      filter_event: query.filterEvent,
+      filter_sort: query.filterSort,
+      filter_sortdir: query.filterSortDir,
+      filter_mana: query.filteredMana,
+      filter_ranks: query.filteredranks,
+      filter_skip: query.filterSkip,
+      collection: JSON.stringify(playerData.cards.cards)
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_explore_decks", parsedResult);
+    })
+  );
 }
 
 export function httpGetTopLadderDecks(): void {
   const _id = makeId(6);
-  httpAsync.unshift({
-    reqId: _id,
-    method: "get_ladder_decks",
-    method_path: "/top_ladder.json"
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "get_ladder_decks",
+      method_path: "/top_ladder.json"
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_ladder_decks", parsedResult);
+    })
+  );
 }
 
 export function httpGetTopLadderTraditionalDecks(): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "get_ladder_traditional_decks",
-    method_path: "/top_ladder_traditional.json"
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "get_ladder_traditional_decks",
+      method_path: "/top_ladder_traditional.json"
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_ladder_traditional_decks", parsedResult);
+    })
+  );
 }
 
 export function httpGetCourse(courseId: string): void {
   const _id = makeId(6);
-  httpAsync.unshift({
-    reqId: _id,
-    method: "get_course",
-    method_path: "/api/get_course.php",
-    courseid: courseId
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "get_course",
+      method_path: "/api/get_course.php",
+      courseid: courseId
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("open_course_deck", parsedResult.result);
+    })
+  );
 }
 
 export function httpSetMatch(match: any): void {
@@ -598,111 +360,155 @@ export function httpSetMatch(match: any): void {
     match.player.name = "Anonymous";
   }
   match = JSON.stringify(match);
-  httpAsync.push({
-    reqId: _id,
-    method: "set_match",
-    method_path: "/api/send_match.php",
-    match: match
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "set_match",
+      method_path: "/api/send_match.php",
+      match: match
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export function httpSetDraft(draft: any): void {
   const _id = makeId(6);
   draft = JSON.stringify(draft);
-  httpAsync.push({
-    reqId: _id,
-    method: "set_draft",
-    method_path: "/api/send_draft.php",
-    draft: draft
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "set_draft",
+      method_path: "/api/send_draft.php",
+      draft: draft
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export function httpSetEconomy(change: any): void {
   const _id = makeId(6);
   change = JSON.stringify(change);
-  httpAsync.push({
-    reqId: _id,
-    method: "set_economy",
-    method_path: "/api/send_economy.php",
-    change: change
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "set_economy",
+      method_path: "/api/send_economy.php",
+      change: change
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export function httpSetSeasonal(change: any): void {
   const _id = makeId(6);
   change = JSON.stringify(change);
-  httpAsync.push({
-    reqId: _id,
-    method: "set_seasonal",
-    method_path: "/api/send_seasonal.php",
-    change: change
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "set_seasonal",
+      method_path: "/api/send_seasonal.php",
+      change: change
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export function httpSetSettings(settings: any): void {
   const _id = makeId(6);
   settings = JSON.stringify(settings);
-  httpAsync.push({
-    reqId: _id,
-    method: "set_settings",
-    method_path: "/api/send_settings.php",
-    settings: settings
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "set_settings",
+      method_path: "/api/send_settings.php",
+      settings: settings
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export function httpDeleteData(): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "delete_data",
-    method_path: "/api/delete_data.php"
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "delete_data",
+      method_path: "/api/delete_data.php"
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export function httpGetDatabase(lang: string): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "get_database",
-    method_path: "/database/" + lang,
-    lang: lang
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "get_database",
+      method_path: "/database/" + lang,
+      lang: lang
+    },
+    handleGetDatabaseResponse
+  );
+}
+
+function handleGetDatabaseResponse(
+  error?: Error | null,
+  task?: HttpTask,
+  results?: string
+): void {
+  if (error) {
+    handleError(error);
+    return;
+  }
+  if (results) {
+    //resetLogLoop(100);
+    // delete parsedResult.ok;
+    ipcLog("Metadata: Ok");
+    db.handleSetDb(null, results);
+    db.updateCache(results);
+    ipcSend("set_db", results);
+    // autologin users may beat the metadata request
+    // manually trigger a UI refresh just in case
+    ipcSend("player_data_refresh");
+  }
 }
 
 export function httpGetDatabaseVersion(lang: string): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "get_database_version",
-    method_path: "/database/latest/" + lang
-  });
-}
-
-function handleGetDatabaseVersionResponse(parsedResult: any): void {
-  const lang = playerData.settings.metadata_lang;
-  if (
-    db.metadata &&
-    db.metadata.language &&
-    parsedResult.lang.toLowerCase() !== db.metadata.language.toLowerCase()
-  ) {
-    // compare language
-    ipcLog(
-      `Downloading database (had lang ${db.metadata.language}, needed ${
-        parsedResult.lang
-      })`
-    );
-    httpGetDatabase(lang);
-  } else if (parsedResult.latest > db.version) {
-    // Compare parsedResult.version with stored version
-    ipcLog(
-      `Downloading latest database (had v${db.version}, found v${
-        parsedResult.latest
-      })`
-    );
-    httpGetDatabase(lang);
-  } else {
-    ipcLog(`Database up to date (${db.version}), skipping download.`);
-  }
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "get_database_version",
+      method_path: "/database/latest/" + lang
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      const lang = playerData.settings.metadata_lang;
+      if (
+        db.metadata &&
+        db.metadata.language &&
+        parsedResult.lang.toLowerCase() !== db.metadata.language.toLowerCase()
+      ) {
+        // compare language
+        ipcLog(
+          `Downloading database (had lang ${db.metadata.language}, needed ${
+            parsedResult.lang
+          })`
+        );
+        httpGetDatabase(lang);
+      } else if (parsedResult.latest > db.version) {
+        // Compare parsedResult.version with stored version
+        ipcLog(
+          `Downloading latest database (had v${db.version}, found v${
+            parsedResult.latest
+          })`
+        );
+        httpGetDatabase(lang);
+      } else {
+        ipcLog(`Database up to date (${db.version}), skipping download.`);
+      }
+    })
+  );
 }
 
 export function httpDraftShareLink(
@@ -711,57 +517,82 @@ export function httpDraftShareLink(
   draftData: any
 ): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "share_draft",
-    method_path: "/api/get_share_draft.php",
-    id: did,
-    draft: draftData,
-    expire: exp
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "share_draft",
+      method_path: "/api/get_share_draft.php",
+      id: did,
+      draft: draftData,
+      expire: exp
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_draft_link", parsedResult.url);
+    })
+  );
 }
 
 export function httpLogShareLink(lid: string, log: any, exp: any): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "share_log",
-    method_path: "/api/get_share_log.php",
-    id: lid,
-    log: log,
-    expire: exp
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "share_log",
+      method_path: "/api/get_share_log.php",
+      id: lid,
+      log: log,
+      expire: exp
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_log_link", parsedResult.url);
+    })
+  );
 }
 
 export function httpDeckShareLink(deck: any, exp: any): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "share_deck",
-    method_path: "/api/get_share_deck.php",
-    deck: deck,
-    expire: exp
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "share_deck",
+      method_path: "/api/get_share_deck.php",
+      deck: deck,
+      expire: exp
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_deck_link", parsedResult.url);
+    })
+  );
 }
 
 export function httpHomeGet(set: string): void {
   const _id = makeId(6);
-  httpAsync.unshift({
-    reqId: _id,
-    method: "home_get",
-    set: set,
-    method_path: "/api/get_home.php"
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "home_get",
+      set: set,
+      method_path: "/api/get_home.php"
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_home", parsedResult);
+    })
+  );
 }
 
 export function httpTournamentGet(tid: string): void {
   const _id = makeId(6);
-  httpAsync.unshift({
-    reqId: _id,
-    method: "tou_get",
-    method_path: "/api/tournament_get.php",
-    id: tid
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "tou_get",
+      method_path: "/api/tournament_get.php",
+      id: tid
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("tou_set", parsedResult.result);
+    })
+  );
 }
 
 export function httpTournamentJoin(
@@ -771,24 +602,34 @@ export function httpTournamentJoin(
 ): void {
   const _id = makeId(6);
   const deck = JSON.stringify(playerData.deck(deckId));
-  httpAsync.unshift({
-    reqId: _id,
-    method: "tou_join",
-    method_path: "/api/tournament_join.php",
-    id: tid,
-    deck: deck,
-    pass: pass
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "tou_join",
+      method_path: "/api/tournament_join.php",
+      id: tid,
+      deck: deck,
+      pass: pass
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      httpTournamentGet(parsedResult.id);
+    })
+  );
 }
 
 export function httpTournamentDrop(tid: string): void {
   const _id = makeId(6);
-  httpAsync.unshift({
-    reqId: _id,
-    method: "tou_drop",
-    method_path: "/api/tournament_drop.php",
-    id: tid
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "tou_drop",
+      method_path: "/api/tournament_drop.php",
+      id: tid
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      httpTournamentGet(parsedResult.id);
+    })
+  );
 }
 
 export function httpTournamentCheck(
@@ -799,27 +640,48 @@ export function httpTournamentCheck(
   bo3 = ""
 ): void {
   const _id = makeId(6);
-  httpAsync.unshift({
-    reqId: _id,
-    method: "tou_check",
-    method_path: "/api/check_match.php",
-    deck: JSON.stringify(deck),
-    opp: opp,
-    setcheck: setCheck + "",
-    bo3: bo3,
-    play_first: playFirst
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "tou_check",
+      method_path: "/api/check_match.php",
+      deck: JSON.stringify(deck),
+      opp: opp,
+      setcheck: setCheck + "",
+      bo3: bo3,
+      play_first: playFirst
+    },
+    handleTournamentCheckResponse
+  );
+}
+
+function handleTournamentCheckResponse(
+  error?: Error | null,
+  task?: HttpTask,
+  results?: string,
+  parsedResult?: any
+): void {
+  // TODO ask Manwe about this
+  if (error && parsedResult && parsedResult.state) {
+    new Notification("MTG Arena Tool", {
+      body: parsedResult.state
+    });
+  }
+  //ipc_send("tou_set_game", parsedResult.result);
 }
 
 export function httpSetMythicRank(opp: string, rank: string): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "mythicrank",
-    method_path: "/api/send_mythic_rank.php",
-    opp: opp,
-    rank: rank
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "mythicrank",
+      method_path: "/api/send_mythic_rank.php",
+      opp: opp,
+      rank: rank
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export function httpSetDeckTag(
@@ -834,14 +696,17 @@ export function httpSetDeckTag(
       quantity: 1
     };
   });
-  httpAsync.push({
-    reqId: _id,
-    method: "set_deck_tag",
-    method_path: "/api/send_deck_tag.php",
-    tag: tag,
-    cards: JSON.stringify(cards),
-    format: format
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "set_deck_tag",
+      method_path: "/api/send_deck_tag.php",
+      tag: tag,
+      cards: JSON.stringify(cards),
+      format: format
+    },
+    makeSimpleResponseHandler()
+  );
 }
 
 export interface SyncRequestData {
@@ -854,19 +719,34 @@ export interface SyncRequestData {
 
 export function httpSyncRequest(data: SyncRequestData): void {
   const _id = makeId(6);
-  httpAsync.push({
-    reqId: _id,
-    method: "get_sync",
-    method_path: "/api/get_sync.php",
-    data: JSON.stringify(data)
-  });
+  httpQueue.push(
+    {
+      reqId: _id,
+      method: "get_sync",
+      method_path: "/api/get_sync.php",
+      data: JSON.stringify(data)
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      syncUserData(parsedResult.data);
+    })
+  );
 }
 
 export function httpDiscordUnlink(): void {
   const _id = makeId(6);
-  httpAsync.unshift({
-    reqId: _id,
-    method: "discord_unlink",
-    method_path: "/api/discord_unlink.php"
-  });
+  httpQueue.unshift(
+    {
+      reqId: _id,
+      method: "discord_unlink",
+      method_path: "/api/discord_unlink.php"
+    },
+    makeSimpleResponseHandler(() => {
+      ipcPop({
+        text: "Unlink Ok",
+        time: 1000,
+        progress: -1
+      });
+      ipcSend("set_discord_tag", "");
+    })
+  );
 }

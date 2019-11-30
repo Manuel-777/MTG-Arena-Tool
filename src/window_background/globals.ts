@@ -13,7 +13,7 @@ let currentMatch: any = null;
 
 const debugLog = false;
 
-const debugNet = true;
+const debugNet = false;
 
 let duringDraft = false;
 
