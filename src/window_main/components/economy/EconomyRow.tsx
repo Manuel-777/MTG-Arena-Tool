@@ -33,7 +33,11 @@ interface BoosterDeltaProps {
 function BoosterDelta(props: BoosterDeltaProps) {
   const { booster } = props;
   const set = getCollationSet(booster.collationId);
-  return <EconomyValueRecord iconClassName={"set_logo_med set_" + db.sets[set].code} title={set} deltaContent={"x" + Math.abs(booster.count)} />
+  return <EconomyValueRecord
+    iconClassName={"set_logo_med set_" + db.sets[set].code}
+    title={set}
+    deltaContent={"x" + Math.abs(booster.count)}
+  />
 }
 
 interface PossibleModifiedEconomyStats {

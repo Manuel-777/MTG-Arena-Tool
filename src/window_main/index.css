@@ -1683,10 +1683,10 @@ a:hover {
     opacity: 1;
     background-repeat: no-repeat;
     width: 32px;
-    padding: 16px;
+    margin: 16px;
     height: 32px;
     cursor: pointer;
-    background-size: 50%;
+    background-size: contain;
     background-position: center;
     -webkit-transition: all .15s ease-in-out;
 }
@@ -3381,6 +3381,15 @@ a:hover {
 }
 
 .top_wildcards_set_icon {
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    margin: auto;
+    width: 24px;
+    height: 24px;
+}
+
+.top_wildcards_wc_icon {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
