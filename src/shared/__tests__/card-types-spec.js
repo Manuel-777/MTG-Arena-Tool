@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { cardType } from "../card-types";
+import { cardType } from "../cardTypes";
 
 import _ from "lodash";
 import db from "../database";

@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import pd from "./player-data";
-import { cardHasType } from "./card-types";
+import { cardHasType } from "./cardTypes";
 import { DbCardData } from "./types/Metadata";
 
 function OwnershipInfinity(props: { owned: number; acquired: number }) {
