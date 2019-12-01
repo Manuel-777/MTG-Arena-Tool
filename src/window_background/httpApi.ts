@@ -698,10 +698,11 @@ export function httpSetMythicRank(opp: string, rank: string): void {
 
 export function httpSetDeckTag(
   tag: string,
-  deck: RawArenaDeck,
+  deck: any, // TODO should be RawArenaDeck
   format: string
 ): void {
   const _id = makeId(6);
+  // TODO what is this hack?
   const cards = deck.mainDeck.map((card: any) => {
     return {
       ...card,
