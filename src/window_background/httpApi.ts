@@ -8,7 +8,6 @@ import { appDb, playerDb } from "../shared/db/LocalDatabase";
 
 import { ipc_send as ipcSend, setData } from "./background-util";
 import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
-import { DeckData } from "./data";
 import {
   asyncWorker,
   HttpTask,
@@ -18,6 +17,7 @@ import {
   makeSimpleResponseHandler
 } from "./httpWorker";
 import globals from "./globals";
+import { RawArenaDeck } from "../shared/types/Deck";
 
 export const playerData = pd as any;
 let httpQueue: async.AsyncQueue<HttpTask>;
@@ -645,7 +645,7 @@ export function httpTournamentDrop(tid: string): void {
 }
 
 export function httpTournamentCheck(
-  deck: DeckData,
+  deck: RawArenaDeck,
   opp: string,
   setCheck: boolean,
   playFirst = "",
@@ -698,7 +698,7 @@ export function httpSetMythicRank(opp: string, rank: string): void {
 
 export function httpSetDeckTag(
   tag: string,
-  deck: DeckData,
+  deck: RawArenaDeck,
   format: string
 ): void {
   const _id = makeId(6);

@@ -17,7 +17,7 @@ export interface Deck {
   lastUpdated: Date
 }
 
-export interface internalDeck {
+export interface RawArenaDeck {
   mainDeck?: anyCardsList,
   sideboard?: anyCardsList,
   lastUpdated?: string,

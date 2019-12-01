@@ -10,7 +10,7 @@ import {
 } from "./util";
 import { DEFAULT_TILE } from "./constants";
 
-import { anyCardsList, internalDeck } from "./types/Deck";
+import { anyCardsList, RawArenaDeck } from "./types/Deck";
 import { DbCardData } from "./types/Metadata";
 
 class Deck { 
@@ -26,7 +26,7 @@ class Deck {
   public custom: boolean;
   public archetype: string;
 
-  constructor(mtgaDeck:internalDeck = {}, main:anyCardsList = [], side:anyCardsList = []) {
+  constructor(mtgaDeck:RawArenaDeck = {}, main:anyCardsList = [], side:anyCardsList = []) {
     if (!mtgaDeck.mainDeck) mtgaDeck.mainDeck = [];
     if (!mtgaDeck.sideboard) mtgaDeck.sideboard = [];
     if (main.length > 0) mtgaDeck.mainDeck = main;
@@ -275,14 +275,14 @@ class Deck {
   /**
    * Returns a copy of this deck as an object.
    */
-  getSave():internalDeck {
+  getSave():RawArenaDeck {
     return objectClone(this.getSaveRaw());
   }
   
   /**
    * Returns a copy of this deck as an object, but maintains variables references.
    */
-  getSaveRaw():internalDeck {
+  getSaveRaw():RawArenaDeck {
     return {
       mainDeck: this.mainboard.get(),
       sideboard: this.sideboard.get(),

@@ -8,7 +8,7 @@ import { DEFAULT_TILE } from '../shared/constants';
 import { MatchCreatedEvent } from '../shared/types/MatchCreatedEvent';
 import { objectClone } from '../shared/util';
 import Deck from "../shared/deck";
-import { internalDeck } from "../shared/types/Deck";
+import { RawArenaDeck } from "../shared/types/Deck";
 
 // Generate objects using default templates.
 // Nothing in here should call IPC functions
@@ -105,8 +105,8 @@ export interface MatchData {
 
 export interface ExtendedMatchData {
   draws: number;
-  playerDeck: internalDeck;
-  oppDeck: internalDeck;
+  playerDeck: RawArenaDeck;
+  oppDeck: RawArenaDeck;
   tags: any;
   date: number;
   onThePlay: number;
