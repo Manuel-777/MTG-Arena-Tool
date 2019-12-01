@@ -508,7 +508,7 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
     const newDeck = globals.currentMatch.player.deck.clone();
     newDeck.mainboard = tempMain;
     newDeck.sideboard = tempSide;
-    newDeck.getColors();
+    newDeck.colors();
 
     globals.currentMatch.player.deck = newDeck;
     console.log("> ", globals.currentMatch.player.deck);
@@ -1136,7 +1136,7 @@ export function onLabelOutDirectGameChallenge(entry) {
 
   const httpApi = require("./http-api");
   httpApi.httpTournamentCheck(
-    deck,
+    parsedDeck,
     json.params.opponentDisplayName,
     false,
     json.params.playFirst,
