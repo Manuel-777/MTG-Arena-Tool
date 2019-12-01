@@ -3,13 +3,6 @@ import { dialog, app, globalShortcut, Menu, Tray, clipboard } from "electron";
 import path from "path";
 import fs from "fs";
 import { autoUpdater } from "electron-updater";
-import Store from "electron-store";
-import { format as formatUrl } from "url";
-
-var rememberStore = new Store({
-  name: "remember",
-  defaults: {}
-});
 
 import {
   ARENA_MODE_IDLE,
@@ -17,6 +10,7 @@ import {
   ARENA_MODE_DRAFT,
   OVERLAY_DRAFT_MODES
 } from "./shared/constants";
+import { appDb } from "./shared/db/LocalDatabase";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
@@ -88,20 +82,20 @@ app.on("ready", () => {
 
 function startUpdater() {
   if (!app.isPackaged) return;
-  updaterWindow = createUpdaterWindow();
+  appDb.init("application");
+  appDb.find("", "settings").then(doc => {
+    const allowBeta = doc.beta_channel || false;
+    updaterWindow = createUpdaterWindow();
 
-  updaterWindow.webContents.on("did-finish-load", function() {
-    updaterWindow.show();
-    updaterWindow.moveTop();
+    updaterWindow.webContents.on("did-finish-load", function() {
+      updaterWindow.show();
+      updaterWindow.moveTop();
+    });
+
+    //autoUpdater.allowDowngrade = true;
+    autoUpdater.allowPrerelease = allowBeta;
+    autoUpdater.checkForUpdatesAndNotify();
   });
-
-  //autoUpdater.allowDowngrade = true;
-  let betaChannel = rememberStore.get("settings.beta_channel");
-  if (betaChannel) {
-    autoUpdater.allowPrerelease = true;
-  }
-
-  autoUpdater.checkForUpdatesAndNotify();
 }
 
 autoUpdater.on("update-not-available", info => {
