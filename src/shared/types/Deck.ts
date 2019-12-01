@@ -17,7 +17,7 @@ export interface Deck {
   lastUpdated: Date
 }
 
-export interface RawArenaDeck {
+export interface SerializedDeck {
   mainDeck?: anyCardsList,
   sideboard?: anyCardsList,
   lastUpdated?: string,

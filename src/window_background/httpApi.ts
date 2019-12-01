@@ -17,7 +17,7 @@ import {
   makeSimpleResponseHandler
 } from "./httpWorker";
 import globals from "./globals";
-import { RawArenaDeck } from "../shared/types/Deck";
+import { SerializedDeck } from "../shared/types/Deck";
 
 export const playerData = pd as any;
 let httpQueue: async.AsyncQueue<HttpTask>;
@@ -645,7 +645,7 @@ export function httpTournamentDrop(tid: string): void {
 }
 
 export function httpTournamentCheck(
-  deck: RawArenaDeck,
+  deck: SerializedDeck,
   opp: string,
   setCheck: boolean,
   playFirst = "",
