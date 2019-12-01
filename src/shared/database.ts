@@ -4,7 +4,7 @@ import fs from "fs";
 import _ from "lodash";
 import { Metadata, Archetype, DbCardData, CardSet, RewardsDate } from "./types/Metadata";
 import { Season, Rank, RankClassInfo } from "./types/Season";
-import { Deck } from "./types/Deck";
+import { ArenaV3Deck } from "./types/Deck";
 
 const cachePath: string | null =
   app || (remote && remote.app)
@@ -41,7 +41,7 @@ class Database {
   rewards_daily_ends: Date;
   rewards_weekly_ends: Date;
   activeEvents: string[];
-  preconDecks: { [id: string]: Deck };
+  preconDecks: { [id: string]: ArenaV3Deck };
   public metadata: Metadata | undefined;
   season: Season | undefined;
 
@@ -131,7 +131,7 @@ class Database {
     }
   }
 
-  handleSetPreconDecks(_event: Event, arg: Deck[]) {
+  handleSetPreconDecks(_event: Event, arg: ArenaV3Deck[]) {
     if (!arg || !arg.length) return;
     try {
       this.preconDecks = {};

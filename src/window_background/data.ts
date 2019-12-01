@@ -7,6 +7,9 @@ import playerData from '../shared/player-data.js';
 import { DEFAULT_TILE } from '../shared/constants';
 import { MatchCreatedEvent } from '../shared/types/MatchCreatedEvent';
 import { objectClone } from '../shared/util';
+import Deck from "../shared/deck";
+import { SerializedDeck } from "../shared/types/Deck";
+
 // Generate objects using default templates.
 // Nothing in here should call IPC functions
 
@@ -37,26 +40,20 @@ export function createDraft(id: string, entry: any) {
 }
 
 // Match Creation
-
-export interface DeckData {
-  mainDeck: [];
-  sideboard: [];
-}
-
 export interface PlayerMatchData {
   seat: number,
-  deck: DeckData,
+  deck: Deck,
   life: number,
   turn: number,
   name: string,
   id: string,
   rank: string,
   tier: number,
-  originalDeck?: any,
+  originalDeck?: Deck,
   percentile?: number,
   leaderboardPlace?: number,
   cards?: any[],
-  commanderGrpIds: any
+  commanderGrpIds: number[]
 }
 
 export interface ExtendedPlayerMatchData {
@@ -108,8 +105,8 @@ export interface MatchData {
 
 export interface ExtendedMatchData {
   draws: number;
-  playerDeck: any;
-  oppDeck: any;
+  playerDeck: SerializedDeck;
+  oppDeck: SerializedDeck;
   tags: any;
   date: number;
   onThePlay: number;
@@ -155,25 +152,25 @@ const matchDataDefault: MatchData = {
   cardsCast: [],
   player: {
     seat: 1,
-    deck: { mainDeck: [], sideboard: [] },
+    deck: new Deck(),
     life: 20,
     turn: 0,
     name: "",
     id: "",
     rank: "",
     tier: 1,
-    commanderGrpIds: null
+    commanderGrpIds: []
   },
   opponent: {
     seat: 2,
-    deck: { mainDeck: [], sideboard: [] },
+    deck: new Deck(),
     life: 20,
     turn: 0,
     name: "",
     id: "",
     rank: "",
     tier: 1,
-    commanderGrpIds: null
+    commanderGrpIds: []
   }
 };
 
@@ -291,7 +288,9 @@ export function completeMatch(match: ExtendedMatchData, matchData: MatchData, ma
   match.draws = draws;
 
   match.eventId = matchData.eventId;
-  match.playerDeck = matchData.player.originalDeck.getSave();
+  if (matchData.player.originalDeck) {
+    match.playerDeck = matchData.player.originalDeck.getSave();
+  }
   match.oppDeck = getOpponentDeck();
   match.oppDeck.commandZoneGRPIds = matchData.opponent.commanderGrpIds;
 

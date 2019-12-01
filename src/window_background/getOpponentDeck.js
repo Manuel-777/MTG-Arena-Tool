@@ -4,8 +4,8 @@ import Deck from "../shared/deck";
 
 function getOpponentDeck() {
   let _deck = new Deck({}, globals.currentMatch.oppCardsUsed, false);
-  _deck.mainboard.removeDuplicates(true);
-  _deck.getColors();
+  _deck.getMainboard().removeDuplicates(true);
+  _deck.colors;
 
   let format = db.events_format[globals.currentMatch.eventId];
   globals.currentMatch.opponent.deck.archetype = "-";

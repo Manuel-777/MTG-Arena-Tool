@@ -3,13 +3,6 @@ import { dialog, app, globalShortcut, Menu, Tray, clipboard } from "electron";
 import path from "path";
 import fs from "fs";
 import { autoUpdater } from "electron-updater";
-import Store from "electron-store";
-import { format as formatUrl } from "url";
-
-var rememberStore = new Store({
-  name: "remember",
-  defaults: {}
-});
 
 import {
   ARENA_MODE_IDLE,
@@ -17,6 +10,7 @@ import {
   ARENA_MODE_DRAFT,
   OVERLAY_DRAFT_MODES
 } from "./shared/constants";
+import { appDb } from "./shared/db/LocalDatabase";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
@@ -88,20 +82,20 @@ app.on("ready", () => {
 
 function startUpdater() {
   if (!app.isPackaged) return;
-  updaterWindow = createUpdaterWindow();
+  appDb.init("application");
+  appDb.find("", "settings").then(doc => {
+    const allowBeta = doc.beta_channel || false;
+    updaterWindow = createUpdaterWindow();
 
-  updaterWindow.webContents.on("did-finish-load", function() {
-    updaterWindow.show();
-    updaterWindow.moveTop();
+    updaterWindow.webContents.on("did-finish-load", function() {
+      updaterWindow.show();
+      updaterWindow.moveTop();
+    });
+
+    //autoUpdater.allowDowngrade = true;
+    autoUpdater.allowPrerelease = allowBeta;
+    autoUpdater.checkForUpdatesAndNotify();
   });
-
-  //autoUpdater.allowDowngrade = true;
-  let betaChannel = rememberStore.get("settings.beta_channel");
-  if (betaChannel) {
-    autoUpdater.allowPrerelease = true;
-  }
-
-  autoUpdater.checkForUpdatesAndNotify();
 }
 
 autoUpdater.on("update-not-available", info => {
@@ -442,21 +436,7 @@ function updateOverlayVisibility() {
     clearTimeout(overlayHideTimeout);
     overlayHideTimeout = undefined;
 
-    const newBounds = { x: 0, y: 0, width: 0, height: 0 };
-    electron.screen.getAllDisplays().forEach(display => {
-      newBounds.x = Math.min(newBounds.x, display.bounds.x);
-      newBounds.y = Math.min(newBounds.y, display.bounds.y);
-      newBounds.width = Math.max(
-        newBounds.width,
-        display.bounds.x + display.bounds.width
-      );
-      newBounds.height = Math.max(
-        newBounds.height,
-        display.bounds.y + display.bounds.height
-      );
-    });
-
-    overlay.setBounds(newBounds);
+    overlaySetBounds();
     overlay.show();
   }
 }
@@ -486,6 +466,34 @@ function getOverlayVisible(settings) {
     (editMode && arenaState === ARENA_MODE_IDLE);
 
   return settings.show && (currentModeApplies || settings.show_always);
+}
+
+function overlaySetBounds() {
+  const newBounds = { x: 0, y: 0, width: 0, height: 0 };
+  electron.screen.getAllDisplays().forEach(display => {
+    newBounds.x = Math.min(newBounds.x, display.bounds.x);
+    newBounds.y = Math.min(newBounds.y, display.bounds.y);
+  });
+  electron.screen.getAllDisplays().forEach(display => {
+    newBounds.width = Math.max(
+      newBounds.width,
+      Math.abs(newBounds.x) + display.bounds.x + display.bounds.width
+    );
+    newBounds.height = Math.max(
+      newBounds.height,
+      Math.abs(newBounds.y) + display.bounds.y + display.bounds.height
+    );
+  });
+
+  console.log(
+    "Overlay bounds: ",
+    newBounds.x,
+    newBounds.y,
+    newBounds.width,
+    newBounds.height
+  );
+
+  overlay.setBounds(newBounds);
 }
 
 // Catch exceptions
@@ -552,13 +560,10 @@ function saveWindowPos() {
 
 function resetWindows() {
   const primary = electron.screen.getPrimaryDisplay();
-  const { bounds, id } = primary;
-  // reset overlay to primary
-  overlay.setBounds(bounds);
-  background.webContents.send("save_user_settings", {
-    overlay_display: id,
-    skip_refresh: true
-  });
+  const { bounds } = primary;
+  // reset overlay
+  overlaySetBounds();
+
   // reset main to primary
   mainWindow.setBounds({ ...bounds, width: 800, height: 600 });
   mainWindow.show();

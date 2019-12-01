@@ -2,14 +2,14 @@ import * as React from "react";
 
 import { CARD_TYPES, CARD_TYPE_CODES } from "./constants";
 import db from "./database";
-import { DeckData } from "../window_background/data";
-import { CardData } from "../overlay/overlayUtil";
+import Deck from "../shared/deck";
+import { CardObject } from "../shared/types/Deck";
 
-function getDeckTypesAmount(deck: DeckData): { [key: string]: number } {
+function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
   const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
-  if (!deck.mainDeck) return types;
+  if (!deck.getMainboard().get()) return types;
 
-  deck.mainDeck.forEach(function(card: CardData | any) {
+  deck.getMainboard().get().forEach(function(card: CardObject | any) {
     // TODO remove group lands hack
     // develop merge conflict 23/11/19
     //if (card.id && card.id.id && card.id.id == 100) {
@@ -32,7 +32,7 @@ function getDeckTypesAmount(deck: DeckData): { [key: string]: number } {
   return types;
 }
 
-export default function DeckTypesStats(props: { deck: DeckData }): JSX.Element {
+export default function DeckTypesStats(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
   const cardTypes = getDeckTypesAmount(deck);
   return (

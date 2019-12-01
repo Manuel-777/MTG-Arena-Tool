@@ -2,18 +2,19 @@ import * as React from "react";
 
 import { MANA_COLORS } from "./constants";
 import db from "./database";
-import { DeckData } from "../window_background/data";
+import Deck from "../shared/deck";
 import { CardData } from "../overlay/overlayUtil";
+import { CardObject } from "./types/Deck";
 
 function add(a: number, b: number): number {
   return a + b;
 }
 
-function getDeckCurve(deck: DeckData): any[] {
+function getDeckCurve(deck: Deck): any[] {
   const curve: any[] = [];
-  if (!deck.mainDeck) return curve;
+  if (!deck.getMainboard()) return curve;
 
-  deck.mainDeck.forEach((card: CardData) => {
+  deck.getMainboard().get().forEach((card: CardObject) => {
     const cardObj = db.card(card.id);
     if (!cardObj) return;
 
@@ -51,7 +52,7 @@ function getDeckCurve(deck: DeckData): any[] {
   return curve;
 }
 
-export default function DeckManaCurve(props: { deck: DeckData }): JSX.Element {
+export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
   const manaCounts = getDeckCurve(deck);
   const curveMax = Math.max(

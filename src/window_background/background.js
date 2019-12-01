@@ -1,10 +1,11 @@
-import { app, remote, ipcRenderer as ipc } from "electron";
 import _ from "lodash";
+import { app, remote, ipcRenderer as ipc } from "electron";
 import path from "path";
-import Store from "electron-store";
 import fs from "fs";
 import sha1 from "js-sha1";
-import * as httpApi from "./http-api";
+import * as httpApi from "./httpApi";
+import { appDb, playerDb } from "../shared/db/LocalDatabase";
+import { rememberDefaults } from "../shared/db/databaseUtil";
 import playerData from "../shared/player-data";
 import { getReadableFormat } from "../shared/util";
 import { HIDDEN_PW, MAIN_DECKS } from "../shared/constants";
@@ -15,7 +16,11 @@ import globals from "./globals";
 import addCustomDeck from "./addCustomDeck";
 import forceDeckUpdate from "./forceDeckUpdate";
 import arenaLogWatcher from "./arena-log-watcher";
-import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
+import {
+  backportNeDbToElectronStore,
+  loadPlayerConfig,
+  syncSettings
+} from "./loadPlayerConfig";
 import update_deck from "./updateDeck";
 
 if (!remote.app.isPackaged) {
@@ -51,108 +56,99 @@ globals.toolVersion = (app || remote.app)
   .split(".")
   .reduce((acc, cur) => +acc * 256 + +cur);
 
-const settingsCfg = {
-  gUri: ""
-};
-
-globals.rStore = new Store({
-  name: "remember",
-  defaults: globals.rememberCfg
-});
-
-globals.store = new Store({
-  name: "default",
-  defaults: playerData.defaultCfg
-});
-
-var settingsStore = new Store({
-  name: "settings",
-  defaults: settingsCfg
-});
-
 let logLoopInterval = null;
 const debugArenaID = undefined;
 
 //
 ipc.on("save_app_settings", function(event, arg) {
   ipc_send("show_loading");
-  const rSettings = globals.rStore.get("settings");
-  rSettings.toolVersion = globals.toolVersion;
-  const updated = { ...rSettings, ...arg };
-
-  if (!updated.remember_me) {
-    globals.rStore.set("email", "");
-    globals.rStore.set("token", "");
-  }
-  globals.rStore.set("settings", updated);
-
-  syncSettings(updated);
-  ipc_send("hide_loading");
+  appDb.find("", "settings").then(appSettings => {
+    appSettings.toolVersion = globals.toolVersion;
+    const updated = { ...appSettings, ...arg };
+    if (!updated.remember_me) {
+      appDb.upsert("", "email", "");
+      appDb.upsert("", "token", "");
+    }
+    appDb.upsert("", "settings", updated);
+    syncSettings(updated);
+    ipc_send("hide_loading");
+  });
 });
 
 function fixBadSettingsData() {
-  const appSettings = globals.rStore.get("settings");
+  appDb.find("", "settings").then(appSettings => {
+    // First introduced in 2.8.4 (2019-07-25)
+    // Some people's date formats are set to "undefined"
+    // These should be an empty string.
+    if (appSettings.log_locale_format === "undefined") {
+      appSettings.log_locale_format = "";
+    }
 
-  // First introduced in 2.8.4 (2019-07-25)
-  // Some people's date formats are set to "undefined"
-  // These should be an empty string.
-  if (appSettings.log_locale_format === "undefined") {
-    appSettings.log_locale_format = "";
-    globals.rStore.set("settings", appSettings);
-  }
+    // Define new metadata language setting.
+    if (appSettings.metadata_lang === undefined) {
+      appSettings.metadata_lang = "en";
+    }
+    // include more fixes below. Be as specific
+    // and conservitive as possible.
 
-  // Define new metadata language setting.
-  if (appSettings.metadata_lang === undefined) {
-    appSettings.metadata_lang = "en";
-    globals.rStore.set("settings", appSettings);
-  }
-  // include more fixes below. Be as specific
-  // and conservitive as possible.
+    appDb.upsert("", "settings", appSettings);
+  });
 }
 
 function downloadMetadata() {
-  const appSettings = globals.rStore.get("settings");
-  httpApi.httpGetDatabase(appSettings.metadata_lang);
-  ipc_send("popup", {
-    text: `Downloading metadata ${appSettings.metadata_lang}`,
-    time: 0
+  appDb.find("", "settings").then(appSettings => {
+    httpApi.httpGetDatabase(appSettings.metadata_lang);
+    ipc_send("popup", {
+      text: `Downloading metadata ${appSettings.metadata_lang}`,
+      time: 0
+    });
   });
 }
 
 ipc.on("download_metadata", downloadMetadata);
 
+ipc.on("backport_all_data", backportNeDbToElectronStore);
+
 //
-ipc.on("start_background", function() {
-  setData({ appDbPath: globals.rStore.path }, false);
+ipc.on("start_background", async function() {
+  appDb.init("application"); // TODO is this redundant with init call in main?
+  setData({ appDbPath: appDb.filePath }, false);
   fixBadSettingsData();
 
-  // first time during bootstrapping that we load
-  // app-level settings into singletons
-
-  const appSettings = globals.rStore.get("settings");
-  const settings = {
-    ...playerData.settings,
-    ...appSettings,
-    logUri: globals.logUri
-  };
-  setData({ settings }, false);
+  let logUri = await appDb.find("", "logUri");
+  if (typeof process.env.LOGFILE !== "undefined") {
+    logUri = process.env.LOGFILE;
+  }
+  if (!logUri) {
+    logUri = mtgaLog.defaultLogUri();
+  }
+  const email = await appDb.find("", "email");
+  const token = await appDb.find("", "token");
+  const appSettings = await appDb.find("", "settings");
+  const settings = _.defaultsDeep(
+    {
+      ...appSettings,
+      logUri,
+      email,
+      token
+    },
+    rememberDefaults.settings
+  );
+  syncSettings(settings, false);
   ipc_send("initial_settings", settings);
 
   // start initial log parse
   logLoopInterval = window.setInterval(attemptLogLoop, 250);
 
   // start http
-  httpApi.httpBasic();
-  httpApi.httpGetDatabaseVersion(appSettings.metadata_lang);
-  ipc_send("popup", {
-    text: `Downloading metadata ${appSettings.metadata_lang}`,
-    time: 0
-  });
+  httpApi.initHttpQueue();
+  httpApi.httpGetDatabaseVersion(settings.metadata_lang);
+  ipc_send("ipc_log", `Downloading metadata ${settings.metadata_lang}`);
 
   // Check if it is the first time we open this version
   if (
-    appSettings.toolVersion == undefined ||
-    globals.toolVersion > appSettings.toolVersion
+    settings.toolVersion == undefined ||
+    globals.toolVersion > settings.toolVersion
   ) {
     ipc_send("show_whats_new");
   }
@@ -167,12 +163,11 @@ function offlineLogin() {
 //
 ipc.on("login", function(event, arg) {
   if (arg.password == HIDDEN_PW) {
-    globals.tokenAuth = globals.rStore.get("token");
     httpApi.httpAuth(arg.username, arg.password);
   } else if (arg.username === "" && arg.password === "") {
     offlineLogin();
   } else {
-    globals.tokenAuth = "";
+    syncSettings({ token: "" }, false);
     httpApi.httpAuth(arg.username, arg.password);
   }
 });
@@ -201,7 +196,7 @@ ipc.on("request_deck_link", function(event, obj) {
 ipc.on("windowBounds", (event, windowBounds) => {
   if (globals.firstPass) return;
   setData({ windowBounds }, false);
-  globals.store.set("windowBounds", windowBounds);
+  playerDb.upsert("", "windowBounds", windowBounds);
 });
 
 //
@@ -213,7 +208,7 @@ ipc.on("overlayBounds", (event, index, bounds) => {
   };
   overlays[index] = newOverlay;
   setData({ settings: { ...playerData.settings, overlays } }, false);
-  globals.store.set("settings.overlays", overlays);
+  playerDb.upsert("settings", "overlays", overlays);
 });
 
 //
@@ -233,7 +228,7 @@ ipc.on("save_overlay_settings", function(event, settings) {
   });
 
   const updated = { ...playerData.settings, overlays };
-  globals.store.set("settings", updated);
+  playerDb.upsert("settings", "overlays", overlays);
   syncSettings(updated);
   ipc_send("hide_loading");
 });
@@ -247,9 +242,8 @@ ipc.on("save_user_settings", function(event, settings) {
     delete settings.skip_refresh;
     refresh = false;
   }
-  const updated = { ...playerData.settings, ...settings };
-  globals.store.set("settings", updated);
-  syncSettings(updated, refresh);
+  syncSettings(settings, refresh);
+  playerDb.upsert("", "settings", playerData.data.settings);
   ipc_send("hide_loading");
 });
 
@@ -283,7 +277,7 @@ ipc.on("toggle_deck_archived", function(event, arg) {
   const decks = { ...playerData.decks, [id]: deckData };
 
   setData({ decks });
-  globals.store.set("decks." + id, deckData);
+  playerDb.upsert("decks", id, deckData);
   ipc_send("hide_loading");
 });
 
@@ -297,7 +291,7 @@ ipc.on("toggle_archived", function(event, arg) {
   data.archived = !data.archived;
 
   setData({ [id]: data });
-  globals.store.set(id, data);
+  playerDb.upsert("", id, data);
   ipc_send("hide_loading");
 });
 
@@ -335,8 +329,9 @@ ipc.on("tou_drop", function(event, arg) {
 
 ipc.on("edit_tag", (event, arg) => {
   const { tag, color } = arg;
-  setData({ tags_colors: { ...playerData.tags_colors, [tag]: color } });
-  globals.store.set("tags_colors." + tag, color);
+  const tags_colors = { ...playerData.tags_colors, [tag]: color };
+  setData({ tags_colors });
+  playerDb.upsert("", "tags_colors", tags_colors);
   sendSettings();
 });
 
@@ -351,7 +346,7 @@ ipc.on("delete_tag", (event, arg) => {
 
   const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
   setData({ decks_tags });
-  globals.store.set("decks_tags." + deckid, tags);
+  playerDb.upsert("", "decks_tags", decks_tags);
 });
 
 ipc.on("add_tag", (event, arg) => {
@@ -365,7 +360,7 @@ ipc.on("add_tag", (event, arg) => {
 
   const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
   setData({ decks_tags });
-  globals.store.set("decks_tags." + deckid, tags);
+  playerDb.upsert("", "decks_tags", decks_tags);
 });
 
 ipc.on("delete_history_tag", (event, arg) => {
@@ -380,7 +375,7 @@ ipc.on("delete_history_tag", (event, arg) => {
   const matchData = { ...match, tags };
 
   setData({ [matchid]: matchData });
-  globals.store.set(matchid + ".tags", tags);
+  playerDb.upsert(matchid, "tags", tags);
 });
 
 ipc.on("add_history_tag", (event, arg) => {
@@ -392,8 +387,8 @@ ipc.on("add_history_tag", (event, arg) => {
   const tags = [...(match.tags || []), tag];
 
   setData({ [matchid]: { ...match, tags } });
-  globals.store.set(matchid + ".tags", tags);
-  httpApi.httpSetDeckTag(tag, match.oppDeck.mainDeck, match.eventId);
+  playerDb.upsert(matchid, "tags", tags);
+  httpApi.httpSetDeckTag(tag, match.oppDeck, match.eventId);
 });
 
 ipc.on("set_odds_samplesize", function(event, state) {
@@ -406,26 +401,18 @@ ipc.on("set_odds_samplesize", function(event, state) {
 ipc.on("set_log", function(event, arg) {
   if (globals.watchingLog) {
     globals.stopWatchingLog();
-    globals.stopWatchingLog = arenaLogWatcher.startWatchingLog();
+    globals.stopWatchingLog = arenaLogWatcher.startWatchingLog(arg);
   }
-  globals.logUri = arg;
-  settingsStore.set("logUri", arg);
+  syncSettings({ logUri: arg });
+  appDb.upsert("", "logUri", arg).then(() => {
+    remote.app.relaunch();
+    remote.app.exit(0);
+  });
 });
 
 // Read the log
 // Set variables to default first
 let prevLogSize = 0;
-
-let settingsLogUri = settingsStore.get("logUri");
-if (settingsLogUri) {
-  globals.logUri = settingsLogUri;
-}
-
-if (typeof process.env.LOGFILE !== "undefined") {
-  globals.logUri = process.env.LOGFILE;
-}
-
-console.log(globals.logUri);
 
 function sendSettings() {
   let tags_colors = playerData.tags_colors;
@@ -444,11 +431,12 @@ async function attemptLogLoop() {
 
 // Basic logic for reading the log file
 async function logLoop() {
+  const logUri = playerData.settings.logUri;
   //console.log("logLoop() start");
   //ipc_send("ipc_log", "logLoop() start");
-  if (fs.existsSync(globals.logUri)) {
-    if (fs.lstatSync(globals.logUri).isDirectory()) {
-      ipc_send("no_log", globals.logUri);
+  if (fs.existsSync(logUri)) {
+    if (fs.lstatSync(logUri).isDirectory()) {
+      ipc_send("no_log", logUri);
       ipc_send("popup", {
         text: "No log file found. Please include the file name too.",
         time: 1000
@@ -456,7 +444,7 @@ async function logLoop() {
       return;
     }
   } else {
-    ipc_send("no_log", globals.logUri);
+    ipc_send("no_log", logUri);
     ipc_send("popup", { text: "No log file found.", time: 1000 });
     return;
   }
@@ -470,7 +458,7 @@ async function logLoop() {
   }
 */
 
-  const { size } = await mtgaLog.stat(globals.logUri);
+  const { size } = await mtgaLog.stat(logUri);
 
   if (size == undefined) {
     // Something went wrong obtaining the file size, try again later
@@ -486,8 +474,8 @@ async function logLoop() {
 
   const logSegment =
     delta > 0
-      ? await mtgaLog.readSegment(globals.logUri, prevLogSize, delta)
-      : await mtgaLog.readSegment(globals.logUri, 0, size);
+      ? await mtgaLog.readSegment(logUri, prevLogSize, delta)
+      : await mtgaLog.readSegment(logUri, 0, size);
 
   // We are looping only to get user data (processLogUser)
   // Process only the user data for initial loading (prior to log in)
@@ -564,15 +552,13 @@ async function logLoop() {
   });
   clearInterval(logLoopInterval);
 
+  const { auto_login, remember_me, email, token } = playerData.settings;
   let username = "";
   let password = "";
-  const { auto_login, remember_me } = playerData.settings;
   if (remember_me) {
-    username = globals.rStore.get("email");
-    const token = globals.rStore.get("token");
-    if (username != "" && token != "") {
+    username = email;
+    if (email && token) {
       password = HIDDEN_PW;
-      globals.tokenAuth = token;
     }
   }
 
@@ -585,7 +571,7 @@ async function logLoop() {
 
   if (auto_login) {
     ipc_send("toggle_login", false);
-    if (remember_me && username && globals.tokenAuth) {
+    if (remember_me && username && token) {
       ipc_send("popup", {
         text: "Logging in automatically...",
         time: 0,

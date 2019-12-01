@@ -1,5 +1,4 @@
 import Deck from "../shared/deck";
-import { defaultLogUri } from "./mtga-log";
 
 // Hey! If you're here, you might be thinking of adding stuff to this file.
 // Don't. This is a shadowy place. You must never go here.
@@ -8,15 +7,13 @@ import { defaultLogUri } from "./mtga-log";
 
 let actionLogDir = "";
 
-let logUri = defaultLogUri();
-
 let currentDeck = new Deck();
 
 let currentMatch: any = null;
 
 const debugLog = false;
 
-const debugNet = true;
+const debugNet = false;
 
 let duringDraft = false;
 
@@ -40,31 +37,11 @@ let matchCompletedOnGameNumber = 0;
 
 let matchGameStats: any[] = [];
 
-let originalDeck: any = undefined;
+let originalDeck:Deck = new Deck();
 
 let odds_sample_size = 1;
 
 let toolVersion: any = null;
-
-const rememberCfg = {
-  email: "",
-  token: "",
-  settings: {
-    toolVersion: toolVersion,
-    auto_login: false,
-    launch_to_tray: false,
-    remember_me: true,
-    beta_channel: false,
-    metadata_lang: "en",
-    log_locale_format: ""
-  }
-};
-
-let rStore: any = null;
-
-let store: any = null;
-
-let tokenAuth: any = undefined;
 
 let watchingLog = false;
 
@@ -85,16 +62,11 @@ export default {
   instanceToCardIdMap,
   logReadStart,
   logTime,
-  logUri,
   matchCompletedOnGameNumber,
   matchGameStats,
   odds_sample_size,
   originalDeck,
-  rememberCfg,
-  rStore,
   stopWatchingLog,
-  store,
-  tokenAuth,
   toolVersion,
   watchingLog
 };

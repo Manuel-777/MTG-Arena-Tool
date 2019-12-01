@@ -159,10 +159,10 @@ async function readChunk(path, position, length) {
   return buffer;
 }
 
-function startWatchingLog() {
+function startWatchingLog(path) {
   globals.logReadStart = new Date();
   return start({
-    path: globals.logUri,
+    path,
     chunkSize: 268435440,
     onLogEntry: onLogEntryFound,
     onError: err => console.error(err),
@@ -394,7 +394,6 @@ function finishLoading() {
       progress: 2
     });
     globals.firstPass = false;
-    globals.store.set(playerData.data);
     logReadEnd = new Date();
     let logReadElapsed = (logReadEnd - globals.logReadStart) / 1000;
     ipc_send("ipc_log", `Log read in ${logReadElapsed}s`);
@@ -417,18 +416,6 @@ function finishLoading() {
     ipc_send("set_settings", JSON.stringify(playerData.settings));
     ipc_send("initialize");
     ipc_send("player_data_refresh");
-
-    if (playerData.name) {
-      // This needs to be triggered somewhere else
-      const httpApi = require("./http-api");
-      httpApi.httpSetPlayer(
-        playerData.name,
-        playerData.rank.constructed.rank,
-        playerData.rank.constructed.tier,
-        playerData.rank.limited.rank,
-        playerData.rank.limited.tier
-      );
-    }
 
     ipc_send("popup", {
       text: "Initialized successfully!",
