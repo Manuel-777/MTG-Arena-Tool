@@ -1,8 +1,8 @@
 // Might conflict with the class?
-export interface Deck {
+export interface ArenaV3Deck {
   commandZoneGRPIds: null | number[];
-  mainDeck: number[];
-  sideboard: number[];
+  mainDeck: v3cardsList;
+  sideboard: v3cardsList;
   isValid: boolean;
   lockedForUse: boolean;
   lockedForEdit: boolean;
