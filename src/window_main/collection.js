@@ -895,7 +895,7 @@ function openSetStats(setStats, setName) {
       var style = getComputedStyle(document.body);
       let compDiv = renderCompletionDiv(
         countStats,
-        style.getPropertyValue(`--wc_${ rarity }_png`),
+        style.getPropertyValue(`--wc_${rarity}_png`),
         capitalizedRarity
       );
       compDiv.style.opacity = 1;
