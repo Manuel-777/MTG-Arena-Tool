@@ -34,7 +34,7 @@ let instanceToCardIdMap: any = {};
 
 let logReadStart: any = null;
 
-let logTime = false;
+let logTime = new Date();
 
 let matchCompletedOnGameNumber = 0;
 
