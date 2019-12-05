@@ -35,7 +35,7 @@ const tagPrompt = "Add";
 
 const cleanupReact = null;
 
-function setFilters(selected = {}) {
+function setFilters(selected: any = {}): void {
   if (selected.eventId || selected.date) {
     // clear all dependent filters
     filters = {
@@ -53,9 +53,9 @@ function setFilters(selected = {}) {
 }
 
 //
-export function openDecksTab(_filters = {}, scrollTop = 0) {
+export function openDecksTab(_filters = {}, scrollTop = 0): void {
   hideLoadingBars();
-  const mainDiv = resetMainContainer();
+  const mainDiv = resetMainContainer() as HTMLElement;
   mainDiv.classList.add("flex_item");
   setFilters(_filters);
 
@@ -122,7 +122,7 @@ export function openDecksTab(_filters = {}, scrollTop = 0) {
     decks.sort(aggregator.compareDecks);
   }
 
-  const isDeckVisible = deck =>
+  const isDeckVisible = (deck: any): boolean =>
     aggregator.filterDeck(deck) &&
     (filters.eventId === Aggregator.DEFAULT_EVENT ||
       aggregator.deckLastPlayed[deck.id]);
