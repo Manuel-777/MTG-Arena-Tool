@@ -569,6 +569,7 @@ export function onLabelInEventGetActiveEventsV2(entry) {
 export function onLabelRankUpdated(entry) {
   const json = entry.json();
   if (!json) return;
+  json.id = entry.hash;
   json.date = json.timestamp;
   json.timestamp = globals.logTime;
   json.lastMatchId = globals.currentMatch.matchId;
@@ -584,11 +585,7 @@ export function onLabelRankUpdated(entry) {
   rank[updateType].step = json.newStep;
   rank[updateType].seasonOrdinal = json.seasonOrdinal;
 
-  json.id = sha1(
-    updateType + json.seasonOrdinal + json.lastMatchId + json.date
-  );
-
-  let seasonal_rank = playerData.addSeasonalRank(
+  const seasonal_rank = playerData.addSeasonalRank(
     json,
     json.seasonOrdinal,
     updateType
@@ -743,7 +740,7 @@ export function onLabelInDeckUpdateDeckV3(entry) {
   json = convertDeckFromV3(json);
   const _deck = playerData.deck(json.id);
 
-  const changeId = sha1(json.id + "-" + json.lastUpdated);
+  const changeId = entry.hash;
   const deltaDeck = {
     id: changeId,
     deckId: _deck.id,
@@ -853,7 +850,7 @@ export function onLabelInventoryUpdated(entry) {
       delta.context = transaction.context + "." + update.context.source;
     }
     // Construct a unique ID
-    delta.id = sha1(JSON.stringify(delta));
+    delta.id = sha1(JSON.stringify(delta) + entry.hash);
     // Add missing data
     delta.date = globals.logTime;
     // Add delta to our current values
@@ -927,7 +924,7 @@ function inventoryUpdate(entry, update) {
     subContext: update.context // preserve sub-context object data
   };
   // Construct a unique ID
-  transaction.id = sha1(JSON.stringify(transaction));
+  transaction.id = sha1(JSON.stringify(transaction) + entry.hash);
   // Add missing data
   transaction.date = globals.logTime;
 
@@ -1069,6 +1066,7 @@ export function onLabelTrackRewardTierUpdated(entry) {
   const economy = { ...playerData.economy };
 
   const transaction = {
+    id: entry.hash,
     context: "Track.RewardTier.Updated",
     timestamp: json.timestamp,
     date: parseWotcTimeFallback(json.timestamp),
@@ -1092,8 +1090,6 @@ export function onLabelTrackRewardTierUpdated(entry) {
     }
   }
 
-  // Construct a unique ID
-  transaction.id = sha1(JSON.stringify(transaction));
   saveEconomyTransaction(transaction);
 
   // console.log(economy);
