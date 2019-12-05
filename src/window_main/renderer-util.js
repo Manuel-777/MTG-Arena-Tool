@@ -658,8 +658,8 @@ function closeDialog() {
 
 function showColorpicker(
   color,
-  onChange = () => {},
-  onDone = () => {},
+  onChange = color => {},
+  onDone = color => {},
   onCancel = () => {},
   pickerOptions = {}
 ) {

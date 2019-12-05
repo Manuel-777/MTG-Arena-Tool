@@ -5,7 +5,7 @@ import { MANA, CARD_RARITIES, EASING_DEFAULT } from "../shared/constants";
 import pd from "../shared/player-data";
 import { createDiv, createInput } from "../shared/dom-fns";
 import {
-  get_deck_missing,
+  get_deck_missing as getDeckMissing,
   getBoosterCountEstimate,
   getReadableFormat
 } from "../shared/util";
@@ -33,8 +33,6 @@ let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
 const tagPrompt = "Add";
 
-const cleanupReact = null;
-
 function setFilters(selected: any = {}): void {
   if (selected.eventId || selected.date) {
     // clear all dependent filters
@@ -59,36 +57,36 @@ export function openDecksTab(_filters = {}, scrollTop = 0): void {
   mainDiv.classList.add("flex_item");
   setFilters(_filters);
 
-  const wrap_r = createDiv(["wrapper_column", "sidebar_column_l"]);
-  wrap_r.style.width = pd.settings.right_panel_width + "px";
-  wrap_r.style.flex = `0 0 ${pd.settings.right_panel_width}px`;
-  const aggregator = new Aggregator(filters);
+  const wrapR = createDiv(["wrapper_column", "sidebar_column_l"]);
+  wrapR.style.width = pd.settings.right_panel_width + "px";
+  wrapR.style.flex = `0 0 ${pd.settings.right_panel_width}px`;
+  const aggregator: any = new Aggregator(filters);
   const statsPanel = new StatsPanel(
     "decks_top",
     aggregator,
     pd.settings.right_panel_width,
     true
   );
-  const decks_top_winrate = statsPanel.render();
-  decks_top_winrate.style.display = "flex";
-  decks_top_winrate.style.flexDirection = "column";
-  decks_top_winrate.style.marginTop = "16px";
-  decks_top_winrate.style.padding = "12px";
+  const decksTopWinrate = statsPanel.render();
+  decksTopWinrate.style.display = "flex";
+  decksTopWinrate.style.flexDirection = "column";
+  decksTopWinrate.style.marginTop = "16px";
+  decksTopWinrate.style.padding = "12px";
 
   const drag = createDiv(["dragger"]);
-  wrap_r.appendChild(drag);
+  wrapR.appendChild(drag);
   makeResizable(drag, statsPanel.handleResize);
 
-  wrap_r.appendChild(decks_top_winrate);
+  wrapR.appendChild(decksTopWinrate);
 
-  const wrap_l = createDiv(["wrapper_column"]);
-  wrap_l.setAttribute("id", "decks_column");
+  const wrapL = createDiv(["wrapper_column"]);
+  wrapL.setAttribute("id", "decks_column");
 
   const d = createDiv(["list_fill"]);
-  wrap_l.appendChild(d);
+  wrapL.appendChild(d);
 
-  mainDiv.appendChild(wrap_l);
-  mainDiv.appendChild(wrap_r);
+  mainDiv.appendChild(wrapL);
+  mainDiv.appendChild(wrapR);
 
   // Tags and filters
   const decksTop = createDiv(["decks_top"]);
@@ -109,7 +107,7 @@ export function openDecksTab(_filters = {}, scrollTop = 0): void {
     true
   );
   mountReactComponent(filterPanel.render(), decksTop);
-  wrap_l.appendChild(decksTop);
+  wrapL.appendChild(decksTop);
 
   const decks = [...pd.deckList];
   if (filters.sort === "By Winrate") {
@@ -128,39 +126,47 @@ export function openDecksTab(_filters = {}, scrollTop = 0): void {
       aggregator.deckLastPlayed[deck.id]);
 
   decks.filter(isDeckVisible).forEach(deck => {
-    let tileGrpid = deck.deckTileId;
-    let listItem;
+    const tileGrpid = deck.deckTileId;
+    let listItem = new ListItem(tileGrpid, deck.id, (id: string) =>
+      openDeckCallback(id, filters)
+    );
     if (deck.custom) {
-      const archiveCallback = id => {
+      const archiveCallback = (id: string): void => {
         ipcSend("toggle_deck_archived", id);
       };
-
       listItem = new ListItem(
         tileGrpid,
         deck.id,
-        id => openDeckCallback(id, filters),
+        (id: string) => openDeckCallback(id, filters),
         archiveCallback,
         deck.archived
-      );
-    } else {
-      listItem = new ListItem(tileGrpid, deck.id, id =>
-        openDeckCallback(id, filters)
       );
     }
     listItem.divideLeft();
     listItem.divideCenter();
     listItem.divideRight();
+    if (
+      !listItem.leftTop ||
+      !listItem.leftBottom ||
+      !listItem.centerTop ||
+      !listItem.centerBottom ||
+      !listItem.rightTop ||
+      !listItem.rightBottom
+    ) {
+      // this should never occur, guard statement is here purely to shut up TS
+      return;
+    }
 
     listItem.centerTop.classList.add("deck_tags_container");
-    createTag(listItem.centerTop, deck.id, null, false);
+    createTag(listItem.centerTop, deck.id, "", false);
     if (deck.format) {
       const fText = getReadableFormat(deck.format);
       const t = createTag(listItem.centerTop, deck.id, fText, false);
       t.style.fontStyle = "italic";
     }
     if (deck.tags) {
-      deck.tags.forEach(tag => {
-        if (tag !== getReadableFormat(deck.format)) {
+      deck.tags.forEach((tag: string) => {
+        if (tag !== getReadableFormat(deck.format) && listItem.centerTop) {
           createTag(listItem.centerTop, deck.id, tag);
         }
       });
@@ -174,13 +180,13 @@ export function openDecksTab(_filters = {}, scrollTop = 0): void {
       mythic: pd.economy.wcMythic
     };
 
-    let missingWildcards = get_deck_missing(deck);
+    const missingWildcards = getDeckMissing(deck);
 
     let wc;
     let n = 0;
-    let boosterCost = getBoosterCountEstimate(missingWildcards);
-    CARD_RARITIES.filter(rarity => rarity !== "land").forEach(cardRarity => {
-      cardRarity = cardRarity.toLowerCase();
+    const boosterCost = getBoosterCountEstimate(missingWildcards);
+    CARD_RARITIES.forEach(cardRarity => {
+      if (cardRarity === "land") return;
       if (missingWildcards[cardRarity]) {
         n++;
         wc = createDiv(["wc_explore_cost", "wc_" + cardRarity]);
@@ -195,7 +201,7 @@ export function openDecksTab(_filters = {}, scrollTop = 0): void {
       }
     });
     if (n !== 0) {
-      const bo = createDiv(["bo_explore_cost"], Math.round(boosterCost));
+      const bo = createDiv(["bo_explore_cost"], Math.round(boosterCost) + "");
       bo.title = "Boosters needed (estimated)";
       listItem.right.appendChild(bo);
     }
@@ -207,8 +213,9 @@ export function openDecksTab(_filters = {}, scrollTop = 0): void {
     const deckNameDiv = createDiv(["list_deck_name"], deck.name);
     listItem.leftTop.appendChild(deckNameDiv);
 
-    deck.colors.forEach(function(color) {
-      const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
+    deck.colors.forEach(function(color: number) {
+      const m = createDiv(["mana_s20", "mana_" + (MANA as any)[color]]);
+      if (!listItem.leftBottom) return;
       listItem.leftBottom.appendChild(m);
     });
 
@@ -253,7 +260,7 @@ export function openDecksTab(_filters = {}, scrollTop = 0): void {
         ["list_deck_winrate"],
         "Since last edit: "
       );
-      deckWinrateLastDiv.style.opacity = 0.6;
+      deckWinrateLastDiv.style.opacity = "0.6";
       const drwr = aggregator.deckRecentStats[deck.id];
       if (drwr && drwr.total > 0) {
         colClass = getWinrateClass(drwr.winrate);
@@ -270,18 +277,18 @@ export function openDecksTab(_filters = {}, scrollTop = 0): void {
       listItem.rightBottom.appendChild(deckWinrateLastDiv);
     }
 
-    wrap_l.appendChild(listItem.container);
+    wrapL.appendChild(listItem.container);
   });
 
-  wrap_l.addEventListener("scroll", function() {
-    setLocalState({ lastScrollTop: wrap_l.scrollTop });
+  wrapL.addEventListener("scroll", function() {
+    setLocalState({ lastScrollTop: wrapL.scrollTop });
   });
   if (scrollTop) {
-    wrap_l.scrollTop = scrollTop;
+    wrapL.scrollTop = scrollTop;
   }
 }
 
-function openDeckCallback(id, filters) {
+function openDeckCallback(id: string, filters: any): void {
   const deck = pd.deck(id);
   if (!deck) return;
   openDeck(deck, { ...filters, deckId: id });
@@ -293,7 +300,12 @@ function openDeckCallback(id, filters) {
   });
 }
 
-function createTag(div, deckId, tag, showClose = true) {
+function createTag(
+  div: HTMLElement,
+  deckId: string,
+  tag: string,
+  showClose = true
+): HTMLDivElement {
   const tagCol = getTagColor(tag);
   const t = createDiv(["deck_tag"], tag || tagPrompt);
   t.style.backgroundColor = tagCol;
@@ -303,8 +315,8 @@ function createTag(div, deckId, tag, showClose = true) {
       e.stopPropagation();
       showColorpicker(
         tagCol,
-        color => (t.style.backgroundColor = color.rgbString),
-        color => ipcSend("edit_tag", { tag, color: color.rgbString }),
+        (color: any) => (t.style.backgroundColor = color.rgbString),
+        (color: any) => ipcSend("edit_tag", { tag, color: color.rgbString }),
         () => (t.style.backgroundColor = tagCol)
       );
     });
@@ -355,7 +367,7 @@ function createTag(div, deckId, tag, showClose = true) {
   return t;
 }
 
-function addTag(deckid, tag) {
+function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);
   if (!deck || !tag) return;
   if (getReadableFormat(deck.format) === tag) return;
@@ -365,7 +377,7 @@ function addTag(deckid, tag) {
   ipcSend("add_tag", { deckid, tag });
 }
 
-function deleteTag(deckid, tag) {
+function deleteTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);
   if (!deck || !tag) return;
   if (!deck.tags || !deck.tags.includes(tag)) return;

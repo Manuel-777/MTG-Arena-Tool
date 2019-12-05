@@ -2,7 +2,7 @@ import { getCardArtCrop } from "../shared/util";
 import { createDiv } from "../shared/dom-fns";
 
 class ListItem {
-  constructor(_grpId, _id, _onClick, _onDelete = false, isArchived = false) {
+  constructor(_grpId, _id, _onClick, _onDelete, isArchived = false) {
     this.onClickCallback = _onClick;
     if (typeof _onDelete == "function") {
       this.onDeleteCallback = _onDelete;

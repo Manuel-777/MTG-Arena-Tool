@@ -41,7 +41,7 @@ class FilterPanel {
     showManaFilter: boolean,
     archs: string[],
     showOppManaFilter: boolean,
-    archCounts: { [key: string]: number },
+    archCounts: { [key: string]: number } | null,
     showArchivedFilter: boolean,
     showSortOption: boolean
   ) {
