@@ -45,7 +45,7 @@ export function openTab(tab:number, filters = {}, dataIndex = 0, scrollTop = 0) 
   resetMainContainer();
   switch (tab) {
     case MAIN_DECKS:
-      openDecksTab(filters, scrollTop);
+      openDecksTab(filters);
       break;
     case MAIN_HISTORY:
       openHistoryTab(filters, dataIndex, scrollTop);

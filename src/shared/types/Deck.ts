@@ -30,6 +30,7 @@ export interface SerializedDeck {
   commandZoneGRPIds?: number[];
   colors?: number[];
   archetype?: string;
+  archived?: boolean;
 }
 
 export interface CardObject {
