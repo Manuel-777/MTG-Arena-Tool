@@ -120,9 +120,6 @@ export function fuzzyTextFilterFn(
   });
 }
 
-// Let the table remove the filter if the string is empty
-fuzzyTextFilterFn.autoRemove = (val: string): boolean => !val;
-
 export function fuzzyTextArrayFilterFn(
   rows: any[],
   id: string,
@@ -133,11 +130,10 @@ export function fuzzyTextArrayFilterFn(
   });
 }
 
-// Let the table remove the filter if the string is empty
-fuzzyTextArrayFilterFn.autoRemove = (val: string): boolean => !val;
+const defaultColors = Aggregator.getDefaultColorFilter();
 
 export function ColorColumnFilter({
-  column: { filterValue = { ...Aggregator.getDefaultColorFilter() }, setFilter }
+  column: { filterValue = { ...defaultColors }, setFilter }
 }: {
   column: any;
 }): JSX.Element {
@@ -147,7 +143,11 @@ export function ColorColumnFilter({
       filterKey={"colors"}
       filters={{ colors: filterValue }}
       onFilterChanged={(colors): void => {
-        setFilter(() => colors);
+        if (_.isMatch(colors, defaultColors)) {
+          setFilter(undefined); // clear filter
+        } else {
+          setFilter(colors);
+        }
       }}
     />
   );
@@ -164,7 +164,7 @@ export function colorsFilterFn(
 }
 
 export function ArchiveColumnFilter({
-  column: { filterValue = false, setFilter }
+  column: { filterValue, setFilter }
 }: {
   column: any;
 }): JSX.Element {
@@ -177,10 +177,10 @@ export function ArchiveColumnFilter({
       <label style={{ cursor: "pointer", whiteSpace: "nowrap" }}>
         <input
           type="checkbox"
-          checked={filterValue === "showAll"}
+          checked={filterValue !== "hideArchived"}
           onChange={(e): void => {
             const val = e.target.checked;
-            setFilter(() => (val ? "showAll" : "false"));
+            setFilter(val ? undefined : "hideArchived");
           }}
         />{" "}
         show all
@@ -189,11 +189,15 @@ export function ArchiveColumnFilter({
   );
 }
 
-export function archivedFilterFn(rows: any[], id: string, filterValue: string): any[] {
-  if (filterValue === "showAll") {
-    return rows;
+export function archivedFilterFn(
+  rows: any[],
+  id: string,
+  filterValue: string
+): any[] {
+  if (filterValue === "hideArchived") {
+    return rows.filter(row => !row.values[id]);
   }
-  return rows.filter(row => !row.values[id]);
+  return rows;
 }
 
 const StyledArtTileHeader = styled.div`
@@ -224,7 +228,10 @@ export function ArtTileHeader(): JSX.Element {
   return <StyledArtTileHeader />;
 }
 
-export function ArtTileCell({ cell, openDeckCallback }: CellProps): JSX.Element {
+export function ArtTileCell({
+  cell,
+  openDeckCallback
+}: CellProps): JSX.Element {
   const data = cell.row.values;
   return (
     <StyledArtTileCell
@@ -610,6 +617,7 @@ const StyledArchiveDiv = styled.div`
   overflow: hidden;
   background: url(../images/show.png) no-repeat left;
   -webkit-transition: all 0.25s cubic-bezier(0.2, 0.5, 0.35, 1);
+  vertical-align: middle;
 `;
 
 export function ArchiveHeader(): JSX.Element {
@@ -629,7 +637,10 @@ const StyledArchivedCell = styled(StyledArchiveDiv)<StyledArchivedCellProps>`
     no-repeat left;
 `;
 
-export function ArchivedCell({ cell, archiveDeckCallback }: CellProps): JSX.Element {
+export function ArchivedCell({
+  cell,
+  archiveDeckCallback
+}: CellProps): JSX.Element {
   const isArchived = !!cell.value;
   const data = cell.row.values;
   if (!data.custom) {

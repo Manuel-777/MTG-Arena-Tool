@@ -266,7 +266,9 @@ export default function DecksTable({
           "winrateLow",
           "winrateHigh"
         ],
-        filters: { archived: "false" },
+        autoResetFilters: false, // will not "work" until entire page is React-controlled
+        filters: { archived: "hideArchived" },
+        autoResetSortBy: false, // will not "work" until entire page is React-controlled
         sortBy: [{ id: "lastTouched", desc: true }]
       }
     },
