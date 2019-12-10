@@ -29,7 +29,7 @@ import {
   showLoadingBars
 } from "./renderer-util";
 
-import { openDecksTab } from "./DeckTab";
+import { openDecksTab } from "./DecksTab";
 import { openHistoryTab } from "./history";
 import { openEventsTab } from "./events";
 import { openEconomyTab } from "./economy";
