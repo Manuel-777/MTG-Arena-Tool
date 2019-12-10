@@ -21,41 +21,12 @@ import {
   resetMainContainer
 } from "./renderer-util";
 import mountReactComponent from "./mountReactComponent";
-import DecksTable from "./components/decks/DecksTable";
+import DecksTable, { DeckStats, DecksData } from "./components/decks/DecksTable";
 
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
 filters.showArchived = true;
 const tagPrompt = "Add";
-
-interface DeckStats {
-  wins: number;
-  losses: number;
-  total: number;
-  duration: number;
-  winrate: number;
-  interval: number;
-  winrateLow: number;
-  winrateHigh: number;
-}
-
-interface MissingWildcards {
-  rare: number;
-  common: number;
-  uncommon: number;
-  mythic: number;
-}
-
-interface DeckData extends SerializedDeck, DeckStats, MissingWildcards {
-  boosterCost: number;
-  colorSortVal: string;
-  lastPlayed: Date;
-  lastTouched: Date;
-  lastEditWins: number;
-  lastEditLosses: number;
-  lastEditTotal: number;
-  lastEditWinrate: number;
-}
 
 function getDefaultStats(): DeckStats {
   return {
@@ -134,12 +105,13 @@ export function openDecksTab(_filters = {}): void {
   const visibleDecks = decks.filter(isDeckVisible);
 
   const data = visibleDecks.map(
-    (deck: SerializedDeck): DeckData => {
+    (deck: SerializedDeck): DecksData => {
       const id = deck.id || "";
       const colorSortVal = deck.colors ? deck.colors.join("") : "";
       // compute winrate metrics
       const deckStats: DeckStats =
         aggregator.deckStats[id] || getDefaultStats();
+      const avgDuration = Math.round(deckStats.duration / deckStats.total);
       const recentStats: DeckStats =
         aggregator.deckRecentStats[id] || getDefaultStats();
       // compute missing card metrics
@@ -152,6 +124,7 @@ export function openDecksTab(_filters = {}): void {
       return {
         ...deck,
         ...deckStats,
+        avgDuration,
         ...missingWildcards,
         boosterCost,
         colorSortVal,

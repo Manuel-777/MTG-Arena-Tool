@@ -9,6 +9,7 @@ import {
   NameCell,
   ColorColumnFilter,
   ColorsCell,
+  DurationCell,
   FormatCell,
   TagsCell,
   DatetimeCell,
@@ -24,8 +25,10 @@ import {
   fuzzyTextArrayFilterFn,
   archivedFilterFn,
   colorsFilterFn,
-  MetricText
+  MetricText,
+  CellProps
 } from "./DecksTableComponents";
+import { SerializedDeck } from "../../../shared/types/Deck";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
 
@@ -58,15 +61,45 @@ const StyledDecksTable = styled.div`
   }
 `;
 
+export interface DeckStats {
+  wins: number;
+  losses: number;
+  total: number;
+  duration: number;
+  winrate: number;
+  interval: number;
+  winrateLow: number;
+  winrateHigh: number;
+}
+
+export interface MissingWildcards {
+  rare: number;
+  common: number;
+  uncommon: number;
+  mythic: number;
+}
+
+export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
+  avgDuration: number;
+  boosterCost: number;
+  colorSortVal: string;
+  lastPlayed: Date;
+  lastTouched: Date;
+  lastEditWins: number;
+  lastEditLosses: number;
+  lastEditTotal: number;
+  lastEditWinrate: number;
+}
+
 export interface DecksTableProps {
-  data: any;
+  data: DecksData[];
   filters: any;
-  filterMatchesCallback: any;
-  openDeckCallback: any;
-  archiveDeckCallback: any;
-  tagDeckCallback: any;
-  editTagCallback: any;
-  deleteTagCallback: any;
+  filterMatchesCallback: (filters: any) => void;
+  openDeckCallback: (id: string) => void;
+  archiveDeckCallback: (id: string) => void;
+  tagDeckCallback: (deckid: string, tag: string) => void;
+  editTagCallback: (tag: string, color: string) => void;
+  deleteTagCallback: (deckid: string, tag: string) => void;
 }
 
 export default function DecksTable({
@@ -76,9 +109,9 @@ export default function DecksTable({
   ...cellCallbacks
 }: DecksTableProps): JSX.Element {
   const CellWrapper = (
-    component: (props: any) => JSX.Element
-  ): ((props: any) => JSX.Element) => {
-    return (props: any): JSX.Element =>
+    component: (props: CellProps) => JSX.Element
+  ): ((props: CellProps) => JSX.Element) => {
+    return (props: CellProps): JSX.Element =>
       component({ ...props, ...cellCallbacks });
   };
   const defaultColumn = React.useMemo(
@@ -177,7 +210,16 @@ export default function DecksTable({
         Filter: NumberRangeColumnFilter,
         filter: "between"
       },
-      { accessor: "duration" }, // TODO
+      {
+        Header: "Total Duration",
+        accessor: "duration",
+        Cell: DurationCell
+      },
+      {
+        Header: "Avg. Duration",
+        accessor: "avgDuration",
+        Cell: DurationCell
+      },
       {
         Header: "Winrate",
         accessor: "winrate",
@@ -262,6 +304,7 @@ export default function DecksTable({
           "uncommon",
           "mythic",
           "duration",
+          "avgDuration",
           "interval",
           "winrateLow",
           "winrateHigh"
@@ -280,6 +323,8 @@ export default function DecksTable({
     "name",
     "format",
     "colorSortVal",
+    "duration",
+    "avgDuration",
     "boosterCost",
     "lastEditWinrate",
     "lastPlayed",

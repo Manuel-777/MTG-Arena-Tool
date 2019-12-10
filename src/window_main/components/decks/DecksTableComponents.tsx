@@ -6,7 +6,7 @@ import styled from "styled-components";
 import matchSorter from "match-sorter";
 
 import { MANA, CARD_RARITIES } from "../../../shared/constants";
-import { getCardArtCrop } from "../../../shared/util";
+import { getCardArtCrop, toMMSS, toDDHHMMSS } from "../../../shared/util";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import pd from "../../../shared/player-data";
 
@@ -22,13 +22,13 @@ import ManaFilter, { ColorFilter } from "../../ManaFilter";
 
 import Aggregator from "../../aggregator";
 
-interface CellProps {
+export interface CellProps {
   cell: any;
-  openDeckCallback: any;
-  archiveDeckCallback: any;
-  tagDeckCallback: any;
-  editTagCallback: any;
-  deleteTagCallback: any;
+  openDeckCallback: (id: string) => void;
+  archiveDeckCallback: (id: string) => void;
+  tagDeckCallback: (deckid: string, tag: string) => void;
+  editTagCallback: (tag: string, color: string) => void;
+  deleteTagCallback: (deckid: string, tag: string) => void;
 }
 
 export function TextBoxFilter({
@@ -41,7 +41,7 @@ export function TextBoxFilter({
   return (
     <input
       value={filterValue || ""}
-      onChange={e => {
+      onChange={(e): void => {
         setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
       }}
       placeholder={`Search ${count} records...`}
@@ -76,7 +76,7 @@ export function NumberRangeColumnFilter({
       <input
         value={filterValue[0] || ""}
         type="number"
-        onChange={e => {
+        onChange={(e): void => {
           const val = e.target.value;
           setFilter((old: number[] = []) => [
             val ? parseInt(val, 10) : undefined,
@@ -93,7 +93,7 @@ export function NumberRangeColumnFilter({
       <input
         value={filterValue[1] || ""}
         type="number"
-        onChange={e => {
+        onChange={(e): void => {
           const val = e.target.value;
           setFilter((old: number[] = []) => [
             old[0],
@@ -379,6 +379,19 @@ export function LastEditWinRateCell({ cell }: CellProps): JSX.Element {
   return <MetricText title={tooltip}>{value}</MetricText>;
 }
 
+export function DurationCell({ cell }: CellProps): JSX.Element {
+  const data = cell.row.values;
+  let value, tooltip;
+  if (data.total) {
+    value = <span>{toMMSS(cell.value)}</span>;
+    tooltip = toDDHHMMSS(cell.value);
+  } else {
+    value = <span>--</span>;
+    tooltip = "no data yet";
+  }
+  return <MetricText title={tooltip}>{value}</MetricText>;
+}
+
 interface StyledTagProps {
   backgroundColor: string;
   fontStyle: string;
@@ -414,15 +427,15 @@ const StyledTagWithClose = styled(StyledTag)`
 interface DeckTagProps {
   deckid: string;
   tag: string;
-  editTagCallback: any;
-  deleteTagCallback: any;
+  editTagCallback: (tag: string, color: string) => void;
+  deleteTagCallback: (deckid: string, tag: string) => void;
 }
 
 function useColorpicker(
   containerRef: any,
   tag: string,
   backgroundColor: string,
-  editTagCallback: any
+  editTagCallback: (tag: string, color: string) => void
 ): (e: any) => void {
   return (e): void => {
     e.stopPropagation();
