@@ -1026,13 +1026,6 @@ a:hover {
     display: flex;
 }
 
-.deck_tags_container {
-    margin: 6px 16px;
-    display: flex;
-    flex-wrap: wrap;
-    flex-grow: 2;
-}
-
 .deck_tag_input {
     height: 16px;
     min-width: 32px;
