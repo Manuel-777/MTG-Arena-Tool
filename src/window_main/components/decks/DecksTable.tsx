@@ -107,6 +107,13 @@ export interface DecksTableProps {
   cachedState: any;
 }
 
+const PresetButton = styled(MetricText).attrs(props => ({
+  className: props.className ? props.className : "" + " button_simple"
+}))`
+  margin: 0 4px 5px 4px;
+  width: 90px;
+`;
+
 export default function DecksTable({
   data,
   filters,
@@ -252,7 +259,10 @@ export default function DecksTable({
       {
         Header: "Booster Cost",
         accessor: "boosterCost",
-        Cell: MissingCardsCell
+        Cell: MissingCardsCell,
+        disableFilters: false,
+        Filter: NumberRangeColumnFilter,
+        filter: "between"
       },
       { accessor: "rare" },
       { accessor: "common" },
@@ -316,7 +326,10 @@ export default function DecksTable({
     getTableBodyProps,
     headerGroups,
     rows,
-    prepareRow
+    prepareRow,
+    toggleSortBy,
+    toggleHideColumn,
+    setAllFilters
   } = ReactTable.useTable(
     {
       columns,
@@ -401,10 +414,80 @@ export default function DecksTable({
       >
         <span style={{ paddingBottom: "8px" }}>Filter match results:</span>
         <span style={{ width: "260px" }}>{filterPanel.render()}</span>
+        <span style={{ paddingBottom: "8px" }}>Presets:</span>
+        <PresetButton
+          onClick={(): void => {
+            setAllFilters({ archived: "hideArchived" });
+            setFiltersVisible(initialFiltersVisible);
+            toggleSortBy("lastTouched", true);
+            for (const columnId of toggleableIds) {
+              const isVisible = [
+                "name",
+                "format",
+                "colorSortVal",
+                "lastTouched",
+                "lastEditWinrate"
+              ].includes(columnId);
+              toggleHideColumn(columnId, !isVisible);
+            }
+          }}
+        >
+          Recent
+        </PresetButton>
+        <PresetButton
+          onClick={(): void => {
+            setAllFilters({
+              archived: "hideArchived",
+              wins: [5, undefined],
+              winrate: [0.5, undefined]
+            });
+            setFiltersVisible({
+              ...initialFiltersVisible,
+              wins: true,
+              winrate: true
+            });
+            toggleSortBy("winrate", true);
+            for (const columnId of toggleableIds) {
+              const isVisible = [
+                "name",
+                "format",
+                "colorSortVal",
+                "losses",
+                "winrate",
+                "wins"
+              ].includes(columnId);
+              toggleHideColumn(columnId, !isVisible);
+            }
+          }}
+        >
+          Best
+        </PresetButton>
+        <PresetButton
+          onClick={(): void => {
+            setAllFilters({
+              archived: "hideArchived",
+              boosterCost: [1, undefined]
+            });
+            setFiltersVisible({ ...initialFiltersVisible, boosterCost: true });
+            toggleSortBy("boosterCost", true);
+            for (const columnId of toggleableIds) {
+              const isVisible = [
+                "name",
+                "format",
+                "colorSortVal",
+                "boosterCost",
+                "lastUpdated"
+              ].includes(columnId);
+              toggleHideColumn(columnId, !isVisible);
+            }
+          }}
+        >
+          Wanted
+        </PresetButton>
         <MetricText
           onClick={(): void => setTogglesVisible(!togglesVisible)}
           className="button_simple"
-          style={{ margin: "0 0 5px 0" }}
+          style={{ margin: "0 0 5px 12px" }}
         >
           {togglesVisible ? "Hide" : "Show"} Column Toggles
         </MetricText>
