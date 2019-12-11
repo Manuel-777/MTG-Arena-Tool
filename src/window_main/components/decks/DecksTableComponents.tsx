@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import format from "date-fns/format";
 import isValid from "date-fns/isValid";
 import styled from "styled-components";
@@ -21,6 +21,7 @@ import { createInput } from "../../../shared/dom-fns"; // TODO remove this
 import ManaFilter, { ColorFilter } from "../../ManaFilter";
 
 import Aggregator from "../../aggregator";
+import { CSSTransition } from "react-transition-group";
 
 export interface CellProps {
   cell: any;
@@ -31,27 +32,47 @@ export interface CellProps {
   deleteTagCallback: (deckid: string, tag: string) => void;
 }
 
+export const StyledInputContainer = styled.div.attrs(props => ({
+  className: props.className ? props.className : "" + " input_container"
+}))`
+  display: inline-flex;
+  width: inherit;
+  margin: inherit;
+  height: 26px;
+  padding-bottom: 4px;
+  &.input_container input {
+    margin: inherit;
+  }
+`;
+
+export const StyledCheckboxContainer = styled.label.attrs(props => ({
+  className: props.className
+    ? props.className
+    : "" + " check_container hover_label"
+}))`
+  display: inline-flex;
+`;
+
 export function TextBoxFilter({
-  column: { filterValue, preFilteredRows, setFilter }
+  column: { id, filterValue, preFilteredRows, setFilter }
 }: {
   column: any;
 }): JSX.Element {
   const count = preFilteredRows.length;
-
+  const prompt =
+    id === "deckTileId" ? `Search ${count} decks...` : `Filter ${id}...`;
   return (
-    <input
-      value={filterValue || ""}
-      onChange={(e): void => {
-        setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
-      }}
-      placeholder={`Search ${count} records...`}
-    />
+    <StyledInputContainer title={prompt}>
+      <input
+        value={filterValue || ""}
+        onChange={(e): void => setFilter(e.target.value || undefined)}
+        placeholder={prompt}
+        style={{ width: "100%" }}
+      />
+    </StyledInputContainer>
   );
 }
 
-// This is a custom UI for our 'between' or number range
-// filter. It uses two number boxes and filters rows to
-// ones that have values between the two
 export function NumberRangeColumnFilter({
   column: { filterValue = [], preFilteredRows, setFilter, id }
 }: {
@@ -68,11 +89,7 @@ export function NumberRangeColumnFilter({
   }, [id, preFilteredRows]);
 
   return (
-    <div
-      style={{
-        display: "flex"
-      }}
-    >
+    <StyledInputContainer>
       <input
         value={filterValue[0] || ""}
         type="number"
@@ -106,7 +123,7 @@ export function NumberRangeColumnFilter({
           marginLeft: "0.5rem"
         }}
       />
-    </div>
+    </StyledInputContainer>
   );
 }
 
@@ -115,19 +132,33 @@ export function fuzzyTextFilterFn(
   id: string,
   filterValue: string
 ): any[] {
-  return matchSorter(rows, filterValue, {
-    keys: [(row: any): any => row.values[id]]
-  });
+  return matchSorter(rows, filterValue, { keys: ["values." + id] });
 }
 
-export function fuzzyTextArrayFilterFn(
+export function uberSearchFilterFn(
   rows: any[],
   id: string,
   filterValue: string
 ): any[] {
-  return matchSorter(rows, filterValue, {
-    keys: [(row: any): any => row.values[id].join(" ")]
-  });
+  const tokens = filterValue.split(" ");
+  const matches = tokens.map(
+    (token: string): any[] =>
+      matchSorter(rows, token, {
+        keys: [
+          "values.deckId",
+          "values.name",
+          "values.format",
+          "values.tags",
+          (row: any): string => {
+            const { colors } = row.values;
+            return colors
+              .map((color: number): string => (MANA as any)[color])
+              .join(" ");
+          }
+        ]
+      })
+  );
+  return _.intersection(...matches);
 }
 
 const defaultColors = Aggregator.getDefaultColorFilter();
@@ -169,23 +200,18 @@ export function ArchiveColumnFilter({
   column: any;
 }): JSX.Element {
   return (
-    <div
-      style={{
-        display: "flex"
-      }}
-    >
-      <label style={{ cursor: "pointer", whiteSpace: "nowrap" }}>
-        <input
-          type="checkbox"
-          checked={filterValue !== "hideArchived"}
-          onChange={(e): void => {
-            const val = e.target.checked;
-            setFilter(val ? undefined : "hideArchived");
-          }}
-        />{" "}
-        show all
-      </label>
-    </div>
+    <StyledCheckboxContainer>
+      show all
+      <input
+        type="checkbox"
+        checked={filterValue !== "hideArchived"}
+        onChange={(e): void => {
+          const val = e.target.checked;
+          setFilter(val ? undefined : "hideArchived");
+        }}
+      />
+      <span className={"checkmark"} />
+    </StyledCheckboxContainer>
   );
 }
 
@@ -201,8 +227,7 @@ export function archivedFilterFn(
 }
 
 const StyledArtTileHeader = styled.div`
-  width: 128px;
-  height: 64px;
+  width: 200px;
   margin: 0;
 `;
 
@@ -211,16 +236,41 @@ interface StyledArtTileCellProps {
 }
 
 const StyledArtTileCell = styled(StyledArtTileHeader)<StyledArtTileCellProps>`
-  opacity: 0.66;
   cursor: pointer;
   background-image: url("${(props): string => props.url}");
   background-size: 200px;
   background-position-x: center;
   background-position-y: -10px;
-  -webkit-transition: 0.2s ease-out;
-  transition: opacity;
-  &:hover {
+  opacity: 0.66;
+  height: 64px;
+  width: 128px;
+  &.deckTileHover-enter {
+    opacity: 0.66;
+    width: 128px;
+  }
+  &.deckTileHover-enter-active {
     opacity: 1;
+    width: 200px;
+    -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
+    transition: opacity 0.2s ease-in, width 0.2s ease-in;
+  }
+  &.deckTileHover-enter-done {
+    opacity: 1;
+    width: 200px;
+  }
+  &.deckTileHover-exit {
+    opacity: 1;
+    width: 200px;
+  }
+  &.deckTileHover-exit-active {
+    opacity: 0.66;
+    width: 128px;
+    -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
+    transition: opacity 0.2s ease-in, width 0.2s ease-in;
+  }
+  &.deckTileHover-exit-done {
+    opacity: 0.66;
+    width: 128px;
   }
 `;
 
@@ -233,12 +283,21 @@ export function ArtTileCell({
   openDeckCallback
 }: CellProps): JSX.Element {
   const data = cell.row.values;
+  const [isHovered, setHovered] = useState(false);
   return (
-    <StyledArtTileCell
-      url={getCardArtCrop(cell.value)}
-      title={`show ${data.name} details`}
-      onClick={(): void => openDeckCallback(data.deckId)}
-    />
+    <CSSTransition
+      classNames="deckTileHover"
+      in={!!isHovered}
+      timeout={200}
+      onMouseEnter={(): void => setHovered(true)}
+      onMouseLeave={(): void => setHovered(false)}
+    >
+      <StyledArtTileCell
+        url={getCardArtCrop(cell.value)}
+        title={`show ${data.name} details`}
+        onClick={(): void => openDeckCallback(data.deckId)}
+      />
+    </CSSTransition>
   );
 }
 
@@ -261,6 +320,12 @@ const StyledFlexRightCell = styled.div`
     }
   }
 `;
+
+export function ColorsHeader(): JSX.Element {
+  return (
+    <div style={{ display: "inline-block", minWidth: "146px" }}>Colors</div>
+  );
+}
 
 export function ColorsCell({ cell }: CellProps): JSX.Element {
   const data = cell.row.values;

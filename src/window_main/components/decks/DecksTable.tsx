@@ -22,11 +22,13 @@ import {
   ArchiveColumnFilter,
   ArchivedCell,
   fuzzyTextFilterFn,
-  fuzzyTextArrayFilterFn,
   archivedFilterFn,
   colorsFilterFn,
   MetricText,
-  CellProps
+  CellProps,
+  uberSearchFilterFn,
+  StyledCheckboxContainer,
+  ColorsHeader
 } from "./DecksTableComponents";
 import { SerializedDeck } from "../../../shared/types/Deck";
 
@@ -126,6 +128,9 @@ export default function DecksTable({
       {
         Header: ArtTileHeader,
         accessor: "deckTileId",
+        disableFilters: false,
+        filter: "uberSearch",
+        Filter: TextBoxFilter,
         disableSortBy: true,
         Cell: CellWrapper(ArtTileCell)
       },
@@ -139,7 +144,7 @@ export default function DecksTable({
         Cell: CellWrapper(NameCell)
       },
       {
-        Header: "Colors",
+        Header: ColorsHeader,
         disableFilters: false,
         accessor: "colorSortVal",
         Filter: ColorColumnFilter,
@@ -160,7 +165,7 @@ export default function DecksTable({
         accessor: "tags",
         disableFilters: false,
         Filter: TextBoxFilter,
-        filter: "fuzzyTextArray",
+        filter: "fuzzyText",
         disableSortBy: true,
         Cell: CellWrapper(TagsCell)
       },
@@ -262,11 +267,10 @@ export default function DecksTable({
   );
   const filterTypes = React.useMemo(
     () => ({
-      // Add a new fuzzyTextFilterFn filter type.
       fuzzyText: fuzzyTextFilterFn,
-      fuzzyTextArray: fuzzyTextArrayFilterFn,
       showArchived: archivedFilterFn,
-      colors: colorsFilterFn
+      colors: colorsFilterFn,
+      uberSearch: uberSearchFilterFn
     }),
     []
   );
@@ -347,6 +351,7 @@ export default function DecksTable({
       initialFiltersVisible[column.id] = false;
     }
   }
+  initialFiltersVisible["deckTileId"] = true; // uber search always visible
   const [filtersVisible, setFiltersVisible] = useState(initialFiltersVisible);
   const [togglesVisible, setTogglesVisible] = useState(false);
   const filterPanel = new FilterPanel(
@@ -388,12 +393,11 @@ export default function DecksTable({
         </MetricText>
         {togglesVisible &&
           toggleableColumns.map((column: any) => (
-            <MetricText key={column.id} style={{ paddingLeft: "16px" }}>
-              <label style={{ cursor: "pointer", whiteSpace: "nowrap" }}>
-                <input type="checkbox" {...column.getToggleHiddenProps()} />{" "}
-                {column.render("Header")}
-              </label>
-            </MetricText>
+            <StyledCheckboxContainer key={column.id}>
+              {column.render("Header")}
+              <input type="checkbox" {...column.getToggleHiddenProps()} />
+              <span className={"checkmark"} />
+            </StyledCheckboxContainer>
           ))}
       </div>
       <StyledDecksTable>
@@ -405,13 +409,15 @@ export default function DecksTable({
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className={
-                      ["name", "tags"].includes(column.id) ? "alignLeft" : ""
+                      ["deckTileId", "name", "tags"].includes(column.id)
+                        ? "alignLeft"
+                        : ""
                     }
                     key={column.id}
                   >
                     <div>
                       {column.render("Header")}
-                      {column.canFilter && (
+                      {column.canFilter && column.id !== "deckTileId" && (
                         <span
                           onClick={(e): void => {
                             e.stopPropagation();
@@ -437,7 +443,7 @@ export default function DecksTable({
                     {filtersVisible[column.id] && (
                       <div
                         onClick={(e): void => e.stopPropagation()}
-                        title={"filter column"}
+                        style={{ paddingTop: "4px", width: "100%" }}
                       >
                         {column.canFilter ? column.render("Filter") : null}
                       </div>
