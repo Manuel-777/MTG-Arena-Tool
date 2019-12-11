@@ -30,7 +30,6 @@ import DecksTable, {
 
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
-filters.showArchived = true;
 const tagPrompt = "Add";
 
 function getDefaultStats(): DeckStats {
@@ -89,27 +88,13 @@ export function openDecksTab(_filters = {}): void {
   const drag = createDiv(["dragger"]);
   wrapR.appendChild(drag);
   makeResizable(drag, statsPanel.handleResize);
-
   wrapR.appendChild(decksTopWinrate);
-
   const wrapL = createDiv(["wrapper_column"]);
   wrapL.style.overflowX = "auto";
-
-  const d = createDiv(["list_fill"]);
-  wrapL.appendChild(d);
-
   mainDiv.appendChild(wrapL);
   mainDiv.appendChild(wrapR);
 
-  const decks: SerializedDeck[] = [...pd.deckList];
-
-  const isDeckVisible = (deck: SerializedDeck): boolean =>
-    aggregator.filterDeck(deck) &&
-    (filters.eventId === Aggregator.DEFAULT_EVENT ||
-      (deck.id && aggregator.deckLastPlayed[deck.id]));
-  const visibleDecks = decks.filter(isDeckVisible);
-
-  const data = visibleDecks.map(
+  const data = pd.deckList.map(
     (deck: SerializedDeck): DecksData => {
       const id = deck.id || "";
       const colorSortVal = deck.colors ? deck.colors.join("") : "";
@@ -143,7 +128,6 @@ export function openDecksTab(_filters = {}): void {
     }
   );
 
-  const deckTableWrapper = createDiv([]);
   const { decksTable } = getLocalState();
   mountReactComponent(
     <DecksTable
@@ -164,9 +148,8 @@ export function openDecksTab(_filters = {}): void {
       }
       deleteTagCallback={deleteTag}
     />,
-    deckTableWrapper
+    wrapL
   );
-  wrapL.appendChild(deckTableWrapper);
 }
 
 function openDeckCallback(id: string, filters: any): void {

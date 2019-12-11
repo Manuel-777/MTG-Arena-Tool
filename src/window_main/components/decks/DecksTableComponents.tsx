@@ -207,7 +207,7 @@ export function ArchiveColumnFilter({
         checked={filterValue !== "hideArchived"}
         onChange={(e): void => {
           const val = e.target.checked;
-          setFilter(val ? undefined : "hideArchived");
+          setFilter(val ? "showArchived" : "hideArchived");
         }}
       />
       <span className={"checkmark"} />
@@ -305,7 +305,7 @@ const StyledFlexLeftCell = styled.div`
   display: flex;
   justify-content: left;
   div {
-    :last-child {
+    :last-child:not(.deck_tag_close) {
       margin-right: auto;
     }
   }

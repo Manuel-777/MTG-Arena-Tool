@@ -324,8 +324,13 @@ export default function DecksTable({
       useControlledState: (state: any) => {
         return React.useMemo(() => {
           tableStateCallback(state);
+          const aggFilter = filters.showArchived;
+          const tableFilter = state.filters.archived === "showArchived";
+          if (aggFilter !== tableFilter) {
+            filterMatchesCallback({ ...filters, showArchived: tableFilter });
+          }
           return state;
-        }, [state, tableStateCallback]);
+        }, [state, tableStateCallback, filters, filterMatchesCallback]);
       },
       defaultColumn,
       filterTypes,
@@ -406,7 +411,9 @@ export default function DecksTable({
         {togglesVisible &&
           toggleableColumns.map((column: any) => (
             <StyledCheckboxContainer key={column.id}>
-              {column.render("Header")}
+              {column.id === "colorSortVal"
+                ? "Colors"
+                : column.render("Header")}
               <input type="checkbox" {...column.getToggleHiddenProps()} />
               <span className={"checkmark"} />
             </StyledCheckboxContainer>
