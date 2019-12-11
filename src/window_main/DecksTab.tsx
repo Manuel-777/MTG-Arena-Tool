@@ -18,10 +18,15 @@ import {
   hideLoadingBars,
   ipcSend,
   makeResizable,
-  resetMainContainer
+  resetMainContainer,
+  setLocalState,
+  getLocalState
 } from "./renderer-util";
 import mountReactComponent from "./mountReactComponent";
-import DecksTable, { DeckStats, DecksData } from "./components/decks/DecksTable";
+import DecksTable, {
+  DeckStats,
+  DecksData
+} from "./components/decks/DecksTable";
 
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
@@ -139,11 +144,16 @@ export function openDecksTab(_filters = {}): void {
   );
 
   const deckTableWrapper = createDiv([]);
+  const { decksTable } = getLocalState();
   mountReactComponent(
     <DecksTable
       data={data}
       filters={filters}
+      cachedState={decksTable}
       filterMatchesCallback={openDecksTab}
+      tableStateCallback={(state: any): void =>
+        setLocalState({ decksTable: state })
+      }
       openDeckCallback={(id: string): void => openDeckCallback(id, filters)}
       archiveDeckCallback={(id: string): void =>
         ipcSend("toggle_deck_archived", id)

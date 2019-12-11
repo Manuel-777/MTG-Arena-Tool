@@ -1,3 +1,4 @@
+import _ from "lodash";
 import React, { useState } from "react";
 import styled from "styled-components";
 
@@ -102,12 +103,16 @@ export interface DecksTableProps {
   tagDeckCallback: (deckid: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
   deleteTagCallback: (deckid: string, tag: string) => void;
+  tableStateCallback: (state: any) => void;
+  cachedState: any;
 }
 
 export default function DecksTable({
   data,
   filters,
   filterMatchesCallback,
+  tableStateCallback,
+  cachedState,
   ...cellCallbacks
 }: DecksTableProps): JSX.Element {
   const CellWrapper = (
@@ -274,6 +279,36 @@ export default function DecksTable({
     }),
     []
   );
+  const initialState = _.defaultsDeep(cachedState, {
+    hiddenColumns: [
+      "deckId",
+      "custom",
+      "boosterCost",
+      "colors",
+      "lastEditLosses",
+      "lastEditTotal",
+      "lastEditWinrate",
+      "lastEditWins",
+      "lastPlayed",
+      "lastUpdated",
+      "wins",
+      "losses",
+      "total",
+      "rare",
+      "common",
+      "uncommon",
+      "mythic",
+      "duration",
+      "avgDuration",
+      "interval",
+      "winrateLow",
+      "winrateHigh"
+    ],
+    autoResetFilters: false, // will not "work" until entire page is React-controlled
+    filters: { archived: "hideArchived" },
+    autoResetSortBy: false, // will not "work" until entire page is React-controlled
+    sortBy: [{ id: "lastTouched", desc: true }]
+  });
 
   const {
     flatColumns,
@@ -286,38 +321,15 @@ export default function DecksTable({
     {
       columns,
       data: React.useMemo(() => data, [data]),
+      useControlledState: (state: any) => {
+        return React.useMemo(() => {
+          tableStateCallback(state);
+          return state;
+        }, [state, tableStateCallback]);
+      },
       defaultColumn,
       filterTypes,
-      initialState: {
-        hiddenColumns: [
-          "deckId",
-          "custom",
-          "boosterCost",
-          "colors",
-          "lastEditLosses",
-          "lastEditTotal",
-          "lastEditWinrate",
-          "lastEditWins",
-          "lastPlayed",
-          "lastUpdated",
-          "wins",
-          "losses",
-          "total",
-          "rare",
-          "common",
-          "uncommon",
-          "mythic",
-          "duration",
-          "avgDuration",
-          "interval",
-          "winrateLow",
-          "winrateHigh"
-        ],
-        autoResetFilters: false, // will not "work" until entire page is React-controlled
-        filters: { archived: "hideArchived" },
-        autoResetSortBy: false, // will not "work" until entire page is React-controlled
-        sortBy: [{ id: "lastTouched", desc: true }]
-      }
+      initialState
     },
     ReactTable.useFilters,
     ReactTable.useSortBy
