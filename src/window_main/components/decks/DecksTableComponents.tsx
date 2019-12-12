@@ -382,12 +382,13 @@ export function MetricCell({ cell }: CellProps): JSX.Element {
 }
 
 export function DatetimeCell({ cell }: CellProps): JSX.Element {
-  if (!cell.value || !isValid(cell.value)) {
+  const dateVal = new Date(cell.value);
+  if (!isValid(dateVal)) {
     return <MetricText>--</MetricText>;
   }
   return (
     <MetricText>
-      <RelativeTime datetime={cell.value.toISOString()} />
+      <RelativeTime datetime={dateVal.toISOString()} />
     </MetricText>
   );
 }
@@ -434,7 +435,7 @@ export function LastEditWinRateCell({ cell }: CellProps): JSX.Element {
       </>
     );
     tooltip = `${formatPercent(cell.value)} winrate since ${format(
-      data.lastUpdated,
+      new Date(data.timeUpdated),
       "Pp"
     )}`;
   } else {

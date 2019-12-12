@@ -1,5 +1,6 @@
 import anime from "animejs";
 import React from "react";
+import isValid from "date-fns/isValid";
 
 import { EASING_DEFAULT } from "../shared/constants";
 import pd from "../shared/player-data";
@@ -110,7 +111,7 @@ export function openDecksTab(_filters = {}): void {
       const boosterCost = getBoosterCountEstimate(missingWildcards);
       // compute last touch metrics
       const lastUpdated = new Date(deck.lastUpdated || NaN);
-      const lastPlayed = new Date(aggregator.deckLastPlayed[id]);
+      const lastPlayed = aggregator.deckLastPlayed[id];
       const lastTouched = dateMaxValid(lastUpdated, lastPlayed);
       return {
         ...deck,
@@ -120,8 +121,9 @@ export function openDecksTab(_filters = {}): void {
         ...missingWildcards,
         boosterCost,
         colorSortVal,
-        lastPlayed,
-        lastTouched,
+        timeUpdated: isValid(lastUpdated) ? lastUpdated.getTime() : NaN,
+        timePlayed: isValid(lastPlayed) ? lastPlayed.getTime() : NaN,
+        timeTouched: isValid(lastTouched) ? lastTouched.getTime() : NaN,
         lastEditWins: recentStats.wins,
         lastEditLosses: recentStats.losses,
         lastEditTotal: recentStats.total,

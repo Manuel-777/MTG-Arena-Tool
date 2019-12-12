@@ -87,8 +87,9 @@ export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
   avgDuration: number;
   boosterCost: number;
   colorSortVal: string;
-  lastPlayed: Date;
-  lastTouched: Date;
+  timeUpdated: number;
+  timePlayed: number;
+  timeTouched: number;
   lastEditWins: number;
   lastEditLosses: number;
   lastEditTotal: number;
@@ -184,24 +185,20 @@ export default function DecksTable({
       },
       {
         Header: "Last Updated",
-        id: "lastUpdated",
-        accessor: (row: any): Date => new Date(row.lastUpdated),
+        accessor: "timeUpdated",
         Cell: DatetimeCell,
-        sortType: "datetime",
         sortDescFirst: true
       },
       {
         Header: "Last Played",
-        accessor: "lastPlayed",
+        accessor: "timePlayed",
         Cell: DatetimeCell,
-        sortType: "datetime",
         sortDescFirst: true
       },
       {
         Header: "Last Touched",
-        accessor: "lastTouched",
+        accessor: "timeTouched",
         Cell: DatetimeCell,
-        sortType: "datetime",
         sortDescFirst: true
       },
       {
@@ -301,8 +298,8 @@ export default function DecksTable({
       "lastEditTotal",
       "lastEditWinrate",
       "lastEditWins",
-      "lastPlayed",
-      "lastUpdated",
+      "timePlayed",
+      "timeUpdated",
       "wins",
       "losses",
       "total",
@@ -320,7 +317,7 @@ export default function DecksTable({
     autoResetFilters: false, // will not "work" until entire page is React-controlled
     filters: { archived: "hideArchived" },
     autoResetSortBy: false, // will not "work" until entire page is React-controlled
-    sortBy: [{ id: "lastTouched", desc: true }]
+    sortBy: [{ id: "timeTouched", desc: true }]
   });
 
   const {
@@ -364,9 +361,9 @@ export default function DecksTable({
     "avgDuration",
     "boosterCost",
     "lastEditWinrate",
-    "lastPlayed",
-    "lastUpdated",
-    "lastTouched",
+    "timePlayed",
+    "timeUpdated",
+    "timeTouched",
     "losses",
     "tags",
     "total",
@@ -422,13 +419,13 @@ export default function DecksTable({
           onClick={(): void => {
             setAllFilters({ archived: "hideArchived" });
             setFiltersVisible(initialFiltersVisible);
-            toggleSortBy("lastTouched", true);
+            toggleSortBy("timeTouched", true);
             for (const columnId of toggleableIds) {
               const isVisible = [
                 "name",
                 "format",
                 "colorSortVal",
-                "lastTouched",
+                "timeTouched",
                 "lastEditWinrate"
               ].includes(columnId);
               toggleHideColumn(columnId, !isVisible);
@@ -479,7 +476,7 @@ export default function DecksTable({
                 "format",
                 "colorSortVal",
                 "boosterCost",
-                "lastUpdated"
+                "timeUpdated"
               ].includes(columnId);
               toggleHideColumn(columnId, !isVisible);
             }
