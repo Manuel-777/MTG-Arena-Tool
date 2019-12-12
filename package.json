@@ -102,7 +102,7 @@
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-is": "^16.11.0",
-    "react-table": "^7.0.0-rc.5",
+    "react-table": "^7.0.0-rc.9",
     "react-transition-group": "^4.3.0",
     "striptags": "^3.1.1",
     "styled-components": "^5.0.0-rc.2",
