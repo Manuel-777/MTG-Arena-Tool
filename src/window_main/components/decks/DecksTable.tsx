@@ -83,6 +83,7 @@ export interface MissingWildcards {
 }
 
 export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
+  winrate100: number;
   avgDuration: number;
   boosterCost: number;
   colorSortVal: string;
@@ -239,12 +240,13 @@ export default function DecksTable({
       },
       {
         Header: "Winrate",
-        accessor: "winrate",
+        accessor: "winrate100",
         Cell: WinRateCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
         filter: "between"
       },
+      { accessor: "winrate" },
       { accessor: "interval", sortInverted: true },
       { accessor: "winrateLow" },
       { accessor: "winrateHigh" },
@@ -311,6 +313,7 @@ export default function DecksTable({
       "duration",
       "avgDuration",
       "interval",
+      "winrate",
       "winrateLow",
       "winrateHigh"
     ],
@@ -367,7 +370,7 @@ export default function DecksTable({
     "losses",
     "tags",
     "total",
-    "winrate",
+    "winrate100",
     "wins"
   ];
 
@@ -439,21 +442,21 @@ export default function DecksTable({
             setAllFilters({
               archived: "hideArchived",
               wins: [5, undefined],
-              winrate: [0.5, undefined]
+              winrate100: [50, undefined]
             });
             setFiltersVisible({
               ...initialFiltersVisible,
               wins: true,
-              winrate: true
+              winrate100: true
             });
-            toggleSortBy("winrate", true);
+            toggleSortBy("winrate100", true);
             for (const columnId of toggleableIds) {
               const isVisible = [
                 "name",
                 "format",
                 "colorSortVal",
                 "losses",
-                "winrate",
+                "winrate100",
                 "wins"
               ].includes(columnId);
               toggleHideColumn(columnId, !isVisible);

@@ -393,29 +393,29 @@ export function DatetimeCell({ cell }: CellProps): JSX.Element {
 }
 
 export function WinRateCell({ cell }: CellProps): JSX.Element {
-  const data = cell.row.values;
-  let interval, tooltip;
-  if (!data.total) {
+  const { total, interval, winrate, winrateLow, winrateHigh } = cell.row.values;
+  if (!total) {
     return <MetricText title={"no data yet"}>--</MetricText>;
   }
-  if (data.total >= 20) {
+  let intervalDisplay, tooltip;
+  if (total >= 20) {
     // sample size is large enough to use Wald Interval
-    interval = formatPercent(data.interval);
+    intervalDisplay = formatPercent(interval);
     tooltip = formatWinrateInterval(
-      formatPercent(data.winrateLow),
-      formatPercent(data.winrateHigh)
+      formatPercent(winrateLow),
+      formatPercent(winrateHigh)
     );
   } else {
     // sample size is too small (garbage results)
-    interval = "???";
+    intervalDisplay = "???";
     tooltip = "play at least 20 matches to estimate actual winrate";
   }
   return (
     <MetricText title={tooltip}>
-      <span className={getWinrateClass(cell.value) + "_bright"}>
-        {formatPercent(cell.value)}
+      <span className={getWinrateClass(winrate) + "_bright"}>
+        {formatPercent(winrate)}
       </span>{" "}
-      <i style={{ opacity: "0.6" }}>&plusmn; {interval}</i>
+      <i style={{ opacity: "0.6" }}>&plusmn; {intervalDisplay}</i>
     </MetricText>
   );
 }

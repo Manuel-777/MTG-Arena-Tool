@@ -104,6 +104,7 @@ export function openDecksTab(_filters = {}): void {
       const avgDuration = Math.round(deckStats.duration / deckStats.total);
       const recentStats: DeckStats =
         aggregator.deckRecentStats[id] || getDefaultStats();
+      const winrate100 = Math.round(deckStats.winrate * 100);
       // compute missing card metrics
       const missingWildcards = getDeckMissing(deck);
       const boosterCost = getBoosterCountEstimate(missingWildcards);
@@ -114,6 +115,7 @@ export function openDecksTab(_filters = {}): void {
       return {
         ...deck,
         ...deckStats,
+        winrate100,
         avgDuration,
         ...missingWildcards,
         boosterCost,
