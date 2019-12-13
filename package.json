@@ -98,7 +98,7 @@
     "npm": "^6.13.2",
     "pikaday": "^1.8.0",
     "qs": "^6.9.1",
-    "queue": "^4.5.1",
+    "queue": "^6.0.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-transition-group": "^4.3.0",
