@@ -20,7 +20,7 @@ if (!remote.app.isPackaged) {
 }
 
 import anime from "animejs";
-import "time-elements";
+import "@github/time-elements";
 
 import {
   EASING_DEFAULT,

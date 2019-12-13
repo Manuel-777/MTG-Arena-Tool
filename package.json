@@ -75,6 +75,7 @@
     "fix": "bumped release fix"
   },
   "dependencies": {
+    "@github/time-elements": "^3.0.10",
     "animejs": "^3.1.0",
     "async": "^3.1.0",
     "chart.js": "^2.9.3",
@@ -102,7 +103,6 @@
     "react-dom": "^16.12.0",
     "react-transition-group": "^4.3.0",
     "striptags": "^3.1.1",
-    "time-elements": "^2.0.2",
     "vanilla-picker": "^2.10.0"
   },
   "devDependencies": {
