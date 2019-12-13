@@ -125,7 +125,6 @@
     "@types/semver": "^6.2.0",
     "@typescript-eslint/eslint-plugin": "^2.11.0",
     "@typescript-eslint/parser": "^2.11.0",
-    "acorn": "^6.3.0",
     "devtron": "^1.4.0",
     "dotenv": "^8.2.0",
     "electron": "^5.0.12",
