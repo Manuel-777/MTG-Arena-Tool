@@ -67,7 +67,7 @@
     "test:jest": "jest src/",
     "test:tsc": "tsc",
     "predist": "npm run clean:dist",
-    "dist": "npm run build && build --x64",
+    "dist": "npm run build && electron-builder build --x64",
     "version": "node -p \"require('./package.json').version\"",
     "load-logs": "npm run build && electron \"./scripts/load-logs.js\"",
     "breaking": "bumped release breaking",
