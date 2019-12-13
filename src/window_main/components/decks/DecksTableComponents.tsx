@@ -141,22 +141,21 @@ export function uberSearchFilterFn(
   filterValue: string
 ): any[] {
   const tokens = filterValue.split(" ");
-  const matches = tokens.map(
-    (token: string): any[] =>
-      matchSorter(rows, token, {
-        keys: [
-          "values.deckId",
-          "values.name",
-          "values.format",
-          "values.tags",
-          (row: any): string => {
-            const { colors } = row.values;
-            return colors
-              .map((color: number): string => (MANA as any)[color])
-              .join(" ");
-          }
-        ]
-      })
+  const matches = tokens.map((token: string): any[] =>
+    matchSorter(rows, token, {
+      keys: [
+        "values.deckId",
+        "values.name",
+        "values.format",
+        "values.tags",
+        (row: any): string => {
+          const { colors } = row.values;
+          return colors
+            .map((color: number): string => (MANA as any)[color])
+            .join(" ");
+        }
+      ]
+    })
   );
   return _.intersection(...matches);
 }
