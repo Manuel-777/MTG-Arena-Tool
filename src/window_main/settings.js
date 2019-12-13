@@ -650,9 +650,7 @@ function appendOverlay(section) {
     overlaySettingsNav.style.display = "flex";
 
     const overlaySettingsIcon = createDiv(["overlay_icon"]);
-    overlaySettingsIcon.style.backgroundColor = `var(--color-${
-      COLORS_ALL[index]
-    })`;
+    overlaySettingsIcon.style.backgroundColor = `var(--color-${COLORS_ALL[index]})`;
     overlaySettingsIcon.style.flexShrink = 0;
     overlaySettingsNav.appendChild(overlaySettingsIcon);
     overlaySettingsNav.appendChild(

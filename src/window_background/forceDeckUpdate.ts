@@ -38,7 +38,7 @@ class Chances {
   }
 }
 
-const forceDeckUpdate = function (removeUsed = true) {
+const forceDeckUpdate = function(removeUsed = true) {
   var decksize = 0;
   var cardsleft = 0;
   var typeCre = 0;
@@ -52,11 +52,13 @@ const forceDeckUpdate = function (removeUsed = true) {
   globals.currentMatch.playerCardsLeft = globals.currentMatch.player.deck.clone();
 
   if (globals.debugLog || !globals.firstPass) {
-    globals.currentMatch.playerCardsLeft.mainboard.get().forEach((card: CardObject) => {
-      //card.total = card.quantity;
-      decksize += card.quantity;
-      cardsleft += card.quantity;
-    });
+    globals.currentMatch.playerCardsLeft.mainboard
+      .get()
+      .forEach((card: CardObject) => {
+        //card.total = card.quantity;
+        decksize += card.quantity;
+        cardsleft += card.quantity;
+      });
 
     if (removeUsed) {
       cardsleft -= globals.currentMatch.playerCardsUsed.length;
@@ -164,7 +166,11 @@ const forceDeckUpdate = function (removeUsed = true) {
   }
 };
 
-function chanceType(quantity: number, cardsleft: number, oddsSampleSize: number) {
+function chanceType(
+  quantity: number,
+  cardsleft: number,
+  oddsSampleSize: number
+) {
   return (
     Math.round(
       hypergeometricRange(

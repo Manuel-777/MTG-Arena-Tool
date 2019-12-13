@@ -6,7 +6,7 @@ export interface Deck {
   id: string;
 }
 
-type StoreShim = { set:(key: string, value: any) => void };
+type StoreShim = { set: (key: string, value: any) => void };
 
 const addCustomDeck = function(customDeck: Deck): void {
   const id = customDeck.id;

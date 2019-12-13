@@ -195,9 +195,7 @@ class StatsPanel {
         curveNumber.innerHTML = `<span class="${colClass}_bright">${formatPercent(
           winRate
         )}</span>`;
-        curveNumber.title = `${cwr.wins} matches won : ${
-          cwr.losses
-        } matches lost`;
+        curveNumber.title = `${cwr.wins} matches won : ${cwr.losses} matches lost`;
 
         if (showTags) {
           const curveTag = createDiv(["mana_curve_tag"], cwr.tag);

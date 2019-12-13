@@ -654,7 +654,10 @@ export function onLabelInDeckGetDeckLists(entry, json = false) {
 export function onLabelInDeckGetDeckListsV3(entry) {
   const json = entry.json();
   if (!json) return;
-  onLabelInDeckGetDeckLists(entry, json.map(d => convertDeckFromV3(d)));
+  onLabelInDeckGetDeckLists(
+    entry,
+    json.map(d => convertDeckFromV3(d))
+  );
 }
 
 export function onLabelInDeckGetPreconDecks(entry) {

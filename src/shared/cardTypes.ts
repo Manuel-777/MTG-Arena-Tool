@@ -13,7 +13,7 @@ export const cardTypes = [
   "Sorcery",
   "Planeswalker"
 ] as const;
-type CardType = (typeof cardTypes)[number];
+type CardType = typeof cardTypes[number];
 
 export const cardType = (card: DbCardData) => {
   const result = cardTypes.find(ct => cardHasType(card, ct));

@@ -27,9 +27,9 @@ ipc.on("update_progress", (event, state) => {
   state.total = Math.round((state.total / 1024 / 1024) * 100) / 100;
   state.transferred = Math.round((state.transferred / 1024 / 1024) * 100) / 100;
 
-  document.getElementById("progressText").innerHTML = ` ${
-    state.transferred
-  }mb / ${state.total}mb (${speed}kb/s)`;
+  document.getElementById(
+    "progressText"
+  ).innerHTML = ` ${state.transferred}mb / ${state.total}mb (${speed}kb/s)`;
 });
 
 /*

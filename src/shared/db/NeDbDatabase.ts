@@ -1,11 +1,7 @@
 import path from "path";
 import Datastore from "nedb";
 import util from "util";
-import {
-  USER_DATA_DIR,
-  showBusy,
-  hideBusyIfDone
-} from "./databaseUtil";
+import { USER_DATA_DIR, showBusy, hideBusyIfDone } from "./databaseUtil";
 import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
 
 // manually maintained list of non-document (non-object) fields

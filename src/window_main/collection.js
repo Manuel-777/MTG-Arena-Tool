@@ -384,9 +384,7 @@ export function openCollectionTab() {
 
   orderedSets.forEach(set => {
     let setbutton = createDiv(["set_filter", "set_filter_on"]);
-    setbutton.style.backgroundImage = `url(../images/sets/${
-      db.sets[set].code
-    }.png)`;
+    setbutton.style.backgroundImage = `url(../images/sets/${db.sets[set].code}.png)`;
     setbutton.title = set;
 
     sets.appendChild(setbutton);

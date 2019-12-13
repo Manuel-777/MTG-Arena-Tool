@@ -503,17 +503,13 @@ export function httpGetDatabaseVersion(lang: string): void {
       ) {
         // compare language
         ipcLog(
-          `Downloading database (had lang ${db.metadata.language}, needed ${
-            parsedResult.lang
-          })`
+          `Downloading database (had lang ${db.metadata.language}, needed ${parsedResult.lang})`
         );
         httpGetDatabase(lang);
       } else if (parsedResult.latest > db.version) {
         // Compare parsedResult.version with stored version
         ipcLog(
-          `Downloading latest database (had v${db.version}, found v${
-            parsedResult.latest
-          })`
+          `Downloading latest database (had v${db.version}, found v${parsedResult.latest})`
         );
         httpGetDatabase(lang);
       } else {
