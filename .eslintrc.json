@@ -1,5 +1,13 @@
 {
-  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:prettier/recommended",
+    "prettier/@typescript-eslint",
+    "prettier/react"
+  ],
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 9
@@ -10,9 +18,9 @@
     "browser": true
   },
   "rules": {
-    "allowEmptyCatch": true,
+    "allowEmptyCatch": 0,
     "no-cond-assign": 0,
-    "no-console": "off",
+    "no-console": "warn",
     "no-unused-vars": "warn",
     "no-redeclare": "warn",
     "no-undef": "error",
@@ -20,6 +28,8 @@
     "no-empty": "warn",
     "complexity": ["warn", 40],
     "max-statements": ["warn", 100],
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "@typescript-eslint/no-empty-function": ["error", { "allow": ["arrowFunctions"] }],
+    "require-atomic-updates": "warn"
   }
 }

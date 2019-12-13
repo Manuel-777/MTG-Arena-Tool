@@ -82,11 +82,8 @@ function compareDraftPicks(a: CardObject, b: CardObject): -1 | 0 | 1 {
   let cmcDiff = aCard.cmc - bCard.cmc;
   let typeDiff = aType - bType;
   let localeCompare = aCard.name.localeCompare(bCard.name);
-  const compare = rankDiff ||
-    colorsLengthDiff ||
-    cmcDiff ||
-    typeDiff ||
-    localeCompare;
+  const compare =
+    rankDiff || colorsLengthDiff || cmcDiff || typeDiff || localeCompare;
 
   if (compare < 0) {
     return -1;

@@ -2,7 +2,13 @@ import path from "path";
 import { app, remote, ipcRenderer as ipc } from "electron";
 import fs from "fs";
 import _ from "lodash";
-import { Metadata, Archetype, DbCardData, CardSet, RewardsDate } from "./types/Metadata";
+import {
+  Metadata,
+  Archetype,
+  DbCardData,
+  CardSet,
+  RewardsDate
+} from "./types/Metadata";
 import { Season, Rank, RankClassInfo } from "./types/Season";
 import { ArenaV3Deck } from "./types/Deck";
 
@@ -156,11 +162,13 @@ class Database {
   }
 
   get cardIds(): number[] {
-    return this.cards ? Object.keys(this.cards).map(k => parseInt(k)) : [] as number[];
+    return this.cards
+      ? Object.keys(this.cards).map(k => parseInt(k))
+      : ([] as number[]);
   }
 
   get cardList(): DbCardData[] {
-    return this.cards ? Object.values(this.cards) : [] as DbCardData[];
+    return this.cards ? Object.values(this.cards) : ([] as DbCardData[]);
   }
 
   get events(): { [id: string]: string } {
@@ -168,11 +176,13 @@ class Database {
   }
 
   get eventIds(): string[] {
-    return this.metadata ? Object.keys(this.metadata.events) : [] as string[];
+    return this.metadata ? Object.keys(this.metadata.events) : ([] as string[]);
   }
 
   get eventList(): string[] {
-    return this.metadata ? Object.values(this.metadata.events) : [] as string[];
+    return this.metadata
+      ? Object.values(this.metadata.events)
+      : ([] as string[]);
   }
 
   get events_format(): { [id: string]: string } {

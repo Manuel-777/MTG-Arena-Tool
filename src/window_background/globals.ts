@@ -37,7 +37,7 @@ let matchCompletedOnGameNumber = 0;
 
 let matchGameStats: any[] = [];
 
-let originalDeck:Deck = new Deck();
+let originalDeck: Deck = new Deck();
 
 let odds_sample_size = 1;
 

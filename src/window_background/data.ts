@@ -1,19 +1,17 @@
-import _ from 'lodash';
-import database from '../shared/database';
-import electron from 'electron';
-import getOpponentDeck from './getOpponentDeck';
-import globals from './globals';
-import playerData from '../shared/player-data.js';
-import { DEFAULT_TILE } from '../shared/constants';
-import { MatchCreatedEvent } from '../shared/types/MatchCreatedEvent';
-import { objectClone } from '../shared/util';
+import _ from "lodash";
+import database from "../shared/database";
+import electron from "electron";
+import getOpponentDeck from "./getOpponentDeck";
+import globals from "./globals";
+import playerData from "../shared/player-data.js";
+import { DEFAULT_TILE } from "../shared/constants";
+import { MatchCreatedEvent } from "../shared/types/MatchCreatedEvent";
+import { objectClone } from "../shared/util";
 import Deck from "../shared/deck";
 import { SerializedDeck } from "../shared/types/Deck";
 
 // Generate objects using default templates.
 // Nothing in here should call IPC functions
-
-
 
 // Draft Creation
 
@@ -41,38 +39,38 @@ export function createDraft(id: string, entry: any) {
 
 // Match Creation
 export interface PlayerMatchData {
-  seat: number,
-  deck: Deck,
-  life: number,
-  turn: number,
-  name: string,
-  id: string,
-  rank: string,
-  tier: number,
-  originalDeck?: Deck,
-  percentile?: number,
-  leaderboardPlace?: number,
-  cards?: any[],
-  commanderGrpIds: number[]
+  seat: number;
+  deck: Deck;
+  life: number;
+  turn: number;
+  name: string;
+  id: string;
+  rank: string;
+  tier: number;
+  originalDeck?: Deck;
+  percentile?: number;
+  leaderboardPlace?: number;
+  cards?: any[];
+  commanderGrpIds: number[];
 }
 
 export interface ExtendedPlayerMatchData {
   userid: string;
   win: number;
   step?: number;
-  seat: number,
-  tier: number,
-  name: string,
-  rank: string,
-  percentile?: number,
-  leaderboardPlace?: number,
-  commanderGrpIds: any
+  seat: number;
+  tier: number;
+  name: string;
+  rank: string;
+  percentile?: number;
+  leaderboardPlace?: number;
+  commanderGrpIds: any;
 }
 
 export interface MatchData {
   eventId: string;
   matchId: string;
-  InternalEventName?: string,
+  InternalEventName?: string;
   beginTime: number;
   matchTime: number;
   currentPriority: number;
@@ -101,7 +99,7 @@ export interface MatchData {
   cardsCast: any[];
   player: PlayerMatchData;
   opponent: PlayerMatchData;
-};
+}
 
 export interface ExtendedMatchData {
   draws: number;
@@ -174,7 +172,10 @@ const matchDataDefault: MatchData = {
   }
 };
 
-export function createMatch(json: MatchCreatedEvent, matchBeginTime: number): MatchData {
+export function createMatch(
+  json: MatchCreatedEvent,
+  matchBeginTime: number
+): MatchData {
   var match = _.cloneDeep(matchDataDefault);
 
   match.player.originalDeck = globals.originalDeck;
@@ -251,7 +252,11 @@ function matchIsLimited(match: MatchData): boolean {
 
 // Given match data calculates derived data for storage.
 // This is called when a match is complete.
-export function completeMatch(match: ExtendedMatchData, matchData: MatchData, matchEndTime: number): ExtendedMatchData | undefined {
+export function completeMatch(
+  match: ExtendedMatchData,
+  matchData: MatchData,
+  matchEndTime: number
+): ExtendedMatchData | undefined {
   if (matchData.eventId === "AIBotMatch") return;
 
   let mode = matchIsLimited(matchData) ? "limited" : "constructed";

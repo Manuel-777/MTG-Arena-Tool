@@ -142,19 +142,17 @@ export default function OverlayWindowlet(
       ? settings.back_url
       : DEFAULT_BACKGROUND) +
     ")";
-  
+
   const backgroundColor = settings.overlay_back_color;
 
-  const bgStyle:any = {
+  const bgStyle: any = {
     opacity: overlaySettings.alpha_back.toString()
-  }
+  };
 
   // This needs its own setting, like a checkbox or something
-  const solidBg:boolean = backgroundColor !== "rgba(0,0,0,0)";
-  if (!solidBg)
-    bgStyle.backgroundImage = backgroundImage;
-  else
-    bgStyle.backgroundColor = backgroundColor;
+  const solidBg: boolean = backgroundColor !== "rgba(0,0,0,0)";
+  if (!solidBg) bgStyle.backgroundImage = backgroundImage;
+  else bgStyle.backgroundColor = backgroundColor;
 
   const borderAlpha = (overlaySettings.alpha_back * 1.5).toString();
   return (
@@ -174,7 +172,10 @@ export default function OverlayWindowlet(
     >
       <div className="outer_wrapper">
         <div
-          className={"overlay_wrapper overlay_bg_image " + (solidBg ? "after_hidden" : "")}
+          className={
+            "overlay_wrapper overlay_bg_image " +
+            (solidBg ? "after_hidden" : "")
+          }
           style={bgStyle}
         />
       </div>

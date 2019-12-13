@@ -1,8 +1,6 @@
 import db from "../shared/database";
 import _ from "lodash";
-import {
-  getReadableEvent
-} from "../shared/util";
+import { getReadableEvent } from "../shared/util";
 
 const questMap = {
   "a4a06519-fd8a-422a-b20f-8fc7a175feef": "Quests/Quest_Azorius_Justiciar",
@@ -80,7 +78,10 @@ function isTrackCode(s: string): s is MasteryTrackKeys {
 type MasteryTrackKeys = keyof typeof trackCodeMap;
 
 function getReadableTrack(trackCode: string) {
-  return (isTrackCode(trackCode) && trackCodeMap[trackCode]) || getReadableCode(trackCode);
+  return (
+    (isTrackCode(trackCode) && trackCodeMap[trackCode]) ||
+    getReadableCode(trackCode)
+  );
 }
 
 // quick and dirty generic pretty formatting
@@ -94,7 +95,6 @@ function getReadableCode(code: string) {
 }
 
 type QuestKeys = keyof typeof questMap;
-
 
 function isQuestCode(s: string): s is QuestKeys {
   return s in questMap;
@@ -173,7 +173,9 @@ export function getPrettyContext(context: string, full = true) {
 
   // If there's no valid pretty context, fallback on generic formatting
   const pretty =
-    (isEconomyTransactionKey(context) && economyTransactionContextsMap[context]) || getReadableCode(context);
+    (isEconomyTransactionKey(context) &&
+      economyTransactionContextsMap[context]) ||
+    getReadableCode(context);
 
   if (!full && pretty.includes(":")) {
     return pretty.split(":")[0];
@@ -188,9 +190,9 @@ export const vaultPercentFormat = {
 };
 
 export interface EconomyState {
-  showArchived: boolean,
-  filterEconomy: string,
-  daysago: number,
-  dayList: any[],
-  sortedChanges: any[],
+  showArchived: boolean;
+  filterEconomy: string;
+  daysago: number;
+  dayList: any[];
+  sortedChanges: any[];
 }

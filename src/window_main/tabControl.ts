@@ -1,7 +1,7 @@
 import {
   EASING_DEFAULT,
   DATE_SEASON,
-  MAIN_HOME ,
+  MAIN_HOME,
   MAIN_DECKS,
   MAIN_HISTORY,
   MAIN_EVENTS,
@@ -40,7 +40,12 @@ import { openSettingsTab } from "./settings";
 import { openHomeTab, requestHome } from "./home";
 
 //
-export function openTab(tab:number, filters = {}, dataIndex = 0, scrollTop = 0) {
+export function openTab(
+  tab: number,
+  filters = {},
+  dataIndex = 0,
+  scrollTop = 0
+) {
   showLoadingBars();
   resetMainContainer();
   switch (tab) {
@@ -87,7 +92,7 @@ export function openTab(tab:number, filters = {}, dataIndex = 0, scrollTop = 0) 
   }
 }
 
-export function clickNav(id:number) {
+export function clickNav(id: number) {
   changeBackground("default");
   document.body.style.cursor = "auto";
   anime({
@@ -96,7 +101,11 @@ export function clickNav(id:number) {
     easing: EASING_DEFAULT,
     duration: 350
   });
-  let filters = { date: pd.settings.last_date_filter, eventId: "All Events", rankedMode: false };
+  let filters = {
+    date: pd.settings.last_date_filter,
+    eventId: "All Events",
+    rankedMode: false
+  };
   let sidebarActive = id;
 
   if (id === MAIN_CONSTRUCTED) {

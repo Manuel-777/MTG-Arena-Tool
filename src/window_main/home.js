@@ -267,9 +267,7 @@ export function openHomeTab(arg, opentab = true) {
       if (filteredWildcardsSet !== set) {
         setbutton.classList.add("set_filter_on");
       }
-      setbutton.style.backgroundImage = `url(../images/sets/${
-        db.sets[set].code
-      }.png)`;
+      setbutton.style.backgroundImage = `url(../images/sets/${db.sets[set].code}.png)`;
       setbutton.title = set;
 
       setsContainer.appendChild(setbutton);

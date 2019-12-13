@@ -138,9 +138,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
   let results = "";
   const req = http.request(options, function(res: IncomingMessage) {
     if (res.statusCode && (res.statusCode < 200 || res.statusCode > 299)) {
-      const text = `Server error with request. (${task.method}: ${
-        res.statusCode
-      })`;
+      const text = `Server error with request. (${task.method}: ${res.statusCode})`;
       callback(new Error(text), task);
       return;
     } else {
@@ -162,9 +160,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
             return;
           }
           if (parsedResult && parsedResult.error) {
-            const text = `Server returned error code. (${task.method}: ${
-              parsedResult.error
-            })`;
+            const text = `Server returned error code. (${task.method}: ${parsedResult.error})`;
             callback(new Error(text), task, results, parsedResult);
             return;
           }

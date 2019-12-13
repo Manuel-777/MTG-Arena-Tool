@@ -38,6 +38,9 @@ export interface LocalDatabase {
   remove(table: string, key: string): Promise<number>;
 }
 
-export const appDb: LocalDatabase = new MigrationDatabase(new ElectronStoreDatabase(), new NeDbDatabase());
+export const appDb: LocalDatabase = new MigrationDatabase(
+  new ElectronStoreDatabase(),
+  new NeDbDatabase()
+);
 export const playerDb: LocalDatabase = new NeDbDatabase();
 export const playerDbLegacy: LocalDatabase = new ElectronStoreDatabase();

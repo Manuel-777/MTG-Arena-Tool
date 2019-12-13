@@ -567,7 +567,10 @@ function deckLoad(_deck, index) {
   CARD_RARITIES.filter(r => r !== "land").forEach(rarity => {
     rarity = rarity.toLowerCase();
     const key = rarity[0];
-    if (_deck.wildcards.hasOwnProperty(key) && _deck.wildcards[key] > 0) {
+    if (
+      Object.prototype.hasOwnProperty.call(_deck.wildcards, key) &&
+      _deck.wildcards[key] > 0
+    ) {
       wc = createDiv(["wc_explore_cost", "wc_" + rarity], _deck.wildcards[key]);
       wc.title = _.capitalize(rarity) + " wildcards needed.";
       flcf.appendChild(wc);
