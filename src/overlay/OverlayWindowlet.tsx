@@ -151,8 +151,11 @@ export default function OverlayWindowlet(
 
   // This needs its own setting, like a checkbox or something
   const solidBg: boolean = backgroundColor !== "rgba(0,0,0,0)";
-  if (!solidBg) bgStyle.backgroundImage = backgroundImage;
-  else bgStyle.backgroundColor = backgroundColor;
+  if (!solidBg) {
+    bgStyle.backgroundImage = backgroundImage;
+  } else {
+    bgStyle.backgroundColor = backgroundColor;
+  }
 
   const borderAlpha = (overlaySettings.alpha_back * 1.5).toString();
   return (
