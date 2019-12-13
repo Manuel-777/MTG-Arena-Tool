@@ -36,7 +36,6 @@ if (!remote.app.isPackaged) {
       });
     }
   });
-  require("devtron").install();
   const Sentry = require("@sentry/electron");
   Sentry.init({
     dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
