@@ -1,6 +1,6 @@
-import math from "mathjs";
-
-math.config({ precision: 2000 });
+import { create, all } from "mathjs";
+const config = { precision: 2000 };
+const math = create(all, config);
 
 //
 function hypergeometric(
