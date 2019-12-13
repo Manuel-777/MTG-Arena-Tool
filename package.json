@@ -55,6 +55,7 @@
     "clean:modules": "rm -rf node_modules",
     "clean:lib": "rm -rf lib",
     "clean:dist": "rm -rf dist",
+    "postinstall": "rm -rf node_modules/@types/react-native",
     "prebuild": "npm run clean:lib",
     "build": "babel src --extensions \".ts,.tsx,.js,.jsx\" --out-dir lib --copy-files",
     "start": "npm run build && electron .",
