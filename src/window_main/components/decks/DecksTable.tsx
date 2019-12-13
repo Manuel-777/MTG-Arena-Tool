@@ -288,37 +288,41 @@ export default function DecksTable({
     }),
     []
   );
-  const initialState = _.defaultsDeep(cachedState, {
-    hiddenColumns: [
-      "deckId",
-      "custom",
-      "boosterCost",
-      "colors",
-      "lastEditLosses",
-      "lastEditTotal",
-      "lastEditWinrate",
-      "lastEditWins",
-      "timePlayed",
-      "timeUpdated",
-      "wins",
-      "losses",
-      "total",
-      "rare",
-      "common",
-      "uncommon",
-      "mythic",
-      "duration",
-      "avgDuration",
-      "interval",
-      "winrate",
-      "winrateLow",
-      "winrateHigh"
-    ],
-    autoResetFilters: false, // will not "work" until entire page is React-controlled
-    filters: { archived: "hideArchived" },
-    autoResetSortBy: false, // will not "work" until entire page is React-controlled
-    sortBy: [{ id: "timeTouched", desc: true }]
-  });
+  const initialState = React.useMemo(
+    () =>
+      _.defaultsDeep(cachedState, {
+        hiddenColumns: [
+          "deckId",
+          "custom",
+          "boosterCost",
+          "colors",
+          "lastEditLosses",
+          "lastEditTotal",
+          "lastEditWinrate",
+          "lastEditWins",
+          "timePlayed",
+          "timeUpdated",
+          "wins",
+          "losses",
+          "total",
+          "rare",
+          "common",
+          "uncommon",
+          "mythic",
+          "duration",
+          "avgDuration",
+          "interval",
+          "winrate",
+          "winrateLow",
+          "winrateHigh"
+        ],
+        autoResetFilters: false, // will not "work" until entire page is React-controlled
+        filters: { archived: "hideArchived" },
+        autoResetSortBy: false, // will not "work" until entire page is React-controlled
+        sortBy: [{ id: "timeTouched", desc: true }]
+      }),
+    [cachedState]
+  );
 
   const {
     flatColumns,
