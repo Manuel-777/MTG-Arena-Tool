@@ -108,11 +108,11 @@
     "vanilla-picker": "^2.10.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.0",
-    "@babel/core": "^7.7.2",
-    "@babel/preset-env": "^7.7.1",
-    "@babel/preset-react": "^7.7.0",
-    "@babel/preset-typescript": "^7.7.2",
+    "@babel/cli": "^7.7.5",
+    "@babel/core": "^7.7.5",
+    "@babel/preset-env": "^7.7.6",
+    "@babel/preset-react": "^7.7.4",
+    "@babel/preset-typescript": "^7.7.4",
     "@sentry/electron": "^0.17.4",
     "@types/async": "^3.0.3",
     "@types/howler": "^2.1.1",
@@ -123,19 +123,19 @@
     "@types/react-dom": "^16.9.4",
     "@types/react-transition-group": "^4.2.3",
     "@types/semver": "^6.2.0",
-    "@typescript-eslint/eslint-plugin": "^2.6.1",
-    "@typescript-eslint/parser": "^2.6.1",
+    "@typescript-eslint/eslint-plugin": "^2.11.0",
+    "@typescript-eslint/parser": "^2.11.0",
     "acorn": "^6.3.0",
     "devtron": "^1.4.0",
     "dotenv": "^8.2.0",
     "electron": "^5.0.12",
     "electron-builder": "^20.44.4",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.3.0",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react": "^7.17.0",
     "jest": "^24.9.0",
-    "prettier": "1.16.4",
-    "typescript": "^3.7.2"
+    "prettier": "1.19.1",
+    "typescript": "^3.7.3"
   }
 }
