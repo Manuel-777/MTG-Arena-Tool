@@ -20,13 +20,16 @@ function localDayDateFormat(date: Date) {
 }
 
 function getDayString(daysago: number, timestamp: Date) {
-  return daysago == 0
-    ? "Today"
-    : daysago == 1
-    ? "Yesterday"
-    : daysago > 0
-    ? localDayDateFormat(startOfDay(timestamp))
-    : "";
+  if (daysago === 0) {
+    return "Today";
+  }
+  if (daysago === 1) {
+    return "Yesterday";
+  }
+  if (daysago > 0) {
+    return localDayDateFormat(startOfDay(timestamp));
+  }
+  return "";
 }
 
 interface EconomyDayHeaderProps {

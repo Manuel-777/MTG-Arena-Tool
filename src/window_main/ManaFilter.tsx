@@ -27,13 +27,8 @@ export default function ManaFilter(props: ManaFilterProps) {
 
   const onClickColorFilter = React.useCallback(
     (code: ManaFilterKeys) => (event: React.MouseEvent<HTMLDivElement>) => {
-      if (event.currentTarget.classList.contains("mana_filter_on")) {
-        event.currentTarget.classList.remove("mana_filter_on");
-        colors[code] = true;
-      } else {
-        event.currentTarget.classList.add("mana_filter_on");
-        colors[code] = false;
-      }
+      colors[code] = event.currentTarget.classList.contains("mana_filter_on");
+      event.currentTarget.classList.toggle("mana_filter_on");
       props.onFilterChanged(colors);
     },
     [props.onFilterChanged]
