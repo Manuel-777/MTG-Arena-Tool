@@ -19,9 +19,7 @@ import {
   hideLoadingBars,
   ipcSend,
   makeResizable,
-  resetMainContainer,
-  setLocalState,
-  getLocalState
+  resetMainContainer
 } from "./renderer-util";
 import mountReactComponent from "./mountReactComponent";
 import DecksTable, {
@@ -132,15 +130,18 @@ export function openDecksTab(_filters = {}): void {
     }
   );
 
-  const { decksTable } = getLocalState();
+  const { decksTableState } = pd.settings;
   mountReactComponent(
     <DecksTable
       data={data}
       filters={filters}
-      cachedState={decksTable}
+      cachedState={decksTableState}
       filterMatchesCallback={openDecksTab}
       tableStateCallback={(state: any): void =>
-        setLocalState({ decksTable: state })
+        ipcSend("save_user_settings", {
+          decksTableState: state,
+          skip_refresh: true
+        })
       }
       openDeckCallback={(id: string): void => openDeckCallback(id, filters)}
       archiveDeckCallback={(id: string): void =>

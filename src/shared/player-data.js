@@ -76,6 +76,7 @@ const defaultCfg = {
     right_panel_width: 400,
     last_date_filter: DATE_LAST_30,
     last_open_tab: -1,
+    decksTableState: undefined,
     card_tile_style: CARD_TILE_FLAT,
     skip_firstpass: false,
     overlay_scale: 100,
