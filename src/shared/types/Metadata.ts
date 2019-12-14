@@ -55,7 +55,8 @@ export interface CardSet {
   code: string,
   arenacode: string,
   tile: number,
-  release: string
+  release: string,
+  svg: string
 }
 
 export interface Archetype {

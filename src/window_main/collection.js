@@ -384,9 +384,10 @@ export function openCollectionTab() {
 
   orderedSets.forEach(set => {
     let setbutton = createDiv(["set_filter", "set_filter_on"]);
-    setbutton.style.backgroundImage = `url(../images/sets/${
-      db.sets[set].code
-    }.png)`;
+    setbutton.style.backgroundImage = `url(data:image/svg+xml;base64,${
+      db.sets[set].svg
+    })`;
+
     setbutton.title = set;
 
     sets.appendChild(setbutton);
@@ -733,7 +734,7 @@ function printStats() {
   mainstats.appendChild(countModeSelect);
 
   // Complete collection sats
-  let rs = renderSetStats(stats.complete, "PW", "Complete collection");
+  let rs = renderSetStats(stats.complete, "Arena", "Complete collection");
   mainstats.appendChild(rs);
 
   // Filter out non booster sets ?
@@ -746,7 +747,7 @@ function printStats() {
     .slice()
     .reverse()
     .forEach(set => {
-      let rs = renderSetStats(stats[set], db.sets[set].code, set);
+      let rs = renderSetStats(stats[set], set, set);
       mainstats.appendChild(rs);
     });
 
@@ -771,12 +772,9 @@ function printStats() {
 }
 
 //
-function renderSetStats(setStats, setIconCode, setName) {
-  const setDiv = renderCompletionDiv(
-    setStats.all,
-    "sets/" + setIconCode + ".png",
-    setName
-  );
+function renderSetStats(setStats, setName, setText) {
+  let setIcon = `url(data:image/svg+xml;base64,${db.sets[setName].svg})`;
+  const setDiv = renderCompletionDiv(setStats.all, setIcon, setText);
 
   setDiv.addEventListener("mouseover", () => {
     let span = setDiv
@@ -794,12 +792,12 @@ function renderSetStats(setStats, setIconCode, setName) {
   });
 
   setDiv.addEventListener("click", () => {
-    openSetStats(setStats, setName);
+    openSetStats(setStats, setText);
   });
 
-  if (defaultSetName == setName) {
+  if (defaultSetName == setText) {
     setTimeout(() => {
-      openSetStats(setStats, setName);
+      openSetStats(setStats, setText);
     }, 500);
   }
 
@@ -894,9 +892,11 @@ function openSetStats(setStats, setName) {
     const countStats = setStats[rarity];
     if (countStats.total > 0) {
       const capitalizedRarity = rarity[0].toUpperCase() + rarity.slice(1) + "s";
+      
+      var style = getComputedStyle(document.body);
       let compDiv = renderCompletionDiv(
         countStats,
-        "wc_" + rarity + ".png",
+        style.getPropertyValue(`--wc_${ rarity }_png`),
         capitalizedRarity
       );
       compDiv.style.opacity = 1;
@@ -975,7 +975,7 @@ function renderCompletionDiv(countStats, image, title) {
   const completionDiv = createDiv(["stats_set_completion"]);
 
   let setIcon = createDiv(["stats_set_icon"]);
-  setIcon.style.backgroundImage = `url(../images/${image})`;
+  setIcon.style.backgroundImage = image;
   let setIconSpan = document.createElement("span");
   setIconSpan.innerHTML = title;
   setIcon.appendChild(setIconSpan);
