@@ -892,11 +892,11 @@ function openSetStats(setStats, setName) {
     const countStats = setStats[rarity];
     if (countStats.total > 0) {
       const capitalizedRarity = rarity[0].toUpperCase() + rarity.slice(1) + "s";
-      
+
       var style = getComputedStyle(document.body);
       let compDiv = renderCompletionDiv(
         countStats,
-        style.getPropertyValue(`--wc_${ rarity }_png`),
+        style.getPropertyValue(`--wc_${rarity}_png`),
         capitalizedRarity
       );
       compDiv.style.opacity = 1;
