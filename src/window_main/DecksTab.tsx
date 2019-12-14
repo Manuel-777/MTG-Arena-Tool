@@ -22,10 +22,9 @@ import {
   resetMainContainer
 } from "./renderer-util";
 import mountReactComponent from "./mountReactComponent";
-import DecksTable, {
-  DeckStats,
-  DecksData
-} from "./components/decks/DecksTable";
+
+import DecksTable from "./components/decks/DecksTable";
+import { DeckStats, DecksData } from "./components/decks/types";
 
 let filters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
@@ -62,15 +61,15 @@ function setFilters(selected: any = {}): void {
 }
 
 //
-export function openDecksTab(_filters = {}): void {
+export function openDecksTab(newFilters = {}): void {
   hideLoadingBars();
   const mainDiv = resetMainContainer() as HTMLElement;
   mainDiv.classList.add("flex_item");
-  setFilters(_filters);
+  setFilters(newFilters);
 
   const wrapR = createDiv(["wrapper_column", "sidebar_column_l"]);
   wrapR.style.width = pd.settings.right_panel_width + "px";
-  wrapR.style.flex = `0 0 ${pd.settings.right_panel_width}px`;
+  wrapR.style.flex = `0 0 ${wrapR.style.width}`;
   const aggregator: any = new Aggregator(filters);
   const statsPanel = new StatsPanel(
     "decks_top",

@@ -3,7 +3,6 @@ import React, { useRef, useState } from "react";
 import format from "date-fns/format";
 import isValid from "date-fns/isValid";
 import styled from "styled-components";
-import matchSorter from "match-sorter";
 
 import { MANA, CARD_RARITIES } from "../../../shared/constants";
 import { getCardArtCrop, toMMSS, toDDHHMMSS } from "../../../shared/util";
@@ -18,221 +17,20 @@ import {
   showColorpicker
 } from "../../renderer-util";
 import { createInput } from "../../../shared/dom-fns"; // TODO remove this
-import ManaFilter, { ColorFilter } from "../../ManaFilter";
 
-import Aggregator from "../../aggregator";
 import { CSSTransition } from "react-transition-group";
-
-export interface CellProps {
-  cell: any;
-  openDeckCallback: (id: string) => void;
-  archiveDeckCallback: (id: string) => void;
-  tagDeckCallback: (deckid: string, tag: string) => void;
-  editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (deckid: string, tag: string) => void;
-}
-
-export const StyledInputContainer = styled.div.attrs(props => ({
-  className: props.className ? props.className : "" + " input_container"
-}))`
-  display: inline-flex;
-  width: inherit;
-  margin: inherit;
-  height: 26px;
-  padding-bottom: 4px;
-  &.input_container input {
-    margin: inherit;
-  }
-`;
-
-export const StyledCheckboxContainer = styled.label.attrs(props => ({
-  className: props.className
-    ? props.className
-    : "" + " check_container hover_label"
-}))`
-  display: inline-flex;
-`;
-
-export function TextBoxFilter({
-  column: { id, filterValue, preFilteredRows, setFilter }
-}: {
-  column: any;
-}): JSX.Element {
-  const count = preFilteredRows.length;
-  const prompt =
-    id === "deckTileId" ? `Search ${count} decks...` : `Filter ${id}...`;
-  return (
-    <StyledInputContainer title={prompt}>
-      <input
-        value={filterValue || ""}
-        onChange={(e): void => setFilter(e.target.value || undefined)}
-        placeholder={prompt}
-        style={{ width: "100%" }}
-      />
-    </StyledInputContainer>
-  );
-}
-
-export function NumberRangeColumnFilter({
-  column: { filterValue = [], preFilteredRows, setFilter, id }
-}: {
-  column: any;
-}): JSX.Element {
-  const [min, max] = React.useMemo(() => {
-    let min = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
-    let max = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
-    preFilteredRows.forEach((row: any) => {
-      min = Math.min(row.values[id], min);
-      max = Math.max(row.values[id], max);
-    });
-    return [min, max];
-  }, [id, preFilteredRows]);
-
-  return (
-    <StyledInputContainer>
-      <input
-        value={filterValue[0] || ""}
-        type="number"
-        onChange={(e): void => {
-          const val = e.target.value;
-          setFilter((old: number[] = []) => [
-            val ? parseInt(val, 10) : undefined,
-            old[1]
-          ]);
-        }}
-        placeholder={`Min (${min})`}
-        style={{
-          width: "70px",
-          marginRight: "0.5rem"
-        }}
-      />
-      to
-      <input
-        value={filterValue[1] || ""}
-        type="number"
-        onChange={(e): void => {
-          const val = e.target.value;
-          setFilter((old: number[] = []) => [
-            old[0],
-            val ? parseInt(val, 10) : undefined
-          ]);
-        }}
-        placeholder={`Max (${max})`}
-        style={{
-          width: "70px",
-          marginLeft: "0.5rem"
-        }}
-      />
-    </StyledInputContainer>
-  );
-}
-
-export function fuzzyTextFilterFn(
-  rows: any[],
-  id: string,
-  filterValue: string
-): any[] {
-  return matchSorter(rows, filterValue, { keys: ["values." + id] });
-}
-
-export function uberSearchFilterFn(
-  rows: any[],
-  id: string,
-  filterValue: string
-): any[] {
-  const tokens = filterValue.split(" ");
-  const matches = tokens.map((token: string): any[] =>
-    matchSorter(rows, token, {
-      keys: [
-        "values.deckId",
-        "values.name",
-        "values.format",
-        "values.tags",
-        (row: any): string => {
-          const { colors } = row.values;
-          return colors
-            .map((color: number): string => (MANA as any)[color])
-            .join(" ");
-        }
-      ]
-    })
-  );
-  return _.intersection(...matches);
-}
-
-const defaultColors = Aggregator.getDefaultColorFilter();
-
-export function ColorColumnFilter({
-  column: { filterValue = { ...defaultColors }, setFilter }
-}: {
-  column: any;
-}): JSX.Element {
-  return (
-    <ManaFilter
-      prefixId={"decks_table"}
-      filterKey={"colors"}
-      filters={{ colors: filterValue }}
-      onFilterChanged={(colors): void => {
-        if (_.isMatch(colors, defaultColors)) {
-          setFilter(undefined); // clear filter
-        } else {
-          setFilter(colors);
-        }
-      }}
-    />
-  );
-}
-
-export function colorsFilterFn(
-  rows: any[],
-  id: string,
-  filterValue: ColorFilter
-): any[] {
-  return rows.filter(row =>
-    Aggregator.filterDeckByColors(row.values, filterValue)
-  );
-}
-
-export function ArchiveColumnFilter({
-  column: { filterValue, setFilter }
-}: {
-  column: any;
-}): JSX.Element {
-  return (
-    <StyledCheckboxContainer>
-      show all
-      <input
-        type="checkbox"
-        checked={filterValue !== "hideArchived"}
-        onChange={(e): void => {
-          const val = e.target.checked;
-          setFilter(val ? "showArchived" : "hideArchived");
-        }}
-      />
-      <span className={"checkmark"} />
-    </StyledCheckboxContainer>
-  );
-}
-
-export function archivedFilterFn(
-  rows: any[],
-  id: string,
-  filterValue: string
-): any[] {
-  if (filterValue === "hideArchived") {
-    return rows.filter(row => !row.values[id]);
-  }
-  return rows;
-}
+import {
+  CellProps,
+  StyledArtTileCellProps,
+  StyledTagProps,
+  DeckTagProps,
+  StyledArchivedCellProps
+} from "./types";
 
 const StyledArtTileHeader = styled.div`
   width: 200px;
   margin: 0;
 `;
-
-interface StyledArtTileCellProps {
-  url: string;
-}
 
 const StyledArtTileCell = styled(StyledArtTileHeader)<StyledArtTileCellProps>`
   cursor: pointer;
@@ -457,11 +255,6 @@ export function DurationCell({ cell }: CellProps): JSX.Element {
   return <MetricText title={tooltip}>{value}</MetricText>;
 }
 
-interface StyledTagProps {
-  backgroundColor: string;
-  fontStyle: string;
-}
-
 const StyledTag = styled.div<StyledTagProps>`
   font-family: var(--sub-font-name);
   cursor: pointer;
@@ -488,13 +281,6 @@ const StyledTag = styled.div<StyledTagProps>`
 const StyledTagWithClose = styled(StyledTag)`
   padding-right: 0;
 `;
-
-interface DeckTagProps {
-  deckid: string;
-  tag: string;
-  editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (deckid: string, tag: string) => void;
-}
 
 function useColorpicker(
   containerRef: any,
@@ -680,10 +466,6 @@ export function MissingCardsCell({ cell }: CellProps): JSX.Element {
       </div>
     </StyledFlexRightCell>
   );
-}
-
-interface StyledArchivedCellProps {
-  archived: boolean;
 }
 
 const StyledArchiveDiv = styled.div`

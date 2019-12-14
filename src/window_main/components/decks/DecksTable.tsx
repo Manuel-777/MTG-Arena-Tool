@@ -6,32 +6,33 @@ import FilterPanel from "../../FilterPanel";
 import {
   ArtTileHeader,
   ArtTileCell,
-  TextBoxFilter,
   NameCell,
-  ColorColumnFilter,
+  ColorsHeader,
   ColorsCell,
-  DurationCell,
   FormatCell,
   TagsCell,
+  DurationCell,
   DatetimeCell,
   MetricCell,
-  NumberRangeColumnFilter,
+  MetricText,
   WinRateCell,
   LastEditWinRateCell,
   MissingCardsCell,
   ArchiveHeader,
+  ArchivedCell
+} from "./cells";
+import {
+  StyledCheckboxContainer,
+  TextBoxFilter,
+  ColorColumnFilter,
+  NumberRangeColumnFilter,
   ArchiveColumnFilter,
-  ArchivedCell,
   fuzzyTextFilterFn,
   archivedFilterFn,
   colorsFilterFn,
-  MetricText,
-  CellProps,
-  uberSearchFilterFn,
-  StyledCheckboxContainer,
-  ColorsHeader
-} from "./DecksTableComponents";
-import { SerializedDeck } from "../../../shared/types/Deck";
+  uberSearchFilterFn
+} from "./filters";
+import { CellProps, DecksTableProps } from "./types";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
 
@@ -63,51 +64,6 @@ const StyledDecksTable = styled.div`
     }
   }
 `;
-
-export interface DeckStats {
-  wins: number;
-  losses: number;
-  total: number;
-  duration: number;
-  winrate: number;
-  interval: number;
-  winrateLow: number;
-  winrateHigh: number;
-}
-
-export interface MissingWildcards {
-  rare: number;
-  common: number;
-  uncommon: number;
-  mythic: number;
-}
-
-export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
-  winrate100: number;
-  avgDuration: number;
-  boosterCost: number;
-  colorSortVal: string;
-  timeUpdated: number;
-  timePlayed: number;
-  timeTouched: number;
-  lastEditWins: number;
-  lastEditLosses: number;
-  lastEditTotal: number;
-  lastEditWinrate: number;
-}
-
-export interface DecksTableProps {
-  data: DecksData[];
-  filters: any;
-  filterMatchesCallback: (filters: any) => void;
-  openDeckCallback: (id: string) => void;
-  archiveDeckCallback: (id: string) => void;
-  tagDeckCallback: (deckid: string, tag: string) => void;
-  editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (deckid: string, tag: string) => void;
-  tableStateCallback: (state: any) => void;
-  cachedState: any;
-}
 
 const PresetButton = styled(MetricText).attrs(props => ({
   className: props.className ? props.className : "" + " button_simple"
