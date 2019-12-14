@@ -24,9 +24,14 @@ import {
 import mountReactComponent from "./mountReactComponent";
 
 import DecksTable from "./components/decks/DecksTable";
-import { DeckStats, DecksData } from "./components/decks/types";
+import {
+  DeckStats,
+  DecksData,
+  AggregatorFilters,
+  DecksTableState
+} from "./components/decks/types";
 
-let filters = Aggregator.getDefaultFilters();
+let filters: AggregatorFilters = Aggregator.getDefaultFilters();
 filters.onlyCurrentDecks = true;
 const tagPrompt = "Add";
 
@@ -43,13 +48,12 @@ function getDefaultStats(): DeckStats {
   };
 }
 
-function setFilters(selected: any = {}): void {
-  if (selected.eventId || selected.date) {
+function setFilters(selected: AggregatorFilters = {}): void {
+  if (selected.date) {
     // clear all dependent filters
     filters = {
       ...Aggregator.getDefaultFilters(),
       date: filters.date,
-      eventId: filters.eventId,
       onlyCurrentDecks: true,
       showArchived: filters.showArchived,
       ...selected
@@ -60,8 +64,7 @@ function setFilters(selected: any = {}): void {
   }
 }
 
-//
-export function openDecksTab(newFilters = {}): void {
+export function openDecksTab(newFilters: AggregatorFilters = {}): void {
   hideLoadingBars();
   const mainDiv = resetMainContainer() as HTMLElement;
   mainDiv.classList.add("flex_item");
@@ -94,20 +97,20 @@ export function openDecksTab(newFilters = {}): void {
 
   const data = pd.deckList.map(
     (deck: SerializedDeck): DecksData => {
-      const id = deck.id || "";
+      const id = deck.id ?? "";
       const colorSortVal = deck.colors ? deck.colors.join("") : "";
       // compute winrate metrics
       const deckStats: DeckStats =
-        aggregator.deckStats[id] || getDefaultStats();
+        aggregator.deckStats[id] ?? getDefaultStats();
       const avgDuration = Math.round(deckStats.duration / deckStats.total);
       const recentStats: DeckStats =
-        aggregator.deckRecentStats[id] || getDefaultStats();
+        aggregator.deckRecentStats[id] ?? getDefaultStats();
       const winrate100 = Math.round(deckStats.winrate * 100);
       // compute missing card metrics
       const missingWildcards = getDeckMissing(deck);
       const boosterCost = getBoosterCountEstimate(missingWildcards);
       // compute last touch metrics
-      const lastUpdated = new Date(deck.lastUpdated || NaN);
+      const lastUpdated = new Date(deck.lastUpdated ?? NaN);
       const lastPlayed = aggregator.deckLastPlayed[id];
       const lastTouched = dateMaxValid(lastUpdated, lastPlayed);
       return {
@@ -136,7 +139,7 @@ export function openDecksTab(newFilters = {}): void {
       filters={filters}
       cachedState={decksTableState}
       filterMatchesCallback={openDecksTab}
-      tableStateCallback={(state: any): void =>
+      tableStateCallback={(state: DecksTableState): void =>
         ipcSend("save_user_settings", {
           decksTableState: state,
           skip_refresh: true
@@ -156,7 +159,7 @@ export function openDecksTab(newFilters = {}): void {
   );
 }
 
-function openDeckCallback(id: string, filters: any): void {
+function openDeckCallback(id: string, filters: AggregatorFilters): void {
   const deck = pd.deck(id);
   if (!deck) return;
   openDeck(deck, { ...filters, deckId: id });

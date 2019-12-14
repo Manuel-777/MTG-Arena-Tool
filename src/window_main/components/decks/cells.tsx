@@ -283,24 +283,24 @@ const StyledTagWithClose = styled(StyledTag)`
 `;
 
 function useColorpicker(
-  containerRef: any,
+  containerRef: React.MutableRefObject<any>,
   tag: string,
   backgroundColor: string,
   editTagCallback: (tag: string, color: string) => void
-): (e: any) => void {
+): (e: React.MouseEvent) => void {
   return (e): void => {
     e.stopPropagation();
     showColorpicker(
       backgroundColor,
-      (color: any) => {
-        const container: any = containerRef.current;
+      (color: { rgbString: string }) => {
+        const container = containerRef.current;
         if (container) {
           container.style.backgroundColor = color.rgbString;
         }
       },
-      (color: any) => editTagCallback(tag, color.rgbString),
+      (color: { rgbString: string }) => editTagCallback(tag, color.rgbString),
       () => {
-        const container: any = containerRef.current;
+        const container = containerRef.current;
         if (container) {
           container.style.backgroundColor = backgroundColor;
         }
@@ -357,7 +357,7 @@ export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
           editTagCallback
         )}
       >
-        {cell.value || "unknown"}
+        {cell.value ?? "unknown"}
       </StyledTag>
     </StyledFlexRightCell>
   );
@@ -373,7 +373,7 @@ export function TagsCell({
   const data = cell.row.values;
   const containerRef = useRef(null);
   // TODO translate this into React
-  const clickHandler = function(e: any): void {
+  const clickHandler = function(e: React.MouseEvent): void {
     const container: any = containerRef.current;
     if (!container) {
       return;

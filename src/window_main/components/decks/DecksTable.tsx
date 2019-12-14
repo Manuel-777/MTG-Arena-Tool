@@ -32,7 +32,7 @@ import {
   colorsFilterFn,
   uberSearchFilterFn
 } from "./filters";
-import { CellProps, DecksTableProps } from "./types";
+import { CellProps, DecksTableProps, DecksTableState } from "./types";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
 
@@ -66,7 +66,7 @@ const StyledDecksTable = styled.div`
 `;
 
 const PresetButton = styled(MetricText).attrs(props => ({
-  className: props.className ? props.className : "" + " button_simple"
+  className: (props.className ?? "") + " button_simple"
 }))`
   margin: 0 4px 5px 4px;
   width: 90px;
@@ -244,7 +244,7 @@ export default function DecksTable({
     }),
     []
   );
-  const initialState = React.useMemo(
+  const initialState: DecksTableState = React.useMemo(
     () =>
       _.defaultsDeep(cachedState, {
         hiddenColumns: [
@@ -272,9 +272,7 @@ export default function DecksTable({
           "winrateLow",
           "winrateHigh"
         ],
-        autoResetFilters: false, // will not "work" until entire page is React-controlled
         filters: { archived: "hideArchived" },
-        autoResetSortBy: false, // will not "work" until entire page is React-controlled
         sortBy: [{ id: "timeTouched", desc: true }]
       }),
     [cachedState]
@@ -294,7 +292,7 @@ export default function DecksTable({
     {
       columns,
       data: React.useMemo(() => data, [data]),
-      useControlledState: (state: any) => {
+      useControlledState: (state: DecksTableState) => {
         return React.useMemo(() => {
           tableStateCallback(state);
           const aggFilter = filters.showArchived;
@@ -307,7 +305,9 @@ export default function DecksTable({
       },
       defaultColumn,
       filterTypes,
-      initialState
+      initialState,
+      autoResetFilters: false,
+      autoResetSortBy: false
     },
     ReactTable.useFilters,
     ReactTable.useSortBy

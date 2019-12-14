@@ -38,8 +38,8 @@ export function TextBoxFilter({
   return (
     <StyledInputContainer title={prompt}>
       <input
-        value={filterValue || ""}
-        onChange={(e): void => setFilter(e.target.value || undefined)}
+        value={filterValue ?? ""}
+        onChange={(e): void => setFilter(e.target.value ?? undefined)}
         placeholder={prompt}
         style={{ width: "100%" }}
       />
@@ -65,7 +65,7 @@ export function NumberRangeColumnFilter({
   return (
     <StyledInputContainer>
       <input
-        value={filterValue[0] || ""}
+        value={filterValue[0] ?? ""}
         type="number"
         onChange={(e): void => {
           const val = e.target.value;
@@ -82,7 +82,7 @@ export function NumberRangeColumnFilter({
       />
       to
       <input
-        value={filterValue[1] || ""}
+        value={filterValue[1] ?? ""}
         type="number"
         onChange={(e): void => {
           const val = e.target.value;

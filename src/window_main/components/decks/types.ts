@@ -32,17 +32,29 @@ export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
   lastEditWinrate: number;
 }
 
+export interface AggregatorFilters {
+  onlyCurrentDecks?: boolean;
+  date?: Date;
+  showArchived?: boolean;
+}
+
+export interface DecksTableState {
+  hiddenColumns: string[];
+  filters: { [key: string]: any };
+  sortBy: [{ id: string; desc: boolean }];
+}
+
 export interface DecksTableProps {
   data: DecksData[];
-  filters: any;
-  filterMatchesCallback: (filters: any) => void;
+  filters: AggregatorFilters;
+  filterMatchesCallback: (filters: AggregatorFilters) => void;
   openDeckCallback: (id: string) => void;
   archiveDeckCallback: (id: string) => void;
   tagDeckCallback: (deckid: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
   deleteTagCallback: (deckid: string, tag: string) => void;
-  tableStateCallback: (state: any) => void;
-  cachedState: any;
+  tableStateCallback: (state: DecksTableState) => void;
+  cachedState: DecksTableState;
 }
 
 export interface CellProps {
