@@ -357,7 +357,7 @@ export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
           editTagCallback
         )}
       >
-        {cell.value ?? "unknown"}
+        {cell.value || "unknown"}
       </StyledTag>
     </StyledFlexRightCell>
   );
