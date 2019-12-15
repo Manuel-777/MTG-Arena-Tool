@@ -386,7 +386,10 @@ function renderSetStats(
   setIconCode: string,
   setName: string
 ): HTMLElement {
-  const setIcon = `url(data:image/svg+xml;base64,${db.sets[setIconCode].svg})`;
+  const iconSvg = db.sets[setIconCode]?.svg ?? db.defaultSet?.svg;
+  const setIcon = iconSvg
+    ? `url(data:image/svg+xml;base64,${iconSvg})`
+    : "url(../images/notfound.png)";
   const setDiv = renderCompletionDiv(setStats.all, setIcon, setName);
 
   setDiv.addEventListener("mouseover", () => {
@@ -483,21 +486,18 @@ export function openSetStats(): void {
   mainstats.appendChild(countModeSelect);
 
   // Complete collection sats
-  const rs = renderSetStats(stats.complete, "Arena", "Complete collection");
+  const rs = renderSetStats(stats.complete, "", "Complete collection");
   mainstats.appendChild(rs);
 
   const sets =
-    displayMode == BOOSTER_CARDS
+    displayMode === BOOSTER_CARDS
       ? db.sortedSetCodes.filter(set => db.sets[set].collation > 0)
       : db.sortedSetCodes;
   // each set stats
-  sets
-    .slice()
-    .reverse()
-    .forEach(set => {
-      const rs = renderSetStats(stats[set], set, set);
-      mainstats.appendChild(rs);
-    });
+  sets.forEach(set => {
+    const rs = renderSetStats(stats[set], set, set);
+    mainstats.appendChild(rs);
+  });
 
   const substats = createDiv(["main_stats", "sub_stats"]);
 

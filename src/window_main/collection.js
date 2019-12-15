@@ -94,7 +94,7 @@ export function openCollectionTab() {
   filteredSets = [];
   filteredMana = [];
   const orderedSets = db.sortedSetCodes.filter(
-    code => db.sets[code].collation > 0
+    code => db.sets[code].collation !== -1
   );
 
   hideLoadingBars();
