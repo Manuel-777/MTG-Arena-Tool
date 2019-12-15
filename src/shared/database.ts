@@ -222,6 +222,16 @@ class Database {
     );
   }
 
+  get sortedSetCodes(): string[] {
+    const setCodes = Object.keys(this.sets);
+    setCodes.sort(
+      (a, b) =>
+        new Date(this.sets[a].release).getTime() -
+        new Date(this.sets[b].release).getTime()
+    );
+    return setCodes;
+  }
+
   get version() {
     return this.metadata ? this.metadata.version : 0;
   }
