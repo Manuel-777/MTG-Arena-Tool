@@ -43,13 +43,14 @@ interface BoosterDeltaProps {
 function BoosterDelta(props: BoosterDeltaProps) {
   const { booster } = props;
   const set = getCollationSet(booster.collationId);
-  const imagePath = db.sets[set]?.code
-    ? "sets/" + db.sets[set].code + ".png"
-    : "notfound.png";
+  const imagePath =
+    db.sets[set] && db.sets[set].code
+      ? `url(data:image/svg+xml;base64,${db.sets[set].svg})`
+      : "url(../images/notfound.png)";
   return (
     <EconomyValueRecord
       iconClassName={"set_logo_med"}
-      iconUrl={"url(../images/" + imagePath + ")"}
+      iconUrl={imagePath}
       title={set}
       deltaContent={"x" + Math.abs(booster.count)}
     />

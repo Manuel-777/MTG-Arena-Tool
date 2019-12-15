@@ -1665,21 +1665,21 @@ a:hover {
 .set_logo_med {
     background-repeat: no-repeat;
     width: 36px;
-    margin: auto 4px;
-    height: 100%;
+    margin: 0 4px;
+    min-height: 60%;
     cursor: pointer;
     background-size: contain;
-    background-position-y: center;
+    background-position: center;
 }
 
 .set_filter {
     opacity: 1;
     background-repeat: no-repeat;
     width: 32px;
-    padding: 16px;
+    margin: 16px;
     height: 32px;
     cursor: pointer;
-    background-size: 50%;
+    background-size: contain;
     background-position: center;
     -webkit-transition: all .15s ease-in-out;
 }
@@ -1748,6 +1748,8 @@ a:hover {
     margin-left: 2px;
     font-family: var(--sub-font-name);
     color: var(--color-light);
+    white-space: nowrap;
+    text-overflow: clip;
     margin: auto 0;
 }
 
@@ -3374,6 +3376,15 @@ a:hover {
 }
 
 .top_wildcards_set_icon {
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    margin: auto;
+    width: 24px;
+    height: 24px;
+}
+
+.top_wildcards_wc_icon {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;

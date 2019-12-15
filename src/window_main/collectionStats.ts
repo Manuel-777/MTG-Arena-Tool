@@ -201,7 +201,7 @@ function renderCompletionDiv(
   const completionDiv = createDiv(["stats_set_completion"]);
 
   const setIcon = createDiv(["stats_set_icon"]);
-  setIcon.style.backgroundImage = `url(../images/${image})`;
+  setIcon.style.backgroundImage = image;
   const setIconSpan = document.createElement("span");
   setIconSpan.innerHTML = title;
   setIcon.appendChild(setIconSpan);
@@ -322,9 +322,10 @@ function openSetStatsDetails(setStats: SetStats, setName: string): void {
     const countStats = (setStats as any)[rarity];
     if (countStats.total > 0) {
       const capitalizedRarity = rarity[0].toUpperCase() + rarity.slice(1) + "s";
+      const globalStyle = getComputedStyle(document.body);
       const compDiv = renderCompletionDiv(
         countStats,
-        "wc_" + rarity + ".png",
+        globalStyle.getPropertyValue(`--wc_${rarity}_png`),
         capitalizedRarity
       );
       compDiv.style.opacity = "1";
@@ -385,11 +386,8 @@ function renderSetStats(
   setIconCode: string,
   setName: string
 ): HTMLElement {
-  const setDiv = renderCompletionDiv(
-    setStats.all,
-    "sets/" + setIconCode + ".png",
-    setName
-  );
+  const setIcon = `url(data:image/svg+xml;base64,${db.sets[setIconCode].svg})`;
+  const setDiv = renderCompletionDiv(setStats.all, setIcon, setName);
 
   setDiv.addEventListener("mouseover", () => {
     const span = setDiv
@@ -485,7 +483,7 @@ export function openSetStats(): void {
   mainstats.appendChild(countModeSelect);
 
   // Complete collection sats
-  const rs = renderSetStats(stats.complete, "PW", "Complete collection");
+  const rs = renderSetStats(stats.complete, "Arena", "Complete collection");
   mainstats.appendChild(rs);
 
   const sets =
@@ -497,7 +495,7 @@ export function openSetStats(): void {
     .slice()
     .reverse()
     .forEach(set => {
-      const rs = renderSetStats(stats[set], db.sets[set].code, set);
+      const rs = renderSetStats(stats[set], set, set);
       mainstats.appendChild(rs);
     });
 

@@ -264,10 +264,11 @@ export function openHomeTab(arg, opentab = true) {
     let setsContainer = createDiv(["top_wildcards_sets_cont"]);
     orderedSets.forEach(set => {
       let setbutton = createDiv(["set_filter"]);
+      const svgData = db.sets[set].svg;
+      setbutton.style.backgroundImage = `url(data:image/svg+xml;base64,${svgData})`;
       if (filteredWildcardsSet !== set) {
         setbutton.classList.add("set_filter_on");
       }
-      setbutton.style.backgroundImage = `url(../images/sets/${db.sets[set].code}.png)`;
       setbutton.title = set;
 
       setsContainer.appendChild(setbutton);
@@ -317,16 +318,19 @@ export function openHomeTab(arg, opentab = true) {
       cell.style.textAlign = "center";
       cont.appendChild(cell);
 
-      cell = createDiv(["top_wildcards_set_icon", ld]);
-      cell.style.backgroundImage = `url(../images/sets/${
-        db.sets[card.set].code
-      }.png)`;
-      cell.title = card.set;
+      cell = createDiv([ld]);
       cell.style.gridArea = `${index + 2} / 2 / auto / auto`;
+
+      let imageDiv = createDiv(["top_wildcards_set_icon"]);
+      imageDiv.style.backgroundImage = `url(data:image/svg+xml;base64,${
+        db.sets[card.set].svg
+      })`;
+      imageDiv.title = card.set;
+      cell.appendChild(imageDiv);
+
       cont.appendChild(cell);
 
-      cell = createDiv(["top_wildcards_set_icon", ld]);
-      cell.style.backgroundImage = `url(../images/wc_${wc.rarity}.png)`;
+      cell = createDiv(["top_wildcards_wc_icon", "wc_" + wc.rarity, ld]);
       cell.title = wc.rarity;
       cell.style.gridArea = `${index + 2} / 3 / auto / auto`;
       cont.appendChild(cell);
