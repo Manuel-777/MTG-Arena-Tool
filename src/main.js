@@ -3,13 +3,6 @@ import { dialog, app, globalShortcut, Menu, Tray, clipboard } from "electron";
 import path from "path";
 import fs from "fs";
 import { autoUpdater } from "electron-updater";
-import Store from "electron-store";
-import { format as formatUrl } from "url";
-
-var rememberStore = new Store({
-  name: "remember",
-  defaults: {}
-});
 
 import {
   ARENA_MODE_IDLE,
@@ -17,11 +10,13 @@ import {
   ARENA_MODE_DRAFT,
   OVERLAY_DRAFT_MODES
 } from "./shared/constants";
+import { appDb } from "./shared/db/LocalDatabase";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
+import electronDebug from "electron-debug";
 // Adds debug features like hotkeys for triggering dev tools and reload
-require("electron-debug")({ showDevTools: false });
+electronDebug({ showDevTools: false });
 console.log(process.platform);
 
 const debugBack = false;
@@ -74,34 +69,27 @@ app.on("ready", () => {
       dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
     });
     startApp();
-    require("devtron").install();
     const dotenv = require("dotenv");
     dotenv.config();
-    if (process.env.REACTDEVTOOLSEXT) {
-      // To enable REACT dev tools createa an .env file
-      // and add REACTDEVTOOLSEXT="path"
-      // where path is the path to your chrome extension folder
-      electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
-    }
   }
 });
 
 function startUpdater() {
   if (!app.isPackaged) return;
-  updaterWindow = createUpdaterWindow();
+  appDb.init("application");
+  appDb.find("", "settings").then(doc => {
+    const allowBeta = doc.beta_channel || false;
+    updaterWindow = createUpdaterWindow();
 
-  updaterWindow.webContents.on("did-finish-load", function() {
-    updaterWindow.show();
-    updaterWindow.moveTop();
+    updaterWindow.webContents.on("did-finish-load", function() {
+      updaterWindow.show();
+      updaterWindow.moveTop();
+    });
+
+    //autoUpdater.allowDowngrade = true;
+    autoUpdater.allowPrerelease = allowBeta;
+    autoUpdater.checkForUpdatesAndNotify();
   });
-
-  //autoUpdater.allowDowngrade = true;
-  let betaChannel = rememberStore.get("settings.beta_channel");
-  if (betaChannel) {
-    autoUpdater.allowPrerelease = true;
-  }
-
-  autoUpdater.checkForUpdatesAndNotify();
 }
 
 autoUpdater.on("update-not-available", info => {

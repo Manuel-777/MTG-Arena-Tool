@@ -3,28 +3,23 @@
 
 import React from "react";
 
-export interface LocalTimeProps
+export interface RelativeTimeProps
   extends React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
   datetime: string;
-  year?: string;
-  month?: string;
-  day?: string;
-  hour?: string;
-  minute?: string;
 }
 
 // Because web components don't type check natively, do this hack.
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      "local-time": LocalTimeProps;
+      "relative-time": RelativeTimeProps;
     }
   }
 }
 
-export default function LocalTime(props: LocalTimeProps) {
-  return <local-time {...props} />;
+export default function RelativeTime(props: RelativeTimeProps): JSX.Element {
+  return <relative-time {...props} />;
 }

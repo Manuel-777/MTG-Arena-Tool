@@ -76,7 +76,9 @@ export default function OverlayController(): JSX.Element {
   };
   const [settings, setSettings] = useState(playerData.settings as SettingsData);
   const [lastBeep, setLastBeep] = useState(Date.now());
-  const [hoverCard, setHoverCard] = useState(undefined as undefined | DbCardData);
+  const [hoverCard, setHoverCard] = useState(
+    undefined as undefined | DbCardData
+  );
 
   const {
     overlay_scale: overlayScale,
@@ -103,13 +105,13 @@ export default function OverlayController(): JSX.Element {
     }
   }, [lastBeep, soundPriorityVolume]);
 
-  const handleToggleEditMode = useCallback(() => ipcSend("toggle_edit_mode"), []);
+  const handleToggleEditMode = useCallback(
+    () => ipcSend("toggle_edit_mode"),
+    []
+  );
 
   // Note: no useCallback because of dependency on deep overlays state
-  const handleSetEditMode = (
-    event: unknown,
-    _editMode: boolean
-  ) => {
+  const handleSetEditMode = (event: unknown, _editMode: boolean) => {
     // Save current windowlet dimensions before we leave edit mode
     if (editMode && !_editMode) {
       // Compute current dimensions of overlay windowlets in DOM

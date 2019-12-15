@@ -2,38 +2,40 @@ import * as React from "react";
 
 import { MANA_COLORS } from "./constants";
 import db from "./database";
-import { DeckData } from "../window_background/data";
+import Deck from "../shared/deck";
 import { CardData } from "../overlay/overlayUtil";
+import { CardObject } from "./types/Deck";
 
 function add(a: number, b: number): number {
   return a + b;
 }
 
-function getDeckCurve(deck: DeckData): any[] {
+function getDeckCurve(deck: Deck): any[] {
   const curve: any[] = [];
-  if (!deck.mainDeck) return curve;
+  if (!deck.getMainboard()) return curve;
 
-  deck.mainDeck.forEach((card: CardData) => {
-    const cardObj = db.card(card.id);
-    if (!cardObj) return;
+  deck
+    .getMainboard()
+    .get()
+    .forEach((card: CardObject) => {
+      const cardObj = db.card(card.id);
+      if (!cardObj) return;
 
-    const cmc = cardObj.cmc;
-    if (!curve[cmc]) curve[cmc] = [0, 0, 0, 0, 0, 0];
+      const cmc = cardObj.cmc;
+      if (!curve[cmc]) curve[cmc] = [0, 0, 0, 0, 0, 0];
 
-    if (!cardObj.type.includes("Land")) {
-      cardObj.cost.forEach(
-        (c: string): void => {
+      if (!cardObj.type.includes("Land")) {
+        cardObj.cost.forEach((c: string): void => {
           if (c.includes("w")) curve[cmc][1] += card.quantity;
           if (c.includes("u")) curve[cmc][2] += card.quantity;
           if (c.includes("b")) curve[cmc][3] += card.quantity;
           if (c.includes("r")) curve[cmc][4] += card.quantity;
           if (c.includes("g")) curve[cmc][5] += card.quantity;
-        }
-      );
+        });
 
-      curve[cmc][0] += card.quantity;
-    }
-  });
+        curve[cmc][0] += card.quantity;
+      }
+    });
   /*
   // Do not account sideboard?
   deck.sideboard.forEach(function(card) {
@@ -51,7 +53,7 @@ function getDeckCurve(deck: DeckData): any[] {
   return curve;
 }
 
-export default function DeckManaCurve(props: { deck: DeckData }): JSX.Element {
+export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
   const manaCounts = getDeckCurve(deck);
   const curveMax = Math.max(

@@ -31,7 +31,10 @@ function LogEntry(props: LogEntryProps): JSX.Element {
   }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = fullCard;
-    if (fullCard && [FACE_SPLIT_FULL, FACE_ADVENTURE_MAIN].includes(fullCard.dfc)) {
+    if (
+      fullCard &&
+      [FACE_SPLIT_FULL, FACE_ADVENTURE_MAIN].includes(fullCard.dfc)
+    ) {
       _card = dfcCard || fullCard;
     }
     openScryfallCard(_card);

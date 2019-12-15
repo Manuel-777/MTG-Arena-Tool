@@ -98,13 +98,13 @@ export default function DraftElements(props: DraftElementsProps): JSX.Element {
   }
   if (settings.mode === OVERLAY_DRAFT) {
     visibleDeck = new Deck({ name: pickName }, pack);
-    cardsCount = visibleDeck.mainboard.count();
-    mainTitle = visibleDeck.name;
+    cardsCount = visibleDeck.getMainboard().count();
+    mainTitle = visibleDeck.getName();
     subTitle = "Cards Left: " + cardsCount + " cards";
   } else if (settings.mode === OVERLAY_DRAFT_BREW) {
     visibleDeck = new Deck({ name: "All Picks" }, draft.pickedCards);
-    cardsCount = visibleDeck.mainboard.count();
-    mainTitle = visibleDeck.name;
+    cardsCount = visibleDeck.getMainboard().count();
+    mainTitle = visibleDeck.getName();
     subTitle = "Total Picks: " + cardsCount + " cards";
   }
 

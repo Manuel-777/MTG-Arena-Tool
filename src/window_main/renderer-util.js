@@ -28,7 +28,7 @@ import {
   queryElements as $$
 } from "../shared/dom-fns";
 import * as deckDrawer from "../shared/deck-drawer";
-import { cardType } from "../shared/card-types";
+import { cardType } from "../shared/cardTypes";
 import { addCardHover } from "../shared/card-hover";
 import {
   deckTypesStats,
@@ -59,7 +59,8 @@ const localState = {
   lastDataIndex: 0,
   lastScrollHandler: null,
   lastScrollTop: 0,
-  exploreData: null
+  exploreData: null,
+  decksTable: {}
 };
 const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
@@ -221,6 +222,7 @@ function drawDeck(div, deck, showWildcards = false) {
         case "Artifact":
           return "Artifacts";
         case "Land":
+        case "Basic Land":
           return "Lands";
         default:
           throw new Error(`Unexpected card type: ${type}`);
@@ -571,7 +573,7 @@ function changeBackground(arg = "default", grpId = 0) {
       topArtist.innerHTML = "";
       mainWrapper.style.backgroundImage = "url(" + pd.settings.back_url + ")";
     } else {
-      topArtist.innerHTML = "Bedevil by Seb Seb McKinnon";
+      topArtist.innerHTML = "Bedevil by Seb McKinnon";
       mainWrapper.style.backgroundImage = "url(" + DEFAULT_BACKGROUND + ")";
     }
   } else if (_card) {
@@ -657,8 +659,8 @@ function closeDialog() {
 
 function showColorpicker(
   color,
-  onChange = () => {},
-  onDone = () => {},
+  onChange = color => {},
+  onDone = color => {},
   onCancel = () => {},
   pickerOptions = {}
 ) {
@@ -754,8 +756,6 @@ function renderLogInput(section) {
       )
     ) {
       ipcSend("set_log", byId("settings_log_uri").value);
-      remote.app.relaunch();
-      remote.app.exit(0);
     } else {
       logUriInput.value = pd.settings.logUri;
     }

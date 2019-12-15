@@ -487,6 +487,20 @@ function appendDataSection(section) {
       });
     }
   }, 500);
+  const exportButton = createDiv(
+    ["button_simple", "centered"],
+    "Backport Data to Legacy JSON"
+  );
+  exportButton.style.width = "300px";
+  exportButton.addEventListener("click", function() {
+    ipcSend("popup", {
+      text: "Backporting all player data...",
+      time: 0,
+      progress: 2
+    });
+    ipcSend("backport_all_data");
+  });
+  section.appendChild(exportButton);
 }
 
 function appendOverlay(section) {
@@ -636,9 +650,7 @@ function appendOverlay(section) {
     overlaySettingsNav.style.display = "flex";
 
     const overlaySettingsIcon = createDiv(["overlay_icon"]);
-    overlaySettingsIcon.style.backgroundColor = `var(--color-${
-      COLORS_ALL[index]
-    })`;
+    overlaySettingsIcon.style.backgroundColor = `var(--color-${COLORS_ALL[index]})`;
     overlaySettingsIcon.style.flexShrink = 0;
     overlaySettingsNav.appendChild(overlaySettingsIcon);
     overlaySettingsNav.appendChild(

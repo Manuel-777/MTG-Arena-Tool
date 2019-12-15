@@ -387,7 +387,6 @@ export function openCollectionTab() {
     setbutton.style.backgroundImage = `url(data:image/svg+xml;base64,${
       db.sets[set].svg
     })`;
-
     setbutton.title = set;
 
     sets.appendChild(setbutton);

@@ -611,7 +611,7 @@ const Color: Record<string, string> = {
   "3": "Black",
   "4": "Red",
   "5": "Green"
-} as const
+} as const;
 
 export const ENUMS = {
   CounterType,
@@ -718,7 +718,13 @@ export const CARD_TYPES = [
   "Planeswalkers"
 ] as const;
 
-export const CARD_RARITIES = ["common", "uncommon", "rare", "mythic", "land"] as const;
+export const CARD_RARITIES = [
+  "common",
+  "uncommon",
+  "rare",
+  "mythic",
+  "land"
+] as const;
 
 export const MANA_COLORS = [
   "#E7CA8E",

@@ -1,5 +1,5 @@
-import ReactDOM from 'react-dom';
-import { addNodeToUnmountReact } from './renderer-util';
+import ReactDOM from "react-dom";
+import { addNodeToUnmountReact } from "./renderer-util";
 
 // You should only use this function to mount react components currently.
 // Once whole panes are in react, we can remove this usage.
