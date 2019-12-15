@@ -118,12 +118,6 @@ const StyledFlexRightCell = styled.div`
   }
 `;
 
-export function ColorsHeader(): JSX.Element {
-  return (
-    <div style={{ display: "inline-block", minWidth: "146px" }}>Colors</div>
-  );
-}
-
 export function ColorsCell({ cell }: CellProps): JSX.Element {
   const data = cell.row.values;
   return (

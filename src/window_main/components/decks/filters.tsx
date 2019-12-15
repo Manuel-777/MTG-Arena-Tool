@@ -19,6 +19,11 @@ export const StyledInputContainer = styled.div.attrs(props => ({
   &.input_container input {
     margin: inherit;
   }
+  &:hover input {
+    color: rgba(255, 255, 255, 1);
+    background-color: var(--color-mid-50);
+    border: 1px solid var(--color-light);
+  }
 `;
 
 export const StyledCheckboxContainer = styled.label.attrs(props => ({

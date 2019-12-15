@@ -7,7 +7,6 @@ import {
   ArtTileHeader,
   ArtTileCell,
   NameCell,
-  ColorsHeader,
   ColorsCell,
   FormatCell,
   TagsCell,
@@ -114,7 +113,7 @@ export default function DecksTable({
         Cell: CellWrapper(NameCell)
       },
       {
-        Header: ColorsHeader,
+        Header: "Colors",
         disableFilters: false,
         accessor: "colorSortVal",
         Filter: ColorColumnFilter,
@@ -287,7 +286,8 @@ export default function DecksTable({
     prepareRow,
     toggleSortBy,
     toggleHideColumn,
-    setAllFilters
+    setAllFilters,
+    setFilter
   } = ReactTable.useTable(
     {
       columns,
@@ -358,6 +358,9 @@ export default function DecksTable({
     false,
     false
   );
+
+  const isLeftAlignCol = (id: string): boolean =>
+    ["deckTileId", "name", "tags"].includes(id);
 
   return (
     <>
@@ -470,44 +473,90 @@ export default function DecksTable({
                 {headerGroup.headers.map((column: any) => (
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className={
-                      ["deckTileId", "name", "tags"].includes(column.id)
-                        ? "alignLeft"
-                        : ""
-                    }
+                    className={"hover_label"}
                     key={column.id}
                   >
-                    <div>
-                      {column.render("Header")}
-                      {column.canFilter && column.id !== "deckTileId" && (
-                        <span
-                          onClick={(e): void => {
-                            e.stopPropagation();
-                            setFiltersVisible({
-                              ...filtersVisible,
-                              [column.id]: !filtersVisible[column.id]
-                            });
-                          }}
-                          style={{ opacity: column.filterValue ? 1 : 0.4 }}
-                          title={"show column filter"}
-                        >
-                          {" 🔩"}
-                        </span>
-                      )}
-                      <span>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: isLeftAlignCol(column.id)
+                          ? "flex-start"
+                          : "flex-end"
+                      }}
+                    >
+                      <div
+                        className={"flex_item"}
+                        style={{ marginRight: "4px" }}
+                      >
                         {column.isSorted
                           ? column.isSortedDesc
-                            ? " 🔽"
-                            : " 🔼"
+                            ? "🔽"
+                            : "🔼"
                           : ""}
-                      </span>
+                      </div>
+                      <div className={"flex_item"}>
+                        {column.render("Header")}
+                      </div>
+                      {column.canFilter && column.id !== "deckTileId" && (
+                        <div className={"flex_item"}>
+                          <div
+                            style={{ marginRight: 0 }}
+                            className={"button settings"}
+                            onClick={(e): void => {
+                              e.stopPropagation();
+                              setFiltersVisible({
+                                ...filtersVisible,
+                                [column.id]: !filtersVisible[column.id]
+                              });
+                            }}
+                            title={
+                              (filtersVisible[column.id] ? "hide" : "show") +
+                              " column filter"
+                            }
+                          />
+                        </div>
+                      )}
+                      {column.filterValue && column.id !== "deckTileId" && (
+                        <div className={"flex_item"}>
+                          <div
+                            style={{ marginRight: 0 }}
+                            className={"button close"}
+                            onClick={(): void =>
+                              setFilter(column.id, undefined)
+                            }
+                            title={"clear column filter"}
+                          />
+                        </div>
+                      )}
                     </div>
-                    {filtersVisible[column.id] && (
+                    {column.canFilter && filtersVisible[column.id] && (
                       <div
                         onClick={(e): void => e.stopPropagation()}
-                        style={{ paddingTop: "4px", width: "100%" }}
+                        style={{
+                          paddingTop: "4px",
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: isLeftAlignCol(column.id)
+                            ? "flex-start"
+                            : "flex-end"
+                        }}
+                        title={"filter column"}
                       >
-                        {column.canFilter ? column.render("Filter") : null}
+                        <div className={"flex_item"}>
+                          {column.render("Filter")}
+                        </div>
+                        {column.filterValue && column.id === "deckTileId" && (
+                          <div className={"flex_item"}>
+                            <div
+                              style={{ marginRight: 0 }}
+                              className={"button close"}
+                              onClick={(): void =>
+                                setFilter(column.id, undefined)
+                              }
+                              title={"clear search"}
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </th>
