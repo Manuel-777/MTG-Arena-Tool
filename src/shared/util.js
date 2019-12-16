@@ -378,7 +378,7 @@ export function getMissingCardCounts(deck) {
   );
   allCardIds.forEach(grpid => {
     const missing = getCardsMissingCount(deck, grpid);
-    if (missing) {
+    if (missing > 0) {
       missingCards[grpid] = missing;
     }
   });
