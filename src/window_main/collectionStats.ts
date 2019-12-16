@@ -336,7 +336,7 @@ function openSetStatsDetails(setStats: SetStats, setName: string): void {
   });
 
   // If the set has a collationId, it means boosters for it exists
-if(db.sets[setName]?.collation){
+  if (db.sets[setName]?.collation) {
     const chanceBoosterHasMythic = 0.125; // assume 1/8 of packs have a mythic
     const chanceBoosterHasRare = 1 - chanceBoosterHasMythic;
     const wantedText =
