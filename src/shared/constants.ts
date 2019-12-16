@@ -735,7 +735,7 @@ export const MANA_COLORS = [
   "#E3E3E3"
 ] as const;
 
-export const MANA = {
+export const MANA: { [key: number]: string } = {
   0: "",
   1: "white",
   2: "blue",

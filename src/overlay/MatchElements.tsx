@@ -16,8 +16,6 @@ import Clock from "./Clock";
 import DeckList from "./DeckList";
 import { DbCardData } from "../shared/types/Metadata";
 
-const manaColorMap: { [key: number]: string } = MANA;
-
 export interface MatchElementsProps {
   actionLog: LogData[];
   index: number;
@@ -101,10 +99,7 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
       {!!settings.title && !!visibleDeck && (
         <div className="overlay_deckcolors">
           {visibleDeck.colors.get().map((color: number) => (
-            <div
-              className={"mana_s20 mana_" + manaColorMap[color]}
-              key={color}
-            />
+            <div className={"mana_s20 mana_" + MANA[color]} key={color} />
           ))}
         </div>
       )}

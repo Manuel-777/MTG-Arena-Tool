@@ -129,9 +129,7 @@ export function uberSearchFilterFn(
         "values.tags",
         (row: any): string => {
           const { colors } = row.values;
-          return colors
-            .map((color: number): string => (MANA as any)[color])
-            .join(" ");
+          return colors.map((color: number): string => MANA[color]).join(" ");
         }
       ]
     })

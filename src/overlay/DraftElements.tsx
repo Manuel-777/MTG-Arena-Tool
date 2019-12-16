@@ -13,7 +13,6 @@ import DeckList from "./DeckList";
 import { DbCardData } from "../shared/types/Metadata";
 
 const packSizeMap: { [key: string]: number } = PACK_SIZES;
-const manaColorMap: { [key: number]: string } = MANA;
 
 export interface DraftElementsProps {
   draft: DraftData;
@@ -131,10 +130,7 @@ export default function DraftElements(props: DraftElementsProps): JSX.Element {
       {!!settings.title && !!visibleDeck && (
         <div className="overlay_deckcolors">
           {visibleDeck.colors.get().map((color: number) => (
-            <div
-              className={"mana_s20 mana_" + manaColorMap[color]}
-              key={color}
-            />
+            <div className={"mana_s20 mana_" + MANA[color]} key={color} />
           ))}
         </div>
       )}

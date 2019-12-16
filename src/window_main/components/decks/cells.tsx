@@ -123,12 +123,7 @@ export function ColorsCell({ cell }: CellProps): JSX.Element {
   return (
     <StyledFlexRightCell>
       {data.colors.map((color: number, index: number) => {
-        return (
-          <div
-            key={index}
-            className={"mana_s20 mana_" + (MANA as any)[color]}
-          />
-        );
+        return <div key={index} className={"mana_s20 mana_" + MANA[color]} />;
       })}
     </StyledFlexRightCell>
   );
