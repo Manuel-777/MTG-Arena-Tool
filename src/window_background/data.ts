@@ -54,17 +54,10 @@ export interface PlayerMatchData {
   commanderGrpIds: number[];
 }
 
-export interface ExtendedPlayerMatchData {
+export interface ExtendedPlayerMatchData extends PlayerMatchData {
   userid: string;
   win: number;
   step?: number;
-  seat: number;
-  tier: number;
-  name: string;
-  rank: string;
-  percentile?: number;
-  leaderboardPlace?: number;
-  commanderGrpIds: any;
 }
 
 export interface MatchData {
@@ -101,15 +94,12 @@ export interface MatchData {
   opponent: PlayerMatchData;
 }
 
-export interface ExtendedMatchData {
+export interface ExtendedMatchData extends MatchData {
   draws: number;
   playerDeck: SerializedDeck;
   oppDeck: SerializedDeck;
-  tags: any;
+  tags: string[];
   date: number;
-  onThePlay: number;
-  eventId: string;
-  bestOf: number;
   gameStats: any[];
   toolVersion: null;
   toolRunFromSource: boolean;
@@ -117,6 +107,8 @@ export interface ExtendedMatchData {
   duration: number;
   player: ExtendedPlayerMatchData;
   opponent: ExtendedPlayerMatchData;
+  type?: string;
+  archived?: boolean;
 }
 
 const matchDataDefault: MatchData = {
@@ -259,36 +251,20 @@ export function completeMatch(
 ): ExtendedMatchData | undefined {
   if (matchData.eventId === "AIBotMatch") return;
 
-  let mode = matchIsLimited(matchData) ? "limited" : "constructed";
-
-  let [playerWins, opponentWins, draws] = matchResults(matchData);
+  const [playerWins, opponentWins, draws] = matchResults(matchData);
 
   match.onThePlay = matchData.onThePlay;
   match.id = matchData.matchId;
   match.duration = matchData.matchTime;
   match.opponent = {
-    name: matchData.opponent.name,
-    rank: matchData.opponent.rank,
-    tier: matchData.opponent.tier,
-    percentile: matchData.opponent.percentile,
-    leaderboardPlace: matchData.opponent.leaderboardPlace,
+    ...matchData.opponent,
     userid: matchData.opponent.id,
-    seat: matchData.opponent.seat,
-    win: opponentWins,
-    commanderGrpIds: matchData.opponent.commanderGrpIds
+    win: opponentWins
   };
-
   match.player = {
-    name: playerData.name,
-    rank: playerData.rank[mode].rank,
-    tier: playerData.rank[mode].tier,
-    step: playerData.rank[mode].step,
-    percentile: playerData.rank[mode].percentile,
-    leaderboardPlace: playerData.rank[mode].leaderboardPlace,
+    ...matchData.player,
     userid: playerData.arenaId,
-    seat: matchData.player.seat,
-    win: playerWins,
-    commanderGrpIds: matchData.player.commanderGrpIds
+    win: playerWins
   };
   match.draws = draws;
 
