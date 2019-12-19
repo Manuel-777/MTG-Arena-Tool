@@ -18,7 +18,7 @@ import {
 import {
   hypergeometricSignificance,
   hypergeometricRange
-} from "../shared/stats-fns";
+} from "../shared/statsFns";
 import {
   actionLogDir,
   changeBackground,
