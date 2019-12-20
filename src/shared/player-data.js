@@ -295,7 +295,6 @@ class PlayerData {
     this.matches_index = [];
     this.economy_index = [];
     this.draft_index = [];
-    this.cardsSizeHoverCard = 0;
     this.offline = false;
     this.patreon = false;
     this.patreon_tier = -1;
