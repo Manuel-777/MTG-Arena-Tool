@@ -250,6 +250,7 @@ export default function DecksTable({
     () =>
       _.defaultsDeep(cachedState, {
         hiddenColumns: [
+          "archived",
           "deckId",
           "custom",
           "boosterCost",
