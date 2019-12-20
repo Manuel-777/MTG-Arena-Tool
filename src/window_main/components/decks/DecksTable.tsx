@@ -78,6 +78,7 @@ export default function DecksTable({
   filterMatchesCallback,
   tableStateCallback,
   cachedState,
+  openDeckCallback,
   ...cellCallbacks
 }: DecksTableProps): JSX.Element {
   const CellWrapper = (
@@ -572,7 +573,7 @@ export default function DecksTable({
               prepareRow(row);
               return (
                 <RowContainer
-                  callbacks={cellCallbacks}
+                  openDeckCallback={openDeckCallback}
                   row={row}
                   key={row.index}
                 />
@@ -585,22 +586,14 @@ export default function DecksTable({
   );
 }
 
-function RowContainer(props: any): JSX.Element {
+function RowContainer({
+  row,
+  openDeckCallback
+}: {
+  row: any;
+  openDeckCallback: (id: string) => void;
+}): JSX.Element {
   const [hover, setHover] = React.useState(false);
-  const { row, callbacks } = props;
-  const { openDeckCallback } = callbacks;
-
-  const getRowStyle = () => {
-    if (hover) {
-      return {
-        backgroundColor: "rgba(0, 0, 0, 0.5)"
-      };
-    } else {
-      return {
-        backgroundColor: "rgba(0, 0, 0, 0)"
-      };
-    }
-  };
 
   const mouseEnter = React.useCallback(() => {
     setHover(true);
@@ -616,7 +609,6 @@ function RowContainer(props: any): JSX.Element {
 
   return (
     <tr
-      style={getRowStyle()}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       onClick={mouseClick}
