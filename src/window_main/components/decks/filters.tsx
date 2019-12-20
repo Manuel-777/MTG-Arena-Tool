@@ -200,7 +200,7 @@ export function archivedFilterFn(
   filterValue: string
 ): any[] {
   if (filterValue === "hideArchived") {
-    return rows.filter(row => !row.values[id]);
+    return rows.filter(row => !row.values.archived);
   }
   return rows;
 }
