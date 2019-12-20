@@ -565,7 +565,7 @@ export default function DecksTable({
           <tbody {...getTableBodyProps()}>
             {rows.map((row: any) => {
               prepareRow(row);
-              return <RowContainer row={row} key={row.index} />;
+              return <RowContainer callbacks={cellCallbacks} row={row} key={row.index} />;
             })}
           </tbody>
         </table>
@@ -576,7 +576,8 @@ export default function DecksTable({
 
 function RowContainer(props: any): JSX.Element {
   const [hover, setHover] = React.useState(false);
-  const { row } = props;
+  const { row, callbacks } = props;
+  const { openDeckCallback } = callbacks;
 
   const getRowStyle = () => {
     if (hover) {
@@ -599,7 +600,7 @@ function RowContainer(props: any): JSX.Element {
   }, []);
 
   const mouseClick = React.useCallback(() => {
-    // Open deck
+    openDeckCallback(row.values.deckId);
   }, []);
 
   return (
@@ -610,6 +611,7 @@ function RowContainer(props: any): JSX.Element {
       onClick={mouseClick}
     >
       {row.cells.map((cell: any) => {
+        cell.hover = hover;
         return (
           <td {...cell.getCellProps()} key={cell.column.id + "_" + row.index}>
             {cell.render("Cell")}

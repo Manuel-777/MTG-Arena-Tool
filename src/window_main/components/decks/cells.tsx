@@ -87,23 +87,18 @@ export function ArtTileHeader(): JSX.Element {
 }
 
 export function ArtTileCell({
-  cell,
-  openDeckCallback
+  cell
 }: CellProps): JSX.Element {
   const data = cell.row.values;
-  const [isHovered, setHovered] = useState(false);
   return (
     <CSSTransition
       classNames="deckTileHover"
-      in={!!isHovered}
+      in={!!cell.hover}
       timeout={200}
-      onMouseEnter={(): void => setHovered(true)}
-      onMouseLeave={(): void => setHovered(false)}
     >
       <StyledArtTileCell
         url={getCardArtCrop(cell.value)}
         title={`show ${data.name} details`}
-        onClick={(): void => openDeckCallback(data.deckId)}
       />
     </CSSTransition>
   );
@@ -152,7 +147,7 @@ const LabelText = styled.div`
   text-align: left;
 `;
 
-export function NameCell({ cell, openDeckCallback }: CellProps): JSX.Element {
+export function NameCell({ cell }: CellProps): JSX.Element {
   const data = cell.row.values;
   let displayName = cell.value;
   if (displayName.includes("?=?Loc/Decks/Precon/")) {
@@ -164,7 +159,6 @@ export function NameCell({ cell, openDeckCallback }: CellProps): JSX.Element {
   return (
     <LabelText
       title={`show ${cell.value} details`}
-      onClick={(): void => openDeckCallback(data.deckId)}
     >
       {displayName}
     </LabelText>
