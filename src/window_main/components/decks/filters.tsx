@@ -13,6 +13,7 @@ export const StyledInputContainer = styled.div.attrs(props => ({
 }))`
   display: inline-flex;
   margin: inherit;
+  width: 100%;
   height: 26px;
   padding-bottom: 4px;
   &.input_container input {
@@ -33,17 +34,15 @@ export const StyledCheckboxContainer = styled.label.attrs(props => ({
 `;
 
 export function TextBoxFilter({
-  column: { id, filterValue, preFilteredRows, setFilter },
-  width
+  column: { id, filterValue, preFilteredRows, setFilter }
 }: {
   column: any;
-  width: number;
 }): JSX.Element {
   const count = preFilteredRows.length;
   const prompt =
     id === "deckTileId" ? `Search ${count} decks...` : `Filter ${id}...`;
   return (
-    <StyledInputContainer title={prompt} style={{ width: width + "px" }}>
+    <StyledInputContainer title={prompt}>
       <input
         value={filterValue ?? ""}
         onChange={(e): void => setFilter(e.target.value ?? undefined)}
@@ -54,11 +53,9 @@ export function TextBoxFilter({
 }
 
 export function NumberRangeColumnFilter({
-  column: { filterValue = [], preFilteredRows, setFilter, id },
-  width
+  column: { filterValue = [], preFilteredRows, setFilter, id }
 }: {
   column: any;
-  width: number;
 }): JSX.Element {
   const [min, max] = React.useMemo(() => {
     let min = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
@@ -70,7 +67,7 @@ export function NumberRangeColumnFilter({
     return [min, max];
   }, [id, preFilteredRows]);
   return (
-    <StyledInputContainer style={{ width: width + "px" }}>
+    <StyledInputContainer>
       <input
         value={filterValue[0] ?? ""}
         type="number"

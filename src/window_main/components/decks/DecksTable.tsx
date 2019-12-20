@@ -87,12 +87,6 @@ export default function DecksTable({
     return (props: CellProps): JSX.Element =>
       component({ ...props, ...cellCallbacks });
   };
-  const FilterWrapper = (
-    component: (props: any) => JSX.Element,
-    width: number
-  ): ((props: any) => JSX.Element) => {
-    return (props: any): JSX.Element => component({ ...props, width });
-  };
   const defaultColumn = React.useMemo(
     () => ({
       disableFilters: true
@@ -107,7 +101,7 @@ export default function DecksTable({
         accessor: "deckTileId",
         disableFilters: false,
         filter: "uberSearch",
-        Filter: FilterWrapper(TextBoxFilter, 170),
+        Filter: TextBoxFilter,
         disableSortBy: true,
         Cell: CellWrapper(ArtTileCell)
       },
@@ -116,7 +110,7 @@ export default function DecksTable({
         accessor: "name",
         disableFilters: false,
         filter: "fuzzyText",
-        Filter: FilterWrapper(TextBoxFilter, 160),
+        Filter: TextBoxFilter,
         sortType: "alphanumeric",
         Cell: CellWrapper(NameCell)
       },
@@ -133,7 +127,7 @@ export default function DecksTable({
         Header: "Format",
         accessor: "format",
         disableFilters: false,
-        Filter: FilterWrapper(TextBoxFilter, 95),
+        Filter: TextBoxFilter,
         filter: "fuzzyText",
         Cell: CellWrapper(FormatCell)
       },
@@ -141,7 +135,7 @@ export default function DecksTable({
         Header: "Tags",
         accessor: "tags",
         disableFilters: false,
-        Filter: FilterWrapper(TextBoxFilter, 95),
+        Filter: TextBoxFilter,
         filter: "fuzzyText",
         disableSortBy: true,
         Cell: CellWrapper(TagsCell)
@@ -169,7 +163,7 @@ export default function DecksTable({
         accessor: "wins",
         Cell: MetricCell,
         disableFilters: false,
-        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
+        Filter: NumberRangeColumnFilter,
         filter: "between"
       },
       {
@@ -177,7 +171,7 @@ export default function DecksTable({
         accessor: "losses",
         Cell: MetricCell,
         disableFilters: false,
-        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
+        Filter: NumberRangeColumnFilter,
         filter: "between"
       },
       {
@@ -185,7 +179,7 @@ export default function DecksTable({
         accessor: "total",
         Cell: MetricCell,
         disableFilters: false,
-        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
+        Filter: NumberRangeColumnFilter,
         filter: "between"
       },
       {
@@ -203,7 +197,7 @@ export default function DecksTable({
         accessor: "winrate100",
         Cell: WinRateCell,
         disableFilters: false,
-        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
+        Filter: NumberRangeColumnFilter,
         filter: "between"
       },
       { accessor: "winrate" },
@@ -223,7 +217,7 @@ export default function DecksTable({
         accessor: "boosterCost",
         Cell: MissingCardsCell,
         disableFilters: false,
-        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
+        Filter: NumberRangeColumnFilter,
         filter: "between"
       },
       { accessor: "rare" },
