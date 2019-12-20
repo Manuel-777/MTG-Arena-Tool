@@ -20,6 +20,7 @@ export interface MissingWildcards {
 
 export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
   winrate100: number;
+  archivedSortVal: number;
   avgDuration: number;
   boosterCost: number;
   colorSortVal: string;

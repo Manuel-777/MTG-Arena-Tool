@@ -223,13 +223,16 @@ export default function DecksTable({
       { accessor: "uncommon" },
       { accessor: "mythic" },
       { accessor: "custom" },
+      { accessor: "archived" },
       {
+        id: "archivedCol",
         Header: ArchiveHeader,
-        accessor: "archived",
+        accessor: "archivedSortVal",
         filter: "showArchived",
         Filter: ArchiveColumnFilter,
         disableFilters: false,
-        Cell: CellWrapper(ArchivedCell)
+        Cell: CellWrapper(ArchivedCell),
+        sortType: "basic"
       }
     ],
     [CellWrapper]
@@ -271,7 +274,6 @@ export default function DecksTable({
           "winrateLow",
           "winrateHigh"
         ],
-        filters: { archived: "hideArchived" },
         sortBy: [{ id: "timeTouched", desc: true }]
       }),
     [cachedState]
@@ -295,13 +297,8 @@ export default function DecksTable({
       useControlledState: (state: DecksTableState) => {
         return React.useMemo(() => {
           tableStateCallback(state);
-          const aggFilter = filters.showArchived;
-          const tableFilter = state.filters.archived === "showArchived";
-          if (aggFilter !== tableFilter) {
-            filterMatchesCallback({ ...filters, showArchived: tableFilter });
-          }
           return state;
-        }, [state, tableStateCallback, filters, filterMatchesCallback]);
+        }, [state, tableStateCallback]);
       },
       defaultColumn,
       filterTypes,
@@ -380,7 +377,7 @@ export default function DecksTable({
         <span style={{ paddingBottom: "8px" }}>Presets:</span>
         <PresetButton
           onClick={(): void => {
-            setAllFilters({ archived: "hideArchived" });
+            setAllFilters({ archivedCol: "hideArchived" });
             setFiltersVisible(initialFiltersVisible);
             toggleSortBy("timeTouched", true);
             for (const columnId of toggleableIds) {
@@ -400,7 +397,7 @@ export default function DecksTable({
         <PresetButton
           onClick={(): void => {
             setAllFilters({
-              archived: "hideArchived",
+              archivedCol: "hideArchived",
               wins: [5, undefined],
               winrate100: [50, undefined]
             });
@@ -428,7 +425,7 @@ export default function DecksTable({
         <PresetButton
           onClick={(): void => {
             setAllFilters({
-              archived: "hideArchived",
+              archivedCol: "hideArchived",
               boosterCost: [1, undefined]
             });
             setFiltersVisible({ ...initialFiltersVisible, boosterCost: true });
@@ -521,9 +518,10 @@ export default function DecksTable({
                           <div
                             style={{ marginRight: 0 }}
                             className={"button close"}
-                            onClick={(): void =>
-                              setFilter(column.id, undefined)
-                            }
+                            onClick={(e): void => {
+                              e.stopPropagation();
+                              setFilter(column.id, undefined);
+                            }}
                             title={"clear column filter"}
                           />
                         </div>
@@ -550,9 +548,10 @@ export default function DecksTable({
                             <div
                               style={{ marginRight: 0 }}
                               className={"button close"}
-                              onClick={(): void =>
-                                setFilter(column.id, undefined)
-                              }
+                              onClick={(e): void => {
+                                e.stopPropagation();
+                                setFilter(column.id, undefined);
+                              }}
                               title={"clear search"}
                             />
                           </div>
