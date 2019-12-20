@@ -46,6 +46,7 @@ const StyledDecksTable = styled.div`
     }
     tr:hover {
       background-color: rgba(0, 0, 0, 0.25);
+      cursor: pointer;
     }
     th,
     td {

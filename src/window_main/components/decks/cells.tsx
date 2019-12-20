@@ -33,7 +33,6 @@ const StyledArtTileHeader = styled.div`
 `;
 
 const StyledArtTile = styled(StyledArtTileHeader)`
-  cursor: pointer;
   background-size: 200px;
   background-position-x: center;
   background-position-y: -10px;
