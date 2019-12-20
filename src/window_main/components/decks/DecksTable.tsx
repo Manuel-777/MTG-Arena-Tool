@@ -365,6 +365,19 @@ export default function DecksTable({
   const isLeftAlignCol = (id: string): boolean =>
     ["deckTileId", "name", "tags"].includes(id);
 
+  const recentFilters = (): { id: string; value: any }[] => [
+    { id: "archivedCol", value: "hideArchived" }
+  ];
+  const bestFilters = (): { id: string; value: any }[] => [
+    { id: "archivedCol", value: "hideArchived" },
+    { id: "wins", value: [5, undefined] },
+    { id: "winrate100", value: [50, undefined] }
+  ];
+  const wantedFilters = (): { id: string; value: any }[] => [
+    { id: "archivedCol", value: "hideArchived" },
+    { id: "boosterCost", value: [1, undefined] }
+  ];
+
   return (
     <>
       <div
@@ -383,7 +396,7 @@ export default function DecksTable({
         <span style={{ paddingBottom: "8px" }}>Presets:</span>
         <PresetButton
           onClick={(): void => {
-            setAllFilters({ archivedCol: "hideArchived" });
+            setAllFilters(recentFilters);
             setFiltersVisible(initialFiltersVisible);
             toggleSortBy("timeTouched", true);
             for (const columnId of toggleableIds) {
@@ -402,11 +415,7 @@ export default function DecksTable({
         </PresetButton>
         <PresetButton
           onClick={(): void => {
-            setAllFilters({
-              archivedCol: "hideArchived",
-              wins: [5, undefined],
-              winrate100: [50, undefined]
-            });
+            setAllFilters(bestFilters);
             setFiltersVisible({
               ...initialFiltersVisible,
               wins: true,
@@ -430,10 +439,7 @@ export default function DecksTable({
         </PresetButton>
         <PresetButton
           onClick={(): void => {
-            setAllFilters({
-              archivedCol: "hideArchived",
-              boosterCost: [1, undefined]
-            });
+            setAllFilters(wantedFilters);
             setFiltersVisible({ ...initialFiltersVisible, boosterCost: true });
             toggleSortBy("boosterCost", true);
             for (const columnId of toggleableIds) {
