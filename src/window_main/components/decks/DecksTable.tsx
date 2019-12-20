@@ -566,24 +566,57 @@ export default function DecksTable({
           <tbody {...getTableBodyProps()}>
             {rows.map((row: any) => {
               prepareRow(row);
-              return (
-                <tr {...row.getRowProps()} key={row.index}>
-                  {row.cells.map((cell: any) => {
-                    return (
-                      <td
-                        {...cell.getCellProps()}
-                        key={cell.column.id + "_" + row.index}
-                      >
-                        {cell.render("Cell")}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
+              return <RowContainer row={row} key={row.index} />;
             })}
           </tbody>
         </table>
       </StyledDecksTable>
     </>
+  );
+}
+
+function RowContainer(props: any): JSX.Element {
+  const [hover, setHover] = React.useState(false);
+  const { row } = props;
+
+  const getRowStyle = () => {
+    if (hover) {
+      return {
+        backgroundColor: "rgba(0, 0, 0, 0.5)"
+      };
+    } else {
+      return {
+        backgroundColor: "rgba(0, 0, 0, 0)"
+      };
+    }
+  };
+
+  const mouseEnter = React.useCallback(() => {
+    setHover(true);
+  }, []);
+
+  const mouseLeave = React.useCallback(() => {
+    setHover(false);
+  }, []);
+
+  const mouseClick = React.useCallback(() => {
+    // Open deck
+  }, []);
+
+  return (
+    <tr
+      style={getRowStyle()}
+      onMouseEnter={mouseEnter}
+      onMouseLeave={mouseLeave}
+      onClick={mouseClick}
+    >
+      {row.cells.map((cell: any) => {
+        return (
+          <td {...cell.getCellProps()} key={cell.column.id + "_" + row.index}>
+            {cell.render("Cell")}
+          </td>
+        );
+      })}
+    </tr>
   );
 }

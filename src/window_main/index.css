@@ -3835,3 +3835,8 @@ a:hover {
     width: 16px;
     height: 16px;
 }
+
+.deck_row_container {
+    display: flex;
+    height: 64px;
+}
