@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import pd from "./player-data";
+import playerData from "./player-data";
 import { cardHasType } from "./cardTypes";
 import { DbCardData } from "./types/Metadata";
 
@@ -66,7 +66,6 @@ export default function OwnershipStars(props: { card: DbCardData }) {
     return <></>;
   }
   const isbasic = cardHasType(card, "Basic Land");
-  const playerData = pd as any;
   const owned = playerData.cards.cards[card.id];
   const acquired = playerData.cardsNew[card.id];
   // TODO add custom logic to handle rats and petitioners

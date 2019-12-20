@@ -281,12 +281,21 @@ class PlayerData {
 
     this.transaction = this.transaction.bind(this);
     this.deck = this.deck.bind(this);
+    this.arenaVersion = undefined;
+    this.userName = undefined;
     this.cards = undefined;
+    this.cardsNew = undefined;
     this.decks = undefined;
     this.name = undefined;
     this.arenaId = undefined;
     this.rank = undefined;
     this.economy = undefined;
+    this.seasonal = undefined;
+    this.courses_index = [];
+    this.matches_index = [];
+    this.economy_index = [];
+    this.draft_index = [];
+    this.cardsSizeHoverCard = 0;
     this.offline = false;
     this.patreon = false;
     this.patreon_tier = -1;

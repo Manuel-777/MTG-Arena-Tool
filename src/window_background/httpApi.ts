@@ -2,7 +2,7 @@ import electron from "electron";
 import async from "async";
 
 import { makeId } from "../shared/util";
-import pd from "../shared/player-data";
+import playerData from "../shared/player-data";
 import db from "../shared/database";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 
@@ -19,7 +19,6 @@ import {
 import globals from "./globals";
 import { SerializedDeck } from "../shared/types/Deck";
 
-export const playerData = pd as any;
 let httpQueue: async.AsyncQueue<HttpTask>;
 
 export function initHttpQueue(): void {

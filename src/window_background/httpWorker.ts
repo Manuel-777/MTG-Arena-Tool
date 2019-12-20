@@ -2,12 +2,11 @@ import qs from "qs";
 import http, { RequestOptions } from "https";
 import { IncomingMessage } from "http";
 
-import pd from "../shared/player-data";
+import playerData from "../shared/player-data";
 import globals from "./globals";
 import { ipc_send as ipcSend, setData } from "./background-util";
 
 const serverAddress = "mtgatool.com";
-export const playerData = pd as any;
 
 export interface HttpTask {
   reqId: string;

@@ -3,7 +3,7 @@ import React, { useEffect, useCallback, useState } from "react";
 import { Howl, Howler } from "howler";
 import striptags from "striptags";
 
-import pd from "../shared/player-data";
+import playerData from "../shared/player-data";
 import Deck from "../shared/deck";
 import {
   ARENA_MODE_IDLE,
@@ -70,10 +70,6 @@ export default function OverlayController(): JSX.Element {
   const [draft, setDraft] = useState(undefined as undefined | DraftData);
   const [draftState, setDraftState] = useState({ packN: 0, pickN: 0 });
   const [turnPriority, setTurnPriority] = useState(1);
-  const playerData = (pd as unknown) as {
-    settings: SettingsData;
-    cardsSizeHoverCard: number;
-  };
   const [settings, setSettings] = useState(playerData.settings as SettingsData);
   const [lastBeep, setLastBeep] = useState(Date.now());
   const [hoverCard, setHoverCard] = useState(
