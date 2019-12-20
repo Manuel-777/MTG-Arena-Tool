@@ -56,6 +56,7 @@ const StyledDecksTable = styled.div`
     }
     th:hover {
       background-color: rgba(0, 0, 0, 0.25);
+      cursor: pointer;
     }
     th.alignLeft,
     td.alignLeft {
