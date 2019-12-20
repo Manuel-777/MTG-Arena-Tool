@@ -592,6 +592,13 @@ export default function DecksTable({
   );
 }
 
+const StyledTableRow = styled.tr`
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+  }
+`;
+
 function RowContainer({
   row,
   openDeckCallback
@@ -614,18 +621,10 @@ function RowContainer({
   }, []);
 
   return (
-    <tr
+    <StyledTableRow
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       onClick={mouseClick}
-      style={
-        hover
-          ? {
-              backgroundColor: "rgba(0, 0, 0, 0.25)",
-              cursor: "pointer"
-            }
-          : undefined
-      }
     >
       {row.cells.map((cell: any) => {
         cell.hover = hover;
@@ -639,6 +638,6 @@ function RowContainer({
           </td>
         );
       })}
-    </tr>
+    </StyledTableRow>
   );
 }
