@@ -485,11 +485,13 @@ export default function DecksTable({
                       }}
                     >
                       <div
-                        className={(column.isSorted
-                          ? column.isSortedDesc
-                            ? " sort_asc"
-                            : " sort_desc"
-                          : "")}
+                        className={
+                          column.isSorted
+                            ? column.isSortedDesc
+                              ? " sort_asc"
+                              : " sort_desc"
+                            : ""
+                        }
                       />
                       <div className={"flex_item"}>
                         {column.render("Header")}
