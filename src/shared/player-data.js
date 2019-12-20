@@ -281,6 +281,7 @@ class PlayerData {
 
     this.transaction = this.transaction.bind(this);
     this.deck = this.deck.bind(this);
+    this.cards = undefined;
     this.decks = undefined;
     this.name = undefined;
     this.arenaId = undefined;

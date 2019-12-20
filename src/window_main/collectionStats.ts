@@ -28,7 +28,6 @@ const BOOSTER_CARDS = "Only in Boosters";
 let countMode = ALL_CARDS;
 let displayMode = BOOSTER_CARDS;
 let defaultSetName = "Complete collection";
-const playerData = (pd as unknown) as any;
 
 class CountStats {
   public owned: number;
@@ -140,8 +139,8 @@ function getCollectionStats(): { [key: string]: SetStats } {
     stats.complete[card.rarity].total += 4;
     stats.complete[card.rarity].unique += 1;
     // add cards we own
-    if (playerData.cards.cards[card.id] !== undefined) {
-      const owned = playerData.cards.cards[card.id];
+    if (pd.cards.cards[card.id] !== undefined) {
+      const owned = pd.cards.cards[card.id];
       obj.owned = owned;
       stats[card.set][card.rarity].owned += owned;
       stats[card.set][card.rarity].uniqueOwned += 1;
