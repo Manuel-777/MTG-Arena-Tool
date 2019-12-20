@@ -59,8 +59,7 @@ const localState = {
   lastDataIndex: 0,
   lastScrollHandler: null,
   lastScrollTop: 0,
-  exploreData: null,
-  decksTable: {}
+  exploreData: null
 };
 const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
