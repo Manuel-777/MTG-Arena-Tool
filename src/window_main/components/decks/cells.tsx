@@ -86,16 +86,10 @@ export function ArtTileHeader(): JSX.Element {
   return <StyledArtTileHeader />;
 }
 
-export function ArtTileCell({
-  cell
-}: CellProps): JSX.Element {
+export function ArtTileCell({ cell }: CellProps): JSX.Element {
   const data = cell.row.values;
   return (
-    <CSSTransition
-      classNames="deckTileHover"
-      in={!!cell.hover}
-      timeout={200}
-    >
+    <CSSTransition classNames="deckTileHover" in={!!cell.hover} timeout={200}>
       <StyledArtTileCell
         url={getCardArtCrop(cell.value)}
         title={`show ${data.name} details`}
@@ -157,11 +151,7 @@ export function NameCell({ cell }: CellProps): JSX.Element {
     displayName = displayName.slice(0, 22) + "...";
   }
   return (
-    <LabelText
-      title={`show ${cell.value} details`}
-    >
-      {displayName}
-    </LabelText>
+    <LabelText title={`show ${cell.value} details`}>{displayName}</LabelText>
   );
 }
 
