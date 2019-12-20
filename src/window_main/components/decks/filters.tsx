@@ -179,13 +179,13 @@ export function ArchiveColumnFilter({
 }): JSX.Element {
   return (
     <StyledCheckboxContainer>
-      show all
+      archived
       <input
         type="checkbox"
         checked={filterValue !== "hideArchived"}
         onChange={(e): void => {
           const val = e.target.checked;
-          setFilter(val ? "showArchived" : "hideArchived");
+          setFilter(val ? undefined : "hideArchived");
         }}
       />
       <span className={"checkmark"} />

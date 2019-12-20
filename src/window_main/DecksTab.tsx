@@ -49,18 +49,26 @@ function getDefaultStats(): DeckStats {
 }
 
 function setFilters(selected: AggregatorFilters = {}): void {
+  const { decksTableState } = pd.settings;
+  const showArchived = decksTableState?.filters?.archivedCol !== "hideArchived";
+
   if (selected.date) {
     // clear all dependent filters
     filters = {
       ...Aggregator.getDefaultFilters(),
       date: filters.date,
       onlyCurrentDecks: true,
-      showArchived: filters.showArchived,
-      ...selected
+      ...selected,
+      showArchived
     };
   } else {
     // default case
-    filters = { ...filters, date: pd.settings.last_date_filter, ...selected };
+    filters = {
+      ...filters,
+      date: pd.settings.last_date_filter,
+      ...selected,
+      showArchived
+    };
   }
 }
 
@@ -98,6 +106,7 @@ export function openDecksTab(newFilters: AggregatorFilters = {}): void {
   const data = pd.deckList.map(
     (deck: SerializedDeck): DecksData => {
       const id = deck.id ?? "";
+      const archivedSortVal = deck.archived ? 1 : deck.custom ? 0.5 : 0;
       const colorSortVal = deck.colors ? deck.colors.join("") : "";
       // compute winrate metrics
       const deckStats: DeckStats =
@@ -120,6 +129,7 @@ export function openDecksTab(newFilters: AggregatorFilters = {}): void {
         avgDuration,
         ...missingWildcards,
         boosterCost,
+        archivedSortVal,
         colorSortVal,
         timeUpdated: isValid(lastUpdated) ? lastUpdated.getTime() : NaN,
         timePlayed: isValid(lastPlayed) ? lastPlayed.getTime() : NaN,

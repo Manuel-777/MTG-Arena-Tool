@@ -506,8 +506,8 @@ export function ArchivedCell({
   cell,
   archiveDeckCallback
 }: CellProps): JSX.Element {
-  const isArchived = !!cell.value;
   const data = cell.row.values;
+  const isArchived = data.archived;
   if (!data.custom) {
     return <></>;
   }
