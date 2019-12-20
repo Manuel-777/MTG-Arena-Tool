@@ -303,7 +303,7 @@ function DeckTag({
       backgroundColor={backgroundColor}
       fontStyle={"normal"}
       ref={containerRef}
-      title={"change color"}
+      title={"change tag color"}
       onClick={useColorpicker(
         containerRef,
         tag,
@@ -333,7 +333,7 @@ export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
         backgroundColor={backgroundColor}
         fontStyle={"italic"}
         ref={containerRef}
-        title={"change color"}
+        title={"change tag color"}
         onClick={useColorpicker(
           containerRef,
           cell.value,
@@ -404,7 +404,7 @@ export function TagsCell({
         backgroundColor={backgroundColor}
         style={{ opacity: 0.6 }}
         fontStyle={"italic"}
-        title={"add a new tag"}
+        title={"add new tag"}
         onClick={clickHandler}
       >
         Add
