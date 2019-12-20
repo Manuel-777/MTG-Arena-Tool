@@ -68,8 +68,9 @@ export interface CellProps {
 
 export interface StyledArtTileCellProps {
   url: string;
-  title: string;
-  className: string;
+  title?: string;
+  className?: string;
+  onClick?: () => void;
 }
 
 export interface StyledTagProps {
