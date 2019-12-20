@@ -241,7 +241,7 @@ const StyledTag = styled.div<StyledTagProps>`
   cursor: pointer;
   color: black;
   font-size: 13px;
-  opacity: 1;
+  opacity: 0.8;
   margin-right: 12px;
   margin-bottom: 4px;
   height: 20px;
@@ -256,6 +256,9 @@ const StyledTag = styled.div<StyledTagProps>`
   font-style: ${({ fontStyle }): string => fontStyle};
   :last-child {
     margin-right: 0;
+  }
+  &:hover {
+    opacity: 1;
   }
 `;
 
@@ -463,6 +466,10 @@ const StyledArchiveDiv = styled.div`
   background: url(../images/show.png) no-repeat left;
   -webkit-transition: all 0.25s cubic-bezier(0.2, 0.5, 0.35, 1);
   vertical-align: middle;
+  opacity: 0.8;
+  &:hover {
+    opacity: 1;
+  }
 `;
 
 export function ArchiveHeader(): JSX.Element {
