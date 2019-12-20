@@ -485,8 +485,8 @@ export default function DecksTable({
                         className={
                           column.isSorted
                             ? column.isSortedDesc
-                              ? " sort_asc"
-                              : " sort_desc"
+                              ? " sort_desc"
+                              : " sort_asc"
                             : ""
                         }
                       />
