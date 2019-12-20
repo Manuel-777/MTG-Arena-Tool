@@ -246,38 +246,41 @@ export default function DecksTable({
     }),
     []
   );
-  const initialState: DecksTableState = React.useMemo(
-    () =>
-      _.defaultsDeep(cachedState, {
-        hiddenColumns: [
-          "deckId",
-          "custom",
-          "boosterCost",
-          "colors",
-          "lastEditLosses",
-          "lastEditTotal",
-          "lastEditWinrate",
-          "lastEditWins",
-          "timePlayed",
-          "timeUpdated",
-          "wins",
-          "losses",
-          "total",
-          "rare",
-          "common",
-          "uncommon",
-          "mythic",
-          "duration",
-          "avgDuration",
-          "interval",
-          "winrate",
-          "winrateLow",
-          "winrateHigh"
-        ],
-        sortBy: [{ id: "timeTouched", desc: true }]
-      }),
-    [cachedState]
-  );
+  const initialState: DecksTableState = React.useMemo(() => {
+    const state = _.defaultsDeep(cachedState, {
+      hiddenColumns: [
+        "archived",
+        "deckId",
+        "custom",
+        "boosterCost",
+        "colors",
+        "lastEditLosses",
+        "lastEditTotal",
+        "lastEditWinrate",
+        "lastEditWins",
+        "timePlayed",
+        "timeUpdated",
+        "wins",
+        "losses",
+        "total",
+        "rare",
+        "common",
+        "uncommon",
+        "mythic",
+        "duration",
+        "avgDuration",
+        "interval",
+        "winrate",
+        "winrateLow",
+        "winrateHigh"
+      ],
+      sortBy: [{ id: "timeTouched", desc: true }]
+    });
+    if (!state.hiddenColumns.includes("archived")) {
+      state.hiddenColumns.push("archived");
+    }
+    return state;
+  }, [cachedState]);
 
   const {
     flatColumns,
@@ -325,7 +328,8 @@ export default function DecksTable({
     "tags",
     "total",
     "winrate100",
-    "wins"
+    "wins",
+    "archivedCol"
   ];
 
   const toggleableColumns = flatColumns.filter((column: any) =>
