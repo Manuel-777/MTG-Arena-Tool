@@ -485,15 +485,12 @@ export default function DecksTable({
                       }}
                     >
                       <div
-                        className={"flex_item"}
-                        style={{ marginRight: "4px" }}
-                      >
-                        {column.isSorted
+                        className={(column.isSorted
                           ? column.isSortedDesc
-                            ? "🔽"
-                            : "🔼"
-                          : ""}
-                      </div>
+                            ? " sort_asc"
+                            : " sort_desc"
+                          : "")}
+                      />
                       <div className={"flex_item"}>
                         {column.render("Header")}
                       </div>
