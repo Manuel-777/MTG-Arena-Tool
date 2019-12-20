@@ -3831,6 +3831,7 @@ a:hover {
 .sort_desc {
     background-image: url(../images/icon_sort.png);
     background-size: cover;
+    transform: rotate(180deg);
     width: 16px;
     height: 16px;
 }
