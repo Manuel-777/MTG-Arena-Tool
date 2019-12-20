@@ -101,6 +101,7 @@ export default function DecksTable({
         disableFilters: false,
         filter: "uberSearch",
         Filter: TextBoxFilter,
+        minWidth: 200,
         disableSortBy: true,
         Cell: CellWrapper(ArtTileCell)
       },
@@ -110,15 +111,17 @@ export default function DecksTable({
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
+        minWidth: 200,
         sortType: "alphanumeric",
         Cell: CellWrapper(NameCell)
       },
       {
-        Header: <span style={{ minWidth: "160px" }}>Colors</span>,
+        Header: "Colors",
         disableFilters: false,
         accessor: "colorSortVal",
         Filter: ColorColumnFilter,
         filter: "colors",
+        minWidth: 167,
         Cell: ColorsCell
       },
       { accessor: "colors" },
@@ -127,6 +130,7 @@ export default function DecksTable({
         accessor: "format",
         disableFilters: false,
         Filter: TextBoxFilter,
+        minWidth: 100,
         filter: "fuzzyText",
         Cell: CellWrapper(FormatCell)
       },
@@ -135,6 +139,7 @@ export default function DecksTable({
         accessor: "tags",
         disableFilters: false,
         Filter: TextBoxFilter,
+        minWidth: 100,
         filter: "fuzzyText",
         disableSortBy: true,
         Cell: CellWrapper(TagsCell)
@@ -197,6 +202,7 @@ export default function DecksTable({
         Cell: WinRateCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
+        minWidth: 125,
         filter: "between"
       },
       { accessor: "winrate" },
@@ -217,6 +223,7 @@ export default function DecksTable({
         Cell: MissingCardsCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
+        minWidth: 125,
         filter: "between"
       },
       { accessor: "rare" },
@@ -231,6 +238,7 @@ export default function DecksTable({
         accessor: "archivedSortVal",
         filter: "showArchived",
         Filter: ArchiveColumnFilter,
+        minWidth: 98,
         disableFilters: false,
         Cell: CellWrapper(ArchivedCell),
         sortType: "basic"
@@ -465,9 +473,7 @@ export default function DecksTable({
         {togglesVisible &&
           toggleableColumns.map((column: any) => (
             <StyledCheckboxContainer key={column.id}>
-              {column.id === "colorSortVal"
-                ? "Colors"
-                : column.render("Header")}
+              {column.render("Header")}
               <input type="checkbox" {...column.getToggleHiddenProps()} />
               <span className={"checkmark"} />
             </StyledCheckboxContainer>
@@ -483,6 +489,11 @@ export default function DecksTable({
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className={"hover_label"}
                     key={column.id}
+                    style={
+                      column.minWidth
+                        ? { minWidth: column.minWidth + "px" }
+                        : undefined
+                    }
                   >
                     <div
                       style={{
@@ -543,7 +554,6 @@ export default function DecksTable({
                         onClick={(e): void => e.stopPropagation()}
                         style={{
                           paddingTop: "4px",
-                          width: "100%",
                           display: "flex",
                           justifyContent: isLeftAlignCol(column.id)
                             ? "flex-start"
@@ -551,7 +561,15 @@ export default function DecksTable({
                         }}
                         title={"filter column"}
                       >
-                        <div className={"flex_item"}>
+                        <div
+                          className={"flex_item"}
+                          style={{
+                            width:
+                              column.filterValue && column.id === "deckTileId"
+                                ? "calc(100% - 30px)"
+                                : "100%"
+                          }}
+                        >
                           {column.render("Filter")}
                         </div>
                         {column.filterValue && column.id === "deckTileId" && (
