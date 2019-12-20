@@ -86,13 +86,9 @@ export function ArtTileHeader(): JSX.Element {
 }
 
 export function ArtTileCell({ cell }: CellProps): JSX.Element {
-  const data = cell.row.values;
   return (
     <CSSTransition classNames="deckTileHover" in={!!cell.hover} timeout={200}>
-      <StyledArtTileCell
-        url={getCardArtCrop(cell.value)}
-        title={`show ${data.name} details`}
-      />
+      <StyledArtTileCell url={getCardArtCrop(cell.value)} />
     </CSSTransition>
   );
 }
@@ -141,7 +137,6 @@ const LabelText = styled.div`
 `;
 
 export function NameCell({ cell }: CellProps): JSX.Element {
-  const data = cell.row.values;
   let displayName = cell.value;
   if (displayName.includes("?=?Loc/Decks/Precon/")) {
     displayName = displayName.replace("?=?Loc/Decks/Precon/", "");
@@ -149,9 +144,7 @@ export function NameCell({ cell }: CellProps): JSX.Element {
   if (displayName.length > 25) {
     displayName = displayName.slice(0, 22) + "...";
   }
-  return (
-    <LabelText title={`show ${cell.value} details`}>{displayName}</LabelText>
-  );
+  return <LabelText>{displayName}</LabelText>;
 }
 
 export const MetricText = styled.div`
@@ -310,6 +303,7 @@ function DeckTag({
       backgroundColor={backgroundColor}
       fontStyle={"normal"}
       ref={containerRef}
+      title={"change color"}
       onClick={useColorpicker(
         containerRef,
         tag,
@@ -320,6 +314,7 @@ function DeckTag({
       {tag}
       <div
         className={"deck_tag_close"}
+        title={"delete tag"}
         onClick={(e): void => {
           e.stopPropagation();
           deleteTagCallback(deckid, tag);
@@ -338,6 +333,7 @@ export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
         backgroundColor={backgroundColor}
         fontStyle={"italic"}
         ref={containerRef}
+        title={"change color"}
         onClick={useColorpicker(
           containerRef,
           cell.value,
@@ -408,6 +404,7 @@ export function TagsCell({
         backgroundColor={backgroundColor}
         style={{ opacity: 0.6 }}
         fontStyle={"italic"}
+        title={"add a new tag"}
         onClick={clickHandler}
       >
         Add

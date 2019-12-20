@@ -570,7 +570,13 @@ export default function DecksTable({
           <tbody {...getTableBodyProps()}>
             {rows.map((row: any) => {
               prepareRow(row);
-              return <RowContainer callbacks={cellCallbacks} row={row} key={row.index} />;
+              return (
+                <RowContainer
+                  callbacks={cellCallbacks}
+                  row={row}
+                  key={row.index}
+                />
+              );
             })}
           </tbody>
         </table>
@@ -618,7 +624,11 @@ function RowContainer(props: any): JSX.Element {
       {row.cells.map((cell: any) => {
         cell.hover = hover;
         return (
-          <td {...cell.getCellProps()} key={cell.column.id + "_" + row.index}>
+          <td
+            {...cell.getCellProps()}
+            key={cell.column.id + "_" + row.index}
+            title={`show ${row.values.name} details`}
+          >
             {cell.render("Cell")}
           </td>
         );
