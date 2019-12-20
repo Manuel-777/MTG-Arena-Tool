@@ -454,11 +454,11 @@ export function MissingCardsCell({ cell }: CellProps): JSX.Element {
 }
 
 const StyledArchiveDiv = styled.div`
-  display: inline-block;
+  border-radius: 50%;
   cursor: pointer;
   width: 32px;
   min-height: 32px;
-  margin-left: 8px;
+  margin: auto;
   overflow: hidden;
   background: url(../images/show.png) no-repeat left;
   -webkit-transition: all 0.25s cubic-bezier(0.2, 0.5, 0.35, 1);
@@ -495,7 +495,9 @@ export function ArchivedCell({
     <StyledArchivedCell
       archived={isArchived}
       title={isArchived ? "restore" : "archive (will not delete data)"}
-      onClick={(): void => {
+      onClick={(e): void => {
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
         archiveDeckCallback(data.deckId);
       }}
     />
