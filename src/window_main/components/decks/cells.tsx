@@ -32,9 +32,8 @@ const StyledArtTileHeader = styled.div`
   margin: 0;
 `;
 
-const StyledArtTileCell = styled(StyledArtTileHeader)<StyledArtTileCellProps>`
+const StyledArtTile = styled(StyledArtTileHeader)`
   cursor: pointer;
-  background-image: url("${(props): string => props.url}");
   background-size: 200px;
   background-position-x: center;
   background-position-y: -10px;
@@ -70,6 +69,18 @@ const StyledArtTileCell = styled(StyledArtTileHeader)<StyledArtTileCellProps>`
     width: 128px;
   }
 `;
+
+export function StyledArtTileCell({
+  url,
+  ...otherProps
+}: StyledArtTileCellProps): JSX.Element {
+  return (
+    <StyledArtTile
+      style={{ backgroundImage: `url("${url}")` }}
+      {...otherProps}
+    />
+  );
+}
 
 export function ArtTileHeader(): JSX.Element {
   return <StyledArtTileHeader />;
