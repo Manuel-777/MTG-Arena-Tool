@@ -87,6 +87,12 @@ export default function DecksTable({
     return (props: CellProps): JSX.Element =>
       component({ ...props, ...cellCallbacks });
   };
+  const FilterWrapper = (
+    component: (props: any) => JSX.Element,
+    width: number
+  ): ((props: any) => JSX.Element) => {
+    return (props: any): JSX.Element => component({ ...props, width });
+  };
   const defaultColumn = React.useMemo(
     () => ({
       disableFilters: true
@@ -101,7 +107,7 @@ export default function DecksTable({
         accessor: "deckTileId",
         disableFilters: false,
         filter: "uberSearch",
-        Filter: TextBoxFilter,
+        Filter: FilterWrapper(TextBoxFilter, 170),
         disableSortBy: true,
         Cell: CellWrapper(ArtTileCell)
       },
@@ -110,12 +116,12 @@ export default function DecksTable({
         accessor: "name",
         disableFilters: false,
         filter: "fuzzyText",
-        Filter: TextBoxFilter,
+        Filter: FilterWrapper(TextBoxFilter, 160),
         sortType: "alphanumeric",
         Cell: CellWrapper(NameCell)
       },
       {
-        Header: "Colors",
+        Header: <span style={{ minWidth: "160px" }}>Colors</span>,
         disableFilters: false,
         accessor: "colorSortVal",
         Filter: ColorColumnFilter,
@@ -127,7 +133,7 @@ export default function DecksTable({
         Header: "Format",
         accessor: "format",
         disableFilters: false,
-        Filter: TextBoxFilter,
+        Filter: FilterWrapper(TextBoxFilter, 95),
         filter: "fuzzyText",
         Cell: CellWrapper(FormatCell)
       },
@@ -135,7 +141,7 @@ export default function DecksTable({
         Header: "Tags",
         accessor: "tags",
         disableFilters: false,
-        Filter: TextBoxFilter,
+        Filter: FilterWrapper(TextBoxFilter, 95),
         filter: "fuzzyText",
         disableSortBy: true,
         Cell: CellWrapper(TagsCell)
@@ -163,7 +169,7 @@ export default function DecksTable({
         accessor: "wins",
         Cell: MetricCell,
         disableFilters: false,
-        Filter: NumberRangeColumnFilter,
+        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
         filter: "between"
       },
       {
@@ -171,7 +177,7 @@ export default function DecksTable({
         accessor: "losses",
         Cell: MetricCell,
         disableFilters: false,
-        Filter: NumberRangeColumnFilter,
+        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
         filter: "between"
       },
       {
@@ -179,7 +185,7 @@ export default function DecksTable({
         accessor: "total",
         Cell: MetricCell,
         disableFilters: false,
-        Filter: NumberRangeColumnFilter,
+        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
         filter: "between"
       },
       {
@@ -197,7 +203,7 @@ export default function DecksTable({
         accessor: "winrate100",
         Cell: WinRateCell,
         disableFilters: false,
-        Filter: NumberRangeColumnFilter,
+        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
         filter: "between"
       },
       { accessor: "winrate" },
@@ -217,7 +223,7 @@ export default function DecksTable({
         accessor: "boosterCost",
         Cell: MissingCardsCell,
         disableFilters: false,
-        Filter: NumberRangeColumnFilter,
+        Filter: FilterWrapper(NumberRangeColumnFilter, 125),
         filter: "between"
       },
       { accessor: "rare" },
@@ -495,6 +501,7 @@ export default function DecksTable({
                               : " sort_asc"
                             : ""
                         }
+                        style={{ marginRight: "4px", width: "16px" }}
                       />
                       <div className={"flex_item"}>
                         {column.render("Header")}

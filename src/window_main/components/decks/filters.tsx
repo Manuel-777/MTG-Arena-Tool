@@ -12,12 +12,12 @@ export const StyledInputContainer = styled.div.attrs(props => ({
   className: (props.className ?? "") + " input_container"
 }))`
   display: inline-flex;
-  width: inherit;
   margin: inherit;
   height: 26px;
   padding-bottom: 4px;
   &.input_container input {
     margin: inherit;
+    width: 100%;
   }
   &:hover input {
     color: rgba(255, 255, 255, 1);
@@ -33,29 +33,32 @@ export const StyledCheckboxContainer = styled.label.attrs(props => ({
 `;
 
 export function TextBoxFilter({
-  column: { id, filterValue, preFilteredRows, setFilter }
+  column: { id, filterValue, preFilteredRows, setFilter },
+  width
 }: {
   column: any;
+  width: number;
 }): JSX.Element {
   const count = preFilteredRows.length;
   const prompt =
     id === "deckTileId" ? `Search ${count} decks...` : `Filter ${id}...`;
   return (
-    <StyledInputContainer title={prompt}>
+    <StyledInputContainer title={prompt} style={{ width: width + "px" }}>
       <input
         value={filterValue ?? ""}
         onChange={(e): void => setFilter(e.target.value ?? undefined)}
         placeholder={prompt}
-        style={{ width: "100%" }}
       />
     </StyledInputContainer>
   );
 }
 
 export function NumberRangeColumnFilter({
-  column: { filterValue = [], preFilteredRows, setFilter, id }
+  column: { filterValue = [], preFilteredRows, setFilter, id },
+  width
 }: {
   column: any;
+  width: number;
 }): JSX.Element {
   const [min, max] = React.useMemo(() => {
     let min = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
@@ -66,9 +69,8 @@ export function NumberRangeColumnFilter({
     });
     return [min, max];
   }, [id, preFilteredRows]);
-
   return (
-    <StyledInputContainer>
+    <StyledInputContainer style={{ width: width + "px" }}>
       <input
         value={filterValue[0] ?? ""}
         type="number"
@@ -79,9 +81,10 @@ export function NumberRangeColumnFilter({
             old[1]
           ]);
         }}
-        placeholder={`Min (${min})`}
+        placeholder={"min"}
+        title={`inclusive lower bound (min ${min})`}
         style={{
-          width: "70px",
+          width: "40px",
           marginRight: "0.5rem"
         }}
       />
@@ -96,9 +99,10 @@ export function NumberRangeColumnFilter({
             val ? parseInt(val, 10) : undefined
           ]);
         }}
-        placeholder={`Max (${max})`}
+        placeholder={"max"}
+        title={`inclusive upper bound (max ${max})`}
         style={{
-          width: "70px",
+          width: "40px",
           marginLeft: "0.5rem"
         }}
       />
