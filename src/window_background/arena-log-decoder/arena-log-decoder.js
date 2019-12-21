@@ -1,5 +1,5 @@
 import _ from "lodash";
-import nthLastIndexOf from "./nth-last-index-of";
+import nthLastIndexOf from "./nthLastIndexOf";
 import * as jsonText from "./json-text";
 import sha1 from "js-sha1";
 
