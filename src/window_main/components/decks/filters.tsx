@@ -7,18 +7,29 @@ import { MANA } from "../../../shared/constants";
 import ManaFilter, { ColorFilter } from "../../ManaFilter";
 
 import Aggregator from "../../aggregator";
+import { MetricText } from "./cells";
 
 export const StyledInputContainer = styled.div.attrs(props => ({
   className: (props.className ?? "") + " input_container"
 }))`
   display: inline-flex;
   margin: inherit;
+  position: relative;
   width: 100%;
   height: 26px;
   padding-bottom: 4px;
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
   &.input_container input {
-    margin: inherit;
-    width: 100%;
+    margin: 0;
+    width: calc(100% - 10px);
+    padding: 2px 4px;
+    position: absolute;
+    left: 0;
+    right: 0;
   }
   &:hover input {
     color: rgba(255, 255, 255, 1);
@@ -67,43 +78,49 @@ export function NumberRangeColumnFilter({
     return [min, max];
   }, [id, preFilteredRows]);
   return (
-    <StyledInputContainer>
-      <input
-        value={filterValue[0] ?? ""}
-        type="number"
-        onChange={(e): void => {
-          const val = e.target.value;
-          setFilter((old: number[] = []) => [
-            val ? parseInt(val, 10) : undefined,
-            old[1]
-          ]);
-        }}
-        placeholder={"min"}
-        title={`inclusive lower bound (min ${min})`}
+    <>
+      <StyledInputContainer
         style={{
-          width: "40px",
-          marginRight: "0.5rem"
+          width: "36px",
+          marginRight: "4px"
         }}
-      />
-      to
-      <input
-        value={filterValue[1] ?? ""}
-        type="number"
-        onChange={(e): void => {
-          const val = e.target.value;
-          setFilter((old: number[] = []) => [
-            old[0],
-            val ? parseInt(val, 10) : undefined
-          ]);
-        }}
-        placeholder={"max"}
-        title={`inclusive upper bound (max ${max})`}
+      >
+        <input
+          value={filterValue[0] ?? ""}
+          type="number"
+          onChange={(e): void => {
+            const val = e.target.value;
+            setFilter((old: number[] = []) => [
+              val ? parseInt(val, 10) : undefined,
+              old[1]
+            ]);
+          }}
+          placeholder={"min"}
+          title={`inclusive lower bound (min ${min})`}
+        />
+      </StyledInputContainer>
+      <MetricText>to</MetricText>
+      <StyledInputContainer
         style={{
-          width: "40px",
-          marginLeft: "0.5rem"
+          width: "36px",
+          marginLeft: "4px"
         }}
-      />
-    </StyledInputContainer>
+      >
+        <input
+          value={filterValue[1] ?? ""}
+          type="number"
+          onChange={(e): void => {
+            const val = e.target.value;
+            setFilter((old: number[] = []) => [
+              old[0],
+              val ? parseInt(val, 10) : undefined
+            ]);
+          }}
+          placeholder={"max"}
+          title={`inclusive upper bound (max ${max})`}
+        />
+      </StyledInputContainer>
+    </>
   );
 }
 

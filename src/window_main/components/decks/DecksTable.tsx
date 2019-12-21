@@ -112,7 +112,6 @@ export default function DecksTable({
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
-        minWidth: 200,
         sortType: "alphanumeric",
         Cell: CellWrapper(NameCell)
       },
@@ -122,7 +121,7 @@ export default function DecksTable({
         accessor: "colorSortVal",
         Filter: ColorColumnFilter,
         filter: "colors",
-        minWidth: 167,
+        minWidth: 170,
         Cell: ColorsCell
       },
       { accessor: "colors" },
@@ -131,7 +130,6 @@ export default function DecksTable({
         accessor: "format",
         disableFilters: false,
         Filter: TextBoxFilter,
-        minWidth: 100,
         filter: "fuzzyText",
         Cell: CellWrapper(FormatCell)
       },
@@ -140,7 +138,6 @@ export default function DecksTable({
         accessor: "tags",
         disableFilters: false,
         Filter: TextBoxFilter,
-        minWidth: 100,
         filter: "fuzzyText",
         disableSortBy: true,
         Cell: CellWrapper(TagsCell)
@@ -203,7 +200,6 @@ export default function DecksTable({
         Cell: WinRateCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
-        minWidth: 125,
         filter: "between"
       },
       { accessor: "winrate" },
@@ -224,7 +220,6 @@ export default function DecksTable({
         Cell: MissingCardsCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
-        minWidth: 125,
         filter: "between"
       },
       { accessor: "rare" },
@@ -567,8 +562,10 @@ export default function DecksTable({
                           style={{
                             width:
                               column.filterValue && column.id === "deckTileId"
-                                ? "calc(100% - 30px)"
-                                : "100%"
+                                ? "calc(100% - 34px)"
+                                : "100%",
+                            flexWrap: "wrap",
+                            marginRight: "4px"
                           }}
                         >
                           {column.render("Filter")}
