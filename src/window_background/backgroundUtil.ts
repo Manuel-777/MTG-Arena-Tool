@@ -4,7 +4,7 @@ import { ipcRenderer as ipc } from "electron";
 import _ from "lodash";
 import parse from "date-fns/parse";
 import isValid from "date-fns/isValid";
-import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY } from "../shared/constants.js";
+import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY } from "../shared/constants";
 import playerData from "../shared/player-data.js";
 import globals from "./globals";
 
@@ -12,7 +12,7 @@ import globals from "./globals";
 // They are all taken from logs
 // Some format from date-fns could be wrong;
 // https://date-fns.org/v2.2.1/docs/parse
-let dateFormats = [
+const dateFormats = [
   "dd.MM.yyyy HH:mm:ss",
   "dd/MM/yyyy HH:mm:ss",
   "M/dd/yyyy hh:mm:ss aa",
@@ -22,7 +22,7 @@ let dateFormats = [
 ];
 
 class DateParseError extends Error {
-  constructor(message) {
+  constructor(message?: string) {
     super(message);
     this.name = "DateParseError";
   }
@@ -35,7 +35,7 @@ class DateParseError extends Error {
 // The original date string should always be kept as backup.
 // Use parseWotcTimeFallback for non-important dates.
 
-export function parseWotcTime(dateStr) {
+export function parseWotcTime(dateStr: string) {
   // This must throw an error if it fails
 
   const dateFormat = getDateFormat(dateStr);
@@ -61,7 +61,7 @@ export function parseWotcTime(dateStr) {
 // Ignore date parsing errors and return `new Date()`
 // All other errors should still be passed upwards.
 // New code should preferentially use parseWotcTime and handle their own errors.
-export function parseWotcTimeFallback(dateStr) {
+export function parseWotcTimeFallback(dateStr: string) {
   try {
     return parseWotcTime(dateStr);
   } catch (e) {
@@ -77,7 +77,7 @@ export function parseWotcTimeFallback(dateStr) {
   }
 }
 
-export function updateLoading(entry) {
+export function updateLoading(entry: any) {
   if (globals.firstPass) {
     const completion = entry.position / entry.size;
     ipc_send("popup", {
@@ -88,11 +88,11 @@ export function updateLoading(entry) {
   }
 }
 
-function isValidDate(date) {
+function isValidDate(date: Date) {
   return isValid(date) && !isNaN(date.getTime());
 }
 
-export function getDateFormat(dateStr) {
+export function getDateFormat(dateStr: string) {
   if (playerData.settings.log_locale_format) {
     // return the players setting
     return playerData.settings.log_locale_format;
@@ -105,23 +105,28 @@ export function getDateFormat(dateStr) {
   }
 }
 
-export function normaliseFields(iterator) {
-  if (typeof iterator == "object") {
-    return _.transform(iterator, function(result, value, key) {
-      let nkey =
-        typeof key == "string" ? key.replace(/List$/, "").toLowerCase() : key;
-      result[nkey] = normaliseFields(value);
-    });
+export function normaliseFields(iterator: any) {
+  if (typeof iterator !== "object") {
+    return iterator;
   }
-  return iterator;
+
+  let ret = _.transform(iterator, function(
+    result: { [key: number]: any },
+    value,
+    key
+  ) {
+    result[key] = normaliseFields(value);
+  });
+
+  return ret;
 }
 
-export function unleakString(s) {
+export function unleakString(s: string) {
   return (" " + s).substr(1);
 }
 
 // Begin of IPC messages recievers
-export function ipc_send(method, arg, to = IPC_MAIN) {
+export function ipc_send(method: string, arg?: any, to = IPC_MAIN) {
   if (method == "ipc_log") {
     //
   }
@@ -152,13 +157,16 @@ const overlayWhitelist = [
 // convenience fn to update player data singletons in all processes
 // (update is destructive, be sure to use spread syntax if necessary)
 export function setData(
-  data,
+  data: any,
   refresh = globals.debugLog || !globals.firstPass
 ) {
   const cleanData = _.omit(data, dataBlacklist);
+
   playerData.handleSetData(null, JSON.stringify(cleanData));
   ipc_send("set_player_data", JSON.stringify(cleanData), IPC_MAIN);
+
   const overlayData = _.pick(cleanData, overlayWhitelist);
   ipc_send("set_player_data", JSON.stringify(overlayData), IPC_OVERLAY);
+
   if (refresh) ipc_send("player_data_refresh");
 }

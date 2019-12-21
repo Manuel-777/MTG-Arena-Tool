@@ -9,7 +9,7 @@ import { rememberDefaults } from "../shared/db/databaseUtil";
 import playerData from "../shared/player-data";
 import { getReadableFormat } from "../shared/util";
 import { HIDDEN_PW, MAIN_DECKS } from "../shared/constants";
-import { ipc_send, setData, unleakString } from "./background-util";
+import { ipc_send, setData, unleakString } from "./backgroundUtil";
 import { createDeck } from "./data";
 import * as mtgaLog from "./mtga-log";
 import globals from "./globals";

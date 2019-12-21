@@ -1,4 +1,4 @@
-import { setData } from "./background-util";
+import { setData } from "./backgroundUtil";
 import { playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/player-data";
 

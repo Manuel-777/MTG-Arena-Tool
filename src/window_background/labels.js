@@ -22,7 +22,7 @@ import {
   normaliseFields,
   parseWotcTimeFallback,
   setData
-} from "./background-util";
+} from "./backgroundUtil";
 import actionLog from "./actionLog";
 import addCustomDeck from "./addCustomDeck";
 import { createDraft, createMatch, completeMatch } from "./data";

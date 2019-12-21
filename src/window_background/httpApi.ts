@@ -6,7 +6,7 @@ import playerData from "../shared/player-data";
 import db from "../shared/database";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 
-import { ipc_send as ipcSend, setData } from "./background-util";
+import { ipc_send as ipcSend, setData } from "./backgroundUtil";
 import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 import {
   asyncWorker,

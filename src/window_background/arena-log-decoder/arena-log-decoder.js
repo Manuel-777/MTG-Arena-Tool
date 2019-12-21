@@ -2,6 +2,7 @@ import _ from "lodash";
 import nthLastIndexOf from "./nth-last-index-of";
 import * as jsonText from "./json-text";
 import sha1 from "js-sha1";
+import unleakString from "../backgroundUtil";
 
 const LABEL_JSON_PATTERNS = [
   /\[UnityCrossThreadLogger\](?<timestamp>.*): (?:Match to )?(?<playerId>\w*)(?: to Match)?: (?<label>.*)(?:\r\n|\n)/,
@@ -20,10 +21,6 @@ const logEntryPattern = new RegExp(
   `(${ALL_PATTERNS.map(re => re.source.replace(/\(\?<\w*>/g, "(")).join("|")})`,
   "g"
 );
-
-function unleakString(s) {
-  return (" " + s).substr(1);
-}
 
 export default function ArenaLogDecoder() {
   let buffer = "";
