@@ -304,7 +304,7 @@ function openSetStatsDetails(setStats: SetStats, setName: string): void {
                   rarityIndex} / auto / ${color * 5 + 1 + rarityIndex}`;
                 table.appendChild(cell);
 
-                addCardHover(cell, dbCard);
+                addCardHover(cell, dbCard ?? false);
               }
             });
           }

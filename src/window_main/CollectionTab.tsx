@@ -1,13 +1,11 @@
-/* eslint-disable max-statements, complexity */
+/* eslint-disable max-statements, complexity, @typescript-eslint/no-use-before-define */
 import { remote } from "electron";
-const Menu = remote.Menu;
-const MenuItem = remote.MenuItem;
+import React from "react";
 
 import { COLORS_BRIEF } from "../shared/constants";
 import db from "../shared/database";
 import pd from "../shared/player-data";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
-import createSelect from "./createSelect";
 import { addCardHover, attachOwnerhipStars } from "../shared/cardHover";
 import {
   collectionSortRarity,
@@ -15,16 +13,24 @@ import {
   openScryfallCard,
   replaceAll
 } from "../shared/util";
+import { DbCardData } from "../shared/types/Metadata";
+
+import createSelect from "./createSelect";
+import mountReactComponent from "./mountReactComponent";
 import { hideLoadingBars, ipcSend, resetMainContainer } from "./renderer-util";
 import { openSetStats } from "./collectionStats";
 
+// import CollectionTable from "./components/collection/CollectionTable";
+
+const Menu = remote.Menu;
+const MenuItem = remote.MenuItem;
+
 let collectionPage = 0;
 let sortingAlgorithm = "Sort by Set";
-let filteredSets;
-let filteredMana;
+let filteredSets: any;
+let filteredMana: any;
 
-//
-function get_collection_export(exportFormat) {
+function getCollectionExport(exportFormat: string): string {
   let list = "";
   Object.keys(pd.cards.cards).forEach(key => {
     let add = exportFormat + "";
@@ -45,7 +51,7 @@ function get_collection_export(exportFormat) {
       add = add.replace("$Collector", card.cid);
       add = add.replace("$Rarity", card.rarity);
       add = add.replace("$Type", card.type);
-      add = add.replace("$Cmc", card.cmc);
+      add = add.replace("$Cmc", card.cmc + "");
       list += add + "\r\n";
     }
   });
@@ -53,12 +59,18 @@ function get_collection_export(exportFormat) {
   return list;
 }
 
-//
-function collectionSortCmc(a, b) {
-  a = db.card(a);
-  b = db.card(b);
-  if (parseInt(a.cmc) < parseInt(b.cmc)) return -1;
-  if (parseInt(a.cmc) > parseInt(b.cmc)) return 1;
+function collectionSortCmc(
+  aId: string | number,
+  bId: string | number
+): -1 | 0 | 1 {
+  const a = db.card(aId);
+  const b = db.card(bId);
+  if (!a && !b) return 0;
+  if (!a) return -1;
+  if (!b) return 1;
+
+  if (a.cmc < b.cmc) return -1;
+  if (a.cmc > b.cmc) return 1;
 
   if (a.set < b.set) return -1;
   if (a.set > b.set) return 1;
@@ -68,10 +80,16 @@ function collectionSortCmc(a, b) {
   return 0;
 }
 
-//
-function collectionSortSet(a, b) {
-  a = db.card(a);
-  b = db.card(b);
+function collectionSortSet(
+  aId: string | number,
+  bId: string | number
+): -1 | 0 | 1 {
+  const a = db.card(aId);
+  const b = db.card(bId);
+  if (!a && !b) return 0;
+  if (!a) return -1;
+  if (!b) return 1;
+
   if (a.set < b.set) return -1;
   if (a.set > b.set) return 1;
 
@@ -80,41 +98,65 @@ function collectionSortSet(a, b) {
   return 0;
 }
 
-//
-function collectionSortName(a, b) {
-  a = db.card(a);
-  b = db.card(b);
+function collectionSortName(
+  aId: string | number,
+  bId: string | number
+): -1 | 0 | 1 {
+  const a = db.card(aId);
+  const b = db.card(bId);
+  if (!a && !b) return 0;
+  if (!a) return -1;
+  if (!b) return 1;
+
   if (a.name < b.name) return -1;
   if (a.name > b.name) return 1;
   return 0;
 }
 
-//
-export function openCollectionTab() {
+function getInputById(id: string): HTMLInputElement {
+  return (document.getElementById(id) ?? {}) as HTMLInputElement;
+}
+
+export function openCollectionTab(): void {
   filteredSets = [];
   filteredMana = [];
+
+  hideLoadingBars();
+  const detailDiv = document.getElementById("ux_1");
+  if (detailDiv) {
+    detailDiv.innerHTML = "";
+    detailDiv.classList.remove("flex_item");
+  }
+  const mainDiv = resetMainContainer();
+  if (!mainDiv) {
+    return;
+  }
+
+  renderCollectionFilters();
+  openCollectionPage();
+  // mountReactComponent(<CollectionTable data={getFilteredCardIds()} />, mainDiv);
+}
+
+function renderCollectionFilters(): void {
+  const mainDiv = document.getElementById("ux_0");
+  if (!mainDiv) {
+    return;
+  }
   const orderedSets = db.sortedSetCodes.filter(
     code => db.sets[code].collation !== -1
   );
 
-  hideLoadingBars();
-  let mainDiv;
-  mainDiv = document.getElementById("ux_1");
-  mainDiv.innerHTML = "";
-  mainDiv.classList.remove("flex_item");
-  mainDiv = resetMainContainer();
+  const div = createDiv(["inventory"]);
 
-  let div = createDiv(["inventory"]);
+  const basicFilters = createDiv(["inventory_filters_basic"]);
 
-  let basicFilters = createDiv(["inventory_filters_basic"]);
+  const fll = createDiv(["inventory_flex_half"]);
+  const flr = createDiv(["inventory_flex_half"]);
 
-  let fll = createDiv(["inventory_flex_half"]);
-  let flr = createDiv(["inventory_flex_half"]);
-
-  let fllt = createDiv(["inventory_flex"]);
-  let fllb = createDiv(["inventory_flex"]);
-  let flrt = createDiv(["inventory_flex"]);
-  let flrb = createDiv(["inventory_flex"]);
+  const fllt = createDiv(["inventory_flex"]);
+  const fllb = createDiv(["inventory_flex"]);
+  const flrt = createDiv(["inventory_flex"]);
+  const flrb = createDiv(["inventory_flex"]);
 
   let icd = createDiv(["input_container_inventory"]);
 
@@ -123,7 +165,7 @@ export function openCollectionTab() {
   label.innerHTML = "Search";
   icd.appendChild(label);
 
-  let input = document.createElement("input");
+  const input = document.createElement("input");
   input.id = "query_name";
   input.autocomplete = "off";
   input.type = "search";
@@ -133,46 +175,51 @@ export function openCollectionTab() {
 
   input.addEventListener("keydown", function(e) {
     if (e.keyCode == 13) {
-      printCollectionPage();
+      openCollectionPage();
     }
   });
 
   let searchButton = createDiv(["button_simple", "button_thin"], "Search");
   flrt.appendChild(searchButton);
 
-  let advancedButton = createDiv(
+  const advancedButton = createDiv(
     ["button_simple", "button_thin"],
     "Advanced Filters"
   );
   flrt.appendChild(advancedButton);
 
   searchButton.addEventListener("click", () => {
-    printCollectionPage();
+    openCollectionPage();
   });
 
   advancedButton.addEventListener("click", () => {
     expandFilters();
   });
 
-  let sortby = ["Sort by Set", "Sort by Name", "Sort by Rarity", "Sort by CMC"];
+  const sortby = [
+    "Sort by Set",
+    "Sort by Name",
+    "Sort by Rarity",
+    "Sort by CMC"
+  ];
   createSelect(
     fllb,
     sortby,
     sortingAlgorithm,
     res => {
       sortingAlgorithm = res;
-      printCollectionPage();
+      openCollectionPage();
     },
     "query_select"
   );
 
-  let exp = createDiv(["button_simple", "button_thin"], "Export Collection");
+  const exp = createDiv(["button_simple", "button_thin"], "Export Collection");
   fllb.appendChild(exp);
 
-  let reset = createDiv(["button_simple", "button_thin"], "Reset");
+  const reset = createDiv(["button_simple", "button_thin"], "Reset");
   flrb.appendChild(reset);
 
-  let stats = createDiv(["button_simple", "button_thin"], "Collection Stats");
+  const stats = createDiv(["button_simple", "button_thin"], "Collection Stats");
   flrb.appendChild(stats);
 
   exp.addEventListener("click", () => {
@@ -195,9 +242,9 @@ export function openCollectionTab() {
   basicFilters.appendChild(flr);
 
   // "ADVANCED" FILTERS
-  let filters = createDiv(["inventory_filters"]);
+  const filters = createDiv(["inventory_filters"]);
 
-  let flex = createDiv(["inventory_flex_half"]);
+  const flex = createDiv(["inventory_flex_half"]);
 
   icd = createDiv(["input_container_inventory"]);
   icd.style.paddingBottom = "8px";
@@ -208,7 +255,7 @@ export function openCollectionTab() {
   label.innerHTML = "Type line";
   icd.appendChild(label);
 
-  let typeInput = document.createElement("input");
+  const typeInput = document.createElement("input");
   typeInput.id = "query_type";
   typeInput.autocomplete = "off";
   typeInput.type = "search";
@@ -217,10 +264,10 @@ export function openCollectionTab() {
   flex.appendChild(icd);
   filters.appendChild(flex);
 
-  let sets = createDiv(["sets_container"]);
+  const sets = createDiv(["sets_container"]);
 
   orderedSets.forEach(set => {
-    let setbutton = createDiv(["set_filter", "set_filter_on"]);
+    const setbutton = createDiv(["set_filter", "set_filter_on"]);
     const svgData = db.sets[set].svg;
     setbutton.style.backgroundImage = `url(data:image/svg+xml;base64,${svgData})`;
     setbutton.title = set;
@@ -230,7 +277,7 @@ export function openCollectionTab() {
       if (!setbutton.classList.toggle("set_filter_on")) {
         filteredSets.push(set);
       } else {
-        let n = filteredSets.indexOf(set);
+        const n = filteredSets.indexOf(set);
         if (n > -1) {
           filteredSets.splice(n, 1);
         }
@@ -239,11 +286,11 @@ export function openCollectionTab() {
   });
   filters.appendChild(sets);
 
-  let manas = createDiv(["sets_container"]);
-  let ms = ["w", "u", "b", "r", "g"];
+  const manas = createDiv(["sets_container"]);
+  const ms = ["w", "u", "b", "r", "g"];
   ms.forEach(function(s, i) {
-    let mi = [1, 2, 3, 4, 5];
-    let manabutton = createDiv(["mana_filter_search", "mana_filter_on"]);
+    const mi = [1, 2, 3, 4, 5];
+    const manabutton = createDiv(["mana_filter_search", "mana_filter_on"]);
     manabutton.style.backgroundImage = `url(../images/${s}64.png)`;
 
     manas.appendChild(manabutton);
@@ -251,7 +298,7 @@ export function openCollectionTab() {
       if (!manabutton.classList.toggle("mana_filter_on")) {
         filteredMana.push(mi[i]);
       } else {
-        let n = filteredMana.indexOf(mi[i]);
+        const n = filteredMana.indexOf(mi[i]);
         if (n > -1) {
           filteredMana.splice(n, 1);
         }
@@ -260,7 +307,7 @@ export function openCollectionTab() {
   });
   filters.appendChild(manas);
 
-  let main_but_cont = createDiv(["main_buttons_container"]);
+  const mainButtonCont = createDiv(["main_buttons_container"]);
   let cont = createDiv(["buttons_container"]);
 
   addCheckboxSearch(
@@ -276,7 +323,7 @@ export function openCollectionTab() {
     false
   );
   addCheckboxSearch(cont, "Exclude unselected colors", "query_exclude", false);
-  main_but_cont.appendChild(cont);
+  mainButtonCont.appendChild(cont);
 
   cont = createDiv(["buttons_container"]);
   addCheckboxSearch(
@@ -303,7 +350,7 @@ export function openCollectionTab() {
     "query_mythic",
     false
   );
-  main_but_cont.appendChild(cont);
+  mainButtonCont.appendChild(cont);
 
   cont = createDiv(["buttons_container"]);
   icd = createDiv(["input_container_inventory", "auto_width"]);
@@ -313,7 +360,7 @@ export function openCollectionTab() {
   label.innerHTML = "CMC:";
   icd.appendChild(label);
 
-  let inputCmc = document.createElement("input");
+  const inputCmc = document.createElement("input");
   inputCmc.style.maxWidth = "80px";
   inputCmc.id = "query_cmc";
   inputCmc.autocomplete = "off";
@@ -322,7 +369,7 @@ export function openCollectionTab() {
   icd.appendChild(inputCmc);
   cont.appendChild(icd);
 
-  let checkboxCmcHigher = addCheckboxSearch(
+  const checkboxCmcHigher = addCheckboxSearch(
     cont,
     "Higher than",
     "query_cmchigher",
@@ -330,7 +377,7 @@ export function openCollectionTab() {
     true
   );
   addCheckboxSearch(cont, "Equal to", "query_cmcequal", true);
-  let checkboxCmcLower = addCheckboxSearch(
+  const checkboxCmcLower = addCheckboxSearch(
     cont,
     "Lower than",
     "query_cmclower",
@@ -338,8 +385,8 @@ export function openCollectionTab() {
     true
   );
 
-  main_but_cont.appendChild(cont);
-  filters.appendChild(main_but_cont);
+  mainButtonCont.appendChild(cont);
+  filters.appendChild(mainButtonCont);
 
   cont = createDiv(["buttons_container"]);
   icd = createDiv(["input_container_inventory", "auto_width"]);
@@ -349,7 +396,7 @@ export function openCollectionTab() {
   label.innerHTML = "Owned Qty:";
   icd.appendChild(label);
 
-  let inputQty = document.createElement("input");
+  const inputQty = document.createElement("input");
   inputQty.style.maxWidth = "80px";
   inputQty.id = "query_qty";
   inputQty.autocomplete = "off";
@@ -359,7 +406,7 @@ export function openCollectionTab() {
 
   icd.appendChild(inputQty);
   cont.appendChild(icd);
-  let checkboxQtyHigher = addCheckboxSearch(
+  const checkboxQtyHigher = addCheckboxSearch(
     cont,
     "Higher than",
     "query_qtyhigher",
@@ -367,7 +414,7 @@ export function openCollectionTab() {
     true
   );
   addCheckboxSearch(cont, "Equal to", "query_qtyequal", true);
-  let checkboxQtyLower = addCheckboxSearch(
+  const checkboxQtyLower = addCheckboxSearch(
     cont,
     "Lower than",
     "query_qtylower",
@@ -375,15 +422,15 @@ export function openCollectionTab() {
     true
   );
 
-  main_but_cont.appendChild(cont);
-  filters.appendChild(main_but_cont);
+  mainButtonCont.appendChild(cont);
+  filters.appendChild(mainButtonCont);
 
   searchButton = createDiv(["button_simple", "button_thin"], "Search");
   searchButton.style.margin = "24px auto";
   filters.appendChild(searchButton);
 
   searchButton.addEventListener("click", () => {
-    printCollectionPage();
+    openCollectionPage();
   });
 
   mainDiv.appendChild(basicFilters);
@@ -391,46 +438,49 @@ export function openCollectionTab() {
   mainDiv.appendChild(div);
 
   checkboxCmcLower.addEventListener("change", () => {
-    if (document.getElementById("query_cmclower").checked == true) {
-      document.getElementById("query_cmchigher").checked = false;
+    if (getInputById("query_cmclower")?.checked == true) {
+      getInputById("query_cmclower").checked = false;
     }
   });
 
   checkboxCmcHigher.addEventListener("change", () => {
-    if (document.getElementById("query_cmchigher").checked == true) {
-      document.getElementById("query_cmclower").checked = false;
+    if (getInputById("query_cmchigher")?.checked == true) {
+      getInputById("query_cmclower").checked = false;
     }
   });
 
   checkboxQtyLower.addEventListener("change", () => {
-    if (document.getElementById("query_qtylower").checked == true) {
-      document.getElementById("query_qtyhigher").checked = false;
+    if (getInputById("query_qtylower").checked == true) {
+      getInputById("query_qtyhigher").checked = false;
     }
   });
 
   checkboxQtyHigher.addEventListener("change", () => {
-    if (document.getElementById("query_qtyhigher").checked == true) {
-      document.getElementById("query_qtylower").checked = false;
+    if (getInputById("query_qtyhigher").checked == true) {
+      getInputById("query_qtylower").checked = false;
     }
   });
-
-  printCards();
 }
 
-//
-function addCheckboxSearch(div, label, iid, def, toggle = false) {
-  let labelCheck = document.createElement("label");
+function addCheckboxSearch(
+  div: HTMLElement,
+  label: any,
+  iid: string,
+  def: boolean,
+  toggle = false
+): HTMLInputElement {
+  const labelCheck = document.createElement("label");
   labelCheck.classList.add("check_container");
   labelCheck.classList.add("hover_label");
   labelCheck.innerHTML = label;
 
-  let inputCheck = document.createElement("input");
+  const inputCheck = document.createElement("input");
   inputCheck.type = "checkbox";
   inputCheck.id = iid;
   inputCheck.innerHTML = label;
   inputCheck.checked = def;
 
-  let spanCheck = document.createElement("span");
+  const spanCheck = document.createElement("span");
   spanCheck.classList.add("checkmark");
   if (toggle) spanCheck.style.borderRadius = "100%";
 
@@ -441,14 +491,17 @@ function addCheckboxSearch(div, label, iid, def, toggle = false) {
   return inputCheck;
 }
 
-function expandFilters() {
-  let mainDiv = document.getElementById("ux_0");
+function expandFilters(): void {
+  const mainDiv = document.getElementById("ux_0");
+  if (!mainDiv) {
+    return;
+  }
   mainDiv.style.overflow = "hidden";
   setTimeout(() => {
     mainDiv.removeAttribute("style");
   }, 1000);
 
-  let div = $$(".inventory_filters")[0];
+  const div = $$(".inventory_filters")[0];
   if (div.style.opacity == 1) {
     div.style.height = "0px";
     div.style.opacity = 0;
@@ -462,56 +515,57 @@ function expandFilters() {
   }
 }
 
-function resetFilters() {
+function resetFilters(): void {
   filteredSets = [];
   filteredMana = [];
 
-  $$(".set_filter").forEach(div => {
+  $$(".set_filter").forEach((div: HTMLElement) => {
     div.classList.remove("set_filter_on");
     div.classList.add("set_filter_on");
   });
-  $$(".mana_filter_search").forEach(div => {
+  $$(".mana_filter_search").forEach((div: HTMLElement) => {
     div.classList.remove("mana_filter_on");
     div.classList.add("mana_filter_on");
   });
 
-  document.getElementById("query_name").value = "";
-  document.getElementById("query_type").value = "";
-  document.getElementById("query_new").checked = false;
-  document.getElementById("query_multicolor").checked = false;
-  document.getElementById("query_exclude").checked = false;
+  getInputById("query_name").value = "";
+  getInputById("query_type").value = "";
+  getInputById("query_new").checked = false;
+  getInputById("query_multicolor").checked = false;
+  getInputById("query_exclude").checked = false;
 
-  document.getElementById("query_common").checked = false;
-  document.getElementById("query_uncommon").checked = false;
-  document.getElementById("query_rare").checked = false;
-  document.getElementById("query_mythic").checked = false;
+  getInputById("query_common").checked = false;
+  getInputById("query_uncommon").checked = false;
+  getInputById("query_rare").checked = false;
+  getInputById("query_mythic").checked = false;
 
-  document.getElementById("query_cmc").value = "";
-  document.getElementById("query_cmclower").checked = false;
-  document.getElementById("query_cmcequal").checked = true;
-  document.getElementById("query_cmchigher").checked = false;
+  getInputById("query_cmc").value = "";
+  getInputById("query_cmclower").checked = false;
+  getInputById("query_cmcequal").checked = true;
+  getInputById("query_cmchigher").checked = false;
 
-  document.getElementById("query_qtylower").checked = false;
-  document.getElementById("query_qtyequal").checked = true;
-  document.getElementById("query_qtyhigher").checked = false;
+  getInputById("query_qtylower").checked = false;
+  getInputById("query_qtyequal").checked = true;
+  getInputById("query_qtyhigher").checked = false;
 
-  printCollectionPage();
+  openCollectionPage();
 }
 
-//
-function exportCollection() {
-  let list = get_collection_export(pd.settings.export_format);
+function exportCollection(): void {
+  const list = getCollectionExport(pd.settings.export_format);
   ipcSend("export_csvtxt", { str: list, name: "collection" });
 }
 
-function sortCollection(alg) {
+function sortCollection(alg: string): void {
   sortingAlgorithm = alg;
-  printCollectionPage();
+  openCollectionPage();
 }
 
-//
-function printCards() {
-  let mainDiv = document.getElementById("ux_0");
+function renderCardsTable(): void {
+  const mainDiv = document.getElementById("ux_0");
+  if (!mainDiv) {
+    return;
+  }
   mainDiv.style.overflow = "hidden";
 
   let div = $$(".inventory_filters")[0];
@@ -522,65 +576,171 @@ function printCards() {
   div = $$(".inventory")[0];
   div.innerHTML = "";
 
-  let paging = createDiv(["paging_container"]);
+  const paging = createDiv(["paging_container"]);
   div.appendChild(paging);
 
-  let filterName = document.getElementById("query_name").value.toLowerCase();
-  let filterType = document.getElementById("query_type").value.toLowerCase();
-  let filterNew = document.getElementById("query_new");
-  let filterMulti = document.getElementById("query_multicolor");
-  let filterExclude = document.getElementById("query_exclude");
+  const list = getFilteredCardIds();
+  const totalCards = list.length;
 
-  let filterCommon = document.getElementById("query_common").checked;
-  let filterUncommon = document.getElementById("query_uncommon").checked;
-  let filterRare = document.getElementById("query_rare").checked;
-  let filterMythic = document.getElementById("query_mythic").checked;
-  let filterAnyRarityChecked =
-    filterCommon || filterUncommon || filterRare || filterMythic;
-
-  let filterCMC = document.getElementById("query_cmc").value;
-  let filterCmcLower = document.getElementById("query_cmclower").checked;
-  let filterCmcEqual = document.getElementById("query_cmcequal").checked;
-  let filterCmcHigher = document.getElementById("query_cmchigher").checked;
-
-  let filterQty = document.getElementById("query_qty").value;
-  let filterQtyLower = document.getElementById("query_qtylower").checked;
-  let filterQtyEqual = document.getElementById("query_qtyequal").checked;
-  let filterQtyHigher = document.getElementById("query_qtyhigher").checked;
-
-  let totalCards = 0;
-  let list;
-  if (filterQty == 0 || filterQtyLower) {
-    list = db.cardIds;
-  } else {
-    list = Object.keys(pd.cards.cards);
-  }
-
-  let keysSorted = [...list];
+  const keysSorted = [...list];
   if (sortingAlgorithm == "Sort by Set") keysSorted.sort(collectionSortSet);
   if (sortingAlgorithm == "Sort by Name") keysSorted.sort(collectionSortName);
   if (sortingAlgorithm == "Sort by Rarity")
     keysSorted.sort(collectionSortRarity);
   if (sortingAlgorithm == "Sort by CMC") keysSorted.sort(collectionSortCmc);
 
-  cardLoop: for (let n = 0; n < keysSorted.length; n++) {
-    let key = keysSorted[n];
+  for (let n = 0; n < keysSorted.length; n++) {
+    const key = keysSorted[n];
 
-    let grpId = key;
-    let card = db.card(grpId);
-    let name = card.name.toLowerCase();
-    let type = card.type.toLowerCase();
-    let rarity = card.rarity;
-    let cost = card.cost;
-    let cmc = card.cmc;
-    let set = card.set;
+    const grpId = key;
+    const card = db.card(grpId);
+    if (!card || !card.images || !card.collectible) {
+      continue;
+    }
 
-    if (card.images == undefined) continue;
-    if (!card.collectible) continue;
+    const cardDiv = createDiv(["inventory_card"]);
+    cardDiv.style.width = pd.cardsSize + "px";
+    attachOwnerhipStars(card, cardDiv);
+    cardDiv.title = card.name;
+
+    const img = document.createElement("img");
+    img.style.width = pd.cardsSize + "px";
+    img.classList.add("inventory_card_img");
+    img.src = getCardImage(card);
+
+    cardDiv.appendChild(img);
+
+    //Don't show card hover, if collection card size is over 340px
+    if (!(pd.cardsSize >= 340)) {
+      addCardHover(img, card);
+    }
+
+    img.addEventListener("click", () => {
+      // TODO handle split cards?
+      // if (db.card(grpId)?.dfc == "SplitHalf") {
+      //   card = db.card(card.dfcId ?? "");
+      // }
+      //let newname = card.name.split(' ').join('-');
+      openScryfallCard(card);
+    });
+
+    addCardMenu(img, card);
+
+    div.appendChild(cardDiv);
+  }
+
+  const pagingBottom = createDiv(["paging_container"]);
+  div.appendChild(pagingBottom);
+  let but, butClone;
+  if (collectionPage <= 0) {
+    but = createDiv(["paging_button_disabled"], " < ");
+    butClone = but.cloneNode(true);
+  } else {
+    but = createDiv(["paging_button"], " < ");
+
+    but.addEventListener("click", () => {
+      openCollectionPage(collectionPage - 1);
+    });
+    butClone = but.cloneNode(true);
+    butClone.addEventListener("click", () => {
+      openCollectionPage(collectionPage + 1);
+    });
+  }
+
+  paging.appendChild(but);
+  pagingBottom.appendChild(butClone);
+
+  const totalPages = Math.ceil(totalCards / 100);
+  for (let n = 0; n < totalPages; n++) {
+    but = createDiv(["paging_button"], String(n + 1));
+    if (collectionPage == n) {
+      but.classList.add("paging_active");
+    }
+
+    const page = n;
+    but.addEventListener("click", () => {
+      openCollectionPage(page);
+    });
+    butClone = but.cloneNode(true);
+    butClone.addEventListener("click", () => {
+      openCollectionPage(page);
+    });
+
+    paging.append(but);
+    pagingBottom.append(butClone);
+  }
+  if (collectionPage >= totalPages - 1) {
+    but = createDiv(["paging_button_disabled"], " > ");
+    butClone = but.cloneNode(true);
+  } else {
+    but = createDiv(["paging_button"], " > ");
+    but.addEventListener("click", () => {
+      openCollectionPage(collectionPage + 1);
+    });
+    butClone = but.cloneNode(true);
+    butClone.addEventListener("click", () => {
+      openCollectionPage(collectionPage + 1);
+    });
+  }
+  paging.appendChild(but);
+  pagingBottom.appendChild(butClone);
+
+  setTimeout(() => {
+    mainDiv.removeAttribute("style");
+  }, 1000);
+}
+
+function getFilteredCardIds(): (number | string)[] {
+  const cardIds: Set<number | string> = new Set();
+
+  const filterName = getInputById("query_name")?.value.toLowerCase();
+  const filterType = getInputById("query_type")?.value.toLowerCase();
+  const filterNew = getInputById("query_new");
+  const filterMulti = getInputById("query_multicolor");
+  const filterExclude = getInputById("query_exclude");
+
+  const filterCommon = getInputById("query_common")?.checked;
+  const filterUncommon = getInputById("query_uncommon")?.checked;
+  const filterRare = getInputById("query_rare")?.checked;
+  const filterMythic = getInputById("query_mythic")?.checked;
+  const filterAnyRarityChecked =
+    filterCommon || filterUncommon || filterRare || filterMythic;
+
+  const filterCMC = parseInt(getInputById("query_cmc")?.value);
+  const filterCmcLower = getInputById("query_cmclower")?.checked;
+  const filterCmcEqual = getInputById("query_cmcequal")?.checked;
+  const filterCmcHigher = getInputById("query_cmchigher")?.checked;
+
+  const filterQty = parseInt(getInputById("query_qty")?.value);
+  const filterQtyLower = getInputById("query_qtylower")?.checked;
+  const filterQtyEqual = getInputById("query_qtyequal")?.checked;
+  const filterQtyHigher = getInputById("query_qtyhigher")?.checked;
+
+  let list;
+  if (filterQty === 0 || filterQtyLower) {
+    list = db.cardIds;
+  } else {
+    list = Object.keys(pd.cards.cards);
+  }
+
+  cardLoop: for (let n = 0; n < list.length; n++) {
+    const key = list[n];
+
+    const grpId = key;
+    const card = db.card(grpId);
+    if (!card || !card.images || !card.collectible) {
+      continue;
+    }
+    const name = card.name.toLowerCase();
+    const type = card.type.toLowerCase();
+    const rarity = card.rarity;
+    const cost = card.cost;
+    const cmc = card.cmc;
+    const set = card.set;
 
     // Filter name
     let arr;
-    arr = filterName.split(" ");
+    arr = filterName?.split(" ");
     for (let m = 0; m < arr.length; m++) {
       if (name.indexOf(arr[m]) == -1) {
         continue cardLoop;
@@ -588,14 +748,14 @@ function printCards() {
     }
 
     // filter type
-    arr = filterType.split(" ");
+    arr = filterType?.split(" ");
     for (let t = 0; t < arr.length; t++) {
       if (type.indexOf(arr[t]) == -1) {
         continue cardLoop;
       }
     }
 
-    if (filterNew.checked && pd.cardsNew[key] === undefined) {
+    if (filterNew?.checked && pd.cardsNew[key] === undefined) {
       continue;
     }
 
@@ -664,12 +824,12 @@ function printCards() {
     if (filterExclude.checked && cost.length == 0) {
       continue;
     } else {
-      let s = [];
+      const s: number[] = [];
       let generic = false;
       for (let i = 0; i < cost.length; i++) {
-        let m = cost[i];
+        const m = cost[i];
         for (let j = 0; j < COLORS_BRIEF.length; j++) {
-          let code = COLORS_BRIEF[j];
+          const code = COLORS_BRIEF[j];
           if (m.indexOf(code) !== -1) {
             if (filterExclude.checked && !filteredMana.includes(j + 1)) {
               continue cardLoop;
@@ -682,13 +842,13 @@ function printCards() {
         }
       }
 
-      let ms = s.reduce((a, b) => a + b, 0);
+      const ms = s.reduce((a, b) => a + b, 0);
       if (generic && ms == 0 && filterExclude.checked) {
         continue;
       }
       if (filteredMana.length > 0) {
         let su = 0;
-        filteredMana.forEach(function(m) {
+        filteredMana.forEach(function(m: number) {
           if (s[m] == 1) {
             su++;
           }
@@ -701,130 +861,36 @@ function printCards() {
         continue;
       }
     }
-
-    totalCards++;
-
-    if (
-      totalCards < collectionPage * 100 ||
-      totalCards > collectionPage * 100 + 99
-    ) {
-      continue;
-    }
-
-    const cardDiv = createDiv(["inventory_card"]);
-    cardDiv.style.width = pd.cardsSize + "px";
-    attachOwnerhipStars(card, cardDiv);
-    cardDiv.title = card.name;
-
-    const img = document.createElement("img");
-    img.style.width = pd.cardsSize + "px";
-    img.classList.add("inventory_card_img");
-    img.src = getCardImage(card);
-
-    cardDiv.appendChild(img);
-
-    //Don't show card hover, if collection card size is over 340px
-    if (!(pd.cardsSize >= 340)) {
-      addCardHover(img, card);
-    }
-
-    img.addEventListener("click", () => {
-      if (db.card(grpId).dfc == "SplitHalf") {
-        card = db.card(card.dfcId);
-      }
-      //let newname = card.name.split(' ').join('-');
-      openScryfallCard(card);
-    });
-
-    addCardMenu(img, card);
-
-    div.appendChild(cardDiv);
+    cardIds.add(grpId);
   }
 
-  let paging_bottom = createDiv(["paging_container"]);
-  div.appendChild(paging_bottom);
-  let but, butClone;
-  if (collectionPage <= 0) {
-    but = createDiv(["paging_button_disabled"], " < ");
-    butClone = but.cloneNode(true);
-  } else {
-    but = createDiv(["paging_button"], " < ");
-
-    but.addEventListener("click", () => {
-      printCollectionPage(collectionPage - 1);
-    });
-    butClone = but.cloneNode(true);
-    butClone.addEventListener("click", () => {
-      printCollectionPage(collectionPage + 1);
-    });
-  }
-
-  paging.appendChild(but);
-  paging_bottom.appendChild(butClone);
-
-  let totalPages = Math.ceil(totalCards / 100);
-  for (let n = 0; n < totalPages; n++) {
-    but = createDiv(["paging_button"], n + 1);
-    if (collectionPage == n) {
-      but.classList.add("paging_active");
-    }
-
-    let page = n;
-    but.addEventListener("click", () => {
-      printCollectionPage(page);
-    });
-    butClone = but.cloneNode(true);
-    butClone.addEventListener("click", () => {
-      printCollectionPage(page);
-    });
-
-    paging.append(but);
-    paging_bottom.append(butClone);
-  }
-  if (collectionPage >= totalPages - 1) {
-    but = createDiv(["paging_button_disabled"], " > ");
-    butClone = but.cloneNode(true);
-  } else {
-    but = createDiv(["paging_button"], " > ");
-    but.addEventListener("click", () => {
-      printCollectionPage(collectionPage + 1);
-    });
-    butClone = but.cloneNode(true);
-    butClone.addEventListener("click", () => {
-      printCollectionPage(collectionPage + 1);
-    });
-  }
-  paging.appendChild(but);
-  paging_bottom.appendChild(butClone);
-
-  setTimeout(() => {
-    mainDiv.removeAttribute("style");
-  }, 1000);
+  return [...cardIds];
 }
 
-function addCardMenu(div, card) {
+function addCardMenu(div: HTMLElement, card: DbCardData): void {
   if (!(card.set in db.sets)) return;
-  let arenaCode = `1 ${card.name} (${db.sets[card.set].arenacode}) ${card.cid}`;
+  const arenaCode = `1 ${card.name} (${db.sets[card.set].arenacode}) ${
+    card.cid
+  }`;
   div.addEventListener(
     "contextmenu",
-    e => {
+    (e: Event) => {
       e.preventDefault();
-      let menu = new Menu();
-      let menuItem = new MenuItem({
+      const menu = new Menu();
+      const menuItem = new MenuItem({
         label: "Copy Arena code",
-        click: () => {
+        click: (): void => {
           remote.clipboard.writeText(arenaCode);
         }
       });
       menu.append(menuItem);
-      menu.popup(remote.getCurrentWindow());
+      menu.popup();
     },
     false
   );
 }
 
-//
-function printCollectionPage(page = 0) {
+function openCollectionPage(page = 0): void {
   collectionPage = page;
-  printCards();
+  renderCardsTable();
 }
