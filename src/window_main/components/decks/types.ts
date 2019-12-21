@@ -60,7 +60,6 @@ export interface DecksTableProps {
 
 export interface CellProps {
   cell: any;
-  openDeckCallback: (id: string) => void;
   archiveDeckCallback: (id: string) => void;
   tagDeckCallback: (deckid: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
@@ -69,6 +68,7 @@ export interface CellProps {
 
 export interface StyledArtTileCellProps {
   url: string;
+  className?: string;
 }
 
 export interface StyledTagProps {

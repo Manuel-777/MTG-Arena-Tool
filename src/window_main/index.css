@@ -3820,3 +3820,18 @@ a:hover {
 .inventory_card_quantity {
     color: var(--color-light);
 }
+
+.sort_asc {
+    background-image: url(../images/icon_sort.png);
+    background-size: cover;
+    width: 16px;
+    height: 16px;
+}
+
+.sort_desc {
+    background-image: url(../images/icon_sort.png);
+    background-size: cover;
+    transform: rotate(180deg);
+    width: 16px;
+    height: 16px;
+}

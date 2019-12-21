@@ -32,9 +32,7 @@ const StyledArtTileHeader = styled.div`
   margin: 0;
 `;
 
-const StyledArtTileCell = styled(StyledArtTileHeader)<StyledArtTileCellProps>`
-  cursor: pointer;
-  background-image: url("${(props): string => props.url}");
+const StyledArtTile = styled(StyledArtTileHeader)`
   background-size: 200px;
   background-position-x: center;
   background-position-y: -10px;
@@ -71,29 +69,26 @@ const StyledArtTileCell = styled(StyledArtTileHeader)<StyledArtTileCellProps>`
   }
 `;
 
+export function StyledArtTileCell({
+  url,
+  ...otherProps
+}: StyledArtTileCellProps): JSX.Element {
+  return (
+    <StyledArtTile
+      style={{ backgroundImage: `url("${url}")` }}
+      {...otherProps}
+    />
+  );
+}
+
 export function ArtTileHeader(): JSX.Element {
   return <StyledArtTileHeader />;
 }
 
-export function ArtTileCell({
-  cell,
-  openDeckCallback
-}: CellProps): JSX.Element {
-  const data = cell.row.values;
-  const [isHovered, setHovered] = useState(false);
+export function ArtTileCell({ cell }: CellProps): JSX.Element {
   return (
-    <CSSTransition
-      classNames="deckTileHover"
-      in={!!isHovered}
-      timeout={200}
-      onMouseEnter={(): void => setHovered(true)}
-      onMouseLeave={(): void => setHovered(false)}
-    >
-      <StyledArtTileCell
-        url={getCardArtCrop(cell.value)}
-        title={`show ${data.name} details`}
-        onClick={(): void => openDeckCallback(data.deckId)}
-      />
+    <CSSTransition classNames="deckTileHover" in={!!cell.hover} timeout={200}>
+      <StyledArtTileCell url={getCardArtCrop(cell.value)} />
     </CSSTransition>
   );
 }
@@ -136,8 +131,7 @@ const LabelText = styled.div`
   text-align: left;
 `;
 
-export function NameCell({ cell, openDeckCallback }: CellProps): JSX.Element {
-  const data = cell.row.values;
+export function NameCell({ cell }: CellProps): JSX.Element {
   let displayName = cell.value;
   if (displayName.includes("?=?Loc/Decks/Precon/")) {
     displayName = displayName.replace("?=?Loc/Decks/Precon/", "");
@@ -145,14 +139,7 @@ export function NameCell({ cell, openDeckCallback }: CellProps): JSX.Element {
   if (displayName.length > 25) {
     displayName = displayName.slice(0, 22) + "...";
   }
-  return (
-    <LabelText
-      title={`show ${cell.value} details`}
-      onClick={(): void => openDeckCallback(data.deckId)}
-    >
-      {displayName}
-    </LabelText>
-  );
+  return <LabelText>{displayName}</LabelText>;
 }
 
 export const MetricText = styled.div`
@@ -249,7 +236,7 @@ const StyledTag = styled.div<StyledTagProps>`
   cursor: pointer;
   color: black;
   font-size: 13px;
-  opacity: 1;
+  opacity: 0.8;
   margin-right: 12px;
   margin-bottom: 4px;
   height: 20px;
@@ -264,6 +251,9 @@ const StyledTag = styled.div<StyledTagProps>`
   font-style: ${({ fontStyle }): string => fontStyle};
   :last-child {
     margin-right: 0;
+  }
+  &:hover {
+    opacity: 1;
   }
 `;
 
@@ -311,6 +301,7 @@ function DeckTag({
       backgroundColor={backgroundColor}
       fontStyle={"normal"}
       ref={containerRef}
+      title={"change tag color"}
       onClick={useColorpicker(
         containerRef,
         tag,
@@ -321,6 +312,7 @@ function DeckTag({
       {tag}
       <div
         className={"deck_tag_close"}
+        title={"delete tag"}
         onClick={(e): void => {
           e.stopPropagation();
           deleteTagCallback(deckid, tag);
@@ -339,6 +331,7 @@ export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
         backgroundColor={backgroundColor}
         fontStyle={"italic"}
         ref={containerRef}
+        title={"change tag color"}
         onClick={useColorpicker(
           containerRef,
           cell.value,
@@ -409,6 +402,7 @@ export function TagsCell({
         backgroundColor={backgroundColor}
         style={{ opacity: 0.6 }}
         fontStyle={"italic"}
+        title={"add new tag"}
         onClick={clickHandler}
       >
         Add
@@ -458,15 +452,19 @@ export function MissingCardsCell({ cell }: CellProps): JSX.Element {
 }
 
 const StyledArchiveDiv = styled.div`
-  display: inline-block;
+  border-radius: 50%;
   cursor: pointer;
   width: 32px;
   min-height: 32px;
-  margin-left: 8px;
+  margin: auto;
   overflow: hidden;
   background: url(../images/show.png) no-repeat left;
   -webkit-transition: all 0.25s cubic-bezier(0.2, 0.5, 0.35, 1);
   vertical-align: middle;
+  opacity: 0.8;
+  &:hover {
+    opacity: 1;
+  }
 `;
 
 export function ArchiveHeader(): JSX.Element {
@@ -499,7 +497,9 @@ export function ArchivedCell({
     <StyledArchivedCell
       archived={isArchived}
       title={isArchived ? "restore" : "archive (will not delete data)"}
-      onClick={(): void => {
+      onClick={(e): void => {
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
         archiveDeckCallback(data.deckId);
       }}
     />

@@ -44,9 +44,6 @@ const StyledDecksTable = styled.div`
       background-color: rgba(0, 0, 0, 0);
       -webkit-transition: all 0.2s ease-in;
     }
-    tr:hover {
-      background-color: rgba(0, 0, 0, 0.25);
-    }
     th,
     td {
       color: var(--color-light);
@@ -56,6 +53,10 @@ const StyledDecksTable = styled.div`
       :last-child {
         padding-right: 0;
       }
+    }
+    th:hover {
+      background-color: rgba(0, 0, 0, 0.25);
+      cursor: pointer;
     }
     th.alignLeft,
     td.alignLeft {
@@ -77,6 +78,7 @@ export default function DecksTable({
   filterMatchesCallback,
   tableStateCallback,
   cachedState,
+  openDeckCallback,
   ...cellCallbacks
 }: DecksTableProps): JSX.Element {
   const CellWrapper = (
@@ -100,6 +102,7 @@ export default function DecksTable({
         disableFilters: false,
         filter: "uberSearch",
         Filter: TextBoxFilter,
+        minWidth: 200,
         disableSortBy: true,
         Cell: CellWrapper(ArtTileCell)
       },
@@ -118,6 +121,7 @@ export default function DecksTable({
         accessor: "colorSortVal",
         Filter: ColorColumnFilter,
         filter: "colors",
+        minWidth: 170,
         Cell: ColorsCell
       },
       { accessor: "colors" },
@@ -230,6 +234,7 @@ export default function DecksTable({
         accessor: "archivedSortVal",
         filter: "showArchived",
         Filter: ArchiveColumnFilter,
+        minWidth: 98,
         disableFilters: false,
         Cell: CellWrapper(ArchivedCell),
         sortType: "basic"
@@ -246,38 +251,41 @@ export default function DecksTable({
     }),
     []
   );
-  const initialState: DecksTableState = React.useMemo(
-    () =>
-      _.defaultsDeep(cachedState, {
-        hiddenColumns: [
-          "deckId",
-          "custom",
-          "boosterCost",
-          "colors",
-          "lastEditLosses",
-          "lastEditTotal",
-          "lastEditWinrate",
-          "lastEditWins",
-          "timePlayed",
-          "timeUpdated",
-          "wins",
-          "losses",
-          "total",
-          "rare",
-          "common",
-          "uncommon",
-          "mythic",
-          "duration",
-          "avgDuration",
-          "interval",
-          "winrate",
-          "winrateLow",
-          "winrateHigh"
-        ],
-        sortBy: [{ id: "timeTouched", desc: true }]
-      }),
-    [cachedState]
-  );
+  const initialState: DecksTableState = React.useMemo(() => {
+    const state = _.defaultsDeep(cachedState, {
+      hiddenColumns: [
+        "archived",
+        "deckId",
+        "custom",
+        "boosterCost",
+        "colors",
+        "lastEditLosses",
+        "lastEditTotal",
+        "lastEditWinrate",
+        "lastEditWins",
+        "timePlayed",
+        "timeUpdated",
+        "wins",
+        "losses",
+        "total",
+        "rare",
+        "common",
+        "uncommon",
+        "mythic",
+        "duration",
+        "avgDuration",
+        "interval",
+        "winrate",
+        "winrateLow",
+        "winrateHigh"
+      ],
+      sortBy: [{ id: "timeTouched", desc: true }]
+    });
+    if (!state.hiddenColumns.includes("archived")) {
+      state.hiddenColumns.push("archived");
+    }
+    return state;
+  }, [cachedState]);
 
   const {
     flatColumns,
@@ -325,7 +333,8 @@ export default function DecksTable({
     "tags",
     "total",
     "winrate100",
-    "wins"
+    "wins",
+    "archivedCol"
   ];
 
   const toggleableColumns = flatColumns.filter((column: any) =>
@@ -359,6 +368,19 @@ export default function DecksTable({
   const isLeftAlignCol = (id: string): boolean =>
     ["deckTileId", "name", "tags"].includes(id);
 
+  const recentFilters = (): { id: string; value: any }[] => [
+    { id: "archivedCol", value: "hideArchived" }
+  ];
+  const bestFilters = (): { id: string; value: any }[] => [
+    { id: "archivedCol", value: "hideArchived" },
+    { id: "wins", value: [5, undefined] },
+    { id: "winrate100", value: [50, undefined] }
+  ];
+  const wantedFilters = (): { id: string; value: any }[] => [
+    { id: "archivedCol", value: "hideArchived" },
+    { id: "boosterCost", value: [1, undefined] }
+  ];
+
   return (
     <>
       <div
@@ -377,7 +399,7 @@ export default function DecksTable({
         <span style={{ paddingBottom: "8px" }}>Presets:</span>
         <PresetButton
           onClick={(): void => {
-            setAllFilters({ archivedCol: "hideArchived" });
+            setAllFilters(recentFilters);
             setFiltersVisible(initialFiltersVisible);
             toggleSortBy("timeTouched", true);
             for (const columnId of toggleableIds) {
@@ -396,11 +418,7 @@ export default function DecksTable({
         </PresetButton>
         <PresetButton
           onClick={(): void => {
-            setAllFilters({
-              archivedCol: "hideArchived",
-              wins: [5, undefined],
-              winrate100: [50, undefined]
-            });
+            setAllFilters(bestFilters);
             setFiltersVisible({
               ...initialFiltersVisible,
               wins: true,
@@ -424,10 +442,7 @@ export default function DecksTable({
         </PresetButton>
         <PresetButton
           onClick={(): void => {
-            setAllFilters({
-              archivedCol: "hideArchived",
-              boosterCost: [1, undefined]
-            });
+            setAllFilters(wantedFilters);
             setFiltersVisible({ ...initialFiltersVisible, boosterCost: true });
             toggleSortBy("boosterCost", true);
             for (const columnId of toggleableIds) {
@@ -454,9 +469,7 @@ export default function DecksTable({
         {togglesVisible &&
           toggleableColumns.map((column: any) => (
             <StyledCheckboxContainer key={column.id}>
-              {column.id === "colorSortVal"
-                ? "Colors"
-                : column.render("Header")}
+              {column.render("Header")}
               <input type="checkbox" {...column.getToggleHiddenProps()} />
               <span className={"checkmark"} />
             </StyledCheckboxContainer>
@@ -472,6 +485,11 @@ export default function DecksTable({
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className={"hover_label"}
                     key={column.id}
+                    style={
+                      column.minWidth
+                        ? { minWidth: column.minWidth + "px" }
+                        : undefined
+                    }
                   >
                     <div
                       style={{
@@ -482,15 +500,15 @@ export default function DecksTable({
                       }}
                     >
                       <div
-                        className={"flex_item"}
-                        style={{ marginRight: "4px" }}
-                      >
-                        {column.isSorted
-                          ? column.isSortedDesc
-                            ? "🔽"
-                            : "🔼"
-                          : ""}
-                      </div>
+                        className={
+                          column.isSorted
+                            ? column.isSortedDesc
+                              ? " sort_desc"
+                              : " sort_asc"
+                            : ""
+                        }
+                        style={{ marginRight: "4px", width: "16px" }}
+                      />
                       <div className={"flex_item"}>
                         {column.render("Header")}
                       </div>
@@ -532,7 +550,6 @@ export default function DecksTable({
                         onClick={(e): void => e.stopPropagation()}
                         style={{
                           paddingTop: "4px",
-                          width: "100%",
                           display: "flex",
                           justifyContent: isLeftAlignCol(column.id)
                             ? "flex-start"
@@ -540,7 +557,17 @@ export default function DecksTable({
                         }}
                         title={"filter column"}
                       >
-                        <div className={"flex_item"}>
+                        <div
+                          className={"flex_item"}
+                          style={{
+                            width:
+                              column.filterValue && column.id === "deckTileId"
+                                ? "calc(100% - 34px)"
+                                : "100%",
+                            flexWrap: "wrap",
+                            marginRight: "4px"
+                          }}
+                        >
                           {column.render("Filter")}
                         </div>
                         {column.filterValue && column.id === "deckTileId" && (
@@ -567,23 +594,66 @@ export default function DecksTable({
             {rows.map((row: any) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} key={row.index}>
-                  {row.cells.map((cell: any) => {
-                    return (
-                      <td
-                        {...cell.getCellProps()}
-                        key={cell.column.id + "_" + row.index}
-                      >
-                        {cell.render("Cell")}
-                      </td>
-                    );
-                  })}
-                </tr>
+                <RowContainer
+                  openDeckCallback={openDeckCallback}
+                  row={row}
+                  key={row.index}
+                />
               );
             })}
           </tbody>
         </table>
       </StyledDecksTable>
     </>
+  );
+}
+
+const StyledTableRow = styled.tr`
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+  }
+`;
+
+function RowContainer({
+  row,
+  openDeckCallback
+}: {
+  row: any;
+  openDeckCallback: (id: string) => void;
+}): JSX.Element {
+  const [hover, setHover] = React.useState(false);
+
+  const mouseEnter = React.useCallback(() => {
+    setHover(true);
+  }, []);
+
+  const mouseLeave = React.useCallback(() => {
+    setHover(false);
+  }, []);
+
+  const mouseClick = React.useCallback(() => {
+    openDeckCallback(row.values.deckId);
+  }, []);
+
+  return (
+    <StyledTableRow
+      onMouseEnter={mouseEnter}
+      onMouseLeave={mouseLeave}
+      onClick={mouseClick}
+    >
+      {row.cells.map((cell: any) => {
+        cell.hover = hover;
+        return (
+          <td
+            {...cell.getCellProps()}
+            key={cell.column.id + "_" + row.index}
+            title={`show ${row.values.name} details`}
+          >
+            {cell.render("Cell")}
+          </td>
+        );
+      })}
+    </StyledTableRow>
   );
 }
