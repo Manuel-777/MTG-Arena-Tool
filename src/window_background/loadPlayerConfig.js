@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { shell } from "electron";
 
-import { IPC_BACKGROUND } from "../shared/constants";
+import { IPC_BACKGROUND, IPC_OVERLAY } from "../shared/constants";
 
 import { ipc_send as ipcSend, setData } from "./background-util";
 import globals from "./globals";
@@ -42,6 +42,13 @@ export async function loadPlayerConfig(playerId) {
   setData(__playerData, true);
   ipcSend("renderer_set_bounds", __playerData.windowBounds);
   syncSettings(settings, true);
+
+  // populate draft overlays with last draft if possible
+  if (playerData.draftList.length) {
+    const lastDraft = playerData.draftList[playerData.draftList.length - 1];
+    ipcSend("set_draft_cards", lastDraft, IPC_OVERLAY);
+  }
+
   ipcLog("...found all documents in player database.");
   ipcPop({ text: "Player history loaded.", time: 3000, progress: -1 });
 
