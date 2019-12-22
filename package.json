@@ -52,10 +52,10 @@
   },
   "scripts": {
     "clean": "npm run clean:lib || npm run clean:dist || npm run clean:modules",
-    "clean:modules": "rm -rf node_modules",
-    "clean:lib": "rm -rf lib",
-    "clean:dist": "rm -rf dist",
-    "postinstall": "rm -rf node_modules/@types/react-native",
+    "clean:modules": "rimraf node_modules",
+    "clean:lib": "rimraf lib",
+    "clean:dist": "rimraf dist",
+    "postinstall": "rimraf node_modules/@types/react-native",
     "prebuild": "npm run clean:lib",
     "build": "babel src --extensions \".ts,.tsx,.js,.jsx\" --out-dir lib --copy-files",
     "start": "npm run build && electron .",
@@ -146,6 +146,7 @@
     "eslint-plugin-react": "^7.17.0",
     "jest": "^24.9.0",
     "prettier": "1.19.1",
+    "rimraf": "^3.0.0",
     "typescript": "^3.7.3"
   }
 }
