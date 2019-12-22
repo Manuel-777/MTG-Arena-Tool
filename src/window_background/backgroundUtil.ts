@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Utility functions that belong only to background
 import { ipcRenderer as ipc } from "electron";
 
@@ -7,6 +8,15 @@ import isValid from "date-fns/isValid";
 import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY } from "../shared/constants";
 import playerData from "../shared/player-data.js";
 import globals from "./globals";
+
+// Begin of IPC messages recievers
+export function ipc_send(method: string, arg?: any, to = IPC_MAIN): void {
+  if (method == "ipc_log") {
+    //
+  }
+  //console.log("IPC SEND", method, arg, to);
+  ipc.send("ipc_switch", method, IPC_BACKGROUND, arg, to);
+}
 
 // These were tested briefly
 // They are all taken from logs
@@ -28,14 +38,30 @@ class DateParseError extends Error {
   }
 }
 
+function isValidDate(date: Date): boolean {
+  return isValid(date) && !isNaN(date.getTime());
+}
+
+export function getDateFormat(dateStr: string): string | undefined {
+  if (playerData.settings.log_locale_format) {
+    // return the players setting
+    return playerData.settings.log_locale_format;
+  } else {
+    // return the first date format which parses
+    // the string returning a valid date
+    return dateFormats.find(dateFormat => {
+      return isValidDate(parse(dateStr, dateFormat, new Date()));
+    });
+  }
+}
+
 // Parse the localised date string using local format
 // or attempted detection
 // This must throw an error if it fails
 // Calling code should notify user or fallback as requested.
 // The original date string should always be kept as backup.
 // Use parseWotcTimeFallback for non-important dates.
-
-export function parseWotcTime(dateStr: string) {
+export function parseWotcTime(dateStr: string): Date {
   // This must throw an error if it fails
 
   const dateFormat = getDateFormat(dateStr);
@@ -61,7 +87,7 @@ export function parseWotcTime(dateStr: string) {
 // Ignore date parsing errors and return `new Date()`
 // All other errors should still be passed upwards.
 // New code should preferentially use parseWotcTime and handle their own errors.
-export function parseWotcTimeFallback(dateStr: string) {
+export function parseWotcTimeFallback(dateStr: string): Date {
   try {
     return parseWotcTime(dateStr);
   } catch (e) {
@@ -77,7 +103,7 @@ export function parseWotcTimeFallback(dateStr: string) {
   }
 }
 
-export function updateLoading(entry: any) {
+export function updateLoading(entry: any): void {
   if (globals.firstPass) {
     const completion = entry.position / entry.size;
     ipc_send("popup", {
@@ -88,24 +114,7 @@ export function updateLoading(entry: any) {
   }
 }
 
-function isValidDate(date: Date) {
-  return isValid(date) && !isNaN(date.getTime());
-}
-
-export function getDateFormat(dateStr: string) {
-  if (playerData.settings.log_locale_format) {
-    // return the players setting
-    return playerData.settings.log_locale_format;
-  } else {
-    // return the first date format which parses
-    // the string returning a valid date
-    return dateFormats.find(dateFormat => {
-      return isValidDate(parse(dateStr, dateFormat, new Date()));
-    });
-  }
-}
-
-export function normaliseFields(iterator: any) {
+export function normaliseFields(iterator: any): any {
   if (typeof iterator == "object") {
     return _.transform(iterator, function(result: any, value, key: string) {
       const nkey =
@@ -116,17 +125,8 @@ export function normaliseFields(iterator: any) {
   }
 }
 
-export function unleakString(s: string) {
+export function unleakString(s: string): string {
   return (" " + s).substr(1);
-}
-
-// Begin of IPC messages recievers
-export function ipc_send(method: string, arg?: any, to = IPC_MAIN) {
-  if (method == "ipc_log") {
-    //
-  }
-  //console.log("IPC SEND", method, arg, to);
-  ipc.send("ipc_switch", method, IPC_BACKGROUND, arg, to);
 }
 
 const dataBlacklist = [
@@ -154,7 +154,7 @@ const overlayWhitelist = [
 export function setData(
   data: any,
   refresh = globals.debugLog || !globals.firstPass
-) {
+): void {
   const cleanData = _.omit(data, dataBlacklist);
 
   playerData.handleSetData(null, JSON.stringify(cleanData));
