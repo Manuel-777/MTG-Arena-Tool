@@ -105,10 +105,10 @@ export function getDateFormat(dateStr: string) {
   }
 }
 
-export function normaliseFields(iterator:any) {
+export function normaliseFields(iterator: any) {
   if (typeof iterator == "object") {
     return _.transform(iterator, function(result: any, value, key: string) {
-      let nkey =
+      const nkey =
         typeof key == "string" ? key.replace(/List$/, "").toLowerCase() : key;
       result[nkey] = normaliseFields(value);
     });
