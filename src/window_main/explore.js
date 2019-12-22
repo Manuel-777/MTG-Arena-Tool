@@ -33,7 +33,7 @@ import {
   formatWinrateInterval
 } from "./renderer-util";
 import { openDeck } from "./deck-details";
-import { normalApproximationInterval } from "../shared/stats-fns";
+import { normalApproximationInterval } from "../shared/statsFns";
 
 // default values for cached local state
 const defaultData = {

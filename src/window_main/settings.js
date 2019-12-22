@@ -33,7 +33,7 @@ import {
   createLabel,
   queryElements as $$
 } from "../shared/dom-fns";
-import * as deckDrawer from "../shared/deck-drawer";
+import * as deckDrawer from "./DeckDrawer";
 import { showWhatsNew } from "./whats-new";
 import createSelect from "./createSelect";
 import { getCardImage } from "../shared/util";

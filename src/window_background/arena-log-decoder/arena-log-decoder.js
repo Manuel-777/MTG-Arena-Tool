@@ -1,6 +1,6 @@
 import _ from "lodash";
-import nthLastIndexOf from "./nth-last-index-of";
-import * as jsonText from "./json-text";
+import nthLastIndexOf from "./nthLastIndexOf";
+import * as jsonText from "./jsonText";
 import sha1 from "js-sha1";
 
 const LABEL_JSON_PATTERNS = [
@@ -126,7 +126,7 @@ function parseLogEntry(text, matchText, position, absPosition) {
     ];
   }
 
-  for (let pattern of LABEL_JSON_PATTERNS) {
+  for (const pattern of LABEL_JSON_PATTERNS) {
     rematches = matchText.match(pattern);
     if (!rematches) continue;
 

@@ -4,7 +4,7 @@ import { MANA, CARD_RARITIES, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
 import pd from "../shared/player-data";
 import { createDiv, createSpan, queryElements as $$ } from "../shared/dom-fns";
-import * as deckDrawer from "../shared/deck-drawer";
+import * as deckDrawer from "./DeckDrawer";
 import {
   deckManaCurve,
   deckTypesStats,

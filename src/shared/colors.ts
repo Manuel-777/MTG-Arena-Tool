@@ -141,6 +141,89 @@ class Colors {
       this.g == color.g
     );
   }
+
+  getColorArchetype() {
+    const colorFlags = {
+      NONE: 0,
+      W: 1,
+      U: 2,
+      B: 4,
+      R: 8,
+      G: 16
+    };
+
+    var currentColorFlags: number = colorFlags.NONE;
+    if (this.w) currentColorFlags |= colorFlags.W;
+    if (this.u) currentColorFlags |= colorFlags.U;
+    if (this.b) currentColorFlags |= colorFlags.B;
+    if (this.r) currentColorFlags |= colorFlags.R;
+    if (this.g) currentColorFlags |= colorFlags.G;
+
+    switch (currentColorFlags) {
+      case 1:
+        return "Mono White";
+      case 2:
+        return "Mono Blue";
+      case 3: //wu
+        return "Azorius";
+      case 4:
+        return "Mono Black";
+      case 5: //wb
+        return "Orzhov";
+      case 6: //ub
+        return "Dimir";
+      case 7: //wub
+        return "Esper";
+      case 8:
+        return "Mono Red";
+      case 9: //wr
+        return "Boros";
+      case 10: //ur
+        return "Izzet";
+      case 11: //wur
+        return "Jeskai";
+      case 12: //br
+        return "Rakdos";
+      case 13: //wbr
+        return "Mardu";
+      case 14: //ubr
+        return "Grixis";
+      case 15: //wubr
+        return "WUBR";
+      case 16:
+        return "Mono Green";
+      case 17: //wg
+        return "Selesnya";
+      case 18: //ug
+        return "Simic";
+      case 19: //wug
+        return "Bant";
+      case 20: //bg
+        return "Golgari";
+      case 21: //wbg
+        return "Abzan";
+      case 22: //ubg
+        return "Sultai";
+      case 23: //wubg
+        return "WUBG";
+      case 24: //rg
+        return "Gruul";
+      case 25: //wrg
+        return "Naya";
+      case 26: //urg
+        return "Temur";
+      case 27: //wurg
+        return "WURG";
+      case 28: //brg
+        return "Jund";
+      case 29: //wbrg
+        return "WBRG";
+      case 30: //ubrg
+        return "UBRG";
+      case 31:
+        return "5-color";
+    }
+  }
 }
 
 export default Colors;

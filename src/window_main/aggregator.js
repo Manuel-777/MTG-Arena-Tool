@@ -22,7 +22,7 @@ import {
   get_deck_missing,
   getBoosterCountEstimate
 } from "../shared/util";
-import { normalApproximationInterval } from "../shared/stats-fns";
+import { normalApproximationInterval } from "../shared/statsFns";
 // Default filter values
 const DEFAULT_DECK = "All Decks";
 const DEFAULT_EVENT = "All Events";

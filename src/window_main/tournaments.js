@@ -1,7 +1,7 @@
 import anime from "animejs";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
 import createSelect from "./createSelect";
-import * as deckDrawer from "../shared/deck-drawer";
+import * as deckDrawer from "./DeckDrawer";
 import { EASING_DEFAULT } from "../shared/constants.js";
 import {
   compare_cards,
