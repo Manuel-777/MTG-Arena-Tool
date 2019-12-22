@@ -1,11 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import db from "./database";
-import { createDiv } from "./dom-fns";
-import CardTile, { CardTileProps } from "./CardTile";
-import Deck from "./deck";
-import { DbCardData } from "./types/Metadata";
+import db from "../shared/database";
+import { createDiv } from "../shared/dom-fns";
+import CardTile, { CardTileProps } from "../shared/CardTile";
+import Deck from "../shared/deck";
+import { DbCardData } from "../shared/types/Metadata";
 
 export const cardSeparator = function(str: string) {
   return createDiv(["card_tile_separator"], str);
