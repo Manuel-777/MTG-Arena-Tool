@@ -8,7 +8,7 @@ import db from "../shared/database";
 import pd from "../shared/player-data";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
 import createSelect from "./createSelect";
-import { addCardHover, attachOwnerhipStars } from "../shared/card-hover";
+import { addCardHover, attachOwnerhipStars } from "../shared/cardHover";
 import {
   collectionSortRarity,
   getCardImage,

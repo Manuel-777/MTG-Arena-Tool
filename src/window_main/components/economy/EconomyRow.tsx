@@ -17,7 +17,7 @@ import {
   getCardArtCrop
 } from "../../../shared/util";
 
-import { addCardHover } from "../../../shared/card-hover";
+import { addCardHover } from "../../../shared/cardHover";
 
 import React, { useState } from "react";
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
@@ -434,7 +434,7 @@ interface InventoryCardProps {
 
 function InventoryCard(props: InventoryCardProps) {
   const { card, isAetherized, quantity } = props;
-  const inventoryCardRef = React.useRef(null);
+  const inventoryCardRef = React.useRef<HTMLDivElement>(null);
   const onCardClick = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const lookupCard = card.dfc == "SplitHalf" ? db.card(card.dfcId) : card;
@@ -446,7 +446,7 @@ function InventoryCard(props: InventoryCardProps) {
 
   React.useEffect(() => {
     if (inventoryCardRef) {
-      addCardHover(inventoryCardRef.current, card);
+      addCardHover(inventoryCardRef.current as HTMLElement, card);
     }
   });
 
