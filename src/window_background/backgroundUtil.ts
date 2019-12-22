@@ -105,20 +105,15 @@ export function getDateFormat(dateStr: string) {
   }
 }
 
-export function normaliseFields(iterator: any) {
-  if (typeof iterator !== "object") {
+export function normaliseFields(iterator:any) {
+  if (typeof iterator == "object") {
+    return _.transform(iterator, function(result: any, value, key: string) {
+      let nkey =
+        typeof key == "string" ? key.replace(/List$/, "").toLowerCase() : key;
+      result[nkey] = normaliseFields(value);
+    });
     return iterator;
   }
-
-  let ret = _.transform(iterator, function(
-    result: { [key: number]: any },
-    value,
-    key
-  ) {
-    result[key] = normaliseFields(value);
-  });
-
-  return ret;
 }
 
 export function unleakString(s: string) {
