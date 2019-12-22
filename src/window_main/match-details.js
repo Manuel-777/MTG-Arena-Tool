@@ -7,7 +7,7 @@ import { MANA, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
 import pd from "../shared/player-data";
 import { createDiv, queryElements as $$ } from "../shared/dom-fns";
-import * as deckDrawer from "../shared/DeckDrawer";
+import * as deckDrawer from "./DeckDrawer";
 import {
   get_deck_export,
   get_deck_export_txt,
