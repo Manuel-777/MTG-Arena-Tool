@@ -3,7 +3,7 @@ import { createDiv, queryElements } from "../shared/dom-fns";
 import { openDialog } from "./renderer-util";
 
 // We should clear this on releases and fill as we add new features
-const screens = [];
+const screens: { image: string; title: string; description: string }[] = [];
 
 let selectedScreen = 0;
 let screenoffset = (screens.length - 1) * 50;
@@ -28,18 +28,12 @@ export function showWhatsNew() {
 
   let scrollerPosCont = createDiv(["wnew_scroller_pos_cont"]);
 
-  let prev, next;
-  if (screens.length > 1) {
-    prev = createDiv(["wnew_prev"]);
-    next = createDiv(["wnew_next"]);
-  }
-
   screens.forEach((sc, index) => {
     let imageCont = createDiv(["wnew_image_cont"]);
     let image = createDiv(["wnew_image"]);
     image.style.backgroundImage = `url(../images/new/${sc.image})`;
     let imageTitle = createDiv(["wnew_image_title"], sc.title);
-    let imageDesc = createDiv(["wnew_image_desc"], sc.desciption);
+    let imageDesc = createDiv(["wnew_image_desc"], sc.description);
 
     imageCont.appendChild(imageTitle);
     imageCont.appendChild(image);
@@ -55,7 +49,7 @@ export function showWhatsNew() {
     }
   });
 
-  let updateScroller = function() {
+  let updateScroller = function () {
     let scrollerContainer = queryElements(".wnew_scroller")[0];
     scrollerContainer.style.left = screenoffset + selectedScreen * -100 + "%";
 
@@ -75,6 +69,9 @@ export function showWhatsNew() {
   cont.appendChild(scrollerPosCont);
 
   if (screens.length > 1) {
+    const prev = createDiv(["wnew_prev"]);
+    const next = createDiv(["wnew_next"]);
+
     prev.addEventListener("click", () => {
       selectedScreen -= 1;
       if (selectedScreen < 0) selectedScreen = screens.length - 1;
