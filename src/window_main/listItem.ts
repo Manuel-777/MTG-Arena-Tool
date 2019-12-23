@@ -25,7 +25,7 @@ class ListItem {
     grpId: number,
     id: any,
     onClick: (id: any) => void,
-    onDelete: (id: any) => void,
+    onDelete = (id: any) => {},
     isArchived = false
   ) {
     this.onClickCallback = onClick;
