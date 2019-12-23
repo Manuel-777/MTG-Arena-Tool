@@ -10,7 +10,8 @@ let screenoffset = (screens.length - 1) * 50;
 
 export function showWhatsNew() {
   // Only show if we actually do have stuff to show
-  if (screens.length == 0) return;
+  if (screens.length === 0) return;
+
   const cont = createDiv(["dialog_content"]);
   cont.style.width = "60vw";
   cont.style.height = "80vh";
@@ -44,12 +45,12 @@ export function showWhatsNew() {
     let posBall = createDiv(["wnew_pos_ball", pName]);
     scrollerPosCont.appendChild(posBall);
 
-    if (selectedScreen == index) {
+    if (selectedScreen === index) {
       posBall.classList.toggle("wnew_pos_ball_selected");
     }
   });
 
-  let updateScroller = function () {
+  let updateScroller = function() {
     let scrollerContainer = queryElements(".wnew_scroller")[0];
     scrollerContainer.style.left = screenoffset + selectedScreen * -100 + "%";
 
