@@ -1,7 +1,7 @@
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import compareAsc from "date-fns/compareAsc";
 import pd from "../shared/player-data";
-import DataScroller from "./data-scroller";
+import DataScroller from "./dataScroller";
 import { resetMainContainer } from "./renderer-util";
 import { createEconomyHeader } from "./components/economy/EconomyHeader";
 import { createDayHeader } from "./components/economy/EconomyDayHeader";

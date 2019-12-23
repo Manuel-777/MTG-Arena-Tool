@@ -6,28 +6,46 @@ import {
 } from "./renderer-util";
 
 class DataScroller {
-  constructor(container, renderData, loadAmount, maxDataIndex) {
+  private container: HTMLElement;
+  private renderData: (container: any, index: any) => number;
+  private loadAmount: number;
+  private maxDataIndex: number;
+  private loaded: number;
+  private dataIndex: number;
+
+  constructor(
+    container: HTMLElement,
+    renderData: (container: HTMLElement, index: number) => number,
+    loadAmount = 20,
+    maxDataIndex = 0
+  ) {
     this.container = container;
     this.renderData = renderData;
-    this.loadAmount = loadAmount || 20;
-    this.maxDataIndex = maxDataIndex || 0;
+    this.loadAmount = loadAmount;
+    this.maxDataIndex = maxDataIndex;
     this.renderRows = this.renderRows.bind(this);
+
+    this.loaded = 0;
+    this.dataIndex = 0;
+
     return this;
   }
 
-  render(loadMore, scrollTop) {
+  render(loadMore: number, scrollTop: number) {
     const d = createDiv(["list_fill"]);
     this.container.appendChild(d);
     this.loaded = 0;
     this.dataIndex = 0;
 
-    this.renderRows(loadMore || this.loadAmount);
+    this.renderRows(loadMore === 0 ? this.loadAmount : loadMore);
 
-    if (scrollTop) {
-      this.container.scrollTop = scrollTop;
-    }
+    this.container.scrollTop = scrollTop;
+
     const handler = () => {
-      const newLs = {};
+      const newLs: { lastDataIndex: number; lastScrollTop: number } = {
+        lastDataIndex: 0,
+        lastScrollTop: 0
+      };
       const desiredHeight = Math.round(
         this.container.scrollTop + this.container.offsetHeight
       );
@@ -42,7 +60,7 @@ class DataScroller {
     setLocalState({ lastScrollHandler: handler });
   }
 
-  renderRows(loadMore) {
+  renderRows(loadMore: number) {
     showLoadingBars();
     const loadEnd = this.loaded + loadMore;
     while (this.loaded < loadEnd && this.dataIndex < this.maxDataIndex) {
