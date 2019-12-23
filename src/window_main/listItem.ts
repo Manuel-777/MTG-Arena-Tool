@@ -2,8 +2,6 @@ import { getCardArtCrop } from "../shared/util";
 import { createDiv } from "../shared/dom-fns";
 
 class ListItem {
-  private onClickCallback: (id: any) => void;
-  private onDeleteCallback: (id: any) => void;
   private id: any;
   private container: HTMLDivElement;
   private left: HTMLDivElement;
@@ -25,12 +23,9 @@ class ListItem {
     grpId: number,
     id: any,
     onClick: (id: any) => void,
-    onDelete = (id: any) => {},
+    onDelete?: (id: any) => void,
     isArchived = false
   ) {
-    this.onClickCallback = onClick;
-    this.onDeleteCallback = onDelete;
-
     this.id = id;
 
     this.container = createDiv(["list_item_container", id]);
@@ -54,16 +49,18 @@ class ListItem {
 
     // Add event listeners
     // All of these should be stored and removed when we 'unmount' the class
-    this.container.appendChild(this.deleteButton);
-    this.deleteButton.addEventListener("click", (e: any) => {
-      e.stopPropagation();
-      this.onDeleteCallback(this.id);
-      if (!isArchived) {
-        this.container.style.height = "0px";
-        this.container.style.overflow = "hidden";
-      }
-      this.deleteButton.classList.add("hidden");
-    });
+    if (onDelete !== undefined) {
+      this.container.appendChild(this.deleteButton);
+      this.deleteButton.addEventListener("click", (e: any) => {
+        e.stopPropagation();
+        onDelete(this.id);
+        if (!isArchived) {
+          this.container.style.height = "0px";
+          this.container.style.overflow = "hidden";
+        }
+        this.deleteButton.classList.add("hidden");
+      });
+    }
 
     this.imageContainer.style.opacity = "0.66";
     this.imageContainer.style.width = "128px";
@@ -81,7 +78,7 @@ class ListItem {
     });
 
     this.container.addEventListener("click", () => {
-      this.onClickCallback(this.id);
+      onClick(this.id);
     });
 
     this.leftTop = createDiv(["flex_top"]);
