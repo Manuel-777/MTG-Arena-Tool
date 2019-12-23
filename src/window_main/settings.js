@@ -34,7 +34,7 @@ import {
   queryElements as $$
 } from "../shared/dom-fns";
 import * as deckDrawer from "./DeckDrawer";
-import { showWhatsNew } from "./whats-new";
+import { showWhatsNew } from "./whatsNew";
 import createSelect from "./createSelect";
 import { getCardImage } from "../shared/util";
 const byId = id => document.getElementById(id);

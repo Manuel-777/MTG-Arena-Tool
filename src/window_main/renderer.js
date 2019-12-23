@@ -59,7 +59,7 @@ import { openHomeTab } from "./home";
 import { tournamentOpen } from "./tournaments";
 import { openDeck } from "./deck-details";
 import { openSettingsTab, setCurrentOverlaySettings } from "./settings";
-import { showWhatsNew } from "./whats-new";
+import { showWhatsNew } from "./whatsNew";
 import { showOfflineSplash } from "./renderer-util";
 import { setExploreDecks } from "./explore";
 
