@@ -207,7 +207,7 @@ class Deck {
   getExportTxt(): string {
     let str = "";
     let mainList = this.mainboard.removeDuplicates(false);
-    mainList.forEach(function (card) {
+    mainList.forEach(function(card) {
       let grpid = card.id;
       let card_name = (db.card(grpid) as DbCardData).name;
 
@@ -217,7 +217,7 @@ class Deck {
     str += "\r\n";
 
     let sideList = this.sideboard.removeDuplicates(false);
-    sideList.forEach(function (card) {
+    sideList.forEach(function(card) {
       let grpid = card.id;
       let card_name = (db.card(grpid) as DbCardData).name;
 
@@ -233,7 +233,7 @@ class Deck {
   getExportArena(): string {
     let str = "";
     let listMain = this.mainboard.removeDuplicates(false);
-    listMain.forEach(function (card) {
+    listMain.forEach(function(card) {
       let grpid = card.id;
       let cardObj = db.card(grpid) as DbCardData;
 
@@ -254,7 +254,7 @@ class Deck {
     str += "\r\n";
 
     let listSide = this.sideboard.removeDuplicates(false);
-    listSide.forEach(function (card) {
+    listSide.forEach(function(card) {
       let grpid = card.id;
       let cardObj = db.card(grpid) as DbCardData;
 

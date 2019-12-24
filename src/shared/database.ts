@@ -243,7 +243,11 @@ class Database {
     return this.metadata ? this.metadata.version : 0;
   }
 
-  card(id: number | string): DbCardData | undefined {
+  card(id?: number | string): DbCardData | undefined {
+    if (id === undefined) {
+      return undefined;
+    }
+
     if (!this.metadata?.cards) {
       return undefined;
     }
