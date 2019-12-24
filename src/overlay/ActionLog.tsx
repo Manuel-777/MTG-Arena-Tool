@@ -17,8 +17,8 @@ function LogEntry(props: LogEntryProps): JSX.Element {
   const { initialTime, log, setHoverCardCallback } = props;
   const [isMouseHovering, setMouseHovering] = useState(false);
   const fullCard = db.card(log.grpId);
-  let dfcCard: any;
-  if (fullCard && fullCard.dfcId) {
+  let dfcCard: DbCardData | undefined;
+  if (fullCard?.dfcId !== undefined) {
     dfcCard = db.card(fullCard.dfcId);
   }
   const handleMouseEnter = useCallback((): void => {

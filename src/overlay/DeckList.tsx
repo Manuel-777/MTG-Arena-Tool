@@ -49,7 +49,7 @@ const landsCard = {
 
 function getRank(cardId: string): number {
   const cardObj = db.card(cardId);
-  return (cardObj && cardObj.rank) || 0;
+  return cardObj?.rank || 0;
 }
 
 function compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
@@ -61,9 +61,9 @@ function compareQuantity(a: CardObject, b: CardObject): -1 | 0 | 1 {
 function compareDraftPicks(a: CardObject, b: CardObject): -1 | 0 | 1 {
   const aCard = db.card(a.id);
   const bCard = db.card(b.id);
-  if (!bCard) {
+  if (bCard === undefined) {
     return -1;
-  } else if (!aCard) {
+  } else if (aCard === undefined) {
     return 1;
   }
   const aColors = new Colors();
@@ -185,13 +185,10 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     }
 
     let fullCard = card;
-    if (card && card.id && !isCardGroupedLands) {
+    if (card?.id && !isCardGroupedLands) {
       fullCard = db.card(card.id);
     }
-    let dfcCard;
-    if (card && card.dfcId) {
-      dfcCard = db.card(card.dfcId) || undefined;
-    }
+
     if (settings.mode === OVERLAY_DRAFT) {
       mainCardTiles.push(
         <div
@@ -210,6 +207,8 @@ export default function DeckList(props: DeckListProps): JSX.Element {
       // skip land cards while doing group lands hack
       return;
     }
+
+    let dfcCard = card?.dfcId ? db.card(card.dfcId) : undefined;
     mainCardTiles.push(
       <CardTile
         style={tileStyle}
@@ -238,12 +237,12 @@ export default function DeckList(props: DeckListProps): JSX.Element {
           ? "0%"
           : card.quantity;
       let fullCard = card;
-      if (card && card.id) {
-        fullCard = db.card(card.id) || undefined;
+      if (card?.id) {
+        fullCard = db.card(card.id);
       }
       let dfcCard;
-      if (card && card.dfcId) {
-        dfcCard = db.card(card.dfcId) || undefined;
+      if (card?.dfcId) {
+        dfcCard = db.card(card.dfcId);
       }
       sideboardCardTiles.push(
         <CardTile

@@ -26,11 +26,11 @@ export const cardTile = function(
   const card = db.card(grpId);
   let dfcCard: DbCardData | undefined;
 
-  if (!card) {
-    return undefined;
+  if (card === undefined) {
+    return card;
   }
 
-  if (card.dfcId && db.card(card.dfcId)) {
+  if (card.dfcId !== undefined && db.card(card.dfcId) !== undefined) {
     dfcCard = db.card(card.dfcId) as DbCardData;
   }
 

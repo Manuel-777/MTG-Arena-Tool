@@ -295,7 +295,7 @@ function openSetStatsDetails(setStats: SetStats, setName: string): void {
             cardsArray.forEach((card, index) => {
               const dbCard = db.card(card.id);
 
-              if (dbCard && (dbCard.booster || displayMode === ALL_CARDS)) {
+              if (dbCard?.booster || displayMode === ALL_CARDS) {
                 const classes = ["completion_table_card", "n" + card.owned];
                 if (card.wanted > 0) classes.push("wanted");
                 const cell = createDiv(classes, String(card.owned));

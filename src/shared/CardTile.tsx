@@ -36,7 +36,7 @@ function isNumber(n: number | string): boolean {
 }
 
 function frameClassName(card: DbCardData): string {
-  const frame = card ? card.frame.concat().sort() : [];
+  const frame = card?.frame.concat().sort() ?? [];
   if (frame.length === 0) {
     return "tile_c";
   } else if (frame.length <= 2) {

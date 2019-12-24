@@ -23,6 +23,7 @@ import React, { useState } from "react";
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
 import ReactDOM from "react-dom";
 import LocalTime from "../../../shared/time-components/LocalTime";
+import { DbCardData } from "../../../shared/types/Metadata";
 
 function EconomyRowDate(date: Date) {
   return (
@@ -100,25 +101,25 @@ function getThingsToCheck(
     default:
       return fullContext.includes("Store") || fullContext.includes("Purchase")
         ? {
-            checkGemsEarnt: change.delta.gemsDelta > 0,
-            checkGemsPaid: change.delta.gemsDelta < 0,
-            checkGoldEarnt: change.delta.goldDelta > 0,
-            checkGoldPaid: change.delta.goldDelta < 0,
-            checkBoosterAdded: true,
-            checkCardsAdded: true,
-            checkAetherized: true,
-            checkWildcardsAdded: true,
-            checkSkinsAdded: true
-          }
+          checkGemsEarnt: change.delta.gemsDelta > 0,
+          checkGemsPaid: change.delta.gemsDelta < 0,
+          checkGoldEarnt: change.delta.goldDelta > 0,
+          checkGoldPaid: change.delta.goldDelta < 0,
+          checkBoosterAdded: true,
+          checkCardsAdded: true,
+          checkAetherized: true,
+          checkWildcardsAdded: true,
+          checkSkinsAdded: true
+        }
         : {
-            checkGemsEarnt: true,
-            checkGoldEarnt: true,
-            checkBoosterAdded: true,
-            checkCardsAdded: true,
-            checkAetherized: true,
-            checkWildcardsAdded: true,
-            checkSkinsAdded: true
-          };
+          checkGemsEarnt: true,
+          checkGoldEarnt: true,
+          checkBoosterAdded: true,
+          checkCardsAdded: true,
+          checkAetherized: true,
+          checkWildcardsAdded: true,
+          checkSkinsAdded: true
+        };
   }
 }
 
@@ -213,8 +214,8 @@ function FlexBottom(props: FlexBottomProps) {
       ) : fullContext === "Redeem Wildcard" ? (
         <AllWildcardsEconomyValueRecord delta={change.delta} isSmall />
       ) : (
-        undefined
-      )}
+            undefined
+          )}
       {checkGemsPaid && !!change.delta.gemsDelta && (
         <EconomyValueRecord
           iconClassName={"economy_gems"}
@@ -316,7 +317,7 @@ function FlexRight(props: FlexRightProps) {
     change.orbCountDiff &&
     Math.abs(
       (change.orbCountDiff.currentOrbCount || 0) -
-        (change.orbCountDiff.oldOrbCount || 0)
+      (change.orbCountDiff.oldOrbCount || 0)
     );
 
   const checkCards =
@@ -335,27 +336,27 @@ function FlexRight(props: FlexRightProps) {
     change.aetherizedCards.length > 0;
   const aetherCards: string[] = checkAether
     ? change.aetherizedCards.reduce(
-        (aggregator: string[], obj: { grpId: string }) => {
-          var grpId = obj.grpId;
-          if (change.delta.cardsAdded) {
-            if (change.delta.cardsAdded.indexOf(grpId) == -1) {
-              aggregator.push(grpId);
-            }
-          } else {
+      (aggregator: string[], obj: { grpId: string }) => {
+        var grpId = obj.grpId;
+        if (change.delta.cardsAdded) {
+          if (change.delta.cardsAdded.indexOf(grpId) == -1) {
             aggregator.push(grpId);
           }
-          return aggregator;
-        },
-        []
-      )
+        } else {
+          aggregator.push(grpId);
+        }
+        return aggregator;
+      },
+      []
+    )
     : [];
 
   const checkSkins =
     checkSkinsAdded && change.delta.artSkinsAdded !== undefined;
   const skinsToCards = checkSkins
     ? change.delta.artSkinsAdded.map((obj: { artId: string }) =>
-        db.cardFromArt(obj.artId)
-      )
+      db.cardFromArt(obj.artId)
+    )
     : undefined;
 
   const xpGainedNumber = change.xpGained && parseInt(change.xpGained);
@@ -427,7 +428,7 @@ function FlexRight(props: FlexRightProps) {
 }
 
 interface InventoryCardProps {
-  card: any;
+  card: DbCardData | undefined;
   isAetherized?: boolean;
   quantity?: number;
 }

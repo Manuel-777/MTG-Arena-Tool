@@ -22,7 +22,7 @@ function getOpponentDeck(): SerializedDeck {
     // console.log(_deck.colors);
     if (globals.currentMatch.opponent.commanderGrpIds?.length) {
       const card = db.card(globals.currentMatch.opponent.commanderGrpIds[0]);
-      globals.currentMatch.oppArchetype = card ? card.name : "";
+      globals.currentMatch.oppArchetype = card !== undefined ? card.name : "";
     } else {
       globals.currentMatch.oppArchetype = _deck.colors.getColorArchetype();
     }

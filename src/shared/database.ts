@@ -243,13 +243,13 @@ class Database {
     return this.metadata ? this.metadata.version : 0;
   }
 
-  card(id: number | string) {
-    if (!this.metadata || !this.metadata.cards) {
-      return false;
+  card(id: number | string): DbCardData | undefined {
+    if (!this.metadata?.cards) {
+      return undefined;
     }
 
     let numId = typeof id === "number" ? id : parseInt(id);
-    return this.metadata.cards[numId] || false;
+    return this.metadata.cards[numId] || undefined;
   }
 
   event(id: string) {

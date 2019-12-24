@@ -73,11 +73,11 @@ export default function CardDetailsWindowlet(
   } = props;
 
   // TODO remove group lands hack
-  const isCardGroupedLands = card && card.id === 100 && odds;
+  const isCardGroupedLands = card?.id === 100 && odds;
   // TODO support split cards
   let name = "";
   let images = {};
-  if (card) {
+  if (card !== undefined) {
     name = card.name;
     images = card.images;
   }
