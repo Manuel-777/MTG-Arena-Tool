@@ -94,9 +94,9 @@ class CardsList {
     if (byName) {
       const cardToFind = db.card(grpId);
       this.list.forEach(function(card) {
-        let cardInList = db.card(card.id);
+        const cardInList = db.card(card.id);
         if (cardToFind?.name === cardInList?.name) {
-          let remove = Math.min(card.quantity, quantity);
+          const remove = Math.min(card.quantity, quantity);
           card.quantity -= remove;
           quantity -= remove;
         }
@@ -104,7 +104,7 @@ class CardsList {
     } else {
       this.list.forEach(function(card) {
         if (grpId == card.id) {
-          let remove = Math.min(card.quantity, quantity);
+          const remove = Math.min(card.quantity, quantity);
           card.quantity -= remove;
           quantity -= remove;
         }
@@ -133,10 +133,10 @@ class CardsList {
    * Creates a n object containing how many of each type the list has
    **/
   countTypesAll(): CardTypesCount {
-    let types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
+    const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };
 
     this.list.forEach(function(card) {
-      let c = db.card(card.id);
+      const c = db.card(card.id);
       if (c !== undefined) {
         if (c.type.includes("Land", 0))
           types.lan += card.measurable ? card.quantity : 1;
@@ -162,7 +162,7 @@ class CardsList {
    * Counts how many cards of a given type the list has.
    **/
   countType(type: string) {
-    let types = this.countTypesAll();
+    const types = this.countTypesAll();
     if (type.includes("Land", 0)) return types.lan;
     else if (type.includes("Creature", 0)) return types.cre;
     else if (type.includes("Artifact", 0)) return types.art;
@@ -178,11 +178,11 @@ class CardsList {
    * Creates an object containing the colors distribution of the list.
    **/
   getColorsAmounts(): ColorsCount {
-    let colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
+    const colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
     this.list.forEach(function(card) {
       if (card.quantity > 0) {
-        let dbCard = db.card(card.id);
+        const dbCard = db.card(card.id);
         if (dbCard !== undefined) {
           dbCard.cost.forEach(function(c) {
             if (c.indexOf("w") !== -1) {
@@ -221,11 +221,11 @@ class CardsList {
    * Creates an object containing the lands color distribution of the list.
    **/
   getLandsAmounts(): ColorsCount {
-    var colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
+    const colors = { total: 0, w: 0, u: 0, b: 0, r: 0, g: 0, c: 0 };
 
     this.list.forEach(function(cardEntry) {
-      var quantity = cardEntry.quantity;
-      let card = db.card(cardEntry.id);
+      const quantity = cardEntry.quantity;
+      const card = db.card(cardEntry.id);
       if (card !== undefined && quantity > 0) {
         if (
           card.type.indexOf("Land") != -1 ||
@@ -279,11 +279,11 @@ class CardsList {
    * Get all colors in the list as a Colors object.
    **/
   getColors(): Colors {
-    let colors = new Colors();
+    const colors = new Colors();
     this.list.forEach(card => {
-      let cardData = db.card(card.id);
+      const cardData = db.card(card.id);
       if (cardData !== undefined) {
-        let isLand = cardData.type.indexOf("Land") !== -1;
+        const isLand = cardData.type.indexOf("Land") !== -1;
         if (isLand && cardData.frame.length < 3) {
           colors.addFromArray(cardData.frame);
         }
@@ -300,12 +300,12 @@ class CardsList {
    * Returns the new list (not a cardsList object)
    **/
   removeDuplicates(replaceList = true): v2cardsList {
-    var newList: v2cardsList = [];
+    const newList: v2cardsList = [];
 
     this.list.forEach(function(card) {
-      let cardObj = db.card(card.id);
-      let found = newList.find((c: CardObject) => {
-        let dbCard = db.card(c.id);
+      const cardObj = db.card(card.id);
+      const found = newList.find((c: CardObject) => {
+        const dbCard = db.card(c.id);
         return dbCard?.name === cardObj?.name;
       });
       if (found) {
