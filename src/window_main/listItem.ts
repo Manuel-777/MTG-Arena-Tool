@@ -2,7 +2,7 @@ import { getCardArtCrop } from "../shared/util";
 import { createDiv } from "../shared/dom-fns";
 
 class ListItem {
-  private id: any;
+  private id: string;
   private container: HTMLDivElement;
   private left: HTMLDivElement;
   private right: HTMLDivElement;
@@ -21,9 +21,9 @@ class ListItem {
 
   constructor(
     grpId: number,
-    id: any,
-    onClick: (id: any) => void,
-    onDelete?: (id: any) => void,
+    id: string,
+    onClick: (id: number | string) => void,
+    onDelete?: (id: number | string) => void,
     isArchived = false
   ) {
     this.id = id;
@@ -51,7 +51,7 @@ class ListItem {
     // All of these should be stored and removed when we 'unmount' the class
     if (onDelete !== undefined) {
       this.container.appendChild(this.deleteButton);
-      this.deleteButton.addEventListener("click", (e: any) => {
+      this.deleteButton.addEventListener("click", (e: Event) => {
         e.stopPropagation();
         onDelete(this.id);
         if (!isArchived) {
@@ -93,19 +93,19 @@ class ListItem {
     return this;
   }
 
-  divideLeft() {
+  divideLeft(): void {
     this.left.style.flexDirection = "column";
     this.left.appendChild(this.leftTop);
     this.left.appendChild(this.leftBottom);
   }
 
-  divideCenter() {
+  divideCenter(): void {
     this.center.style.flexDirection = "column";
     this.center.appendChild(this.centerTop);
     this.center.appendChild(this.centerBottom);
   }
 
-  divideRight() {
+  divideRight(): void {
     this.right.style.flexDirection = "column";
     this.right.appendChild(this.rightTop);
     this.right.appendChild(this.rightBottom);
