@@ -3,51 +3,23 @@ import { create, all, MathJsStatic } from "mathjs";
 const config = { precision: 2000 };
 const math: MathJsStatic = create(all, config) as MathJsStatic;
 
-function hypergeometric(
-  exact: number,
+export function hypergeometricRange(
+  lowerBound: number,
+  upperBound: number,
   population: number,
   sample: number,
   hitsInPop: number
 ): number;
-function hypergeometric(
-  exact: number,
-  population: number,
-  sample: number,
-  hitsInPop: number,
-  returnBig: boolean
-): math.MathType;
-function hypergeometric(
-  exact: number,
-  population: number,
-  sample: number,
-  hitsInPop: number,
-  returnBig = false
-): math.MathType {
-  return hypergeometricRange(
-    exact,
-    exact,
-    population,
-    sample,
-    hitsInPop,
-    returnBig
-  );
-}
 
 export function hypergeometricRange(
   lowerBound: number,
   upperBound: number,
   population: number,
   sample: number,
-  hitsInPop: number
-): number;
-export function hypergeometricRange(
-  lowerBound: number,
-  upperBound: number,
-  population: number,
-  sample: number,
   hitsInPop: number,
   returnBig: boolean
 ): math.MathType;
+
 export function hypergeometricRange(
   lowerBound: number,
   upperBound: number,
@@ -87,12 +59,43 @@ export function hypergeometricRange(
   return returnBig ? probability : math.number(probability as any);
 }
 
+function hypergeometric(
+  exact: number,
+  population: number,
+  sample: number,
+  hitsInPop: number
+): number;
+function hypergeometric(
+  exact: number,
+  population: number,
+  sample: number,
+  hitsInPop: number,
+  returnBig: boolean
+): math.MathType;
+function hypergeometric(
+  exact: number,
+  population: number,
+  sample: number,
+  hitsInPop: number,
+  returnBig = false
+): math.MathType {
+  return hypergeometricRange(
+    exact,
+    exact,
+    population,
+    sample,
+    hitsInPop,
+    returnBig
+  );
+}
+
 export function hypergeometricSignificance(
   value: number,
   population: number,
   sample: number,
   hitsInPop: number
 ): number;
+
 export function hypergeometricSignificance(
   value: number,
   population: number,

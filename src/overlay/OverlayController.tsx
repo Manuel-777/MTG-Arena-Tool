@@ -15,10 +15,10 @@ import {
 import {
   DraftData,
   LogData,
-  MatchData,
   OverlaySettingsData,
   SettingsData
 } from "./overlayUtil";
+import { MatchData } from "../window_background/types/currentMatch";
 import CardDetailsWindowlet from "./CardDetailsWindowlet";
 import OverlayWindowlet from "./OverlayWindowlet";
 import { DbCardData } from "../shared/types/Metadata";

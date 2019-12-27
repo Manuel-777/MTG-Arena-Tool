@@ -9,7 +9,7 @@ import { getReadableEvent, toMMSS } from "../shared/util";
 import Aggregator from "./aggregator";
 import DataScroller from "./data-scroller";
 import FilterPanel from "./FilterPanel";
-import ListItem from "./list-item";
+import ListItem from "./listItem";
 import StatsPanel from "./stats-panel";
 import {
   attachDraftData,

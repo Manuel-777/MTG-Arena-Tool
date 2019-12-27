@@ -132,7 +132,7 @@ class Colors {
   /**
    * Checks if this color is equal to another
    */
-  equalTo(color: Colors) {
+  equalTo(color: Colors): boolean {
     return (
       this.w == color.w &&
       this.u == color.u &&
@@ -142,7 +142,7 @@ class Colors {
     );
   }
 
-  getColorArchetype() {
+  getColorArchetype(): string {
     const colorFlags = {
       NONE: 0,
       W: 1,
@@ -152,7 +152,7 @@ class Colors {
       G: 16
     };
 
-    var currentColorFlags: number = colorFlags.NONE;
+    let currentColorFlags: number = colorFlags.NONE;
     if (this.w) currentColorFlags |= colorFlags.W;
     if (this.u) currentColorFlags |= colorFlags.U;
     if (this.b) currentColorFlags |= colorFlags.B;
@@ -222,6 +222,8 @@ class Colors {
         return "UBRG";
       case 31:
         return "5-color";
+      default:
+        return "";
     }
   }
 }

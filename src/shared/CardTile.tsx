@@ -14,7 +14,7 @@ import {
   getRankColorClass,
   openScryfallCard
 } from "./util";
-import { addCardHover } from "./card-hover";
+import { addCardHover } from "./cardHover";
 import { DbCardData, Rarity } from "./types/Metadata";
 import _ from "lodash";
 

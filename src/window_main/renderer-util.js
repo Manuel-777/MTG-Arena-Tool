@@ -29,7 +29,7 @@ import {
 } from "../shared/dom-fns";
 import * as deckDrawer from "./DeckDrawer";
 import { cardType } from "../shared/cardTypes";
-import { addCardHover } from "../shared/card-hover";
+import { addCardHover } from "../shared/cardHover";
 import {
   deckTypesStats,
   formatRank,

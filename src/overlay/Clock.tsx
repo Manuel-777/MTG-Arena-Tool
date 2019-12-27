@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { toMMSS, toHHMMSS } from "../shared/util";
+import { PriorityTimers } from "../window_background/types/currentMatch";
 
 const CLOCK_MODE_BOTH = 0;
 const CLOCK_MODE_ELAPSED = 1;
@@ -8,7 +9,7 @@ const CLOCK_MODE_CLOCK = 2;
 
 export interface ClockProps {
   matchBeginTime: Date;
-  priorityTimers: number[];
+  priorityTimers: PriorityTimers;
   turnPriority: number;
   oppName: string;
   playerSeat: number;
@@ -79,13 +80,13 @@ export default function Clock(props: ClockProps): JSX.Element {
 
   // Clock Mode BOTH
   const lastDurationInSec = Math.floor(
-    (now.getTime() - new Date(priorityTimers[0]).getTime()) / 1000
+    (now.getTime() - new Date(priorityTimers.date).getTime()) / 1000
   );
-  let duration1 = Math.floor(priorityTimers[1] / 1000);
+  let duration1 = Math.floor(priorityTimers.timers[1] / 1000);
   if (turnPriority === 1 && duration1 > 0) {
     duration1 += lastDurationInSec;
   }
-  let duration2 = Math.floor(priorityTimers[2] / 1000);
+  let duration2 = Math.floor(priorityTimers.timers[2] / 1000);
   if (turnPriority === 2 && duration2 > 0) {
     duration2 += lastDurationInSec;
   }

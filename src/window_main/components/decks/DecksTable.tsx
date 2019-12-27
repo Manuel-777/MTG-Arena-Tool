@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import _ from "lodash";
 import React, { useState } from "react";
 import styled from "styled-components";
@@ -34,36 +35,6 @@ import {
 import { CellProps, DecksTableProps, DecksTableState } from "./types";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
-
-const StyledDecksTable = styled.div`
-  table {
-    padding: 16px;
-    tr {
-      white-space: nowrap;
-      height: 64px;
-      background-color: rgba(0, 0, 0, 0);
-      -webkit-transition: all 0.2s ease-in;
-    }
-    th,
-    td {
-      color: var(--color-light);
-      text-align: right;
-      white-space: nowrap;
-      padding-right: 16px;
-      :last-child {
-        padding-right: 0;
-      }
-    }
-    th:hover {
-      background-color: rgba(0, 0, 0, 0.25);
-      cursor: pointer;
-    }
-    th.alignLeft,
-    td.alignLeft {
-      text-align: left;
-    }
-  }
-`;
 
 const PresetButton = styled(MetricText).attrs(props => ({
   className: (props.className ?? "") + " button_simple"
@@ -102,7 +73,7 @@ export default function DecksTable({
         disableFilters: false,
         filter: "uberSearch",
         Filter: TextBoxFilter,
-        minWidth: 200,
+        minWidth: 100,
         disableSortBy: true,
         Cell: CellWrapper(ArtTileCell)
       },
@@ -365,9 +336,6 @@ export default function DecksTable({
     false
   );
 
-  const isLeftAlignCol = (id: string): boolean =>
-    ["deckTileId", "name", "tags"].includes(id);
-
   const recentFilters = (): { id: string; value: any }[] => [
     { id: "archivedCol", value: "hideArchived" }
   ];
@@ -475,145 +443,113 @@ export default function DecksTable({
             </StyledCheckboxContainer>
           ))}
       </div>
-      <StyledDecksTable>
-        <table {...getTableProps()}>
-          <thead>
-            {headerGroups.map((headerGroup: any, index: number) => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-                {headerGroup.headers.map((column: any) => (
-                  <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className={"hover_label"}
-                    key={column.id}
-                    style={
-                      column.minWidth
-                        ? { minWidth: column.minWidth + "px" }
-                        : undefined
-                    }
-                  >
+      <div
+        className="decks_table_head"
+        style={{
+          gridTemplateColumns: `100px 200px 150px 150px ${"1fr ".repeat(
+            headerGroups[0].headers ? headerGroups[0].headers.length - 4 : 1
+          )}`
+        }}
+        {...getTableProps()}
+      >
+        {headerGroups.map((headerGroup: any) => {
+          return (
+            <>
+              {headerGroup.headers.map((column: any, ii: number) => (
+                <div
+                  {...column.getHeaderProps(column.getSortByToggleProps())}
+                  className={"hover_label"}
+                  style={{
+                    height: "64px",
+                    gridArea: `1 / ${ii + 1} / 1 / ${ii + 2}`
+                  }}
+                  key={column.id}
+                >
+                  <div className={"decks_table_head_container"}>
                     <div
+                      className={
+                        column.isSorted
+                          ? column.isSortedDesc
+                            ? " sort_desc"
+                            : " sort_asc"
+                          : ""
+                      }
+                      style={{ marginRight: "4px", width: "16px" }}
+                    />
+                    <div className={"flex_item"}>{column.render("Header")}</div>
+                    {column.canFilter && column.id !== "deckTileId" && (
+                      <div
+                        style={{ marginRight: 0 }}
+                        className={"button settings"}
+                        onClick={(e): void => {
+                          e.stopPropagation();
+                          setFiltersVisible({
+                            ...filtersVisible,
+                            [column.id]: !filtersVisible[column.id]
+                          });
+                        }}
+                        title={
+                          (filtersVisible[column.id] ? "hide" : "show") +
+                          " column filter"
+                        }
+                      />
+                    )}
+                    {column.filterValue && column.id !== "deckTileId" && (
+                      <div
+                        style={{ marginRight: 0 }}
+                        className={"button close"}
+                        onClick={(e): void => {
+                          e.stopPropagation();
+                          setFilter(column.id, undefined);
+                        }}
+                        title={"clear column filter"}
+                      />
+                    )}
+                  </div>
+                  {column.canFilter && filtersVisible[column.id] && (
+                    <div
+                      onClick={(e): void => e.stopPropagation()}
                       style={{
                         display: "flex",
-                        justifyContent: isLeftAlignCol(column.id)
-                          ? "flex-start"
-                          : "flex-end"
+                        justifyContent: "center"
                       }}
+                      title={"filter column"}
                     >
-                      <div
-                        className={
-                          column.isSorted
-                            ? column.isSortedDesc
-                              ? " sort_desc"
-                              : " sort_asc"
-                            : ""
-                        }
-                        style={{ marginRight: "4px", width: "16px" }}
-                      />
-                      <div className={"flex_item"}>
-                        {column.render("Header")}
-                      </div>
-                      {column.canFilter && column.id !== "deckTileId" && (
-                        <div className={"flex_item"}>
-                          <div
-                            style={{ marginRight: 0 }}
-                            className={"button settings"}
-                            onClick={(e): void => {
-                              e.stopPropagation();
-                              setFiltersVisible({
-                                ...filtersVisible,
-                                [column.id]: !filtersVisible[column.id]
-                              });
-                            }}
-                            title={
-                              (filtersVisible[column.id] ? "hide" : "show") +
-                              " column filter"
-                            }
-                          />
-                        </div>
-                      )}
-                      {column.filterValue && column.id !== "deckTileId" && (
-                        <div className={"flex_item"}>
-                          <div
-                            style={{ marginRight: 0 }}
-                            className={"button close"}
-                            onClick={(e): void => {
-                              e.stopPropagation();
-                              setFilter(column.id, undefined);
-                            }}
-                            title={"clear column filter"}
-                          />
-                        </div>
+                      {column.render("Filter")}
+                      {column.filterValue && column.id === "deckTileId" && (
+                        <div
+                          style={{ marginRight: 0 }}
+                          className={"button close"}
+                          onClick={(e): void => {
+                            e.stopPropagation();
+                            setFilter(column.id, undefined);
+                          }}
+                          title={"clear search"}
+                        />
                       )}
                     </div>
-                    {column.canFilter && filtersVisible[column.id] && (
-                      <div
-                        onClick={(e): void => e.stopPropagation()}
-                        style={{
-                          paddingTop: "4px",
-                          display: "flex",
-                          justifyContent: isLeftAlignCol(column.id)
-                            ? "flex-start"
-                            : "flex-end"
-                        }}
-                        title={"filter column"}
-                      >
-                        <div
-                          className={"flex_item"}
-                          style={{
-                            width:
-                              column.filterValue && column.id === "deckTileId"
-                                ? "calc(100% - 34px)"
-                                : "100%",
-                            flexWrap: "wrap",
-                            marginRight: "4px"
-                          }}
-                        >
-                          {column.render("Filter")}
-                        </div>
-                        {column.filterValue && column.id === "deckTileId" && (
-                          <div className={"flex_item"}>
-                            <div
-                              style={{ marginRight: 0 }}
-                              className={"button close"}
-                              onClick={(e): void => {
-                                e.stopPropagation();
-                                setFilter(column.id, undefined);
-                              }}
-                              title={"clear search"}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {rows.map((row: any) => {
-              prepareRow(row);
-              return (
-                <RowContainer
-                  openDeckCallback={openDeckCallback}
-                  row={row}
-                  key={row.index}
-                />
-              );
-            })}
-          </tbody>
-        </table>
-      </StyledDecksTable>
+                  )}
+                </div>
+              ))}
+            </>
+          );
+        })}
+      </div>
+      <div className="decks_table_body" {...getTableBodyProps()}>
+        {rows.map((row: any) => {
+          prepareRow(row);
+          return (
+            <RowContainer
+              openDeckCallback={openDeckCallback}
+              row={row}
+              key={row.index}
+            />
+          );
+        })}
+      </div>
     </>
   );
 }
-
-const StyledTableRow = styled.tr`
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-  }
-`;
 
 function RowContainer({
   row,
@@ -636,8 +572,17 @@ function RowContainer({
     openDeckCallback(row.values.deckId);
   }, []);
 
+  const isLeftAlignCol = (id: string): boolean =>
+    ["deckTileId", "name", "tags"].includes(id);
+
   return (
-    <StyledTableRow
+    <div
+      className="decks_table_body_row"
+      style={{
+        gridTemplateColumns: `100px 200px 150px 150px ${"1fr ".repeat(
+          row.cells.length - 4
+        )}`
+      }}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       onClick={mouseClick}
@@ -645,15 +590,19 @@ function RowContainer({
       {row.cells.map((cell: any) => {
         cell.hover = hover;
         return (
-          <td
+          <div
+            className="inner_div"
+            style={{
+              justifyContent: isLeftAlignCol(cell.column.id) ? "flex-start" : ""
+            }}
             {...cell.getCellProps()}
             key={cell.column.id + "_" + row.index}
             title={`show ${row.values.name} details`}
           >
             {cell.render("Cell")}
-          </td>
+          </div>
         );
       })}
-    </StyledTableRow>
+    </div>
   );
 }

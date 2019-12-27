@@ -9,13 +9,13 @@ import { MatchCreatedEvent } from "../shared/types/MatchCreatedEvent";
 import { objectClone } from "../shared/util";
 import Deck from "../shared/deck";
 import { SerializedDeck } from "../shared/types/Deck";
-
+import { MatchData, matchDataDefault } from "./types/currentMatch";
 // Generate objects using default templates.
 // Nothing in here should call IPC functions
 
 // Draft Creation
 
-var currentDraftDefault = {
+const currentDraftDefault = {
   eventId: "",
   draftId: "",
   set: "",
@@ -27,7 +27,7 @@ var currentDraftDefault = {
   date: undefined
 };
 
-export function createDraft(id: string, entry: any) {
+export function createDraft(id: string) {
   const data = {
     ..._.cloneDeep(currentDraftDefault),
     id,
@@ -67,40 +67,6 @@ export interface ExtendedPlayerMatchData {
   commanderGrpIds: any;
 }
 
-export interface MatchData {
-  eventId: string;
-  matchId: string;
-  InternalEventName?: string;
-  beginTime: number;
-  matchTime: number;
-  currentPriority: number;
-  bestOf: number;
-  game: number;
-  priorityTimers: number[];
-  lastPriorityChangeTime: number;
-  results: any[];
-  playerChances: Object;
-  playerCardsLeft: Object;
-  oppArchetype: string;
-  oppCards: Object;
-  onThePlay: number;
-  GREtoClient: Object;
-  processedAnnotations: any[];
-  timers: Object;
-  zones: any[];
-  players: Object;
-  annotations: any[];
-  gameObjs: Object;
-  gameInfo: Object;
-  gameStage: string;
-  turnInfo: Object;
-  playerCardsUsed: any[];
-  oppCardsUsed: any[];
-  cardsCast: any[];
-  player: PlayerMatchData;
-  opponent: PlayerMatchData;
-}
-
 export interface ExtendedMatchData {
   draws: number;
   playerDeck: SerializedDeck;
@@ -119,64 +85,11 @@ export interface ExtendedMatchData {
   opponent: ExtendedPlayerMatchData;
 }
 
-const matchDataDefault: MatchData = {
-  eventId: "",
-  matchId: "",
-  beginTime: 0,
-  matchTime: 0,
-  currentPriority: 0,
-  bestOf: 1,
-  game: 0,
-  priorityTimers: [0, 0, 0, 0, 0],
-  lastPriorityChangeTime: 0,
-  results: [],
-  playerChances: {},
-  playerCardsLeft: {},
-  oppArchetype: "",
-  oppCards: {},
-  onThePlay: 0,
-  GREtoClient: {},
-  processedAnnotations: [],
-  timers: {},
-  zones: [],
-  players: {},
-  annotations: [],
-  gameObjs: {},
-  gameInfo: {},
-  gameStage: "",
-  turnInfo: {},
-  playerCardsUsed: [],
-  oppCardsUsed: [],
-  cardsCast: [],
-  player: {
-    seat: 1,
-    deck: new Deck(),
-    life: 20,
-    turn: 0,
-    name: "",
-    id: "",
-    rank: "",
-    tier: 1,
-    commanderGrpIds: []
-  },
-  opponent: {
-    seat: 2,
-    deck: new Deck(),
-    life: 20,
-    turn: 0,
-    name: "",
-    id: "",
-    rank: "",
-    tier: 1,
-    commanderGrpIds: []
-  }
-};
-
 export function createMatch(
   json: MatchCreatedEvent,
-  matchBeginTime: number
+  matchBeginTime: Date
 ): MatchData {
-  var match = _.cloneDeep(matchDataDefault);
+  const match = _.cloneDeep(matchDataDefault);
 
   match.player.originalDeck = globals.originalDeck;
   if (globals.originalDeck) {
@@ -230,7 +143,7 @@ function matchResults(matchData: MatchData): number[] {
 // Guess if an event is a limited or constructed event.
 function matchIsLimited(match: MatchData): boolean {
   // old data uses InternalEventName
-  var eventId = match.eventId || match.InternalEventName;
+  const eventId = match.eventId || match.InternalEventName;
 
   // The order of can matter.
   if (eventId && database.limited_ranked_events.includes(eventId)) {
@@ -259,9 +172,9 @@ export function completeMatch(
 ): ExtendedMatchData | undefined {
   if (matchData.eventId === "AIBotMatch") return;
 
-  let mode = matchIsLimited(matchData) ? "limited" : "constructed";
+  const mode = matchIsLimited(matchData) ? "limited" : "constructed";
 
-  let [playerWins, opponentWins, draws] = matchResults(matchData);
+  const [playerWins, opponentWins, draws] = matchResults(matchData);
 
   match.onThePlay = matchData.onThePlay;
   match.id = matchData.matchId;
@@ -334,6 +247,6 @@ const deckDefault = {
   sideboard: []
 };
 
-export function createDeck() {
+export function createDeck(): Deck {
   return objectClone(deckDefault);
 }

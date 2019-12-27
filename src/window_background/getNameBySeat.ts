@@ -8,7 +8,7 @@ function getPlayerNameWithoutSuffix(playerName: string) {
 }
 
 // Get player name by seat in the game
-const getNameBySeat = function(seat: 1 | 2): string {
+const getNameBySeat = function(seat: number): string {
   try {
     if (seat === globals.currentMatch.player.seat) {
       return getPlayerNameWithoutSuffix(playerData.name);

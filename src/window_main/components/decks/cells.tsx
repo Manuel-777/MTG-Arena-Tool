@@ -38,34 +38,34 @@ const StyledArtTile = styled(StyledArtTileHeader)`
   background-position-y: -10px;
   opacity: 0.66;
   height: 64px;
-  width: 128px;
+  width: 80px;
   &.deckTileHover-enter {
     opacity: 0.66;
-    width: 128px;
+    width: 80px;
   }
   &.deckTileHover-enter-active {
     opacity: 1;
-    width: 200px;
+    width: 100px;
     -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
     transition: opacity 0.2s ease-in, width 0.2s ease-in;
   }
   &.deckTileHover-enter-done {
     opacity: 1;
-    width: 200px;
+    width: 100px;
   }
   &.deckTileHover-exit {
     opacity: 1;
-    width: 200px;
+    width: 100px;
   }
   &.deckTileHover-exit-active {
     opacity: 0.66;
-    width: 128px;
+    width: 80px;
     -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
     transition: opacity 0.2s ease-in, width 0.2s ease-in;
   }
   &.deckTileHover-exit-done {
     opacity: 0.66;
-    width: 128px;
+    width: 80px;
   }
 `;
 
@@ -127,7 +127,6 @@ export function ColorsCell({ cell }: CellProps): JSX.Element {
 const LabelText = styled.div`
   display: inline-block;
   cursor: pointer;
-  width: -webkit-fill-available;
   text-align: left;
 `;
 

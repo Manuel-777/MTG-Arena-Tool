@@ -38,8 +38,6 @@ export default function ManaFilter(props: ManaFilterProps) {
 
   const manasStyles = {
     display: "flex",
-    margin: "8px",
-    width: "150px",
     height: "32px"
   };
 

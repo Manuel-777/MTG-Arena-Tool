@@ -14,9 +14,11 @@ import {
   DraftData,
   DraftState,
   LogData,
-  MatchData,
   SettingsData
 } from "./overlayUtil";
+
+import { MatchData } from "../window_background/types/currentMatch";
+
 import DraftElements from "./DraftElements";
 import MatchElements from "./MatchElements";
 import { DbCardData } from "../shared/types/Metadata";

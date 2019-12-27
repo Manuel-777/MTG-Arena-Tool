@@ -1,12 +1,7 @@
 import _ from "lodash";
 import db from "./database.js";
 import Colors from "./colors";
-import {
-  CardObject,
-  v2cardsList,
-  v3cardsList,
-  isV2CardsList
-} from "./types/Deck";
+import { CardObject, v2cardsList, isV2CardsList } from "./types/Deck";
 import { DbCardData } from "./types/Metadata";
 
 interface CardTypesCount {
@@ -161,7 +156,7 @@ class CardsList {
   /**
    * Counts how many cards of a given type the list has.
    **/
-  countType(type: string) {
+  countType(type: string): number {
     const types = this.countTypesAll();
     if (type.includes("Land", 0)) return types.lan;
     else if (type.includes("Creature", 0)) return types.cre;
@@ -269,7 +264,7 @@ class CardsList {
   /**
    * Inserts a chance property to each card in the list.
    **/
-  addChance(fn: (item?: CardObject) => number): void {
+  addChance(fn: (item: CardObject) => number): void {
     this.list.forEach(card => {
       card.chance = fn(card);
     });

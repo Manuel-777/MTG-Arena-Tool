@@ -1,4 +1,7 @@
+/* eslint-disable prefer-const */
 import Deck from "../shared/deck";
+import { ZoneData } from "./types/greInterpreter";
+import { MatchData, matchDataDefault } from "./types/currentMatch";
 
 // Hey! If you're here, you might be thinking of adding stuff to this file.
 // Don't. This is a shadowy place. You must never go here.
@@ -8,8 +11,6 @@ import Deck from "../shared/deck";
 let actionLogDir = "";
 
 let currentDeck = new Deck();
-
-let currentMatch: any = null;
 
 const debugLog = false;
 
@@ -25,7 +26,7 @@ let gameNumberCompleted = 0;
 
 let idChanges: any = {};
 
-let initialLibraryInstanceIds: any[] = [];
+let initialLibraryInstanceIds: number[] = [];
 
 let instanceToCardIdMap: any = {};
 
@@ -47,6 +48,10 @@ let watchingLog = false;
 
 let stopWatchingLog: any;
 
+let cardTypesByZone: ZoneData = {};
+
+let currentMatch: MatchData = matchDataDefault;
+
 export default {
   actionLogDir,
   currentDeck,
@@ -65,6 +70,7 @@ export default {
   matchCompletedOnGameNumber,
   matchGameStats,
   odds_sample_size,
+  cardTypesByZone,
   originalDeck,
   stopWatchingLog,
   toolVersion,

@@ -22,9 +22,10 @@ import DeckTypesStats from "../shared/DeckTypesStats";
 import OwnershipStars from "../shared/OwnershipStars";
 
 import { CardObject } from "../shared/types/Deck";
-import { OddsData, OverlaySettingsData } from "./overlayUtil";
+import { OverlaySettingsData } from "./overlayUtil";
 import SampleSizePanel from "./SampleSizePanel";
 import { DbCardData } from "../shared/types/Metadata";
+import { Chances } from "../window_background/types/decks";
 
 const landsCard = {
   id: 100,
@@ -77,11 +78,11 @@ function compareDraftPicks(a: CardObject, b: CardObject): -1 | 0 | 1 {
   const aType = getCardTypeSort(aCard.type);
   const bType = getCardTypeSort(bCard.type);
 
-  let rankDiff = bCard.rank - aCard.rank;
-  let colorsLengthDiff = aColors.length - bColors.length;
-  let cmcDiff = aCard.cmc - bCard.cmc;
-  let typeDiff = aType - bType;
-  let localeCompare = aCard.name.localeCompare(bCard.name);
+  const rankDiff = bCard.rank - aCard.rank;
+  const colorsLengthDiff = aColors.length - bColors.length;
+  const cmcDiff = aCard.cmc - bCard.cmc;
+  const typeDiff = aType - bType;
+  const localeCompare = aCard.name.localeCompare(bCard.name);
   const compare =
     rankDiff || colorsLengthDiff || cmcDiff || typeDiff || localeCompare;
 
@@ -100,7 +101,7 @@ export interface DeckListProps {
   highlightCardId?: string;
   settings: OverlaySettingsData;
   tileStyle: number;
-  cardOdds?: OddsData;
+  cardOdds?: Chances;
   setHoverCardCallback: (card?: DbCardData) => void;
   setOddsCallback?: (sampleSize: number) => void;
 }

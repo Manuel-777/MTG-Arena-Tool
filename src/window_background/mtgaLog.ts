@@ -8,7 +8,7 @@ const fsPromises = {
   read: promisify(fs.read)
 };
 
-export function defaultLogUri() {
+export function defaultLogUri(): string {
   if (process.platform !== "win32") {
     return (
       process.env.HOME +
@@ -17,13 +17,16 @@ export function defaultLogUri() {
       "/AppData/LocalLow/Wizards of the Coast/MTGA/output_log.txt"
     );
   }
-  return process.env.APPDATA.replace(
-    "Roaming",
-    "LocalLow\\Wizards Of The Coast\\MTGA\\output_log.txt"
+
+  const windowsMtgaLogFolder =
+    "LocalLow\\Wizards Of The Coast\\MTGA\\output_log.txt";
+  return (
+    process.env.APPDATA?.replace("Roaming", windowsMtgaLogFolder) ??
+    "c:\\users\\" + process.env.USER + "\\AppData\\" + windowsMtgaLogFolder
   );
 }
 
-export async function exists(path) {
+export async function exists(path: fs.PathLike): Promise<boolean> {
   try {
     await fsPromises.access(path, fs.constants.R_OK);
     return true;
@@ -32,11 +35,15 @@ export async function exists(path) {
   }
 }
 
-export async function stat(path) {
+export async function stat(path: fs.PathLike): Promise<fs.Stats> {
   return await fsPromises.stat(path);
 }
 
-export async function readSegment(path, start, length) {
+export async function readSegment(
+  path: fs.PathLike,
+  start: number | null,
+  length: number
+): Promise<string> {
   const fd = await fsPromises.open(path, "r");
   try {
     const buffer = Buffer.alloc(length);

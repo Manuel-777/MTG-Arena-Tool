@@ -11,7 +11,7 @@ import { getReadableFormat } from "../shared/util";
 import { HIDDEN_PW, MAIN_DECKS } from "../shared/constants";
 import { ipc_send, setData, unleakString } from "./backgroundUtil";
 import { createDeck } from "./data";
-import * as mtgaLog from "./mtga-log";
+import * as mtgaLog from "./mtgaLog";
 import globals from "./globals";
 import addCustomDeck from "./addCustomDeck";
 import forceDeckUpdate from "./forceDeckUpdate";

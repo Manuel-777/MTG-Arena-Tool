@@ -8,7 +8,7 @@ import {
   createInput,
   queryElements as $$
 } from "../shared/dom-fns";
-import { addCardHover } from "../shared/card-hover";
+import { addCardHover } from "../shared/cardHover";
 import { getCardImage } from "../shared/util";
 import { changeBackground } from "./renderer-util";
 

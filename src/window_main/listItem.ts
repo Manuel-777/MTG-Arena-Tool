@@ -2,15 +2,33 @@ import { getCardArtCrop } from "../shared/util";
 import { createDiv } from "../shared/dom-fns";
 
 class ListItem {
-  constructor(_grpId, _id, _onClick, _onDelete, isArchived = false) {
-    this.onClickCallback = _onClick;
-    if (typeof _onDelete == "function") {
-      this.onDeleteCallback = _onDelete;
-    }
+  private id: string;
+  private container: HTMLDivElement;
+  private left: HTMLDivElement;
+  private right: HTMLDivElement;
+  private center: HTMLDivElement;
+  private deleteButton: HTMLDivElement;
+  private imageContainer: HTMLDivElement;
 
-    this.id = _id;
+  private leftTop: HTMLDivElement;
+  private leftBottom: HTMLDivElement;
 
-    this.container = createDiv(["list_item_container", _id]);
+  private centerTop: HTMLDivElement;
+  private centerBottom: HTMLDivElement;
+
+  private rightTop: HTMLDivElement;
+  private rightBottom: HTMLDivElement;
+
+  constructor(
+    grpId: number,
+    id: string,
+    onClick: (id: number | string) => void,
+    onDelete?: (id: number | string) => void,
+    isArchived = false
+  ) {
+    this.id = id;
+
+    this.container = createDiv(["list_item_container", id]);
     this.left = createDiv(["list_item_left"]);
     this.center = createDiv(["list_item_center"]);
     this.right = createDiv(["list_item_right"]);
@@ -22,9 +40,7 @@ class ListItem {
       ? "restore"
       : "archive (will not delete data)";
     this.imageContainer = createDiv(["list_item_image"]);
-    this.imageContainer.style.backgroundImage = `url(${getCardArtCrop(
-      _grpId
-    )})`;
+    this.imageContainer.style.backgroundImage = `url(${getCardArtCrop(grpId)})`;
 
     this.container.appendChild(this.imageContainer);
     this.container.appendChild(this.left);
@@ -33,11 +49,11 @@ class ListItem {
 
     // Add event listeners
     // All of these should be stored and removed when we 'unmount' the class
-    if (_onDelete) {
+    if (onDelete !== undefined) {
       this.container.appendChild(this.deleteButton);
-      this.deleteButton.addEventListener("click", e => {
+      this.deleteButton.addEventListener("click", (e: Event) => {
         e.stopPropagation();
-        this.onDeleteCallback(this.id);
+        onDelete(this.id);
         if (!isArchived) {
           this.container.style.height = "0px";
           this.container.style.overflow = "hidden";
@@ -46,48 +62,50 @@ class ListItem {
       });
     }
 
-    this.imageContainer.style.opacity = 0.66;
+    this.imageContainer.style.opacity = "0.66";
     this.imageContainer.style.width = "128px";
+
     this.container.addEventListener("mouseover", () => {
-      this.imageContainer.style.opacity = 1;
+      this.imageContainer.style.opacity = "1";
       this.imageContainer.style.width = "200px";
-      if (_onDelete) {
-        this.deleteButton.style.width = "32px";
-      }
+      this.deleteButton.style.width = "32px";
     });
+
     this.container.addEventListener("mouseout", () => {
-      this.imageContainer.style.opacity = 0.66;
+      this.imageContainer.style.opacity = "0.66";
       this.imageContainer.style.width = "128px";
-      if (_onDelete) {
-        this.deleteButton.style.width = "4px";
-      }
+      this.deleteButton.style.width = "4px";
     });
+
     this.container.addEventListener("click", () => {
-      this.onClickCallback(this.id);
+      onClick(this.id);
     });
+
+    this.leftTop = createDiv(["flex_top"]);
+    this.leftBottom = createDiv(["flex_bottom"]);
+
+    this.centerTop = createDiv(["flex_top"]);
+    this.centerBottom = createDiv(["flex_bottom"]);
+
+    this.rightTop = createDiv(["flex_top"]);
+    this.rightBottom = createDiv(["flex_bottom"]);
 
     return this;
   }
 
-  divideLeft() {
-    this.leftTop = createDiv(["flex_top"]);
-    this.leftBottom = createDiv(["flex_bottom"]);
+  divideLeft(): void {
     this.left.style.flexDirection = "column";
     this.left.appendChild(this.leftTop);
     this.left.appendChild(this.leftBottom);
   }
 
-  divideCenter() {
-    this.centerTop = createDiv(["flex_top"]);
-    this.centerBottom = createDiv(["flex_bottom"]);
+  divideCenter(): void {
     this.center.style.flexDirection = "column";
     this.center.appendChild(this.centerTop);
     this.center.appendChild(this.centerBottom);
   }
 
-  divideRight() {
-    this.rightTop = createDiv(["flex_top"]);
-    this.rightBottom = createDiv(["flex_bottom"]);
+  divideRight(): void {
     this.right.style.flexDirection = "column";
     this.right.appendChild(this.rightTop);
     this.right.appendChild(this.rightBottom);

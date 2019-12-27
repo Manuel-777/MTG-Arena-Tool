@@ -3835,3 +3835,35 @@ a:hover {
     width: 16px;
     height: 16px;
 }
+
+.decks_table_head {
+    display: grid;
+    color: var(--color-light);
+}
+
+.decks_table_head_container {
+    display: flex;
+    justify-content: center;   
+}
+
+.decks_table_body_row {
+    display: grid;
+    color: var(--color-light);
+    -webkit-transition: all .2s ease-in;
+}
+
+.decks_table_body_row:hover {
+    background-color: rgba(0,0,0,0.4);
+}
+
+.decks_table_body_row .inner_div {
+    display: flex;
+    padding: 2px;
+    justify-content: flex-end;
+    align-items: center;
+    overflow: hidden;
+}
+
+.hover_label:hover {
+    background-color: rgba(0,0,0,0.4);
+}
