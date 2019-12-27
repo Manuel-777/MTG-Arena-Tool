@@ -26,7 +26,7 @@ export function defaultLogUri(): string {
   );
 }
 
-export async function exists(path: fs.PathLike) {
+export async function exists(path: fs.PathLike): Promise<boolean> {
   try {
     await fsPromises.access(path, fs.constants.R_OK);
     return true;
@@ -35,7 +35,7 @@ export async function exists(path: fs.PathLike) {
   }
 }
 
-export async function stat(path: fs.PathLike) {
+export async function stat(path: fs.PathLike): Promise<fs.Stats> {
   return await fsPromises.stat(path);
 }
 
@@ -43,7 +43,7 @@ export async function readSegment(
   path: fs.PathLike,
   start: number | null,
   length: number
-) {
+): Promise<string> {
   const fd = await fsPromises.open(path, "r");
   try {
     const buffer = Buffer.alloc(length);
