@@ -14,31 +14,46 @@ const MAX_HOVER_TIME = 10000; // 10 seconds
 
 let lastHoverStart: number | undefined = undefined;
 
-export function addCardHover(element: HTMLElement, card: false | DbCardData) {
+export function attachOwnerhipStars(
+  card: false | DbCardData,
+  starContainer: HTMLDivElement
+): void {
+  if (!card) {
+    return;
+  }
+
+  starContainer.style.opacity = "1";
+  ReactDOM.render(<OwnershipStars card={card} />, starContainer);
+}
+
+export function addCardHover(
+  element: HTMLElement,
+  card: false | DbCardData
+): void {
   if (!card) return;
 
   const dbCard = card;
   if (!dbCard.images || dbCard.type === "Special") return;
 
-  const hideHover = () => {
+  const hideHover = (): void => {
     $$(
       ".hover_card_quantity, .main_hover, .main_hover_ratings, .main_hover_dfc, .loader, .loader_dfc"
-    ).forEach((element: any) => (element.style.opacity = "0"));
+    ).forEach((element: HTMLElement) => (element.style.opacity = "0"));
     lastHoverStart = undefined;
   };
 
   element.addEventListener("mouseover", () => {
     $$(".loader, .main_hover").forEach(
-      (element: any) => (element.style.opacity = "1")
+      (element: HTMLElement) => (element.style.opacity = "1")
     );
     // Split cards are readable both halves, no problem
     if (
       dbCard.dfcId &&
       (dbCard.dfc === FACE_DFC_BACK || dbCard.dfc === FACE_DFC_FRONT)
     ) {
-      $$(".loader_dfc, .main_hover_dfc").forEach((el: any) => {
+      $$(".loader_dfc, .main_hover_dfc").forEach((el: HTMLElement) => {
         el.style.display = "block";
-        el.style.opacity = 1;
+        el.style.opacity = "1";
       });
 
       const dfcCard = db.card(dbCard.dfcId);
@@ -47,18 +62,20 @@ export function addCardHover(element: HTMLElement, card: false | DbCardData) {
       const dfcImageElement = $$(".main_hover_dfc")[0];
       dfcImageElement.src = dfcCardImage;
       dfcImageElement.addEventListener("load", () => {
-        $$(".loader_dfc").forEach((el: any) => (el.style.opacity = 0));
+        $$(".loader_dfc").forEach(
+          (el: HTMLElement) => (el.style.opacity = "0")
+        );
       });
     } else {
       $$(".main_hover_dfc, .loader_dfc").forEach(
-        (el: any) => (el.style.display = "none")
+        (el: HTMLElement) => (el.style.display = "none")
       );
     }
 
     const mainImageElement = $$(".main_hover")[0];
     mainImageElement.src = getCardImage(dbCard);
     mainImageElement.addEventListener("load", () => {
-      $$(".loader").forEach((el: any) => (el.style.opacity = 0));
+      $$(".loader").forEach((el: HTMLElement) => (el.style.opacity = "0"));
     });
 
     // show card quantity
@@ -73,16 +90,4 @@ export function addCardHover(element: HTMLElement, card: false | DbCardData) {
   });
 
   element.addEventListener("mouseleave", hideHover);
-}
-
-export function attachOwnerhipStars(
-  card: false | DbCardData,
-  starContainer: HTMLDivElement
-): void {
-  if (!card) {
-    return;
-  }
-
-  starContainer.style.opacity = "1";
-  ReactDOM.render(<OwnershipStars card={card} />, starContainer);
 }
