@@ -59,7 +59,6 @@ import { openHomeTab } from "./home";
 import { tournamentOpen } from "./tournaments";
 import { openDeck } from "./deck-details";
 import { openSettingsTab, setCurrentOverlaySettings } from "./settings";
-import { showWhatsNew } from "./whatsNew";
 import { showOfflineSplash } from "./renderer-util";
 import { setExploreDecks } from "./explore";
 
@@ -294,12 +293,6 @@ ipc.on("prefill_auth_form", function(event, arg) {
   byId("signin_pass").value = arg.password;
 });
 
-let isNew = false;
-//
-ipc.on("show_whats_new", function(event, arg) {
-  isNew = true;
-});
-
 // Seems this is not used anymore?
 function rememberMe() {
   const rSettings = {
@@ -314,13 +307,6 @@ ipc.on("initialize", function() {
   updateTopBar();
 
   openTab(pd.settings.last_open_tab);
-
-  if (isNew) {
-    ipcSend("save_app_settings", {});
-    setTimeout(() => {
-      showWhatsNew();
-    }, 1000);
-  }
 
   $$(".top_nav")[0].classList.remove("hidden");
   $$(".overflow_ux")[0].classList.remove("hidden");
