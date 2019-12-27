@@ -7,7 +7,7 @@ import {
 
 class DataScroller {
   private container: HTMLElement;
-  private renderData: (container: any, index: any) => number;
+  private renderData: (container: HTMLElement, index: number) => number;
   private loadAmount: number;
   private maxDataIndex: number;
   private loaded: number;
@@ -31,7 +31,7 @@ class DataScroller {
     return this;
   }
 
-  render(loadMore: number, scrollTop: number) {
+  render(loadMore: number, scrollTop: number): void {
     const d = createDiv(["list_fill"]);
     this.container.appendChild(d);
     this.loaded = 0;
@@ -41,7 +41,7 @@ class DataScroller {
 
     this.container.scrollTop = scrollTop;
 
-    const handler = () => {
+    const handler = (): void => {
       const newLs: { lastDataIndex: number; lastScrollTop: number } = {
         lastDataIndex: 0,
         lastScrollTop: 0
@@ -60,7 +60,7 @@ class DataScroller {
     setLocalState({ lastScrollHandler: handler });
   }
 
-  renderRows(loadMore: number) {
+  renderRows(loadMore: number): void {
     showLoadingBars();
     const loadEnd = this.loaded + loadMore;
     while (this.loaded < loadEnd && this.dataIndex < this.maxDataIndex) {
