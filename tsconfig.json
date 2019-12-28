@@ -14,7 +14,8 @@
       "isolatedModules": true,
       // Import non-ES modules as default imports.
       "esModuleInterop": true,
-      "jsx": "react"
+      "jsx": "react",
+      "downlevelIteration": true
     },
     "include": [
       "src"
