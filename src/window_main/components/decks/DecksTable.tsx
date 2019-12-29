@@ -455,29 +455,29 @@ export default function DecksTable({
       >
         {headers
           .filter((header: any) => header.isVisible)
-          .map((header: any, ii: number) => (
+          .map((column: any, ii: number) => (
             <div
-              {...header.getHeaderProps(header.getSortByToggleProps())}
+              {...column.getHeaderProps(column.getSortByToggleProps())}
               className={"hover_label"}
               style={{
                 height: "64px",
                 gridArea: `1 / ${ii + 1} / 1 / ${ii + 2}`
               }}
-              key={header.id}
+              key={column.id}
             >
               <div className={"decks_table_head_container"}>
                 <div
                   className={
-                    header.isSorted
-                      ? header.isSortedDesc
+                    column.isSorted
+                      ? column.isSortedDesc
                         ? " sort_desc"
                         : " sort_asc"
                       : ""
                   }
                   style={{ marginRight: "4px", width: "16px" }}
                 />
-                <div className={"flex_item"}>{header.render("Header")}</div>
-                {header.canFilter && header.id !== "deckTileId" && (
+                <div className={"flex_item"}>{column.render("Header")}</div>
+                {column.canFilter && column.id !== "deckTileId" && (
                   <div
                     style={{ marginRight: 0 }}
                     className={"button settings"}
@@ -485,28 +485,28 @@ export default function DecksTable({
                       e.stopPropagation();
                       setFiltersVisible({
                         ...filtersVisible,
-                        [header.id]: !filtersVisible[header.id]
+                        [column.id]: !filtersVisible[column.id]
                       });
                     }}
                     title={
-                      (filtersVisible[header.id] ? "hide" : "show") +
+                      (filtersVisible[column.id] ? "hide" : "show") +
                       " column filter"
                     }
                   />
                 )}
-                {header.filterValue && header.id !== "deckTileId" && (
+                {column.filterValue && column.id !== "deckTileId" && (
                   <div
                     style={{ marginRight: 0 }}
                     className={"button close"}
                     onClick={(e): void => {
                       e.stopPropagation();
-                      setFilter(header.id, undefined);
+                      setFilter(column.id, undefined);
                     }}
                     title={"clear column filter"}
                   />
                 )}
               </div>
-              {header.canFilter && filtersVisible[header.id] && (
+              {column.canFilter && filtersVisible[column.id] && (
                 <div
                   onClick={(e): void => e.stopPropagation()}
                   style={{
@@ -515,14 +515,14 @@ export default function DecksTable({
                   }}
                   title={"filter column"}
                 >
-                  {header.render("Filter")}
-                  {header.filterValue && header.id === "deckTileId" && (
+                  {column.render("Filter")}
+                  {column.filterValue && column.id === "deckTileId" && (
                     <div
                       style={{ marginRight: 0 }}
                       className={"button close"}
                       onClick={(e): void => {
                         e.stopPropagation();
-                        setFilter(header.id, undefined);
+                        setFilter(column.id, undefined);
                       }}
                       title={"clear search"}
                     />
