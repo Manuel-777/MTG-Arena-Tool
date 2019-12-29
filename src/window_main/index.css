@@ -3854,6 +3854,7 @@ a:hover {
 
 .decks_table_body_row:hover {
     background-color: rgba(0,0,0,0.4);
+    cursor: pointer;
 }
 
 .decks_table_body_row .inner_div {
@@ -3866,4 +3867,5 @@ a:hover {
 
 .hover_label:hover {
     background-color: rgba(0,0,0,0.4);
+    cursor: pointer;
 }
