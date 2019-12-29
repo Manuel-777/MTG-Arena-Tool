@@ -453,7 +453,7 @@ function InventoryCard(props: InventoryCardProps) {
 
   const tooltip = isAetherized
     ? computeAetherizedTooltip(card, quantity)
-    : card.name;
+    : card?.name ?? "";
   return (
     <div
       ref={inventoryCardRef}
