@@ -26,10 +26,7 @@ export function attachOwnerhipStars(
   ReactDOM.render(<OwnershipStars card={card} />, starContainer);
 }
 
-export function addCardHover(
-  element: HTMLElement,
-  card: false | DbCardData
-): void {
+export function addCardHover(element: HTMLElement, card?: DbCardData): void {
   if (!card) return;
 
   const dbCard = card;

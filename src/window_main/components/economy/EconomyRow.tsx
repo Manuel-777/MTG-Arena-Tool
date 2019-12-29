@@ -23,6 +23,7 @@ import React, { useState } from "react";
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
 import ReactDOM from "react-dom";
 import LocalTime from "../../../shared/time-components/LocalTime";
+import { DbCardData } from "../../../shared/types/Metadata";
 
 function EconomyRowDate(date: Date) {
   return (
@@ -427,7 +428,7 @@ function FlexRight(props: FlexRightProps) {
 }
 
 interface InventoryCardProps {
-  card: any;
+  card?: DbCardData;
   isAetherized?: boolean;
   quantity?: number;
 }
@@ -437,7 +438,7 @@ function InventoryCard(props: InventoryCardProps) {
   const inventoryCardRef = React.useRef<HTMLDivElement>(null);
   const onCardClick = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const lookupCard = card.dfc == "SplitHalf" ? db.card(card.dfcId) : card;
+      const lookupCard = db.card(card?.dfcId) ?? card;
       openScryfallCard(lookupCard);
     },
     [card]
@@ -452,7 +453,7 @@ function InventoryCard(props: InventoryCardProps) {
 
   const tooltip = isAetherized
     ? computeAetherizedTooltip(card, quantity)
-    : card.name;
+    : card?.name ?? "";
   return (
     <div
       ref={inventoryCardRef}
