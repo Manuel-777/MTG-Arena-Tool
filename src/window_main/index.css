@@ -1267,7 +1267,7 @@ a:hover {
     padding-left: 8px;
     padding-right: 8px;
     width: calc(100% - 16px);
-    height: calc(100% - 122px);
+    height: calc(100% - 182px);
     overflow: auto;
     display: flex;
     flex-wrap: wrap;
@@ -1275,10 +1275,8 @@ a:hover {
 }
 
 .inventory_filters_basic {
-    display: flex;
     align-items: center;
     padding: 16px 32px;
-    height: 90px;
     background-color: rgba(0, 0, 0, 0.2);
     justify-content: space-between;
 }

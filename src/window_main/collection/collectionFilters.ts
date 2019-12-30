@@ -79,11 +79,38 @@ export function renderCollectionFilters(
   updateCallback: () => void,
   exportCallback: () => void
 ): void {
+  const closeAndUpdate = (): void => {
+    closeFilters();
+    updateCallback();
+  };
   const orderedSets = db.sortedSetCodes.filter(
     code => db.sets[code].collation !== -1
   );
 
   const basicFilters = createDiv(["inventory_filters_basic"]);
+
+  const sets = createDiv(["sets_container"]);
+  orderedSets.forEach(set => {
+    const setbutton = createDiv(["set_filter", "set_filter_on"]);
+    const svgData = db.sets[set].svg;
+    setbutton.style.backgroundImage = `url(data:image/svg+xml;base64,${svgData})`;
+    setbutton.title = set;
+
+    sets.appendChild(setbutton);
+    setbutton.addEventListener("click", () => {
+      if (!setbutton.classList.toggle("set_filter_on")) {
+        filteredSets.push(set);
+        closeAndUpdate();
+      } else {
+        const n = filteredSets.indexOf(set);
+        if (n > -1) {
+          filteredSets.splice(n, 1);
+          closeAndUpdate();
+        }
+      }
+    });
+  });
+  basicFilters.appendChild(sets);
 
   const fll = createDiv(["inventory_flex_half"]);
   const flr = createDiv(["inventory_flex_half"]);
@@ -97,20 +124,20 @@ export function renderCollectionFilters(
 
   let label = document.createElement("label");
   label.style.display = "table";
-  label.innerHTML = "Search";
+  label.innerHTML = "Name:";
   icd.appendChild(label);
-
   const input = document.createElement("input");
   input.id = "query_name";
   input.autocomplete = "off";
   input.type = "search";
+  input.placeholder = "Search card name...";
 
   icd.appendChild(input);
   fllt.appendChild(icd);
 
   input.addEventListener("keydown", function(e) {
     if (e.keyCode == 13) {
-      updateCallback();
+      closeAndUpdate();
     }
   });
 
@@ -119,48 +146,18 @@ export function renderCollectionFilters(
   flrt.appendChild(searchButton);
 
   searchButton.addEventListener("click", () => {
-    updateCallback();
+    closeAndUpdate();
   });
-
-  createSelect(
-    fllb,
-    ["Card View", "Chart View", "Set View"],
-    displayMode,
-    res => {
-      displayMode = res;
-      updateCallback();
-    },
-    "query_display_mode"
-  );
-
-  if (displayMode === "Card View") {
-    const sortby = [
-      "Sort by Set",
-      "Sort by Name",
-      "Sort by Rarity",
-      "Sort by CMC"
-    ];
-    createSelect(
-      flrb,
-      sortby,
-      sortingAlgorithm,
-      res => {
-        sortingAlgorithm = res;
-        updateCallback();
-      },
-      "query_sort_by"
-    );
-  }
 
   const exp = createDiv(["button_simple", "button_thin"], "Export");
   exp.style.width = "100px";
   exp.addEventListener("click", exportCallback);
-  flrb.appendChild(exp);
+  flrt.appendChild(exp);
 
   const reset = createDiv(["button_simple", "button_thin"], "Reset");
   reset.style.width = "100px";
   reset.addEventListener("click", () => {
-    resetFilters(updateCallback);
+    resetFilters(closeAndUpdate);
   });
   flrt.appendChild(reset);
 
@@ -171,58 +168,55 @@ export function renderCollectionFilters(
   });
   flrt.appendChild(advButton);
 
+  const displayModeInput = createSelect(
+    fllb,
+    ["Card View", "Chart View", "Set View"],
+    displayMode,
+    res => {
+      displayMode = res;
+      sortInput.style.visibility =
+        displayMode === "Card View" ? "visible" : "hidden";
+      closeAndUpdate();
+    },
+    "query_display_mode"
+  );
+  displayModeInput.style.marginLeft = "0";
+
+  const sortby = [
+    "Sort by Set",
+    "Sort by Name",
+    "Sort by Rarity",
+    "Sort by CMC"
+  ];
+  const sortInput = createSelect(
+    flrb,
+    sortby,
+    sortingAlgorithm,
+    res => {
+      sortingAlgorithm = res;
+      closeAndUpdate();
+    },
+    "query_sort_by"
+  );
+  sortInput.style.marginLeft = "auto";
+  sortInput.style.marginRight = "0";
+
   fll.appendChild(fllt);
   fll.appendChild(fllb);
   flr.appendChild(flrt);
   flr.appendChild(flrb);
-  basicFilters.appendChild(fll);
-  basicFilters.appendChild(flr);
+  const columnWrapper = createDiv(["inventory_flex"]);
+  columnWrapper.appendChild(fll);
+  columnWrapper.appendChild(flr);
+  basicFilters.appendChild(columnWrapper);
 
   // "ADVANCED" FILTERS
   const filters = createDiv(["inventory_filters"]);
 
-  const flex = createDiv(["inventory_flex_half"]);
-
   icd = createDiv(["input_container_inventory"]);
   icd.style.paddingBottom = "8px";
 
-  // Type line input
-  label = document.createElement("label");
-  label.style.display = "table";
-  label.innerHTML = "Type line";
-  icd.appendChild(label);
-
-  const typeInput = document.createElement("input");
-  typeInput.id = "query_type";
-  typeInput.autocomplete = "off";
-  typeInput.type = "search";
-
-  icd.appendChild(typeInput);
-  flex.appendChild(icd);
-  filters.appendChild(flex);
-
-  const sets = createDiv(["sets_container"]);
-
-  orderedSets.forEach(set => {
-    const setbutton = createDiv(["set_filter", "set_filter_on"]);
-    const svgData = db.sets[set].svg;
-    setbutton.style.backgroundImage = `url(data:image/svg+xml;base64,${svgData})`;
-    setbutton.title = set;
-
-    sets.appendChild(setbutton);
-    setbutton.addEventListener("click", () => {
-      if (!setbutton.classList.toggle("set_filter_on")) {
-        filteredSets.push(set);
-      } else {
-        const n = filteredSets.indexOf(set);
-        if (n > -1) {
-          filteredSets.splice(n, 1);
-        }
-      }
-    });
-  });
-  filters.appendChild(sets);
-
+  // mana color filter bar
   const manas = createDiv(["sets_container"]);
   const ms = ["w", "u", "b", "r", "g"];
   ms.forEach(function(s, i) {
@@ -243,6 +237,25 @@ export function renderCollectionFilters(
     });
   });
   filters.appendChild(manas);
+
+  // Type line filter
+  const flex = createDiv(["inventory_flex_half"]);
+  flex.style.marginLeft = "auto";
+  flex.style.marginRight = "auto";
+  label = document.createElement("label");
+  label.style.display = "table";
+  label.innerHTML = "Types:";
+  icd.appendChild(label);
+
+  const typeInput = document.createElement("input");
+  typeInput.id = "query_type";
+  typeInput.autocomplete = "off";
+  typeInput.type = "search";
+  typeInput.placeholder = "Search card types...";
+
+  icd.appendChild(typeInput);
+  flex.appendChild(icd);
+  filters.appendChild(flex);
 
   const mainButtonCont = createDiv(["main_buttons_container"]);
   let cont = createDiv(["buttons_container"]);
@@ -373,7 +386,7 @@ export function renderCollectionFilters(
   searchButton.style.margin = "24px auto";
   filters.appendChild(searchButton);
 
-  searchButton.addEventListener("click", updateCallback);
+  searchButton.addEventListener("click", closeAndUpdate);
 
   container.appendChild(basicFilters);
   container.appendChild(filters);
@@ -432,6 +445,15 @@ function addCheckboxSearch(
   return inputCheck;
 }
 
+function closeFilters(): void {
+  const div = $$(".inventory_filters")[0];
+  if (div.style.opacity == 1) {
+    div.style.height = "0px";
+    div.style.opacity = 0;
+    $$(".inventory")[0].style.display = "flex";
+  }
+}
+
 function expandFilters(container: HTMLElement): void {
   container.style.overflow = "hidden";
   setTimeout(() => {
@@ -440,11 +462,9 @@ function expandFilters(container: HTMLElement): void {
 
   const div = $$(".inventory_filters")[0];
   if (div.style.opacity == 1) {
-    div.style.height = "0px";
-    div.style.opacity = 0;
-    $$(".inventory")[0].style.display = "flex";
+    closeFilters();
   } else {
-    div.style.height = "calc(100% - 122px)";
+    div.style.height = "calc(100% - 182px)";
     div.style.opacity = 1;
     setTimeout(function() {
       $$(".inventory")[0].style.display = "none";
@@ -467,7 +487,7 @@ function resetFilters(updateCallback: () => void): void {
 
   getInputById("query_name").value = "";
   getInputById("query_type").value = "";
-  getInputById("query_in_boosters").checked = true;
+  getInputById("query_in_boosters").checked = false;
   getInputById("query_new").checked = false;
   getInputById("query_multicolor").checked = false;
   getInputById("query_exclude").checked = false;

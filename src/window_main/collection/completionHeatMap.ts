@@ -17,10 +17,20 @@ import { CardStats } from "./collectionStats";
 export default function createHeatMap(
   container: HTMLElement,
   cardData: { [key: string]: CardStats[] }[],
-  title: string
+  setName: string
 ): void {
   const label = document.createElement("label");
-  label.innerHTML = title + " completion";
+  const iconSvg = db.sets[setName]?.svg ?? db.defaultSet?.svg;
+  const setIcon = createDiv(["stats_set_icon"]);
+  setIcon.style.display = "inline-block";
+  setIcon.style.backgroundImage = iconSvg
+    ? `url(data:image/svg+xml;base64,${iconSvg})`
+    : "url(../images/notfound.png)";
+  const setIconSpan = document.createElement("span");
+  setIconSpan.innerHTML = setName;
+  setIcon.appendChild(setIconSpan);
+  container.appendChild(setIcon);
+  label.appendChild(setIcon);
   container.appendChild(label);
 
   const table = createDiv(["completion_table"]);
