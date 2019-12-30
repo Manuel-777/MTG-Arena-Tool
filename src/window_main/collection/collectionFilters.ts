@@ -1,62 +1,19 @@
 /* eslint-disable max-statements, complexity, @typescript-eslint/no-use-before-define */
-import { remote } from "electron";
-import React from "react";
+import { COLORS_BRIEF } from "../../shared/constants";
+import db from "../../shared/database";
+import pd from "../../shared/player-data";
+import { queryElements as $$, createDiv } from "../../shared/dom-fns";
+import { collectionSortRarity } from "../../shared/util";
 
-import { COLORS_BRIEF } from "../shared/constants";
-import db from "../shared/database";
-import pd from "../shared/player-data";
-import { queryElements as $$, createDiv } from "../shared/dom-fns";
-import { addCardHover, attachOwnerhipStars } from "../shared/cardHover";
-import {
-  collectionSortRarity,
-  getCardImage,
-  openScryfallCard,
-  replaceAll
-} from "../shared/util";
-import { DbCardData } from "../shared/types/Metadata";
+import createSelect from "../createSelect";
 
-import createSelect from "./createSelect";
-import mountReactComponent from "./mountReactComponent";
-import { hideLoadingBars, ipcSend, resetMainContainer } from "./renderer-util";
-import { openSetStats } from "./collectionStats";
-
-// import CollectionTable from "./components/collection/CollectionTable";
-
-const Menu = remote.Menu;
-const MenuItem = remote.MenuItem;
-
-let collectionPage = 0;
 let sortingAlgorithm = "Sort by Set";
-let filteredSets: any;
-let filteredMana: any;
+let displayMode = "Card View";
+let filteredSets: any = [];
+let filteredMana: any = [];
 
-function getCollectionExport(exportFormat: string): string {
-  let list = "";
-  Object.keys(pd.cards.cards).forEach(key => {
-    let add = exportFormat + "";
-    const card = db.card(key);
-    if (card) {
-      let name = card.name;
-      name = replaceAll(name, "///", "//");
-      add = add.replace("$Name", '"' + name + '"');
-
-      add = add.replace(
-        "$Count",
-        pd.cards.cards[key] === 9999 ? 1 : pd.cards.cards[key]
-      );
-
-      add = add.replace("$SetName", card.set);
-      if (card.set in db.sets)
-        add = add.replace("$SetCode", db.sets[card.set].code);
-      add = add.replace("$Collector", card.cid);
-      add = add.replace("$Rarity", card.rarity);
-      add = add.replace("$Type", card.type);
-      add = add.replace("$Cmc", card.cmc + "");
-      list += add + "\r\n";
-    }
-  });
-
-  return list;
+export function getDisplayMode(): string {
+  return displayMode;
 }
 
 function collectionSortCmc(
@@ -117,36 +74,14 @@ function getInputById(id: string): HTMLInputElement {
   return (document.getElementById(id) ?? {}) as HTMLInputElement;
 }
 
-export function openCollectionTab(): void {
-  filteredSets = [];
-  filteredMana = [];
-
-  hideLoadingBars();
-  const detailDiv = document.getElementById("ux_1");
-  if (detailDiv) {
-    detailDiv.innerHTML = "";
-    detailDiv.classList.remove("flex_item");
-  }
-  const mainDiv = resetMainContainer();
-  if (!mainDiv) {
-    return;
-  }
-
-  renderCollectionFilters();
-  openCollectionPage();
-  // mountReactComponent(<CollectionTable data={getFilteredCardIds()} />, mainDiv);
-}
-
-function renderCollectionFilters(): void {
-  const mainDiv = document.getElementById("ux_0");
-  if (!mainDiv) {
-    return;
-  }
+export function renderCollectionFilters(
+  container: HTMLElement,
+  updateCallback: () => void,
+  exportCallback: () => void
+): void {
   const orderedSets = db.sortedSetCodes.filter(
     code => db.sets[code].collation !== -1
   );
-
-  const div = createDiv(["inventory"]);
 
   const basicFilters = createDiv(["inventory_filters_basic"]);
 
@@ -175,64 +110,66 @@ function renderCollectionFilters(): void {
 
   input.addEventListener("keydown", function(e) {
     if (e.keyCode == 13) {
-      openCollectionPage();
+      updateCallback();
     }
   });
 
   let searchButton = createDiv(["button_simple", "button_thin"], "Search");
+  searchButton.style.width = "100px";
   flrt.appendChild(searchButton);
 
-  const advancedButton = createDiv(
-    ["button_simple", "button_thin"],
-    "Advanced Filters"
-  );
-  flrt.appendChild(advancedButton);
-
   searchButton.addEventListener("click", () => {
-    openCollectionPage();
+    updateCallback();
   });
 
-  advancedButton.addEventListener("click", () => {
-    expandFilters();
-  });
-
-  const sortby = [
-    "Sort by Set",
-    "Sort by Name",
-    "Sort by Rarity",
-    "Sort by CMC"
-  ];
   createSelect(
     fllb,
-    sortby,
-    sortingAlgorithm,
+    ["Card View", "Chart View", "Set View"],
+    displayMode,
     res => {
-      sortingAlgorithm = res;
-      openCollectionPage();
+      displayMode = res;
+      updateCallback();
     },
-    "query_select"
+    "query_display_mode"
   );
 
-  const exp = createDiv(["button_simple", "button_thin"], "Export Collection");
-  fllb.appendChild(exp);
+  if (displayMode === "Card View") {
+    const sortby = [
+      "Sort by Set",
+      "Sort by Name",
+      "Sort by Rarity",
+      "Sort by CMC"
+    ];
+    createSelect(
+      flrb,
+      sortby,
+      sortingAlgorithm,
+      res => {
+        sortingAlgorithm = res;
+        updateCallback();
+      },
+      "query_sort_by"
+    );
+  }
+
+  const exp = createDiv(["button_simple", "button_thin"], "Export");
+  exp.style.width = "100px";
+  exp.addEventListener("click", exportCallback);
+  flrb.appendChild(exp);
 
   const reset = createDiv(["button_simple", "button_thin"], "Reset");
-  flrb.appendChild(reset);
-
-  const stats = createDiv(["button_simple", "button_thin"], "Collection Stats");
-  flrb.appendChild(stats);
-
-  exp.addEventListener("click", () => {
-    exportCollection();
-  });
-
+  reset.style.width = "100px";
   reset.addEventListener("click", () => {
-    resetFilters();
+    resetFilters(updateCallback);
   });
+  flrt.appendChild(reset);
 
-  stats.addEventListener("click", () => {
-    openSetStats();
+  const advButton = createDiv(["button_simple", "button_thin"], "Advanced");
+  advButton.style.width = "100px";
+  advButton.addEventListener("click", () => {
+    expandFilters(container);
   });
+  flrt.appendChild(advButton);
 
   fll.appendChild(fllt);
   fll.appendChild(fllb);
@@ -309,6 +246,13 @@ function renderCollectionFilters(): void {
 
   const mainButtonCont = createDiv(["main_buttons_container"]);
   let cont = createDiv(["buttons_container"]);
+
+  addCheckboxSearch(
+    cont,
+    '<div class="icon_search_booster"></div>In boosters only',
+    "query_in_boosters",
+    false
+  );
 
   addCheckboxSearch(
     cont,
@@ -429,13 +373,10 @@ function renderCollectionFilters(): void {
   searchButton.style.margin = "24px auto";
   filters.appendChild(searchButton);
 
-  searchButton.addEventListener("click", () => {
-    openCollectionPage();
-  });
+  searchButton.addEventListener("click", updateCallback);
 
-  mainDiv.appendChild(basicFilters);
-  mainDiv.appendChild(filters);
-  mainDiv.appendChild(div);
+  container.appendChild(basicFilters);
+  container.appendChild(filters);
 
   checkboxCmcLower.addEventListener("change", () => {
     if (getInputById("query_cmclower")?.checked == true) {
@@ -491,14 +432,10 @@ function addCheckboxSearch(
   return inputCheck;
 }
 
-function expandFilters(): void {
-  const mainDiv = document.getElementById("ux_0");
-  if (!mainDiv) {
-    return;
-  }
-  mainDiv.style.overflow = "hidden";
+function expandFilters(container: HTMLElement): void {
+  container.style.overflow = "hidden";
   setTimeout(() => {
-    mainDiv.removeAttribute("style");
+    container.removeAttribute("style");
   }, 1000);
 
   const div = $$(".inventory_filters")[0];
@@ -515,7 +452,7 @@ function expandFilters(): void {
   }
 }
 
-function resetFilters(): void {
+function resetFilters(updateCallback: () => void): void {
   filteredSets = [];
   filteredMana = [];
 
@@ -530,6 +467,7 @@ function resetFilters(): void {
 
   getInputById("query_name").value = "";
   getInputById("query_type").value = "";
+  getInputById("query_in_boosters").checked = true;
   getInputById("query_new").checked = false;
   getInputById("query_multicolor").checked = false;
   getInputById("query_exclude").checked = false;
@@ -548,153 +486,15 @@ function resetFilters(): void {
   getInputById("query_qtyequal").checked = true;
   getInputById("query_qtyhigher").checked = false;
 
-  openCollectionPage();
+  updateCallback();
 }
 
-function exportCollection(): void {
-  const list = getCollectionExport(pd.settings.export_format);
-  ipcSend("export_csvtxt", { str: list, name: "collection" });
-}
-
-function sortCollection(alg: string): void {
-  sortingAlgorithm = alg;
-  openCollectionPage();
-}
-
-function renderCardsTable(): void {
-  const mainDiv = document.getElementById("ux_0");
-  if (!mainDiv) {
-    return;
-  }
-  mainDiv.style.overflow = "hidden";
-
-  let div = $$(".inventory_filters")[0];
-  div.style.height = "0px";
-  div.style.opacity = 0;
-  $$(".inventory")[0].style.display = "flex";
-
-  div = $$(".inventory")[0];
-  div.innerHTML = "";
-
-  const paging = createDiv(["paging_container"]);
-  div.appendChild(paging);
-
-  const list = getFilteredCardIds();
-  const totalCards = list.length;
-
-  const keysSorted = [...list];
-  if (sortingAlgorithm == "Sort by Set") keysSorted.sort(collectionSortSet);
-  if (sortingAlgorithm == "Sort by Name") keysSorted.sort(collectionSortName);
-  if (sortingAlgorithm == "Sort by Rarity")
-    keysSorted.sort(collectionSortRarity);
-  if (sortingAlgorithm == "Sort by CMC") keysSorted.sort(collectionSortCmc);
-
-  for (let n = 0; n < keysSorted.length; n++) {
-    const key = keysSorted[n];
-
-    const grpId = key;
-    const card = db.card(grpId);
-    if (!card || !card.images || !card.collectible) {
-      continue;
-    }
-
-    const cardDiv = createDiv(["inventory_card"]);
-    cardDiv.style.width = pd.cardsSize + "px";
-    attachOwnerhipStars(card, cardDiv);
-    cardDiv.title = card.name;
-
-    const img = document.createElement("img");
-    img.style.width = pd.cardsSize + "px";
-    img.classList.add("inventory_card_img");
-    img.src = getCardImage(card);
-
-    cardDiv.appendChild(img);
-
-    //Don't show card hover, if collection card size is over 340px
-    if (!(pd.cardsSize >= 340)) {
-      addCardHover(img, card);
-    }
-
-    img.addEventListener("click", () => {
-      // TODO handle split cards?
-      // if (db.card(grpId)?.dfc == "SplitHalf") {
-      //   card = db.card(card.dfcId ?? "");
-      // }
-      //let newname = card.name.split(' ').join('-');
-      openScryfallCard(card);
-    });
-
-    addCardMenu(img, card);
-
-    div.appendChild(cardDiv);
-  }
-
-  const pagingBottom = createDiv(["paging_container"]);
-  div.appendChild(pagingBottom);
-  let but, butClone;
-  if (collectionPage <= 0) {
-    but = createDiv(["paging_button_disabled"], " < ");
-    butClone = but.cloneNode(true);
-  } else {
-    but = createDiv(["paging_button"], " < ");
-
-    but.addEventListener("click", () => {
-      openCollectionPage(collectionPage - 1);
-    });
-    butClone = but.cloneNode(true);
-    butClone.addEventListener("click", () => {
-      openCollectionPage(collectionPage + 1);
-    });
-  }
-
-  paging.appendChild(but);
-  pagingBottom.appendChild(butClone);
-
-  const totalPages = Math.ceil(totalCards / 100);
-  for (let n = 0; n < totalPages; n++) {
-    but = createDiv(["paging_button"], String(n + 1));
-    if (collectionPage == n) {
-      but.classList.add("paging_active");
-    }
-
-    const page = n;
-    but.addEventListener("click", () => {
-      openCollectionPage(page);
-    });
-    butClone = but.cloneNode(true);
-    butClone.addEventListener("click", () => {
-      openCollectionPage(page);
-    });
-
-    paging.append(but);
-    pagingBottom.append(butClone);
-  }
-  if (collectionPage >= totalPages - 1) {
-    but = createDiv(["paging_button_disabled"], " > ");
-    butClone = but.cloneNode(true);
-  } else {
-    but = createDiv(["paging_button"], " > ");
-    but.addEventListener("click", () => {
-      openCollectionPage(collectionPage + 1);
-    });
-    butClone = but.cloneNode(true);
-    butClone.addEventListener("click", () => {
-      openCollectionPage(collectionPage + 1);
-    });
-  }
-  paging.appendChild(but);
-  pagingBottom.appendChild(butClone);
-
-  setTimeout(() => {
-    mainDiv.removeAttribute("style");
-  }, 1000);
-}
-
-function getFilteredCardIds(): (number | string)[] {
+export function getFilteredCardIds(): (number | string)[] {
   const cardIds: Set<number | string> = new Set();
 
-  const filterName = getInputById("query_name")?.value.toLowerCase();
-  const filterType = getInputById("query_type")?.value.toLowerCase();
+  const filterName = getInputById("query_name")?.value?.toLowerCase();
+  const filterType = getInputById("query_type")?.value?.toLowerCase();
+  const filterInBoosters = getInputById("query_in_boosters");
   const filterNew = getInputById("query_new");
   const filterMulti = getInputById("query_multicolor");
   const filterExclude = getInputById("query_exclude");
@@ -716,13 +516,7 @@ function getFilteredCardIds(): (number | string)[] {
   const filterQtyEqual = getInputById("query_qtyequal")?.checked;
   const filterQtyHigher = getInputById("query_qtyhigher")?.checked;
 
-  let list;
-  if (filterQty === 0 || filterQtyLower) {
-    list = db.cardIds;
-  } else {
-    list = Object.keys(pd.cards.cards);
-  }
-
+  const list = db.cardIds ?? [];
   cardLoop: for (let n = 0; n < list.length; n++) {
     const key = list[n];
 
@@ -731,6 +525,10 @@ function getFilteredCardIds(): (number | string)[] {
     if (!card || !card.images || !card.collectible) {
       continue;
     }
+    if (filterInBoosters?.checked && !card.booster) {
+      continue;
+    }
+
     const name = card.name.toLowerCase();
     const type = card.type.toLowerCase();
     const rarity = card.rarity;
@@ -867,30 +665,22 @@ function getFilteredCardIds(): (number | string)[] {
   return [...cardIds];
 }
 
-function addCardMenu(div: HTMLElement, card: DbCardData): void {
-  if (!(card.set in db.sets)) return;
-  const arenaCode = `1 ${card.name} (${db.sets[card.set].arenacode}) ${
-    card.cid
-  }`;
-  div.addEventListener(
-    "contextmenu",
-    (e: Event) => {
-      e.preventDefault();
-      const menu = new Menu();
-      const menuItem = new MenuItem({
-        label: "Copy Arena code",
-        click: (): void => {
-          remote.clipboard.writeText(arenaCode);
-        }
-      });
-      menu.append(menuItem);
-      menu.popup();
-    },
-    false
-  );
-}
-
-function openCollectionPage(page = 0): void {
-  collectionPage = page;
-  renderCardsTable();
+export function sortCardIds(cardIds: (string | number)[]): void {
+  let sortFn = collectionSortSet;
+  switch (sortingAlgorithm) {
+    default:
+    case "Sort by Set":
+      sortFn = collectionSortSet;
+      break;
+    case "Sort by Name":
+      sortFn = collectionSortName;
+      break;
+    case "Sort by Rarity":
+      sortFn = collectionSortRarity;
+      break;
+    case "Sort by CMC":
+      sortFn = collectionSortCmc;
+      break;
+  }
+  cardIds.sort(sortFn);
 }

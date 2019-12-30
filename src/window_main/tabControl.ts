@@ -34,7 +34,7 @@ import { openHistoryTab } from "./history";
 import { openEventsTab } from "./events";
 import { openEconomyTab } from "./economy";
 import { openExploreTab } from "./explore";
-import { openCollectionTab } from "./CollectionTab";
+import { openCollectionTab } from "./collection/collectionTab";
 import { showOfflineSplash } from "./renderer-util";
 import { openSettingsTab } from "./settings";
 import { openHomeTab, requestHome } from "./home";

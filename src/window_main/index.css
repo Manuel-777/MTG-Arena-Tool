@@ -1484,6 +1484,15 @@ a:hover {
     background: center no-repeat url('../images/create.png');
 }
 
+.icon_search_booster {
+    display: -webkit-inline-box;
+    width: 20px;
+    margin-right: 16px;
+    height: 20px;
+    background: center no-repeat var(--booster_png);
+    background-size: contain;
+}
+
 .wc_search_icon {
     width: 24px;
     height: 20px;
@@ -1539,8 +1548,8 @@ a:hover {
 
 
 .main_stats {
-    margin: 16px 16px 16px 32px;
-    min-width: 320px;
+    margin: 12px;
+    min-width: 240px;
     display: block;
     text-align: center;
 }
@@ -1551,8 +1560,7 @@ a:hover {
 }
 
 .stats_set_completion {
-    cursor: pointer;
-    max-width: 320px;
+    max-width: 240px;
     margin: 24px auto;
     display: flex;
     flex-direction: column;
@@ -1581,7 +1589,6 @@ a:hover {
 }
 
 .stats_set_details {
-    cursor: pointer;
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
@@ -1589,7 +1596,6 @@ a:hover {
 }
 
 .stats_set_details span {
-    cursor: pointer;
     line-height: 24px;
     margin: 0 6px;
     font-size: 13px;
@@ -1598,7 +1604,6 @@ a:hover {
 }
 
 .stats_rarity_icon {
-    cursor: pointer;
     /*width: 24px;*/
     height: 24px;
     background-repeat: no-repeat;
@@ -1608,7 +1613,6 @@ a:hover {
 }
 
 .stats_rarity_icon span {
-    cursor: pointer;
     line-height: 24px;
     display: flex;
     font-size: 15px;
@@ -1626,7 +1630,7 @@ a:hover {
 .stats_set_bar:after {
     content: '';
     left: 0;
-    width: 320px;
+    width: 240px;
     background-color: rgb(99, 79, 53);
     height: 2px;
     position: absolute;
