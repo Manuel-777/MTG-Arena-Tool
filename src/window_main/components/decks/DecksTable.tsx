@@ -17,7 +17,8 @@ import {
   LastEditWinRateCell,
   MissingCardsCell,
   ArchiveHeader,
-  ArchivedCell
+  ArchivedCell,
+  StyledArtTileCell
 } from "./cells";
 import {
   StyledCheckboxContainer,
@@ -31,6 +32,9 @@ import {
   uberSearchFilterFn
 } from "./filters";
 import { CellProps, DecksTableProps, DecksTableState } from "./types";
+import { CSSTransition } from "react-transition-group";
+import { getCardArtCrop } from "../../../shared/util";
+import { ReactSelect } from "../../../shared/ReactSelect";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
 
@@ -323,6 +327,7 @@ export default function DecksTable({
   }
   const [filtersVisible, setFiltersVisible] = useState(initialFiltersVisible);
   const [togglesVisible, setTogglesVisible] = useState(false);
+  const [tableMode, setTableMode] = useState("Table View");
   const filterPanel = new FilterPanel(
     "decks_top",
     filterMatchesCallback,
@@ -449,6 +454,13 @@ export default function DecksTable({
             ))}
         </div>
         <div className="decks_table_search_cont">
+          <div className={"select_container"}>
+            <ReactSelect
+              current={tableMode}
+              options={["Table View", "Deck Art View"]}
+              callback={setTableMode}
+            />
+          </div>
           {deckTileColumn.render("Filter")}
           {deckTileColumn.filterValue && (
             <div
@@ -543,8 +555,15 @@ export default function DecksTable({
       <div className="decks_table_body" {...getTableBodyProps()}>
         {rows.map((row: any, index: number) => {
           prepareRow(row);
-          return (
+          return tableMode === "Table View" ? (
             <RowContainer
+              openDeckCallback={openDeckCallback}
+              row={row}
+              index={index}
+              key={row.index}
+            />
+          ) : (
+            <DeckTile
               openDeckCallback={openDeckCallback}
               row={row}
               index={index}
@@ -602,6 +621,57 @@ function RowContainer({
             {...cell.getCellProps()}
             key={cell.column.id + "_" + row.index}
             title={`show ${row.values.name} details`}
+          >
+            {cell.render("Cell")}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function DeckTile({
+  row,
+  index,
+  openDeckCallback
+}: {
+  row: any;
+  index: number;
+  openDeckCallback: (id: string) => void;
+}): JSX.Element {
+  const [hover, setHover] = React.useState(false);
+
+  const mouseEnter = React.useCallback(() => {
+    setHover(true);
+  }, []);
+
+  const mouseLeave = React.useCallback(() => {
+    setHover(false);
+  }, []);
+
+  const mouseClick = React.useCallback(() => {
+    openDeckCallback(row.values.deckId);
+  }, []);
+
+  return (
+    <div
+      className={"decks_table_deck_tile"}
+      style={{ width: "200px" }}
+      title={`show ${row.values.name} details`}
+      onMouseEnter={mouseEnter}
+      onMouseLeave={mouseLeave}
+      onClick={mouseClick}
+    >
+      <CSSTransition classNames="deckTileHover" in={!!hover} timeout={200}>
+        <StyledArtTileCell url={getCardArtCrop(row.values["deckTileId"])} />
+      </CSSTransition>
+      {row.cells.map((cell: any) => {
+        cell.hover = hover;
+        return (
+          <div
+            className="inner_div"
+            {...cell.getCellProps()}
+            key={cell.column.id + "_" + row.index}
           >
             {cell.render("Cell")}
           </div>

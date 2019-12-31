@@ -25,6 +25,64 @@ import {
   StyledArchivedCellProps
 } from "./types";
 
+const StyledArtTileHeader = styled.div`
+  width: 200px;
+  margin: 0;
+`;
+
+const StyledArtTile = styled(StyledArtTileHeader)`
+  background-size: 200px;
+  background-position-x: center;
+  background-position-y: -10px;
+  opacity: 0.66;
+  height: 64px;
+  width: 160px;
+  &.deckTileHover-enter {
+    opacity: 0.66;
+    width: 160px;
+  }
+  &.deckTileHover-enter-active {
+    opacity: 1;
+    width: 200px;
+    -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
+    transition: opacity 0.2s ease-in, width 0.2s ease-in;
+  }
+  &.deckTileHover-enter-done {
+    opacity: 1;
+    width: 200px;
+  }
+  &.deckTileHover-exit {
+    opacity: 1;
+    width: 200px;
+  }
+  &.deckTileHover-exit-active {
+    opacity: 0.66;
+    width: 160px;
+    -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
+    transition: opacity 0.2s ease-in, width 0.2s ease-in;
+  }
+  &.deckTileHover-exit-done {
+    opacity: 0.66;
+    width: 160px;
+  }
+`;
+interface StyledArtTileCellProps {
+  url: string;
+  className?: string;
+}
+
+export function StyledArtTileCell({
+  url,
+  ...otherProps
+}: StyledArtTileCellProps): JSX.Element {
+  return (
+    <StyledArtTile
+      style={{ backgroundImage: `url("${url}")` }}
+      {...otherProps}
+    />
+  );
+}
+
 const StyledFlexLeftCell = styled.div`
   display: flex;
   justify-content: left;

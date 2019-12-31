@@ -3888,6 +3888,27 @@ a:hover {
     overflow: hidden;
 }
 
+.decks_table_deck_tile {
+    display: inline-block;
+    height: 32px;
+    color: var(--color-light);
+    -webkit-transition: all .1s ease-out;
+}
+
+.decks_table_deck_tile:hover {
+    background-color: rgba(0,0,0,0.4);
+    cursor: pointer;
+}
+
+.decks_table_deck_tile .inner_div {
+    display: flex;
+    padding: 2px;
+    margin-left: 8px;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+}
+
 .hover_label:hover {
     background-color: rgba(0,0,0,0.4);
     cursor: pointer;
