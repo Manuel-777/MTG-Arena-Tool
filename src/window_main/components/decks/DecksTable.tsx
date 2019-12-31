@@ -656,7 +656,6 @@ function DeckTile({
   return (
     <div
       className={"decks_table_deck_tile"}
-      style={{ width: "200px" }}
       title={`show ${row.values.name} details`}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
@@ -670,6 +669,7 @@ function DeckTile({
         return (
           <div
             className="inner_div"
+            style={hover ? { backgroundColor: "rgba(0,0,0,0.4)" } : undefined}
             {...cell.getCellProps()}
             key={cell.column.id + "_" + row.index}
           >

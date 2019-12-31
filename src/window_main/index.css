@@ -3859,12 +3859,17 @@ a:hover {
     display: grid;
     color: var(--color-light);
     border-bottom: 1px solid var(--color-light);
+    background-color: var(--color-mid-20);
 }
 
 .decks_table_head_container {
     margin-top: 8px;
     display: flex;
     justify-content: center;   
+}
+
+.decks_table_body {
+    background-color: var(--color-mid-20);
 }
 
 .decks_table_body_row {
@@ -3891,12 +3896,9 @@ a:hover {
 .decks_table_deck_tile {
     display: inline-block;
     height: 32px;
+    width: 208px;
     color: var(--color-light);
     -webkit-transition: all .1s ease-out;
-}
-
-.decks_table_deck_tile:hover {
-    background-color: rgba(0,0,0,0.4);
     cursor: pointer;
 }
 

@@ -27,7 +27,7 @@ import {
 
 const StyledArtTileHeader = styled.div`
   width: 200px;
-  margin: 0;
+  margin: 0 8px;
 `;
 
 const StyledArtTile = styled(StyledArtTileHeader)`
