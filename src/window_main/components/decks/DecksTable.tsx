@@ -262,6 +262,7 @@ export default function DecksTable({
     }
     return state;
   }, [cachedState]);
+  const [tableMode, setTableMode] = useState(cachedTableMode);
 
   const {
     flatColumns,
@@ -281,9 +282,9 @@ export default function DecksTable({
       data: React.useMemo(() => data, [data]),
       useControlledState: (state: DecksTableState) => {
         return React.useMemo(() => {
-          tableStateCallback(state);
+          tableStateCallback({ ...state, decksTableMode: tableMode });
           return state;
-        }, [state, tableStateCallback]);
+        }, [state, tableMode, tableStateCallback]);
       },
       defaultColumn,
       filterTypes,
@@ -330,7 +331,6 @@ export default function DecksTable({
   }
   const [filtersVisible, setFiltersVisible] = useState(initialFiltersVisible);
   const [togglesVisible, setTogglesVisible] = useState(false);
-  const [tableMode, setTableMode] = useState(cachedTableMode);
   const filterPanel = new FilterPanel(
     "decks_top",
     filterMatchesCallback,

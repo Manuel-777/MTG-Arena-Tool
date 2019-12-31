@@ -153,6 +153,7 @@ export function openDecksTab(newFilters: AggregatorFilters = {}): void {
       tableStateCallback={(state: DecksTableState): void =>
         ipcSend("save_user_settings", {
           decksTableState: state,
+          decksTableMode: state.decksTableMode,
           skip_refresh: true
         })
       }

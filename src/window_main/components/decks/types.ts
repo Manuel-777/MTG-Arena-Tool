@@ -43,6 +43,7 @@ export interface DecksTableState {
   hiddenColumns: string[];
   filters: { [key: string]: any };
   sortBy: [{ id: string; desc: boolean }];
+  decksTableMode: string;
 }
 
 export interface DecksTableProps {
