@@ -56,6 +56,7 @@ export interface DecksTableProps {
   deleteTagCallback: (deckid: string, tag: string) => void;
   tableStateCallback: (state: DecksTableState) => void;
   cachedState: DecksTableState;
+  cachedTableMode: string;
 }
 
 export interface CellProps {

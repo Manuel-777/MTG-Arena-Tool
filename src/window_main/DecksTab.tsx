@@ -142,12 +142,13 @@ export function openDecksTab(newFilters: AggregatorFilters = {}): void {
     }
   );
 
-  const { decksTableState } = pd.settings;
+  const { decksTableState, decksTableMode } = pd.settings;
   mountReactComponent(
     <DecksTable
       data={data}
       filters={filters}
       cachedState={decksTableState}
+      cachedTableMode={decksTableMode}
       filterMatchesCallback={openDecksTab}
       tableStateCallback={(state: DecksTableState): void =>
         ipcSend("save_user_settings", {

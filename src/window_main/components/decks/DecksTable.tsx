@@ -2,6 +2,11 @@
 import _ from "lodash";
 import React, { useState } from "react";
 import styled from "styled-components";
+import { CSSTransition } from "react-transition-group";
+
+import { getCardArtCrop } from "../../../shared/util";
+import { ReactSelect } from "../../../shared/ReactSelect";
+import { TABLE_MODES, TABLE_MODE } from "../../../shared/constants";
 
 import FilterPanel from "../../FilterPanel";
 import {
@@ -32,9 +37,6 @@ import {
   uberSearchFilterFn
 } from "./filters";
 import { CellProps, DecksTableProps, DecksTableState } from "./types";
-import { CSSTransition } from "react-transition-group";
-import { getCardArtCrop } from "../../../shared/util";
-import { ReactSelect } from "../../../shared/ReactSelect";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
 
@@ -51,6 +53,7 @@ export default function DecksTable({
   filterMatchesCallback,
   tableStateCallback,
   cachedState,
+  cachedTableMode,
   openDeckCallback,
   ...cellCallbacks
 }: DecksTableProps): JSX.Element {
@@ -327,7 +330,7 @@ export default function DecksTable({
   }
   const [filtersVisible, setFiltersVisible] = useState(initialFiltersVisible);
   const [togglesVisible, setTogglesVisible] = useState(false);
-  const [tableMode, setTableMode] = useState("Table View");
+  const [tableMode, setTableMode] = useState(cachedTableMode);
   const filterPanel = new FilterPanel(
     "decks_top",
     filterMatchesCallback,
@@ -457,7 +460,7 @@ export default function DecksTable({
           <div className={"select_container"}>
             <ReactSelect
               current={tableMode}
-              options={["Table View", "Deck Art View"]}
+              options={TABLE_MODES}
               callback={setTableMode}
             />
           </div>
@@ -555,7 +558,7 @@ export default function DecksTable({
       <div className="decks_table_body" {...getTableBodyProps()}>
         {rows.map((row: any, index: number) => {
           prepareRow(row);
-          return tableMode === "Table View" ? (
+          return tableMode === TABLE_MODE ? (
             <RowContainer
               openDeckCallback={openDeckCallback}
               row={row}

@@ -807,3 +807,7 @@ export const DATE_LAST_DAY = "Last 24 Hours";
 export const DATE_LAST_30 = "Last 30 Days";
 export const DATE_SEASON = "Current Season";
 export const DATE_ALL_TIME = "All Time";
+
+export const DECK_ART_MODE = "Deck Art View";
+export const TABLE_MODE = "Table View";
+export const TABLE_MODES = [DECK_ART_MODE, TABLE_MODE];

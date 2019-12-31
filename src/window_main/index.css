@@ -3905,6 +3905,7 @@ a:hover {
 .decks_table_deck_tile .inner_div {
     display: flex;
     padding: 2px;
+    padding-left: 10px;
     margin-left: 8px;
     justify-content: flex-start;
     align-items: center;
