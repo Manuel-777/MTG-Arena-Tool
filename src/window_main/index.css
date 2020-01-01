@@ -3850,7 +3850,8 @@ a:hover {
     display: flex;
     flex-wrap: wrap;
     width: -webkit-fill-available;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
 }
 
 .decks_table_search_cont {
