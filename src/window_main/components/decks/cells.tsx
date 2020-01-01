@@ -402,7 +402,13 @@ export function TagsCell({
 
 export function MissingCardsCell({ cell }: CellProps): JSX.Element {
   if (!cell.value) {
-    return <></>;
+    return (
+      <StyledFlexRightCell>
+        <div className={"bo_explore_cost"} style={{ visibility: "hidden" }}>
+          0
+        </div>
+      </StyledFlexRightCell>
+    );
   }
   const data = cell.row.values;
   const ownedWildcards = {
@@ -429,11 +435,7 @@ export function MissingCardsCell({ cell }: CellProps): JSX.Element {
           </div>
         );
       })}
-      <div
-        key={"booster"}
-        className={"bo_explore_cost"}
-        title={"Boosters needed (estimated)"}
-      >
+      <div className={"bo_explore_cost"} title={"Boosters needed (estimated)"}>
         {Math.round(cell.value)}
       </div>
     </StyledFlexRightCell>
@@ -480,7 +482,7 @@ export function ArchivedCell({
   const data = cell.row.values;
   const isArchived = data.archived;
   if (!data.custom) {
-    return <></>;
+    return <StyledArchiveDiv style={{ visibility: "hidden" }} />;
   }
   return (
     <StyledArchivedCell
