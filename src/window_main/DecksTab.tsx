@@ -172,17 +172,15 @@ export function DecksTab({
   const [aggFilters, setAggFilters] = React.useState(
     defaultAggFilters as AggregatorFilters
   );
-  const aggregator = React.useMemo(() => new Aggregator(aggFilters), [
-    aggFilters
-  ]);
-  const data = getDecksData(aggregator);
+  const data = React.useMemo(() => {
+    const aggregator = new Aggregator(aggFilters);
+    return getDecksData(aggregator);
+  }, [aggFilters]);
 
   const sidePanelWidth = panelWidth + "px";
   const rightPanelRef = React.useRef<HTMLDivElement>(null);
-  const updateStatsCallback: (
-    deckId?: string | string[]
-  ) => void = React.useMemo(
-    () => (deckId?: string | string[]): void => {
+  const filterDecksCallback = React.useCallback(
+    (deckId?: string | string[]): void => {
       if (rightPanelRef?.current) {
         updateStatsPanel(
           rightPanelRef.current,
@@ -192,7 +190,10 @@ export function DecksTab({
     },
     [rightPanelRef, aggFilters]
   );
-
+  const openDeckCallback = React.useCallback(
+    (id: string): void => openDeckDetails(id, aggFilters),
+    [aggFilters]
+  );
   return (
     <>
       <div
@@ -208,10 +209,8 @@ export function DecksTab({
           cachedTableMode={decksTableMode}
           filterMatchesCallback={setAggFilters}
           tableStateCallback={saveUserState}
-          filterDecksCallback={updateStatsCallback}
-          openDeckCallback={(id: string): void =>
-            openDeckDetails(id, aggFilters)
-          }
+          filterDecksCallback={filterDecksCallback}
+          openDeckCallback={openDeckCallback}
           archiveDeckCallback={toggleDeckArchived}
           tagDeckCallback={addTag}
           editTagCallback={editTag}
