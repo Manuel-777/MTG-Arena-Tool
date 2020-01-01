@@ -1493,11 +1493,17 @@ a:hover {
 }
 
 .paging_container {
-    margin: 16px 24px;
+    margin: 8px;
     display: flex;
     width: 100%;
     height: 24px;
     justify-content: center;
+    align-items: center;
+}
+
+.paging_text {
+    color: var(--color-light);
+    white-space: nowrap;
 }
 
 .paging_button {
@@ -3851,8 +3857,8 @@ a:hover {
     display: flex;
     margin: 4px auto;
     width: -webkit-fill-available;
-    justify-content: center;
-    max-width: 600px;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .decks_table_head {

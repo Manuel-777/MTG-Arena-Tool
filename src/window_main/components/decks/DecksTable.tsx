@@ -37,6 +37,7 @@ import {
   uberSearchFilterFn
 } from "./filters";
 import { CellProps, DecksTableProps, DecksTableState } from "./types";
+import PagingControls from "../PagingControls";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
 
@@ -253,7 +254,8 @@ export default function DecksTable({
         "winrateLow",
         "winrateHigh"
       ],
-      sortBy: [{ id: "timeTouched", desc: true }]
+      sortBy: [{ id: "timeTouched", desc: true }],
+      pageSize: 25
     });
     if (!state.hiddenColumns.includes("archived")) {
       state.hiddenColumns.push("archived");
@@ -272,11 +274,20 @@ export default function DecksTable({
     getTableBodyProps,
     headerGroups,
     rows,
+    page,
     prepareRow,
     toggleSortBy,
     toggleHideColumn,
     setAllFilters,
     setFilter,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
     state
   } = ReactTable.useTable(
     {
@@ -289,8 +300,10 @@ export default function DecksTable({
       autoResetSortBy: false
     },
     ReactTable.useFilters,
-    ReactTable.useSortBy
+    ReactTable.useSortBy,
+    ReactTable.usePagination
   );
+  const { pageIndex, pageSize } = state;
 
   React.useEffect(() => {
     tableStateCallback({ ...state, decksTableMode: tableMode });
@@ -361,6 +374,19 @@ export default function DecksTable({
     { id: "archivedCol", value: "hideArchived" },
     { id: "boosterCost", value: [1, undefined] }
   ];
+
+  const pagingProps = {
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    pageIndex,
+    pageSize
+  };
 
   return (
     <div className="decks_table_wrap">
@@ -470,7 +496,7 @@ export default function DecksTable({
           {deckTileColumn.render("Filter")}
           {deckTileColumn.filterValue && (
             <div
-              style={{ marginRight: 0 }}
+              style={{ marginRight: 0, minWidth: "24px" }}
               className={"button close"}
               onClick={(e): void => {
                 e.stopPropagation();
@@ -479,6 +505,7 @@ export default function DecksTable({
               title={"clear column filter"}
             />
           )}
+          <PagingControls {...pagingProps} />
         </div>
       </div>
       <div
@@ -559,7 +586,7 @@ export default function DecksTable({
           ))}
       </div>
       <div className="decks_table_body" {...getTableBodyProps()}>
-        {rows.map((row: any, index: number) => {
+        {page.map((row: any, index: number) => {
           prepareRow(row);
           return tableMode === TABLE_MODE ? (
             <RowContainer
@@ -578,6 +605,7 @@ export default function DecksTable({
           );
         })}
       </div>
+      <PagingControls {...pagingProps} />
     </div>
   );
 }
