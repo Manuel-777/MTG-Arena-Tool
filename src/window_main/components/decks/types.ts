@@ -34,7 +34,6 @@ export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
 }
 
 export interface AggregatorFilters {
-  onlyCurrentDecks?: boolean;
   date?: Date;
   showArchived?: boolean;
 }
@@ -51,6 +50,7 @@ export interface DecksTableProps {
   filters: AggregatorFilters;
   filterMatchesCallback: (filters: AggregatorFilters) => void;
   openDeckCallback: (id: string) => void;
+  filterDecksCallback: (deckId?: string | string[]) => void;
   archiveDeckCallback: (id: string) => void;
   tagDeckCallback: (deckid: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;

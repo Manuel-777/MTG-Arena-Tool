@@ -54,6 +54,7 @@ export default function DecksTable({
   tableStateCallback,
   cachedState,
   cachedTableMode,
+  filterDecksCallback,
   openDeckCallback,
   ...cellCallbacks
 }: DecksTableProps): JSX.Element {
@@ -275,17 +276,12 @@ export default function DecksTable({
     toggleSortBy,
     toggleHideColumn,
     setAllFilters,
-    setFilter
+    setFilter,
+    state
   } = ReactTable.useTable(
     {
       columns,
       data: React.useMemo(() => data, [data]),
-      useControlledState: (state: DecksTableState) => {
-        return React.useMemo(() => {
-          tableStateCallback({ ...state, decksTableMode: tableMode });
-          return state;
-        }, [state, tableMode, tableStateCallback]);
-      },
       defaultColumn,
       filterTypes,
       initialState,
@@ -295,6 +291,13 @@ export default function DecksTable({
     ReactTable.useFilters,
     ReactTable.useSortBy
   );
+
+  React.useEffect(() => {
+    tableStateCallback({ ...state, decksTableMode: tableMode });
+  }, [state, tableMode, tableStateCallback]);
+  React.useEffect(() => {
+    filterDecksCallback(rows.map((row: any) => row.values.deckId));
+  }, [filterDecksCallback, rows]);
 
   const toggleableIds = [
     "name",

@@ -203,7 +203,7 @@ function showTournamentRegister(mainDiv, tou) {
       .filter(deck => !deck.custom)
       .filter(deck => getBoosterCountEstimate(get_deck_missing(deck)) === 0);
 
-    validDecks.sort(new Aggregator({ onlyCurrentDecks: true }).compareDecks);
+    validDecks.sort(new Aggregator().compareDecks);
     const deckSelect = createSelect(
       deckSelectContainer,
       validDecks.map(deck => deck.id),

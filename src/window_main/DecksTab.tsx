@@ -4,7 +4,7 @@ import isValid from "date-fns/isValid";
 
 import { EASING_DEFAULT } from "../shared/constants";
 import pd from "../shared/player-data";
-import { createDiv } from "../shared/dom-fns";
+import { createDiv, queryElements } from "../shared/dom-fns";
 import {
   get_deck_missing as getDeckMissing,
   getBoosterCountEstimate,
@@ -32,7 +32,6 @@ import {
 } from "./components/decks/types";
 
 let filters: AggregatorFilters = Aggregator.getDefaultFilters();
-filters.onlyCurrentDecks = true;
 const tagPrompt = "Add";
 
 function getDefaultStats(): DeckStats {
@@ -57,7 +56,6 @@ function setFilters(selected: AggregatorFilters = {}): void {
     filters = {
       ...Aggregator.getDefaultFilters(),
       date: filters.date,
-      onlyCurrentDecks: true,
       ...selected,
       showArchived
     };
@@ -72,16 +70,15 @@ function setFilters(selected: AggregatorFilters = {}): void {
   }
 }
 
-export function openDecksTab(newFilters: AggregatorFilters = {}): void {
-  hideLoadingBars();
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mainDiv.classList.add("flex_item");
-  setFilters(newFilters);
-
-  const wrapR = createDiv(["wrapper_column", "sidebar_column_l"]);
-  wrapR.style.width = pd.settings.right_panel_width + "px";
-  wrapR.style.flex = `0 0 ${wrapR.style.width}`;
-  const aggregator: any = new Aggregator(filters);
+function updateStatsPanel(
+  deckId: string | string[] = Aggregator.DEFAULT_DECK
+): void {
+  const wrapR = queryElements(".sidebar_column_l")[0];
+  if (!wrapR) {
+    return;
+  }
+  wrapR.innerHTML = "";
+  const aggregator: any = new Aggregator({ ...filters, deckId });
   const statsPanel = new StatsPanel(
     "decks_top",
     aggregator,
@@ -96,12 +93,28 @@ export function openDecksTab(newFilters: AggregatorFilters = {}): void {
 
   const drag = createDiv(["dragger"]);
   wrapR.appendChild(drag);
-  makeResizable(drag, statsPanel.handleResize);
+  if (deckId === Aggregator.DEFAULT_DECK) {
+    makeResizable(drag, statsPanel.handleResize);
+  }
   wrapR.appendChild(decksTopWinrate);
+}
+
+export function openDecksTab(newFilters: AggregatorFilters = {}): void {
+  hideLoadingBars();
+  const mainDiv = resetMainContainer() as HTMLElement;
+  mainDiv.classList.add("flex_item");
+  setFilters(newFilters);
+  const aggregator: any = new Aggregator(filters);
+
+  const wrapR = createDiv(["wrapper_column", "sidebar_column_l"]);
+  wrapR.style.width = pd.settings.right_panel_width + "px";
+  wrapR.style.flex = `0 0 ${wrapR.style.width}`;
+
   const wrapL = createDiv(["wrapper_column"]);
   wrapL.style.overflowX = "auto";
   mainDiv.appendChild(wrapL);
   mainDiv.appendChild(wrapR);
+  updateStatsPanel();
 
   const data = pd.deckList.map(
     (deck: SerializedDeck): DecksData => {
@@ -157,6 +170,7 @@ export function openDecksTab(newFilters: AggregatorFilters = {}): void {
           skip_refresh: true
         })
       }
+      filterDecksCallback={updateStatsPanel}
       openDeckCallback={(id: string): void => openDeckCallback(id, filters)}
       archiveDeckCallback={(id: string): void =>
         ipcSend("toggle_deck_archived", id)
