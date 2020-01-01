@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { CSSTransition } from "react-transition-group";
 
 import { getCardArtCrop } from "../../../shared/util";
-import { ReactSelect } from "../../../shared/ReactSelect";
+import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { TABLE_MODES, TABLE_MODE } from "../../../shared/constants";
 
 import FilterPanel from "../../FilterPanel";
@@ -486,13 +486,12 @@ export default function DecksTable({
             ))}
         </div>
         <div className="decks_table_search_cont">
-          <div className={"select_container"}>
-            <ReactSelect
-              current={tableMode}
-              options={TABLE_MODES}
-              callback={setTableMode}
-            />
-          </div>
+          <WrappedReactSelect
+            current={tableMode}
+            options={TABLE_MODES}
+            callback={setTableMode}
+            className={"decks_table_mode"}
+          />
           {deckTileColumn.render("Filter")}
           {deckTileColumn.filterValue && (
             <div
@@ -588,15 +587,10 @@ export default function DecksTable({
       <div className="decks_table_body" {...getTableBodyProps()}>
         {page.map((row: any, index: number) => {
           prepareRow(row);
-          return tableMode === TABLE_MODE ? (
-            <RowContainer
-              openDeckCallback={openDeckCallback}
-              row={row}
-              index={index}
-              key={row.index}
-            />
-          ) : (
-            <DeckTile
+          const RowRenderer =
+            tableMode === TABLE_MODE ? TableViewRow : DeckTile;
+          return (
+            <RowRenderer
               openDeckCallback={openDeckCallback}
               row={row}
               index={index}
@@ -610,7 +604,7 @@ export default function DecksTable({
   );
 }
 
-function RowContainer({
+function TableViewRow({
   row,
   index,
   openDeckCallback
@@ -619,20 +613,10 @@ function RowContainer({
   index: number;
   openDeckCallback: (id: string) => void;
 }): JSX.Element {
-  const [hover, setHover] = React.useState(false);
-
-  const mouseEnter = React.useCallback(() => {
-    setHover(true);
-  }, []);
-
-  const mouseLeave = React.useCallback(() => {
-    setHover(false);
-  }, []);
-
+  const deckId = row.values.deckId;
   const mouseClick = React.useCallback(() => {
-    openDeckCallback(row.values.deckId);
-  }, []);
-
+    openDeckCallback(deckId);
+  }, [deckId]);
   return (
     <div
       className={
@@ -643,12 +627,9 @@ function RowContainer({
           row.cells.length - 3
         )}`
       }}
-      onMouseEnter={mouseEnter}
-      onMouseLeave={mouseLeave}
       onClick={mouseClick}
     >
       {row.cells.map((cell: any) => {
-        cell.hover = hover;
         return (
           <div
             className="inner_div"
@@ -683,9 +664,10 @@ function DeckTile({
     setHover(false);
   }, []);
 
+  const deckId = row.values.deckId;
   const mouseClick = React.useCallback(() => {
-    openDeckCallback(row.values.deckId);
-  }, []);
+    openDeckCallback(deckId);
+  }, [deckId]);
 
   return (
     <div
