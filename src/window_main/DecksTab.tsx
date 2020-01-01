@@ -93,9 +93,7 @@ function updateStatsPanel(
 
   const drag = createDiv(["dragger"]);
   wrapR.appendChild(drag);
-  if (deckId === Aggregator.DEFAULT_DECK) {
-    makeResizable(drag, statsPanel.handleResize);
-  }
+  makeResizable(drag, statsPanel.handleResize);
   wrapR.appendChild(decksTopWinrate);
 }
 
