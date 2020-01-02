@@ -239,6 +239,14 @@ class Database {
     return setCodes;
   }
 
+  get standardSetCodes(): string[] {
+    return this.sortedSetCodes.filter(
+      code =>
+        this.sets[code].collation !== -1 &&
+        new Date(this.sets[code].release) > new Date("2018-07-13")
+    );
+  }
+
   get version() {
     return this.metadata ? this.metadata.version : 0;
   }
