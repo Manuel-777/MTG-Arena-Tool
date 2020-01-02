@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import { MANA } from "../../shared/constants";
+import db from "../../shared/database";
 
 import { getTagColor, showColorpicker } from "../renderer-util";
 
@@ -213,7 +214,7 @@ const SymbolBase = styled.div`
 `;
 
 const RaritySymbolBase = styled(SymbolBase).attrs<RaritySymbolProps>(props => ({
-  className: `wc_explore_cost wc_${props.rarity} ${props.className ?? ""}`
+  className: `rarity_filter wc_${props.rarity} ${props.className ?? ""}`
 }))``;
 
 interface RaritySymbolProps {
@@ -221,6 +222,54 @@ interface RaritySymbolProps {
 }
 
 export const RaritySymbol = styled(RaritySymbolBase)<RaritySymbolProps>``;
+
+const SetSymbolBase = styled(SymbolBase).attrs(props => ({
+  className: `set_filter ${props.className ?? ""}`
+}))``;
+
+interface SetSymbolProps extends React.HTMLAttributes<HTMLDivElement> {
+  set: string;
+}
+
+export function SetSymbol({
+  set,
+  style,
+  ...otherProps
+}: SetSymbolProps): JSX.Element {
+  const setSvg = set === "other" ? db.defaultSet?.svg : db.sets[set].svg;
+  return (
+    <SetSymbolBase
+      style={{
+        ...style,
+        backgroundImage: `url(data:image/svg+xml;base64,${setSvg})`
+      }}
+      {...otherProps}
+    />
+  );
+}
+
+function getTypeIconClass(type: string): string {
+  if (type.includes("Land", 0)) return "type_lan";
+  else if (type.includes("Creature", 0)) return "type_cre";
+  else if (type.includes("Artifact", 0)) return "type_art";
+  else if (type.includes("Enchantment", 0)) return "type_enc";
+  else if (type.includes("Instant", 0)) return "type_ins";
+  else if (type.includes("Sorcery", 0)) return "type_sor";
+  else if (type.includes("Planeswalker", 0)) return "type_pla";
+  else return "";
+}
+
+const TypeSymbolBase = styled(SymbolBase).attrs<TypeSymbolProps>(props => ({
+  className: `wc_explore_cost ${getTypeIconClass(
+    props.type
+  )} ${props.className ?? ""}`
+}))``;
+
+interface TypeSymbolProps {
+  type: string;
+}
+
+export const TypeSymbol = styled(TypeSymbolBase)<TypeSymbolProps>``;
 
 export const BoosterSymbol = styled(SymbolBase).attrs(props => ({
   className: `bo_explore_cost ${props.className ?? ""}`

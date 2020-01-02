@@ -2,6 +2,7 @@ import { ipcRenderer as ipc, remote } from "electron";
 import _ from "lodash";
 import {
   CARD_TILE_FLAT,
+  COLLECTION_CARD_MODE,
   DATE_LAST_30,
   DECKS_ART_MODE,
   DEFAULT_TILE,
@@ -79,6 +80,7 @@ const defaultCfg = {
     last_open_tab: -1,
     decksTableState: undefined,
     decksTableMode: DECKS_ART_MODE,
+    collectionTableMode: COLLECTION_CARD_MODE,
     card_tile_style: CARD_TILE_FLAT,
     skip_firstpass: false,
     overlay_scale: 100,

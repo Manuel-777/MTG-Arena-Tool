@@ -811,3 +811,14 @@ export const DATE_ALL_TIME = "All Time";
 export const DECKS_ART_MODE = "Deck Art View";
 export const DECKS_TABLE_MODE = "Table View";
 export const DECKS_TABLE_MODES = [DECKS_ART_MODE, DECKS_TABLE_MODE];
+
+export const COLLECTION_CARD_MODE = "Card View";
+export const COLLECTION_CHART_MODE = "Chart View";
+export const COLLECTION_TABLE_MODE = "Table View";
+export const COLLECTION_SETS_MODE = "Sets View";
+export const COLLECTION_TABLE_MODES = [
+  COLLECTION_CARD_MODE,
+  COLLECTION_CHART_MODE,
+  COLLECTION_TABLE_MODE,
+  COLLECTION_SETS_MODE
+];
