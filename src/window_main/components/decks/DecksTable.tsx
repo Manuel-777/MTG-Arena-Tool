@@ -1,14 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires */
 import _ from "lodash";
-import React, { useState } from "react";
-import styled from "styled-components";
-import { CSSTransition } from "react-transition-group";
+import React from "react";
 
-import { getCardArtCrop } from "../../../shared/util";
-import { WrappedReactSelect } from "../../../shared/ReactSelect";
-import { TABLE_MODES, TABLE_MODE } from "../../../shared/constants";
+import { TABLE_MODE } from "../../../shared/constants";
 
-import FilterPanel from "../../FilterPanel";
 import {
   NameCell,
   ColorsCell,
@@ -17,16 +12,13 @@ import {
   DurationCell,
   DatetimeCell,
   MetricCell,
-  MetricText,
   WinRateCell,
   LastEditWinRateCell,
   MissingCardsCell,
   ArchiveHeader,
-  ArchivedCell,
-  StyledArtTileCell
+  ArchivedCell
 } from "./cells";
 import {
-  StyledCheckboxContainer,
   TextBoxFilter,
   ColorColumnFilter,
   NumberRangeColumnFilter,
@@ -34,20 +26,14 @@ import {
   fuzzyTextFilterFn,
   archivedFilterFn,
   colorsFilterFn,
-  uberSearchFilterFn,
-  GlobalFilter
+  uberSearchFilterFn
 } from "./filters";
 import { CellProps, DecksTableProps, DecksTableState } from "./types";
 import PagingControls from "../PagingControls";
+import DecksTableControls from "./DecksTableControls";
+import { TableViewRow, DeckTile } from "./rows";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
-
-const PresetButton = styled(MetricText).attrs(props => ({
-  className: (props.className ?? "") + " button_simple"
-}))`
-  margin: 0 4px 5px 4px;
-  width: 90px;
-`;
 
 export default function DecksTable({
   data,
@@ -260,7 +246,6 @@ export default function DecksTable({
     }
     return state;
   }, [cachedState]);
-  const [tableMode, setTableMode] = useState(cachedTableMode);
 
   const {
     flatColumns,
@@ -304,6 +289,7 @@ export default function DecksTable({
     ReactTable.usePagination
   );
   const { globalFilter, pageIndex, pageSize } = state;
+  const [tableMode, setTableMode] = React.useState(cachedTableMode);
 
   React.useEffect(() => {
     tableStateCallback({ ...state, decksTableMode: tableMode });
@@ -311,65 +297,6 @@ export default function DecksTable({
   React.useEffect(() => {
     filterDecksCallback(rows.map((row: any) => row.values.deckId));
   }, [filterDecksCallback, rows]);
-
-  const toggleableIds = [
-    "name",
-    "format",
-    "colorSortVal",
-    "duration",
-    "avgDuration",
-    "boosterCost",
-    "lastEditWinrate",
-    "timePlayed",
-    "timeUpdated",
-    "timeTouched",
-    "losses",
-    "tags",
-    "total",
-    "winrate100",
-    "wins",
-    "archivedCol"
-  ];
-
-  const toggleableColumns = flatColumns.filter((column: any) =>
-    toggleableIds.includes(column.id)
-  );
-
-  const initialFiltersVisible: { [key: string]: boolean } = {};
-  for (const column of flatColumns) {
-    if (column.canFilter) {
-      initialFiltersVisible[column.id] = !!column.filterValue;
-    }
-  }
-  const [filtersVisible, setFiltersVisible] = useState(initialFiltersVisible);
-  const [togglesVisible, setTogglesVisible] = useState(false);
-  const filterPanel = new FilterPanel(
-    "decks_top",
-    filterMatchesCallback,
-    filters,
-    [],
-    [],
-    [],
-    false,
-    [],
-    false,
-    null,
-    false,
-    false
-  );
-
-  const recentFilters = (): { id: string; value: any }[] => [
-    { id: "archivedCol", value: "hideArchived" }
-  ];
-  const bestFilters = (): { id: string; value: any }[] => [
-    { id: "archivedCol", value: "hideArchived" },
-    { id: "wins", value: [5, undefined] },
-    { id: "winrate100", value: [50, undefined] }
-  ];
-  const wantedFilters = (): { id: string; value: any }[] => [
-    { id: "archivedCol", value: "hideArchived" },
-    { id: "boosterCost", value: [1, undefined] }
-  ];
 
   const pagingProps = {
     canPreviousPage,
@@ -384,206 +311,36 @@ export default function DecksTable({
     pageSize
   };
 
-  const visibleHeaders = headers.filter((header: any) => header.isVisible);
+  const tableControlsProps = {
+    canNextPage,
+    canPreviousPage,
+    filterMatchesCallback,
+    filters,
+    flatColumns,
+    getTableProps,
+    globalFilter,
+    gotoPage,
+    headers,
+    nextPage,
+    pageCount,
+    pageIndex,
+    pageOptions,
+    pageSize,
+    preGlobalFilteredRows,
+    previousPage,
+    setAllFilters,
+    setFilter,
+    setGlobalFilter,
+    setPageSize,
+    setTableMode,
+    tableMode,
+    toggleHideColumn,
+    toggleSortBy
+  };
 
   return (
     <div className="decks_table_wrap">
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          color: "var(--color-light)",
-          paddingBottom: "8px"
-        }}
-      >
-        <div className="decks_table_toggles">
-          <span style={{ paddingBottom: "8px" }}>Filter match results:</span>
-          <span style={{ width: "260px" }}>{filterPanel.render()}</span>
-          <span style={{ paddingBottom: "8px" }}>Presets:</span>
-          <PresetButton
-            onClick={(): void => {
-              setAllFilters(recentFilters);
-              setFiltersVisible(initialFiltersVisible);
-              toggleSortBy("timeTouched", true);
-              for (const columnId of toggleableIds) {
-                const isVisible = [
-                  "name",
-                  "format",
-                  "colorSortVal",
-                  "timeTouched",
-                  "lastEditWinrate"
-                ].includes(columnId);
-                toggleHideColumn(columnId, !isVisible);
-              }
-            }}
-          >
-            Recent
-          </PresetButton>
-          <PresetButton
-            onClick={(): void => {
-              setAllFilters(bestFilters);
-              setFiltersVisible({
-                ...initialFiltersVisible,
-                wins: true,
-                winrate100: true
-              });
-              toggleSortBy("winrate100", true);
-              for (const columnId of toggleableIds) {
-                const isVisible = [
-                  "name",
-                  "format",
-                  "colorSortVal",
-                  "losses",
-                  "winrate100",
-                  "wins"
-                ].includes(columnId);
-                toggleHideColumn(columnId, !isVisible);
-              }
-            }}
-          >
-            Best
-          </PresetButton>
-          <PresetButton
-            onClick={(): void => {
-              setAllFilters(wantedFilters);
-              setFiltersVisible({
-                ...initialFiltersVisible,
-                boosterCost: true
-              });
-              toggleSortBy("boosterCost", true);
-              for (const columnId of toggleableIds) {
-                const isVisible = [
-                  "name",
-                  "format",
-                  "colorSortVal",
-                  "boosterCost",
-                  "timeUpdated"
-                ].includes(columnId);
-                toggleHideColumn(columnId, !isVisible);
-              }
-            }}
-          >
-            Wanted
-          </PresetButton>
-          <MetricText
-            onClick={(): void => setTogglesVisible(!togglesVisible)}
-            className="button_simple"
-            style={{ margin: "0 0 5px 12px" }}
-          >
-            {togglesVisible ? "Hide" : "Show"} Column Toggles
-          </MetricText>
-        </div>
-        <div className="decks_table_toggles">
-          {togglesVisible &&
-            toggleableColumns.map((column: any) => (
-              <StyledCheckboxContainer key={column.id}>
-                {column.render("Header")}
-                <input type="checkbox" {...column.getToggleHiddenProps()} />
-                <span className={"checkmark"} />
-              </StyledCheckboxContainer>
-            ))}
-        </div>
-        <div className="decks_table_search_cont">
-          <WrappedReactSelect
-            current={tableMode}
-            options={TABLE_MODES}
-            callback={setTableMode}
-            className={"decks_table_mode"}
-          />
-          <GlobalFilter
-            preGlobalFilteredRows={preGlobalFilteredRows}
-            globalFilter={globalFilter}
-            setGlobalFilter={setGlobalFilter}
-          />
-          {globalFilter && (
-            <div
-              style={{ marginRight: 0, minWidth: "24px" }}
-              className={"button close"}
-              onClick={(e): void => {
-                e.stopPropagation();
-                setGlobalFilter(undefined);
-              }}
-              title={"clear column filter"}
-            />
-          )}
-          <PagingControls {...pagingProps} />
-        </div>
-      </div>
-      <div
-        className="decks_table_head line_dark"
-        style={{
-          gridTemplateColumns: `200px 150px 150px ${"1fr ".repeat(
-            visibleHeaders.length - 3
-          )}`
-        }}
-        {...getTableProps()}
-      >
-        {visibleHeaders.map((column: any, ii: number) => (
-          <div
-            {...column.getHeaderProps(column.getSortByToggleProps())}
-            className={"hover_label"}
-            style={{
-              height: "64px",
-              gridArea: `1 / ${ii + 1} / 1 / ${ii + 2}`
-            }}
-            key={column.id}
-          >
-            <div className={"decks_table_head_container"}>
-              <div
-                className={
-                  column.isSorted
-                    ? column.isSortedDesc
-                      ? " sort_desc"
-                      : " sort_asc"
-                    : ""
-                }
-                style={{ marginRight: "4px", width: "16px" }}
-              />
-              <div className={"flex_item"}>{column.render("Header")}</div>
-              {column.canFilter && (
-                <div
-                  style={{ marginRight: 0 }}
-                  className={"button settings"}
-                  onClick={(e): void => {
-                    e.stopPropagation();
-                    setFiltersVisible({
-                      ...filtersVisible,
-                      [column.id]: !filtersVisible[column.id]
-                    });
-                  }}
-                  title={
-                    (filtersVisible[column.id] ? "hide" : "show") +
-                    " column filter"
-                  }
-                />
-              )}
-              {column.filterValue && (
-                <div
-                  style={{ marginRight: 0 }}
-                  className={"button close"}
-                  onClick={(e): void => {
-                    e.stopPropagation();
-                    setFilter(column.id, undefined);
-                  }}
-                  title={"clear column filter"}
-                />
-              )}
-            </div>
-            {column.canFilter && filtersVisible[column.id] && (
-              <div
-                onClick={(e): void => e.stopPropagation()}
-                style={{
-                  display: "flex",
-                  justifyContent: "center"
-                }}
-                title={"filter column"}
-              >
-                {column.render("Filter")}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      <DecksTableControls {...tableControlsProps} />
       <div className="decks_table_body" {...getTableBodyProps()}>
         {page.map((row: any, index: number) => {
           prepareRow(row);
@@ -600,126 +357,6 @@ export default function DecksTable({
         })}
       </div>
       <PagingControls {...pagingProps} />
-    </div>
-  );
-}
-
-function TableViewRow({
-  row,
-  index,
-  openDeckCallback
-}: {
-  row: any;
-  index: number;
-  openDeckCallback: (id: string) => void;
-}): JSX.Element {
-  const deckId = row.values.deckId;
-  const mouseClick = React.useCallback(() => {
-    openDeckCallback(deckId);
-  }, [deckId]);
-  return (
-    <div
-      className={
-        "decks_table_body_row " + (index % 2 == 0 ? "line_light" : "line_dark")
-      }
-      style={{
-        gridTemplateColumns: `200px 150px 150px ${"1fr ".repeat(
-          row.cells.length - 3
-        )}`
-      }}
-      onClick={mouseClick}
-    >
-      {row.cells.map((cell: any) => {
-        return (
-          <div
-            className="inner_div"
-            {...cell.getCellProps()}
-            key={cell.column.id + "_" + row.index}
-            title={`show ${row.values.name} details`}
-          >
-            {cell.render("Cell")}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function DeckTile({
-  row,
-  index,
-  openDeckCallback
-}: {
-  row: any;
-  index: number;
-  openDeckCallback: (id: string) => void;
-}): JSX.Element {
-  const [hover, setHover] = React.useState(false);
-
-  const mouseEnter = React.useCallback(() => {
-    setHover(true);
-  }, []);
-
-  const mouseLeave = React.useCallback(() => {
-    setHover(false);
-  }, []);
-
-  const deckId = row.values.deckId;
-  const mouseClick = React.useCallback(() => {
-    openDeckCallback(deckId);
-  }, [deckId]);
-
-  const requireLabelIds = [
-    "duration",
-    "avgDuration",
-    "winrate100",
-    "lastEditWinrate",
-    "timePlayed",
-    "timeUpdated",
-    "timeTouched",
-    "losses",
-    "total",
-    "wins"
-  ];
-
-  return (
-    <div
-      className={"decks_table_deck_tile"}
-      title={`show ${row.values.name} details`}
-      onMouseEnter={mouseEnter}
-      onMouseLeave={mouseLeave}
-      onClick={mouseClick}
-    >
-      <CSSTransition classNames="deckTileHover" in={!!hover} timeout={200}>
-        <StyledArtTileCell url={getCardArtCrop(row.values["deckTileId"])} />
-      </CSSTransition>
-      {row.cells.map((cell: any) => {
-        cell.hover = hover;
-        return (
-          <div
-            className="inner_div"
-            style={hover ? { backgroundColor: "rgba(0,0,0,0.4)" } : undefined}
-            {...cell.getCellProps()}
-            key={cell.column.id + "_" + row.index}
-          >
-            {requireLabelIds.includes(cell.column.id) && (
-              <MetricText
-                style={{
-                  paddingRight: "8px",
-                  fontSize: "small",
-                  whiteSpace: "nowrap",
-                  fontWeight: 300,
-                  color: "var(--color-light-50)"
-                }}
-              >
-                {cell.column.render("Header")}:
-              </MetricText>
-            )}
-            {cell.render("Cell")}
-          </div>
-        );
-      })}
-      <div className="inner_div"> </div>
     </div>
   );
 }

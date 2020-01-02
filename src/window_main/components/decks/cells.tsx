@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { useRef } from "react";
+import React from "react";
 import format from "date-fns/format";
 import isValid from "date-fns/isValid";
 import styled from "styled-components";
@@ -251,7 +251,7 @@ const StyledTagWithClose = styled(StyledTag)`
 `;
 
 function useColorpicker(
-  containerRef: React.MutableRefObject<any>,
+  containerRef: React.MutableRefObject<HTMLElement | null>,
   tag: string,
   backgroundColor: string,
   editTagCallback: (tag: string, color: string) => void
@@ -284,7 +284,9 @@ function DeckTag({
   deleteTagCallback
 }: DeckTagProps): JSX.Element {
   const backgroundColor = getTagColor(tag);
-  const containerRef = useRef(null);
+  const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
+    null
+  );
   return (
     <StyledTagWithClose
       backgroundColor={backgroundColor}
@@ -313,7 +315,9 @@ function DeckTag({
 
 export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
   const backgroundColor = getTagColor(cell.value);
-  const containerRef = useRef(null);
+  const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
+    null
+  );
   return (
     <StyledFlexRightCell>
       <StyledTag
@@ -342,10 +346,12 @@ export function TagsCell({
 }: CellProps): JSX.Element {
   const backgroundColor = getTagColor();
   const data = cell.row.values;
-  const containerRef = useRef(null);
+  const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
+    null
+  );
   // TODO translate this into React
   const clickHandler = function(e: React.MouseEvent): void {
-    const container: any = containerRef.current;
+    const container = containerRef.current;
     if (!container) {
       return;
     }
