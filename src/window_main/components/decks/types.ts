@@ -60,6 +60,33 @@ export interface DecksTableProps {
   cachedTableMode: string;
 }
 
+export interface DecksTableControlsProps {
+  canNextPage: boolean;
+  canPreviousPage: boolean;
+  filterMatchesCallback: (filters: AggregatorFilters) => void;
+  filters: AggregatorFilters;
+  flatColumns: any[];
+  getTableProps: any;
+  globalFilter: any;
+  gotoPage: any;
+  headers: any[];
+  nextPage: any;
+  pageCount: number;
+  pageIndex: number;
+  pageOptions: any;
+  pageSize: number;
+  preGlobalFilteredRows: any[];
+  previousPage: any;
+  setAllFilters: any;
+  setFilter: any;
+  setGlobalFilter: any;
+  setPageSize: any;
+  setTableMode: any;
+  tableMode: string;
+  toggleHideColumn: any;
+  toggleSortBy: any;
+}
+
 export interface CellProps {
   cell: any;
   archiveDeckCallback: (id: string) => void;

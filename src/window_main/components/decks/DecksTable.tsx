@@ -28,8 +28,13 @@ import {
   colorsFilterFn,
   uberSearchFilterFn
 } from "./filters";
-import { CellProps, DecksTableProps, DecksTableState } from "./types";
-import PagingControls from "../PagingControls";
+import {
+  CellProps,
+  DecksTableProps,
+  DecksTableState,
+  DecksTableControlsProps
+} from "./types";
+import PagingControls, { PagingControlsProps } from "../PagingControls";
 import DecksTableControls from "./DecksTableControls";
 import { TableViewRow, DeckTile } from "./rows";
 
@@ -298,7 +303,7 @@ export default function DecksTable({
     filterDecksCallback(rows.map((row: any) => row.values.deckId));
   }, [filterDecksCallback, rows]);
 
-  const pagingProps = {
+  const pagingProps: PagingControlsProps = {
     canPreviousPage,
     canNextPage,
     pageOptions,
@@ -311,7 +316,7 @@ export default function DecksTable({
     pageSize
   };
 
-  const tableControlsProps = {
+  const tableControlsProps: DecksTableControlsProps = {
     canNextPage,
     canPreviousPage,
     filterMatchesCallback,

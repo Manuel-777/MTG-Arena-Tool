@@ -31,30 +31,31 @@ export const StyledInputContainer = styled.div.attrs(props => ({
   }
 `;
 
-export default function PagingControls(props: {
-  canPreviousPage: any;
-  canNextPage: any;
+export interface PagingControlsProps {
+  canPreviousPage: boolean;
+  canNextPage: boolean;
   pageOptions: any;
-  pageCount: any;
+  pageCount: number;
   gotoPage: any;
   nextPage: any;
   previousPage: any;
   setPageSize: any;
-  pageIndex: any;
-  pageSize: any;
-}): JSX.Element {
-  const {
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-    pageIndex,
-    pageSize
-  } = props;
+  pageIndex: number;
+  pageSize: number;
+}
+
+export default function PagingControls({
+  canPreviousPage,
+  canNextPage,
+  pageOptions,
+  pageCount,
+  gotoPage,
+  nextPage,
+  previousPage,
+  setPageSize,
+  pageIndex,
+  pageSize
+}: PagingControlsProps): JSX.Element {
   const expandButtons = pageCount < 10;
 
   let pageButtons: JSX.Element[] | JSX.Element = [];

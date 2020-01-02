@@ -9,6 +9,7 @@ import FilterPanel from "../../FilterPanel";
 import { MetricText } from "./cells";
 import { StyledCheckboxContainer, GlobalFilter } from "./filters";
 import PagingControls from "../PagingControls";
+import { DecksTableControlsProps } from "./types";
 
 const PresetButton = styled(MetricText).attrs(props => ({
   className: (props.className ?? "") + " button_simple"
@@ -73,7 +74,7 @@ export default function DecksTableControls({
   tableMode,
   toggleHideColumn,
   toggleSortBy
-}: any): JSX.Element {
+}: DecksTableControlsProps): JSX.Element {
   const toggleableColumns = flatColumns.filter((column: any) =>
     toggleableIds.includes(column.id)
   );
