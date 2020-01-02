@@ -450,6 +450,7 @@ const StyledArchiveDiv = styled.div`
   margin: auto;
   overflow: hidden;
   background: url(../images/show.png) no-repeat left;
+  background-size: contain;
   -webkit-transition: all 0.25s cubic-bezier(0.2, 0.5, 0.35, 1);
   vertical-align: middle;
   opacity: 0.8;
@@ -463,6 +464,7 @@ export function ArchiveHeader(): JSX.Element {
     <StyledArchiveDiv
       title={`archive/restore
 (deck must no longer be in Arena)`}
+      style={{ height: "24px", minHeight: "24px" }}
     />
   );
 }

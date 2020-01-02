@@ -212,7 +212,7 @@ export function ArchiveColumnFilter({
   column: any;
 }): JSX.Element {
   return (
-    <StyledCheckboxContainer style={{ marginLeft: 0 }}>
+    <StyledCheckboxContainer style={{ margin: "4px" }}>
       archived
       <input
         type="checkbox"
