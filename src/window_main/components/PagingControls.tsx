@@ -100,7 +100,7 @@ export default function PagingControls({
               }
             }}
             style={{ width: "40px" }}
-            placeholder={pageIndex + 1}
+            placeholder={String(pageIndex + 1)}
           />
         </StyledInputContainer>
         <span className={"paging_text"}>
