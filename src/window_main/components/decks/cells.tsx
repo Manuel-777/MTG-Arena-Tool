@@ -83,7 +83,7 @@ export function StyledArtTileCell({
   );
 }
 
-const StyledFlexLeftCell = styled.div`
+export const StyledFlexLeftCell = styled.div`
   display: flex;
   justify-content: left;
   div {
@@ -93,7 +93,7 @@ const StyledFlexLeftCell = styled.div`
   }
 `;
 
-const StyledFlexRightCell = styled.div`
+export const StyledFlexRightCell = styled.div`
   display: flex;
   justify-content: right;
   div {
@@ -106,18 +106,19 @@ const StyledFlexRightCell = styled.div`
 export function ColorsCell({ cell }: CellProps): JSX.Element {
   const data = cell.row.values;
   return (
-    <StyledFlexRightCell>
+    <StyledFlexLeftCell>
       {data.colors.map((color: number, index: number) => {
         return <div key={index} className={"mana_s16 mana_" + MANA[color]} />;
       })}
-    </StyledFlexRightCell>
+    </StyledFlexLeftCell>
   );
 }
 
-const LabelText = styled.div`
+export const LabelText = styled.div`
   display: inline-block;
   cursor: pointer;
   text-align: left;
+  white-space: nowrap;
 `;
 
 export function NameCell({ cell }: CellProps): JSX.Element {
@@ -319,7 +320,7 @@ export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
     null
   );
   return (
-    <StyledFlexRightCell>
+    <StyledFlexLeftCell>
       <StyledTag
         backgroundColor={backgroundColor}
         fontStyle={"italic"}
@@ -334,7 +335,7 @@ export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
       >
         {cell.value || "unknown"}
       </StyledTag>
-    </StyledFlexRightCell>
+    </StyledFlexLeftCell>
   );
 }
 
@@ -409,11 +410,11 @@ export function TagsCell({
 export function MissingCardsCell({ cell }: CellProps): JSX.Element {
   if (!cell.value) {
     return (
-      <StyledFlexRightCell>
+      <StyledFlexLeftCell>
         <div className={"bo_explore_cost"} style={{ visibility: "hidden" }}>
           0
         </div>
-      </StyledFlexRightCell>
+      </StyledFlexLeftCell>
     );
   }
   const data = cell.row.values;
@@ -424,7 +425,7 @@ export function MissingCardsCell({ cell }: CellProps): JSX.Element {
     mythic: pd.economy.wcMythic
   };
   return (
-    <StyledFlexRightCell>
+    <StyledFlexLeftCell>
       {CARD_RARITIES.map(cardRarity => {
         if (cardRarity === "land" || !data[cardRarity]) {
           return;
@@ -444,7 +445,7 @@ export function MissingCardsCell({ cell }: CellProps): JSX.Element {
       <div className={"bo_explore_cost"} title={"Boosters needed (estimated)"}>
         {Math.round(cell.value)}
       </div>
-    </StyledFlexRightCell>
+    </StyledFlexLeftCell>
   );
 }
 

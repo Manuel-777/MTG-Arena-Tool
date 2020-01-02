@@ -285,8 +285,7 @@ export default function DecksTable({
       initialState,
       autoResetFilters: false,
       autoResetGlobalFilter: false,
-      autoResetSortBy: false,
-      autoResetPage: false
+      autoResetSortBy: false
     },
     ReactTable.useFilters,
     ReactTable.useGlobalFilter,

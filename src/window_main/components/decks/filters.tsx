@@ -131,10 +131,11 @@ export function uberSearchFilterFn(
 export function GlobalFilter({
   preGlobalFilteredRows,
   globalFilter,
-  setGlobalFilter
+  setGlobalFilter,
+  promptNoun
 }: any): JSX.Element {
   const count = preGlobalFilteredRows.length;
-  const prompt = `Search ${count} decks...`;
+  const prompt = `Search ${count} ${promptNoun}...`;
   return (
     <StyledInputContainer title={prompt}>
       <input
