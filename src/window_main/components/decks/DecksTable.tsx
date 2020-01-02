@@ -34,7 +34,8 @@ import {
   fuzzyTextFilterFn,
   archivedFilterFn,
   colorsFilterFn,
-  uberSearchFilterFn
+  uberSearchFilterFn,
+  GlobalFilter
 } from "./filters";
 import { CellProps, DecksTableProps, DecksTableState } from "./types";
 import PagingControls from "../PagingControls";
@@ -74,12 +75,7 @@ export default function DecksTable({
   const columns = React.useMemo(
     () => [
       { id: "deckId", accessor: "id" },
-      {
-        accessor: "deckTileId",
-        disableFilters: false,
-        filter: "uberSearch",
-        Filter: TextBoxFilter
-      },
+      { accessor: "deckTileId" },
       {
         Header: "Name",
         accessor: "name",
@@ -220,8 +216,7 @@ export default function DecksTable({
     () => ({
       fuzzyText: fuzzyTextFilterFn,
       showArchived: archivedFilterFn,
-      colors: colorsFilterFn,
-      uberSearch: uberSearchFilterFn
+      colors: colorsFilterFn
     }),
     []
   );
@@ -272,7 +267,6 @@ export default function DecksTable({
     headers,
     getTableProps,
     getTableBodyProps,
-    headerGroups,
     rows,
     page,
     prepareRow,
@@ -280,6 +274,8 @@ export default function DecksTable({
     toggleHideColumn,
     setAllFilters,
     setFilter,
+    preGlobalFilteredRows,
+    setGlobalFilter,
     canPreviousPage,
     canNextPage,
     pageOptions,
@@ -295,16 +291,19 @@ export default function DecksTable({
       data: React.useMemo(() => data, [data]),
       defaultColumn,
       filterTypes,
+      globalFilter: uberSearchFilterFn,
       initialState,
       autoResetFilters: false,
+      autoResetGlobalFilter: false,
       autoResetSortBy: false,
       autoResetPage: false
     },
     ReactTable.useFilters,
+    ReactTable.useGlobalFilter,
     ReactTable.useSortBy,
     ReactTable.usePagination
   );
-  const { pageIndex, pageSize } = state;
+  const { globalFilter, pageIndex, pageSize } = state;
 
   React.useEffect(() => {
     tableStateCallback({ ...state, decksTableMode: tableMode });
@@ -337,12 +336,8 @@ export default function DecksTable({
   );
 
   const initialFiltersVisible: { [key: string]: boolean } = {};
-  let deckTileColumn: any;
   for (const column of flatColumns) {
-    if (column.id === "deckTileId") {
-      deckTileColumn = column;
-      initialFiltersVisible[column.id] = true; // uber search always visible
-    } else if (column.canFilter) {
+    if (column.canFilter) {
       initialFiltersVisible[column.id] = false;
     }
   }
@@ -493,14 +488,18 @@ export default function DecksTable({
             callback={setTableMode}
             className={"decks_table_mode"}
           />
-          {deckTileColumn.render("Filter")}
-          {deckTileColumn.filterValue && (
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={globalFilter}
+            setGlobalFilter={setGlobalFilter}
+          />
+          {globalFilter && (
             <div
               style={{ marginRight: 0, minWidth: "24px" }}
               className={"button close"}
               onClick={(e): void => {
                 e.stopPropagation();
-                setFilter(deckTileColumn.id, undefined);
+                setGlobalFilter(undefined);
               }}
               title={"clear column filter"}
             />
@@ -512,7 +511,7 @@ export default function DecksTable({
         className="decks_table_head line_dark"
         style={{
           gridTemplateColumns: `200px 150px 150px ${"1fr ".repeat(
-            headerGroups[0].headers ? headerGroups[0].headers.length - 3 : 1
+            headers.length - 3
           )}`
         }}
         {...getTableProps()}

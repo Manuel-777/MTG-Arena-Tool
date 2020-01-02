@@ -155,6 +155,24 @@ export function uberSearchFilterFn(
   return _.intersection(...matches);
 }
 
+export function GlobalFilter({
+  preGlobalFilteredRows,
+  globalFilter,
+  setGlobalFilter
+}: any): JSX.Element {
+  const count = preGlobalFilteredRows.length;
+  const prompt = `Search ${count} decks...`;
+  return (
+    <StyledInputContainer title={prompt}>
+      <input
+        value={globalFilter ?? ""}
+        onChange={(e): void => setGlobalFilter(e.target.value ?? undefined)}
+        placeholder={prompt}
+      />
+    </StyledInputContainer>
+  );
+}
+
 const defaultColors = Aggregator.getDefaultColorFilter();
 
 export function ColorColumnFilter({
