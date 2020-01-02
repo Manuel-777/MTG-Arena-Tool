@@ -69,7 +69,7 @@ export interface DecksTableControlsProps {
   getTableProps: any;
   globalFilter: any;
   gotoPage: any;
-  headers: any[];
+  gridTemplateColumns: string;
   nextPage: any;
   pageCount: number;
   pageIndex: number;
@@ -85,6 +85,7 @@ export interface DecksTableControlsProps {
   tableMode: string;
   toggleHideColumn: any;
   toggleSortBy: any;
+  visibleHeaders: any[];
 }
 
 export interface CellProps {

@@ -74,7 +74,8 @@ export default function DecksTable({
         filter: "fuzzyText",
         Filter: TextBoxFilter,
         sortType: "alphanumeric",
-        Cell: CellWrapper(NameCell)
+        Cell: CellWrapper(NameCell),
+        gridWidth: "200px"
       },
       {
         Header: "Colors",
@@ -83,7 +84,8 @@ export default function DecksTable({
         Filter: ColorColumnFilter,
         filter: "colors",
         minWidth: 170,
-        Cell: ColorsCell
+        Cell: ColorsCell,
+        gridWidth: "150px"
       },
       { accessor: "colors" },
       {
@@ -92,7 +94,8 @@ export default function DecksTable({
         disableFilters: false,
         Filter: TextBoxFilter,
         filter: "fuzzyText",
-        Cell: CellWrapper(FormatCell)
+        Cell: CellWrapper(FormatCell),
+        gridWidth: "150px"
       },
       {
         Header: "Tags",
@@ -101,7 +104,8 @@ export default function DecksTable({
         Filter: TextBoxFilter,
         filter: "fuzzyText",
         disableSortBy: true,
-        Cell: CellWrapper(TagsCell)
+        Cell: CellWrapper(TagsCell),
+        gridWidth: "200px"
       },
       {
         Header: "Last Updated",
@@ -315,6 +319,11 @@ export default function DecksTable({
     pageSize
   };
 
+  const visibleHeaders = headers.filter((header: any) => header.isVisible);
+  const gridTemplateColumns = visibleHeaders
+    .map((header: any) => header.gridWidth ?? "1fr")
+    .join(" ");
+
   const tableControlsProps: DecksTableControlsProps = {
     canNextPage,
     canPreviousPage,
@@ -324,7 +333,7 @@ export default function DecksTable({
     getTableProps,
     globalFilter,
     gotoPage,
-    headers,
+    gridTemplateColumns,
     nextPage,
     pageCount,
     pageIndex,
@@ -339,7 +348,8 @@ export default function DecksTable({
     setTableMode,
     tableMode,
     toggleHideColumn,
-    toggleSortBy
+    toggleSortBy,
+    visibleHeaders
   };
 
   return (
@@ -356,6 +366,7 @@ export default function DecksTable({
               row={row}
               index={index}
               key={row.index}
+              gridTemplateColumns={gridTemplateColumns}
             />
           );
         })}

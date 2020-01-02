@@ -9,11 +9,13 @@ import { MetricText, StyledArtTileCell } from "./cells";
 export function TableViewRow({
   row,
   index,
-  openDeckCallback
+  openDeckCallback,
+  gridTemplateColumns
 }: {
   row: any;
   index: number;
   openDeckCallback: (id: string) => void;
+  gridTemplateColumns: string;
 }): JSX.Element {
   const deckId = row.values.deckId;
   const mouseClick = React.useCallback(() => {
@@ -24,11 +26,7 @@ export function TableViewRow({
       className={
         "decks_table_body_row " + (index % 2 == 0 ? "line_light" : "line_dark")
       }
-      style={{
-        gridTemplateColumns: `200px 150px 150px ${"1fr ".repeat(
-          row.cells.length - 3
-        )}`
-      }}
+      style={{ gridTemplateColumns }}
       onClick={mouseClick}
     >
       {row.cells.map((cell: any) => {
@@ -50,11 +48,13 @@ export function TableViewRow({
 export function DeckTile({
   row,
   index,
-  openDeckCallback
+  openDeckCallback,
+  gridTemplateColumns
 }: {
   row: any;
   index: number;
   openDeckCallback: (id: string) => void;
+  gridTemplateColumns: string;
 }): JSX.Element {
   const [hover, setHover] = React.useState(false);
 

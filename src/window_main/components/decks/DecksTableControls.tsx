@@ -58,7 +58,7 @@ export default function DecksTableControls({
   getTableProps,
   globalFilter,
   gotoPage,
-  headers,
+  gridTemplateColumns,
   nextPage,
   pageCount,
   pageIndex,
@@ -73,12 +73,12 @@ export default function DecksTableControls({
   setTableMode,
   tableMode,
   toggleHideColumn,
-  toggleSortBy
+  toggleSortBy,
+  visibleHeaders
 }: DecksTableControlsProps): JSX.Element {
   const toggleableColumns = flatColumns.filter((column: any) =>
     toggleableIds.includes(column.id)
   );
-  const visibleHeaders = headers.filter((header: any) => header.isVisible);
   const initialFiltersVisible: { [key: string]: boolean } = {};
   for (const column of flatColumns) {
     if (column.canFilter) {
@@ -241,11 +241,7 @@ export default function DecksTableControls({
       </div>
       <div
         className="decks_table_head line_dark"
-        style={{
-          gridTemplateColumns: `200px 150px 150px ${"1fr ".repeat(
-            visibleHeaders.length - 3
-          )}`
-        }}
+        style={{ gridTemplateColumns }}
         {...getTableProps()}
       >
         {visibleHeaders.map((column: any, ii: number) => (
