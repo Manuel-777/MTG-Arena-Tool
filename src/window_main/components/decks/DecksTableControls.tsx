@@ -18,24 +18,6 @@ const PresetButton = styled(MetricText).attrs(props => ({
   width: 90px;
 `;
 
-const toggleableIds = [
-  "name",
-  "format",
-  "colorSortVal",
-  "duration",
-  "avgDuration",
-  "boosterCost",
-  "lastEditWinrate",
-  "timePlayed",
-  "timeUpdated",
-  "timeTouched",
-  "losses",
-  "tags",
-  "total",
-  "winrate100",
-  "wins",
-  "archivedCol"
-];
 const recentFilters = (): { id: string; value: any }[] => [
   { id: "archivedCol", value: "hideArchived" }
 ];
@@ -76,15 +58,18 @@ export default function DecksTableControls({
   toggleSortBy,
   visibleHeaders
 }: DecksTableControlsProps): JSX.Element {
-  const toggleableColumns = flatColumns.filter((column: any) =>
-    toggleableIds.includes(column.id)
-  );
-  const initialFiltersVisible: { [key: string]: boolean } = {};
-  for (const column of flatColumns) {
-    if (column.canFilter) {
-      initialFiltersVisible[column.id] = !!column.filterValue;
+  const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
+    const toggleableColumns = flatColumns.filter(
+      (column: any) => column.mayToggle
+    );
+    const initialFiltersVisible: { [key: string]: boolean } = {};
+    for (const column of flatColumns) {
+      if (column.canFilter) {
+        initialFiltersVisible[column.id] = !!column.filterValue;
+      }
     }
-  }
+    return [toggleableColumns, initialFiltersVisible];
+  }, [flatColumns]);
   const [filtersVisible, setFiltersVisible] = React.useState(
     initialFiltersVisible
   );
@@ -134,15 +119,15 @@ export default function DecksTableControls({
               setAllFilters(recentFilters);
               setFiltersVisible(initialFiltersVisible);
               toggleSortBy("timeTouched", true);
-              for (const columnId of toggleableIds) {
+              for (const column of toggleableColumns) {
                 const isVisible = [
                   "name",
                   "format",
                   "colorSortVal",
                   "timeTouched",
                   "lastEditWinrate"
-                ].includes(columnId);
-                toggleHideColumn(columnId, !isVisible);
+                ].includes(column.id);
+                toggleHideColumn(column.id, !isVisible);
               }
             }}
           >
@@ -157,7 +142,7 @@ export default function DecksTableControls({
                 winrate100: true
               });
               toggleSortBy("winrate100", true);
-              for (const columnId of toggleableIds) {
+              for (const column of toggleableColumns) {
                 const isVisible = [
                   "name",
                   "format",
@@ -165,8 +150,8 @@ export default function DecksTableControls({
                   "losses",
                   "winrate100",
                   "wins"
-                ].includes(columnId);
-                toggleHideColumn(columnId, !isVisible);
+                ].includes(column.id);
+                toggleHideColumn(column.id, !isVisible);
               }
             }}
           >
@@ -180,15 +165,15 @@ export default function DecksTableControls({
                 boosterCost: true
               });
               toggleSortBy("boosterCost", true);
-              for (const columnId of toggleableIds) {
+              for (const column of toggleableColumns) {
                 const isVisible = [
                   "name",
                   "format",
                   "colorSortVal",
                   "boosterCost",
                   "timeUpdated"
-                ].includes(columnId);
-                toggleHideColumn(columnId, !isVisible);
+                ].includes(column.id);
+                toggleHideColumn(column.id, !isVisible);
               }
             }}
           >

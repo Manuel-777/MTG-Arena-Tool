@@ -85,7 +85,8 @@ export default function DecksTable({
         filter: "colors",
         minWidth: 170,
         Cell: ColorsCell,
-        gridWidth: "150px"
+        gridWidth: "150px",
+        mayToggle: true
       },
       { accessor: "colors" },
       {
@@ -95,7 +96,8 @@ export default function DecksTable({
         Filter: TextBoxFilter,
         filter: "fuzzyText",
         Cell: CellWrapper(FormatCell),
-        gridWidth: "150px"
+        gridWidth: "150px",
+        mayToggle: true
       },
       {
         Header: "Tags",
@@ -105,25 +107,29 @@ export default function DecksTable({
         filter: "fuzzyText",
         disableSortBy: true,
         Cell: CellWrapper(TagsCell),
-        gridWidth: "200px"
+        gridWidth: "200px",
+        mayToggle: true
       },
       {
         Header: "Last Updated",
         accessor: "timeUpdated",
         Cell: DatetimeCell,
-        sortDescFirst: true
+        sortDescFirst: true,
+        mayToggle: true
       },
       {
         Header: "Last Played",
         accessor: "timePlayed",
         Cell: DatetimeCell,
-        sortDescFirst: true
+        sortDescFirst: true,
+        mayToggle: true
       },
       {
         Header: "Last Touched",
         accessor: "timeTouched",
         Cell: DatetimeCell,
-        sortDescFirst: true
+        sortDescFirst: true,
+        mayToggle: true
       },
       {
         Header: "Won",
@@ -131,7 +137,8 @@ export default function DecksTable({
         Cell: MetricCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
-        filter: "between"
+        filter: "between",
+        mayToggle: true
       },
       {
         Header: "Lost",
@@ -139,7 +146,8 @@ export default function DecksTable({
         Cell: MetricCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
-        filter: "between"
+        filter: "between",
+        mayToggle: true
       },
       {
         Header: "Total",
@@ -147,17 +155,20 @@ export default function DecksTable({
         Cell: MetricCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
-        filter: "between"
+        filter: "between",
+        mayToggle: true
       },
       {
         Header: "Total Duration",
         accessor: "duration",
-        Cell: DurationCell
+        Cell: DurationCell,
+        mayToggle: true
       },
       {
         Header: "Avg. Duration",
         accessor: "avgDuration",
-        Cell: DurationCell
+        Cell: DurationCell,
+        mayToggle: true
       },
       {
         Header: "Winrate",
@@ -165,7 +176,8 @@ export default function DecksTable({
         Cell: WinRateCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
-        filter: "between"
+        filter: "between",
+        mayToggle: true
       },
       { accessor: "winrate" },
       { accessor: "interval", sortInverted: true },
@@ -174,7 +186,8 @@ export default function DecksTable({
       {
         Header: "Since last edit",
         accessor: "lastEditWinrate",
-        Cell: LastEditWinRateCell
+        Cell: LastEditWinRateCell,
+        mayToggle: true
       },
       { accessor: "lastEditWins" },
       { accessor: "lastEditLosses" },
@@ -185,7 +198,8 @@ export default function DecksTable({
         Cell: MissingCardsCell,
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
-        filter: "between"
+        filter: "between",
+        mayToggle: true
       },
       { accessor: "rare" },
       { accessor: "common" },
@@ -202,7 +216,8 @@ export default function DecksTable({
         minWidth: 98,
         disableFilters: false,
         Cell: CellWrapper(ArchivedCell),
-        sortType: "basic"
+        sortType: "basic",
+        mayToggle: true
       }
     ],
     [CellWrapper]
