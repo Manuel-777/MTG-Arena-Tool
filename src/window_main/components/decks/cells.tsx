@@ -25,7 +25,9 @@ import {
   ArchiveSymbol,
   useColorpicker,
   ColoredArchivedSymbol,
-  ManaSymbol
+  ManaSymbol,
+  RaritySymbol,
+  BoosterSymbol
 } from "../display";
 import { DecksTableCellProps } from "./types";
 
@@ -247,10 +249,10 @@ export function TagsCell({
 export function MissingCardsCell({ cell }: DecksTableCellProps): JSX.Element {
   if (!cell.value) {
     return (
-      <FlexLeftContainer>
-        <div className={"bo_explore_cost"} style={{ visibility: "hidden" }}>
-          0
-        </div>
+      <FlexLeftContainer style={{ visibility: "hidden" }}>
+        <MetricText>
+          <BoosterSymbol /> 0
+        </MetricText>
       </FlexLeftContainer>
     );
   }
@@ -268,20 +270,21 @@ export function MissingCardsCell({ cell }: DecksTableCellProps): JSX.Element {
           return;
         }
         return (
-          <div
+          <MetricText
             key={cardRarity}
-            className={"wc_explore_cost wc_" + cardRarity}
             title={_.capitalize(cardRarity) + " wildcards needed."}
+            style={{ marginRight: "4px" }}
           >
+            <RaritySymbol rarity={cardRarity} />{" "}
             {(ownedWildcards[cardRarity] > 0
               ? ownedWildcards[cardRarity] + "/"
               : "") + data[cardRarity]}
-          </div>
+          </MetricText>
         );
       })}
-      <div className={"bo_explore_cost"} title={"Boosters needed (estimated)"}>
-        {Math.round(cell.value)}
-      </div>
+      <MetricText title={"Boosters needed (estimated)"}>
+        <BoosterSymbol /> {Math.round(cell.value)}
+      </MetricText>
     </FlexLeftContainer>
   );
 }
@@ -291,7 +294,6 @@ export function ArchiveHeader(): JSX.Element {
     <ArchiveSymbol
       title={`archive/restore
 (deck must no longer be in Arena)`}
-      style={{ height: "24px", minHeight: "24px" }}
     />
   );
 }

@@ -201,14 +201,39 @@ interface ManaSymbolProps {
 
 export const ManaSymbol = styled(ManaSymbolBase)<ManaSymbolProps>``;
 
+const SymbolBase = styled.div`
+  line-height: initial;
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+  background-size: contain;
+  background-position: center;
+  margin: auto 2px;
+  vertical-align: middle;
+`;
+
+const RaritySymbolBase = styled(SymbolBase).attrs<RaritySymbolProps>(props => ({
+  className: `wc_explore_cost wc_${props.rarity} ${props.className ?? ""}`
+}))``;
+
+interface RaritySymbolProps {
+  rarity: string;
+}
+
+export const RaritySymbol = styled(RaritySymbolBase)<RaritySymbolProps>``;
+
+export const BoosterSymbol = styled(SymbolBase).attrs(props => ({
+  className: `bo_explore_cost ${props.className ?? ""}`
+}))``;
+
 export const ArchiveSymbol = styled.div`
   border-radius: 50%;
   cursor: pointer;
-  width: 32px;
-  min-height: 32px;
+  width: 30px;
+  min-height: 24px;
   margin: auto;
   overflow: hidden;
-  background: url(../images/show.png) no-repeat left;
+  background: url(../images/show.png) no-repeat center;
   background-size: contain;
   -webkit-transition: all 0.25s cubic-bezier(0.2, 0.5, 0.35, 1);
   vertical-align: middle;
@@ -229,7 +254,7 @@ export const ColoredArchivedSymbol = styled(ArchiveSymbol)<
       ${(props): string => (props.archived ? "--color-g" : "--color-r")}
     )
     url(../images/${(props): string => (props.archived ? "show.png" : "hide.png")})
-    no-repeat left;
+    no-repeat center;
 `;
 
 export const InputContainer = styled.div.attrs(props => ({
