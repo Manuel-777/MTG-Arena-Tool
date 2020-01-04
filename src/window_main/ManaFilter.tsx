@@ -39,12 +39,7 @@ export default function ManaFilter(props: ManaFilterProps): JSX.Element {
   );
 
   const allFilters: ManaFilterKeys[] = [...COLORS_BRIEF, "multi"];
-
   const symbolSize = props.symbolSize ?? 20;
-  const symbolStyle = {
-    width: symbolSize + "px",
-    height: symbolSize + "px"
-  };
 
   return (
     <div
@@ -65,9 +60,21 @@ export default function ManaFilter(props: ManaFilterProps): JSX.Element {
             title={filterLabels[code]}
           >
             {code === "multi" ? (
-              <div className={"icon_search_inclusive"} style={symbolStyle} />
+              <div
+                className={"icon_search_inclusive"}
+                style={{
+                  width: symbolSize + 2 + "px",
+                  height: symbolSize + 2 + "px"
+                }}
+              />
             ) : (
-              <ManaSymbol colorIndex={index + 1} style={symbolStyle} />
+              <ManaSymbol
+                colorIndex={index + 1}
+                style={{
+                  width: symbolSize + "px",
+                  height: symbolSize + "px"
+                }}
+              />
             )}
           </div>
         );

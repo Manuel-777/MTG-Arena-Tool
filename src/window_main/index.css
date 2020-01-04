@@ -1483,6 +1483,7 @@ a:hover {
     margin: auto 2px auto 2px;
     background-repeat: no-repeat;
     filter: drop-shadow(-1px 1px black);
+    vertical-align: middle;
 }
 
 .wc_search_icon {
