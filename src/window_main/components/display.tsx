@@ -17,8 +17,8 @@ export const ArtTile = styled(ArtTileHeader)`
   opacity: 0.7;
   height: 64px;
   width: 200px;
-  -webkit-transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1.0);
-  transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1.0);
+  -webkit-transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1);
+  transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1);
   &.deckTileHover-enter {
     opacity: 0.7;
     background-size: 110%;
