@@ -68,7 +68,8 @@ export default function DecksTable({
         Filter: TextBoxFilter,
         sortType: "alphanumeric",
         Cell: NameCell,
-        gridWidth: "200px"
+        gridWidth: "200px",
+        defaultVisible: true
       },
       {
         Header: "Colors",
@@ -79,7 +80,8 @@ export default function DecksTable({
         minWidth: 170,
         Cell: ColorsCell,
         gridWidth: "150px",
-        mayToggle: true
+        mayToggle: true,
+        defaultVisible: true
       },
       { accessor: "colors" },
       {
@@ -90,7 +92,8 @@ export default function DecksTable({
         filter: "fuzzyText",
         Cell: FormatCell,
         gridWidth: "150px",
-        mayToggle: true
+        mayToggle: true,
+        defaultVisible: true
       },
       {
         Header: "Tags",
@@ -108,21 +111,25 @@ export default function DecksTable({
         accessor: "timeUpdated",
         Cell: DatetimeCell,
         sortDescFirst: true,
-        mayToggle: true
+        mayToggle: true,
+        needsTileLabel: true
       },
       {
         Header: "Last Played",
         accessor: "timePlayed",
         Cell: DatetimeCell,
         sortDescFirst: true,
-        mayToggle: true
+        mayToggle: true,
+        needsTileLabel: true
       },
       {
         Header: "Last Touched",
         accessor: "timeTouched",
         Cell: DatetimeCell,
         sortDescFirst: true,
-        mayToggle: true
+        mayToggle: true,
+        defaultVisible: true,
+        needsTileLabel: true
       },
       {
         Header: "Won",
@@ -131,7 +138,8 @@ export default function DecksTable({
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
         filter: "between",
-        mayToggle: true
+        mayToggle: true,
+        needsTileLabel: true
       },
       {
         Header: "Lost",
@@ -140,7 +148,8 @@ export default function DecksTable({
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
         filter: "between",
-        mayToggle: true
+        mayToggle: true,
+        needsTileLabel: true
       },
       {
         Header: "Total",
@@ -149,19 +158,22 @@ export default function DecksTable({
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
         filter: "between",
-        mayToggle: true
+        mayToggle: true,
+        needsTileLabel: true
       },
       {
         Header: "Total Duration",
         accessor: "duration",
         Cell: DurationCell,
-        mayToggle: true
+        mayToggle: true,
+        needsTileLabel: true
       },
       {
         Header: "Avg. Duration",
         accessor: "avgDuration",
         Cell: DurationCell,
-        mayToggle: true
+        mayToggle: true,
+        needsTileLabel: true
       },
       {
         Header: "Winrate",
@@ -170,7 +182,9 @@ export default function DecksTable({
         disableFilters: false,
         Filter: NumberRangeColumnFilter,
         filter: "between",
-        mayToggle: true
+        mayToggle: true,
+        defaultVisible: true,
+        needsTileLabel: true
       },
       { accessor: "winrate" },
       { accessor: "interval", sortInverted: true },
@@ -180,7 +194,8 @@ export default function DecksTable({
         Header: "Since last edit",
         accessor: "lastEditWinrate",
         Cell: LastEditWinRateCell,
-        mayToggle: true
+        mayToggle: true,
+        needsTileLabel: true
       },
       { accessor: "lastEditWins" },
       { accessor: "lastEditLosses" },
@@ -210,7 +225,8 @@ export default function DecksTable({
         disableFilters: false,
         Cell: ArchivedCell,
         sortType: "basic",
-        mayToggle: true
+        mayToggle: true,
+        defaultVisible: true
       }
     ],
     []
@@ -224,45 +240,23 @@ export default function DecksTable({
     []
   );
   const initialState: DecksTableState = React.useMemo(() => {
+    // default hidden columns
+    const hiddenColumns = columns
+      .filter(column => !column.defaultVisible)
+      .map(column => column.id ?? column.accessor);
     const state = _.defaultsDeep(cachedState, {
-      hiddenColumns: [
-        "deckTileId",
-        "archived",
-        "deckId",
-        "custom",
-        "boosterCost",
-        "colors",
-        "lastEditLosses",
-        "lastEditTotal",
-        "lastEditWinrate",
-        "lastEditWins",
-        "timePlayed",
-        "timeUpdated",
-        "wins",
-        "losses",
-        "total",
-        "rare",
-        "common",
-        "uncommon",
-        "mythic",
-        "duration",
-        "avgDuration",
-        "interval",
-        "winrate",
-        "winrateLow",
-        "winrateHigh"
-      ],
+      hiddenColumns,
       sortBy: [{ id: "timeTouched", desc: true }],
       pageSize: 25
     });
-    if (!state.hiddenColumns.includes("archived")) {
-      state.hiddenColumns.push("archived");
-    }
-    if (!state.hiddenColumns.includes("deckTileId")) {
-      state.hiddenColumns.push("deckTileId");
+    // ensure data-only columns are all invisible
+    for (const column of columns) {
+      if (!column.defaultVisible && !column.mayToggle) {
+        state.hiddenColumns.push(column.id);
+      }
     }
     return state;
-  }, [cachedState]);
+  }, [cachedState, columns]);
 
   const {
     flatColumns,

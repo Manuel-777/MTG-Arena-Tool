@@ -61,19 +61,6 @@ export function DeckTile({
     openDeckCallback(deckId);
   }, [deckId]);
 
-  const requireLabelIds = [
-    "duration",
-    "avgDuration",
-    "winrate100",
-    "lastEditWinrate",
-    "timePlayed",
-    "timeUpdated",
-    "timeTouched",
-    "losses",
-    "total",
-    "wins"
-  ];
-
   return (
     <div
       className={"decks_table_deck_tile"}
@@ -94,7 +81,7 @@ export function DeckTile({
             {...cell.getCellProps()}
             key={cell.column.id + "_" + row.index}
           >
-            {requireLabelIds.includes(cell.column.id) && (
+            {cell.column.needsTileLabel && (
               <MetricText
                 style={{
                   paddingRight: "8px",
