@@ -362,7 +362,9 @@ export default function DecksTable({
         {page.map((row: any, index: number) => {
           prepareRow(row);
           const RowRenderer =
-            tableMode === DECKS_TABLE_MODE ? DecksTableViewRow : DecksArtViewRow;
+            tableMode === DECKS_TABLE_MODE
+              ? DecksTableViewRow
+              : DecksArtViewRow;
           return (
             <RowRenderer
               openDeckCallback={openDeckCallback}
