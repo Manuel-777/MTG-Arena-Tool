@@ -11,39 +11,43 @@ export const ArtTileHeader = styled.div`
 `;
 
 export const ArtTile = styled(ArtTileHeader)`
-  background-size: 200px;
+  background-size: 100%;
   background-position-x: center;
-  background-position-y: -10px;
-  opacity: 0.66;
+  background-position-y: 10%;
+  opacity: 0.7;
   height: 64px;
-  width: 160px;
+  width: 200px;
+  -webkit-transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1.0);
+  transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1.0);
   &.deckTileHover-enter {
-    opacity: 0.66;
-    width: 160px;
+    opacity: 0.7;
+    background-size: 110%;
+    background-position-y: 16%;
   }
   &.deckTileHover-enter-active {
     opacity: 1;
-    width: 200px;
-    -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
-    transition: opacity 0.2s ease-in, width 0.2s ease-in;
+    background-size: 110%;
+    background-position-y: 16%;
   }
   &.deckTileHover-enter-done {
     opacity: 1;
-    width: 200px;
+    background-size: 110%;
+    background-position-y: 16%;
   }
   &.deckTileHover-exit {
     opacity: 1;
-    width: 200px;
+    background-size: 110%;
+    background-position-y: 16%;
   }
   &.deckTileHover-exit-active {
-    opacity: 0.66;
-    width: 160px;
-    -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
-    transition: opacity 0.2s ease-in, width 0.2s ease-in;
+    opacity: 0.7;
+    background-size: 100%;
+    background-position-y: 10%;
   }
   &.deckTileHover-exit-done {
-    opacity: 0.66;
-    width: 160px;
+    opacity: 0.75;
+    background-size: 100%;
+    background-position-y: 10%;
   }
 `;
 
