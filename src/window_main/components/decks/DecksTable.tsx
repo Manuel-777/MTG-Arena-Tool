@@ -29,7 +29,6 @@ import {
   deckSearchFilterFn
 } from "./filters";
 import {
-  CellProps,
   DecksTableProps,
   DecksTableState,
   DecksTableControlsProps
@@ -51,12 +50,6 @@ export default function DecksTable({
   openDeckCallback,
   ...cellCallbacks
 }: DecksTableProps): JSX.Element {
-  const CellWrapper = (
-    component: (props: CellProps) => JSX.Element
-  ): ((props: CellProps) => JSX.Element) => {
-    return (props: CellProps): JSX.Element =>
-      component({ ...props, ...cellCallbacks });
-  };
   const defaultColumn = React.useMemo(
     () => ({
       disableFilters: true
@@ -74,7 +67,7 @@ export default function DecksTable({
         filter: "fuzzyText",
         Filter: TextBoxFilter,
         sortType: "alphanumeric",
-        Cell: CellWrapper(NameCell),
+        Cell: NameCell,
         gridWidth: "200px"
       },
       {
@@ -95,7 +88,7 @@ export default function DecksTable({
         disableFilters: false,
         Filter: TextBoxFilter,
         filter: "fuzzyText",
-        Cell: CellWrapper(FormatCell),
+        Cell: FormatCell,
         gridWidth: "150px",
         mayToggle: true
       },
@@ -106,7 +99,7 @@ export default function DecksTable({
         Filter: TextBoxFilter,
         filter: "fuzzyText",
         disableSortBy: true,
-        Cell: CellWrapper(TagsCell),
+        Cell: TagsCell,
         gridWidth: "200px",
         mayToggle: true
       },
@@ -215,12 +208,12 @@ export default function DecksTable({
         Filter: ArchiveColumnFilter,
         minWidth: 98,
         disableFilters: false,
-        Cell: CellWrapper(ArchivedCell),
+        Cell: ArchivedCell,
         sortType: "basic",
         mayToggle: true
       }
     ],
-    [CellWrapper]
+    []
   );
   const filterTypes = React.useMemo(
     () => ({
@@ -304,7 +297,8 @@ export default function DecksTable({
       initialState,
       autoResetFilters: false,
       autoResetGlobalFilter: false,
-      autoResetSortBy: false
+      autoResetSortBy: false,
+      ...cellCallbacks
     },
     ReactTable.useFilters,
     ReactTable.useGlobalFilter,

@@ -5,12 +5,12 @@ import { InputContainer, PagingButton } from "./display";
 export interface PagingControlsProps {
   canPreviousPage: boolean;
   canNextPage: boolean;
-  pageOptions: any;
+  pageOptions: any[];
   pageCount: number;
-  gotoPage: any;
-  nextPage: any;
-  previousPage: any;
-  setPageSize: any;
+  gotoPage: (index: number) => void;
+  nextPage: () => void;
+  previousPage: () => void;
+  setPageSize: (index: number) => void;
   pageIndex: number;
   pageSize: number;
 }
@@ -60,9 +60,9 @@ export default function PagingControls({
               gotoPage(page);
               e.target.value = "";
             }}
-            onKeyUp={(e: any): void => {
+            onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>): void => {
               if (e.keyCode === 13) {
-                e.target.blur();
+                (e.target as HTMLInputElement).blur();
               }
             }}
             style={{ width: "40px" }}

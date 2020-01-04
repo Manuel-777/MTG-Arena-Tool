@@ -270,6 +270,10 @@ export const SmallTextButton = styled(MetricText).attrs(props => ({
   width: 90px;
 `;
 
+export const MediumTextButton = styled(SmallTextButton)`
+  width: 180px;
+`;
+
 interface PagingButtonProps {
   selected?: boolean;
 }

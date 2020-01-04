@@ -3,7 +3,7 @@ import React from "react";
 import format from "date-fns/format";
 import isValid from "date-fns/isValid";
 
-import { MANA, CARD_RARITIES } from "../../../shared/constants";
+import { CARD_RARITIES } from "../../../shared/constants";
 import { toMMSS, toDDHHMMSS } from "../../../shared/util";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import pd from "../../../shared/player-data";
@@ -27,7 +27,7 @@ import {
   ColoredArchivedSymbol,
   ManaSymbol
 } from "../display";
-import { CellProps } from "./types";
+import { DecksTableCellProps } from "./types";
 
 interface ArtTileCellProps {
   url: string;
@@ -43,7 +43,7 @@ export function ArtTileCell({
   );
 }
 
-export function ColorsCell({ cell }: CellProps): JSX.Element {
+export function ColorsCell({ cell }: DecksTableCellProps): JSX.Element {
   const data = cell.row.values;
   return (
     <FlexLeftContainer>
@@ -54,7 +54,7 @@ export function ColorsCell({ cell }: CellProps): JSX.Element {
   );
 }
 
-export function NameCell({ cell }: CellProps): JSX.Element {
+export function NameCell({ cell }: DecksTableCellProps): JSX.Element {
   let displayName = cell.value;
   if (displayName.includes("?=?Loc/Decks/Precon/")) {
     displayName = displayName.replace("?=?Loc/Decks/Precon/", "");
@@ -65,11 +65,11 @@ export function NameCell({ cell }: CellProps): JSX.Element {
   return <LabelText>{displayName}</LabelText>;
 }
 
-export function MetricCell({ cell }: CellProps): JSX.Element {
+export function MetricCell({ cell }: DecksTableCellProps): JSX.Element {
   return <MetricText>{cell.value}</MetricText>;
 }
 
-export function DatetimeCell({ cell }: CellProps): JSX.Element {
+export function DatetimeCell({ cell }: DecksTableCellProps): JSX.Element {
   const dateVal = new Date(cell.value);
   if (!isValid(dateVal)) {
     return <MetricText>-</MetricText>;
@@ -81,7 +81,7 @@ export function DatetimeCell({ cell }: CellProps): JSX.Element {
   );
 }
 
-export function WinRateCell({ cell }: CellProps): JSX.Element {
+export function WinRateCell({ cell }: DecksTableCellProps): JSX.Element {
   const { total, interval, winrate, winrateLow, winrateHigh } = cell.row.values;
   if (!total) {
     return <MetricText title={"no data yet"}>-</MetricText>;
@@ -109,7 +109,9 @@ export function WinRateCell({ cell }: CellProps): JSX.Element {
   );
 }
 
-export function LastEditWinRateCell({ cell }: CellProps): JSX.Element {
+export function LastEditWinRateCell({
+  cell
+}: DecksTableCellProps): JSX.Element {
   const data = cell.row.values;
   let value, tooltip;
   if (data.lastEditTotal) {
@@ -133,7 +135,7 @@ export function LastEditWinRateCell({ cell }: CellProps): JSX.Element {
   return <MetricText title={tooltip}>{value}</MetricText>;
 }
 
-export function DurationCell({ cell }: CellProps): JSX.Element {
+export function DurationCell({ cell }: DecksTableCellProps): JSX.Element {
   const data = cell.row.values;
   let value, tooltip;
   if (data.total) {
@@ -146,7 +148,10 @@ export function DurationCell({ cell }: CellProps): JSX.Element {
   return <MetricText title={tooltip}>{value}</MetricText>;
 }
 
-export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
+export function FormatCell({
+  cell,
+  editTagCallback
+}: DecksTableCellProps): JSX.Element {
   const backgroundColor = getTagColor(cell.value);
   const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
     null
@@ -176,7 +181,7 @@ export function TagsCell({
   deleteTagCallback,
   editTagCallback,
   tagDeckCallback
-}: CellProps): JSX.Element {
+}: DecksTableCellProps): JSX.Element {
   const backgroundColor = getTagColor();
   const data = cell.row.values;
   const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
@@ -239,7 +244,7 @@ export function TagsCell({
   );
 }
 
-export function MissingCardsCell({ cell }: CellProps): JSX.Element {
+export function MissingCardsCell({ cell }: DecksTableCellProps): JSX.Element {
   if (!cell.value) {
     return (
       <FlexLeftContainer>
@@ -294,7 +299,7 @@ export function ArchiveHeader(): JSX.Element {
 export function ArchivedCell({
   cell,
   archiveDeckCallback
-}: CellProps): JSX.Element {
+}: DecksTableCellProps): JSX.Element {
   const data = cell.row.values;
   const isArchived = data.archived;
   if (!data.custom) {

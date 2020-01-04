@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SerializedDeck } from "../../../shared/types/Deck";
 
 export interface DeckStats {
@@ -88,7 +89,14 @@ export interface DecksTableControlsProps {
   visibleHeaders: any[];
 }
 
-export interface CellProps {
+export interface DecksTableRowProps {
+  row: any;
+  index: number;
+  openDeckCallback: (id: string) => void;
+  gridTemplateColumns: string;
+}
+
+export interface DecksTableCellProps {
   cell: any;
   archiveDeckCallback: (id: string) => void;
   tagDeckCallback: (deckid: string, tag: string) => void;

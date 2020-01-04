@@ -6,7 +6,11 @@ import { TABLE_MODES } from "../../../shared/constants";
 
 import FilterPanel from "../../FilterPanel";
 import PagingControls from "../PagingControls";
-import { MetricText, CheckboxContainer, SmallTextButton } from "../display";
+import {
+  CheckboxContainer,
+  SmallTextButton,
+  MediumTextButton
+} from "../display";
 import { GlobalFilter } from "./filters";
 import { DecksTableControlsProps } from "./types";
 
@@ -171,13 +175,12 @@ export default function DecksTableControls({
           >
             Wanted
           </SmallTextButton>
-          <MetricText
+          <MediumTextButton
             onClick={(): void => setTogglesVisible(!togglesVisible)}
-            className="button_simple"
             style={{ margin: "0 0 5px 12px" }}
           >
             {togglesVisible ? "Hide" : "Show"} Column Toggles
-          </MetricText>
+          </MediumTextButton>
         </div>
         <div className="decks_table_toggles">
           {togglesVisible &&

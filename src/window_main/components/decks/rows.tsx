@@ -6,18 +6,14 @@ import { getCardArtCrop } from "../../../shared/util";
 
 import { ArtTileCell } from "./cells";
 import { MetricText } from "../display";
+import { DecksTableRowProps } from "./types";
 
 export function TableViewRow({
   row,
   index,
   openDeckCallback,
   gridTemplateColumns
-}: {
-  row: any;
-  index: number;
-  openDeckCallback: (id: string) => void;
-  gridTemplateColumns: string;
-}): JSX.Element {
+}: DecksTableRowProps): JSX.Element {
   const deckId = row.values.deckId;
   const mouseClick = React.useCallback(() => {
     openDeckCallback(deckId);
@@ -48,15 +44,8 @@ export function TableViewRow({
 
 export function DeckTile({
   row,
-  index,
-  openDeckCallback,
-  gridTemplateColumns
-}: {
-  row: any;
-  index: number;
-  openDeckCallback: (id: string) => void;
-  gridTemplateColumns: string;
-}): JSX.Element {
+  openDeckCallback
+}: DecksTableRowProps): JSX.Element {
   const [hover, setHover] = React.useState(false);
 
   const mouseEnter = React.useCallback(() => {
