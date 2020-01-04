@@ -107,15 +107,15 @@ export default function PagingControls({
           {">>"}
         </PagingButton>
       )}
-      <div className={"select_container"} style={{ width: "140px" }}>
+      <div
+        className={"select_container"}
+        style={{ width: "140px" }}
+        key={pageSize} // for some reason, React needs this to refresht the ReactSelect
+      >
         <ReactSelect
           current={String(pageSize)}
           options={["10", "25", "50", "100"]}
-          optionFormatter={(pageSize): JSX.Element => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          )}
+          optionFormatter={(pageSize): string => "Show " + pageSize}
           callback={(val): void => setPageSize(Number(val))}
         />
       </div>
