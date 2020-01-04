@@ -1,5 +1,6 @@
 import React from "react";
 import { COLORS_BRIEF } from "../shared/constants";
+import { ManaSymbol } from "./components/display";
 
 export type ManaFilterKeys = "w" | "u" | "b" | "r" | "g" | "multi";
 
@@ -10,9 +11,10 @@ export interface ManaFilterProps {
   prefixId: string;
   filters: { [key: string]: ColorFilter };
   onFilterChanged: (colors: ColorFilter) => void;
+  symbolSize?: number;
 }
 
-export default function ManaFilter(props: ManaFilterProps) {
+export default function ManaFilter(props: ManaFilterProps): JSX.Element {
   const { filterKey, prefixId, filters } = props;
   const colors = filters[filterKey];
 
@@ -26,7 +28,9 @@ export default function ManaFilter(props: ManaFilterProps) {
   };
 
   const onClickColorFilter = React.useCallback(
-    (code: ManaFilterKeys) => (event: React.MouseEvent<HTMLDivElement>) => {
+    (code: ManaFilterKeys) => (
+      event: React.MouseEvent<HTMLDivElement>
+    ): void => {
       colors[code] = event.currentTarget.classList.contains("mana_filter_on");
       event.currentTarget.classList.toggle("mana_filter_on");
       props.onFilterChanged(colors);
@@ -36,31 +40,36 @@ export default function ManaFilter(props: ManaFilterProps) {
 
   const allFilters: ManaFilterKeys[] = [...COLORS_BRIEF, "multi"];
 
-  const manasStyles = {
-    display: "flex",
-    height: "32px"
+  const symbolSize = props.symbolSize ?? 20;
+  const symbolStyle = {
+    width: symbolSize + "px",
+    height: symbolSize + "px"
   };
 
   return (
-    <div className={prefixId + "_query_mana"} style={manasStyles}>
-      {allFilters.map(code => {
+    <div
+      className={prefixId + "_query_mana"}
+      style={{
+        display: "flex",
+        height: symbolSize + 4 + "px"
+      }}
+    >
+      {allFilters.map((code, index) => {
         const classNamesList =
-          "mana_filter" +
-          (code === "multi" ? " icon_search_inclusive" : "") +
-          (colors[code] ? "" : " mana_filter_on");
-        const additionalStyles = {
-          width: "30px",
-          backgroundImage:
-            code === "multi" ? undefined : `url(../images/${code}20.png)`
-        };
+          "mana_filter" + (colors[code] ? "" : " mana_filter_on");
         return (
           <div
             key={code}
             onClick={onClickColorFilter(code)}
             className={classNamesList}
-            style={additionalStyles}
             title={filterLabels[code]}
-          />
+          >
+            {code === "multi" ? (
+              <div className={"icon_search_inclusive"} style={symbolStyle} />
+            ) : (
+              <ManaSymbol colorIndex={index + 1} style={symbolStyle} />
+            )}
+          </div>
         );
       })}
     </div>

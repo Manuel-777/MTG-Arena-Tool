@@ -1478,10 +1478,11 @@ a:hover {
 
 .icon_search_inclusive {
     display: -webkit-inline-box;
-    width: 20px;
-    margin-right: 16px;
-    height: 20px;
     background: center no-repeat url('../images/create.png');
+    background-size: contain;
+    margin: auto 2px auto 2px;
+    background-repeat: no-repeat;
+    filter: drop-shadow(-1px 1px black);
 }
 
 .wc_search_icon {
@@ -1883,9 +1884,7 @@ a:hover {
     align-self: center;
     opacity: 1;
     background-repeat: no-repeat;
-    width: 40px;
-    margin: 0 auto;
-    height: 20px;
+    margin: 0 2px;
     cursor: pointer;
     background-position: center;
     background-size: contain;

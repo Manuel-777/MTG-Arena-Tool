@@ -150,6 +150,7 @@ export function ColorColumnFilter({
       prefixId={"decks_table"}
       filterKey={"colors"}
       filters={{ colors: filterValue }}
+      symbolSize={16}
       onFilterChanged={(colors): void => {
         if (_.isMatch(colors, defaultColors)) {
           setFilter(undefined); // clear filter
