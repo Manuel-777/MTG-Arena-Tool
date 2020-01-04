@@ -2,7 +2,7 @@
 import React from "react";
 
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
-import { TABLE_MODES } from "../../../shared/constants";
+import { DECKS_TABLE_MODES } from "../../../shared/constants";
 
 import FilterPanel from "../../FilterPanel";
 import PagingControls from "../PagingControls";
@@ -204,7 +204,7 @@ export default function DecksTableControls({
         <div className="decks_table_search_cont">
           <WrappedReactSelect
             current={tableMode}
-            options={TABLE_MODES}
+            options={DECKS_TABLE_MODES}
             callback={setTableMode}
             className={"decks_table_mode"}
           />

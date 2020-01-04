@@ -2,7 +2,7 @@
 import _ from "lodash";
 import React from "react";
 
-import { TABLE_MODE } from "../../../shared/constants";
+import { DECKS_TABLE_MODE } from "../../../shared/constants";
 
 import {
   NameCell,
@@ -35,7 +35,7 @@ import {
 } from "./types";
 import PagingControls, { PagingControlsProps } from "../PagingControls";
 import DecksTableControls from "./DecksTableControls";
-import { TableViewRow, DeckTile } from "./rows";
+import { DecksTableViewRow, DecksArtViewRow } from "./rows";
 
 const ReactTable = require("react-table"); // no @types package for current rc yet
 
@@ -362,7 +362,7 @@ export default function DecksTable({
         {page.map((row: any, index: number) => {
           prepareRow(row);
           const RowRenderer =
-            tableMode === TABLE_MODE ? TableViewRow : DeckTile;
+            tableMode === DECKS_TABLE_MODE ? DecksTableViewRow : DecksArtViewRow;
           return (
             <RowRenderer
               openDeckCallback={openDeckCallback}

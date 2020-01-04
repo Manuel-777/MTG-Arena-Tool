@@ -8,7 +8,7 @@ import { ArtTileCell } from "./cells";
 import { MetricText } from "../display";
 import { DecksTableRowProps } from "./types";
 
-export function TableViewRow({
+export function DecksTableViewRow({
   row,
   index,
   openDeckCallback,
@@ -42,7 +42,7 @@ export function TableViewRow({
   );
 }
 
-export function DeckTile({
+export function DecksArtViewRow({
   row,
   openDeckCallback
 }: DecksTableRowProps): JSX.Element {

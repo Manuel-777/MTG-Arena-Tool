@@ -3,7 +3,7 @@ import _ from "lodash";
 import {
   CARD_TILE_FLAT,
   DATE_LAST_30,
-  DECK_ART_MODE,
+  DECKS_ART_MODE,
   DEFAULT_TILE,
   BLACK,
   BLUE,
@@ -78,7 +78,7 @@ const defaultCfg = {
     last_date_filter: DATE_LAST_30,
     last_open_tab: -1,
     decksTableState: undefined,
-    decksTableMode: DECK_ART_MODE,
+    decksTableMode: DECKS_ART_MODE,
     card_tile_style: CARD_TILE_FLAT,
     skip_firstpass: false,
     overlay_scale: 100,
