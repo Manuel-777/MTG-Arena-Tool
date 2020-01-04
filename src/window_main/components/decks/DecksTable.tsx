@@ -26,7 +26,7 @@ import {
   fuzzyTextFilterFn,
   archivedFilterFn,
   colorsFilterFn,
-  uberSearchFilterFn
+  deckSearchFilterFn
 } from "./filters";
 import {
   CellProps,
@@ -300,7 +300,7 @@ export default function DecksTable({
       data: React.useMemo(() => data, [data]),
       defaultColumn,
       filterTypes,
-      globalFilter: uberSearchFilterFn,
+      globalFilter: deckSearchFilterFn,
       initialState,
       autoResetFilters: false,
       autoResetGlobalFilter: false,

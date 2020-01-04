@@ -95,19 +95,3 @@ export interface CellProps {
   editTagCallback: (tag: string, color: string) => void;
   deleteTagCallback: (deckid: string, tag: string) => void;
 }
-
-export interface StyledTagProps {
-  backgroundColor: string;
-  fontStyle: string;
-}
-
-export interface DeckTagProps {
-  deckid: string;
-  tag: string;
-  editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (deckid: string, tag: string) => void;
-}
-
-export interface StyledArchivedCellProps {
-  archived: boolean;
-}

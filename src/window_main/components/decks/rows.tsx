@@ -4,7 +4,8 @@ import { CSSTransition } from "react-transition-group";
 
 import { getCardArtCrop } from "../../../shared/util";
 
-import { MetricText, StyledArtTileCell } from "./cells";
+import { ArtTileCell } from "./cells";
+import { MetricText } from "../display";
 
 export function TableViewRow({
   row,
@@ -93,7 +94,7 @@ export function DeckTile({
       onClick={mouseClick}
     >
       <CSSTransition classNames="deckTileHover" in={!!hover} timeout={200}>
-        <StyledArtTileCell url={getCardArtCrop(row.values["deckTileId"])} />
+        <ArtTileCell url={getCardArtCrop(row.values["deckTileId"])} />
       </CSSTransition>
       {row.cells.map((cell: any) => {
         cell.hover = hover;

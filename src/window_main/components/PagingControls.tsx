@@ -1,35 +1,6 @@
 import React from "react";
-import styled from "styled-components";
 import { ReactSelect } from "../../shared/ReactSelect";
-
-export const StyledInputContainer = styled.div.attrs(props => ({
-  className: (props.className ?? "") + " input_container"
-}))`
-  display: inline-flex;
-  margin: inherit;
-  position: relative;
-  width: 100%;
-  height: 26px;
-  padding-bottom: 4px;
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  &.input_container input {
-    margin: 0;
-    width: calc(100% - 10px);
-    padding: 2px 4px;
-    position: absolute;
-    left: 0;
-    right: 0;
-  }
-  &:hover input {
-    color: rgba(255, 255, 255, 1);
-    background-color: var(--color-mid-50);
-    border: 1px solid var(--color-light);
-  }
-`;
+import { InputContainer, PagingButton } from "./display";
 
 export interface PagingControlsProps {
   canPreviousPage: boolean;
@@ -62,19 +33,14 @@ export default function PagingControls({
   if (expandButtons) {
     for (let n = 0; n < pageCount; n++) {
       pageButtons.push(
-        <button
+        <PagingButton
           key={n}
-          className={
-            pageIndex === n
-              ? "paging_active paging_button_disabled"
-              : "paging_button"
-          }
-          style={{ width: "initial", height: "initial", minWidth: "30px" }}
           onClick={(): void => gotoPage(n)}
           disabled={pageIndex === n}
+          selected={pageIndex === n}
         >
           {n + 1}
-        </button>
+        </PagingButton>
       );
     }
   } else {
@@ -82,7 +48,7 @@ export default function PagingControls({
     pageButtons = (
       <>
         <span className={"paging_text"}>Page</span>
-        <StyledInputContainer
+        <InputContainer
           title={prompt}
           style={{ width: "50px", margin: "0 4px" }}
         >
@@ -102,7 +68,7 @@ export default function PagingControls({
             style={{ width: "40px" }}
             placeholder={String(pageIndex + 1)}
           />
-        </StyledInputContainer>
+        </InputContainer>
         <span className={"paging_text"}>
           <strong>of {pageOptions?.length}</strong>{" "}
         </span>
@@ -113,51 +79,33 @@ export default function PagingControls({
   return (
     <div className={"paging_container"}>
       {!expandButtons && (
-        <button
-          className={
-            canPreviousPage
-              ? "paging_button"
-              : "paging_active paging_button_disabled"
-          }
-          style={{ width: "initial", height: "initial", minWidth: "30px" }}
+        <PagingButton
           onClick={(): void => gotoPage(0)}
           disabled={!canPreviousPage}
+          selected={!canPreviousPage}
         >
           {"<<"}
-        </button>
+        </PagingButton>
       )}
-      <button
-        className={
-          canPreviousPage ? "paging_button" : " paging_button_disabled"
-        }
-        style={{ width: "initial", height: "initial", minWidth: "30px" }}
+      <PagingButton
         onClick={(): void => previousPage()}
         disabled={!canPreviousPage}
       >
         {"<"}
-      </button>
+      </PagingButton>
       {pageButtons}
-      <button
-        className={canNextPage ? "paging_button" : " paging_button_disabled"}
-        style={{ width: "initial", height: "initial", minWidth: "30px" }}
-        onClick={(): void => nextPage()}
-        disabled={!canNextPage}
-      >
+      <PagingButton onClick={(): void => nextPage()} disabled={!canNextPage}>
         {">"}
-      </button>
+      </PagingButton>
       {!expandButtons && (
-        <button
-          className={
-            canNextPage
-              ? "paging_button"
-              : "paging_active paging_button_disabled"
-          }
+        <PagingButton
           style={{ width: "initial", height: "initial", minWidth: "30px" }}
           onClick={(): void => gotoPage(pageCount - 1)}
           disabled={!canNextPage}
+          selected={!canNextPage}
         >
           {">>"}
-        </button>
+        </PagingButton>
       )}
       <div className={"select_container"} style={{ width: "140px" }}>
         <ReactSelect

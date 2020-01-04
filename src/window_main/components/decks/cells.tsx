@@ -2,124 +2,57 @@ import _ from "lodash";
 import React from "react";
 import format from "date-fns/format";
 import isValid from "date-fns/isValid";
-import styled from "styled-components";
 
 import { MANA, CARD_RARITIES } from "../../../shared/constants";
 import { toMMSS, toDDHHMMSS } from "../../../shared/util";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import pd from "../../../shared/player-data";
+import { createInput } from "../../../shared/dom-fns"; // TODO remove this
 
 import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass,
-  getTagColor,
-  showColorpicker
+  getTagColor
 } from "../../renderer-util";
-import { createInput } from "../../../shared/dom-fns"; // TODO remove this
-
 import {
-  CellProps,
-  StyledTagProps,
-  DeckTagProps,
-  StyledArchivedCellProps
-} from "./types";
+  ArtTile,
+  FlexLeftContainer,
+  LabelText,
+  MetricText,
+  TagBubble,
+  TagBubbleWithClose,
+  ArchiveSymbol,
+  useColorpicker,
+  ColoredArchivedSymbol,
+  ManaSymbol
+} from "../display";
+import { CellProps } from "./types";
 
-const StyledArtTileHeader = styled.div`
-  width: 200px;
-  margin: 0 8px;
-`;
-
-const StyledArtTile = styled(StyledArtTileHeader)`
-  background-size: 200px;
-  background-position-x: center;
-  background-position-y: -10px;
-  opacity: 0.66;
-  height: 64px;
-  width: 160px;
-  &.deckTileHover-enter {
-    opacity: 0.66;
-    width: 160px;
-  }
-  &.deckTileHover-enter-active {
-    opacity: 1;
-    width: 200px;
-    -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
-    transition: opacity 0.2s ease-in, width 0.2s ease-in;
-  }
-  &.deckTileHover-enter-done {
-    opacity: 1;
-    width: 200px;
-  }
-  &.deckTileHover-exit {
-    opacity: 1;
-    width: 200px;
-  }
-  &.deckTileHover-exit-active {
-    opacity: 0.66;
-    width: 160px;
-    -webkit-transition: opacity 0.2s ease-in, width 0.2s ease-in;
-    transition: opacity 0.2s ease-in, width 0.2s ease-in;
-  }
-  &.deckTileHover-exit-done {
-    opacity: 0.66;
-    width: 160px;
-  }
-`;
-interface StyledArtTileCellProps {
+interface ArtTileCellProps {
   url: string;
   className?: string;
 }
 
-export function StyledArtTileCell({
+export function ArtTileCell({
   url,
   ...otherProps
-}: StyledArtTileCellProps): JSX.Element {
+}: ArtTileCellProps): JSX.Element {
   return (
-    <StyledArtTile
-      style={{ backgroundImage: `url("${url}")` }}
-      {...otherProps}
-    />
+    <ArtTile style={{ backgroundImage: `url("${url}")` }} {...otherProps} />
   );
 }
-
-export const StyledFlexLeftCell = styled.div`
-  display: flex;
-  justify-content: left;
-  div {
-    :last-child:not(.deck_tag_close) {
-      margin-right: auto;
-    }
-  }
-`;
-
-export const StyledFlexRightCell = styled.div`
-  display: flex;
-  justify-content: right;
-  div {
-    :first-child {
-      margin-left: auto;
-    }
-  }
-`;
 
 export function ColorsCell({ cell }: CellProps): JSX.Element {
   const data = cell.row.values;
   return (
-    <StyledFlexLeftCell>
+    <FlexLeftContainer>
       {data.colors.map((color: number, index: number) => {
-        return <div key={index} className={"mana_s16 mana_" + MANA[color]} />;
+        return <ManaSymbol key={index} colorIndex={color} />;
       })}
-    </StyledFlexLeftCell>
+    </FlexLeftContainer>
   );
 }
-
-export const LabelText = styled.div`
-  display: inline-block;
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
-`;
 
 export function NameCell({ cell }: CellProps): JSX.Element {
   let displayName = cell.value;
@@ -131,14 +64,6 @@ export function NameCell({ cell }: CellProps): JSX.Element {
   }
   return <LabelText>{displayName}</LabelText>;
 }
-
-export const MetricText = styled.div`
-  display: inline-block;
-  line-height: 32px;
-  font-family: var(--sub-font-name);
-  color: var(--color-light);
-  font-weight: 300;
-`;
 
 export function MetricCell({ cell }: CellProps): JSX.Element {
   return <MetricText>{cell.value}</MetricText>;
@@ -221,107 +146,14 @@ export function DurationCell({ cell }: CellProps): JSX.Element {
   return <MetricText title={tooltip}>{value}</MetricText>;
 }
 
-const StyledTag = styled.div<StyledTagProps>`
-  font-family: var(--sub-font-name);
-  cursor: pointer;
-  color: black;
-  font-size: 13px;
-  opacity: 0.8;
-  margin-right: 12px;
-  margin-bottom: 4px;
-  height: 20px;
-  line-height: 20px;
-  text-indent: 8px;
-  padding-right: 12px;
-  border-radius: 16px;
-  display: flex;
-  justify-content: space-between;
-  -webkit-transition: all 0.2s ease-in-out;
-  background-color: ${({ backgroundColor }): string => backgroundColor};
-  font-style: ${({ fontStyle }): string => fontStyle};
-  :last-child {
-    margin-right: 0;
-  }
-  &:hover {
-    opacity: 1;
-  }
-`;
-
-const StyledTagWithClose = styled(StyledTag)`
-  padding-right: 0;
-`;
-
-function useColorpicker(
-  containerRef: React.MutableRefObject<HTMLElement | null>,
-  tag: string,
-  backgroundColor: string,
-  editTagCallback: (tag: string, color: string) => void
-): (e: React.MouseEvent) => void {
-  return (e): void => {
-    e.stopPropagation();
-    showColorpicker(
-      backgroundColor,
-      (color: { rgbString: string }) => {
-        const container = containerRef.current;
-        if (container) {
-          container.style.backgroundColor = color.rgbString;
-        }
-      },
-      (color: { rgbString: string }) => editTagCallback(tag, color.rgbString),
-      () => {
-        const container = containerRef.current;
-        if (container) {
-          container.style.backgroundColor = backgroundColor;
-        }
-      }
-    );
-  };
-}
-
-function DeckTag({
-  deckid,
-  tag,
-  editTagCallback,
-  deleteTagCallback
-}: DeckTagProps): JSX.Element {
-  const backgroundColor = getTagColor(tag);
-  const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
-    null
-  );
-  return (
-    <StyledTagWithClose
-      backgroundColor={backgroundColor}
-      fontStyle={"normal"}
-      ref={containerRef}
-      title={"change tag color"}
-      onClick={useColorpicker(
-        containerRef,
-        tag,
-        backgroundColor,
-        editTagCallback
-      )}
-    >
-      {tag}
-      <div
-        className={"deck_tag_close"}
-        title={"delete tag"}
-        onClick={(e): void => {
-          e.stopPropagation();
-          deleteTagCallback(deckid, tag);
-        }}
-      />
-    </StyledTagWithClose>
-  );
-}
-
 export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
   const backgroundColor = getTagColor(cell.value);
   const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
     null
   );
   return (
-    <StyledFlexLeftCell>
-      <StyledTag
+    <FlexLeftContainer>
+      <TagBubble
         backgroundColor={backgroundColor}
         fontStyle={"italic"}
         ref={containerRef}
@@ -334,8 +166,8 @@ export function FormatCell({ cell, editTagCallback }: CellProps): JSX.Element {
         )}
       >
         {cell.value || "unknown"}
-      </StyledTag>
-    </StyledFlexLeftCell>
+      </TagBubble>
+    </FlexLeftContainer>
   );
 }
 
@@ -383,9 +215,9 @@ export function TagsCell({
     e.stopPropagation();
   };
   return (
-    <StyledFlexLeftCell>
+    <FlexLeftContainer>
       {cell.value.map((tag: string) => (
-        <DeckTag
+        <TagBubbleWithClose
           deckid={data.deckId}
           tag={tag}
           key={tag}
@@ -393,7 +225,7 @@ export function TagsCell({
           deleteTagCallback={deleteTagCallback}
         />
       ))}
-      <StyledTag
+      <TagBubble
         ref={containerRef}
         backgroundColor={backgroundColor}
         style={{ opacity: 0.6 }}
@@ -402,19 +234,19 @@ export function TagsCell({
         onClick={clickHandler}
       >
         Add
-      </StyledTag>
-    </StyledFlexLeftCell>
+      </TagBubble>
+    </FlexLeftContainer>
   );
 }
 
 export function MissingCardsCell({ cell }: CellProps): JSX.Element {
   if (!cell.value) {
     return (
-      <StyledFlexLeftCell>
+      <FlexLeftContainer>
         <div className={"bo_explore_cost"} style={{ visibility: "hidden" }}>
           0
         </div>
-      </StyledFlexLeftCell>
+      </FlexLeftContainer>
     );
   }
   const data = cell.row.values;
@@ -425,7 +257,7 @@ export function MissingCardsCell({ cell }: CellProps): JSX.Element {
     mythic: pd.economy.wcMythic
   };
   return (
-    <StyledFlexLeftCell>
+    <FlexLeftContainer>
       {CARD_RARITIES.map(cardRarity => {
         if (cardRarity === "land" || !data[cardRarity]) {
           return;
@@ -445,44 +277,19 @@ export function MissingCardsCell({ cell }: CellProps): JSX.Element {
       <div className={"bo_explore_cost"} title={"Boosters needed (estimated)"}>
         {Math.round(cell.value)}
       </div>
-    </StyledFlexLeftCell>
+    </FlexLeftContainer>
   );
 }
 
-const StyledArchiveDiv = styled.div`
-  border-radius: 50%;
-  cursor: pointer;
-  width: 32px;
-  min-height: 32px;
-  margin: auto;
-  overflow: hidden;
-  background: url(../images/show.png) no-repeat left;
-  background-size: contain;
-  -webkit-transition: all 0.25s cubic-bezier(0.2, 0.5, 0.35, 1);
-  vertical-align: middle;
-  opacity: 0.8;
-  &:hover {
-    opacity: 1;
-  }
-`;
-
 export function ArchiveHeader(): JSX.Element {
   return (
-    <StyledArchiveDiv
+    <ArchiveSymbol
       title={`archive/restore
 (deck must no longer be in Arena)`}
       style={{ height: "24px", minHeight: "24px" }}
     />
   );
 }
-
-const StyledArchivedCell = styled(StyledArchiveDiv)<StyledArchivedCellProps>`
-  background: var(
-      ${(props): string => (props.archived ? "--color-g" : "--color-r")}
-    )
-    url(../images/${(props): string => (props.archived ? "show.png" : "hide.png")})
-    no-repeat left;
-`;
 
 export function ArchivedCell({
   cell,
@@ -491,10 +298,10 @@ export function ArchivedCell({
   const data = cell.row.values;
   const isArchived = data.archived;
   if (!data.custom) {
-    return <StyledArchiveDiv style={{ visibility: "hidden" }} />;
+    return <ArchiveSymbol style={{ visibility: "hidden" }} />;
   }
   return (
-    <StyledArchivedCell
+    <ColoredArchivedSymbol
       archived={isArchived}
       title={isArchived ? "restore" : "archive (will not delete data)"}
       onClick={(e): void => {

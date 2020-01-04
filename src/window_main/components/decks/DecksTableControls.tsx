@@ -1,22 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import styled from "styled-components";
 
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { TABLE_MODES } from "../../../shared/constants";
 
 import FilterPanel from "../../FilterPanel";
-import { MetricText } from "./cells";
-import { StyledCheckboxContainer, GlobalFilter } from "./filters";
 import PagingControls from "../PagingControls";
+import { MetricText, CheckboxContainer, SmallTextButton } from "../display";
+import { GlobalFilter } from "./filters";
 import { DecksTableControlsProps } from "./types";
-
-const PresetButton = styled(MetricText).attrs(props => ({
-  className: (props.className ?? "") + " button_simple"
-}))`
-  margin: 0 4px 5px 4px;
-  width: 90px;
-`;
 
 const recentFilters = (): { id: string; value: any }[] => [
   { id: "archivedCol", value: "hideArchived" }
@@ -114,7 +106,7 @@ export default function DecksTableControls({
           <span style={{ paddingBottom: "8px" }}>Filter match results:</span>
           <span style={{ width: "260px" }}>{filterPanel.render()}</span>
           <span style={{ paddingBottom: "8px" }}>Presets:</span>
-          <PresetButton
+          <SmallTextButton
             onClick={(): void => {
               setAllFilters(recentFilters);
               setFiltersVisible(initialFiltersVisible);
@@ -132,8 +124,8 @@ export default function DecksTableControls({
             }}
           >
             Recent
-          </PresetButton>
-          <PresetButton
+          </SmallTextButton>
+          <SmallTextButton
             onClick={(): void => {
               setAllFilters(bestFilters);
               setFiltersVisible({
@@ -156,8 +148,8 @@ export default function DecksTableControls({
             }}
           >
             Best
-          </PresetButton>
-          <PresetButton
+          </SmallTextButton>
+          <SmallTextButton
             onClick={(): void => {
               setAllFilters(wantedFilters);
               setFiltersVisible({
@@ -178,7 +170,7 @@ export default function DecksTableControls({
             }}
           >
             Wanted
-          </PresetButton>
+          </SmallTextButton>
           <MetricText
             onClick={(): void => setTogglesVisible(!togglesVisible)}
             className="button_simple"
@@ -190,11 +182,11 @@ export default function DecksTableControls({
         <div className="decks_table_toggles">
           {togglesVisible &&
             toggleableColumns.map((column: any) => (
-              <StyledCheckboxContainer key={column.id}>
+              <CheckboxContainer key={column.id}>
                 {column.render("Header")}
                 <input type="checkbox" {...column.getToggleHiddenProps()} />
                 <span className={"checkmark"} />
-              </StyledCheckboxContainer>
+              </CheckboxContainer>
             ))}
         </div>
         <div className="decks_table_search_cont">

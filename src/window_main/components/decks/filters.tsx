@@ -1,21 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import _ from "lodash";
 import React from "react";
-import styled from "styled-components";
 import matchSorter from "match-sorter";
 
 import { MANA } from "../../../shared/constants";
 import ManaFilter, { ColorFilter } from "../../ManaFilter";
-
 import Aggregator from "../../aggregator";
-import { MetricText } from "./cells";
-import { StyledInputContainer } from "../PagingControls";
-
-export const StyledCheckboxContainer = styled.label.attrs(props => ({
-  className: (props.className ?? "") + " check_container hover_label"
-}))`
-  display: inline-flex;
-`;
+import { MetricText, InputContainer, CheckboxContainer } from "../display";
 
 export function TextBoxFilter({
   column: { id, filterValue, preFilteredRows, setFilter }
@@ -26,13 +17,13 @@ export function TextBoxFilter({
   const prompt =
     id === "deckTileId" ? `Search ${count} decks...` : `Filter ${id}...`;
   return (
-    <StyledInputContainer title={prompt}>
+    <InputContainer title={prompt}>
       <input
         value={filterValue ?? ""}
         onChange={(e): void => setFilter(e.target.value ?? undefined)}
         placeholder={prompt}
       />
-    </StyledInputContainer>
+    </InputContainer>
   );
 }
 
@@ -52,7 +43,7 @@ export function NumberRangeColumnFilter({
   }, [id, preFilteredRows]);
   return (
     <>
-      <StyledInputContainer
+      <InputContainer
         style={{
           width: "36px",
           marginRight: "4px"
@@ -71,9 +62,9 @@ export function NumberRangeColumnFilter({
           placeholder={"min"}
           title={`inclusive lower bound (min ${min})`}
         />
-      </StyledInputContainer>
+      </InputContainer>
       <MetricText>to</MetricText>
-      <StyledInputContainer
+      <InputContainer
         style={{
           width: "36px",
           marginLeft: "4px"
@@ -92,7 +83,7 @@ export function NumberRangeColumnFilter({
           placeholder={"max"}
           title={`inclusive upper bound (max ${max})`}
         />
-      </StyledInputContainer>
+      </InputContainer>
     </>
   );
 }
@@ -105,7 +96,7 @@ export function fuzzyTextFilterFn(
   return matchSorter(rows, filterValue, { keys: ["values." + id] });
 }
 
-export function uberSearchFilterFn(
+export function deckSearchFilterFn(
   rows: any[],
   id: string,
   filterValue: string
@@ -137,13 +128,13 @@ export function GlobalFilter({
   const count = preGlobalFilteredRows.length;
   const prompt = `Search ${count} ${promptNoun}...`;
   return (
-    <StyledInputContainer title={prompt}>
+    <InputContainer title={prompt}>
       <input
         value={globalFilter ?? ""}
         onChange={(e): void => setGlobalFilter(e.target.value ?? undefined)}
         placeholder={prompt}
       />
-    </StyledInputContainer>
+    </InputContainer>
   );
 }
 
@@ -186,7 +177,7 @@ export function ArchiveColumnFilter({
   column: any;
 }): JSX.Element {
   return (
-    <StyledCheckboxContainer style={{ margin: "4px" }}>
+    <CheckboxContainer style={{ margin: "4px" }}>
       archived
       <input
         type="checkbox"
@@ -197,7 +188,7 @@ export function ArchiveColumnFilter({
         }}
       />
       <span className={"checkmark"} />
-    </StyledCheckboxContainer>
+    </CheckboxContainer>
   );
 }
 
