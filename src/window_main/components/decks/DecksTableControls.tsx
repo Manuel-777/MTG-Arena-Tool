@@ -126,7 +126,6 @@ export default function DecksTableControls({
               toggleSortBy("timeTouched", true);
               for (const column of toggleableColumns) {
                 const isVisible = [
-                  "name",
                   "format",
                   "colorSortVal",
                   "timeTouched",
@@ -149,7 +148,6 @@ export default function DecksTableControls({
               toggleSortBy("winrate100", true);
               for (const column of toggleableColumns) {
                 const isVisible = [
-                  "name",
                   "format",
                   "colorSortVal",
                   "losses",
@@ -172,7 +170,6 @@ export default function DecksTableControls({
               toggleSortBy("boosterCost", true);
               for (const column of toggleableColumns) {
                 const isVisible = [
-                  "name",
                   "format",
                   "colorSortVal",
                   "boosterCost",
