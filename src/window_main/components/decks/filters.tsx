@@ -101,7 +101,10 @@ export function deckSearchFilterFn(
   id: string,
   filterValue: string
 ): any[] {
-  const tokens = filterValue.split(" ");
+  const tokens = filterValue.split(" ").filter(token => token.length > 2);
+  if (tokens.length === 0) {
+    return rows;
+  }
   const matches = tokens.map((token: string): any[] =>
     matchSorter(rows, token, {
       keys: [

@@ -211,27 +211,55 @@ export function setFilterFn(
   );
 }
 
+const colorSearchKey = (row: any): string => {
+  const { colors } = row.values;
+  return colors.map((color: number): string => MANA[color]).join(" ");
+};
+
+// inspired by https://scryfall.com/docs/syntax
+const searchKeyMap: { [key: string]: any } = {
+  id: "values.id",
+  n: "values.name",
+  name: "values.name",
+  t: "values.type",
+  type: "values.type",
+  s: "values.set",
+  set: "values.set",
+  r: "values.rarity",
+  rarity: "values.rarity",
+  a: "values.artist",
+  art: "values.artist",
+  artist: "values.artist",
+  c: colorSearchKey,
+  color: colorSearchKey
+};
+
+const allSearchKeys = [...new Set(Object.values(searchKeyMap))];
+
 export function cardSearchFilterFn(
   rows: any[],
   id: string,
   filterValue: string
 ): any[] {
-  const tokens = filterValue.split(" ");
-  const matches = tokens.map((token: string): any[] =>
-    matchSorter(rows, token, {
-      keys: [
-        "values.id",
-        "values.name",
-        "values.type",
-        "values.set",
-        "values.rarity",
-        "values.artist",
-        (row: any): string => {
-          const { colors } = row.values;
-          return colors.map((color: number): string => MANA[color]).join(" ");
-        }
-      ]
-    })
-  );
+  const tokens = filterValue
+    .split(" ")
+    .filter(token =>
+      token.includes(":") ? token.split(":")[1].length > 2 : token.length > 2
+    );
+  if (tokens.length === 0) {
+    return rows;
+  }
+  const matches = tokens.map((token: string): any[] => {
+    let keys = allSearchKeys;
+    let finalToken = token;
+    if (token.includes(":")) {
+      const [tokenKey, tokenVal] = token.split(":");
+      if (tokenKey in searchKeyMap) {
+        keys = [searchKeyMap[tokenKey]];
+        finalToken = tokenVal;
+      }
+    }
+    return matchSorter(rows, finalToken, { keys });
+  });
   return _.intersection(...matches);
 }
