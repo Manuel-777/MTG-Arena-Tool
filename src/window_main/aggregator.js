@@ -88,6 +88,7 @@ class Aggregator {
 
   static getDefaultFilters() {
     return {
+      matchIds: undefined,
       eventId: DEFAULT_EVENT,
       tag: DEFAULT_TAG,
       colors: Aggregator.getDefaultColorFilter(),
@@ -213,6 +214,10 @@ class Aggregator {
     const { eventId, oppColors, arch, showArchived } = this.filters;
     if (!showArchived && match.archived && match.archived) return false;
 
+    const passesMatchFilter =
+      !this.validMatches || this.validMatches.has(match.id);
+    if (!passesMatchFilter) return false;
+
     const passesEventFilter =
       this.filterEvent(match.eventId) ||
       (eventId === ALL_DRAFTS && Aggregator.isDraftMatch(match)) ||
@@ -251,6 +256,11 @@ class Aggregator {
       ...this.filters,
       ...filters
     };
+    if (this.filters.matchIds instanceof Array) {
+      this.validMatches = new Set(this.filters.matchIds);
+    } else {
+      this.validMatches = undefined;
+    }
     if (this.filters.deckId instanceof Array) {
       this.validDecks = new Set(this.filters.deckId);
     } else {

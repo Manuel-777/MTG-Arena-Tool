@@ -1,267 +1,35 @@
 import anime from "animejs";
-import React from "react";
 import isValid from "date-fns/isValid";
-
-import autocomplete from "../shared/autocomplete";
-import {
-  DATE_SEASON,
-  DEFAULT_TILE,
-  EASING_DEFAULT,
-  RANKS
-} from "../shared/constants";
+import React from "react";
+import { DATE_SEASON, EASING_DEFAULT, RANKS } from "../shared/constants";
 import db from "../shared/database";
+import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
-import { createDiv, createInput } from "../shared/dom-fns";
-import { makeId } from "../shared/util";
 import Aggregator from "./aggregator";
-
-import FilterPanel from "./FilterPanel";
-import ListItem from "./listItem";
-import StatsPanel from "./stats-panel";
+import { AggregatorFilters } from "./components/decks/types";
+import MatchesTable from "./components/matches/MatchesTable";
 import {
-  attachDraftData,
-  attachMatchData,
+  MatchesTableState,
+  MatchTableData,
+  SerializedMatch,
+  TagCounts
+} from "./components/matches/types";
+import { openMatch } from "./match-details";
+import mountReactComponent from "./mountReactComponent";
+import {
   formatPercent,
-  getTagColor,
+  hideLoadingBars,
   ipcSend,
   makeResizable,
   resetMainContainer,
-  showColorpicker,
   toggleArchived
 } from "./renderer-util";
-import { openDraft } from "./draft-details";
-import { openMatch } from "./match-details";
-import mountReactComponent from "./mountReactComponent";
+import StatsPanel from "./stats-panel";
 
-const byId = id => document.getElementById(id);
-const {
-  DEFAULT_DECK,
-  DEFAULT_ARCH,
-  NO_ARCH,
-  RANKED_CONST,
-  RANKED_DRAFT
-} = Aggregator;
-let filters = Aggregator.getDefaultFilters();
-let filteredMatches;
-let sortedHistory;
-let totalAgg;
+const { DEFAULT_ARCH, NO_ARCH, RANKED_CONST, RANKED_DRAFT } = Aggregator;
 const tagPrompt = "Set archetype";
 
-function getNextRank(currentRank) {
-  const rankIndex = RANKS.indexOf(currentRank);
-  if (rankIndex < RANKS.length - 1) {
-    return RANKS[rankIndex + 1];
-  } else {
-    return undefined;
-  }
-}
-
-export function setFilters(selected = {}) {
-  if (selected.eventId || selected.date) {
-    // clear all dependent filters
-    filters = {
-      ...Aggregator.getDefaultFilters(),
-      date: filters.date,
-      eventId: filters.eventId,
-      showArchived: filters.showArchived,
-      ...selected
-    };
-  } else if (selected.tag || selected.colors) {
-    // tag or colors filters resets deck filter
-    filters = {
-      ...filters,
-      deckId: DEFAULT_DECK,
-      ...selected
-    };
-  } else {
-    // default case
-    filters = { ...filters, date: pd.settings.last_date_filter, ...selected };
-  }
-}
-
-export function openMatchesTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
-  const mainDiv = resetMainContainer();
-  mainDiv.classList.add("flex_item");
-
-  sortedHistory = pd.matchList;
-  sortedHistory.sort(compare_matches);
-  setFilters(_filters);
-  totalAgg = new Aggregator({ date: filters.date });
-  if (
-    filters.arch !== Aggregator.DEFAULT_ARCH &&
-    !totalAgg.archs.includes(filters.arch)
-  ) {
-    filters.arch = Aggregator.DEFAULT_ARCH;
-  }
-  filteredMatches = new Aggregator(filters);
-
-  const wrap_r = createDiv(["wrapper_column", "sidebar_column_l"]);
-  wrap_r.style.width = pd.settings.right_panel_width + "px";
-  wrap_r.style.flex = `0 0 ${pd.settings.right_panel_width}px`;
-
-  const div = createDiv(["ranks_history"]);
-  div.style.padding = "0 12px";
-
-  let rankedStats;
-  const showingRanked =
-    filters.date === DATE_SEASON &&
-    (filters.eventId === RANKED_CONST || filters.eventId === RANKED_DRAFT);
-  if (showingRanked) {
-    const rankStats = createDiv(["ranks_stats"]);
-    renderRanksStats(rankStats, filteredMatches);
-    rankStats.style.paddingBottom = "16px";
-    div.appendChild(rankStats);
-    rankedStats =
-      filters.eventId === RANKED_CONST
-        ? filteredMatches.constructedStats
-        : filteredMatches.limitedStats;
-  }
-  if (filters.eventId === RANKED_CONST) {
-    rankedStats = filteredMatches.constructedStats;
-  }
-
-  const statsPanel = new StatsPanel(
-    "matches_top",
-    filteredMatches,
-    pd.settings.right_panel_width,
-    true,
-    rankedStats,
-    filters.eventId === RANKED_DRAFT
-  );
-  const historyTopWinrate = statsPanel.render();
-  div.appendChild(historyTopWinrate);
-
-  const drag = createDiv(["dragger"]);
-  wrap_r.appendChild(drag);
-  makeResizable(drag, statsPanel.handleResize);
-  wrap_r.appendChild(div);
-
-  const wrap_l = createDiv(["wrapper_column"]);
-  wrap_l.appendChild(createDiv(["list_fill"]));
-
-  const historyTop = createDiv(["matches_top"]);
-  const eventFilter = { eventId: filters.eventId, date: filters.date };
-  const matchesInEvent = new Aggregator(eventFilter);
-  const matchesInPartialDeckFilters = new Aggregator({
-    ...eventFilter,
-    tag: filters.tag,
-    colors: filters.colors
-  });
-  const filterPanel = new FilterPanel(
-    "matches_top",
-    selected => openMatchesTab(selected),
-    filters,
-    totalAgg.events,
-    matchesInEvent.tags,
-    matchesInPartialDeckFilters.decks,
-    true,
-    matchesInEvent.archs,
-    true,
-    matchesInEvent.archCounts,
-    true
-  );
-  mountReactComponent(filterPanel.render(), historyTop);
-  wrap_l.appendChild(historyTop);
-
-  mainDiv.appendChild(wrap_l);
-  const dataScroller = new DataScroller(
-    wrap_l,
-    renderData,
-    20,
-    sortedHistory.length
-  );
-  dataScroller.render(dataIndex, scrollTop);
-
-  mainDiv.appendChild(wrap_r);
-}
-
-// return val = how many rows it rendered into container
-function renderData(container, index) {
-  // for performance reasons, we leave matches order mostly alone
-  // to display most-recent-first, we use a reverse index
-  const revIndex = sortedHistory.length - index - 1;
-  const match = sortedHistory[revIndex];
-
-  //console.log("match: ", id, match);
-  if (match == undefined) {
-    return 0;
-  }
-
-  if (match.type == "match") {
-    if (!match.opponent || !match.opponent.userid) {
-      return 0;
-    }
-    if (match.opponent.userid.indexOf("Familiar") !== -1) {
-      return 0;
-    }
-  }
-
-  if (match.type == "Event") {
-    return 0;
-  }
-
-  if (!filteredMatches.filterMatch(match)) {
-    return 0;
-  }
-
-  let tileGrpid, clickCallback;
-  if (match.type == "match") {
-    tileGrpid = match.playerDeck.deckTileId;
-    clickCallback = handleOpenMatch;
-  } else {
-    if (match.set in db.sets && db.sets[match.set].tile) {
-      tileGrpid = db.sets[match.set].tile;
-    } else {
-      tileGrpid = DEFAULT_TILE;
-    }
-    clickCallback = handleOpenDraft;
-  }
-  const deleteCallback = id => {
-    toggleArchived(id);
-  };
-
-  const listItem = new ListItem(
-    tileGrpid,
-    match.id,
-    clickCallback,
-    deleteCallback,
-    match.archived
-  );
-  listItem.divideLeft();
-  listItem.divideRight();
-
-  if (match.type === "match") {
-    attachMatchData(listItem, match);
-    container.appendChild(listItem.container);
-
-    // Render tag
-    const tagsDiv = byId("matches_tags_" + match.id);
-    const allTags = [
-      ...totalAgg.archs.filter(
-        arch => arch !== NO_ARCH && arch !== DEFAULT_ARCH
-      ),
-      ...db.archetypes.map(arch => arch.name)
-    ];
-    const tags = [...new Set(allTags)].map(tag => {
-      const count = totalAgg.archCounts[tag] || 0;
-      return { tag, q: count };
-    });
-    if (match.tags && match.tags.length) {
-      match.tags.forEach(tag => createTag(tagsDiv, match.id, tags, tag, true));
-    } else {
-      createTag(tagsDiv, match.id, tags, null, false);
-    }
-  } else {
-    attachDraftData(listItem, match);
-    container.appendChild(listItem.container);
-  }
-
-  //console.log("Load match: ", match_id, match);
-  //console.log("Match: ", match.type, match);
-  return 1;
-}
-
-function handleOpenMatch(id) {
+function openMatchDetails(id: string | number): void {
   openMatch(id);
   anime({
     targets: ".moving_ux",
@@ -271,151 +39,48 @@ function handleOpenMatch(id) {
   });
 }
 
-function handleOpenDraft(id) {
-  openDraft(id);
-  anime({
-    targets: ".moving_ux",
-    left: "-100%",
-    easing: EASING_DEFAULT,
-    duration: 350
-  });
-}
-
-function renderRanksStats(container, aggregator) {
-  container.innerHTML = "";
-  if (!aggregator || !aggregator.stats.total) return;
-  const { winrate } = aggregator.stats;
-
-  const viewingLimitSeason = filters.eventId === RANKED_DRAFT;
-  const seasonName = !viewingLimitSeason ? "constructed" : "limited";
-  const switchSeasonName = viewingLimitSeason ? "constructed" : "limited";
-  const switchSeasonFilters = {
-    ...Aggregator.getDefaultFilters(),
-    date: DATE_SEASON,
-    eventId: viewingLimitSeason ? RANKED_CONST : RANKED_DRAFT
-  };
-
-  const seasonToggleButton = createDiv(
-    ["button_simple", "button_thin", "season_toggle"],
-    `Show ${switchSeasonName}`
-  );
-  seasonToggleButton.style.margin = "8px auto";
-
-  container.appendChild(seasonToggleButton);
-  container.appendChild(
-    createDiv(["ranks_history_title"], `Current ${seasonName} season:`)
-  );
-
-  const currentRank = viewingLimitSeason
-    ? pd.rank.limited.rank
-    : pd.rank.constructed.rank;
-  const expected = getStepsUntilNextRank(viewingLimitSeason, winrate);
-  container.appendChild(
-    createDiv(
-      ["ranks_history_title"],
-      `Games until ${getNextRank(currentRank)}: ${expected}`,
-      { title: `Using ${formatPercent(winrate)} winrate` }
-    )
-  );
-
-  seasonToggleButton.addEventListener("click", () => {
-    openMatchesTab(switchSeasonFilters);
-  });
-}
-
-function createTag(div, matchId, tags, tag, showClose = true) {
-  const tagCol = getTagColor(tag);
-  const iid = makeId(6);
-  const t = createDiv(["deck_tag", iid], tag || tagPrompt);
-  t.style.backgroundColor = tagCol;
-
-  if (tag) {
-    t.addEventListener("click", function(e) {
-      e.stopPropagation();
-      showColorpicker(
-        tagCol,
-        color => (t.style.backgroundColor = color.rgbString),
-        color => ipcSend("edit_tag", { tag, color: color.rgbString }),
-        () => (t.style.backgroundColor = tagCol)
-      );
-    });
-  } else {
-    t.addEventListener("click", function(e) {
-      t.innerHTML = "";
-      const ac = createDiv(["autocomplete"]);
-      const input = createInput(["deck_tag_input"], "", {
-        id: iid,
-        type: "text",
-        autocomplete: "off",
-        placeholder: tagPrompt,
-        size: 1
-      });
-      input.style.minWidth = "120px";
-      input.addEventListener("keyup", function(e) {
-        if (e.keyCode === 13) {
-          e.stopPropagation();
-          const val = this.value;
-          if (val && val !== tagPrompt) {
-            addTag(matchId, val);
-          }
-        } else {
-          setTimeout(() => {
-            input.style.width = this.value.length * 8 + "px";
-          }, 10);
-        }
-      });
-      const focusAndSave = () => {
-        input.focus();
-        input.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 13 }));
-      };
-      autocomplete(input, tags, focusAndSave, focusAndSave);
-
-      ac.appendChild(input);
-      t.appendChild(ac);
-      input.focus();
-
-      e.stopPropagation();
-    });
-  }
-
-  if (showClose && tag) {
-    const tc = createDiv(["deck_tag_close"]);
-    tc.addEventListener("click", function(e) {
-      e.stopPropagation();
-      tc.style.visibility = "hidden";
-      deleteTag(matchId, tag);
-    });
-    t.appendChild(tc);
-  } else {
-    t.style.paddingRight = "12px";
-  }
-  div.appendChild(t);
-  return t;
-}
-
-function addTag(matchid, tag) {
+function addTag(matchid: string, tag: string): void {
   const match = pd.match(matchid);
   if (!match || !tag) return;
   if ([tagPrompt, NO_ARCH, DEFAULT_ARCH].includes(tag)) return;
   if (match.tags && match.tags.includes(tag)) return;
-
   ipcSend("add_matches_tag", { matchid, tag });
 }
 
-function deleteTag(matchid, tag) {
+function editTag(tag: string, color: string): void {
+  ipcSend("edit_tag", { tag, color });
+}
+
+function deleteTag(matchid: string, tag: string): void {
   const match = pd.match(matchid);
   if (!match || !tag) return;
   if (!match.tags || !match.tags.includes(tag)) return;
-
   ipcSend("delete_matches_tag", { matchid, tag });
 }
 
-function getStepsUntilNextRank(mode, winrate) {
-  let rr = mode ? pd.rank.limited : pd.rank.constructed;
+function getNextRank(currentRank: string): undefined | string {
+  const rankIndex = (RANKS as any).indexOf(currentRank);
+  if (rankIndex < RANKS.length - 1) {
+    return RANKS[rankIndex + 1];
+  } else {
+    return undefined;
+  }
+}
 
-  let cr = rr.rank;
-  let cs = rr.step;
-  let ct = rr.tier;
+function saveUserState(state: MatchesTableState): void {
+  ipcSend("save_user_settings", {
+    matchesTableState: state,
+    matchesTableMode: state.matchesTableMode,
+    skip_refresh: true
+  });
+}
+
+function getStepsUntilNextRank(mode: boolean, winrate: number): string {
+  const rr = mode ? pd.rank.limited : pd.rank.constructed;
+
+  const cr = rr.rank;
+  const cs = rr.step;
+  const ct = rr.tier;
 
   let st = 1;
   let stw = 1;
@@ -449,7 +114,7 @@ function getStepsUntilNextRank(mode, winrate) {
   const expectedValue = winrate * stw - (1 - winrate) * stl;
   if (expectedValue <= 0) return "&#x221e";
 
-  let stepsNeeded = st * ct - cs;
+  const stepsNeeded = st * ct - cs;
   let expected = 0;
   let n = 0;
   // console.log("stepsNeeded", stepsNeeded);
@@ -462,9 +127,248 @@ function getStepsUntilNextRank(mode, winrate) {
   return "~" + n;
 }
 
-function compare_matches(a, b) {
-  if (a === undefined) return 0;
-  if (b === undefined) return 0;
+function renderRanksStats(
+  container: HTMLElement,
+  aggregator: any,
+  isLimited: boolean
+): void {
+  container.innerHTML = "";
+  if (!aggregator || !aggregator.stats.total) return;
+  const { winrate } = aggregator.stats;
 
-  return Date.parse(a.date) - Date.parse(b.date);
+  const seasonName = !isLimited ? "constructed" : "limited";
+  const switchSeasonName = isLimited ? "constructed" : "limited";
+  const switchSeasonFilters: AggregatorFilters = {
+    ...Aggregator.getDefaultFilters(),
+    date: DATE_SEASON,
+    eventId: isLimited ? RANKED_CONST : RANKED_DRAFT
+  };
+
+  const seasonToggleButton = createDiv(
+    ["button_simple", "button_thin", "season_toggle"],
+    `Show ${switchSeasonName}`
+  );
+  seasonToggleButton.style.margin = "8px auto";
+
+  container.appendChild(seasonToggleButton);
+  container.appendChild(
+    createDiv(["ranks_history_title"], `Current ${seasonName} season:`)
+  );
+
+  const currentRank = isLimited
+    ? pd.rank.limited.rank
+    : pd.rank.constructed.rank;
+  const expected = getStepsUntilNextRank(isLimited, winrate);
+  container.appendChild(
+    createDiv(
+      ["ranks_history_title"],
+      `Games until ${getNextRank(currentRank)}: ${expected}`,
+      { title: `Using ${formatPercent(winrate)} winrate` }
+    )
+  );
+
+  seasonToggleButton.addEventListener("click", () => {
+    openMatchesTab(switchSeasonFilters);
+  });
+}
+
+function updateStatsPanel(
+  container: HTMLElement,
+  aggregator: Aggregator
+): void {
+  container.innerHTML = "";
+  const filters = aggregator.filters;
+  const { date, eventId } = filters;
+  let rankedStats;
+  const showingRanked =
+    date === DATE_SEASON &&
+    (eventId === RANKED_CONST || eventId === RANKED_DRAFT);
+  const isLimited = eventId === RANKED_DRAFT;
+
+  const div = createDiv(["ranks_history"]);
+  div.style.padding = "0 12px";
+
+  if (showingRanked) {
+    const rankStats = createDiv(["ranks_stats"]);
+    renderRanksStats(rankStats, aggregator, isLimited);
+    rankStats.style.paddingBottom = "16px";
+    div.appendChild(rankStats);
+
+    rankedStats =
+      eventId === RANKED_CONST
+        ? aggregator.constructedStats
+        : aggregator.limitedStats;
+  }
+  if (eventId === RANKED_CONST) {
+    rankedStats = aggregator.constructedStats;
+  }
+  const statsPanel = new StatsPanel(
+    "matches_top",
+    aggregator,
+    pd.settings.right_panel_width,
+    true,
+    rankedStats,
+    isLimited
+  );
+  const statsPanelDiv = statsPanel.render();
+  statsPanelDiv.style.display = "flex";
+  statsPanelDiv.style.flexDirection = "column";
+  statsPanelDiv.style.marginTop = "16px";
+  statsPanelDiv.style.padding = "12px";
+  div.appendChild(statsPanelDiv);
+  const drag = createDiv(["dragger"]);
+  container.appendChild(drag);
+  makeResizable(drag, statsPanel.handleResize);
+  container.appendChild(div);
+}
+
+function getMatchesData(aggregator: Aggregator): MatchTableData[] {
+  return pd.matchList
+    .filter((match: SerializedMatch) => {
+      // legacy filter logic
+      if (match == undefined) {
+        return false;
+      }
+      if (!match.opponent || !match.opponent.userid) {
+        return false;
+      }
+      if (match.opponent.userid.indexOf("Familiar") !== -1) {
+        return false;
+      }
+      return aggregator.filterMatch(match);
+    })
+    .map(
+      (match: SerializedMatch): MatchTableData => {
+        const timestamp = new Date(match.date ?? NaN);
+        const colors = match.playerDeck.colors ?? [];
+        const oppColors = match.oppDeck.colors ?? [];
+        return {
+          ...match,
+          archivedSortVal: match.archived ? 1 : 0,
+          custom: true,
+          colors,
+          colorSortVal: colors.join(""),
+          deckId: match.playerDeck.id ?? "",
+          deckName: match.playerDeck.name ?? "",
+          deckTags: match.playerDeck.tags ?? [],
+          deckFormat: match.playerDeck.format ?? "",
+          losses: match.opponent.win,
+          oppArchetype: match.oppDeck.archetype ?? "unknown",
+          oppColors,
+          oppColorSortVal: oppColors.join(""),
+          oppLeaderboardPlace: match.opponent.leaderboardPlace,
+          oppName: match.opponent.name ?? "",
+          oppPercentile: match.opponent.percentile
+            ? match.opponent.percentile / 100
+            : undefined,
+          oppRank: match.opponent.rank,
+          oppTier: match.opponent.tier,
+          oppUserId: match.opponent.userid,
+          tags: match.tags ?? [],
+          timestamp: isValid(timestamp) ? timestamp.getTime() : NaN,
+          wins: match.player.win
+        };
+      }
+    );
+}
+
+function getTotalAggData(): [string[], TagCounts] {
+  const totalAgg = new Aggregator();
+  const allTags = [
+    ...(totalAgg.archs ?? []).filter(
+      arch => arch !== NO_ARCH && arch !== DEFAULT_ARCH
+    ),
+    ...Object.values(db.archetypes).map(arch => arch.name)
+  ];
+  const tags = [...new Set(allTags)].map(tag => {
+    const count = (totalAgg.archCounts as any)?.[String(tag)] ?? 0;
+    return { tag, q: count };
+  });
+  return [totalAgg.events, tags];
+}
+
+export function MatchesTab({
+  aggFiltersArg
+}: {
+  aggFiltersArg: AggregatorFilters;
+}): JSX.Element {
+  const {
+    matchesTableMode,
+    matchesTableState,
+    last_date_filter: dateFilter,
+    right_panel_width: panelWidth
+  } = pd.settings;
+  const showArchived =
+    matchesTableState?.filters?.archivedCol !== "hideArchived";
+  const defaultAggFilters = {
+    ...Aggregator.getDefaultFilters(),
+    date: dateFilter,
+    ...aggFiltersArg,
+    showArchived
+  };
+  const [aggFilters, setAggFilters] = React.useState(
+    defaultAggFilters as AggregatorFilters
+  );
+  const [events, tags] = React.useMemo(getTotalAggData, []);
+  const data = React.useMemo(() => {
+    const aggregator = new Aggregator(aggFilters);
+    return getMatchesData(aggregator);
+  }, [aggFilters]);
+
+  const sidePanelWidth = panelWidth + "px";
+  const rightPanelRef = React.useRef<HTMLDivElement>(null);
+  const filterMatchesCallback = React.useCallback(
+    (matchIds?: string | string[]): void => {
+      if (rightPanelRef?.current) {
+        updateStatsPanel(
+          rightPanelRef.current,
+          new Aggregator({ ...aggFilters, matchIds })
+        );
+      }
+    },
+    [rightPanelRef, aggFilters]
+  );
+
+  return (
+    <>
+      <div
+        className={"wrapper_column"}
+        style={{
+          overflowX: "auto"
+        }}
+      >
+        <MatchesTable
+          data={data}
+          aggFilters={aggFilters}
+          events={events}
+          tags={tags}
+          cachedState={matchesTableState}
+          cachedTableMode={matchesTableMode}
+          setAggFiltersCallback={setAggFilters}
+          tableStateCallback={saveUserState}
+          filterMatchesCallback={filterMatchesCallback}
+          openMatchCallback={openMatchDetails}
+          archiveCallback={toggleArchived}
+          addTagCallback={addTag}
+          editTagCallback={editTag}
+          deleteTagCallback={deleteTag}
+        />
+      </div>
+      <div
+        ref={rightPanelRef}
+        className={"wrapper_column sidebar_column_l"}
+        style={{
+          width: sidePanelWidth,
+          flex: `0 0 ${sidePanelWidth}`
+        }}
+      ></div>
+    </>
+  );
+}
+
+export function openMatchesTab(aggFilters: AggregatorFilters = {}): void {
+  hideLoadingBars();
+  const mainDiv = resetMainContainer() as HTMLElement;
+  mainDiv.classList.add("flex_item");
+  mountReactComponent(<MatchesTab aggFiltersArg={aggFilters} />, mainDiv);
 }

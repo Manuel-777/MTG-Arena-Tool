@@ -3,7 +3,7 @@ import {
   DATE_SEASON,
   MAIN_HOME,
   MAIN_DECKS,
-  MAIN_MATCHES as MAIN_MATCHES,
+  MAIN_MATCHES,
   MAIN_EVENTS,
   MAIN_EXPLORE,
   MAIN_ECONOMY,
@@ -52,7 +52,7 @@ export function openTab(
       openDecksTab(filters);
       break;
     case MAIN_MATCHES:
-      openMatchesTab(filters, dataIndex, scrollTop);
+      openMatchesTab(filters);
       break;
     case MAIN_EVENTS:
       openEventsTab(filters, dataIndex, scrollTop);

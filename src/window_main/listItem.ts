@@ -3,7 +3,7 @@ import { createDiv } from "../shared/dom-fns";
 
 class ListItem {
   private id: string;
-  private container: HTMLDivElement;
+  public container: HTMLDivElement;
   private left: HTMLDivElement;
   private right: HTMLDivElement;
   private center: HTMLDivElement;
