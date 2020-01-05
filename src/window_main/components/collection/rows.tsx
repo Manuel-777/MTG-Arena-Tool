@@ -74,7 +74,7 @@ export function CardTileRow({
       }}
       style={{ display: "inline-block" }}
     >
-      <OwnershipStars card={card} />
+      <OwnershipStars card={card} wanted={card.wanted} />
       <div
         className={"inventory_card"}
         style={{ width: pd.cardsSize + "px" }}
