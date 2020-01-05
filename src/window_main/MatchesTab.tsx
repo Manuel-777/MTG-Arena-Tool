@@ -1,4 +1,7 @@
 import anime from "animejs";
+import React from "react";
+import isValid from "date-fns/isValid";
+
 import autocomplete from "../shared/autocomplete";
 import {
   DATE_SEASON,
@@ -11,7 +14,7 @@ import pd from "../shared/player-data";
 import { createDiv, createInput } from "../shared/dom-fns";
 import { makeId } from "../shared/util";
 import Aggregator from "./aggregator";
-import DataScroller from "./dataScroller";
+
 import FilterPanel from "./FilterPanel";
 import ListItem from "./listItem";
 import StatsPanel from "./stats-panel";
@@ -76,11 +79,11 @@ export function setFilters(selected = {}) {
   }
 }
 
-export function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
+export function openMatchesTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
   const mainDiv = resetMainContainer();
   mainDiv.classList.add("flex_item");
 
-  sortedHistory = [...pd.history];
+  sortedHistory = pd.matchList;
   sortedHistory.sort(compare_matches);
   setFilters(_filters);
   totalAgg = new Aggregator({ date: filters.date });
@@ -118,7 +121,7 @@ export function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
   }
 
   const statsPanel = new StatsPanel(
-    "history_top",
+    "matches_top",
     filteredMatches,
     pd.settings.right_panel_width,
     true,
@@ -136,7 +139,7 @@ export function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
   const wrap_l = createDiv(["wrapper_column"]);
   wrap_l.appendChild(createDiv(["list_fill"]));
 
-  const historyTop = createDiv(["history_top"]);
+  const historyTop = createDiv(["matches_top"]);
   const eventFilter = { eventId: filters.eventId, date: filters.date };
   const matchesInEvent = new Aggregator(eventFilter);
   const matchesInPartialDeckFilters = new Aggregator({
@@ -145,8 +148,8 @@ export function openHistoryTab(_filters = {}, dataIndex = 25, scrollTop = 0) {
     colors: filters.colors
   });
   const filterPanel = new FilterPanel(
-    "history_top",
-    selected => openHistoryTab(selected),
+    "matches_top",
+    selected => openMatchesTab(selected),
     filters,
     totalAgg.events,
     matchesInEvent.tags,
@@ -232,7 +235,7 @@ function renderData(container, index) {
     container.appendChild(listItem.container);
 
     // Render tag
-    const tagsDiv = byId("history_tags_" + match.id);
+    const tagsDiv = byId("matches_tags_" + match.id);
     const allTags = [
       ...totalAgg.archs.filter(
         arch => arch !== NO_ARCH && arch !== DEFAULT_ARCH
@@ -316,7 +319,7 @@ function renderRanksStats(container, aggregator) {
   );
 
   seasonToggleButton.addEventListener("click", () => {
-    openHistoryTab(switchSeasonFilters);
+    openMatchesTab(switchSeasonFilters);
   });
 }
 
@@ -396,7 +399,7 @@ function addTag(matchid, tag) {
   if ([tagPrompt, NO_ARCH, DEFAULT_ARCH].includes(tag)) return;
   if (match.tags && match.tags.includes(tag)) return;
 
-  ipcSend("add_history_tag", { matchid, tag });
+  ipcSend("add_matches_tag", { matchid, tag });
 }
 
 function deleteTag(matchid, tag) {
@@ -404,7 +407,7 @@ function deleteTag(matchid, tag) {
   if (!match || !tag) return;
   if (!match.tags || !match.tags.includes(tag)) return;
 
-  ipcSend("delete_history_tag", { matchid, tag });
+  ipcSend("delete_matches_tag", { matchid, tag });
 }
 
 function getStepsUntilNextRank(mode, winrate) {

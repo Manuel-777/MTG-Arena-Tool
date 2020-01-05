@@ -151,12 +151,12 @@ function deckStatsSection(deck) {
   }
 
   if (pd.deckChanges(deck.id).length) {
-    const openHistory = createDiv(
-      ["button_simple", "openHistory"],
+    const openMatches = createDiv(
+      ["button_simple", "openMatches"],
       "History of changes"
     );
-    openHistory.addEventListener("click", () => setChangesTimeline(deck.id));
-    stats.appendChild(openHistory);
+    openMatches.addEventListener("click", () => setChangesTimeline(deck.id));
+    stats.appendChild(openMatches);
   }
 
   const exportDeck = createDiv(

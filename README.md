@@ -4,7 +4,7 @@
 # MTG Arena Tool
 MTG Arena Tool is a collection browser, a deck tracker and a statistics manager. Explore which decks you played against and what other players are brewing. MTG Arena Tool is all about improving your Magic Arena experience.
 
-![History Screen](/Readme/screenshot_1.png)
+![Matches Screen](/Readme/screenshot_1.png)
 
 
 ## Download

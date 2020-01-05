@@ -771,7 +771,7 @@ export const EASING_DEFAULT = "cubicBezier(0.570, 0.165, 0.210, 0.990)";
 export const MAIN_LOGIN = -2;
 export const MAIN_HOME = -1;
 export const MAIN_DECKS = 0;
-export const MAIN_HISTORY = 1;
+export const MAIN_MATCHES = 1;
 export const MAIN_EVENTS = 2;
 export const MAIN_EXPLORE = 3;
 export const MAIN_ECONOMY = 4;
@@ -807,6 +807,10 @@ export const DATE_LAST_DAY = "Last 24 Hours";
 export const DATE_LAST_30 = "Last 30 Days";
 export const DATE_SEASON = "Current Season";
 export const DATE_ALL_TIME = "All Time";
+
+export const MATCHES_LIST_MODE = "List View";
+export const MATCHES_TABLE_MODE = "Table View";
+export const MATCHES_TABLE_MODES = [MATCHES_LIST_MODE, MATCHES_TABLE_MODE];
 
 export const DECKS_ART_MODE = "Deck Art View";
 export const DECKS_TABLE_MODE = "Table View";

@@ -891,8 +891,8 @@ function attachMatchData(listItem, match) {
     listItem.rightBottom.appendChild(m);
   });
 
-  const tagsDiv = createDiv(["history_tags"], "", {
-    id: "history_tags_" + match.id
+  const tagsDiv = createDiv(["matches_tags"], "", {
+    id: "matches_tags_" + match.id
   });
   listItem.rightBottom.appendChild(tagsDiv);
 

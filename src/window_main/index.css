@@ -557,7 +557,7 @@ span.top_nav_item_text {
 }
 
 
-.visualView, .openDeck, .openHistory, .exportDeck, .exportDeckStandard, .centered {
+.visualView, .openDeck, .openMatches, .exportDeck, .exportDeckStandard, .centered {
         display: block;
     margin: 16px auto !important;
 }
@@ -914,14 +914,14 @@ a:hover {
     justify-content: space-between;
 }
 
-.history_top {
+.matches_top {
     display: flex;
     min-height: 64px;
     margin-left: 16px;
     justify-content: space-between;
 }
 
-.history_tags {
+.matches_tags {
     display: flex;
     margin: 1px -10px 0px 8px;
 }

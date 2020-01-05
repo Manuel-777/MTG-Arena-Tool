@@ -1,16 +1,16 @@
 import _ from "lodash";
-import React, { useEffect } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { queryElements as $$ } from "../shared/dom-fns";
-import { openTab, clickNav } from "./tabControl";
+import { clickNav } from "./tabControl";
 import pd from "../shared/player-data";
 
-import { get_rank_index, formatRank } from "../shared/util";
+import { get_rank_index as getRankIndex, formatRank } from "../shared/util";
 
 import {
   MAIN_HOME,
   MAIN_DECKS,
-  MAIN_HISTORY,
+  MAIN_MATCHES,
   MAIN_EVENTS,
   MAIN_EXPLORE,
   MAIN_ECONOMY,
@@ -27,11 +27,11 @@ interface TopNavItemProps {
   title: string;
 }
 
-function TopNavItem(props: TopNavItemProps) {
+function TopNavItem(props: TopNavItemProps): JSX.Element {
   const { currentTab, compact, id, callback, title } = props;
 
   const clickTab = React.useCallback(
-    (tabId: number) => (event: React.MouseEvent<HTMLDivElement>) => {
+    (tabId: number) => (): void => {
       clickNav(tabId);
       callback(tabId);
     },
@@ -74,7 +74,7 @@ function TopNavItem(props: TopNavItemProps) {
   );
 }
 
-interface topRankProps {
+interface TopRankProps {
   currentTab: number;
   id: number;
   rank: any | null;
@@ -82,13 +82,13 @@ interface topRankProps {
   rankClass: string;
 }
 
-function TopRankIcon(props: topRankProps) {
+function TopRankIcon(props: TopRankProps): JSX.Element {
   const { currentTab, id, rank, callback, rankClass } = props;
 
   const selected = currentTab === id;
 
   const clickTab = React.useCallback(
-    tabId => (event: React.MouseEvent<HTMLDivElement>) => {
+    tabId => (): void => {
       clickNav(tabId);
       callback(tabId);
     },
@@ -109,7 +109,7 @@ function TopRankIcon(props: topRankProps) {
 
   const propTitle = formatRank(rank);
   const rankStyle = {
-    backgroundPosition: get_rank_index(rank.rank, rank.tier) * -48 + "px 0px"
+    backgroundPosition: getRankIndex(rank.rank, rank.tier) * -48 + "px 0px"
   };
 
   return (
@@ -122,12 +122,12 @@ function TopRankIcon(props: topRankProps) {
   );
 }
 
-interface patreonProps {
+interface PatreonProps {
   patreon: boolean;
   patreonTier: number;
 }
 
-function PatreonBadge(props: patreonProps) {
+function PatreonBadge(props: PatreonProps): JSX.Element {
   const { patreonTier } = props;
 
   let title = "Patreon Basic Tier";
@@ -143,7 +143,7 @@ function PatreonBadge(props: patreonProps) {
   return <div title={title} style={style} className="top_patreon"></div>;
 }
 
-function TopNav() {
+function TopNav(): JSX.Element {
   const [compact, setCompact] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState(pd.settings.last_open_tab);
   const topNavIconsRef: any = React.useRef(null);
@@ -155,8 +155,8 @@ function TopNav() {
   };
 
   const homeTab = { ...defaultTab, id: MAIN_HOME, title: "" };
-  const myDecksTab = { ...defaultTab, id: MAIN_DECKS, title: "MY DECKS" };
-  const historyTab = { ...defaultTab, id: MAIN_HISTORY, title: "HISTORY" };
+  const myDecksTab = { ...defaultTab, id: MAIN_DECKS, title: "DECKS" };
+  const matchesTab = { ...defaultTab, id: MAIN_MATCHES, title: "MATCHES" };
   const eventsTab = { ...defaultTab, id: MAIN_EVENTS, title: "EVENTS" };
   const exploreTab = { ...defaultTab, id: MAIN_EXPLORE, title: "EXPLORE" };
   const economyTab = { ...defaultTab, id: MAIN_ECONOMY, title: "ECONOMY" };
@@ -197,15 +197,15 @@ function TopNav() {
     patreonTier: pd.patreon_tier
   };
 
-  let userName = pd.name.slice(0, -6);
-  let userNumerical = pd.name.slice(-6);
+  const userName = pd.name.slice(0, -6);
+  const userNumerical = pd.name.slice(-6);
 
   return (
     <div className="top_nav">
       <div ref={topNavIconsRef} className="top_nav_icons">
         <TopNavItem {...homeTab} />
         <TopNavItem {...myDecksTab} />
-        <TopNavItem {...historyTab} />
+        <TopNavItem {...matchesTab} />
         <TopNavItem {...eventsTab} />
         <TopNavItem {...exploreTab} />
         <TopNavItem {...economyTab} />
@@ -233,7 +233,7 @@ export default function createTopNav(parent: Element): boolean {
   return true;
 }
 
-export function updateTopBar() {
+export function updateTopBar(): void {
   const topNavDiv = $$(".top_nav_container")[0];
   createTopNav(topNavDiv);
 
