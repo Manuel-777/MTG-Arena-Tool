@@ -1,5 +1,6 @@
-import db from "../shared/database";
 import _ from "lodash";
+
+import db from "../shared/database";
 import { getReadableEvent } from "../shared/util";
 
 const questMap = {
@@ -77,7 +78,7 @@ function isTrackCode(s: string): s is MasteryTrackKeys {
 
 type MasteryTrackKeys = keyof typeof trackCodeMap;
 
-function getReadableTrack(trackCode: string) {
+function getReadableTrack(trackCode: string): string {
   return (
     (isTrackCode(trackCode) && trackCodeMap[trackCode]) ||
     getReadableCode(trackCode)
@@ -86,7 +87,7 @@ function getReadableTrack(trackCode: string) {
 
 // quick and dirty generic pretty formatting
 // "WhyDoesWotc.KeepChanging.Codes" => "Why Does Wotc: Keep Changing: Codes"
-function getReadableCode(code: string) {
+function getReadableCode(code: string): string {
   let result = "";
   code.split(".").forEach(group => {
     result += ": " + _.startCase(group);
@@ -100,7 +101,7 @@ function isQuestCode(s: string): s is QuestKeys {
   return s in questMap;
 }
 
-function getReadableQuest(questCode: string) {
+function getReadableQuest(questCode: string): string {
   if (isQuestCode(questCode)) {
     return questMap[questCode].slice(13).replace(/_/g, " ");
   }
@@ -108,8 +109,8 @@ function getReadableQuest(questCode: string) {
   return `#${questCode.substring(0, 6)}`;
 }
 
-export function getCollationSet(collationid: number) {
-  for (let name in db.sets) {
+export function getCollationSet(collationid: number): string {
+  for (const name in db.sets) {
     if (db.sets[name].collation === collationid) {
       return name;
     }
@@ -117,7 +118,7 @@ export function getCollationSet(collationid: number) {
   return "";
 }
 
-export function getPrettyContext(context: string, full = true) {
+export function getPrettyContext(context: string, full = true): string {
   if (context == undefined || !context) {
     return "-";
   }
@@ -188,11 +189,3 @@ export const vaultPercentFormat = {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1
 };
-
-export interface EconomyState {
-  showArchived: boolean;
-  filterEconomy: string;
-  daysago: number;
-  dayList: any[];
-  sortedChanges: any[];
-}

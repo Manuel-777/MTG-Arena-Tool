@@ -12,7 +12,9 @@ interface EconomyValueRecordProps {
   iconUrl?: string;
 }
 
-export default function EconomyValueRecord(props: EconomyValueRecordProps) {
+export default function EconomyValueRecord(
+  props: EconomyValueRecordProps
+): JSX.Element {
   const contents = (
     <>
       {props.iconClassName && (
@@ -71,7 +73,10 @@ export default function EconomyValueRecord(props: EconomyValueRecordProps) {
   );
 }
 
-function DeltaLabel(props: { content: string; smallLabel?: boolean }) {
+function DeltaLabel(props: {
+  content: string;
+  smallLabel?: boolean;
+}): JSX.Element {
   return (
     <div className={"economy_sub" + (props.smallLabel ? " small" : "")}>
       {props.content}
@@ -85,7 +90,7 @@ interface EconomyIconProps {
   url?: string;
 }
 
-export function EconomyIcon(props: EconomyIconProps) {
+export function EconomyIcon(props: EconomyIconProps): JSX.Element {
   return (
     <div
       className={props.className}

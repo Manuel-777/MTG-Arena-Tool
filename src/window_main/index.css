@@ -745,7 +745,7 @@ font-family:  var(--main-font-name);
 }
 
 .list_economy {
-    cursor: pointer;
+    cursor: default;
     padding-left: 16px;
     height: 64px;
     opacity: 0.66;
@@ -3146,6 +3146,10 @@ a:hover {
     height: 72px;
     opacity: 0.8;
     background: url(../images/swap.png) no-repeat center;
+}
+
+.line_lighter {
+    background-color: var(--color-mid-66);
 }
 
 .line_light {

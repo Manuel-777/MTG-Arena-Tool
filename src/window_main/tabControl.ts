@@ -32,7 +32,7 @@ import {
 import { openDecksTab } from "./DecksTab";
 import { openHistoryTab } from "./history";
 import { openEventsTab } from "./events";
-import { openEconomyTab } from "./economy";
+import { openEconomyTab } from "./EconomyTab";
 import { openExploreTab } from "./explore";
 import { openCollectionTab } from "./collection/CollectionTab";
 import { showOfflineSplash } from "./renderer-util";
@@ -66,7 +66,7 @@ export function openTab(
       }
       break;
     case MAIN_ECONOMY:
-      openEconomyTab(dataIndex, scrollTop);
+      openEconomyTab();
       break;
     case MAIN_COLLECTION:
       openCollectionTab();
