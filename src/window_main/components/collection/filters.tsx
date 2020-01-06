@@ -241,6 +241,24 @@ export function cardSearchFilterFn(
   id: string,
   filterValue: string
 ): any[] {
+  const exp = /(?<normal>(?<tok>[^\s"]+)(?<sep>\b[>=|<=|:|=|<|<]{1,2})(?<val>[^\s"]+))|(?<quoted>(?<qtok>[^\s"]+)(?<qsep>\b[>=|<=|:|=|<|<]{1,2})(?<qval>"[^"]*"))/;
+  const filterPattern = new RegExp(exp, "g");
+  let match;
+  while ((match = filterPattern.exec(filterValue))) {
+    console.log("filterPattern match: ", match.groups);
+    let token, separator, value;
+    if (match.groups?.normal) {
+      token = match.groups.tok;
+      separator = match.groups.sep;
+      value = match.groups.val; // should remove quotes too
+    } else if (match.groups?.quoted) {
+      token = match.groups.qtok;
+      separator = match.groups.qsep;
+      value = match.groups.qval; // should remove quotes too
+    }
+    // use token , separator and value to get proper filtering function
+  }
+
   const tokens = filterValue
     .split(" ")
     .filter(token =>
