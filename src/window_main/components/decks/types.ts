@@ -52,8 +52,8 @@ export interface DecksTableProps {
   filterMatchesCallback: (filters: AggregatorFilters) => void;
   openDeckCallback: (id: string) => void;
   filterDecksCallback: (deckId?: string | string[]) => void;
-  archiveDeckCallback: (id: string) => void;
-  tagDeckCallback: (deckid: string, tag: string) => void;
+  archiveCallback: (id: string) => void;
+  addTagCallback: (id: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
   deleteTagCallback: (deckid: string, tag: string) => void;
   tableStateCallback: (state: DecksTableState) => void;
@@ -98,8 +98,8 @@ export interface DecksTableRowProps {
 
 export interface DecksTableCellProps {
   cell: any;
-  archiveDeckCallback: (id: string) => void;
-  tagDeckCallback: (deckid: string, tag: string) => void;
+  archiveCallback: (id: string) => void;
+  addTagCallback: (id: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
   deleteTagCallback: (deckid: string, tag: string) => void;
 }

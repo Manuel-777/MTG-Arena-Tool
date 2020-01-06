@@ -13,6 +13,7 @@ export interface PagingControlsProps {
   setPageSize: (index: number) => void;
   pageIndex: number;
   pageSize: number;
+  pageSizeOptions?: string[];
 }
 
 export default function PagingControls({
@@ -25,8 +26,10 @@ export default function PagingControls({
   previousPage,
   setPageSize,
   pageIndex,
-  pageSize
+  pageSize,
+  pageSizeOptions
 }: PagingControlsProps): JSX.Element {
+  pageSizeOptions = pageSizeOptions ?? ["10", "25", "50", "100"];
   const expandButtons = pageCount < 10;
 
   let pageButtons: JSX.Element[] | JSX.Element = [];
@@ -110,11 +113,11 @@ export default function PagingControls({
       <div
         className={"select_container"}
         style={{ width: "140px" }}
-        key={pageSize} // for some reason, React needs this to refresht the ReactSelect
+        key={pageSize} // for some reason, React needs this to refresh the ReactSelect
       >
         <ReactSelect
           current={String(pageSize)}
-          options={["10", "25", "50", "100"]}
+          options={pageSizeOptions}
           optionFormatter={(pageSize): string => "Show " + pageSize}
           callback={(val): void => setPageSize(Number(val))}
         />

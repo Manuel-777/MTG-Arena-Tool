@@ -6,6 +6,7 @@ import isValid from "date-fns/isValid";
 import { CARD_RARITIES } from "../../../shared/constants";
 import { toMMSS, toDDHHMMSS } from "../../../shared/util";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
+import LocalTime from "../../../shared/time-components/LocalTime";
 import pd from "../../../shared/player-data";
 import { createInput } from "../../../shared/dom-fns"; // TODO remove this
 
@@ -13,7 +14,8 @@ import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass,
-  getTagColor
+  getTagColor,
+  formatNumber
 } from "../../renderer-util";
 import {
   ArtTile,
@@ -56,22 +58,52 @@ export function ColorsCell({ cell }: DecksTableCellProps): JSX.Element {
   );
 }
 
-export function NameCell({ cell }: DecksTableCellProps): JSX.Element {
-  let displayName = cell.value;
+export function ShortTextCell({ cell }: DecksTableCellProps): JSX.Element {
+  let displayName = cell.value ?? "";
   if (displayName.includes("?=?Loc/Decks/Precon/")) {
     displayName = displayName.replace("?=?Loc/Decks/Precon/", "");
   }
   if (displayName.length > 25) {
     displayName = displayName.slice(0, 22) + "...";
   }
-  return <LabelText>{displayName}</LabelText>;
+  return <LabelText title={cell.value}>{displayName}</LabelText>;
+}
+
+export function TextCell({ cell }: DecksTableCellProps): JSX.Element {
+  return <LabelText>{cell.value}</LabelText>;
 }
 
 export function MetricCell({ cell }: DecksTableCellProps): JSX.Element {
-  return <MetricText>{cell.value}</MetricText>;
+  return <MetricText>{formatNumber(cell.value)}</MetricText>;
 }
 
-export function DatetimeCell({ cell }: DecksTableCellProps): JSX.Element {
+export function PercentCell({ cell }: DecksTableCellProps): JSX.Element {
+  const value = (cell.value ?? 0) / (cell.column.divideBy100 ? 100 : 1);
+  return (
+    <MetricText>
+      {formatPercent(value, cell.column.percentFormatOptions)}
+    </MetricText>
+  );
+}
+
+export function LocalTimeCell({ cell }: DecksTableCellProps): JSX.Element {
+  const dateVal = new Date(cell.value);
+  if (!isValid(dateVal)) {
+    return <MetricText>-</MetricText>;
+  }
+  return (
+    <MetricText>
+      <LocalTime
+        datetime={dateVal.toISOString()}
+        year={"numeric"}
+        month={"long"}
+        day={"numeric"}
+      />
+    </MetricText>
+  );
+}
+
+export function RelativeTimeCell({ cell }: DecksTableCellProps): JSX.Element {
   const dateVal = new Date(cell.value);
   if (!isValid(dateVal)) {
     return <MetricText>-</MetricText>;
@@ -182,7 +214,7 @@ export function TagsCell({
   cell,
   deleteTagCallback,
   editTagCallback,
-  tagDeckCallback
+  addTagCallback
 }: DecksTableCellProps): JSX.Element {
   const backgroundColor = getTagColor();
   const data = cell.row.values;
@@ -214,7 +246,7 @@ export function TagsCell({
     input.addEventListener("focusout", function() {
       const val = input.value;
       if (val && val !== "Add") {
-        tagDeckCallback(data.deckId, val);
+        addTagCallback(data.deckId, val);
       }
     });
     container.appendChild(input);
@@ -300,8 +332,11 @@ export function ArchiveHeader(): JSX.Element {
 
 export function ArchivedCell({
   cell,
-  archiveDeckCallback
-}: DecksTableCellProps): JSX.Element {
+  archiveCallback
+}: {
+  cell: any;
+  archiveCallback: (id: string) => void;
+}): JSX.Element {
   const data = cell.row.values;
   const isArchived = data.archived;
   if (!data.custom) {
@@ -314,7 +349,7 @@ export function ArchivedCell({
       onClick={(e): void => {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        archiveDeckCallback(data.deckId);
+        archiveCallback(data.id);
       }}
     />
   );

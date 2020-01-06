@@ -211,8 +211,8 @@ export function DecksTab({
           tableStateCallback={saveUserState}
           filterDecksCallback={filterDecksCallback}
           openDeckCallback={openDeckCallback}
-          archiveDeckCallback={toggleDeckArchived}
-          tagDeckCallback={addTag}
+          archiveCallback={toggleDeckArchived}
+          addTagCallback={addTag}
           editTagCallback={editTag}
           deleteTagCallback={deleteTag}
         />

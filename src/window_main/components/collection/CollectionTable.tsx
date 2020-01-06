@@ -10,7 +10,7 @@ import {
 import { createDiv } from "../../../shared/dom-fns";
 import db from "../../../shared/database";
 import PagingControls, { PagingControlsProps } from "../PagingControls";
-import { NameCell, ColorsCell, MetricCell } from "../decks/cells";
+import { ShortTextCell, ColorsCell, MetricCell } from "../decks/cells";
 import {
   TextBoxFilter,
   ColorColumnFilter,
@@ -121,7 +121,7 @@ export default function CollectionTable({
   );
   const columns = React.useMemo(
     () => [
-      { id: "grpId", accessor: "id", sortInverted: true },
+      { id: "grpId", accessor: "id" },
       { accessor: "id" },
       { accessor: "dfc" },
       { accessor: "dfcId" },
@@ -132,7 +132,7 @@ export default function CollectionTable({
         filter: "fuzzyText",
         Filter: TextBoxFilter,
         sortType: "alphanumeric",
-        Cell: NameCell,
+        Cell: ShortTextCell,
         gridWidth: "200px",
         defaultVisible: true
       },
@@ -229,7 +229,7 @@ export default function CollectionTable({
         filter: "fuzzyText",
         Filter: TextBoxFilter,
         sortType: "alphanumeric",
-        Cell: NameCell,
+        Cell: ShortTextCell,
         gridWidth: "200px",
         mayToggle: true
       },
@@ -284,7 +284,7 @@ export default function CollectionTable({
     // ensure data-only columns are all invisible
     for (const column of columns) {
       if (!column.defaultVisible && !column.mayToggle) {
-        state.hiddenColumns.push(column.id);
+        state.hiddenColumns.push(column.id ?? column.accessor);
       }
     }
     return state;

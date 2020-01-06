@@ -5,12 +5,12 @@ import React from "react";
 import { DECKS_TABLE_MODE } from "../../../shared/constants";
 
 import {
-  NameCell,
+  ShortTextCell,
   ColorsCell,
   FormatCell,
   TagsCell,
   DurationCell,
-  DatetimeCell,
+  RelativeTimeCell,
   MetricCell,
   WinRateCell,
   LastEditWinRateCell,
@@ -58,6 +58,7 @@ export default function DecksTable({
   );
   const columns = React.useMemo(
     () => [
+      { accessor: "id" },
       { id: "deckId", accessor: "id" },
       { accessor: "deckTileId" },
       {
@@ -67,7 +68,7 @@ export default function DecksTable({
         filter: "fuzzyText",
         Filter: TextBoxFilter,
         sortType: "alphanumeric",
-        Cell: NameCell,
+        Cell: ShortTextCell,
         gridWidth: "200px",
         defaultVisible: true
       },
@@ -109,7 +110,7 @@ export default function DecksTable({
       {
         Header: "Last Updated",
         accessor: "timeUpdated",
-        Cell: DatetimeCell,
+        Cell: RelativeTimeCell,
         sortDescFirst: true,
         mayToggle: true,
         needsTileLabel: true
@@ -117,7 +118,7 @@ export default function DecksTable({
       {
         Header: "Last Played",
         accessor: "timePlayed",
-        Cell: DatetimeCell,
+        Cell: RelativeTimeCell,
         sortDescFirst: true,
         mayToggle: true,
         needsTileLabel: true
@@ -125,7 +126,7 @@ export default function DecksTable({
       {
         Header: "Last Touched",
         accessor: "timeTouched",
-        Cell: DatetimeCell,
+        Cell: RelativeTimeCell,
         sortDescFirst: true,
         mayToggle: true,
         defaultVisible: true,
@@ -221,10 +222,10 @@ export default function DecksTable({
         accessor: "archivedSortVal",
         filter: "showArchived",
         Filter: ArchiveColumnFilter,
-        minWidth: 98,
         disableFilters: false,
         Cell: ArchivedCell,
         sortType: "basic",
+        gridWidth: "100px",
         mayToggle: true,
         defaultVisible: true
       }
@@ -252,7 +253,7 @@ export default function DecksTable({
     // ensure data-only columns are all invisible
     for (const column of columns) {
       if (!column.defaultVisible && !column.mayToggle) {
-        state.hiddenColumns.push(column.id);
+        state.hiddenColumns.push(column.id ?? column.accessor);
       }
     }
     return state;
