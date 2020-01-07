@@ -74,13 +74,17 @@ export function TextCell({ cell }: DecksTableCellProps): JSX.Element {
 }
 
 export function MetricCell({ cell }: DecksTableCellProps): JSX.Element {
-  return <MetricText>{formatNumber(cell.value)}</MetricText>;
+  return (
+    <MetricText style={cell.value === 0 ? { opacity: 0.6 } : undefined}>
+      {formatNumber(cell.value)}
+    </MetricText>
+  );
 }
 
 export function PercentCell({ cell }: DecksTableCellProps): JSX.Element {
   const value = (cell.value ?? 0) / (cell.column.divideBy100 ? 100 : 1);
   return (
-    <MetricText>
+    <MetricText style={cell.value === 0 ? { opacity: 0.6 } : undefined}>
       {formatPercent(value, cell.column.percentFormatOptions)}
     </MetricText>
   );
