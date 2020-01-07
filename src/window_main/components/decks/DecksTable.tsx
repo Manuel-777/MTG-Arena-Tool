@@ -247,6 +247,7 @@ export default function DecksTable({
       .map(column => column.id ?? column.accessor);
     const state = _.defaultsDeep(cachedState, {
       hiddenColumns,
+      filters: [{ id: "archivedCol", value: "hideArchived" }],
       sortBy: [{ id: "timeTouched", desc: true }],
       pageSize: 25
     });

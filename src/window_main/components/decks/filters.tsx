@@ -108,7 +108,6 @@ export function deckSearchFilterFn(
   const matches = tokens.map((token: string): any[] =>
     matchSorter(rows, token, {
       keys: [
-        "values.deckId",
         "values.name",
         "values.format",
         "values.tags",

@@ -80,6 +80,7 @@ const defaultCfg = {
     last_open_tab: -1,
     decksTableState: undefined,
     decksTableMode: DECKS_ART_MODE,
+    collectionTableState: undefined,
     collectionTableMode: COLLECTION_CARD_MODE,
     card_tile_style: CARD_TILE_FLAT,
     skip_firstpass: false,
