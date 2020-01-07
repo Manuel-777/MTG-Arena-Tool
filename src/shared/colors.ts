@@ -66,23 +66,25 @@ class Colors {
    * Adds a string mana cost to this class.
    */
   addFromCost(cost: string[]) {
-    cost.forEach(c => {
-      switch (c) {
-        case "w":
-          this.w += 1;
-          break;
-        case "u":
-          this.u += 1;
-          break;
-        case "b":
-          this.b += 1;
-          break;
-        case "r":
-          this.r += 1;
-          break;
-        case "g":
-          this.g += 1;
-          break;
+    cost.forEach(symbol => {
+      for (const c of symbol) {
+        switch (c) {
+          case "w":
+            this.w += 1;
+            break;
+          case "u":
+            this.u += 1;
+            break;
+          case "b":
+            this.b += 1;
+            break;
+          case "r":
+            this.r += 1;
+            break;
+          case "g":
+            this.g += 1;
+            break;
+        }
       }
     });
 
