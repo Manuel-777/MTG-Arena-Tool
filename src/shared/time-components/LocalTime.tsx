@@ -3,17 +3,21 @@
 
 import React from "react";
 
+type numericOptions = "2-digit" | "numeric";
+type textOptions = "short" | "long";
 export interface LocalTimeProps
   extends React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
   datetime: string;
-  year?: string;
-  month?: string;
-  day?: string;
-  hour?: string;
-  minute?: string;
+  year?: numericOptions;
+  month?: textOptions;
+  day?: numericOptions;
+  weekday?: textOptions;
+  hour?: numericOptions;
+  minute?: numericOptions;
+  second?: numericOptions;
 }
 
 // Because web components don't type check natively, do this hack.
@@ -25,6 +29,6 @@ declare global {
   }
 }
 
-export default function LocalTime(props: LocalTimeProps) {
+export default function LocalTime(props: LocalTimeProps): JSX.Element {
   return <local-time {...props} />;
 }

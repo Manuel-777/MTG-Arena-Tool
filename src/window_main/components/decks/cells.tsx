@@ -90,7 +90,7 @@ export function PercentCell({ cell }: DecksTableCellProps): JSX.Element {
   );
 }
 
-export function LocalTimeCell({ cell }: DecksTableCellProps): JSX.Element {
+export function LocalDateCell({ cell }: DecksTableCellProps): JSX.Element {
   const dateVal = new Date(cell.value);
   if (!isValid(dateVal)) {
     return <MetricText>-</MetricText>;
@@ -102,6 +102,23 @@ export function LocalTimeCell({ cell }: DecksTableCellProps): JSX.Element {
         year={"numeric"}
         month={"long"}
         day={"numeric"}
+      />
+    </MetricText>
+  );
+}
+
+export function LocalTimeCell({ cell }: DecksTableCellProps): JSX.Element {
+  const dateVal = new Date(cell.value);
+  if (!isValid(dateVal)) {
+    return <MetricText>-</MetricText>;
+  }
+  return (
+    <MetricText>
+      <LocalTime
+        datetime={dateVal.toISOString()}
+        hour={"numeric"}
+        minute={"numeric"}
+        second={"numeric"}
       />
     </MetricText>
   );
