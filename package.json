@@ -130,6 +130,7 @@
     "@types/qs": "^6.9.0",
     "@types/react": "^16.9.16",
     "@types/react-dom": "^16.9.4",
+    "@types/react-table": "^7.0.2",
     "@types/react-transition-group": "^4.2.3",
     "@types/semver": "^6.2.0",
     "@types/styled-components": "^4.4.1",
