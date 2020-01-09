@@ -71,20 +71,23 @@ declare module "react-table" {
   export interface Column<D extends object = {}>
     extends UseFiltersColumnOptions<D>,
       UseGroupByColumnOptions<D>,
-      UseSortByColumnOptions<D> {}
-
-  export interface ColumnInstance<D extends object = {}>
-    extends UseFiltersColumnProps<D>,
-      UseGroupByColumnProps<D>,
-      UseSortByColumnProps<D>,
-      UseTableColumnProps<D> {
-    getToggleHiddenProps: (userProps: any) => any;
+      UseSortByColumnOptions<D> {
+    // add custom column property options below
     gridWidth?: string;
     mayToggle?: boolean;
     defaultVisible?: boolean;
     percentFormatOptions?: any;
     divideBy100?: boolean;
     needsTileLabel?: boolean;
+  }
+
+  export interface ColumnInstance<D extends object = {}>
+    extends UseFiltersColumnProps<D>,
+      UseGroupByColumnProps<D>,
+      UseSortByColumnProps<D>,
+      UseTableColumnProps<D> {
+    // this is a bugfix for a misspelled function type declaration
+    getToggleHiddenProps: (userProps: any) => any;
   }
 
   export interface Cell<D extends object = {}>
