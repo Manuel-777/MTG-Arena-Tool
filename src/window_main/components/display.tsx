@@ -74,7 +74,6 @@ export const FlexRightContainer = styled.div`
 
 export const LabelText = styled.div`
   display: inline-block;
-  cursor: pointer;
   text-align: left;
   white-space: nowrap;
 `;

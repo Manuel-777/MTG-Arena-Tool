@@ -5,6 +5,8 @@ export function TableViewRow<D extends TableData>({
   row,
   index,
   gridTemplateColumns,
+  style,
+  className,
   ...otherProps
 }: TableViewRowProps<D>): JSX.Element {
   const lineClass = React.useMemo(
@@ -18,8 +20,8 @@ export function TableViewRow<D extends TableData>({
   );
   return (
     <div
-      className={"decks_table_body_row " + lineClass}
-      style={{ gridTemplateColumns }}
+      className={(className ?? "") + " decks_table_body_row " + lineClass}
+      style={{ ...style, gridTemplateColumns }}
       {...otherProps}
     >
       {row.cells.map(cell => {
