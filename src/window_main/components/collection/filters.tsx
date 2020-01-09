@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import _ from "lodash";
-import React from "react";
 import matchSorter from "match-sorter";
-
+import React from "react";
+import { ColumnInstance, Row } from "react-table";
 import { CARD_RARITIES, MANA } from "../../../shared/constants";
 import db from "../../../shared/database";
-import { SetSymbol, TypeSymbol, RaritySymbol } from "../display";
+import { RaritySymbol, SetSymbol, TypeSymbol } from "../display";
+import { CardsData } from "./types";
 
 export type RarityFilterKeys =
   | "common"
@@ -92,7 +92,7 @@ export function RarityFilter(props: RarityFilterProps): JSX.Element {
 export function RarityColumnFilter({
   column: { filterValue = { ...defaultRarity }, setFilter }
 }: {
-  column: any;
+  column: ColumnInstance<CardsData>;
 }): JSX.Element {
   return (
     <RarityFilter
@@ -110,10 +110,10 @@ export function RarityColumnFilter({
 }
 
 export function rarityFilterFn(
-  rows: any[],
+  rows: Row<CardsData>[],
   id: string,
   filterValue: RarityFilterValue
-): any[] {
+): Row<CardsData>[] {
   return rows.filter(row =>
     Object.entries(filterValue).some(
       ([code, value]) => value && row.values.rarity === code
@@ -180,7 +180,7 @@ export function SetFilter(props: SetFilterProps): JSX.Element {
 export function SetColumnFilter({
   column: { filterValue = { ...defaultSetFilter }, setFilter }
 }: {
-  column: any;
+  column: ColumnInstance<CardsData>;
 }): JSX.Element {
   return (
     <SetFilter
@@ -198,10 +198,10 @@ export function SetColumnFilter({
 }
 
 export function setFilterFn(
-  rows: any[],
+  rows: Row<CardsData>[],
   id: string,
   filterValue: SetFilterValue
-): any[] {
+): Row<CardsData>[] {
   return rows.filter(
     row =>
       Object.entries(filterValue).some(
@@ -211,13 +211,15 @@ export function setFilterFn(
   );
 }
 
-const colorSearchKey = (row: any): string => {
+type SearchKeyFn = (row: Row<CardsData>) => string;
+const colorSearchKey: SearchKeyFn = row => {
   const { colors } = row.values;
   return colors.map((color: number): string => MANA[color]).join(" ");
 };
 
 // inspired by https://scryfall.com/docs/syntax
-const searchKeyMap: { [key: string]: any } = {
+type SearchKeyValue = string | SearchKeyFn;
+const searchKeyMap: { [key: string]: SearchKeyValue } = {
   id: "values.id",
   n: "values.name",
   name: "values.name",
@@ -237,15 +239,15 @@ const searchKeyMap: { [key: string]: any } = {
 const allSearchKeys = [...new Set(Object.values(searchKeyMap))];
 
 export function cardSearchFilterFn(
-  rows: any[],
-  id: string,
+  rows: Row<CardsData>[],
+  columnIds: string[],
   filterValue: string
-): any[] {
+): Row<CardsData>[] {
   const exp = /(?<normal>(?<tok>[^\s"]+)(?<sep>\b[>=|<=|:|=|<|<]{1,2})(?<val>[^\s"]+))|(?<quoted>(?<qtok>[^\s"]+)(?<qsep>\b[>=|<=|:|=|<|<]{1,2})(?<qval>"[^"]*"))/;
   const filterPattern = new RegExp(exp, "g");
   let match;
   while ((match = filterPattern.exec(filterValue))) {
-    console.log("filterPattern match: ", match.groups);
+    // console.log("filterPattern match: ", match.groups);
     let token, separator, value;
     if (match.groups?.normal) {
       token = match.groups.tok;
@@ -267,7 +269,7 @@ export function cardSearchFilterFn(
   if (tokens.length === 0) {
     return rows;
   }
-  const matches = tokens.map((token: string): any[] => {
+  const matches = tokens.map(token => {
     let keys = allSearchKeys;
     let finalToken = token;
     if (token.includes(":")) {

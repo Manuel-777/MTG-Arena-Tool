@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
+import { FilterValue } from "react-table";
 
 import db from "../../../shared/database";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
@@ -9,27 +9,26 @@ import {
   COLLECTION_SETS_MODE
 } from "../../../shared/constants";
 
-import PagingControls from "../PagingControls";
-import TableHeaders from "../TableHeaders";
 import {
   CheckboxContainer,
   SmallTextButton,
   MediumTextButton
 } from "../display";
-import { GlobalFilter } from "../decks/filters";
+import PagingControls from "../tables/PagingControls";
+import TableHeaders from "../tables/TableHeaders";
+import { GlobalFilter } from "../tables/filters";
+import { FiltersVisible } from "../tables/types";
 import { CollectionTableControlsProps } from "./types";
 
-const standardSetsFilter: { [key: string]: boolean } = {};
-db.standardSetCodes.forEach(
-  (code: string) => (standardSetsFilter[code] = true)
-);
-const standardFilters = (): { id: string; value: any }[] => [
+const standardSetsFilter: FilterValue = {};
+db.standardSetCodes.forEach(code => (standardSetsFilter[code] = true));
+const standardFilters = (): FilterValue[] => [
   { id: "set", value: standardSetsFilter }
 ];
-const ownedFilters = (): { id: string; value: any }[] => [
+const ownedFilters = (): FilterValue[] => [
   { id: "owned", value: [1, undefined] }
 ];
-const wantedFilters = (): { id: string; value: any }[] => [
+const wantedFilters = (): FilterValue[] => [
   { id: "wanted", value: [1, undefined] }
 ];
 
@@ -64,10 +63,8 @@ export default function CollectionTableControls({
   visibleHeaders
 }: CollectionTableControlsProps): JSX.Element {
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
-    const toggleableColumns = flatColumns.filter(
-      (column: any) => column.mayToggle
-    );
-    const initialFiltersVisible: { [key: string]: boolean } = {};
+    const toggleableColumns = flatColumns.filter(column => column.mayToggle);
+    const initialFiltersVisible: FiltersVisible = {};
     for (const column of flatColumns) {
       if (column.canFilter) {
         initialFiltersVisible[column.id] = !!column.filterValue;
@@ -87,8 +84,7 @@ export default function CollectionTableControls({
   const inBoostersOnly = React.useMemo(
     () =>
       filters.some(
-        (filter: any) =>
-          filter.id === "boosterSortVal" && filter.value === "yes"
+        filter => filter.id === "boosterSortVal" && filter.value === "yes"
       ),
     [filters]
   );
@@ -143,7 +139,7 @@ export default function CollectionTableControls({
                 ...initialFiltersVisible,
                 set: true
               });
-              toggleSortBy("grpId", true);
+              toggleSortBy("grpId", true, false);
               for (const column of toggleableColumns) {
                 const isVisible = [
                   "colorSortVal",
@@ -165,7 +161,7 @@ export default function CollectionTableControls({
                 ...initialFiltersVisible,
                 owned: true
               });
-              toggleSortBy("grpId", true);
+              toggleSortBy("grpId", true, false);
               for (const column of toggleableColumns) {
                 const isVisible = [
                   "colorSortVal",
@@ -187,7 +183,7 @@ export default function CollectionTableControls({
                 ...initialFiltersVisible,
                 wanted: true
               });
-              toggleSortBy("grpId", true);
+              toggleSortBy("grpId", true, false);
               for (const column of toggleableColumns) {
                 const isVisible = [
                   "colorSortVal",
@@ -213,10 +209,10 @@ export default function CollectionTableControls({
         </div>
         <div className="decks_table_toggles">
           {togglesVisible &&
-            toggleableColumns.map((column: any) => (
+            toggleableColumns.map(column => (
               <CheckboxContainer key={column.id}>
                 {column.render("Header")}
-                <input type="checkbox" {...column.getToggleHiddenProps()} />
+                <input type="checkbox" {...column.getToggleHiddenProps({})} />
                 <span className={"checkmark"} />
               </CheckboxContainer>
             ))}

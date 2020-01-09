@@ -1,4 +1,6 @@
+import { Cell, Row, TableState } from "react-table";
 import { DbCardData } from "../../../shared/types/Metadata";
+import { TableControlsProps, TableViewRowProps } from "../tables/types";
 
 export interface CardsData extends DbCardData {
   colors: number[];
@@ -10,10 +12,7 @@ export interface CardsData extends DbCardData {
   wanted: number;
 }
 
-export interface CollectionTableState {
-  hiddenColumns: string[];
-  filters: { [key: string]: any };
-  sortBy: [{ id: string; desc: boolean }];
+export interface CollectionTableState extends TableState<CardsData> {
   collectionTableMode: string;
 }
 
@@ -26,52 +25,21 @@ export interface CollectionTableProps {
   cachedTableMode: string;
   filterCallback: (cardIds: string[]) => void;
   exportCallback: (cardIds: string[]) => void;
-  openCardCallback: (cardObj: any) => void;
+  openCardCallback: (cardObj: DbCardData) => void;
 }
 
-export interface CollectionTableControlsProps {
-  canNextPage: boolean;
-  canPreviousPage: boolean;
+export interface CollectionTableControlsProps
+  extends TableControlsProps<CardsData> {
   exportCallback: (cardIds: string[]) => void;
-  filters: any;
-  flatColumns: any[];
-  getTableProps: any;
-  globalFilter: any;
-  gotoPage: any;
-  gridTemplateColumns: string;
-  nextPage: any;
-  pageCount: number;
-  pageIndex: number;
-  pageOptions: any;
-  pageSize: number;
-  preGlobalFilteredRows: any[];
-  previousPage: any;
-  rows: any[];
-  setAllFilters: any;
-  setFilter: any;
-  setGlobalFilter: any;
-  setPageSize: any;
-  setTableMode: any;
-  tableMode: string;
-  toggleHideColumn: any;
-  toggleSortBy: any;
-  visibleHeaders: any[];
+  rows: Row<CardsData>[];
 }
 
-export interface CardRowProps {
-  row: any;
-  index: number;
+export interface CollectionTableRowProps extends TableViewRowProps<CardsData> {
   cardHoverCallback: (cardDiv: HTMLElement, card: DbCardData) => void;
   contextMenuCallback: (cardDiv: HTMLElement, card: DbCardData) => void;
-  openCardCallback: (cardObj: any) => void;
-  gridTemplateColumns: string;
+  openCardCallback: (cardObj: DbCardData) => void;
 }
 
-export interface CellProps {
-  cell: any;
-}
-
-export interface StyledArtTileCellProps {
-  url: string;
-  className?: string;
+export interface CollectionTableCellProps {
+  cell: Cell<CardsData>;
 }

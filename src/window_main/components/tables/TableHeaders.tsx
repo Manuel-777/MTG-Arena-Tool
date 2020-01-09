@@ -1,30 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
+import { TableData, TableHeadersProps } from "./types";
 
-export interface TableHeadersProps {
-  filtersVisible: any;
-  getTableProps: any;
-  gridTemplateColumns: any;
-  setFilter: any;
-  setFiltersVisible: any;
-  visibleHeaders: any;
-}
-
-export default function TableHeaders({
+export default function TableHeaders<D extends TableData>({
   filtersVisible,
   getTableProps,
   gridTemplateColumns,
   setFilter,
   setFiltersVisible,
   visibleHeaders
-}: TableHeadersProps): JSX.Element {
+}: TableHeadersProps<D>): JSX.Element {
   return (
     <div
       className="decks_table_head line_dark"
       style={{ gridTemplateColumns }}
       {...getTableProps()}
     >
-      {visibleHeaders.map((column: any, ii: number) => (
+      {visibleHeaders.map((column, ii) => (
         <div
           {...column.getHeaderProps(column.getSortByToggleProps())}
           className={"hover_label"}

@@ -204,7 +204,7 @@ export function DecksTab({
       >
         <DecksTable
           data={data}
-          filters={aggFilters}
+          aggFilters={aggFilters}
           cachedState={decksTableState}
           cachedTableMode={decksTableMode}
           filterMatchesCallback={setAggFilters}

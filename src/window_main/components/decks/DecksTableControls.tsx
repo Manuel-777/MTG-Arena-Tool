@@ -1,38 +1,37 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-
-import { WrappedReactSelect } from "../../../shared/ReactSelect";
+import { FilterValue } from "react-table";
 import { DECKS_TABLE_MODES } from "../../../shared/constants";
-
+import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import FilterPanel from "../../FilterPanel";
-import PagingControls from "../PagingControls";
-import TableHeaders from "../TableHeaders";
 import {
   CheckboxContainer,
-  SmallTextButton,
-  MediumTextButton
+  MediumTextButton,
+  SmallTextButton
 } from "../display";
-import { GlobalFilter } from "./filters";
+import { GlobalFilter } from "../tables/filters";
+import PagingControls from "../tables/PagingControls";
+import TableHeaders from "../tables/TableHeaders";
+import { FiltersVisible } from "../tables/types";
 import { DecksTableControlsProps } from "./types";
 
-const recentFilters = (): { id: string; value: any }[] => [
+const recentFilters = (): { id: string; value: FilterValue }[] => [
   { id: "archivedCol", value: "hideArchived" }
 ];
-const bestFilters = (): { id: string; value: any }[] => [
+const bestFilters = (): { id: string; value: FilterValue }[] => [
   { id: "archivedCol", value: "hideArchived" },
   { id: "wins", value: [5, undefined] },
   { id: "winrate100", value: [50, undefined] }
 ];
-const wantedFilters = (): { id: string; value: any }[] => [
+const wantedFilters = (): { id: string; value: FilterValue }[] => [
   { id: "archivedCol", value: "hideArchived" },
   { id: "boosterCost", value: [1, undefined] }
 ];
 
 export default function DecksTableControls({
+  aggFilters,
   canNextPage,
   canPreviousPage,
   filterMatchesCallback,
-  filters,
   flatColumns,
   getTableProps,
   globalFilter,
@@ -56,10 +55,8 @@ export default function DecksTableControls({
   visibleHeaders
 }: DecksTableControlsProps): JSX.Element {
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
-    const toggleableColumns = flatColumns.filter(
-      (column: any) => column.mayToggle
-    );
-    const initialFiltersVisible: { [key: string]: boolean } = {};
+    const toggleableColumns = flatColumns.filter(column => column.mayToggle);
+    const initialFiltersVisible: FiltersVisible = {};
     for (const column of flatColumns) {
       if (column.canFilter) {
         initialFiltersVisible[column.id] = !!column.filterValue;
@@ -74,7 +71,7 @@ export default function DecksTableControls({
   const filterPanel = new FilterPanel(
     "decks_top",
     filterMatchesCallback,
-    filters,
+    aggFilters,
     [],
     [],
     [],
@@ -123,7 +120,7 @@ export default function DecksTableControls({
             onClick={(): void => {
               setAllFilters(recentFilters);
               setFiltersVisible(initialFiltersVisible);
-              toggleSortBy("timeTouched", true);
+              toggleSortBy("timeTouched", true, false);
               for (const column of toggleableColumns) {
                 const isVisible = [
                   "format",
@@ -145,7 +142,7 @@ export default function DecksTableControls({
                 wins: true,
                 winrate100: true
               });
-              toggleSortBy("winrate100", true);
+              toggleSortBy("winrate100", true, false);
               for (const column of toggleableColumns) {
                 const isVisible = [
                   "format",
@@ -167,7 +164,7 @@ export default function DecksTableControls({
                 ...initialFiltersVisible,
                 boosterCost: true
               });
-              toggleSortBy("boosterCost", true);
+              toggleSortBy("boosterCost", true, false);
               for (const column of toggleableColumns) {
                 const isVisible = [
                   "format",
@@ -190,10 +187,10 @@ export default function DecksTableControls({
         </div>
         <div className="decks_table_toggles">
           {togglesVisible &&
-            toggleableColumns.map((column: any) => (
+            toggleableColumns.map(column => (
               <CheckboxContainer key={column.id}>
                 {column.render("Header")}
-                <input type="checkbox" {...column.getToggleHiddenProps()} />
+                <input type="checkbox" {...column.getToggleHiddenProps({})} />
                 <span className={"checkmark"} />
               </CheckboxContainer>
             ))}

@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Cell, TableState } from "react-table";
 import { SerializedDeck } from "../../../shared/types/Deck";
+import { TableControlsProps } from "../tables/types";
 
 export interface DeckStats {
   wins: number;
@@ -39,16 +40,13 @@ export interface AggregatorFilters {
   showArchived?: boolean;
 }
 
-export interface DecksTableState {
-  hiddenColumns: string[];
-  filters: { [key: string]: any };
-  sortBy: [{ id: string; desc: boolean }];
+export interface DecksTableState extends TableState<DecksData> {
   decksTableMode: string;
 }
 
 export interface DecksTableProps {
   data: DecksData[];
-  filters: AggregatorFilters;
+  aggFilters: AggregatorFilters;
   filterMatchesCallback: (filters: AggregatorFilters) => void;
   openDeckCallback: (id: string) => void;
   filterDecksCallback: (deckId?: string | string[]) => void;
@@ -61,45 +59,11 @@ export interface DecksTableProps {
   cachedTableMode: string;
 }
 
-export interface DecksTableControlsProps {
-  canNextPage: boolean;
-  canPreviousPage: boolean;
+export interface DecksTableControlsProps extends TableControlsProps<DecksData> {
   filterMatchesCallback: (filters: AggregatorFilters) => void;
-  filters: AggregatorFilters;
-  flatColumns: any[];
-  getTableProps: any;
-  globalFilter: any;
-  gotoPage: any;
-  gridTemplateColumns: string;
-  nextPage: any;
-  pageCount: number;
-  pageIndex: number;
-  pageOptions: any;
-  pageSize: number;
-  preGlobalFilteredRows: any[];
-  previousPage: any;
-  setAllFilters: any;
-  setFilter: any;
-  setGlobalFilter: any;
-  setPageSize: any;
-  setTableMode: any;
-  tableMode: string;
-  toggleHideColumn: any;
-  toggleSortBy: any;
-  visibleHeaders: any[];
-}
-
-export interface DecksTableRowProps {
-  row: any;
-  index: number;
-  openDeckCallback: (id: string) => void;
-  gridTemplateColumns: string;
+  aggFilters: AggregatorFilters;
 }
 
 export interface DecksTableCellProps {
-  cell: any;
-  archiveCallback: (id: string) => void;
-  addTagCallback: (id: string, tag: string) => void;
-  editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (deckid: string, tag: string) => void;
+  cell: Cell<DecksData>;
 }

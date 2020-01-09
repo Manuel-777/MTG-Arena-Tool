@@ -1,6 +1,4 @@
 import React from "react";
-import db from "../../../shared/database";
-
 import {
   FlexLeftContainer,
   LabelText,
@@ -8,9 +6,9 @@ import {
   SetSymbol,
   TypeSymbol
 } from "../display";
-import { CellProps } from "./types";
+import { CollectionTableCellProps } from "./types";
 
-export function RarityCell({ cell }: CellProps): JSX.Element {
+export function RarityCell({ cell }: CollectionTableCellProps): JSX.Element {
   const data = cell.row.values;
   const code = data.rarity;
   return (
@@ -27,7 +25,7 @@ export function RarityCell({ cell }: CellProps): JSX.Element {
   );
 }
 
-export function SetCell({ cell }: CellProps): JSX.Element {
+export function SetCell({ cell }: CollectionTableCellProps): JSX.Element {
   const data = cell.row.values;
   const set = data.set;
   return (
@@ -38,7 +36,7 @@ export function SetCell({ cell }: CellProps): JSX.Element {
   );
 }
 
-export function TypeCell({ cell }: CellProps): JSX.Element {
+export function TypeCell({ cell }: CollectionTableCellProps): JSX.Element {
   const data = cell.row.values;
   const type = data.type;
   return (

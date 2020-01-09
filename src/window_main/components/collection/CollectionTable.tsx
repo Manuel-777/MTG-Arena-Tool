@@ -1,47 +1,51 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires */
 import _ from "lodash";
 import React from "react";
-
 import {
-  COLLECTION_TABLE_MODE,
+  useFilters,
+  useGlobalFilter,
+  usePagination,
+  useSortBy,
+  useTable
+} from "react-table";
+import {
   COLLECTION_CHART_MODE,
-  COLLECTION_SETS_MODE
+  COLLECTION_SETS_MODE,
+  COLLECTION_TABLE_MODE
 } from "../../../shared/constants";
-import { createDiv } from "../../../shared/dom-fns";
 import db from "../../../shared/database";
-import PagingControls, { PagingControlsProps } from "../PagingControls";
-import { ShortTextCell, ColorsCell, MetricCell } from "../decks/cells";
-import {
-  TextBoxFilter,
-  ColorColumnFilter,
-  NumberRangeColumnFilter,
-  fuzzyTextFilterFn,
-  colorsFilterFn
-} from "../decks/filters";
+import { createDiv } from "../../../shared/dom-fns";
 import {
   CollectionStats,
+  createWantedStats,
   getCollectionStats,
-  renderSetStats,
-  createWantedStats
+  renderSetStats
 } from "../../collection/collectionStats";
 import createHeatMap from "../../collection/completionHeatMap";
-import CollectionTableControls from "./CollectionTableControls";
-import { CardTableViewRow, CardTileRow } from "./rows";
-import { RarityCell, SetCell, TypeCell } from "./cells";
+import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {
+  ColorColumnFilter,
+  colorsFilterFn,
+  fuzzyTextFilterFn,
+  NumberRangeColumnFilter,
+  TextBoxFilter
+} from "../tables/filters";
+import PagingControls from "../tables/PagingControls";
+import { PagingControlsProps } from "../tables/types";
+import { RarityCell, SetCell, TypeCell } from "./cells";
+import CollectionTableControls from "./CollectionTableControls";
+import {
+  cardSearchFilterFn,
   RarityColumnFilter,
   rarityFilterFn,
-  cardSearchFilterFn,
-  setFilterFn,
-  SetColumnFilter
+  SetColumnFilter,
+  setFilterFn
 } from "./filters";
+import { CardTableViewRow, CardTileRow } from "./rows";
 import {
+  CollectionTableControlsProps,
   CollectionTableProps,
-  CollectionTableState,
-  CollectionTableControlsProps
+  CollectionTableState
 } from "./types";
-
-const ReactTable = require("react-table"); // no @types package for current rc yet
 
 const legacyModes = [COLLECTION_CHART_MODE, COLLECTION_SETS_MODE];
 
@@ -313,7 +317,7 @@ export default function CollectionTable({
     previousPage,
     setPageSize,
     state
-  } = ReactTable.useTable(
+  } = useTable(
     {
       columns,
       data: React.useMemo(() => data, [data]),
@@ -325,10 +329,10 @@ export default function CollectionTable({
       autoResetGlobalFilter: false,
       autoResetSortBy: false
     },
-    ReactTable.useFilters,
-    ReactTable.useGlobalFilter,
-    ReactTable.useSortBy,
-    ReactTable.usePagination
+    useFilters,
+    useGlobalFilter,
+    useSortBy,
+    usePagination
   );
   const { filters, globalFilter, pageIndex, pageSize } = state;
   const [tableMode, setTableMode] = React.useState(cachedTableMode);
@@ -343,11 +347,11 @@ export default function CollectionTable({
     tableStateCallback({ ...state, collectionTableMode: tableMode });
   }, [state, tableMode, tableStateCallback]);
   React.useEffect(() => {
-    const cardIds = rows.map((row: any) => row.values.id);
+    const cardIds = rows.map(row => row.values.id);
     filterCallback(cardIds);
   }, [filterCallback, rows]);
   React.useEffect(() => {
-    const cardIds = rows.map((row: any) => row.values.id);
+    const cardIds = rows.map(row => row.values.id);
     if (legacyContainerRef?.current) {
       const stats = getCollectionStats(cardIds);
       updateLegacyViews(
@@ -372,9 +376,9 @@ export default function CollectionTable({
     pageSize
   };
 
-  const visibleHeaders = headers.filter((header: any) => header.isVisible);
+  const visibleHeaders = headers.filter(header => header.isVisible);
   const gridTemplateColumns = visibleHeaders
-    .map((header: any) => header.gridWidth ?? "1fr")
+    .map(header => header.gridWidth ?? "1fr")
     .join(" ");
 
   const tableControlsProps: CollectionTableControlsProps = {
@@ -412,7 +416,7 @@ export default function CollectionTable({
     </div>
   ) : (
     <div className="decks_table_body" {...getTableBodyProps()}>
-      {page.map((row: any, index: number) => {
+      {page.map((row, index) => {
         prepareRow(row);
         const RowRenderer =
           tableMode === COLLECTION_TABLE_MODE ? CardTableViewRow : CardTileRow;

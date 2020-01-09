@@ -1,20 +1,7 @@
 import React from "react";
-import { ReactSelect } from "../../shared/ReactSelect";
-import { InputContainer, PagingButton } from "./display";
-
-export interface PagingControlsProps {
-  canPreviousPage: boolean;
-  canNextPage: boolean;
-  pageOptions: any[];
-  pageCount: number;
-  gotoPage: (index: number) => void;
-  nextPage: () => void;
-  previousPage: () => void;
-  setPageSize: (index: number) => void;
-  pageIndex: number;
-  pageSize: number;
-  pageSizeOptions?: string[];
-}
+import { ReactSelect } from "../../../shared/ReactSelect";
+import { InputContainer, PagingButton } from "../display";
+import { PagingControlsProps } from "./types";
 
 export default function PagingControls({
   canPreviousPage,

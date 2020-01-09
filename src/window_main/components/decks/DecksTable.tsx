@@ -1,47 +1,52 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires */
 import _ from "lodash";
 import React from "react";
-
+import {
+  ColumnInstance,
+  Row,
+  useFilters,
+  useGlobalFilter,
+  usePagination,
+  useSortBy,
+  useTable
+} from "react-table";
 import { DECKS_TABLE_MODE } from "../../../shared/constants";
-
 import {
-  ShortTextCell,
-  ColorsCell,
-  FormatCell,
-  TagsCell,
-  DurationCell,
-  RelativeTimeCell,
-  MetricCell,
-  WinRateCell,
-  LastEditWinRateCell,
-  MissingCardsCell,
+  ArchivedCell,
   ArchiveHeader,
-  ArchivedCell
-} from "./cells";
+  ColorsCell,
+  DurationCell,
+  FormatCell,
+  MetricCell,
+  RelativeTimeCell,
+  ShortTextCell,
+  TagsCell
+} from "../tables/cells";
 import {
-  TextBoxFilter,
-  ColorColumnFilter,
-  NumberRangeColumnFilter,
   ArchiveColumnFilter,
-  fuzzyTextFilterFn,
   archivedFilterFn,
+  ColorColumnFilter,
   colorsFilterFn,
-  deckSearchFilterFn
-} from "./filters";
-import {
-  DecksTableProps,
-  DecksTableState,
-  DecksTableControlsProps
-} from "./types";
-import PagingControls, { PagingControlsProps } from "../PagingControls";
+  fuzzyTextFilterFn,
+  NumberRangeColumnFilter,
+  TextBoxFilter
+} from "../tables/filters";
+import PagingControls from "../tables/PagingControls";
+import { TableViewRow } from "../tables/TableViewRow";
+import { PagingControlsProps } from "../tables/types";
+import { LastEditWinRateCell, MissingCardsCell, WinRateCell } from "./cells";
+import DecksArtViewRow from "./DecksArtViewRow";
 import DecksTableControls from "./DecksTableControls";
-import { DecksTableViewRow, DecksArtViewRow } from "./rows";
-
-const ReactTable = require("react-table"); // no @types package for current rc yet
+import { deckSearchFilterFn } from "./filters";
+import {
+  DecksData,
+  DecksTableControlsProps,
+  DecksTableProps,
+  DecksTableState
+} from "./types";
 
 export default function DecksTable({
   data,
-  filters,
+  aggFilters,
   filterMatchesCallback,
   tableStateCallback,
   cachedState,
@@ -283,7 +288,7 @@ export default function DecksTable({
     previousPage,
     setPageSize,
     state
-  } = ReactTable.useTable(
+  } = useTable(
     {
       columns,
       data: React.useMemo(() => data, [data]),
@@ -296,19 +301,19 @@ export default function DecksTable({
       autoResetSortBy: false,
       ...cellCallbacks
     },
-    ReactTable.useFilters,
-    ReactTable.useGlobalFilter,
-    ReactTable.useSortBy,
-    ReactTable.usePagination
+    useFilters,
+    useGlobalFilter,
+    useSortBy,
+    usePagination
   );
-  const { globalFilter, pageIndex, pageSize } = state;
+  const { filters, globalFilter, pageIndex, pageSize } = state;
   const [tableMode, setTableMode] = React.useState(cachedTableMode);
 
   React.useEffect(() => {
     tableStateCallback({ ...state, decksTableMode: tableMode });
   }, [state, tableMode, tableStateCallback]);
   React.useEffect(() => {
-    filterDecksCallback(rows.map((row: any) => row.values.deckId));
+    filterDecksCallback(rows.map((row: Row<DecksData>) => row.values.deckId));
   }, [filterDecksCallback, rows]);
 
   const pagingProps: PagingControlsProps = {
@@ -324,12 +329,15 @@ export default function DecksTable({
     pageSize
   };
 
-  const visibleHeaders = headers.filter((header: any) => header.isVisible);
+  const visibleHeaders = headers.filter(
+    (header: ColumnInstance<DecksData>) => header.isVisible
+  );
   const gridTemplateColumns = visibleHeaders
-    .map((header: any) => header.gridWidth ?? "1fr")
+    .map((header: ColumnInstance<DecksData>) => header.gridWidth ?? "1fr")
     .join(" ");
 
   const tableControlsProps: DecksTableControlsProps = {
+    aggFilters,
     canNextPage,
     canPreviousPage,
     filterMatchesCallback,
@@ -361,15 +369,16 @@ export default function DecksTable({
     <div className="decks_table_wrap">
       <DecksTableControls {...tableControlsProps} />
       <div className="decks_table_body" {...getTableBodyProps()}>
-        {page.map((row: any, index: number) => {
+        {page.map((row: Row<DecksData>, index: number) => {
           prepareRow(row);
+          const data = row.original;
           const RowRenderer =
-            tableMode === DECKS_TABLE_MODE
-              ? DecksTableViewRow
-              : DecksArtViewRow;
+            tableMode === DECKS_TABLE_MODE ? TableViewRow : DecksArtViewRow;
+          const onClick = (): void => openDeckCallback(data.id ?? "");
           return (
             <RowRenderer
-              openDeckCallback={openDeckCallback}
+              onClick={onClick}
+              title={`show ${data.name} details`}
               row={row}
               index={index}
               key={row.index}
