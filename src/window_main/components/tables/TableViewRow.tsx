@@ -7,11 +7,18 @@ export function TableViewRow<D extends TableData>({
   gridTemplateColumns,
   ...otherProps
 }: TableViewRowProps<D>): JSX.Element {
+  const lineClass = React.useMemo(
+    () =>
+      index === -1
+        ? "line_lighter"
+        : index % 2 === 0
+        ? "line_light"
+        : "line_dark",
+    [index]
+  );
   return (
     <div
-      className={
-        "decks_table_body_row " + (index % 2 == 0 ? "line_light" : "line_dark")
-      }
+      className={"decks_table_body_row " + lineClass}
       style={{ gridTemplateColumns }}
       {...otherProps}
     >
@@ -22,7 +29,9 @@ export function TableViewRow<D extends TableData>({
             {...cell.getCellProps()}
             key={cell.column.id + "_" + row.index}
           >
-            {cell.render("Cell")}
+            {cell.isAggregated
+              ? cell.render("Aggregated")
+              : cell.render("Cell")}
           </div>
         );
       })}

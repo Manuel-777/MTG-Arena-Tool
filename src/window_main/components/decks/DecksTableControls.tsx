@@ -206,7 +206,7 @@ export default function DecksTableControls({
             preGlobalFilteredRows={preGlobalFilteredRows}
             globalFilter={globalFilter}
             setGlobalFilter={setGlobalFilter}
-            promptNoun={"decks"}
+            countLabel={"decks"}
           />
           {globalFilter && (
             <div

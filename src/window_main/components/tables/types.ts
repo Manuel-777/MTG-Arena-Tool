@@ -1,5 +1,4 @@
 import {
-  Cell,
   CellValue,
   ColumnInstance,
   Filters,
@@ -7,11 +6,7 @@ import {
   IdType,
   Row,
   TablePropGetter,
-  TableProps,
-  UseFiltersColumnProps,
-  UseGroupByColumnProps,
-  UseSortByColumnProps,
-  UseTableColumnProps
+  TableProps
 } from "react-table";
 
 export type TableData = Record<string, CellValue>;
@@ -76,8 +71,4 @@ export interface TableViewRowProps<D extends TableData>
   row: Row<D>;
   index: number;
   gridTemplateColumns: string;
-}
-
-export interface CellProps<D extends TableData> {
-  cell: Cell<D>;
 }

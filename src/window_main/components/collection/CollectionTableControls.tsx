@@ -1,22 +1,20 @@
 import React from "react";
 import { FilterValue } from "react-table";
-
+import {
+  COLLECTION_CHART_MODE,
+  COLLECTION_SETS_MODE,
+  COLLECTION_TABLE_MODES
+} from "../../../shared/constants";
 import db from "../../../shared/database";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import {
-  COLLECTION_TABLE_MODES,
-  COLLECTION_CHART_MODE,
-  COLLECTION_SETS_MODE
-} from "../../../shared/constants";
-
-import {
   CheckboxContainer,
-  SmallTextButton,
-  MediumTextButton
+  MediumTextButton,
+  SmallTextButton
 } from "../display";
+import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
-import { GlobalFilter } from "../tables/filters";
 import { FiltersVisible } from "../tables/types";
 import { CollectionTableControlsProps } from "./types";
 
@@ -229,7 +227,7 @@ export default function CollectionTableControls({
             preGlobalFilteredRows={preGlobalFilteredRows}
             globalFilter={globalFilter}
             setGlobalFilter={setGlobalFilter}
-            promptNoun={"cards"}
+            countLabel={"cards"}
           />
           {globalFilter && (
             <div

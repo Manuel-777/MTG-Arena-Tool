@@ -1,6 +1,6 @@
 import isValid from "date-fns/isValid";
 import React from "react";
-import { Cell } from "react-table";
+import { Cell, CellProps } from "react-table";
 import { createInput } from "../../../shared/dom-fns"; // TODO remove this
 import LocalTime from "../../../shared/time-components/LocalTime";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
@@ -17,7 +17,7 @@ import {
   TagBubbleWithClose,
   useColorpicker
 } from "../display";
-import { CellProps, TableData } from "./types";
+import { TableData } from "./types";
 
 export function ColorsCell<D extends TableData>({
   cell
@@ -274,5 +274,19 @@ export function ArchivedCell<D extends TableData>({
         archiveCallback(data.id);
       }}
     />
+  );
+}
+
+export function AggregatedContextCell<D extends TableData>({
+  cell,
+  countLabel
+}: {
+  cell: Cell<D>;
+  countLabel: string;
+}): JSX.Element {
+  return (
+    <LabelText>
+      {cell.value} {countLabel}
+    </LabelText>
   );
 }

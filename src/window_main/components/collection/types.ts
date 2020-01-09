@@ -1,4 +1,4 @@
-import { Cell, Row, TableState } from "react-table";
+import { CellProps, Row, TableState } from "react-table";
 import { DbCardData } from "../../../shared/types/Metadata";
 import { TableControlsProps, TableViewRowProps } from "../tables/types";
 
@@ -40,6 +40,4 @@ export interface CollectionTableRowProps extends TableViewRowProps<CardsData> {
   openCardCallback: (cardObj: DbCardData) => void;
 }
 
-export interface CollectionTableCellProps {
-  cell: Cell<CardsData>;
-}
+export type CollectionTableCellProps = CellProps<CardsData>;

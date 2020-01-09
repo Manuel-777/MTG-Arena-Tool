@@ -1,4 +1,4 @@
-import { Cell, TableState } from "react-table";
+import { CellProps, TableState } from "react-table";
 import { SerializedDeck } from "../../../shared/types/Deck";
 import { TableControlsProps } from "../tables/types";
 
@@ -64,6 +64,4 @@ export interface DecksTableControlsProps extends TableControlsProps<DecksData> {
   aggFilters: AggregatorFilters;
 }
 
-export interface DecksTableCellProps {
-  cell: Cell<DecksData>;
-}
+export type DecksTableCellProps = CellProps<DecksData>;

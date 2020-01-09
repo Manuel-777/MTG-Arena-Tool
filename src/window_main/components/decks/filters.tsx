@@ -15,7 +15,7 @@ export function deckSearchFilterFn(
   if (tokens.length === 0) {
     return rows;
   }
-  const matches = tokens.map((token): Row<DecksData>[] =>
+  const matches = tokens.map(token =>
     matchSorter(rows, token, {
       keys: [
         "values.name",

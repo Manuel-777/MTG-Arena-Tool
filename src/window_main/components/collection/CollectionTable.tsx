@@ -292,7 +292,7 @@ export default function CollectionTable({
       }
     }
     return state;
-  }, [cachedState]);
+  }, [cachedState, columns]);
 
   const {
     flatColumns,

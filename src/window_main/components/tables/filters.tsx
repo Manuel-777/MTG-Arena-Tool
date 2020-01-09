@@ -99,15 +99,15 @@ export function GlobalFilter<D extends TableData>({
   preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
-  promptNoun
+  countLabel
 }: {
   preGlobalFilteredRows: Row<D>[];
   globalFilter: FilterValue;
   setGlobalFilter: (filterValue: FilterValue) => void;
-  promptNoun: string;
+  countLabel: string;
 }): JSX.Element {
   const count = preGlobalFilteredRows.length;
-  const prompt = `Search ${count} ${promptNoun}...`;
+  const prompt = `Search ${count} ${countLabel}...`;
   return (
     <InputContainer title={prompt}>
       <input
