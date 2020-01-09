@@ -47,7 +47,7 @@ export interface DecksTableState extends TableState<DecksData> {
 export interface DecksTableProps {
   data: DecksData[];
   aggFilters: AggregatorFilters;
-  filterMatchesCallback: (filters: AggregatorFilters) => void;
+  setAggFiltersCallback: (filters: AggregatorFilters) => void;
   openDeckCallback: (id: string) => void;
   filterDecksCallback: (deckId?: string | string[]) => void;
   archiveCallback: (id: string) => void;
@@ -60,7 +60,7 @@ export interface DecksTableProps {
 }
 
 export interface DecksTableControlsProps extends TableControlsProps<DecksData> {
-  filterMatchesCallback: (filters: AggregatorFilters) => void;
+  setAggFiltersCallback: (filters: AggregatorFilters) => void;
   aggFilters: AggregatorFilters;
 }
 

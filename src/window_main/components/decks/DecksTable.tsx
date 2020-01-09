@@ -47,7 +47,7 @@ import {
 export default function DecksTable({
   data,
   aggFilters,
-  filterMatchesCallback,
+  setAggFiltersCallback,
   tableStateCallback,
   cachedState,
   cachedTableMode,
@@ -340,7 +340,7 @@ export default function DecksTable({
     aggFilters,
     canNextPage,
     canPreviousPage,
-    filterMatchesCallback,
+    setAggFiltersCallback,
     filters,
     flatColumns,
     getTableProps,

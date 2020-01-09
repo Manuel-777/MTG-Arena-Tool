@@ -31,7 +31,7 @@ export default function DecksTableControls({
   aggFilters,
   canNextPage,
   canPreviousPage,
-  filterMatchesCallback,
+  setAggFiltersCallback,
   flatColumns,
   getTableProps,
   globalFilter,
@@ -70,7 +70,7 @@ export default function DecksTableControls({
   const [togglesVisible, setTogglesVisible] = React.useState(false);
   const filterPanel = new FilterPanel(
     "decks_top",
-    filterMatchesCallback,
+    setAggFiltersCallback,
     aggFilters,
     [],
     [],

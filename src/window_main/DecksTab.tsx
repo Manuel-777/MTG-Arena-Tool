@@ -207,7 +207,7 @@ export function DecksTab({
           aggFilters={aggFilters}
           cachedState={decksTableState}
           cachedTableMode={decksTableMode}
-          filterMatchesCallback={setAggFilters}
+          setAggFiltersCallback={setAggFilters}
           tableStateCallback={saveUserState}
           filterDecksCallback={filterDecksCallback}
           openDeckCallback={openDeckCallback}
