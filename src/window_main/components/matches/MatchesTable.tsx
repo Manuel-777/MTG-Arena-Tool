@@ -14,7 +14,6 @@ import {
   ArchiveHeader,
   ColorsCell,
   DurationCell,
-  FormatCell,
   MetricCell,
   PercentCell,
   RelativeTimeCell,
@@ -33,8 +32,14 @@ import {
 import PagingControls from "../tables/PagingControls";
 import { TableViewRow } from "../tables/TableViewRow";
 import { PagingControlsProps } from "../tables/types";
-import { MatchTagsCell } from "./cells";
-import { matchSearchFilterFn } from "./filters";
+import { MatchTagsCell, OnPlayCell, RankCell } from "./cells";
+import {
+  matchSearchFilterFn,
+  OnPlayColumnFilter,
+  onPlayFilterFn,
+  RankColumnFilter,
+  rankFilterFn
+} from "./filters";
 import MatchesListViewRow from "./MatchesListViewRow";
 import MatchesTableControls from "./MatchesTableControls";
 import {
@@ -75,17 +80,27 @@ export default function MatchesTable({
         mayToggle: true,
         defaultVisible: true
       },
-      { Header: "On Play", accessor: "onThePlay", mayToggle: true },
+      { accessor: "onThePlay" },
+      {
+        Header: "Flip",
+        accessor: "isOnPlay",
+        disableFilters: false,
+        filter: "onPlay",
+        Filter: OnPlayColumnFilter,
+        Cell: OnPlayCell,
+        gridWidth: "100px",
+        mayToggle: true
+      },
       {
         Header: "Event",
         accessor: "eventId",
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
-        sortType: "alphanumeric",
         Cell: ShortTextCell,
         gridWidth: "200px",
-        mayToggle: true
+        mayToggle: true,
+        defaultVisible: true
       },
       {
         Header: "Best of",
@@ -100,6 +115,43 @@ export default function MatchesTable({
       { accessor: "toolVersion" },
       { accessor: "toolRunFromSource" },
       { accessor: "player" },
+      {
+        Header: "My Rank",
+        accessor: "rank",
+        disableFilters: false,
+        filter: "rank",
+        Filter: RankColumnFilter,
+        Cell: RankCell,
+        gridWidth: "140px",
+        mayToggle: true
+      },
+      {
+        Header: "My Tier",
+        accessor: "tier",
+        Cell: MetricCell,
+        disableFilters: false,
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
+        mayToggle: true
+      },
+      {
+        Header: "My Mythic %",
+        accessor: "percentile",
+        Cell: PercentCell,
+        disableFilters: false,
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
+        mayToggle: true
+      },
+      {
+        Header: "My Mythic #",
+        accessor: "leaderboardPlace",
+        Cell: MetricCell,
+        disableFilters: false,
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
+        mayToggle: true
+      },
       { accessor: "playerDeck" },
       { accessor: "deckId" },
       {
@@ -108,7 +160,6 @@ export default function MatchesTable({
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
-        sortType: "alphanumeric",
         Cell: ShortTextCell,
         gridWidth: "200px",
         mayToggle: true,
@@ -123,8 +174,7 @@ export default function MatchesTable({
         filter: "colors",
         Cell: ColorsCell,
         gridWidth: "150px",
-        mayToggle: true,
-        defaultVisible: true
+        mayToggle: true
       },
       {
         Header: "My Tags",
@@ -145,25 +195,23 @@ export default function MatchesTable({
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
-        sortType: "alphanumeric",
         Cell: ShortTextCell,
         gridWidth: "200px",
         mayToggle: true,
         defaultVisible: true
       },
       {
-        Header: "Opp. Rank",
+        Header: "Op. Rank",
         accessor: "oppRank",
         disableFilters: false,
-        filter: "fuzzyText",
-        Filter: TextBoxFilter,
-        sortType: "alphanumeric",
-        Cell: ShortTextCell,
-        gridWidth: "120px",
+        filter: "rank",
+        Filter: RankColumnFilter,
+        Cell: RankCell,
+        gridWidth: "140px",
         mayToggle: true
       },
       {
-        Header: "Opp. Tier",
+        Header: "Op. Tier",
         accessor: "oppTier",
         Cell: MetricCell,
         disableFilters: false,
@@ -172,7 +220,7 @@ export default function MatchesTable({
         mayToggle: true
       },
       {
-        Header: "Opp. Mythic %",
+        Header: "Op. Mythic %",
         accessor: "oppPercentile",
         Cell: PercentCell,
         disableFilters: false,
@@ -181,7 +229,7 @@ export default function MatchesTable({
         mayToggle: true
       },
       {
-        Header: "Opp. Mythic #",
+        Header: "Op. Mythic #",
         accessor: "oppLeaderboardPlace",
         Cell: MetricCell,
         disableFilters: false,
@@ -191,7 +239,7 @@ export default function MatchesTable({
       },
       { accessor: "oppColors" },
       {
-        Header: "Opp. Colors",
+        Header: "Op. Colors",
         disableFilters: false,
         accessor: "oppColorSortVal",
         Filter: ColorColumnFilter,
@@ -201,18 +249,9 @@ export default function MatchesTable({
         mayToggle: true,
         defaultVisible: true
       },
+      { accessor: "oppArchetype" },
       {
         Header: "Archetype",
-        accessor: "oppArchetype",
-        disableFilters: false,
-        Filter: TextBoxFilter,
-        filter: "fuzzyText",
-        Cell: FormatCell,
-        gridWidth: "200px",
-        mayToggle: true
-      },
-      {
-        Header: "Opp. Tag",
         accessor: "tags",
         disableFilters: false,
         Filter: TextBoxFilter,
@@ -276,9 +315,11 @@ export default function MatchesTable({
   );
   const filterTypes = React.useMemo(
     () => ({
+      colors: colorsFilterFn,
       fuzzyText: fuzzyTextFilterFn,
-      showArchived: archivedFilterFn,
-      colors: colorsFilterFn
+      onPlay: onPlayFilterFn,
+      rank: rankFilterFn,
+      showArchived: archivedFilterFn
     }),
     []
   );

@@ -252,6 +252,8 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
           deckName: match.playerDeck.name ?? "",
           deckTags: match.playerDeck.tags ?? [],
           deckFormat: match.playerDeck.format ?? "",
+          isOnPlay: match.player.seat === match.onThePlay ?? false,
+          leaderboardPlace: match.player.leaderboardPlace,
           losses: match.opponent.win,
           oppArchetype: match.oppDeck.archetype ?? "unknown",
           oppColors,
@@ -264,7 +266,12 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
           oppRank: match.opponent.rank,
           oppTier: match.opponent.tier,
           oppUserId: match.opponent.userid,
+          percentile: match.player.percentile
+            ? match.player.percentile / 100
+            : undefined,
+          rank: match.player.rank,
           tags: match.tags ?? [],
+          tier: match.player.tier,
           timestamp: isValid(timestamp) ? timestamp.getTime() : NaN,
           wins: match.player.win
         };

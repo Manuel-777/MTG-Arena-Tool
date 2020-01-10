@@ -21,6 +21,7 @@ export interface MatchTableData extends SerializedMatch, TableData {
   deckName: string;
   deckTags: string[];
   deckFormat: string;
+  leaderboardPlace?: number;
   losses: number;
   oppArchetype: string;
   oppColors: number[];
@@ -31,6 +32,9 @@ export interface MatchTableData extends SerializedMatch, TableData {
   oppRank: string;
   oppTier: number;
   oppUserId: string;
+  percentile?: number;
+  rank: string;
+  tier: number;
   timestamp: number;
   wins: number;
 }

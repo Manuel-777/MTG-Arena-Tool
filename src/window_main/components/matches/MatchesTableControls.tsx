@@ -1,14 +1,23 @@
 import React from "react";
+import { FilterValue } from "react-table";
 import { MATCHES_TABLE_MODES } from "../../../shared/constants";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
 import FilterPanel from "../../FilterPanel";
-import { CheckboxContainer, MediumTextButton } from "../display";
+import {
+  CheckboxContainer,
+  MediumTextButton,
+  SmallTextButton
+} from "../display";
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { FiltersVisible } from "../tables/types";
 import { MatchesTableControlsProps } from "./types";
+
+const defaultFilters = (): { id: string; value: FilterValue }[] => [
+  { id: "archivedCol", value: "hideArchived" }
+];
 
 export default function MatchesTableControls({
   aggFilters,
@@ -28,11 +37,13 @@ export default function MatchesTableControls({
   preGlobalFilteredRows,
   previousPage,
   setAggFiltersCallback,
+  setAllFilters,
   setFilter,
   setGlobalFilter,
   setPageSize,
   setTableMode,
   tableMode,
+  toggleSortBy,
   visibleHeaders
 }: MatchesTableControlsProps): JSX.Element {
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
@@ -104,6 +115,15 @@ export default function MatchesTableControls({
             }
             optionFormatter={getReadableEvent}
           />
+          <SmallTextButton
+            onClick={(): void => {
+              setAllFilters(defaultFilters);
+              setFiltersVisible({});
+              toggleSortBy("timestamp", true, false);
+            }}
+          >
+            Reset
+          </SmallTextButton>
           <MediumTextButton
             onClick={(): void => setTogglesVisible(!togglesVisible)}
             className="button_simple"

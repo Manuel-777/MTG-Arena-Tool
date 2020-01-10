@@ -2,7 +2,13 @@ import React from "react";
 import { Cell } from "react-table";
 import { createInput } from "../../../shared/dom-fns"; // TODO remove this
 import { getTagColor } from "../../renderer-util";
-import { FlexLeftContainer, TagBubble, TagBubbleWithClose } from "../display";
+import {
+  FlexLeftContainer,
+  OnPlaySymbol,
+  RankSymbol,
+  TagBubble,
+  TagBubbleWithClose
+} from "../display";
 import { MatchTableData } from "./types";
 
 const tagPrompt = "Set archetype";
@@ -77,6 +83,27 @@ export function MatchTagsCell({
           {tagPrompt}
         </TagBubble>
       )}
+    </FlexLeftContainer>
+  );
+}
+
+export function OnPlayCell({
+  cell
+}: {
+  cell: Cell<MatchTableData>;
+}): JSX.Element {
+  return <OnPlaySymbol isOnPlay={cell.value} />;
+}
+
+export function RankCell({
+  cell
+}: {
+  cell: Cell<MatchTableData>;
+}): JSX.Element {
+  return (
+    <FlexLeftContainer>
+      <RankSymbol rank={cell.value} />
+      {cell.value}
     </FlexLeftContainer>
   );
 }
