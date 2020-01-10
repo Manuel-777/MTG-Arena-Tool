@@ -78,8 +78,3 @@ export interface MatchesTableRowProps
   editTagCallback: (tag: string, color: string) => void;
   deleteTagCallback: (id: string, tag: string) => void;
 }
-
-export interface StyledArtTileCellProps {
-  url: string;
-  className?: string;
-}

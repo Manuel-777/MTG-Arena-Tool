@@ -328,16 +328,12 @@ export default function MatchesTable({
     const hiddenColumns = columns
       .filter(column => !column.defaultVisible)
       .map(column => column.id ?? column.accessor);
-    // TODO cachedState
-    const state = _.defaultsDeep(
-      {},
-      {
-        hiddenColumns,
-        filters: [{ id: "archivedCol", value: "hideArchived" }],
-        sortBy: [{ id: "timestamp", desc: true }],
-        pageSize: 25
-      }
-    );
+    const state = _.defaultsDeep(cachedState, {
+      hiddenColumns,
+      filters: [{ id: "archivedCol", value: "hideArchived" }],
+      sortBy: [{ id: "timestamp", desc: true }],
+      pageSize: 25
+    });
     // ensure data-only columns are all invisible
     for (const column of columns) {
       if (!column.defaultVisible && !column.mayToggle) {
