@@ -1,9 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-
 import { MANA } from "../../shared/constants";
 import db from "../../shared/database";
-
+import { get_rank_index_16 as getRankIndex16 } from "../../shared/util";
 import { getTagColor, showColorpicker } from "../renderer-util";
 
 export const ArtTileHeader = styled.div`
@@ -269,6 +268,38 @@ interface TypeSymbolProps {
 }
 
 export const TypeSymbol = styled(TypeSymbolBase)<TypeSymbolProps>``;
+
+const OnPlaySymbolBase = styled(SymbolBase).attrs<OnPlaySymbolProps>(props => ({
+  className: `${props.className ?? ""} rarity_filter ${
+    props.isOnPlay ? "ontheplay" : "onthedraw"
+  }`,
+  title: props.isOnPlay ? "On the play" : "On the draw"
+}))``;
+
+interface OnPlaySymbolProps {
+  isOnPlay: boolean;
+}
+
+export const OnPlaySymbol = styled(OnPlaySymbolBase)<OnPlaySymbolProps>``;
+
+const RankSymbolBase = styled(SymbolBase).attrs<RankSymbolProps>(props => ({
+  className: `${props.className ?? ""} rarity_filter ranks_16`,
+  title: props.rank,
+  style: {
+    ...props.style,
+    marginRight: "2px",
+    height: "16px",
+    width: "16px",
+    backgroundSize: "initial",
+    backgroundPosition: getRankIndex16(props.rank) * -16 + "px 0px"
+  }
+}))``;
+
+interface RankSymbolProps {
+  rank: string;
+}
+
+export const RankSymbol = styled(RankSymbolBase)<RankSymbolProps>``;
 
 export const BoosterSymbol = styled(SymbolBase).attrs(props => ({
   className: `bo_explore_cost ${props.className ?? ""}`
