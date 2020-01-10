@@ -36,8 +36,9 @@ export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
 }
 
 export interface AggregatorFilters {
-  date?: Date;
+  date?: Date | string;
   showArchived?: boolean;
+  eventId?: string;
 }
 
 export interface DecksTableState extends TableState<DecksData> {

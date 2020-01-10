@@ -145,11 +145,13 @@ export function ColorColumnFilter<D extends TableData>({
 
 export function colorsFilterFn<D extends TableData>(
   rows: Row<D>[],
-  id: string,
+  columnIds: string[],
   filterValue: ColorFilter
 ): Row<D>[] {
+  const [id] = columnIds;
+  const key = id.replace("SortVal", "s");
   return rows.filter(row =>
-    Aggregator.filterDeckByColors(row.original, filterValue)
+    Aggregator.filterDeckByColors({ colors: row.original[key] }, filterValue)
   );
 }
 

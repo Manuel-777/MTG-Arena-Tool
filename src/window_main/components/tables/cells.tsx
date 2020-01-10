@@ -23,9 +23,12 @@ export function ColorsCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
   const data = cell.row.values;
+  // assume data key is fooColors and cell.column.id is fooColorSortVal
+  const key = cell.column.id.replace("SortVal", "s");
+  const colors = data[key] ?? cell.value;
   return (
     <FlexLeftContainer>
-      {data.colors.map((color: number, index: number) => {
+      {colors.map((color: number, index: number) => {
         return <ManaSymbol key={index} colorIndex={color} />;
       })}
     </FlexLeftContainer>
@@ -56,7 +59,7 @@ export function MetricCell<D extends TableData>({
 }: CellProps<D>): JSX.Element {
   return (
     <MetricText style={cell.value === 0 ? { opacity: 0.6 } : undefined}>
-      {formatNumber(cell.value)}
+      {cell.value && formatNumber(cell.value)}
     </MetricText>
   );
 }
@@ -127,9 +130,8 @@ export function RelativeTimeCell<D extends TableData>({
 export function DurationCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
-  const data = cell.row.values;
   let value, tooltip;
-  if (data.total) {
+  if (cell.value) {
     value = <span>{toMMSS(cell.value)}</span>;
     tooltip = toDDHHMMSS(cell.value);
   } else {

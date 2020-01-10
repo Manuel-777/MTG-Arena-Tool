@@ -1,8 +1,7 @@
 import _ from "lodash";
 import React from "react";
 import {
-  ColumnInstance,
-  Row,
+  Column,
   useFilters,
   useGlobalFilter,
   usePagination,
@@ -61,7 +60,7 @@ export default function DecksTable({
     }),
     []
   );
-  const columns = React.useMemo(
+  const columns: Column<DecksData>[] = React.useMemo(
     () => [
       { accessor: "id" },
       { id: "deckId", accessor: "id" },
@@ -83,7 +82,6 @@ export default function DecksTable({
         accessor: "colorSortVal",
         Filter: ColorColumnFilter,
         filter: "colors",
-        minWidth: 170,
         Cell: ColorsCell,
         gridWidth: "150px",
         mayToggle: true,
@@ -313,7 +311,7 @@ export default function DecksTable({
     tableStateCallback({ ...state, decksTableMode: tableMode });
   }, [state, tableMode, tableStateCallback]);
   React.useEffect(() => {
-    filterDecksCallback(rows.map((row: Row<DecksData>) => row.values.deckId));
+    filterDecksCallback(rows.map(row => row.values.deckId));
   }, [filterDecksCallback, rows]);
 
   const pagingProps: PagingControlsProps = {
@@ -329,11 +327,9 @@ export default function DecksTable({
     pageSize
   };
 
-  const visibleHeaders = headers.filter(
-    (header: ColumnInstance<DecksData>) => header.isVisible
-  );
+  const visibleHeaders = headers.filter(header => header.isVisible);
   const gridTemplateColumns = visibleHeaders
-    .map((header: ColumnInstance<DecksData>) => header.gridWidth ?? "1fr")
+    .map(header => header.gridWidth ?? "1fr")
     .join(" ");
 
   const tableControlsProps: DecksTableControlsProps = {
@@ -369,7 +365,7 @@ export default function DecksTable({
     <div className="decks_table_wrap">
       <DecksTableControls {...tableControlsProps} />
       <div className="decks_table_body" {...getTableBodyProps()}>
-        {page.map((row: Row<DecksData>, index: number) => {
+        {page.map((row, index) => {
           prepareRow(row);
           const data = row.original;
           const RowRenderer =
