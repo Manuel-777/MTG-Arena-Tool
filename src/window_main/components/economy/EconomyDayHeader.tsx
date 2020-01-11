@@ -1,14 +1,13 @@
-import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
-import { createDiv } from "../../../shared/dom-fns";
-import startOfDay from "date-fns/startOfDay";
-import { formatNumber, formatPercent } from "../../renderer-util";
-import { vaultPercentFormat, EconomyState } from "../../economyUtils";
 import React from "react";
-import ReactDOM from "react-dom";
-import EconomyValueRecord from "./EconomyValueRecord";
-import LocalTime from "../../../shared/time-components/LocalTime";
+import addDays from "date-fns/addDays";
+import startOfDay from "date-fns/startOfDay";
 
-function localDayDateFormat(date: Date) {
+import LocalTime from "../../../shared/time-components/LocalTime";
+import { formatNumber, formatPercent } from "../../renderer-util";
+import { vaultPercentFormat } from "../../economyUtils";
+import EconomyValueRecord from "./EconomyValueRecord";
+
+function localDayDateFormat(date: Date): JSX.Element {
   return (
     <LocalTime
       datetime={date.toISOString()}
@@ -19,7 +18,7 @@ function localDayDateFormat(date: Date) {
   );
 }
 
-function getDayString(daysago: number, timestamp: Date) {
+function getDayString(daysago: number, timestamp: Date): string | JSX.Element {
   if (daysago === 0) {
     return "Today";
   }
@@ -32,17 +31,26 @@ function getDayString(daysago: number, timestamp: Date) {
   return "";
 }
 
-interface EconomyDayHeaderProps {
+export interface EconomyDayHeaderProps {
   date: string;
-  econState: EconomyState;
+  daysAgo: number;
+  cardsAddedCount: number;
+  vaultProgressDelta: number;
+  gemsDelta: number;
+  goldDelta: number;
+  xpGainedNumber: number;
 }
 
-export function EconomyDayHeader(props: EconomyDayHeaderProps) {
-  const { date, econState } = props;
-  const timestamp = new Date(date);
-  econState.daysago = differenceInCalendarDays(new Date(), timestamp);
-  const { dayList, daysago } = econState;
-  const deltaPercent = dayList[econState.daysago].vaultProgress / 100.0;
+export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
+  const {
+    daysAgo,
+    cardsAddedCount,
+    vaultProgressDelta,
+    gemsDelta,
+    goldDelta,
+    xpGainedNumber
+  } = props;
+  const timestamp = addDays(new Date(), -daysAgo);
 
   const gridTitleStyle = {
     gridArea: "1 / 1 / auto / 2",
@@ -52,54 +60,48 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps) {
   return (
     <>
       <div style={gridTitleStyle} className={"flex_item gridTitle"}>
-        {getDayString(daysago, timestamp)}
+        {getDayString(daysAgo, timestamp)}
       </div>
       <EconomyValueRecord
         containerDiv
         iconClassName={"economy_card"}
         className={"gridCards"}
-        deltaUpContent={formatNumber(dayList[daysago].cardsEarned)}
+        deltaUpContent={formatNumber(cardsAddedCount)}
         title={"Cards"}
       />
       <EconomyValueRecord
         containerDiv
         iconClassName={"economy_vault"}
         className={"gridVault"}
-        deltaUpContent={formatPercent(deltaPercent, vaultPercentFormat as any)}
+        deltaUpContent={formatPercent(
+          vaultProgressDelta,
+          vaultPercentFormat as any
+        )}
         title={"Vault"}
       />
       <EconomyValueRecord
         containerDiv
         iconClassName={"economy_gold marginLeft"}
         className={"gridGold"}
-        deltaUpContent={formatNumber(dayList[daysago].goldEarned)}
-        deltaDownContent={formatNumber(dayList[daysago].goldSpent)}
+        deltaUpContent={goldDelta >= 0 ? formatNumber(goldDelta) : undefined}
+        deltaDownContent={goldDelta < 0 ? formatNumber(goldDelta) : undefined}
         title={"Gold"}
       />
       <EconomyValueRecord
         containerDiv
         iconClassName={"economy_gems"}
         className={"gridGems"}
-        deltaUpContent={formatNumber(dayList[daysago].gemsEarned)}
-        deltaDownContent={formatNumber(dayList[daysago].gemsSpent)}
+        deltaUpContent={gemsDelta >= 0 ? formatNumber(gemsDelta) : undefined}
+        deltaDownContent={gemsDelta < 0 ? formatNumber(gemsDelta) : undefined}
         title={"Gems"}
       />
       <EconomyValueRecord
         containerDiv
         iconClassName={"economy_exp"}
         className={"gridExp"}
-        deltaUpContent={formatNumber(dayList[daysago].expEarned)}
+        deltaUpContent={String(formatNumber(xpGainedNumber ?? 0))}
         title={"Experience"}
       />
     </>
   );
-}
-
-export function createDayHeader(change: { date: string }, state: EconomyState) {
-  const headerGrid = createDiv(["economy_title"]);
-  ReactDOM.render(
-    <EconomyDayHeader econState={state} date={change.date} />,
-    headerGrid
-  );
-  return headerGrid;
 }
