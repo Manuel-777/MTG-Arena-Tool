@@ -3,9 +3,12 @@ import matchSorter from "match-sorter";
 import React from "react";
 import { ColumnInstance, FilterValue, Row } from "react-table";
 import Aggregator from "../../aggregator";
-import ManaFilter, { ColorFilter } from "../../ManaFilter";
+import ManaFilter, { ColorFilter, ManaFilterKeys } from "../../ManaFilter";
 import { CheckboxContainer, InputContainer, MetricText } from "../display";
 import { TableData } from "./types";
+import { COLORS_BRIEF, COLORS_ALL } from "../../../shared/constants";
+import { SerializedMatch } from "../matches/types";
+import { SerializedDeck } from "../../../shared/types/Deck";
 
 export function TextBoxFilter<D extends TableData>({
   column: { id, filterValue, preFilteredRows, setFilter }
@@ -119,7 +122,33 @@ export function GlobalFilter<D extends TableData>({
   );
 }
 
-const defaultColors = Aggregator.getDefaultColorFilter();
+export function getDefaultColorFilter(): ColorFilter {
+  const colorFilters: any = {};
+  COLORS_BRIEF.forEach(code => (colorFilters[code] = false));
+  return { ...colorFilters, multi: true };
+}
+
+export function filterDeckByColors(
+  deck: SerializedDeck | null,
+  _colors: ColorFilter
+): boolean {
+  if (!deck) return true;
+  // Normalize deck colors into matching data format
+  const deckColorCodes = getDefaultColorFilter();
+  deck.colors?.forEach(
+    i => (deckColorCodes[COLORS_ALL[i - 1] as ManaFilterKeys] = true)
+  );
+  return Object.entries(_colors).every(([color, value]) => {
+    const key = color as ManaFilterKeys;
+    if (key === "multi") return true;
+    if (!_colors.multi || value) {
+      return deckColorCodes[key] === value;
+    }
+    return true;
+  });
+}
+
+const defaultColors = getDefaultColorFilter();
 
 export function ColorColumnFilter<D extends TableData>({
   column: { filterValue = { ...defaultColors }, setFilter }
@@ -151,7 +180,7 @@ export function colorsFilterFn<D extends TableData>(
   const [id] = columnIds;
   const key = id.replace("SortVal", "s");
   return rows.filter(row =>
-    Aggregator.filterDeckByColors({ colors: row.original[key] }, filterValue)
+    filterDeckByColors({ colors: row.original[key] }, filterValue)
   );
 }
 

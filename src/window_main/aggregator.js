@@ -6,9 +6,6 @@ import max from "date-fns/max";
 import startOfDay from "date-fns/startOfDay";
 import subDays from "date-fns/subDays";
 import {
-  COLORS_ALL,
-  COLORS_BRIEF,
-  CONSTRUCTED_EVENTS,
   DATE_ALL_TIME,
   DATE_LAST_30,
   DATE_LAST_DAY,
@@ -16,13 +13,9 @@ import {
 } from "../shared/constants";
 import db from "../shared/database";
 import pd from "../shared/player-data";
-import {
-  getReadableEvent,
-  getRecentDeckName,
-  get_deck_missing,
-  getBoosterCountEstimate
-} from "../shared/util";
 import { normalApproximationInterval } from "../shared/statsFns";
+import { getReadableEvent, getRecentDeckName } from "../shared/util";
+
 // Default filter values
 const DEFAULT_DECK = "All Decks";
 const DEFAULT_EVENT = "All Events";
@@ -57,11 +50,6 @@ class Aggregator {
     this.updateFilters = this.updateFilters.bind(this);
     this._processMatch = this._processMatch.bind(this);
     this.compareDecks = this.compareDecks.bind(this);
-    this.compareDecksByWins = this.compareDecksByWins.bind(this);
-    this.compareDecksByWinrates = this.compareDecksByWinrates.bind(this);
-    this.compareDecksByIncompleteness = this.compareDecksByIncompleteness.bind(
-      this
-    );
     this.compareEvents = this.compareEvents.bind(this);
     this.updateFilters(filters);
   }
@@ -80,24 +68,13 @@ class Aggregator {
     stats.winrateHigh = roundWinrate(winrate + interval);
   }
 
-  static getDefaultColorFilter() {
-    const colorFilters = {};
-    COLORS_BRIEF.forEach(code => (colorFilters[code] = false));
-    return { ...colorFilters, multi: true };
-  }
-
   static getDefaultFilters() {
     return {
       matchIds: undefined,
       eventId: DEFAULT_EVENT,
-      tag: DEFAULT_TAG,
-      colors: Aggregator.getDefaultColorFilter(),
       deckId: DEFAULT_DECK,
-      arch: DEFAULT_ARCH,
-      oppColors: Aggregator.getDefaultColorFilter(),
       date: pd.settings.last_date_filter,
-      showArchived: false,
-      sort: "By Date"
+      showArchived: false
     };
   }
 
@@ -150,49 +127,14 @@ class Aggregator {
     return isAfter(new Date(_date), dateFilter);
   }
 
-  static filterDeckByColors(deck, _colors) {
-    if (!deck) return true;
-
-    // Normalize deck colors into matching data format
-    const deckColorCodes = Aggregator.getDefaultColorFilter();
-    deck.colors.forEach(i => (deckColorCodes[COLORS_ALL[i - 1]] = true));
-
-    return Object.entries(_colors).every(([color, value]) => {
-      if (color === "multi") return true;
-      if (!_colors.multi || value) {
-        return deckColorCodes[color] === value;
-      }
-      return true;
-    });
-  }
-
   filterDeck(deck) {
-    const { tag, colors, deckId } = this.filters;
+    const { deckId } = this.filters;
     if (!deck) return deckId === DEFAULT_DECK;
-    const passesDeckFilter =
+    return (
       deckId === DEFAULT_DECK ||
       deckId === deck.id ||
-      this.validDecks.has(deck.id);
-    if (!passesDeckFilter) return false;
-
-    const deckTags = [deck.format];
-    if (deck.tags) {
-      deckTags.push(...deck.tags);
-    }
-    const currentDeck = pd.deck(deck.id);
-    if (currentDeck) {
-      deckTags.push(currentDeck.format);
-      if (currentDeck.tags) {
-        deckTags.push(...currentDeck.tags);
-      }
-    }
-    const passesTagFilter = tag === DEFAULT_TAG || deckTags.includes(tag);
-    if (!passesTagFilter) return false;
-
-    const passesColorFilter = Aggregator.filterDeckByColors(deck, colors);
-    if (!passesColorFilter) return false;
-
-    return true;
+      this.validDecks.has(deck.id)
+    );
   }
 
   filterEvent(_eventId) {
@@ -211,41 +153,18 @@ class Aggregator {
 
   filterMatch(match) {
     if (!match) return false;
-    const { eventId, oppColors, arch, showArchived } = this.filters;
+    const { showArchived } = this.filters;
     if (!showArchived && match.archived && match.archived) return false;
 
     const passesMatchFilter =
       !this.validMatches || this.validMatches.has(match.id);
     if (!passesMatchFilter) return false;
 
-    const passesEventFilter =
-      this.filterEvent(match.eventId) ||
-      (eventId === ALL_DRAFTS && Aggregator.isDraftMatch(match)) ||
-      (eventId === DRAFT_REPLAYS && match.type === "draft");
+    const passesEventFilter = this.filterEvent(match.eventId);
     if (!passesEventFilter) return false;
 
     const passesPlayerDeckFilter = this.filterDeck(match.playerDeck);
     if (!passesPlayerDeckFilter) return false;
-
-    if (
-      match.type === "draft" &&
-      (arch !== DEFAULT_ARCH ||
-        (Object.values(oppColors).some(color => color) && !oppColors.multi))
-    )
-      return false;
-
-    const passesOppDeckFilter = Aggregator.filterDeckByColors(
-      match.oppDeck,
-      oppColors
-    );
-    if (!passesOppDeckFilter) return false;
-
-    const passesArchFilter =
-      arch === DEFAULT_ARCH ||
-      (match.tags && match.tags.length && arch === match.tags[0]) ||
-      ((!match.tags || !match.tags.length || !match.tags[0]) &&
-        arch === NO_ARCH);
-    if (!passesArchFilter) return false;
 
     return this.filterDate(match.date);
   }
@@ -313,7 +232,6 @@ class Aggregator {
         this._decks.push(deck);
       }
     }
-    this._decks.sort(this.compareDecks);
   }
 
   _processMatch(match) {
@@ -452,67 +370,6 @@ class Aggregator {
     return aName.localeCompare(bName);
   }
 
-  compareDecksByWins(a, b) {
-    const aStats = {
-      ...Aggregator.getDefaultStats(),
-      winrate: 0,
-      ...this.deckStats[a.id]
-    };
-    const bStats = {
-      ...Aggregator.getDefaultStats(),
-      winrate: 0,
-      ...this.deckStats[b.id]
-    };
-    const aName = getRecentDeckName(a.id);
-    const bName = getRecentDeckName(b.id);
-
-    return (
-      bStats.wins - aStats.wins ||
-      bStats.winrate - aStats.winrate ||
-      aName.localeCompare(bName)
-    );
-  }
-
-  compareDecksByWinrates(a, b) {
-    const aStats = {
-      ...Aggregator.getDefaultStats(),
-      winrate: 0,
-      ...this.deckStats[a.id]
-    };
-    const bStats = {
-      ...Aggregator.getDefaultStats(),
-      winrate: 0,
-      ...this.deckStats[b.id]
-    };
-    const aName = getRecentDeckName(a.id);
-    const bName = getRecentDeckName(b.id);
-
-    return (
-      bStats.winrate - aStats.winrate ||
-      bStats.wins - aStats.wins ||
-      aName.localeCompare(bName)
-    );
-  }
-
-  compareDecksByIncompleteness(a, b) {
-    const aMissing = get_deck_missing(a);
-    const bMissing = get_deck_missing(b);
-    const aMissingBoosters = getBoosterCountEstimate(aMissing);
-    const bMissingBoosters = getBoosterCountEstimate(bMissing);
-
-    const aName = getRecentDeckName(a.id);
-    const bName = getRecentDeckName(b.id);
-
-    return (
-      bMissingBoosters - aMissingBoosters ||
-      bMissing.mythic - aMissing.mythic ||
-      bMissing.rare - aMissing.rare ||
-      bMissing.uncommon - aMissing.uncommon ||
-      bMissing.common - aMissing.common ||
-      aName.localeCompare(bName)
-    );
-  }
-
   compareEvents(a, b) {
     const aDate = this.eventLastPlayed[a];
     const bDate = this.eventLastPlayed[b];
@@ -531,10 +388,6 @@ class Aggregator {
     return aName.localeCompare(bName);
   }
 
-  get matches() {
-    return this._matches;
-  }
-
   get events() {
     return [
       DEFAULT_EVENT,
@@ -543,16 +396,6 @@ class Aggregator {
       ALL_DRAFTS,
       DRAFT_REPLAYS,
       ...this._eventIds
-    ];
-  }
-
-  get trackEvents() {
-    return [
-      ALL_EVENT_TRACKS,
-      RANKED_DRAFT,
-      ...this._eventIds.filter(
-        eventId => !db.single_match_events.includes(eventId)
-      )
     ];
   }
 
