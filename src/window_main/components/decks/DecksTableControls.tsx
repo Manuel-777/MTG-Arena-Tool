@@ -2,7 +2,7 @@ import React from "react";
 import { FilterValue } from "react-table";
 import { DECKS_TABLE_MODES } from "../../../shared/constants";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
-import FilterPanel from "../../FilterPanel";
+import DateFilter from "../../DateFilter";
 import {
   CheckboxContainer,
   MediumTextButton,
@@ -68,20 +68,6 @@ export default function DecksTableControls({
     initialFiltersVisible
   );
   const [togglesVisible, setTogglesVisible] = React.useState(false);
-  const filterPanel = new FilterPanel(
-    "decks_top",
-    setAggFiltersCallback,
-    aggFilters,
-    [],
-    [],
-    [],
-    false,
-    [],
-    false,
-    null,
-    false,
-    false
-  );
   const pagingProps = {
     canPreviousPage,
     canNextPage,
@@ -114,7 +100,13 @@ export default function DecksTableControls({
       >
         <div className="decks_table_toggles">
           <span style={{ paddingBottom: "8px" }}>Filter match results:</span>
-          <span style={{ width: "260px" }}>{filterPanel.render()}</span>
+          <DateFilter
+            prefixId={"decks_top"}
+            current={aggFilters.date}
+            callback={(date): void =>
+              setAggFiltersCallback({ ...aggFilters, date })
+            }
+          />
           <span style={{ paddingBottom: "8px" }}>Presets:</span>
           <SmallTextButton
             onClick={(): void => {

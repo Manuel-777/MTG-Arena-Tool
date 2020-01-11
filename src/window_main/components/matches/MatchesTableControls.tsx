@@ -3,7 +3,7 @@ import { FilterValue } from "react-table";
 import { MATCHES_TABLE_MODES } from "../../../shared/constants";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
-import FilterPanel from "../../FilterPanel";
+import DateFilter from "../../DateFilter";
 import {
   CheckboxContainer,
   MediumTextButton,
@@ -60,20 +60,6 @@ export default function MatchesTableControls({
     initialFiltersVisible
   );
   const [togglesVisible, setTogglesVisible] = React.useState(false);
-  const filterPanel = new FilterPanel(
-    "decks_top",
-    setAggFiltersCallback,
-    aggFilters,
-    [],
-    [],
-    [],
-    false,
-    [],
-    false,
-    null,
-    false,
-    false
-  );
   const pagingProps = {
     canPreviousPage,
     canNextPage,
@@ -105,7 +91,13 @@ export default function MatchesTableControls({
         }}
       >
         <div className="decks_table_toggles">
-          <span style={{ width: "260px" }}>{filterPanel.render()}</span>
+          <DateFilter
+            prefixId={"decks_top"}
+            current={aggFilters.date}
+            callback={(date): void =>
+              setAggFiltersCallback({ ...aggFilters, date })
+            }
+          />
           <WrappedReactSelect
             className={"decks_top_query_event"}
             options={events}
