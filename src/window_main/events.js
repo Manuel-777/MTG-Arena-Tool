@@ -1,102 +1,22 @@
 import anime from "animejs";
-import compareAsc from "date-fns/compareAsc";
 import compareDesc from "date-fns/compareDesc";
-import { DEFAULT_TILE, MANA, EASING_DEFAULT } from "../shared/constants";
+import { DEFAULT_TILE, EASING_DEFAULT, MANA } from "../shared/constants";
 import db from "../shared/database";
-import pd from "../shared/player-data";
 import { createDiv, queryElementsByClass } from "../shared/dom-fns";
+import pd from "../shared/player-data";
 import { getReadableEvent, toMMSS } from "../shared/util";
-import Aggregator from "./aggregator";
-import DataScroller from "./dataScroller";
-import FilterPanel from "./FilterPanel";
+import { openDraft } from "./draft-details";
 import ListItem from "./listItem";
-import StatsPanel from "./stats-panel";
+import { openMatch } from "./match-details";
 import {
   attachDraftData,
   attachMatchData,
   getEventWinLossClass,
   localTimeSince,
-  resetMainContainer,
   toggleArchived
 } from "./renderer-util";
-import { openMatch } from "./match-details";
-import { openDraft } from "./draft-details";
-import mountReactComponent from "./mountReactComponent";
 
-let filters = Aggregator.getDefaultFilters();
-filters.eventId = Aggregator.ALL_EVENT_TRACKS;
-let filteredMatches;
-let sortedEvents;
-
-export function openEventsTab(_filters, dataIndex = 25, scrollTop = 0) {
-  const mainDiv = resetMainContainer();
-  const d = createDiv(["list_fill"]);
-  mainDiv.appendChild(d);
-
-  sortedEvents = [...pd.eventList];
-  sortedEvents.sort(compareEvents);
-  filters = { ...filters, date: pd.settings.last_date_filter, ..._filters };
-  filteredMatches = new Aggregator(filters);
-
-  const eventsTop = createDiv(["events_top"]);
-  eventsTop.style.display = "flex";
-  eventsTop.style.width = "100%";
-  eventsTop.style.alignItems = "center";
-  eventsTop.style.justifyContent = "space-between";
-
-  const filterPanel = new FilterPanel(
-    "events_top",
-    selected => openEventsTab(selected),
-    filters,
-    new Aggregator({ date: filters.date }).trackEvents,
-    [],
-    [],
-    false,
-    [],
-    false,
-    null,
-    true
-  );
-
-  mountReactComponent(filterPanel.render(), eventsTop);
-
-  const statsPanel = new StatsPanel("events_top", filteredMatches);
-  const eventsTopWinrate = statsPanel.render();
-  eventsTopWinrate.style.width = "300px";
-  eventsTopWinrate.style.marginRight = "16px";
-  eventsTop.appendChild(eventsTopWinrate);
-
-  mainDiv.appendChild(eventsTop);
-  const dataScroller = new DataScroller(
-    mainDiv,
-    renderData,
-    20,
-    sortedEvents.length
-  );
-  dataScroller.render(dataIndex, scrollTop);
-}
-
-// return val = how many rows it rendered into container
-function renderData(container, index) {
-  // for performance reasons, we leave events order mostly alone
-  // to display most-recent-first, we use a reverse index
-  const revIndex = sortedEvents.length - index - 1;
-  const course = sortedEvents[revIndex];
-
-  if (
-    course === undefined ||
-    course.CourseDeck === undefined ||
-    (course.archived && !filters.showArchived)
-  ) {
-    return 0;
-  }
-
-  if (!filteredMatches) return 0;
-  if (!filteredMatches.filterDate(course.date)) return 0;
-  if (!filteredMatches.filterEvent(course.InternalEventName)) {
-    return 0;
-  }
-
+export function renderEventRow(container, course) {
   const tileGrpid = course.CourseDeck.deckTileId;
   let listItem;
   if (course.custom) {
@@ -122,7 +42,6 @@ function renderData(container, index) {
 
   container.appendChild(listItem.container);
   container.appendChild(divExp);
-  return 1;
 }
 
 // converts a match index from a courses
@@ -188,12 +107,7 @@ function getCourseStats(course) {
   matchesList
     .map(getMatchesHistoryIndex)
     .map(pd.match)
-    .filter(
-      match =>
-        match &&
-        match.type === "match" &&
-        (!match.archived || filters.showArchived)
-    )
+    .filter(match => match && match.type === "match")
     .forEach(match => {
       // some of the data is wierd. Games which last years or have no data.
       if (match.duration && match.duration < 3600) {
@@ -324,12 +238,7 @@ export function expandEvent(id) {
   const matchesList = wlGate ? wlGate.ProcessedMatchIds || [] : [];
   const matchRows = matchesList
     .map(index => pd.match(index) || pd.match(index + "-" + pd.arenaId))
-    .filter(
-      match =>
-        match !== undefined &&
-        match.type === "match" &&
-        (!match.archived || filters.showArchived)
-    );
+    .filter(match => match && match.type === "match");
   const draftId = id + "-draft";
   matchRows.sort((a, b) => {
     if (!a || !b) return 0;
@@ -346,9 +255,4 @@ export function expandEvent(id) {
   const newHeight = matchRows.length * 64 + 16;
 
   expandDiv.style.height = `${newHeight}px`;
-}
-
-function compareEvents(a, b) {
-  if (!a || !b) return 0;
-  return compareAsc(new Date(a.date), new Date(b.date));
 }

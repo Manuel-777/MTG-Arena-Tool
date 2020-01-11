@@ -808,6 +808,10 @@ export const DATE_LAST_30 = "Last 30 Days";
 export const DATE_SEASON = "Current Season";
 export const DATE_ALL_TIME = "All Time";
 
+export const EVENTS_LIST_MODE = "List View";
+export const EVENTS_TABLE_MODE = "Table View";
+export const EVENTS_TABLE_MODES = [EVENTS_LIST_MODE, EVENTS_TABLE_MODE];
+
 export const MATCHES_LIST_MODE = "List View";
 export const MATCHES_TABLE_MODE = "Table View";
 export const MATCHES_TABLE_MODES = [MATCHES_LIST_MODE, MATCHES_TABLE_MODE];

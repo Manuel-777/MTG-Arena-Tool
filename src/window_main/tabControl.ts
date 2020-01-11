@@ -31,7 +31,7 @@ import {
 
 import { openDecksTab } from "./DecksTab";
 import { openMatchesTab } from "./MatchesTab";
-import { openEventsTab } from "./events";
+import { openEventsTab } from "./EventsTab";
 import { openEconomyTab } from "./economy";
 import { openExploreTab } from "./explore";
 import { openCollectionTab } from "./collection/CollectionTab";
@@ -55,7 +55,7 @@ export function openTab(
       openMatchesTab(filters);
       break;
     case MAIN_EVENTS:
-      openEventsTab(filters, dataIndex, scrollTop);
+      openEventsTab(filters);
       break;
     case MAIN_EXPLORE:
       if (pd.offline) {
