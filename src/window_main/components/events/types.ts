@@ -29,18 +29,32 @@ export interface SerializedEvent {
   type: "Event";
 }
 
-export interface EventTableData extends SerializedEvent, TableData {
+export interface EventInstanceData {
+  CurrentWins: number;
+  CurrentLosses?: number;
+  ProcessedMatchIds?: string[];
+}
+
+export interface EventStats {
+  displayName: string;
+  duration?: number;
+  eventState: string;
+  gameWins?: number;
+  gameLosses?: number;
+  isMissingMatchData: boolean;
+  losses: number;
+  matchIds: string[];
+  wins: number;
+}
+
+export interface EventTableData extends TableData, SerializedEvent, EventStats {
   archivedSortVal: number;
   colors: number[];
   colorSortVal: string;
   deckId: string;
   deckName: string;
-  losses: number;
-  matchIds: string[];
-  name: string;
-  eventState: string;
+  stats: EventStats;
   timestamp: number;
-  wins: number;
 }
 
 export interface EventsTableState extends TableState<EventTableData> {

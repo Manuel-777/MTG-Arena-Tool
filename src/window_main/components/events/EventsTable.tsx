@@ -13,6 +13,7 @@ import {
   ArchivedCell,
   ArchiveHeader,
   ColorsCell,
+  DurationCell,
   MetricCell,
   RelativeTimeCell,
   ShortTextCell,
@@ -80,7 +81,7 @@ export default function EventsTable({
       },
       {
         Header: "Event",
-        accessor: "name",
+        accessor: "displayName",
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
@@ -115,6 +116,14 @@ export default function EventsTable({
         defaultVisible: true
       },
       {
+        Header: "Duration",
+        accessor: "duration",
+        Cell: DurationCell,
+        gridWidth: "100px",
+        mayToggle: true,
+        defaultVisible: true
+      },
+      {
         Header: "Won",
         accessor: "wins",
         Cell: MetricCell,
@@ -134,6 +143,25 @@ export default function EventsTable({
         mayToggle: true,
         defaultVisible: true
       },
+      {
+        Header: "Games Won",
+        accessor: "gameWins",
+        Cell: MetricCell,
+        disableFilters: false,
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
+        mayToggle: true
+      },
+      {
+        Header: "Games Lost",
+        accessor: "gameLosses",
+        Cell: MetricCell,
+        disableFilters: false,
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
+        mayToggle: true
+      },
+      { accessor: "isMissingMatchData" },
       { accessor: "CurrentEventState" },
       {
         Header: "State",
@@ -142,7 +170,8 @@ export default function EventsTable({
         filter: "fuzzyText",
         Filter: TextBoxFilter,
         Cell: TextCell,
-        mayToggle: true
+        mayToggle: true,
+        defaultVisible: true
       },
       { accessor: "custom" },
       { accessor: "archived" },
@@ -236,8 +265,7 @@ export default function EventsTable({
     tableStateCallback({ ...state, eventsTableMode: tableMode });
   }, [state, tableMode, tableStateCallback]);
   React.useEffect(() => {
-    const matchIds = _.flatten(rows.map(row => row.original.matchIds));
-    console.log(matchIds);
+    const matchIds = _.flatten(rows.map(row => row.original.stats.matchIds));
     filterMatchesCallback(matchIds);
   }, [filterMatchesCallback, rows]);
 
