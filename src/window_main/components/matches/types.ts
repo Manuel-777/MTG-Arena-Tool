@@ -9,6 +9,7 @@ import {
 
 export interface SerializedMatch extends ExtendedMatchData {
   archived?: boolean;
+  set: string;
   type: "match";
 }
 

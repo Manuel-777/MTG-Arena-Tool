@@ -4,20 +4,20 @@ import { createDiv } from "../shared/dom-fns";
 class ListItem {
   private id: string;
   public container: HTMLDivElement;
-  private left: HTMLDivElement;
-  private right: HTMLDivElement;
-  private center: HTMLDivElement;
+  public left: HTMLDivElement;
+  public right: HTMLDivElement;
+  public center: HTMLDivElement;
   private deleteButton: HTMLDivElement;
   private imageContainer: HTMLDivElement;
 
-  private leftTop: HTMLDivElement;
-  private leftBottom: HTMLDivElement;
+  public leftTop: HTMLDivElement;
+  public leftBottom: HTMLDivElement;
 
-  private centerTop: HTMLDivElement;
-  private centerBottom: HTMLDivElement;
+  public centerTop: HTMLDivElement;
+  public centerBottom: HTMLDivElement;
 
-  private rightTop: HTMLDivElement;
-  private rightBottom: HTMLDivElement;
+  public rightTop: HTMLDivElement;
+  public rightBottom: HTMLDivElement;
 
   constructor(
     grpId: number,
