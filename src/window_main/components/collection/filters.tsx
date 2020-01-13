@@ -278,12 +278,15 @@ export function cardSearchFilterFn(
     let finalToken = token;
     let threshold;
     if (token.includes(":") || token.includes("=")) {
-      const [[tokenKey, separator, tokenVal]] = parseFilterValue(token);
-      if (tokenKey in searchKeyMap) {
-        keys = [searchKeyMap[tokenKey]];
-        finalToken = tokenVal;
-        if (separator === "=") {
-          threshold = matchSorter.rankings.EQUAL;
+      const results = parseFilterValue(token);
+      if (results.length) {
+        const [[tokenKey, separator, tokenVal]] = results;
+        if (tokenKey in searchKeyMap) {
+          keys = [searchKeyMap[tokenKey]];
+          finalToken = tokenVal;
+          if (separator === "=") {
+            threshold = matchSorter.rankings.EQUAL;
+          }
         }
       }
     }
