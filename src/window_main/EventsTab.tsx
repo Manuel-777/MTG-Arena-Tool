@@ -24,6 +24,10 @@ import {
 } from "./renderer-util";
 import StatsPanel from "./stats-panel";
 
+function editTag(tag: string, color: string): void {
+  ipcSend("edit_tag", { tag, color });
+}
+
 function saveUserState(state: EventsTableState): void {
   ipcSend("save_user_settings", {
     eventsTableState: state,
@@ -237,6 +241,7 @@ export function EventsTab({
           tableStateCallback={saveUserState}
           filterMatchesCallback={filterMatchesCallback}
           archiveCallback={toggleArchived}
+          editTagCallback={editTag}
         />
       </div>
       <div

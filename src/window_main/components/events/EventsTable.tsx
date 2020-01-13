@@ -50,7 +50,8 @@ export default function EventsTable({
   tableStateCallback,
   cachedState,
   cachedTableMode,
-  filterMatchesCallback
+  filterMatchesCallback,
+  editTagCallback
 }: EventsTableProps): JSX.Element {
   const defaultColumn = React.useMemo(
     () => ({
@@ -262,7 +263,8 @@ export default function EventsTable({
       initialState,
       autoResetFilters: false,
       autoResetGlobalFilter: false,
-      autoResetSortBy: false
+      autoResetSortBy: false,
+      editTagCallback
     },
     useFilters,
     useGlobalFilter,

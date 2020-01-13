@@ -68,6 +68,7 @@ export interface EventsTableProps {
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
   filterMatchesCallback: (matchId?: string | string[]) => void;
   archiveCallback: (id: string | number) => void;
+  editTagCallback: (tag: string, color: string) => void;
   tableStateCallback: (state: EventsTableState) => void;
   cachedState: EventsTableState;
   cachedTableMode: string;
