@@ -2,13 +2,11 @@ import _ from "lodash";
 import matchSorter from "match-sorter";
 import React from "react";
 import { ColumnInstance, FilterValue, Row } from "react-table";
-import Aggregator from "../../aggregator";
+import { COLORS_ALL, COLORS_BRIEF } from "../../../shared/constants";
+import { SerializedDeck } from "../../../shared/types/Deck";
 import ManaFilter, { ColorFilter, ManaFilterKeys } from "../../ManaFilter";
 import { CheckboxContainer, InputContainer, MetricText } from "../display";
 import { TableData } from "./types";
-import { COLORS_BRIEF, COLORS_ALL } from "../../../shared/constants";
-import { SerializedMatch } from "../matches/types";
-import { SerializedDeck } from "../../../shared/types/Deck";
 
 export function TextBoxFilter<D extends TableData>({
   column: { id, filterValue, preFilteredRows, setFilter }

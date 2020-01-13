@@ -15,7 +15,7 @@ export function CardTableViewRow({
   const card = row.original;
   const onClick = React.useCallback(() => {
     openCardCallback(card);
-  }, [card]);
+  }, [card, openCardCallback]);
   const containerEl = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const containerDiv = containerEl.current;
@@ -45,7 +45,7 @@ export function CardTileRow({
   const card = row.original;
   const onClick = React.useCallback(() => {
     openCardCallback(card);
-  }, [card]);
+  }, [card, openCardCallback]);
   const containerEl = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const containerDiv = containerEl.current;
@@ -53,7 +53,7 @@ export function CardTileRow({
       contextMenuCallback(containerDiv, card);
       cardHoverCallback(containerDiv, card);
     }
-  }, [card, contextMenuCallback]);
+  }, [card, cardHoverCallback, contextMenuCallback]);
   return (
     <div
       ref={containerEl}

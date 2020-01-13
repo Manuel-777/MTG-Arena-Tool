@@ -336,11 +336,14 @@ export default function CollectionTable({
   const [tableMode, setTableMode] = React.useState(cachedTableMode);
   const legacyContainerRef = React.useRef<HTMLDivElement>(null);
 
-  const setClickCallback = React.useCallback((set: string) => {
-    setTableMode(COLLECTION_CHART_MODE);
-    setFilter("set", { [set]: true });
-    toggleHideColumn("set", false);
-  }, []);
+  const setClickCallback = React.useCallback(
+    (set: string) => {
+      setTableMode(COLLECTION_CHART_MODE);
+      setFilter("set", { [set]: true });
+      toggleHideColumn("set", false);
+    },
+    [setFilter, toggleHideColumn]
+  );
   React.useEffect(() => {
     tableStateCallback({ ...state, collectionTableMode: tableMode });
   }, [state, tableMode, tableStateCallback]);
@@ -359,7 +362,7 @@ export default function CollectionTable({
         setClickCallback
       );
     }
-  }, [tableMode, rows, legacyContainerRef]);
+  }, [tableMode, rows, legacyContainerRef, setClickCallback]);
 
   const pagingProps: PagingControlsProps = {
     canPreviousPage,

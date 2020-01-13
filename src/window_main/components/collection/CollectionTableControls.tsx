@@ -77,7 +77,7 @@ export default function CollectionTableControls({
   const [togglesVisible, setTogglesVisible] = React.useState(false);
   const exportRows = React.useCallback(() => {
     exportCallback(rows.map(row => row.values.id));
-  }, [rows]);
+  }, [exportCallback, rows]);
 
   const inBoostersOnly = React.useMemo(
     () =>

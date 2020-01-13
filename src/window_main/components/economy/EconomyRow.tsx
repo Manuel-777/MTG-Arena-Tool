@@ -550,7 +550,7 @@ function DeleteButton(props: DeleteButtonProps): JSX.Element {
       }
       toggleArchived(economyId);
     },
-    []
+    [change, economyId, hideRowCallback]
   );
 
   return (

@@ -52,7 +52,7 @@ export function RarityFilter(props: RarityFilterProps): JSX.Element {
       event.currentTarget.classList.toggle("rarity_filter_on");
       props.onFilterChanged(filterValue);
     },
-    [props.onFilterChanged]
+    [filterValue, props]
   );
   return (
     <div
@@ -146,7 +146,7 @@ export function SetFilter(props: SetFilterProps): JSX.Element {
       event.currentTarget.classList.toggle("set_filter_on");
       props.onFilterChanged(filterValue);
     },
-    [props.onFilterChanged]
+    [filterValue, props]
   );
   return (
     <div

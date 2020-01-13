@@ -34,7 +34,7 @@ export function OnPlayFilter(props: OnPlayFilterProps): JSX.Element {
       event.currentTarget.classList.toggle("rarity_filter_on");
       props.onFilterChanged(filterValue);
     },
-    [props.onFilterChanged]
+    [filterValue, props]
   );
   return (
     <div
@@ -131,7 +131,7 @@ export function RankFilter(props: RankFilterProps): JSX.Element {
       event.currentTarget.classList.toggle("rarity_filter_on");
       props.onFilterChanged(filterValue);
     },
-    [props.onFilterChanged]
+    [filterValue, props]
   );
   return (
     <div
