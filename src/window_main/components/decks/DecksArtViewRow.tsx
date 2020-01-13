@@ -14,21 +14,22 @@ export default function DecksArtViewRow({
   ...otherProps
 }: TableViewRowProps<DecksData>): JSX.Element {
   const [hover, setHover] = React.useState(false);
-
   const mouseEnter = React.useCallback(() => {
     setHover(true);
   }, []);
-
   const mouseLeave = React.useCallback(() => {
     setHover(false);
   }, []);
+  const divProps = { ...otherProps };
+  delete divProps.index;
+  delete divProps.gridTemplateColumns;
 
   return (
     <div
       className={"decks_table_deck_tile"}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
-      {...otherProps}
+      {...divProps}
     >
       <CSSTransition classNames="deckTileHover" in={!!hover} timeout={200}>
         <DeckArt url={getCardArtCrop(row.values["deckTileId"])} />
