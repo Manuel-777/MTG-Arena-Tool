@@ -14,6 +14,7 @@ import {
   ArchiveHeader,
   ColorsCell,
   DurationCell,
+  FormatCell,
   MetricCell,
   RelativeTimeCell,
   ShortTextCell,
@@ -89,6 +90,16 @@ export default function EventsTable({
         gridWidth: "200px",
         mayToggle: true,
         defaultVisible: true
+      },
+      {
+        Header: "Format",
+        accessor: "format",
+        disableFilters: false,
+        filter: "fuzzyText",
+        Filter: TextBoxFilter,
+        Cell: FormatCell,
+        gridWidth: "150px",
+        mayToggle: true
       },
       { accessor: "CourseDeck" },
       { accessor: "deckId" },

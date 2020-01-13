@@ -1,16 +1,18 @@
 import isValid from "date-fns/isValid";
 import React from "react";
+import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
+import { getReadableEvent } from "../shared/util";
 import Aggregator from "./aggregator";
 import { AggregatorFilters } from "./components/decks/types";
 import EventsTable from "./components/events/EventsTable";
 import {
+  EventInstanceData,
   EventsTableState,
-  EventTableData,
-  SerializedEvent,
   EventStats,
-  EventInstanceData
+  EventTableData,
+  SerializedEvent
 } from "./components/events/types";
 import mountReactComponent from "./mountReactComponent";
 import {
@@ -21,7 +23,6 @@ import {
   toggleArchived
 } from "./renderer-util";
 import StatsPanel from "./stats-panel";
-import { getReadableEvent } from "../shared/util";
 
 function saveUserState(state: EventsTableState): void {
   ipcSend("save_user_settings", {
@@ -163,6 +164,7 @@ function getEventsData(aggregator: Aggregator): EventTableData[] {
           colorSortVal: colors.join(""),
           deckId: event.CourseDeck.id ?? "",
           deckName: event.CourseDeck.name ?? "",
+          format: db.events_format[event.InternalEventName] ?? "unknown",
           stats,
           timestamp: isValid(timestamp) ? timestamp.getTime() : NaN
         };
