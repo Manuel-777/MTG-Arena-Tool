@@ -12,13 +12,14 @@ import { openMatch } from "../../match-details";
 import {
   attachDraftData,
   attachMatchData,
+  createDraftRares,
   getEventWinLossClass,
   localTimeSince,
   toggleArchived
 } from "../../renderer-util";
+import { SerializedMatch } from "../matches/types";
 import { TableViewRowProps } from "../tables/types";
 import { EventTableData } from "./types";
-import { SerializedMatch } from "../matches/types";
 
 function handleOpenMatch(id: string | number): void {
   openMatch(id);
@@ -83,6 +84,13 @@ function attachEventData(listItem: ListItem, event: EventTableData): void {
   const resultDiv = createDiv(["list_match_result", winLossClass], wl);
   resultDiv.style.marginLeft = "8px";
   listItem.right.after(resultDiv);
+
+  const draftId = event.id + "-draft";
+  if (pd.draftExists(draftId)) {
+    const draft = pd.draft(draftId);
+    const draftRares = createDraftRares(draft);
+    listItem.center.appendChild(draftRares);
+  }
 }
 
 // Given the data of a match will return a data row to be
@@ -103,8 +111,10 @@ function createMatchRow(match: SerializedMatch): HTMLElement {
 
   if (match.type === "match") {
     attachMatchData(matchRow, match);
+    matchRow.container.title = "show match details";
   } else {
     attachDraftData(matchRow, match);
+    matchRow.container.title = "show draft details";
   }
 
   return matchRow.container;

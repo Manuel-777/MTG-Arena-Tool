@@ -944,7 +944,7 @@ export function createRoundCard(card, rarityOverlay = false) {
   return roundCard;
 }
 
-function createDraftRares(draft) {
+export function createDraftRares(draft) {
   var draftRares = createDiv(["flex_item"]);
   draftRares.style.margin = "auto";
   if (!draft.pickedCards) return draftRares;
@@ -974,6 +974,7 @@ function createReplayShareButton(draft) {
     ["list_draft_share", draft.id + "dr"],
     () => draftShareLink(draft.id, draft)
   );
+  replayShareButton.title = "share draft replay";
   return replayShareButton;
 }
 
