@@ -26,6 +26,7 @@ import {
 import actionLog from "./actionLog";
 import addCustomDeck from "./addCustomDeck";
 import { createDraft, createMatch, completeMatch } from "./data";
+import { loadPlayerConfig } from "../loadPlayerConfig";
 
 let logLanguage = "English";
 
@@ -297,6 +298,12 @@ export function onLabelOutLogInfo(entry) {
 
   if (json.params.messageName == "Client.Connected") {
     logLanguage = json.params.payloadObject.settings.language.language;
+    const parsedData = {};
+    parsedData.arenaId = json.params.payloadObject.playerId;
+    parsedData.name = json.params.payloadObject.screenName;
+    parsedData.arenaVersion = json.params.payloadObject.clientVersion;
+    setData(parsedData, false);
+    loadPlayerConfig(json.params.payloadObject.playerId);
   }
   if (skipMatch) return;
   if (json.params.messageName == "DuelScene.GameStop") {

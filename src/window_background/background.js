@@ -504,7 +504,7 @@ async function logLoop() {
 
     // Get player Id
     strCheck = '\\"playerId\\": \\"';
-    if (value.includes(strCheck)) {
+    if (value.includes(strCheck) && parsedData.arenaId == undefined) {
       parsedData.arenaId = debugArenaID
         ? debugArenaID
         : unleakString(dataChop(value, strCheck, '\\"'));
@@ -512,13 +512,13 @@ async function logLoop() {
 
     // Get User name
     strCheck = '\\"screenName\\": \\"';
-    if (value.includes(strCheck)) {
+    if (value.includes(strCheck) && parsedData.name == undefined) {
       parsedData.name = unleakString(dataChop(value, strCheck, '\\"'));
     }
 
     // Get Client Version
     strCheck = '\\"clientVersion\\": "\\';
-    if (value.includes(strCheck)) {
+    if (value.includes(strCheck) && parsedData.arenaVersion == undefined) {
       parsedData.arenaVersion = unleakString(dataChop(value, strCheck, '\\"'));
     }
     /*

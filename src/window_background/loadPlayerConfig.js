@@ -52,10 +52,14 @@ export async function loadPlayerConfig(playerId) {
   ipcLog("...found all documents in player database.");
   ipcPop({ text: "Player history loaded.", time: 3000, progress: -1 });
 
-  globals.watchingLog = true;
-  ipcLog("Starting Arena Log Watcher: " + settings.logUri);
-  globals.stopWatchingLog = arenaLogWatcher.startWatchingLog(settings.logUri);
-  ipcLog("Calling back to http-api...");
+  // Only if watcher is not initialized
+  // Could happen when using multi accounts
+  if (globals.watchingLog == false) {
+    globals.watchingLog = true;
+    ipcLog("Starting Arena Log Watcher: " + settings.logUri);
+    globals.stopWatchingLog = arenaLogWatcher.startWatchingLog(settings.logUri);
+    ipcLog("Calling back to http-api...");
+  }
 }
 
 function ipcUpgradeProgress(progress) {
