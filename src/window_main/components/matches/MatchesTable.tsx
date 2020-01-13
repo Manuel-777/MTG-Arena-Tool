@@ -14,6 +14,7 @@ import {
   ArchiveHeader,
   ColorsCell,
   DurationCell,
+  FormatCell,
   MetricCell,
   PercentCell,
   RelativeTimeCell,
@@ -91,9 +92,10 @@ export default function MatchesTable({
         gridWidth: "100px",
         mayToggle: true
       },
+      { accessor: "eventId" },
       {
         Header: "Event",
-        accessor: "eventId",
+        accessor: "eventName",
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
@@ -101,6 +103,16 @@ export default function MatchesTable({
         gridWidth: "200px",
         mayToggle: true,
         defaultVisible: true
+      },
+      {
+        Header: "Format",
+        accessor: "format",
+        disableFilters: false,
+        filter: "fuzzyText",
+        Filter: TextBoxFilter,
+        Cell: FormatCell,
+        gridWidth: "150px",
+        mayToggle: true
       },
       {
         Header: "Best of",

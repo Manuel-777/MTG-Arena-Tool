@@ -5,6 +5,7 @@ import { DATE_SEASON, EASING_DEFAULT, RANKS } from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
+import { getReadableEvent } from "../shared/util";
 import Aggregator from "./aggregator";
 import { AggregatorFilters } from "./components/decks/types";
 import MatchesTable from "./components/matches/MatchesTable";
@@ -252,6 +253,8 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
           deckName: match.playerDeck.name ?? "",
           deckTags: match.playerDeck.tags ?? [],
           deckFormat: match.playerDeck.format ?? "",
+          eventName: getReadableEvent(match.eventId),
+          format: db.events_format[match.eventId] ?? "unknown",
           isOnPlay: match.player.seat === match.onThePlay ?? false,
           leaderboardPlace: match.player.leaderboardPlace,
           losses: match.opponent.win,
