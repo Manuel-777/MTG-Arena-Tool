@@ -238,14 +238,13 @@ const searchKeyMap: { [key: string]: SearchKeyValue } = {
 
 const allSearchKeys = [...new Set(Object.values(searchKeyMap))];
 
-export function cardSearchFilterFn(
-  rows: Row<CardsData>[],
-  columnIds: string[],
-  filterValue: string
-): Row<CardsData>[] {
+type ParsedToken = [string, string, string];
+
+function parseFilterValue(filterValue: string): ParsedToken[] {
   const exp = /(?<normal>(?<tok>[^\s"]+)(?<sep>\b[>=|<=|:|=|<|<]{1,2})(?<val>[^\s"]+))|(?<quoted>(?<qtok>[^\s"]+)(?<qsep>\b[>=|<=|:|=|<|<]{1,2})(?<qval>"[^"]*"))/;
   const filterPattern = new RegExp(exp, "g");
   let match;
+  const results: ParsedToken[] = [];
   while ((match = filterPattern.exec(filterValue))) {
     // console.log("filterPattern match: ", match.groups);
     let token, separator, value;
@@ -258,28 +257,37 @@ export function cardSearchFilterFn(
       separator = match.groups.qsep;
       value = match.groups.qval; // should remove quotes too
     }
-    // use token , separator and value to get proper filtering function
+    if (token && separator && value) {
+      results.push([token, separator, value]);
+    }
   }
+  return results;
+}
 
-  const tokens = filterValue
-    .split(" ")
-    .filter(token =>
-      token.includes(":") ? token.split(":")[1].length > 2 : token.length > 2
-    );
+export function cardSearchFilterFn(
+  rows: Row<CardsData>[],
+  columnIds: string[],
+  filterValue: string
+): Row<CardsData>[] {
+  const tokens = filterValue.split(" ").filter(token => token.length > 2);
   if (tokens.length === 0) {
     return rows;
   }
   const matches = tokens.map(token => {
     let keys = allSearchKeys;
     let finalToken = token;
-    if (token.includes(":")) {
-      const [tokenKey, tokenVal] = token.split(":");
+    let threshold;
+    if (token.includes(":") || token.includes("=")) {
+      const [[tokenKey, separator, tokenVal]] = parseFilterValue(token);
       if (tokenKey in searchKeyMap) {
         keys = [searchKeyMap[tokenKey]];
         finalToken = tokenVal;
+        if (separator === "=") {
+          threshold = matchSorter.rankings.EQUAL;
+        }
       }
     }
-    return matchSorter(rows, finalToken, { keys });
+    return matchSorter(rows, finalToken, { keys, threshold });
   });
   return _.intersection(...matches);
 }
