@@ -1,4 +1,6 @@
 import { ipcRenderer as ipc, remote } from "electron";
+import isValid from "date-fns/isValid";
+import parseISO from "date-fns/parseISO";
 import _ from "lodash";
 import {
   CARD_TILE_FLAT,
@@ -429,6 +431,15 @@ class PlayerData {
       custom: !this.static_decks.includes(id),
       tags: this.decks_tags[id] || []
     };
+    // lastUpdated does not specify timezone but implicitly occurs at UTC
+    // attempt to add UTC timezone to lastUpdated iff result would be valid
+    if (
+      deckData.lastUpdated &&
+      !deckData.lastUpdated.includes("Z") &&
+      isValid(parseISO(deckData.lastUpdated + "Z"))
+    ) {
+      deckData.lastUpdated = deckData.lastUpdated + "Z";
+    }
     return prettierDeckData(deckData);
   }
 
