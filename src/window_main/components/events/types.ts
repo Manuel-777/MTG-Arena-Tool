@@ -1,6 +1,9 @@
 import { TableState } from "react-table";
-import { AggregatorFilters } from "../decks/types";
-import { TableControlsProps, TableData } from "../tables/types";
+import {
+  AggregatorFilters,
+  TableControlsProps,
+  TableData
+} from "../tables/types";
 
 export interface SerializedEvent {
   archived?: boolean;
@@ -57,21 +60,18 @@ export interface EventTableData extends TableData, SerializedEvent, EventStats {
   timestamp: number;
 }
 
-export interface EventsTableState extends TableState<EventTableData> {
-  eventsTableMode: string;
-}
-
 export interface EventsTableProps {
-  data: EventTableData[];
-  aggFilters: AggregatorFilters;
-  events: string[];
-  setAggFiltersCallback: (filters: AggregatorFilters) => void;
-  filterMatchesCallback: (matchId?: string | string[]) => void;
   archiveCallback: (id: string | number) => void;
-  editTagCallback: (tag: string, color: string) => void;
-  tableStateCallback: (state: EventsTableState) => void;
-  cachedState: EventsTableState;
+  aggFilters: AggregatorFilters;
+  cachedState: TableState<EventTableData>;
   cachedTableMode: string;
+  data: EventTableData[];
+  editTagCallback: (tag: string, color: string) => void;
+  events: string[];
+  filterDataCallback: (data: EventTableData[]) => void;
+  setAggFiltersCallback: (filters: AggregatorFilters) => void;
+  tableModeCallback: (tableMode: string) => void;
+  tableStateCallback: (state: TableState<EventTableData>) => void;
 }
 
 export interface EventsTableControlsProps

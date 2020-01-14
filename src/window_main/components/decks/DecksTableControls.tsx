@@ -11,8 +11,8 @@ import {
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
-import { FiltersVisible } from "../tables/types";
 import { DecksTableControlsProps } from "./types";
+import { useBaseTableControls } from "../tables/hooks";
 
 const recentFilters = (): { id: string; value: FilterValue }[] => [
   { id: "archivedCol", value: "hideArchived" }
@@ -27,67 +27,30 @@ const wantedFilters = (): { id: string; value: FilterValue }[] => [
   { id: "boosterCost", value: [1, undefined] }
 ];
 
-export default function DecksTableControls({
-  aggFilters,
-  canNextPage,
-  canPreviousPage,
-  setAggFiltersCallback,
-  flatColumns,
-  getTableProps,
-  globalFilter,
-  gotoPage,
-  gridTemplateColumns,
-  nextPage,
-  pageCount,
-  pageIndex,
-  pageOptions,
-  pageSize,
-  preGlobalFilteredRows,
-  previousPage,
-  setAllFilters,
-  setFilter,
-  setGlobalFilter,
-  setPageSize,
-  setTableMode,
-  tableMode,
-  toggleHideColumn,
-  toggleSortBy,
-  visibleHeaders
-}: DecksTableControlsProps): JSX.Element {
-  const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
-    const toggleableColumns = flatColumns.filter(column => column.mayToggle);
-    const initialFiltersVisible: FiltersVisible = {};
-    for (const column of flatColumns) {
-      if (column.canFilter) {
-        initialFiltersVisible[column.id] = !!column.filterValue;
-      }
-    }
-    return [toggleableColumns, initialFiltersVisible];
-  }, [flatColumns]);
-  const [filtersVisible, setFiltersVisible] = React.useState(
-    initialFiltersVisible
-  );
-  const [togglesVisible, setTogglesVisible] = React.useState(false);
-  const pagingProps = {
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-    pageIndex,
-    pageSize
-  };
-  const headersProps = {
-    filtersVisible,
-    getTableProps,
-    gridTemplateColumns,
-    setFilter,
+export default function DecksTableControls(
+  props: DecksTableControlsProps
+): JSX.Element {
+  const {
+    aggFilters,
+    globalFilter,
+    preGlobalFilteredRows,
+    setAggFiltersCallback,
+    setAllFilters,
+    setGlobalFilter,
+    setTableMode,
+    tableMode,
+    toggleHideColumn,
+    toggleSortBy
+  } = props;
+  const {
+    headersProps,
+    initialFiltersVisible,
+    pagingProps,
     setFiltersVisible,
-    visibleHeaders
-  };
+    setTogglesVisible,
+    toggleableColumns,
+    togglesVisible
+  } = useBaseTableControls(props);
   return (
     <>
       <div

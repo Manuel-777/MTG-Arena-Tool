@@ -18,6 +18,7 @@ import {
   toggleArchived
 } from "../../renderer-util";
 import { SerializedMatch } from "../matches/types";
+import { useLegacyRenderer } from "../tables/hooks";
 import { TableViewRowProps } from "../tables/types";
 import { EventTableData } from "./types";
 
@@ -184,12 +185,6 @@ export function renderEventRow(
 export default function EventsListViewRow({
   row
 }: TableViewRowProps<EventTableData>): JSX.Element {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (containerRef?.current) {
-      containerRef.current.innerHTML = "";
-      renderEventRow(containerRef.current, row.original);
-    }
-  }, [row, containerRef]);
+  const containerRef = useLegacyRenderer(renderEventRow, row.original);
   return <div title={"show event details"} ref={containerRef} />;
 }

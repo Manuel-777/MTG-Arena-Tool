@@ -1,6 +1,6 @@
 import { CellProps, TableState } from "react-table";
 import { SerializedDeck } from "../../../shared/types/Deck";
-import { TableControlsProps } from "../tables/types";
+import { TableControlsProps, AggregatorFilters } from "../tables/types";
 
 export interface DeckStats {
   wins: number;
@@ -35,29 +35,20 @@ export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
   lastEditWinrate: number;
 }
 
-export interface AggregatorFilters {
-  date?: Date | string;
-  showArchived?: boolean;
-  eventId?: string;
-}
-
-export interface DecksTableState extends TableState<DecksData> {
-  decksTableMode: string;
-}
-
 export interface DecksTableProps {
-  data: DecksData[];
-  aggFilters: AggregatorFilters;
-  setAggFiltersCallback: (filters: AggregatorFilters) => void;
-  openDeckCallback: (id: string) => void;
-  filterDecksCallback: (deckId?: string | string[]) => void;
-  archiveCallback: (id: string) => void;
   addTagCallback: (id: string, tag: string) => void;
-  editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (deckid: string, tag: string) => void;
-  tableStateCallback: (state: DecksTableState) => void;
-  cachedState: DecksTableState;
+  archiveCallback: (id: string) => void;
+  aggFilters: AggregatorFilters;
+  cachedState: TableState<DecksData>;
   cachedTableMode: string;
+  data: DecksData[];
+  deleteTagCallback: (deckid: string, tag: string) => void;
+  editTagCallback: (tag: string, color: string) => void;
+  filterDataCallback: (data: DecksData[]) => void;
+  openDeckCallback: (id: string) => void;
+  setAggFiltersCallback: (filters: AggregatorFilters) => void;
+  tableModeCallback: (tableMode: string) => void;
+  tableStateCallback: (state: TableState<DecksData>) => void;
 }
 
 export interface DecksTableControlsProps extends TableControlsProps<DecksData> {

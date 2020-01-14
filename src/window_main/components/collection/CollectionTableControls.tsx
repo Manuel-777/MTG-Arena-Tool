@@ -15,8 +15,8 @@ import {
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
-import { FiltersVisible } from "../tables/types";
 import { CollectionTableControlsProps } from "./types";
+import { useBaseTableControls } from "../tables/hooks";
 
 const standardSetsFilter: FilterValue = {};
 db.standardSetCodes.forEach(code => (standardSetsFilter[code] = true));
@@ -32,53 +32,36 @@ const wantedFilters = (): FilterValue[] => [
 
 const legacyModes = [COLLECTION_CHART_MODE, COLLECTION_SETS_MODE];
 
-export default function CollectionTableControls({
-  canNextPage,
-  canPreviousPage,
-  exportCallback,
-  filters,
-  flatColumns,
-  getTableProps,
-  globalFilter,
-  gotoPage,
-  gridTemplateColumns,
-  nextPage,
-  pageCount,
-  pageIndex,
-  pageOptions,
-  pageSize,
-  preGlobalFilteredRows,
-  previousPage,
-  rows,
-  setAllFilters,
-  setFilter,
-  setGlobalFilter,
-  setPageSize,
-  setTableMode,
-  tableMode,
-  toggleHideColumn,
-  toggleSortBy,
-  visibleHeaders
-}: CollectionTableControlsProps): JSX.Element {
-  const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
-    const toggleableColumns = flatColumns.filter(column => column.mayToggle);
-    const initialFiltersVisible: FiltersVisible = {};
-    for (const column of flatColumns) {
-      if (column.canFilter) {
-        initialFiltersVisible[column.id] = !!column.filterValue;
-      }
-    }
-    return [toggleableColumns, initialFiltersVisible];
-  }, [flatColumns]);
+export default function CollectionTableControls(
+  props: CollectionTableControlsProps
+): JSX.Element {
+  const {
+    exportCallback,
+    filters,
+    globalFilter,
+    preGlobalFilteredRows,
+    rows,
+    setAllFilters,
+    setFilter,
+    setGlobalFilter,
+    setTableMode,
+    tableMode,
+    toggleHideColumn,
+    toggleSortBy
+  } = props;
+  const {
+    headersProps,
+    initialFiltersVisible,
+    pagingProps,
+    setFiltersVisible,
+    setTogglesVisible,
+    toggleableColumns,
+    togglesVisible
+  } = useBaseTableControls(props);
 
-  const [filtersVisible, setFiltersVisible] = React.useState(
-    initialFiltersVisible
-  );
-  const [togglesVisible, setTogglesVisible] = React.useState(false);
   const exportRows = React.useCallback(() => {
     exportCallback(rows.map(row => row.values.id));
   }, [exportCallback, rows]);
-
   const inBoostersOnly = React.useMemo(
     () =>
       filters.some(
@@ -86,27 +69,6 @@ export default function CollectionTableControls({
       ),
     [filters]
   );
-
-  const pagingProps = {
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-    pageIndex,
-    pageSize
-  };
-  const headersProps = {
-    filtersVisible,
-    getTableProps,
-    gridTemplateColumns,
-    setFilter,
-    setFiltersVisible,
-    visibleHeaders
-  };
   return (
     <>
       <div

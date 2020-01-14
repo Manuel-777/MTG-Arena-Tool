@@ -1,19 +1,21 @@
 import isValid from "date-fns/isValid";
+import _ from "lodash";
 import React from "react";
+import { TableState } from "react-table";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
 import { getReadableEvent } from "../shared/util";
 import Aggregator from "./aggregator";
-import { AggregatorFilters } from "./components/decks/types";
 import EventsTable from "./components/events/EventsTable";
 import {
   EventInstanceData,
-  EventsTableState,
   EventStats,
   EventTableData,
   SerializedEvent
 } from "./components/events/types";
+import { useAggregatorAndSidePanel } from "./components/tables/hooks";
+import { AggregatorFilters } from "./components/tables/types";
 import mountReactComponent from "./mountReactComponent";
 import {
   hideLoadingBars,
@@ -28,10 +30,16 @@ function editTag(tag: string, color: string): void {
   ipcSend("edit_tag", { tag, color });
 }
 
-function saveUserState(state: EventsTableState): void {
+function saveTableState(eventsTableState: TableState<EventTableData>): void {
   ipcSend("save_user_settings", {
-    eventsTableState: state,
-    eventsTableMode: state.eventsTableMode,
+    eventsTableState,
+    skip_refresh: true
+  });
+}
+
+function saveTableMode(eventsTableMode: string): void {
+  ipcSend("save_user_settings", {
+    eventsTableMode,
     skip_refresh: true
   });
 }
@@ -186,42 +194,28 @@ export function EventsTab({
 }: {
   aggFiltersArg: AggregatorFilters;
 }): JSX.Element {
-  const {
-    eventsTableMode,
-    eventsTableState,
-    last_date_filter: dateFilter,
-    right_panel_width: panelWidth
-  } = pd.settings;
+  const { eventsTableMode, eventsTableState } = pd.settings;
   const showArchived =
     eventsTableState?.filters?.archivedCol !== "hideArchived";
-  const defaultAggFilters = {
-    ...Aggregator.getDefaultFilters(),
-    date: dateFilter,
-    ...aggFiltersArg,
-    showArchived
+  const getDataAggFilters = (data: EventTableData[]): AggregatorFilters => {
+    const matchIds = _.flatten(data.map(event => event.stats.matchIds));
+    return { matchIds };
   };
-  const [aggFilters, setAggFilters] = React.useState(
-    defaultAggFilters as AggregatorFilters
-  );
+  const {
+    aggFilters,
+    data,
+    filterDataCallback,
+    rightPanelRef,
+    setAggFilters,
+    sidePanelWidth
+  } = useAggregatorAndSidePanel({
+    aggFiltersArg,
+    getData: getEventsData,
+    getDataAggFilters,
+    showArchived,
+    updateSidebarCallback: updateStatsPanel
+  });
   const events = React.useMemo(getTotalAggEvents, []);
-  const data = React.useMemo(() => {
-    const aggregator = new Aggregator(aggFilters);
-    return getEventsData(aggregator);
-  }, [aggFilters]);
-
-  const sidePanelWidth = panelWidth + "px";
-  const rightPanelRef = React.useRef<HTMLDivElement>(null);
-  const filterMatchesCallback = React.useCallback(
-    (matchIds?: string | string[]): void => {
-      if (rightPanelRef?.current) {
-        updateStatsPanel(
-          rightPanelRef.current,
-          new Aggregator({ ...aggFilters, matchIds })
-        );
-      }
-    },
-    [rightPanelRef, aggFilters]
-  );
 
   return (
     <>
@@ -238,8 +232,9 @@ export function EventsTab({
           cachedState={eventsTableState}
           cachedTableMode={eventsTableMode}
           setAggFiltersCallback={setAggFilters}
-          tableStateCallback={saveUserState}
-          filterMatchesCallback={filterMatchesCallback}
+          tableModeCallback={saveTableMode}
+          tableStateCallback={saveTableState}
+          filterDataCallback={filterDataCallback}
           archiveCallback={toggleArchived}
           editTagCallback={editTag}
         />

@@ -9,6 +9,7 @@ import {
   getTagColor,
   showColorpicker
 } from "../../renderer-util";
+import { useLegacyRenderer } from "../tables/hooks";
 import { MatchesTableRowProps, SerializedMatch, TagCounts } from "./types";
 
 const tagPrompt = "Set archetype";
@@ -160,29 +161,15 @@ export default function MatchesListViewRow({
   editTagCallback,
   deleteTagCallback
 }: MatchesTableRowProps): JSX.Element {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (containerRef?.current) {
-      renderData(
-        containerRef.current,
-        row.original,
-        tags,
-        openMatchCallback,
-        archiveCallback,
-        addTagCallback,
-        editTagCallback,
-        deleteTagCallback
-      );
-    }
-  }, [
-    row,
+  const containerRef = useLegacyRenderer(
+    renderData,
+    row.original,
     tags,
     openMatchCallback,
     archiveCallback,
     addTagCallback,
     editTagCallback,
-    deleteTagCallback,
-    containerRef
-  ]);
+    deleteTagCallback
+  );
   return <div title={"show match details"} ref={containerRef} />;
 }

@@ -1,17 +1,47 @@
 import {
   CellValue,
+  Column,
   ColumnInstance,
   Filters,
   FilterValue,
   IdType,
   Row,
   TablePropGetter,
-  TableProps
+  TableProps,
+  TableState,
+  PluginHook
 } from "react-table";
+
+export interface AggregatorFilters {
+  date?: Date | string;
+  showArchived?: boolean;
+  eventId?: string;
+  matchIds?: (string | undefined)[];
+  deckId?: string | (string | undefined)[];
+}
 
 export type TableData = Record<string, CellValue>;
 
 export type FiltersVisible = { [key: string]: boolean };
+
+export interface BaseTableProps<D extends TableData> {
+  cachedState: TableState<D>;
+  columns: Column<D>[];
+  customDefaultColumn?: Partial<Column<D>>;
+  customFilterTypes?: { [key: string]: any };
+  customHooks?: PluginHook<D>[];
+  customProps?: { [key: string]: any };
+  data: D[];
+  defaultState?: Partial<TableState<D>>;
+  filterDataCallback?: (data: D[]) => void;
+  globalFilter:
+    | string
+    | ((rows: Row<D>[], columnIds: IdType<D>[], filterValue: any) => Row<D>[])
+    | undefined;
+  setTableMode: (tableMode: string) => void;
+  tableMode: string;
+  tableStateCallback: (state: TableState<D>) => void;
+}
 
 export interface PagingControlsProps {
   canPreviousPage: boolean;

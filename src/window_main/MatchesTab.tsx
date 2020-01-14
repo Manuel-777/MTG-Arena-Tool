@@ -1,20 +1,21 @@
 import anime from "animejs";
 import isValid from "date-fns/isValid";
 import React from "react";
+import { TableState } from "react-table";
 import { DATE_SEASON, EASING_DEFAULT, RANKS } from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
 import { getReadableEvent } from "../shared/util";
 import Aggregator from "./aggregator";
-import { AggregatorFilters } from "./components/decks/types";
 import MatchesTable from "./components/matches/MatchesTable";
 import {
-  MatchesTableState,
   MatchTableData,
   SerializedMatch,
   TagCounts
 } from "./components/matches/types";
+import { useAggregatorAndSidePanel } from "./components/tables/hooks";
+import { AggregatorFilters } from "./components/tables/types";
 import { openMatch } from "./match-details";
 import mountReactComponent from "./mountReactComponent";
 import {
@@ -68,10 +69,16 @@ function getNextRank(currentRank: string): undefined | string {
   }
 }
 
-function saveUserState(state: MatchesTableState): void {
+function saveTableState(matchesTableState: TableState<MatchTableData>): void {
   ipcSend("save_user_settings", {
-    matchesTableState: state,
-    matchesTableMode: state.matchesTableMode,
+    matchesTableState,
+    skip_refresh: true
+  });
+}
+
+function saveTableMode(matchesTableMode: string): void {
+  ipcSend("save_user_settings", {
+    matchesTableMode,
     skip_refresh: true
   });
 }
@@ -130,12 +137,12 @@ function getStepsUntilNextRank(mode: boolean, winrate: number): string {
 
 function renderRanksStats(
   container: HTMLElement,
-  aggregator: any,
+  aggregator: Aggregator,
   isLimited: boolean
 ): void {
   container.innerHTML = "";
-  if (!aggregator || !aggregator.stats.total) return;
-  const { winrate } = aggregator.stats;
+  if (!aggregator || !aggregator.stats?.total) return;
+  const { winrate } = aggregator.stats as any;
 
   const seasonName = !isLimited ? "constructed" : "limited";
   const switchSeasonName = isLimited ? "constructed" : "limited";
@@ -302,42 +309,28 @@ export function MatchesTab({
 }: {
   aggFiltersArg: AggregatorFilters;
 }): JSX.Element {
-  const {
-    matchesTableMode,
-    matchesTableState,
-    last_date_filter: dateFilter,
-    right_panel_width: panelWidth
-  } = pd.settings;
+  const { matchesTableMode, matchesTableState } = pd.settings;
   const showArchived =
     matchesTableState?.filters?.archivedCol !== "hideArchived";
-  const defaultAggFilters = {
-    ...Aggregator.getDefaultFilters(),
-    date: dateFilter,
-    ...aggFiltersArg,
-    showArchived
+  const getDataAggFilters = (data: MatchTableData[]): AggregatorFilters => {
+    const matchIds = data.map(match => match.id);
+    return { matchIds };
   };
-  const [aggFilters, setAggFilters] = React.useState(
-    defaultAggFilters as AggregatorFilters
-  );
+  const {
+    aggFilters,
+    data,
+    filterDataCallback,
+    rightPanelRef,
+    setAggFilters,
+    sidePanelWidth
+  } = useAggregatorAndSidePanel({
+    aggFiltersArg,
+    getData: getMatchesData,
+    getDataAggFilters,
+    showArchived,
+    updateSidebarCallback: updateStatsPanel
+  });
   const [events, tags] = React.useMemo(getTotalAggData, []);
-  const data = React.useMemo(() => {
-    const aggregator = new Aggregator(aggFilters);
-    return getMatchesData(aggregator);
-  }, [aggFilters]);
-
-  const sidePanelWidth = panelWidth + "px";
-  const rightPanelRef = React.useRef<HTMLDivElement>(null);
-  const filterMatchesCallback = React.useCallback(
-    (matchIds?: string | string[]): void => {
-      if (rightPanelRef?.current) {
-        updateStatsPanel(
-          rightPanelRef.current,
-          new Aggregator({ ...aggFilters, matchIds })
-        );
-      }
-    },
-    [rightPanelRef, aggFilters]
-  );
 
   return (
     <>
@@ -355,8 +348,9 @@ export function MatchesTab({
           cachedState={matchesTableState}
           cachedTableMode={matchesTableMode}
           setAggFiltersCallback={setAggFilters}
-          tableStateCallback={saveUserState}
-          filterMatchesCallback={filterMatchesCallback}
+          tableModeCallback={saveTableMode}
+          tableStateCallback={saveTableState}
+          filterDataCallback={filterDataCallback}
           openMatchCallback={openMatchDetails}
           archiveCallback={toggleArchived}
           addTagCallback={addTag}

@@ -54,16 +54,13 @@ export interface TransactionData extends SerializedTransaction {
   xpGainedNumber: number;
 }
 
-export interface EconomyTableState extends TableState<TransactionData> {
-  economyTableMode: string;
-}
-
 export interface EconomyTableProps {
-  data: TransactionData[];
   archiveCallback: (id: string) => void;
-  tableStateCallback: (state: EconomyTableState) => void;
-  cachedState: EconomyTableState;
+  cachedState: TableState<TransactionData>;
   cachedTableMode: string;
+  data: TransactionData[];
+  tableModeCallback: (tableMode: string) => void;
+  tableStateCallback: (state: TableState<TransactionData>) => void;
 }
 
 export interface EconomyTableControlsProps

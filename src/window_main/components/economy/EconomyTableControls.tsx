@@ -5,70 +5,29 @@ import { CheckboxContainer, MediumTextButton } from "../display";
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
-import { FiltersVisible } from "../tables/types";
 import { EconomyHeader } from "./EconomyHeader";
 import { EconomyTableControlsProps } from "./types";
+import { useBaseTableControls } from "../tables/hooks";
 
-export default function EconomyTableControls({
-  canNextPage,
-  canPreviousPage,
-  flatColumns,
-  getTableProps,
-  globalFilter,
-  gotoPage,
-  gridTemplateColumns,
-  isExpanded,
-  nextPage,
-  pageCount,
-  pageIndex,
-  pageOptions,
-  pageSize,
-  preGlobalFilteredRows,
-  previousPage,
-  setExpanded,
-  setFilter,
-  setGlobalFilter,
-  setPageSize,
-  setTableMode,
-  tableMode,
-  visibleHeaders,
-  pageSizeOptions
-}: EconomyTableControlsProps): JSX.Element {
-  const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
-    const toggleableColumns = flatColumns.filter(column => column.mayToggle);
-    const initialFiltersVisible: FiltersVisible = {};
-    for (const column of flatColumns) {
-      if (column.canFilter) {
-        initialFiltersVisible[column.id] = !!column.filterValue;
-      }
-    }
-    return [toggleableColumns, initialFiltersVisible];
-  }, [flatColumns]);
-  const [filtersVisible, setFiltersVisible] = React.useState(
-    initialFiltersVisible
-  );
-  const [togglesVisible, setTogglesVisible] = React.useState(false);
-  const pagingProps = {
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-    pageIndex,
-    pageSize,
-    pageSizeOptions
-  };
-  const headersProps = {
-    filtersVisible,
-    getTableProps,
-    gridTemplateColumns,
-    setFilter,
-    setFiltersVisible,
-    visibleHeaders
-  };
+export default function EconomyTableControls(
+  props: EconomyTableControlsProps
+): JSX.Element {
+  const {
+    globalFilter,
+    isExpanded,
+    preGlobalFilteredRows,
+    setExpanded,
+    setGlobalFilter,
+    setTableMode,
+    tableMode
+  } = props;
+  const {
+    headersProps,
+    pagingProps,
+    setTogglesVisible,
+    toggleableColumns,
+    togglesVisible
+  } = useBaseTableControls(props);
   return (
     <>
       <div

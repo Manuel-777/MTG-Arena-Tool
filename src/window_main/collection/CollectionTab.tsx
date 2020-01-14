@@ -1,37 +1,31 @@
-import React from "react";
 import { remote } from "electron";
-
+import React from "react";
+import { TableState } from "react-table";
+import { addCardHover } from "../../shared/cardHover";
+import Colors from "../../shared/colors";
 import { DRAFT_RANKS } from "../../shared/constants";
 import db from "../../shared/database";
-import pd from "../../shared/player-data";
 import { createDiv } from "../../shared/dom-fns";
-import { addCardHover } from "../../shared/cardHover";
+import pd from "../../shared/player-data";
 import { DbCardData } from "../../shared/types/Metadata";
-import Colors from "../../shared/colors";
 import {
-  replaceAll,
+  getMissingCardCounts,
   openScryfallCard,
-  getMissingCardCounts
+  replaceAll
 } from "../../shared/util";
-
+import CollectionTable from "../components/collection/CollectionTable";
+import { CardsData } from "../components/collection/types";
 import mountReactComponent from "../mountReactComponent";
 import {
   hideLoadingBars,
+  ipcSend,
   makeResizable,
-  resetMainContainer,
-  ipcSend
+  resetMainContainer
 } from "../renderer-util";
-
-import CollectionTable from "../components/collection/CollectionTable";
 import {
-  CardsData,
-  CollectionTableState
-} from "../components/collection/types";
-
-import {
+  CollectionStats,
   createInventoryStats,
-  getCollectionStats,
-  CollectionStats
+  getCollectionStats
 } from "./collectionStats";
 
 const Menu = remote.Menu;
@@ -94,10 +88,16 @@ function exportCards(cardIds: string[]): void {
   ipcSend("export_csvtxt", { str: exportString, name: "cards" });
 }
 
-function saveUserState(state: CollectionTableState): void {
+function saveTableState(collectionTableState: TableState<CardsData>): void {
   ipcSend("save_user_settings", {
-    collectionTableState: state,
-    collectionTableMode: state.collectionTableMode,
+    collectionTableState,
+    skip_refresh: true
+  });
+}
+
+function saveTableMode(collectionTableMode: string): void {
+  ipcSend("save_user_settings", {
+    collectionTableMode,
     skip_refresh: true
   });
 }
@@ -160,10 +160,11 @@ export function CollectionTab(): JSX.Element {
 
   const sidePanelWidth = panelWidth + "px";
   const rightPanelRef = React.useRef<HTMLDivElement>(null);
-  const filterCallback = React.useCallback(
-    (cardIds: string[]): void => {
-      const stats = getCollectionStats(cardIds);
+  const filterDataCallback = React.useCallback(
+    (data: CardsData[]): void => {
       if (rightPanelRef?.current) {
+        const cardIds = data.map(card => card.id);
+        const stats = getCollectionStats(cardIds);
         updateStatsPanel(rightPanelRef.current, stats);
       }
     },
@@ -178,15 +179,16 @@ export function CollectionTab(): JSX.Element {
         }}
       >
         <CollectionTable
-          data={data}
-          contextMenuCallback={addCardMenu}
           cachedState={collectionTableState}
           cachedTableMode={collectionTableMode}
-          tableStateCallback={saveUserState}
-          filterCallback={filterCallback}
-          exportCallback={exportCards}
-          openCardCallback={openScryfallCard}
           cardHoverCallback={addCardHover}
+          contextMenuCallback={addCardMenu}
+          data={data}
+          exportCallback={exportCards}
+          filterDataCallback={filterDataCallback}
+          openCardCallback={openScryfallCard}
+          tableModeCallback={saveTableMode}
+          tableStateCallback={saveTableState}
         />
       </div>
       <div

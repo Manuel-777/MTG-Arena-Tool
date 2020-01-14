@@ -1,10 +1,10 @@
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import isValid from "date-fns/isValid";
 import React from "react";
+import { TableState } from "react-table";
 import pd from "../shared/player-data";
 import EconomyTable from "./components/economy/EconomyTable";
 import {
-  EconomyTableState,
   SerializedTransaction,
   TransactionData
 } from "./components/economy/types";
@@ -17,13 +17,20 @@ import {
   toggleArchived
 } from "./renderer-util";
 
-function saveUserState(state: EconomyTableState): void {
+function saveTableState(economyTableState: TableState<TransactionData>): void {
   ipcSend("save_user_settings", {
-    economyTableState: state,
-    economyTableMode: state.economyTableMode,
+    economyTableState,
     skip_refresh: true
   });
 }
+
+function saveTableMode(economyTableMode: string): void {
+  ipcSend("save_user_settings", {
+    economyTableMode,
+    skip_refresh: true
+  });
+}
+
 const sumBoosterCount = (boosters: { count: number }[]): number =>
   boosters.reduce(
     (accumulator: number, booster: { count: number }) =>
@@ -96,11 +103,12 @@ export function EconomyTab(): JSX.Element {
   const data = React.useMemo(() => getTxnData(), []);
   return (
     <EconomyTable
-      data={data}
+      archiveCallback={toggleArchived}
       cachedState={economyTableState}
       cachedTableMode={economyTableMode}
-      tableStateCallback={saveUserState}
-      archiveCallback={toggleArchived}
+      data={data}
+      tableModeCallback={saveTableMode}
+      tableStateCallback={saveTableState}
     />
   );
 }

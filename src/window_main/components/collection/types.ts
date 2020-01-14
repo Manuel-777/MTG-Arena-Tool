@@ -12,20 +12,17 @@ export interface CardsData extends DbCardData {
   wanted: number;
 }
 
-export interface CollectionTableState extends TableState<CardsData> {
-  collectionTableMode: string;
-}
-
 export interface CollectionTableProps {
-  data: CardsData[];
+  cachedState: TableState<CardsData>;
+  cachedTableMode: string;
   cardHoverCallback: (cardDiv: HTMLElement, card: DbCardData) => void;
   contextMenuCallback: (cardDiv: HTMLElement, card: DbCardData) => void;
-  tableStateCallback: (state: CollectionTableState) => void;
-  cachedState: CollectionTableState;
-  cachedTableMode: string;
-  filterCallback: (cardIds: string[]) => void;
+  data: CardsData[];
   exportCallback: (cardIds: string[]) => void;
+  filterDataCallback: (data: CardsData[]) => void;
   openCardCallback: (cardObj: DbCardData) => void;
+  tableModeCallback: (tableMode: string) => void;
+  tableStateCallback: (state: TableState<CardsData>) => void;
 }
 
 export interface CollectionTableControlsProps
