@@ -2,12 +2,13 @@ import React from "react";
 import { ECONOMY_TABLE_MODES } from "../../../shared/constants";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { CheckboxContainer, MediumTextButton } from "../display";
+import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
+import { useBaseTableControls } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { EconomyHeader } from "./EconomyHeader";
 import { EconomyTableControlsProps } from "./types";
-import { useBaseTableControls } from "../tables/hooks";
 
 export default function EconomyTableControls(
   props: EconomyTableControlsProps
@@ -58,16 +59,10 @@ export default function EconomyTableControls(
             {togglesVisible ? "Hide" : "Show"} Column Toggles
           </MediumTextButton>
         </div>
-        <div className="decks_table_toggles">
-          {togglesVisible &&
-            toggleableColumns.map(column => (
-              <CheckboxContainer key={column.id}>
-                {column.render("Header")}
-                <input type="checkbox" {...column.getToggleHiddenProps({})} />
-                <span className={"checkmark"} />
-              </CheckboxContainer>
-            ))}
-        </div>
+        <ColumnToggles
+          toggleableColumns={toggleableColumns}
+          togglesVisible={togglesVisible}
+        />
         <div className="decks_table_search_cont">
           <WrappedReactSelect
             current={tableMode}

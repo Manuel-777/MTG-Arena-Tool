@@ -12,11 +12,12 @@ import {
   MediumTextButton,
   SmallTextButton
 } from "../display";
+import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
+import { useBaseTableControls } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { CollectionTableControlsProps } from "./types";
-import { useBaseTableControls } from "../tables/hooks";
 
 const standardSetsFilter: FilterValue = {};
 db.standardSetCodes.forEach(code => (standardSetsFilter[code] = true));
@@ -167,16 +168,10 @@ export default function CollectionTableControls(
           </MediumTextButton>
           <SmallTextButton onClick={exportRows}>Export</SmallTextButton>
         </div>
-        <div className="decks_table_toggles">
-          {togglesVisible &&
-            toggleableColumns.map(column => (
-              <CheckboxContainer key={column.id}>
-                {column.render("Header")}
-                <input type="checkbox" {...column.getToggleHiddenProps({})} />
-                <span className={"checkmark"} />
-              </CheckboxContainer>
-            ))}
-        </div>
+        <ColumnToggles
+          toggleableColumns={toggleableColumns}
+          togglesVisible={togglesVisible}
+        />
         <div className="decks_table_search_cont">
           <WrappedReactSelect
             key={tableMode}

@@ -76,17 +76,11 @@ function toggleDeckArchived(id: string): void {
 }
 
 function saveTableState(decksTableState: TableState<DecksData>): void {
-  ipcSend("save_user_settings", {
-    decksTableState,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { decksTableState, skipRefresh: true });
 }
 
 function saveTableMode(decksTableMode: string): void {
-  ipcSend("save_user_settings", {
-    decksTableMode,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { decksTableMode, skipRefresh: true });
 }
 
 function updateStatsPanel(

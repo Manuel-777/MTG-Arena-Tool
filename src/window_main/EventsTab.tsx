@@ -31,17 +31,11 @@ function editTag(tag: string, color: string): void {
 }
 
 function saveTableState(eventsTableState: TableState<EventTableData>): void {
-  ipcSend("save_user_settings", {
-    eventsTableState,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { eventsTableState, skipRefresh: true });
 }
 
 function saveTableMode(eventsTableMode: string): void {
-  ipcSend("save_user_settings", {
-    eventsTableMode,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { eventsTableMode, skipRefresh: true });
 }
 
 function updateStatsPanel(

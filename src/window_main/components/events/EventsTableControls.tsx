@@ -4,16 +4,13 @@ import { EVENTS_TABLE_MODES } from "../../../shared/constants";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
 import DateFilter from "../../DateFilter";
-import {
-  CheckboxContainer,
-  MediumTextButton,
-  SmallTextButton
-} from "../display";
+import { MediumTextButton, SmallTextButton } from "../display";
+import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
+import { useBaseTableControls } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { EventsTableControlsProps } from "./types";
-import { useBaseTableControls } from "../tables/hooks";
 
 const defaultFilters = (): { id: string; value: FilterValue }[] => [
   { id: "archivedCol", value: "hideArchived" }
@@ -86,16 +83,10 @@ export default function EventsTableControls(
             {togglesVisible ? "Hide" : "Show"} Column Toggles
           </MediumTextButton>
         </div>
-        <div className="decks_table_toggles">
-          {togglesVisible &&
-            toggleableColumns.map(column => (
-              <CheckboxContainer key={column.id}>
-                {column.render("Header")}
-                <input type="checkbox" {...column.getToggleHiddenProps({})} />
-                <span className={"checkmark"} />
-              </CheckboxContainer>
-            ))}
-        </div>
+        <ColumnToggles
+          toggleableColumns={toggleableColumns}
+          togglesVisible={togglesVisible}
+        />
         <div className="decks_table_search_cont">
           <WrappedReactSelect
             key={tableMode}

@@ -89,17 +89,11 @@ function exportCards(cardIds: string[]): void {
 }
 
 function saveTableState(collectionTableState: TableState<CardsData>): void {
-  ipcSend("save_user_settings", {
-    collectionTableState,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { collectionTableState, skipRefresh: true });
 }
 
 function saveTableMode(collectionTableMode: string): void {
-  ipcSend("save_user_settings", {
-    collectionTableMode,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { collectionTableMode, skipRefresh: true });
 }
 
 function getCollectionData(): CardsData[] {

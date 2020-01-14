@@ -70,17 +70,11 @@ function getNextRank(currentRank: string): undefined | string {
 }
 
 function saveTableState(matchesTableState: TableState<MatchTableData>): void {
-  ipcSend("save_user_settings", {
-    matchesTableState,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { matchesTableState, skipRefresh: true });
 }
 
 function saveTableMode(matchesTableMode: string): void {
-  ipcSend("save_user_settings", {
-    matchesTableMode,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { matchesTableMode, skipRefresh: true });
 }
 
 function getStepsUntilNextRank(mode: boolean, winrate: number): string {

@@ -18,17 +18,11 @@ import {
 } from "./renderer-util";
 
 function saveTableState(economyTableState: TableState<TransactionData>): void {
-  ipcSend("save_user_settings", {
-    economyTableState,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { economyTableState, skipRefresh: true });
 }
 
 function saveTableMode(economyTableMode: string): void {
-  ipcSend("save_user_settings", {
-    economyTableMode,
-    skip_refresh: true
-  });
+  ipcSend("save_user_settings", { economyTableMode, skipRefresh: true });
 }
 
 const sumBoosterCount = (boosters: { count: number }[]): number =>
