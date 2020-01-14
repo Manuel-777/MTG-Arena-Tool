@@ -68,7 +68,10 @@ export default function CollectionTableControls(
         }}
       >
         <div className="decks_table_toggles">
-          <span style={{ paddingBottom: "8px" }}>Presets:</span>
+          <SmallTextButton onClick={exportRows}>Export</SmallTextButton>
+          <span style={{ paddingBottom: "8px", marginLeft: "12px" }}>
+            Presets:
+          </span>
           <SmallTextButton
             onClick={(): void => {
               setAllFilters(standardFilters);
@@ -142,7 +145,6 @@ export default function CollectionTableControls(
           >
             {togglesVisible ? "Hide" : "Show"} Column Toggles
           </MediumTextButton>
-          <SmallTextButton onClick={exportRows}>Export</SmallTextButton>
         </div>
         <ColumnToggles
           toggleableColumns={toggleableColumns}

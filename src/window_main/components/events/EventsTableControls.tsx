@@ -1,7 +1,7 @@
 import React from "react";
 import { FilterValue } from "react-table";
 import { EVENTS_TABLE_MODES } from "../../../shared/constants";
-import { WrappedReactSelect } from "../../../shared/ReactSelect";
+import { ReactSelect, WrappedReactSelect } from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
 import DateFilter from "../../DateFilter";
 import { MediumTextButton, SmallTextButton } from "../display";
@@ -57,15 +57,16 @@ export default function EventsTableControls(
               setAggFiltersCallback({ ...aggFilters, date })
             }
           />
-          <WrappedReactSelect
-            className={"decks_top_query_event"}
-            options={events}
-            current={aggFilters.eventId ?? ""}
-            callback={(eventId): void =>
-              setAggFiltersCallback({ ...aggFilters, eventId })
-            }
-            optionFormatter={getReadableEvent}
-          />
+          <div className={"select_container"} style={{ marginBottom: "auto" }}>
+            <ReactSelect
+              options={events}
+              current={aggFilters.eventId ?? ""}
+              callback={(eventId): void =>
+                setAggFiltersCallback({ ...aggFilters, eventId })
+              }
+              optionFormatter={getReadableEvent}
+            />
+          </div>
           <SmallTextButton
             onClick={(): void => {
               setAllFilters(defaultFilters);
