@@ -3,64 +3,20 @@ import matchSorter from "match-sorter";
 import React from "react";
 import { ColumnInstance, FilterValue, Row } from "react-table";
 import { MANA, RANKS } from "../../../shared/constants";
-import { BinarySymbol, RankSymbol } from "../display";
+import { RankSymbol } from "../display";
+import { BinaryColumnFilter, BinaryFilterValue } from "../tables/filters";
 import { useMultiSelectFilter } from "../tables/hooks";
 import { MultiSelectFilterProps } from "../tables/types";
 import { MatchTableData } from "./types";
 
-export type OnPlayFilterKeys = "true" | "false";
-
-export type OnPlayFilterValue = { [key in OnPlayFilterKeys]: boolean };
-
-const defaultOnPlay: OnPlayFilterValue = {
-  true: true,
-  false: true
-};
-
-export type OnPlayFilterProps = MultiSelectFilterProps<OnPlayFilterValue>;
-
-export function OnPlayFilter(props: OnPlayFilterProps): JSX.Element {
-  const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
-  return (
-    <div
-      className={"matches_table_query_onplay"}
-      style={{
-        display: "flex",
-        height: "32px"
-      }}
-    >
-      <BinarySymbol
-        isOn={true}
-        onClick={onClickMultiFilter("true")}
-        className={filterValue["true"] ? "" : " rarity_filter_on"}
-        title={"On the play"}
-      />
-      <BinarySymbol
-        isOn={false}
-        onClick={onClickMultiFilter("false")}
-        className={filterValue["false"] ? "" : " rarity_filter_on"}
-        title={"On the draw"}
-      />
-    </div>
-  );
-}
-
-export function OnPlayColumnFilter({
-  column: { filterValue = { ...defaultOnPlay }, id, setFilter }
-}: {
+export function OnPlayColumnFilter(props: {
   column: ColumnInstance<MatchTableData>;
 }): JSX.Element {
   return (
-    <OnPlayFilter
-      filterKey={id}
-      filters={{ [id]: filterValue }}
-      onFilterChanged={(filterValue): void => {
-        if (_.isMatch(filterValue, defaultOnPlay)) {
-          setFilter(undefined); // clear filter
-        } else {
-          setFilter(filterValue);
-        }
-      }}
+    <BinaryColumnFilter
+      {...props}
+      trueLabel={"On the play"}
+      falseLabel={"On the draw"}
     />
   );
 }
@@ -68,11 +24,11 @@ export function OnPlayColumnFilter({
 export function onPlayFilterFn(
   rows: Row<MatchTableData>[],
   id: string,
-  filterValue: OnPlayFilterValue
+  filterValue: BinaryFilterValue
 ): Row<MatchTableData>[] {
   return rows.filter(row =>
     Object.entries(filterValue).some(
-      ([code, value]) => value && String(row.values.isOnPlay) === code
+      ([code, value]) => value && String(row.original.isOnPlay) === code
     )
   );
 }

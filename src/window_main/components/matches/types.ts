@@ -24,6 +24,7 @@ export interface MatchTableData extends SerializedMatch, TableData {
   deckFormat: string;
   eventName: string;
   format: string;
+  isOnPlay: boolean;
   leaderboardPlace?: number;
   losses: number;
   oppArchetype: string;

@@ -4,66 +4,20 @@ import React from "react";
 import { ColumnInstance, Row } from "react-table";
 import { CARD_RARITIES, MANA } from "../../../shared/constants";
 import db from "../../../shared/database";
-import { BinarySymbol, RaritySymbol, SetSymbol, TypeSymbol } from "../display";
+import { RaritySymbol, SetSymbol, TypeSymbol } from "../display";
+import { BinaryColumnFilter, BinaryFilterValue } from "../tables/filters";
 import { useMultiSelectFilter } from "../tables/hooks";
 import { MultiSelectFilterProps } from "../tables/types";
 import { CardsData } from "./types";
 
-export type InBoostersFilterKeys = "true" | "false";
-
-export type InBoostersFilterValue = { [key in InBoostersFilterKeys]: boolean };
-
-const defaultInBoosters: InBoostersFilterValue = {
-  true: true,
-  false: true
-};
-
-export type InBoostersFilterProps = MultiSelectFilterProps<
-  InBoostersFilterValue
->;
-
-export function InBoostersFilter(props: InBoostersFilterProps): JSX.Element {
-  const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
-  return (
-    <div
-      className={"matches_table_query_inboosters"}
-      style={{
-        display: "flex",
-        height: "32px"
-      }}
-    >
-      <BinarySymbol
-        isOn={true}
-        onClick={onClickMultiFilter("true")}
-        className={filterValue["true"] ? "" : " rarity_filter_on"}
-        title={"available in boosters"}
-      />
-      <BinarySymbol
-        isOn={false}
-        onClick={onClickMultiFilter("false")}
-        className={filterValue["false"] ? "" : " rarity_filter_on"}
-        title={"not available in boosters"}
-      />
-    </div>
-  );
-}
-
-export function InBoostersColumnFilter({
-  column: { filterValue = { ...defaultInBoosters }, id, setFilter }
-}: {
+export function InBoostersColumnFilter(props: {
   column: ColumnInstance<CardsData>;
 }): JSX.Element {
   return (
-    <InBoostersFilter
-      filterKey={id}
-      filters={{ [id]: filterValue }}
-      onFilterChanged={(filterValue): void => {
-        if (_.isMatch(filterValue, defaultInBoosters)) {
-          setFilter(undefined); // clear filter
-        } else {
-          setFilter(filterValue);
-        }
-      }}
+    <BinaryColumnFilter
+      {...props}
+      trueLabel={"available in boosters"}
+      falseLabel={"not available in boosters"}
     />
   );
 }
@@ -71,11 +25,11 @@ export function InBoostersColumnFilter({
 export function inBoostersFilterFn(
   rows: Row<CardsData>[],
   id: string,
-  filterValue: InBoostersFilterValue
+  filterValue: BinaryFilterValue
 ): Row<CardsData>[] {
   return rows.filter(row =>
     Object.entries(filterValue).some(
-      ([code, value]) => value && String(row.values.booster) === code
+      ([code, value]) => value && String(row.original.booster) === code
     )
   );
 }

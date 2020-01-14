@@ -5,8 +5,14 @@ import { ColumnInstance, FilterValue, Row } from "react-table";
 import { COLORS_ALL, COLORS_BRIEF } from "../../../shared/constants";
 import { SerializedDeck } from "../../../shared/types/Deck";
 import ManaFilter, { ColorFilter, ManaFilterKeys } from "../../ManaFilter";
-import { CheckboxContainer, InputContainer, MetricText } from "../display";
-import { TableData } from "./types";
+import {
+  CheckboxContainer,
+  InputContainer,
+  MetricText,
+  BinarySymbol
+} from "../display";
+import { TableData, MultiSelectFilterProps } from "./types";
+import { useMultiSelectFilter } from "./hooks";
 
 export function TextBoxFilter<D extends TableData>({
   column: { id, filterValue, preFilteredRows, setFilter }
@@ -117,6 +123,71 @@ export function GlobalFilter<D extends TableData>({
         placeholder={prompt}
       />
     </InputContainer>
+  );
+}
+
+export type BinaryFilterKeys = "true" | "false";
+
+export type BinaryFilterValue = { [key in BinaryFilterKeys]: boolean };
+
+const defaultBinary: BinaryFilterValue = {
+  true: true,
+  false: true
+};
+
+export interface BinaryFilterProps
+  extends MultiSelectFilterProps<BinaryFilterValue> {
+  trueLabel: string;
+  falseLabel: string;
+}
+
+export function BinaryFilter(props: BinaryFilterProps): JSX.Element {
+  const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
+  return (
+    <div
+      className={"matches_table_query_binary"}
+      style={{
+        display: "flex",
+        height: "32px"
+      }}
+    >
+      <BinarySymbol
+        isOn={true}
+        onClick={onClickMultiFilter("true")}
+        className={filterValue["true"] ? "" : " rarity_filter_on"}
+        title={props.trueLabel}
+      />
+      <BinarySymbol
+        isOn={false}
+        onClick={onClickMultiFilter("false")}
+        className={filterValue["false"] ? "" : " rarity_filter_on"}
+        title={props.falseLabel}
+      />
+    </div>
+  );
+}
+
+export function BinaryColumnFilter<D extends TableData>({
+  column: { filterValue = { ...defaultBinary }, id, setFilter },
+  ...filterProps
+}: {
+  column: ColumnInstance<D>;
+  trueLabel: string;
+  falseLabel: string;
+}): JSX.Element {
+  return (
+    <BinaryFilter
+      filterKey={id}
+      filters={{ [id]: filterValue }}
+      onFilterChanged={(filterValue): void => {
+        if (_.isMatch(filterValue, defaultBinary)) {
+          setFilter(undefined); // clear filter
+        } else {
+          setFilter(filterValue);
+        }
+      }}
+      {...filterProps}
+    />
   );
 }
 
