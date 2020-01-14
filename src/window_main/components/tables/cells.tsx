@@ -1,7 +1,6 @@
 import isValid from "date-fns/isValid";
 import React from "react";
 import { Cell, CellProps } from "react-table";
-import { createInput } from "../../../shared/dom-fns"; // TODO remove this
 import LocalTime from "../../../shared/time-components/LocalTime";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { toDDHHMMSS, toMMSS } from "../../../shared/util";
@@ -17,7 +16,7 @@ import {
   TagBubbleWithClose,
   useColorpicker
 } from "../display";
-import { TableData } from "./types";
+import { TableData, TagCounts } from "./types";
 
 export function ColorsCell<D extends TableData>({
   cell
@@ -172,75 +171,105 @@ export function FormatCell<D extends TableData>({
   );
 }
 
+export function NewTag({
+  parentId,
+  addTagCallback,
+  tagPrompt,
+  tags,
+  title
+}: {
+  parentId: string;
+  addTagCallback: (id: string, tag: string) => void;
+  tagPrompt: string;
+  tags: TagCounts;
+  title: string;
+}): JSX.Element {
+  const backgroundColor = getTagColor();
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  return (
+    <TagBubble
+      backgroundColor={backgroundColor}
+      style={{ opacity: 0.6 }}
+      fontStyle={"italic"}
+      title={title}
+      onClick={(e): void => {
+        inputRef.current?.focus();
+        e.stopPropagation();
+      }}
+    >
+      <input
+        ref={inputRef}
+        className={"deck_tag_input"}
+        type={"text"}
+        autoComplete={"off"}
+        placeholder={tagPrompt}
+        size={1}
+        onBlur={(e): void => {
+          const val = e.target.value;
+          if (val && val !== tagPrompt) {
+            addTagCallback(parentId, val);
+          }
+          e.target.value = "";
+        }}
+        onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>): void => {
+          if (e.keyCode === 13) {
+            inputRef.current?.blur();
+            e.stopPropagation();
+          } else {
+            setTimeout(() => {
+              if (inputRef.current) {
+                inputRef.current.style.width =
+                  inputRef.current.value.length * 8 + "px";
+              }
+            }, 10);
+          }
+        }}
+      />
+    </TagBubble>
+  );
+}
+
 export function TagsCell<D extends TableData>({
   cell,
   deleteTagCallback,
   editTagCallback,
-  addTagCallback
+  addTagCallback,
+  disallowMultiple = false,
+  tagPrompt = "Add",
+  tags = [],
+  title = "add new tag"
 }: {
   cell: Cell<D>;
   addTagCallback: (id: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
   deleteTagCallback: (deckid: string, tag: string) => void;
+  disallowMultiple?: boolean;
+  tagPrompt?: string;
+  tags?: TagCounts;
+  title?: string;
 }): JSX.Element {
-  const backgroundColor = getTagColor();
-  const data = cell.row.values;
-  const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
-    null
-  );
-  // TODO translate this into React
-  const clickHandler = function(e: React.MouseEvent): void {
-    const container = containerRef.current;
-    if (!container) {
-      return;
-    }
-    container.innerHTML = "";
-    const input = createInput(["deck_tag_input"], "", {
-      type: "text",
-      autocomplete: "off",
-      placeholder: "Add",
-      size: 1
-    });
-    input.addEventListener("keyup", function(e) {
-      setTimeout(() => {
-        input.style.width = input.value.length * 8 + "px";
-      }, 10);
-      if (e.keyCode === 13) {
-        e.stopPropagation();
-        input.blur();
-      }
-    });
-    input.addEventListener("focusout", function() {
-      const val = input.value;
-      if (val && val !== "Add") {
-        addTagCallback(data.deckId, val);
-      }
-    });
-    container.appendChild(input);
-    input.focus();
-    e.stopPropagation();
-  };
+  const parentId = cell.row.original.id;
   return (
-    <FlexLeftContainer>
+    <FlexLeftContainer style={{ flexWrap: "wrap" }}>
       {cell.value.map((tag: string) => (
         <TagBubbleWithClose
-          deckid={data.deckId}
-          tag={tag}
           key={tag}
+          tag={tag}
+          parentId={parentId}
           editTagCallback={editTagCallback}
           deleteTagCallback={deleteTagCallback}
         />
       ))}
-      <TagBubble
-        ref={containerRef}
-        backgroundColor={backgroundColor}
-        style={{ opacity: 0.6 }}
-        fontStyle={"italic"}
-        title={"add new tag"}
-        onClick={clickHandler}
-      >
-        Add
-      </TagBubble>
+      {(cell.value.length === 0 || !disallowMultiple) && (
+        <NewTag
+          parentId={parentId}
+          addTagCallback={addTagCallback}
+          tagPrompt={tagPrompt}
+          tags={tags}
+          title={title}
+        />
+      )}
     </FlexLeftContainer>
   );
 }

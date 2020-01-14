@@ -9,13 +9,9 @@ import pd from "../shared/player-data";
 import { getReadableEvent } from "../shared/util";
 import Aggregator from "./aggregator";
 import MatchesTable from "./components/matches/MatchesTable";
-import {
-  MatchTableData,
-  SerializedMatch,
-  TagCounts
-} from "./components/matches/types";
+import { MatchTableData, SerializedMatch } from "./components/matches/types";
 import { useAggregatorAndSidePanel } from "./components/tables/hooks";
-import { AggregatorFilters } from "./components/tables/types";
+import { AggregatorFilters, TagCounts } from "./components/tables/types";
 import { openMatch } from "./match-details";
 import mountReactComponent from "./mountReactComponent";
 import {
@@ -252,7 +248,6 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
           colorSortVal: colors.join(""),
           deckId: match.playerDeck.id ?? "",
           deckName: match.playerDeck.name ?? "",
-          deckTags: match.playerDeck.tags ?? [],
           deckFormat: match.playerDeck.format ?? "",
           eventName: getReadableEvent(match.eventId),
           format: db.events_format[match.eventId] ?? "unknown",

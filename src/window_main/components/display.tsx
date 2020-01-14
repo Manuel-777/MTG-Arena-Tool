@@ -95,6 +95,7 @@ export const TagBubble = styled.div<TagBubbleProps>`
   cursor: pointer;
   color: black;
   font-size: 13px;
+  white-space: nowrap;
   opacity: 0.8;
   margin-right: 12px;
   margin-bottom: 4px;
@@ -148,14 +149,14 @@ export function useColorpicker(
 }
 
 interface TagBubbleWithCloseProps {
-  deckid: string;
+  parentId: string;
   tag: string;
   editTagCallback: (tag: string, color: string) => void;
   deleteTagCallback: (deckid: string, tag: string) => void;
 }
 
 export function TagBubbleWithClose({
-  deckid,
+  parentId,
   tag,
   editTagCallback,
   deleteTagCallback
@@ -183,7 +184,7 @@ export function TagBubbleWithClose({
         title={"delete tag"}
         onClick={(e): void => {
           e.stopPropagation();
-          deleteTagCallback(deckid, tag);
+          deleteTagCallback(parentId, tag);
         }}
       />
     </TagBubbleWithCloseContainer>

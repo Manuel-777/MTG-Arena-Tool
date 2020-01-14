@@ -10,7 +10,8 @@ import {
   showColorpicker
 } from "../../renderer-util";
 import { useLegacyRenderer } from "../tables/hooks";
-import { MatchesTableRowProps, SerializedMatch, TagCounts } from "./types";
+import { TagCounts } from "../tables/types";
+import { MatchesTableRowProps, SerializedMatch } from "./types";
 
 const tagPrompt = "Set archetype";
 

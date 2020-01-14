@@ -74,7 +74,7 @@ const columns: Column<DecksData>[] = [
     filter: "fuzzyText",
     disableSortBy: true,
     Cell: TagsCell,
-    gridWidth: "200px",
+    gridWidth: "2fr",
     mayToggle: true
   },
   {

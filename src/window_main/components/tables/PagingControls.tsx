@@ -53,6 +53,7 @@ export default function PagingControls({
             onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>): void => {
               if (e.keyCode === 13) {
                 (e.target as HTMLInputElement).blur();
+                e.stopPropagation();
               }
             }}
             style={{ width: "40px" }}

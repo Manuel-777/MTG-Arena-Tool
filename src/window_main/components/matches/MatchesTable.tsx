@@ -1,5 +1,5 @@
 import React from "react";
-import { Column, TableState } from "react-table";
+import { Column } from "react-table";
 import { MATCHES_TABLE_MODE } from "../../../shared/constants";
 import {
   ArchivedCell,
@@ -10,8 +10,7 @@ import {
   MetricCell,
   PercentCell,
   RelativeTimeCell,
-  ShortTextCell,
-  TagsCell
+  ShortTextCell
 } from "../tables/cells";
 import {
   ArchiveColumnFilter,
@@ -23,7 +22,7 @@ import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
-import { MatchTagsCell, OnPlayCell, RankCell } from "./cells";
+import { ArchetypeCell, OnPlayCell, RankCell } from "./cells";
 import {
   matchSearchFilterFn,
   OnPlayColumnFilter,
@@ -157,17 +156,6 @@ const columns: Column<MatchTableData>[] = [
     gridWidth: "150px",
     mayToggle: true
   },
-  {
-    Header: "My Tags",
-    accessor: "deckTags",
-    disableFilters: false,
-    Filter: TextBoxFilter,
-    filter: "fuzzyText",
-    disableSortBy: true,
-    Cell: TagsCell,
-    gridWidth: "200px",
-    mayToggle: true
-  },
   { accessor: "opponent" },
   { accessor: "oppDeck" },
   {
@@ -238,7 +226,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: TextBoxFilter,
     filter: "fuzzyText",
     disableSortBy: true,
-    Cell: MatchTagsCell,
+    Cell: ArchetypeCell,
     gridWidth: "200px",
     mayToggle: true,
     defaultVisible: true
@@ -297,7 +285,6 @@ export default function MatchesTable({
   data,
   aggFilters,
   events,
-  tags,
   setAggFiltersCallback,
   tableModeCallback,
   tableStateCallback,
@@ -371,7 +358,6 @@ export default function MatchesTable({
               index={index}
               key={row.index}
               gridTemplateColumns={gridTemplateColumns}
-              tags={tags}
               openMatchCallback={openMatchCallback}
               {...customProps}
             />

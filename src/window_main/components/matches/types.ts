@@ -4,7 +4,8 @@ import {
   AggregatorFilters,
   TableControlsProps,
   TableData,
-  TableViewRowProps
+  TableViewRowProps,
+  TagCounts
 } from "../tables/types";
 
 export interface SerializedMatch extends ExtendedMatchData {
@@ -20,7 +21,6 @@ export interface MatchTableData extends SerializedMatch, TableData {
   colorSortVal: string;
   deckId: string;
   deckName: string;
-  deckTags: string[];
   deckFormat: string;
   eventName: string;
   format: string;
@@ -41,8 +41,6 @@ export interface MatchTableData extends SerializedMatch, TableData {
   timestamp: number;
   wins: number;
 }
-
-export type TagCounts = { tag: string; q: number }[];
 
 export interface MatchesTableProps {
   addTagCallback: (id: string, tag: string) => void;

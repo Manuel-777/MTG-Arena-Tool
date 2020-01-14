@@ -20,6 +20,8 @@ export interface AggregatorFilters {
   deckId?: string | (string | undefined)[];
 }
 
+export type TagCounts = { tag: string; q: number }[];
+
 export type TableData = Record<string, CellValue>;
 
 export type FiltersVisible = { [key: string]: boolean };
