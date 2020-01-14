@@ -5,7 +5,6 @@ import { TableControlsProps, TableViewRowProps } from "../tables/types";
 export interface CardsData extends DbCardData {
   colors: number[];
   colorSortVal: string;
-  boosterSortVal: string;
   rankSortVal: string;
   owned: number;
   acquired: number;

@@ -1,5 +1,5 @@
 import React from "react";
-import { Column, TableState } from "react-table";
+import { Column } from "react-table";
 import { DECKS_TABLE_MODE } from "../../../shared/constants";
 import {
   ArchivedCell,

@@ -270,18 +270,17 @@ interface TypeSymbolProps {
 
 export const TypeSymbol = styled(TypeSymbolBase)<TypeSymbolProps>``;
 
-const OnPlaySymbolBase = styled(SymbolBase).attrs<OnPlaySymbolProps>(props => ({
+const BinarySymbolBase = styled(SymbolBase).attrs<BinarySymbolProps>(props => ({
   className: `${props.className ?? ""} rarity_filter ${
-    props.isOnPlay ? "ontheplay" : "onthedraw"
-  }`,
-  title: props.isOnPlay ? "On the play" : "On the draw"
+    props.isOn ? "ontheplay" : "onthedraw"
+  }`
 }))``;
 
-interface OnPlaySymbolProps {
-  isOnPlay: boolean;
+interface BinarySymbolProps {
+  isOn: boolean;
 }
 
-export const OnPlaySymbol = styled(OnPlaySymbolBase)<OnPlaySymbolProps>``;
+export const BinarySymbol = styled(BinarySymbolBase)<BinarySymbolProps>``;
 
 const RankSymbolBase = styled(SymbolBase).attrs<RankSymbolProps>(props => ({
   className: `${props.className ?? ""} rarity_filter ranks_16`,

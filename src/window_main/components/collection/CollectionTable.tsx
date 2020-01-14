@@ -22,10 +22,18 @@ import {
 import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import { BaseTableProps } from "../tables/types";
-import { RarityCell, SetCell, TypeCell } from "./cells";
+import {
+  InBoostersCell,
+  InBoostersHeader,
+  RarityCell,
+  SetCell,
+  TypeCell
+} from "./cells";
 import CollectionTableControls from "./CollectionTableControls";
 import {
   cardSearchFilterFn,
+  InBoostersColumnFilter,
+  inBoostersFilterFn,
   RarityColumnFilter,
   rarityFilterFn,
   SetColumnFilter,
@@ -211,15 +219,15 @@ const columns = [
   { accessor: "collectible" },
   { accessor: "craftable" },
   {
-    Header: "In Boosters",
-    accessor: "boosterSortVal",
+    Header: InBoostersHeader,
+    accessor: "booster",
     disableFilters: false,
-    filter: "fuzzyText",
-    Filter: TextBoxFilter,
-    sortType: "alphanumeric",
+    filter: "inBoosters",
+    Filter: InBoostersColumnFilter,
+    Cell: InBoostersCell,
+    gridWidth: "100px",
     mayToggle: true
   },
-  { accessor: "booster" },
   {
     Header: "Rank",
     accessor: "rankSortVal",
@@ -253,6 +261,7 @@ export default function CollectionTable({
     tableModeCallback
   ]);
   const customFilterTypes = {
+    inBoosters: inBoostersFilterFn,
     rarity: rarityFilterFn,
     set: setFilterFn
   };
@@ -262,7 +271,15 @@ export default function CollectionTable({
     customFilterTypes,
     data,
     defaultState: {
-      filters: [{ id: "boosterSortVal", value: "yes" }],
+      filters: [
+        {
+          id: "booster",
+          value: {
+            true: true,
+            false: false
+          }
+        }
+      ],
       sortBy: [{ id: "grpId", desc: true }]
     },
     filterDataCallback,

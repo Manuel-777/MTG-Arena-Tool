@@ -3,7 +3,9 @@ import matchSorter from "match-sorter";
 import React from "react";
 import { ColumnInstance, FilterValue, Row } from "react-table";
 import { MANA, RANKS } from "../../../shared/constants";
-import { OnPlaySymbol, RankSymbol } from "../display";
+import { BinarySymbol, RankSymbol } from "../display";
+import { useMultiSelectFilter } from "../tables/hooks";
+import { MultiSelectFilterProps } from "../tables/types";
 import { MatchTableData } from "./types";
 
 export type OnPlayFilterKeys = "true" | "false";
@@ -15,27 +17,10 @@ const defaultOnPlay: OnPlayFilterValue = {
   false: true
 };
 
-export interface OnPlayFilterProps {
-  filterKey: string;
-  filters: { [key: string]: OnPlayFilterValue };
-  onFilterChanged: (filter: OnPlayFilterValue) => void;
-}
+export type OnPlayFilterProps = MultiSelectFilterProps<OnPlayFilterValue>;
 
 export function OnPlayFilter(props: OnPlayFilterProps): JSX.Element {
-  const { filterKey, filters } = props;
-  const filterValue = filters[filterKey];
-  const onClickOnPlayFilter = React.useCallback(
-    (code: OnPlayFilterKeys) => (
-      event: React.MouseEvent<HTMLDivElement>
-    ): void => {
-      filterValue[code] = event.currentTarget.classList.contains(
-        "rarity_filter_on"
-      );
-      event.currentTarget.classList.toggle("rarity_filter_on");
-      props.onFilterChanged(filterValue);
-    },
-    [filterValue, props]
-  );
+  const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
   return (
     <div
       className={"matches_table_query_onplay"}
@@ -44,15 +29,15 @@ export function OnPlayFilter(props: OnPlayFilterProps): JSX.Element {
         height: "32px"
       }}
     >
-      <OnPlaySymbol
-        isOnPlay={true}
-        onClick={onClickOnPlayFilter("true")}
+      <BinarySymbol
+        isOn={true}
+        onClick={onClickMultiFilter("true")}
         className={filterValue["true"] ? "" : " rarity_filter_on"}
         title={"On the play"}
       />
-      <OnPlaySymbol
-        isOnPlay={false}
-        onClick={onClickOnPlayFilter("false")}
+      <BinarySymbol
+        isOn={false}
+        onClick={onClickMultiFilter("false")}
         className={filterValue["false"] ? "" : " rarity_filter_on"}
         title={"On the draw"}
       />
@@ -111,28 +96,10 @@ const defaultRank: RankFilterValue = {
   Mythic: true
 };
 
-export interface RankFilterProps {
-  filterKey: string;
-  filters: { [key: string]: RankFilterValue };
-  onFilterChanged: (filter: RankFilterValue) => void;
-}
+export type RankFilterProps = MultiSelectFilterProps<RankFilterValue>;
 
 export function RankFilter(props: RankFilterProps): JSX.Element {
-  const { filterKey, filters } = props;
-  const filterValue = filters[filterKey];
-
-  const onClickRankFilter = React.useCallback(
-    (code: RankFilterKeys) => (
-      event: React.MouseEvent<HTMLDivElement>
-    ): void => {
-      filterValue[code] = event.currentTarget.classList.contains(
-        "rarity_filter_on"
-      );
-      event.currentTarget.classList.toggle("rarity_filter_on");
-      props.onFilterChanged(filterValue);
-    },
-    [filterValue, props]
-  );
+  const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
   return (
     <div
       className={"collection_table_query_rank"}
@@ -146,7 +113,7 @@ export function RankFilter(props: RankFilterProps): JSX.Element {
           <RankSymbol
             rank={code}
             key={code}
-            onClick={onClickRankFilter(code)}
+            onClick={onClickMultiFilter(code)}
             className={filterValue[code] ? "" : " rarity_filter_on"}
             title={code}
           />

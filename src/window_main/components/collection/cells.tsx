@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  BinarySymbol,
+  BoosterSymbol,
   FlexLeftContainer,
   LabelText,
   RaritySymbol,
@@ -47,4 +49,19 @@ export function TypeCell({ cell }: CollectionTableCellProps): JSX.Element {
       <LabelText>{type}</LabelText>
     </FlexLeftContainer>
   );
+}
+
+export function InBoostersCell({
+  cell
+}: CollectionTableCellProps): JSX.Element {
+  return (
+    <BinarySymbol
+      isOn={cell.value}
+      title={(cell.value ? "" : "not ") + "available in boosters"}
+    />
+  );
+}
+
+export function InBoostersHeader(): JSX.Element {
+  return <BoosterSymbol title={"is available in boosters"} />;
 }

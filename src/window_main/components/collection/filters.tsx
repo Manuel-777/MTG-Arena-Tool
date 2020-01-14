@@ -4,8 +4,81 @@ import React from "react";
 import { ColumnInstance, Row } from "react-table";
 import { CARD_RARITIES, MANA } from "../../../shared/constants";
 import db from "../../../shared/database";
-import { RaritySymbol, SetSymbol, TypeSymbol } from "../display";
+import { BinarySymbol, RaritySymbol, SetSymbol, TypeSymbol } from "../display";
+import { useMultiSelectFilter } from "../tables/hooks";
+import { MultiSelectFilterProps } from "../tables/types";
 import { CardsData } from "./types";
+
+export type InBoostersFilterKeys = "true" | "false";
+
+export type InBoostersFilterValue = { [key in InBoostersFilterKeys]: boolean };
+
+const defaultInBoosters: InBoostersFilterValue = {
+  true: true,
+  false: true
+};
+
+export type InBoostersFilterProps = MultiSelectFilterProps<
+  InBoostersFilterValue
+>;
+
+export function InBoostersFilter(props: InBoostersFilterProps): JSX.Element {
+  const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
+  return (
+    <div
+      className={"matches_table_query_inboosters"}
+      style={{
+        display: "flex",
+        height: "32px"
+      }}
+    >
+      <BinarySymbol
+        isOn={true}
+        onClick={onClickMultiFilter("true")}
+        className={filterValue["true"] ? "" : " rarity_filter_on"}
+        title={"available in boosters"}
+      />
+      <BinarySymbol
+        isOn={false}
+        onClick={onClickMultiFilter("false")}
+        className={filterValue["false"] ? "" : " rarity_filter_on"}
+        title={"not available in boosters"}
+      />
+    </div>
+  );
+}
+
+export function InBoostersColumnFilter({
+  column: { filterValue = { ...defaultInBoosters }, id, setFilter }
+}: {
+  column: ColumnInstance<CardsData>;
+}): JSX.Element {
+  return (
+    <InBoostersFilter
+      filterKey={id}
+      filters={{ [id]: filterValue }}
+      onFilterChanged={(filterValue): void => {
+        if (_.isMatch(filterValue, defaultInBoosters)) {
+          setFilter(undefined); // clear filter
+        } else {
+          setFilter(filterValue);
+        }
+      }}
+    />
+  );
+}
+
+export function inBoostersFilterFn(
+  rows: Row<CardsData>[],
+  id: string,
+  filterValue: InBoostersFilterValue
+): Row<CardsData>[] {
+  return rows.filter(row =>
+    Object.entries(filterValue).some(
+      ([code, value]) => value && String(row.values.booster) === code
+    )
+  );
+}
 
 export type RarityFilterKeys =
   | "common"
@@ -24,16 +97,9 @@ const defaultRarity: RarityFilterValue = {
   land: true
 };
 
-export interface RarityFilterProps {
-  filterKey: string;
-  filters: { [key: string]: RarityFilterValue };
-  onFilterChanged: (filter: RarityFilterValue) => void;
-}
+export type RarityFilterProps = MultiSelectFilterProps<RarityFilterValue>;
 
 export function RarityFilter(props: RarityFilterProps): JSX.Element {
-  const { filterKey, filters } = props;
-  const filterValue = filters[filterKey];
-
   const filterLabels: { [key in RarityFilterKeys]: string } = {
     common: "Common",
     uncommon: "Uncommon",
@@ -41,19 +107,7 @@ export function RarityFilter(props: RarityFilterProps): JSX.Element {
     mythic: "Mythic",
     land: "Land"
   };
-
-  const onClickRarityFilter = React.useCallback(
-    (code: RarityFilterKeys) => (
-      event: React.MouseEvent<HTMLDivElement>
-    ): void => {
-      filterValue[code] = event.currentTarget.classList.contains(
-        "rarity_filter_on"
-      );
-      event.currentTarget.classList.toggle("rarity_filter_on");
-      props.onFilterChanged(filterValue);
-    },
-    [filterValue, props]
-  );
+  const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
   return (
     <div
       className={"collection_table_query_rarity"}
@@ -67,7 +121,7 @@ export function RarityFilter(props: RarityFilterProps): JSX.Element {
           <div className="type_icon_cont" key={code}>
             <TypeSymbol
               type={"Land"}
-              onClick={onClickRarityFilter(code)}
+              onClick={onClickMultiFilter(code)}
               className={
                 "rarity_filter " +
                 (filterValue[code] ? "" : " rarity_filter_on")
@@ -79,7 +133,7 @@ export function RarityFilter(props: RarityFilterProps): JSX.Element {
           <RaritySymbol
             rarity={code}
             key={code}
-            onClick={onClickRarityFilter(code)}
+            onClick={onClickMultiFilter(code)}
             className={filterValue[code] ? "" : " rarity_filter_on"}
             title={filterLabels[code]}
           />
@@ -128,26 +182,10 @@ export type SetFilterValue = { [set: string]: boolean };
 const defaultSetFilter: SetFilterValue = { other: true };
 setCodes.forEach((code: string) => (defaultSetFilter[code] = true));
 
-export interface SetFilterProps {
-  filterKey: string;
-  filters: { [key: string]: SetFilterValue };
-  onFilterChanged: (filter: SetFilterValue) => void;
-}
+export type SetFilterProps = MultiSelectFilterProps<SetFilterValue>;
 
 export function SetFilter(props: SetFilterProps): JSX.Element {
-  const { filterKey, filters } = props;
-  const filterValue = filters[filterKey];
-
-  const onClickSetFilter = React.useCallback(
-    (code: string) => (event: React.MouseEvent<HTMLDivElement>): void => {
-      filterValue[code] = event.currentTarget.classList.contains(
-        "set_filter_on"
-      );
-      event.currentTarget.classList.toggle("set_filter_on");
-      props.onFilterChanged(filterValue);
-    },
-    [filterValue, props]
-  );
+  const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
   return (
     <div
       className={"collection_table_query_rarity"}
@@ -161,16 +199,16 @@ export function SetFilter(props: SetFilterProps): JSX.Element {
           <SetSymbol
             key={code}
             set={code}
-            onClick={onClickSetFilter(code)}
-            className={filterValue?.[code] ? "" : "set_filter_on"}
+            onClick={onClickMultiFilter(code)}
+            className={filterValue?.[code] ? "" : "rarity_filter_on"}
             title={code}
           />
         );
       })}
       <SetSymbol
         set={"other"}
-        onClick={onClickSetFilter("other")}
-        className={filterValue?.other ? "" : "set_filter_on"}
+        onClick={onClickMultiFilter("other")}
+        className={filterValue?.other ? "" : "rarity_filter_on"}
         title={"all other sets"}
       />
     </div>

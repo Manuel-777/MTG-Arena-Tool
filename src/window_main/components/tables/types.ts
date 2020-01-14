@@ -26,6 +26,12 @@ export type TableData = Record<string, CellValue>;
 
 export type FiltersVisible = { [key: string]: boolean };
 
+export interface MultiSelectFilterProps<D> {
+  filterKey: string;
+  filters: { [key: string]: D };
+  onFilterChanged: (filter: D) => void;
+}
+
 export interface BaseTableProps<D extends TableData> {
   cachedState: TableState<D>;
   columns: Column<D>[];
@@ -38,7 +44,11 @@ export interface BaseTableProps<D extends TableData> {
   filterDataCallback?: (data: D[]) => void;
   globalFilter:
     | string
-    | ((rows: Row<D>[], columnIds: IdType<D>[], filterValue: any) => Row<D>[])
+    | ((
+        rows: Row<D>[],
+        columnIds: IdType<D>[],
+        filterValue: FilterValue
+      ) => Row<D>[])
     | undefined;
   setTableMode: (tableMode: string) => void;
   tableMode: string;

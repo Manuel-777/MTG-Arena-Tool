@@ -117,7 +117,6 @@ function getCollectionData(): CardsData[] {
         colorsObj.addFromCost(card.cost);
         const colors = colorsObj.get();
         const colorSortVal = colors.join("");
-        const boosterSortVal = card.booster ? "yes" : "no";
         const rankSortVal = DRAFT_RANKS[card.rank] ?? "?";
         return {
           ...card,
@@ -126,7 +125,6 @@ function getCollectionData(): CardsData[] {
           colors,
           colorSortVal,
           wanted,
-          boosterSortVal,
           rankSortVal
         };
       }

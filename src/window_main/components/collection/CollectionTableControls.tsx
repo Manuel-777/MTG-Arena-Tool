@@ -7,11 +7,7 @@ import {
 } from "../../../shared/constants";
 import db from "../../../shared/database";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
-import {
-  CheckboxContainer,
-  MediumTextButton,
-  SmallTextButton
-} from "../display";
+import { MediumTextButton, SmallTextButton } from "../display";
 import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
 import { useBaseTableControls } from "../tables/hooks";
@@ -38,12 +34,10 @@ export default function CollectionTableControls(
 ): JSX.Element {
   const {
     exportCallback,
-    filters,
     globalFilter,
     preGlobalFilteredRows,
     rows,
     setAllFilters,
-    setFilter,
     setGlobalFilter,
     setTableMode,
     tableMode,
@@ -63,13 +57,6 @@ export default function CollectionTableControls(
   const exportRows = React.useCallback(() => {
     exportCallback(rows.map(row => row.values.id));
   }, [exportCallback, rows]);
-  const inBoostersOnly = React.useMemo(
-    () =>
-      filters.some(
-        filter => filter.id === "boosterSortVal" && filter.value === "yes"
-      ),
-    [filters]
-  );
   return (
     <>
       <div
@@ -81,17 +68,6 @@ export default function CollectionTableControls(
         }}
       >
         <div className="decks_table_toggles">
-          <CheckboxContainer title={"In boosters only"}>
-            <div className={"icon_search_booster"} />
-            <input
-              type="checkbox"
-              checked={inBoostersOnly}
-              onChange={(): void => {
-                setFilter("boosterSortVal", inBoostersOnly ? undefined : "yes");
-              }}
-            />
-            <span className={"checkmark"} />
-          </CheckboxContainer>
           <span style={{ paddingBottom: "8px" }}>Presets:</span>
           <SmallTextButton
             onClick={(): void => {

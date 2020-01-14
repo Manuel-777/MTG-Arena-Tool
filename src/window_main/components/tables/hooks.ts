@@ -24,8 +24,32 @@ import {
   PagingControlsProps,
   TableControlsProps,
   TableData,
-  TableHeadersProps
+  TableHeadersProps,
+  MultiSelectFilterProps
 } from "../tables/types";
+
+export function useMultiSelectFilter<D>(
+  props: MultiSelectFilterProps<D>
+): [
+  D,
+  (
+    code: string
+  ) => (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+] {
+  const { filterKey, filters, onFilterChanged } = props;
+  const filterValue = filters[filterKey];
+  const onClickMultiFilter = React.useCallback(
+    (code: string) => (event: React.MouseEvent<HTMLDivElement>): void => {
+      (filterValue as any)[code] = event.currentTarget.classList.contains(
+        "rarity_filter_on"
+      );
+      event.currentTarget.classList.toggle("rarity_filter_on");
+      onFilterChanged(filterValue);
+    },
+    [filterValue, onFilterChanged]
+  );
+  return [filterValue, onClickMultiFilter];
+}
 
 export function useLegacyRenderer(
   renderEventRow: (container: HTMLDivElement, ...rendererArgs: any[]) => any,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Cell } from "react-table";
-import { FlexLeftContainer, OnPlaySymbol, RankSymbol } from "../display";
+import { BinarySymbol, FlexLeftContainer, RankSymbol } from "../display";
 import { TagsCell } from "../tables/cells";
 import { TagCounts } from "../tables/types";
 import { MatchTableData } from "./types";
@@ -22,7 +22,12 @@ export function OnPlayCell({
 }: {
   cell: Cell<MatchTableData>;
 }): JSX.Element {
-  return <OnPlaySymbol isOnPlay={cell.value} />;
+  return (
+    <BinarySymbol
+      isOn={cell.value}
+      title={"On the " + (cell.value ? "play" : "draw")}
+    />
+  );
 }
 
 export function RankCell({
