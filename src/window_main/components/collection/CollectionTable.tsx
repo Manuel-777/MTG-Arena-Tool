@@ -53,7 +53,7 @@ function renderSetView(
   stats: CollectionStats,
   setClickCallback: (set: string) => void
 ): void {
-  const setsContainer = createDiv(["main_stats", "sub_stats"]);
+  const setsContainer = createDiv(["main_stats"]);
   db.sortedSetCodes.forEach(set => {
     // If the set has a collationId, it means boosters for it exists
     if (!db.sets[set]?.collation) {
@@ -74,7 +74,7 @@ function renderSetView(
 }
 
 function renderHeatMaps(container: HTMLElement, stats: CollectionStats): void {
-  const chartContainer = createDiv(["main_stats", "sub_stats"]);
+  const chartContainer = createDiv(["main_stats"]);
   db.sortedSetCodes.forEach(set => {
     const cardData = stats[set].cards;
     if (cardData.length > 0) {

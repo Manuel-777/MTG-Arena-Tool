@@ -1516,15 +1516,11 @@ a:hover {
 
 
 .main_stats {
-    margin: 12px;
+    padding: 12px;
     min-width: 240px;
+    width: -webkit-fill-available;
     display: block;
     text-align: center;
-}
-
-.main_stats.sub_stats {
-    margin: 16px;
-    width: -webkit-fill-available;
 }
 
 .set_stats {
