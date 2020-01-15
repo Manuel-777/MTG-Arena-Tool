@@ -1,11 +1,11 @@
+import Colors from "../../shared/colors";
 import { CARD_RARITIES } from "../../shared/constants";
 import db from "../../shared/database";
-import pd from "../../shared/player-data";
-import Colors from "../../shared/colors";
 import { createDiv } from "../../shared/dom-fns";
+import pd from "../../shared/player-data";
 import { getMissingCardCounts } from "../../shared/util";
-
 import createSelect from "../createSelect";
+import { formatNumber } from "../renderer-util";
 
 const ALL_CARDS = "All cards";
 const SINGLETONS = "Singletons (at least one)";
@@ -233,7 +233,19 @@ export function createInventoryStats(
   updateCallback: () => void
 ): void {
   const top = createDiv(["decklist_top"]);
-  top.appendChild(createDiv(["deck_top_colors"]));
+  top.style.margin = "12px";
+  top.style.padding = "0";
+  top.style.color = "var(--color-light)";
+  top.style.display = "flex";
+  top.style.alignItems = "center";
+  top.appendChild(createDiv(["economy_wc", "wc_common"]));
+  top.appendChild(createDiv([], formatNumber(pd.economy.wcCommon)));
+  top.appendChild(createDiv(["economy_wc", "wc_uncommon"]));
+  top.appendChild(createDiv([], formatNumber(pd.economy.wcUncommon)));
+  top.appendChild(createDiv(["economy_wc", "wc_rare"]));
+  top.appendChild(createDiv([], formatNumber(pd.economy.wcRare)));
+  top.appendChild(createDiv(["economy_wc", "wc_mythic"]));
+  top.appendChild(createDiv([], formatNumber(pd.economy.wcMythic)));
 
   const flex = createDiv(["flex_item"]);
   const mainstats = createDiv(["main_stats"]);
