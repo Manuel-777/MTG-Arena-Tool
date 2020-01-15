@@ -18,15 +18,18 @@
   ],
   "keywords": [
     "mtg",
+    "magic",
+    "tracker",
     "mtg-arena",
     "deck-tracker",
-    "magic-the-gathering"
+    "magic-the-gathering",
+    "statistics"
   ],
   "license": "SEE LICENSE IN LICENSE.md",
   "homepage": "https://mtgatool.com/",
   "repository": "https://github.com/Manuel-777/MTG-Arena-Tool",
   "bugs": "https://github.com/Manuel-777/MTG-Arena-Tool/issues",
-  "version": "2.14.4",
+  "version": "3.0.1",
   "main": "lib/main.js",
   "build": {
     "appId": "com.github.manuel777.mtgatool",
