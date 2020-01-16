@@ -123,6 +123,16 @@ const columns: Column<TransactionData>[] = [
     mayToggle: true
   },
   {
+    Header: "Cosmetics",
+    accessor: "vanityAddedCount",
+    Cell: MetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    aggregate: "sum",
+    mayToggle: true
+  },
+  {
     Header: "Wildcards",
     accessor: "wcDelta",
     Cell: MetricCell,
@@ -175,6 +185,26 @@ const columns: Column<TransactionData>[] = [
   {
     Header: "Boosters",
     accessor: "boosterDeltaCount",
+    Cell: MetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    aggregate: "sum",
+    mayToggle: true
+  },
+  {
+    Header: "Draft Tokens",
+    accessor: "draftTokensDelta",
+    Cell: MetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    aggregate: "sum",
+    mayToggle: true
+  },
+  {
+    Header: "Sealed Tokens",
+    accessor: "sealedTokensDelta",
     Cell: MetricCell,
     disableFilters: false,
     Filter: NumberRangeColumnFilter,

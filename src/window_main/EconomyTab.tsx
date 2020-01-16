@@ -43,22 +43,28 @@ function getTxnData(): TransactionData[] {
       const currentOrbCount = txn.orbCountDiff?.currentOrbCount ?? 0;
       const oldOrbCount = txn.orbCountDiff?.oldOrbCount ?? 0;
       let {
-        cardsAdded,
         artSkinsAdded,
+        boosterDelta,
+        cardsAdded,
+        draftTokensDelta,
         gemsDelta,
         goldDelta,
-        boosterDelta,
+        sealedTokensDelta,
+        vanityItemsAdded,
         vaultProgressDelta,
         wcCommonDelta,
         wcUncommonDelta,
         wcRareDelta,
         wcMythicDelta
       } = txn.delta;
-      cardsAdded = cardsAdded ?? [];
       artSkinsAdded = artSkinsAdded ?? [];
+      boosterDelta = boosterDelta ?? [];
+      cardsAdded = cardsAdded ?? [];
+      draftTokensDelta = draftTokensDelta ?? 0;
       gemsDelta = gemsDelta ?? 0;
       goldDelta = goldDelta ?? 0;
-      boosterDelta = boosterDelta ?? [];
+      sealedTokensDelta = sealedTokensDelta ?? 0;
+      vanityItemsAdded = vanityItemsAdded ?? [];
       vaultProgressDelta = vaultProgressDelta ?? 0;
       wcCommonDelta = wcCommonDelta ?? 0;
       wcUncommonDelta = wcUncommonDelta ?? 0;
@@ -74,6 +80,7 @@ function getTxnData(): TransactionData[] {
         orbDelta: currentOrbCount - oldOrbCount,
         cardsAddedCount: cardsAdded.length ?? 0,
         artSkinsAddedCount: artSkinsAdded.length ?? 0,
+        draftTokensDelta,
         gemsDelta,
         goldDelta,
         wcDelta: wcCommonDelta + wcUncommonDelta + wcRareDelta + wcMythicDelta,
@@ -81,7 +88,9 @@ function getTxnData(): TransactionData[] {
         wcUncommonDelta,
         wcRareDelta,
         wcMythicDelta,
+        sealedTokensDelta,
         boosterDeltaCount: sumBoosterCount(boosterDelta ?? []),
+        vanityAddedCount: vanityItemsAdded.length ?? 0,
         vaultProgressDelta: vaultProgressDelta / 100,
         aetherizedCardsCount: txn.aetherizedCards?.length ?? 0,
         timestamp: isValid(ts) ? ts.getTime() : NaN,

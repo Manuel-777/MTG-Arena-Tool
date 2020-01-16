@@ -31,26 +31,27 @@ export interface SerializedTransaction {
 }
 
 export interface TransactionData extends SerializedTransaction {
-  prettyContext: string;
-  fullContext: string;
+  aetherizedCardsCount: number;
   archivedSortVal: number;
-  custom: boolean;
-  trackLevelDelta: number;
-  orbDelta: number;
-  cardsAddedCount: number;
   artSkinsAddedCount: number;
+  boosterDeltaCount: number;
+  cardsAddedCount: number;
+  custom: boolean;
+  daysAgo: number;
+  fullContext: string;
   gemsDelta: number;
   goldDelta: number;
-  wcDelta: number;
-  wcCommonDelta: number;
-  wcUncommonDelta: number;
-  wcRareDelta: number;
-  wcMythicDelta: number;
-  boosterDeltaCount: number;
-  vaultProgressDelta: number;
-  aetherizedCardsCount: number;
+  orbDelta: number;
+  prettyContext: string;
   timestamp: number;
-  daysAgo: number;
+  trackLevelDelta: number;
+  vanityAddedCount: number;
+  vaultProgressDelta: number;
+  wcCommonDelta: number;
+  wcDelta: number;
+  wcMythicDelta: number;
+  wcRareDelta: number;
+  wcUncommonDelta: number;
   xpGainedNumber: number;
 }
 
