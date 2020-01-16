@@ -14,11 +14,14 @@ export interface SerializedTransaction {
     oldOrbCount: number;
   };
   delta: {
-    cardsAdded?: { grpId: string }[];
     artSkinsAdded?: { artId: string }[];
+    boosterDelta?: { collationId: number; count: number }[];
+    cardsAdded?: { grpId: string }[];
+    draftTokensDelta?: number;
     gemsDelta?: number;
     goldDelta?: number;
-    boosterDelta?: { collationId: number; count: number }[];
+    sealedTokensDelta?: number;
+    vanityItemsAdded?: string[];
     vaultProgressDelta?: number;
     wcCommonDelta?: number;
     wcUncommonDelta?: number;
@@ -38,11 +41,13 @@ export interface TransactionData extends SerializedTransaction {
   cardsAddedCount: number;
   custom: boolean;
   daysAgo: number;
+  draftTokensDelta: number;
   fullContext: string;
   gemsDelta: number;
   goldDelta: number;
   orbDelta: number;
   prettyContext: string;
+  sealedTokensDelta: number;
   timestamp: number;
   trackLevelDelta: number;
   vanityAddedCount: number;
