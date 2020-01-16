@@ -218,10 +218,21 @@ export default function DecksTable({
     tableMode,
     tableModeCallback
   ]);
+  const tags = React.useMemo(() => {
+    const tagCounts: { [tag: string]: number } = {};
+    for (const deck of data) {
+      deck.tags?.forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] ?? 0) + 1;
+      });
+    }
+    return Object.entries(tagCounts).map(([tag, q]) => {
+      return { tag, q };
+    });
+  }, [data]);
   const tableProps: BaseTableProps<DecksData> = {
     cachedState,
     columns,
-    customProps,
+    customProps: { ...customProps, tags },
     data,
     defaultState: {
       filters: [{ id: "archivedCol", value: "hideArchived" }],
