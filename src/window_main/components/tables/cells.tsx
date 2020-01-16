@@ -16,6 +16,7 @@ import {
   TagBubbleWithClose,
   useColorpicker
 } from "../display";
+import AutosuggestInput from "./AutosuggestInput";
 import { TableData, TagCounts } from "./types";
 
 export function ColorsCell<D extends TableData>({
@@ -185,46 +186,17 @@ export function NewTag({
   title: string;
 }): JSX.Element {
   const backgroundColor = getTagColor();
-  const inputRef = React.useRef<HTMLInputElement>(null);
-
   return (
     <TagBubble
       backgroundColor={backgroundColor}
-      style={{ opacity: 0.6 }}
       fontStyle={"italic"}
       title={title}
-      onClick={(e): void => {
-        inputRef.current?.focus();
-        e.stopPropagation();
-      }}
     >
-      <input
-        ref={inputRef}
-        className={"deck_tag_input"}
-        type={"text"}
-        autoComplete={"off"}
+      <AutosuggestInput
+        id={parentId}
         placeholder={tagPrompt}
-        size={1}
-        onBlur={(e): void => {
-          const val = e.target.value;
-          if (val && val !== tagPrompt) {
-            addTagCallback(parentId, val);
-          }
-          e.target.value = "";
-        }}
-        onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>): void => {
-          if (e.keyCode === 13) {
-            inputRef.current?.blur();
-            e.stopPropagation();
-          } else {
-            setTimeout(() => {
-              if (inputRef.current) {
-                inputRef.current.style.width =
-                  inputRef.current.value.length * 8 + "px";
-              }
-            }, 10);
-          }
-        }}
+        submitCallback={(val: string): void => addTagCallback(parentId, val)}
+        tags={tags}
       />
     </TagBubble>
   );
@@ -251,7 +223,10 @@ export function TagsCell<D extends TableData>({
 }): JSX.Element {
   const parentId = cell.row.original.id;
   return (
-    <FlexLeftContainer style={{ flexWrap: "wrap" }}>
+    <FlexLeftContainer
+      style={{ flexWrap: "wrap" }}
+      onClick={(e): void => e.stopPropagation()}
+    >
       {cell.value.map((tag: string) => (
         <TagBubbleWithClose
           key={tag}
