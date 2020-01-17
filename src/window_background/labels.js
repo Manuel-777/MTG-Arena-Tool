@@ -26,7 +26,7 @@ import {
 import actionLog from "./actionLog";
 import addCustomDeck from "./addCustomDeck";
 import { createDraft, createMatch, completeMatch } from "./data";
-import { loadPlayerConfig } from "../loadPlayerConfig";
+import { loadPlayerConfig } from "./loadPlayerConfig";
 
 let logLanguage = "English";
 
