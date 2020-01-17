@@ -12,11 +12,11 @@ import {
   LabelText,
   ManaSymbol,
   MetricText,
+  NewTag,
   TagBubble,
   TagBubbleWithClose,
   useColorpicker
 } from "../display";
-import AutosuggestInput from "./AutosuggestInput";
 import { TableData, TagCounts } from "./types";
 
 export function ColorsCell<D extends TableData>({
@@ -169,36 +169,6 @@ export function FormatCell<D extends TableData>({
         {cell.value || "unknown"}
       </TagBubble>
     </FlexLeftContainer>
-  );
-}
-
-export function NewTag({
-  parentId,
-  addTagCallback,
-  tagPrompt,
-  tags,
-  title
-}: {
-  parentId: string;
-  addTagCallback: (id: string, tag: string) => void;
-  tagPrompt: string;
-  tags: TagCounts;
-  title: string;
-}): JSX.Element {
-  const backgroundColor = getTagColor();
-  return (
-    <TagBubble
-      backgroundColor={backgroundColor}
-      fontStyle={"italic"}
-      title={title}
-    >
-      <AutosuggestInput
-        id={parentId}
-        placeholder={tagPrompt}
-        submitCallback={(val: string): void => addTagCallback(parentId, val)}
-        tags={tags}
-      />
-    </TagBubble>
   );
 }
 

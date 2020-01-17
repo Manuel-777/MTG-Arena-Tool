@@ -2,8 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { MANA } from "../../shared/constants";
 import db from "../../shared/database";
+import { createDiv } from "../../shared/dom-fns";
 import { get_rank_index_16 as getRankIndex16 } from "../../shared/util";
+import mountReactComponent from "../mountReactComponent";
 import { getTagColor, showColorpicker } from "../renderer-util";
+import AutosuggestInput from "./tables/AutosuggestInput";
+import { TagCounts } from "./tables/types";
 
 export const ArtTileHeader = styled.div`
   width: 200px;
@@ -189,6 +193,60 @@ export function TagBubbleWithClose({
       />
     </TagBubbleWithCloseContainer>
   );
+}
+
+export function renderTagBubbleWithClose(
+  parent: Element,
+  props: TagBubbleWithCloseProps
+): HTMLDivElement {
+  const container = createDiv([]);
+  container.style.alignSelf = "center";
+  mountReactComponent(<TagBubbleWithClose {...props} />, container);
+  parent.appendChild(container);
+  return container;
+}
+
+interface NewTagProps {
+  parentId: string;
+  addTagCallback: (id: string, tag: string) => void;
+  tagPrompt: string;
+  tags: TagCounts;
+  title: string;
+}
+
+export function NewTag({
+  parentId,
+  addTagCallback,
+  tagPrompt,
+  tags,
+  title
+}: NewTagProps): JSX.Element {
+  const backgroundColor = getTagColor();
+  return (
+    <TagBubble
+      backgroundColor={backgroundColor}
+      fontStyle={"italic"}
+      title={title}
+    >
+      <AutosuggestInput
+        id={parentId}
+        placeholder={tagPrompt}
+        submitCallback={(val: string): void => addTagCallback(parentId, val)}
+        tags={tags}
+      />
+    </TagBubble>
+  );
+}
+
+export function renderNewTag(
+  parent: Element,
+  props: NewTagProps
+): HTMLDivElement {
+  const container = createDiv([]);
+  container.style.alignSelf = "center";
+  mountReactComponent(<NewTag {...props} />, container);
+  parent.appendChild(container);
+  return container;
 }
 
 const ManaSymbolBase = styled.div.attrs<ManaSymbolProps>(props => ({
