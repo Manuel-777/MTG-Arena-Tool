@@ -227,6 +227,7 @@ export function NewTag({
       backgroundColor={backgroundColor}
       fontStyle={"italic"}
       title={title}
+      onClick={(e): void => e.stopPropagation()}
     >
       <AutosuggestInput
         id={parentId}

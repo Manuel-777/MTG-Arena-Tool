@@ -23,10 +23,30 @@ function renderData(
 ): void {
   container.innerHTML = "";
   const tileGrpid = match.playerDeck.deckTileId ?? DEFAULT_TILE;
+
+  // e.stopPropagation will not work across React/non-React boundary???
+  // hack to manually prevent tag clicks from causing a drilldown action
+  let disableDrilldown = false;
+  const setDisableDrilldown = (value: boolean): void => {
+    disableDrilldown = value;
+  };
+  const onRowClick = (): void => {
+    if (disableDrilldown) {
+      return;
+    }
+    openMatchCallback(match.id);
+  };
+  const onTagHoverIn = (): void => {
+    setDisableDrilldown(true);
+  };
+  const onTagHoverOut = (): void => {
+    setDisableDrilldown(false);
+  };
+
   const listItem = new ListItem(
     tileGrpid,
     match.id,
-    openMatchCallback,
+    onRowClick,
     archiveCallback,
     match.archived
   );
@@ -41,24 +61,29 @@ function renderData(
   if (!tagsDiv) {
     return;
   }
-  tagsDiv?.addEventListener("click", (e): void => e.stopPropagation());
   if (match.tags && match.tags.length) {
-    match.tags.forEach((tag: string) =>
-      renderTagBubbleWithClose(tagsDiv, {
+    match.tags.forEach((tag: string) => {
+      const tagBubble = renderTagBubbleWithClose(tagsDiv, {
         parentId: match.id,
         tag,
         editTagCallback,
         deleteTagCallback
-      })
-    );
+      });
+      // hack to manually prevent tag clicks from causing a drilldown action
+      tagBubble.addEventListener("mouseover", onTagHoverIn);
+      tagBubble.addEventListener("mouseout", onTagHoverOut);
+    });
   } else {
-    renderNewTag(tagsDiv, {
+    const tagBubble = renderNewTag(tagsDiv, {
       parentId: match.id,
       addTagCallback,
       tagPrompt,
       tags,
       title: "set custom match archetype"
     });
+    // hack to manually prevent tag clicks from causing a drilldown action
+    tagBubble.addEventListener("mouseover", onTagHoverIn);
+    tagBubble.addEventListener("mouseout", onTagHoverOut);
   }
 }
 

@@ -193,10 +193,7 @@ export function TagsCell<D extends TableData>({
 }): JSX.Element {
   const parentId = cell.row.original.id;
   return (
-    <FlexLeftContainer
-      style={{ flexWrap: "wrap" }}
-      onClick={(e): void => e.stopPropagation()}
-    >
+    <FlexLeftContainer style={{ flexWrap: "wrap" }}>
       {cell.value.map((tag: string) => (
         <TagBubbleWithClose
           key={tag}
