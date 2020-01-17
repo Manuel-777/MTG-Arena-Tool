@@ -1,7 +1,7 @@
 import { TableState } from "react-table";
 import { ExtendedMatchData } from "../../../window_background/data";
+import { AggregatorFilters } from "../../aggregator";
 import {
-  AggregatorFilters,
   TableControlsProps,
   TableData,
   TableViewRowProps,

@@ -11,21 +11,20 @@ import {
   useTable
 } from "react-table";
 import pd from "../../../shared/player-data";
-import Aggregator from "../../aggregator";
+import Aggregator, { AggregatorFilters } from "../../aggregator";
 import {
   archivedFilterFn,
   colorsFilterFn,
   fuzzyTextFilterFn
 } from "../tables/filters";
 import {
-  AggregatorFilters,
   BaseTableProps,
   FiltersVisible,
+  MultiSelectFilterProps,
   PagingControlsProps,
   TableControlsProps,
   TableData,
-  TableHeadersProps,
-  MultiSelectFilterProps
+  TableHeadersProps
 } from "../tables/types";
 
 export function useMultiSelectFilter<D>(

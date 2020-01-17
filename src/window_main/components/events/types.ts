@@ -1,9 +1,6 @@
 import { TableState } from "react-table";
-import {
-  AggregatorFilters,
-  TableControlsProps,
-  TableData
-} from "../tables/types";
+import { AggregatorFilters } from "../../aggregator";
+import { TableControlsProps, TableData } from "../tables/types";
 
 export interface SerializedEvent {
   archived?: boolean;

@@ -1,6 +1,7 @@
 import { CellProps, TableState } from "react-table";
 import { SerializedDeck } from "../../../shared/types/Deck";
-import { TableControlsProps, AggregatorFilters } from "../tables/types";
+import { AggregatorFilters, AggregatorStats } from "../../aggregator";
+import { TableControlsProps } from "../tables/types";
 
 export interface MissingWildcards {
   rare: number;
@@ -9,7 +10,10 @@ export interface MissingWildcards {
   mythic: number;
 }
 
-export interface DecksData extends SerializedDeck, DeckStats, MissingWildcards {
+export interface DecksData
+  extends SerializedDeck,
+    AggregatorStats,
+    MissingWildcards {
   winrate100: number;
   archivedSortVal: number;
   avgDuration: number;
