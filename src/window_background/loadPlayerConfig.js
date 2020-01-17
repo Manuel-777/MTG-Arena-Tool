@@ -1,13 +1,13 @@
-import _ from "lodash";
 import { shell } from "electron";
-
+import _ from "lodash";
 import { IPC_BACKGROUND, IPC_OVERLAY } from "../shared/constants";
-
-import { ipc_send as ipcSend, setData } from "./backgroundUtil";
-import globals from "./globals";
 import { playerDb, playerDbLegacy } from "../shared/db/LocalDatabase";
 import playerData from "../shared/player-data";
+import { isV2CardsList } from "../shared/types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
+import { ipc_send as ipcSend, setData } from "./backgroundUtil";
+import globals from "./globals";
+import { convertDeckFromV3 } from "./labels";
 
 const ipcLog = message => ipcSend("ipc_log", message);
 const ipcPop = args => ipcSend("popup", args);
@@ -22,6 +22,16 @@ export function syncSettings(
   const settings = { ...playerData.settings, ...dirtySettings };
   setData({ settings }, refresh);
   if (refresh) ipcSend("set_settings", JSON.stringify(settings));
+}
+
+function fixBadPlayerData() {
+  // 2020-01-17 discovered with @Thaoden that some old draft decks might be v3
+  // probably caused by a bad label handler that was temporarily on stable
+  for (const deck of playerData.deckList) {
+    if (!isV2CardsList(deck.mainDeck)) {
+      convertDeckFromV3(deck);
+    }
+  }
 }
 
 // Loads this player's configuration file
@@ -40,6 +50,7 @@ export async function loadPlayerConfig(playerId) {
   const __playerData = _.defaultsDeep(savedData, playerData);
   const { settings } = __playerData;
   setData(__playerData, true);
+  fixBadPlayerData();
   ipcSend("renderer_set_bounds", __playerData.windowBounds);
   syncSettings(settings, true);
 

@@ -264,7 +264,7 @@ function convertV3ToV2(v3List) {
   return ret;
 }
 
-function convertDeckFromV3(deck) {
+export function convertDeckFromV3(deck) {
   if (deck.CourseDeck) {
     if (deck.CourseDeck.mainDeck)
       deck.CourseDeck.mainDeck = convertV3ToV2(deck.CourseDeck.mainDeck);
