@@ -320,10 +320,7 @@ export function get_wc_missing(deck, grpid, isSideboard) {
   // cap at 4 copies to handle petitioners, rat colony, etc
   needed = Math.min(4, needed);
 
-  const card = db.card(grpid);
-  if (!card) {
-    return 0;
-  }
+  let card = db.card(grpid);
   let arr = card.reprints;
   if (!arr) arr = [grpid];
   else arr.push(grpid);
