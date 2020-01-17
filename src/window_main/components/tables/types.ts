@@ -12,14 +12,6 @@ import {
   PluginHook
 } from "react-table";
 
-export interface AggregatorFilters {
-  date?: Date | string;
-  showArchived?: boolean;
-  eventId?: string;
-  matchIds?: (string | undefined)[];
-  deckId?: string | (string | undefined)[];
-}
-
 export type TagCount = { tag: string; q: number };
 
 export type TagCounts = TagCount[];

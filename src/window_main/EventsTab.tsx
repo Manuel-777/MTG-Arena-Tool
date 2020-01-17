@@ -6,7 +6,7 @@ import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
 import { getReadableEvent } from "../shared/util";
-import Aggregator from "./aggregator";
+import Aggregator, { AggregatorFilters } from "./aggregator";
 import EventsTable from "./components/events/EventsTable";
 import {
   EventInstanceData,
@@ -15,7 +15,6 @@ import {
   SerializedEvent
 } from "./components/events/types";
 import { useAggregatorAndSidePanel } from "./components/tables/hooks";
-import { AggregatorFilters } from "./components/tables/types";
 import mountReactComponent from "./mountReactComponent";
 import {
   hideLoadingBars,

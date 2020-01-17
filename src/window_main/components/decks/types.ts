@@ -2,17 +2,6 @@ import { CellProps, TableState } from "react-table";
 import { SerializedDeck } from "../../../shared/types/Deck";
 import { TableControlsProps, AggregatorFilters } from "../tables/types";
 
-export interface DeckStats {
-  wins: number;
-  losses: number;
-  total: number;
-  duration: number;
-  winrate: number;
-  interval: number;
-  winrateLow: number;
-  winrateHigh: number;
-}
-
 export interface MissingWildcards {
   rare: number;
   common: number;

@@ -7,11 +7,11 @@ import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
 import { getReadableEvent } from "../shared/util";
-import Aggregator from "./aggregator";
+import Aggregator, { AggregatorFilters } from "./aggregator";
 import MatchesTable from "./components/matches/MatchesTable";
 import { MatchTableData, SerializedMatch } from "./components/matches/types";
 import { useAggregatorAndSidePanel } from "./components/tables/hooks";
-import { AggregatorFilters, TagCounts } from "./components/tables/types";
+import { TagCounts } from "./components/tables/types";
 import { openMatch } from "./match-details";
 import mountReactComponent from "./mountReactComponent";
 import {

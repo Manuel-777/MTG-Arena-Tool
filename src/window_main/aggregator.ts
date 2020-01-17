@@ -15,25 +15,10 @@ import db from "../shared/database";
 import pd from "../shared/player-data";
 import { normalApproximationInterval } from "../shared/statsFns";
 import { getReadableEvent, getRecentDeckName } from "../shared/util";
+import { SerializedDeck } from "../shared/types/Deck";
+import { ExtendedMatchData } from "../window_background/data";
 
-// Default filter values
-const DEFAULT_DECK = "All Decks";
-const DEFAULT_EVENT = "All Events";
-const DEFAULT_TAG = "All Tags";
-const DEFAULT_ARCH = "All Archetypes";
-// Ranked constants
-const RANKED_CONST = "Ranked Constructed";
-const RANKED_DRAFT = "Ranked Limited";
-// Draft-related constants
-const ALL_DRAFTS = "All Drafts";
-const DRAFT_REPLAYS = "Draft Replays";
-// Event-related constant
-const ALL_EVENT_TRACKS = "All Event Tracks";
-
-// Archetype constants
-const NO_ARCH = "No Archetype";
-
-export const dateMaxValid = (a, b) => {
+export const dateMaxValid = (a: any, b: any): any => {
   const aValid = isValid(a);
   const bValid = isValid(b);
   return (
@@ -41,57 +26,97 @@ export const dateMaxValid = (a, b) => {
   );
 };
 
-class Aggregator {
-  constructor(filters) {
-    this.filterDate = this.filterDate.bind(this);
-    this.filterDeck = this.filterDeck.bind(this);
-    this.filterEvent = this.filterEvent.bind(this);
-    this.filterMatch = this.filterMatch.bind(this);
-    this.updateFilters = this.updateFilters.bind(this);
-    this._processMatch = this._processMatch.bind(this);
-    this.compareDecks = this.compareDecks.bind(this);
-    this.compareEvents = this.compareEvents.bind(this);
-    this.updateFilters(filters);
+export interface AggregatorFilters {
+  date?: Date | string;
+  showArchived?: boolean;
+  eventId?: string;
+  matchIds?: string[];
+  deckId?: string | string[];
+}
+
+export interface AggregatorStats {
+  wins: number;
+  losses: number;
+  total: number;
+  winrate: number;
+  interval: number;
+  winrateLow: number;
+  winrateHigh: number;
+  duration: number;
+  avgDuration: number;
+  rank?: string;
+  colors?: number[];
+  tag?: string;
+}
+
+export default class Aggregator {
+  // Default filter values
+  public static DEFAULT_DECK = "All Decks";
+  public static DEFAULT_EVENT = "All Events";
+  public static DEFAULT_TAG = "All Tags";
+  public static DEFAULT_ARCH = "All Archetypes";
+  // Ranked filter values
+  public static RANKED_CONST = "Ranked Constructed";
+  public static RANKED_DRAFT = "Ranked Limited";
+  // Draft-related filter values
+  public static ALL_DRAFTS = "All Drafts";
+  public static DRAFT_REPLAYS = "Draft Replays";
+  // Event-related filter values
+  public static ALL_EVENT_TRACKS = "All Event Tracks";
+  // Archetype filter values
+  public static NO_ARCH = "No Archetype";
+
+  public static getDefaultStats(): AggregatorStats {
+    return {
+      wins: 0,
+      losses: 0,
+      total: 0,
+      interval: NaN,
+      winrate: NaN,
+      winrateLow: NaN,
+      winrateHigh: NaN,
+      duration: 0,
+      avgDuration: NaN
+    };
   }
 
-  static getDefaultStats() {
-    return { wins: 0, losses: 0, total: 0, duration: 0 };
-  }
-
-  static finishStats(stats) {
-    const { wins, total } = stats;
+  private static finishStats(stats: AggregatorStats): void {
+    const { wins, total, duration } = stats;
+    if (total) {
+      stats.avgDuration = duration / total;
+    }
     const { winrate, interval } = normalApproximationInterval(total, wins);
-    const roundWinrate = x => Math.round(x * 100) / 100;
+    const roundWinrate = (x: number): number => Math.round(x * 100) / 100;
     stats.winrate = roundWinrate(winrate);
     stats.interval = roundWinrate(interval);
     stats.winrateLow = roundWinrate(winrate - interval);
     stats.winrateHigh = roundWinrate(winrate + interval);
   }
 
-  static getDefaultFilters() {
+  public static getDefaultFilters(): AggregatorFilters {
     return {
       matchIds: undefined,
-      eventId: DEFAULT_EVENT,
-      deckId: DEFAULT_DECK,
+      eventId: Aggregator.DEFAULT_EVENT,
+      deckId: Aggregator.DEFAULT_DECK,
       date: pd.settings.last_date_filter,
       showArchived: false
     };
   }
 
-  static isDraftMatch(match) {
+  public static isDraftMatch(match: any): boolean {
     return (
       (match.eventId && match.eventId.includes("Draft")) ||
       (match.type && match.type === "draft")
     );
   }
 
-  static gatherTags(_decks) {
-    const tagSet = new Set();
-    const formatSet = new Set();
-    const counts = {};
+  private static gatherTags(_decks: any[]): string[] {
+    const tagSet = new Set<string>();
+    const formatSet = new Set<string>();
+    const counts: Record<string, number> = {};
     _decks.forEach(deck => {
       if (deck.tags) {
-        deck.tags.forEach(tag => {
+        deck.tags.forEach((tag: string) => {
           tagSet.add(tag);
           counts[tag] = (counts[tag] || 0) + 1;
         });
@@ -106,10 +131,44 @@ class Aggregator {
     const formatList = [...formatSet];
     formatList.sort((a, b) => counts[b] - counts[a]);
 
-    return [DEFAULT_TAG, ...tagList, ...formatList];
+    return [Aggregator.DEFAULT_TAG, ...tagList, ...formatList];
   }
 
-  filterDate(_date) {
+  private _decks: SerializedDeck[] = [];
+  private _matches: ExtendedMatchData[] = [];
+  private _eventIds: string[] = [];
+  private validDecks: Set<string> = new Set();
+  private validMatches: Set<string> = new Set();
+
+  public archs: string[] = [];
+  public archCounts: { [key: string]: number } = {};
+  public colorStats: { [key: string]: AggregatorStats } = {};
+  public constructedStats: { [key: string]: AggregatorStats } = {};
+  public deckMap: { [key: string]: SerializedDeck } = {};
+  public deckLastPlayed: { [key: string]: Date } = {};
+  public drawStats: AggregatorStats = Aggregator.getDefaultStats();
+  public deckStats: { [key: string]: AggregatorStats } = {};
+  public deckRecentStats: { [key: string]: AggregatorStats } = {};
+  public eventLastPlayed: { [key: string]: Date } = {};
+  public filters: AggregatorFilters = {};
+  public limitedStats: { [key: string]: AggregatorStats } = {};
+  public playStats: AggregatorStats = Aggregator.getDefaultStats();
+  public stats: AggregatorStats = Aggregator.getDefaultStats();
+  public tagStats: { [key: string]: AggregatorStats } = {};
+
+  constructor(filters?: AggregatorFilters) {
+    this.filterDate = this.filterDate.bind(this);
+    this.filterDeck = this.filterDeck.bind(this);
+    this.filterEvent = this.filterEvent.bind(this);
+    this.filterMatch = this.filterMatch.bind(this);
+    this.updateFilters = this.updateFilters.bind(this);
+    this._processMatch = this._processMatch.bind(this);
+    this.compareDecks = this.compareDecks.bind(this);
+    this.compareEvents = this.compareEvents.bind(this);
+    this.updateFilters(filters);
+  }
+
+  filterDate(_date: any): boolean {
     const { date } = this.filters;
     let dateFilter = null;
     const now = new Date();
@@ -122,42 +181,41 @@ class Aggregator {
     } else if (date === DATE_LAST_DAY) {
       dateFilter = subDays(now, 1);
     } else {
-      dateFilter = new Date(date);
+      dateFilter = new Date(date ?? NaN);
     }
     return isAfter(new Date(_date), dateFilter);
   }
 
-  filterDeck(deck) {
+  filterDeck(deck: any): boolean {
     const { deckId } = this.filters;
-    if (!deck) return deckId === DEFAULT_DECK;
+    if (!deck) return deckId === Aggregator.DEFAULT_DECK;
     return (
-      deckId === DEFAULT_DECK ||
+      deckId === Aggregator.DEFAULT_DECK ||
       deckId === deck.id ||
       this.validDecks.has(deck.id)
     );
   }
 
-  filterEvent(_eventId) {
+  filterEvent(_eventId: string): boolean {
     const { eventId } = this.filters;
     return (
-      (eventId === DEFAULT_EVENT && _eventId !== "AIBotMatch") ||
-      (eventId === ALL_EVENT_TRACKS &&
+      (eventId === Aggregator.DEFAULT_EVENT && _eventId !== "AIBotMatch") ||
+      (eventId === Aggregator.ALL_EVENT_TRACKS &&
         !db.single_match_events.includes(_eventId)) ||
-      (eventId === RANKED_CONST &&
+      (eventId === Aggregator.RANKED_CONST &&
         db.standard_ranked_events.includes(_eventId)) ||
-      (eventId === RANKED_DRAFT &&
+      (eventId === Aggregator.RANKED_DRAFT &&
         db.limited_ranked_events.includes(_eventId)) ||
       eventId === _eventId
     );
   }
 
-  filterMatch(match) {
+  filterMatch(match: any): boolean {
     if (!match) return false;
-    const { showArchived } = this.filters;
+    const { showArchived, matchIds } = this.filters;
     if (!showArchived && match.archived && match.archived) return false;
 
-    const passesMatchFilter =
-      !this.validMatches || this.validMatches.has(match.id);
+    const passesMatchFilter = !matchIds || this.validMatches.has(match.id);
     if (!passesMatchFilter) return false;
 
     const passesEventFilter = this.filterEvent(match.eventId);
@@ -169,7 +227,7 @@ class Aggregator {
     return this.filterDate(match.date);
   }
 
-  updateFilters(filters = {}) {
+  updateFilters(filters = {}): void {
     this.filters = {
       ...Aggregator.getDefaultFilters(),
       ...this.filters,
@@ -178,7 +236,7 @@ class Aggregator {
     if (this.filters.matchIds instanceof Array) {
       this.validMatches = new Set(this.filters.matchIds);
     } else {
-      this.validMatches = undefined;
+      this.validMatches = new Set();
     }
     if (this.filters.deckId instanceof Array) {
       this.validDecks = new Set(this.filters.deckId);
@@ -221,10 +279,10 @@ class Aggregator {
     this._eventIds.sort(this.compareEvents);
 
     const archList = Object.keys(this.archCounts).filter(
-      arch => arch !== NO_ARCH
+      arch => arch !== Aggregator.NO_ARCH
     );
     archList.sort();
-    this.archs = [DEFAULT_ARCH, NO_ARCH, ...archList];
+    this.archs = [Aggregator.DEFAULT_ARCH, Aggregator.NO_ARCH, ...archList];
 
     for (const deckId in this.deckMap) {
       const deck = pd.deck(deckId) || this.deckMap[deckId];
@@ -234,7 +292,7 @@ class Aggregator {
     }
   }
 
-  _processMatch(match) {
+  _processMatch(match: any): void {
     const statsToUpdate = [this.stats];
     // on play vs draw
     if (match.onThePlay && match.player) {
@@ -311,7 +369,9 @@ class Aggregator {
       }
       // process archetype
       const tag =
-        match.tags && match.tags.length ? match.tags[0] || NO_ARCH : NO_ARCH;
+        match.tags && match.tags.length
+          ? match.tags[0] || Aggregator.NO_ARCH
+          : Aggregator.NO_ARCH;
       this.archCounts[tag] = (this.archCounts[tag] || 0) + 1;
       if (!(tag in this.tagStats)) {
         this.tagStats[tag] = {
@@ -346,7 +406,7 @@ class Aggregator {
     });
   }
 
-  compareDecks(a, b) {
+  compareDecks(a: any, b: any): number {
     const aDate = dateMaxValid(
       this.deckLastPlayed[a.id],
       new Date(a.lastUpdated)
@@ -370,7 +430,7 @@ class Aggregator {
     return aName.localeCompare(bName);
   }
 
-  compareEvents(a, b) {
+  compareEvents(a: string, b: string): number {
     const aDate = this.eventLastPlayed[a];
     const bDate = this.eventLastPlayed[b];
     const aValid = isValid(aDate);
@@ -388,35 +448,25 @@ class Aggregator {
     return aName.localeCompare(bName);
   }
 
-  get events() {
+  get events(): string[] {
     return [
-      DEFAULT_EVENT,
-      RANKED_CONST,
-      RANKED_DRAFT,
-      ALL_DRAFTS,
-      DRAFT_REPLAYS,
+      Aggregator.DEFAULT_EVENT,
+      Aggregator.RANKED_CONST,
+      Aggregator.RANKED_DRAFT,
+      Aggregator.ALL_DRAFTS,
+      Aggregator.DRAFT_REPLAYS,
       ...this._eventIds
     ];
   }
 
-  get decks() {
-    return [{ id: DEFAULT_DECK, name: DEFAULT_DECK }, ...this._decks];
+  get decks(): SerializedDeck[] {
+    return [
+      { id: Aggregator.DEFAULT_DECK, name: Aggregator.DEFAULT_DECK },
+      ...this._decks
+    ];
   }
 
-  get tags() {
+  get tags(): string[] {
     return Aggregator.gatherTags(this.decks);
   }
 }
-
-Aggregator.DEFAULT_DECK = DEFAULT_DECK;
-Aggregator.DEFAULT_EVENT = DEFAULT_EVENT;
-Aggregator.DEFAULT_TAG = DEFAULT_TAG;
-Aggregator.DEFAULT_ARCH = DEFAULT_ARCH;
-Aggregator.RANKED_CONST = RANKED_CONST;
-Aggregator.RANKED_DRAFT = RANKED_DRAFT;
-Aggregator.ALL_DRAFTS = ALL_DRAFTS;
-Aggregator.DRAFT_REPLAYS = DRAFT_REPLAYS;
-Aggregator.ALL_EVENT_TRACKS = ALL_EVENT_TRACKS;
-Aggregator.NO_ARCH = NO_ARCH;
-
-export default Aggregator;

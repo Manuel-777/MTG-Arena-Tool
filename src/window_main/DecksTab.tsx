@@ -11,11 +11,14 @@ import {
   getReadableFormat,
   get_deck_missing as getDeckMissing
 } from "../shared/util";
-import Aggregator, { dateMaxValid } from "./aggregator";
+import Aggregator, {
+  AggregatorFilters,
+  dateMaxValid,
+  AggregatorStats
+} from "./aggregator";
 import DecksTable from "./components/decks/DecksTable";
-import { DecksData, DeckStats } from "./components/decks/types";
+import { DecksData } from "./components/decks/types";
 import { useAggregatorAndSidePanel } from "./components/tables/hooks";
-import { AggregatorFilters } from "./components/tables/types";
 import { openDeck } from "./deck-details";
 import mountReactComponent from "./mountReactComponent";
 import {
@@ -25,19 +28,6 @@ import {
   resetMainContainer
 } from "./renderer-util";
 import StatsPanel from "./stats-panel";
-
-function getDefaultStats(): DeckStats {
-  return {
-    wins: 0,
-    losses: 0,
-    total: 0,
-    duration: 0,
-    winrate: 0,
-    interval: 0,
-    winrateLow: 0,
-    winrateHigh: 0
-  };
-}
 
 function openDeckDetails(id: string, filters: AggregatorFilters): void {
   const deck = pd.deck(id);
@@ -112,11 +102,10 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
       const archivedSortVal = deck.archived ? 1 : deck.custom ? 0.5 : 0;
       const colorSortVal = deck.colors ? deck.colors.join("") : "";
       // compute winrate metrics
-      const deckStats: DeckStats =
-        (aggregator.deckStats as any)[id] ?? getDefaultStats();
-      const avgDuration = Math.round(deckStats.duration / deckStats.total);
-      const recentStats: DeckStats =
-        (aggregator.deckRecentStats as any)[id] ?? getDefaultStats();
+      const deckStats: AggregatorStats =
+        (aggregator.deckStats as any)[id] ?? Aggregator.getDefaultStats();
+      const recentStats: AggregatorStats =
+        (aggregator.deckRecentStats as any)[id] ?? Aggregator.getDefaultStats();
       const winrate100 = Math.round(deckStats.winrate * 100);
       // compute missing card metrics
       const missingWildcards = getDeckMissing(deck);
@@ -129,7 +118,6 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
         ...deck,
         ...deckStats,
         winrate100,
-        avgDuration,
         ...missingWildcards,
         boosterCost,
         archivedSortVal,
@@ -154,7 +142,7 @@ export function DecksTab({
   const { decksTableMode, decksTableState } = pd.settings;
   const showArchived = decksTableState?.filters?.archivedCol !== "hideArchived";
   const getDataAggFilters = (data: DecksData[]): AggregatorFilters => {
-    const deckId = data.map(deck => deck.id);
+    const deckId = data.map(deck => deck.id).filter(id => id) as string[];
     return { deckId };
   };
   const {
