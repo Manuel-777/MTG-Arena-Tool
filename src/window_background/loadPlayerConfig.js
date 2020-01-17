@@ -30,6 +30,7 @@ function fixBadPlayerData() {
   for (const deck of playerData.deckList) {
     if (!isV2CardsList(deck.mainDeck)) {
       convertDeckFromV3(deck);
+      setData({ [deck.id]: deck }, false);
     }
   }
 }
