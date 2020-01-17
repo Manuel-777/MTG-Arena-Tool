@@ -8,7 +8,7 @@ const questMap = {
   "7658b13d-861b-4c0c-bc7b-e01efcfa64ae": "Quests/Quest_Azorius_Judge",
   "59fd1ddb-6445-4016-aeef-d401e7ac98df": "Quests/Quest_Boros_Vigor",
   "7d257bad-9007-4e1f-b00e-697737130fdb": "Quests/Quest_Boros_Reckoner",
-  "2bc8f0c7-60d8-40fc-aceb-41b8b66e7118": "Quests/Quest_Horrible_Horde",
+  "2bc8f0c7-60d8-40fc-aceb-41b8b66e7118": "Quests/Quest_Creature_Commander",
   "84bb640d-58fd-40b3-84c6-b3cb989e493a": "Quests/Quest_Creature_Comforts",
   "d901ed54-99f1-4872-a134-78a25e794ed2": "Quests/Quest_Dimir_Cutpurse",
   "14480b30-416b-4283-83cb-e8ef509bfe37": "Quests/Quest_Dimir_Guile",
