@@ -31,8 +31,9 @@ async function fixBadPlayerData() {
   for (const deck of playerData.deckList) {
     if (!isV2CardsList(deck.mainDeck)) {
       ipcLog("Converting v3 deck: " + deck.id);
-      decks[deck.id] = convertDeckFromV3(deck);
-      await playerDb.upsert("decks", deck.id, deck);
+      const fixedDeck = convertDeckFromV3(deck);
+      decks[deck.id] = fixedDeck;
+      await playerDb.upsert("decks", deck.id, fixedDeck);
     }
   }
   setData({ decks }, false);
