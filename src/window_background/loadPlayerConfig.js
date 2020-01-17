@@ -27,12 +27,14 @@ export function syncSettings(
 function fixBadPlayerData() {
   // 2020-01-17 discovered with @Thaoden that some old draft decks might be v3
   // probably caused by a bad label handler that was temporarily on stable
+  const decks = { ...playerData.decks };
   for (const deck of playerData.deckList) {
     if (!isV2CardsList(deck.mainDeck)) {
-      convertDeckFromV3(deck);
-      setData({ [deck.id]: deck }, false);
+      ipcLog("Converting v3 deck: " + deck.id);
+      decks[deck.id] = convertDeckFromV3(deck);
     }
   }
+  setData({ decks }, false);
 }
 
 // Loads this player's configuration file
