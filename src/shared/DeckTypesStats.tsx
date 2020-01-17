@@ -17,7 +17,7 @@ function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
       // develop merge conflict 23/11/19
       //if (card.id && card.id.id && card.id.id == 100) {
       //  types.lan += card.quantity;
-      if (card.id.id && card.id.id == 100) {
+      if (card?.id?.id === 100) {
         return;
       }
       const c = db.card(card.id);
