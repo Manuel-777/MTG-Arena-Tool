@@ -655,6 +655,7 @@ export const FORMATS: Record<string, string> = {
   GRN: "Ravnica Constructed",
   XLN: "Ixalan Constructed"
 };
+export const STANDARD_CUTOFF_DATE = "2018-07-13";
 
 export const COLORS_ALL = ["w", "u", "b", "r", "g", "c"] as const;
 export const COLORS_BRIEF = ["w", "u", "b", "r", "g"] as const;
