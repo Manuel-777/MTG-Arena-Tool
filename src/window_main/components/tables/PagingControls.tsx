@@ -12,6 +12,7 @@ export default function PagingControls({
   nextPage,
   previousPage,
   setPageSize,
+  pageLabel,
   pageIndex,
   pageSize,
   pageSizeOptions
@@ -106,7 +107,9 @@ export default function PagingControls({
         <ReactSelect
           current={String(pageSize)}
           options={pageSizeOptions}
-          optionFormatter={(pageSize): string => "Show " + pageSize}
+          optionFormatter={(pageSize): string =>
+            "Show " + pageSize + (pageLabel ? " " + pageLabel : "")
+          }
           callback={(val): void => setPageSize(Number(val))}
         />
       </div>

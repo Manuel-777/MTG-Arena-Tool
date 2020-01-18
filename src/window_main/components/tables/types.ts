@@ -59,6 +59,7 @@ export interface PagingControlsProps {
   previousPage: () => void;
   setPageSize: (pageSize: number) => void;
   pageIndex: number;
+  pageLabel?: string;
   pageSize: number;
   pageSizeOptions?: string[];
 }

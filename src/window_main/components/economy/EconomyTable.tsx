@@ -337,11 +337,13 @@ export default function EconomyTable({
   const { getTableBodyProps, page, prepareRow } = table;
   const pageSizeOptions = ["3", "7", "21"];
   pagingProps.pageSizeOptions = pageSizeOptions;
+  pagingProps.pageLabel = "days";
   const [isExpanded, setExpanded] = React.useState(true);
   const economyTableControlsProps: EconomyTableControlsProps = {
     isExpanded,
     setExpanded,
     ...tableControlsProps,
+    pageLabel: "days",
     pageSizeOptions
   };
   return (

@@ -35,7 +35,7 @@ const columns: Column<EventTableData>[] = [
   { accessor: "id" },
   { accessor: "date" },
   {
-    Header: "Played",
+    Header: "Date",
     accessor: "timestamp",
     Cell: RelativeTimeCell,
     sortDescFirst: true,
