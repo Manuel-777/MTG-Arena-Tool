@@ -10,7 +10,6 @@ import {
   LocalTimeCell,
   MetricCell,
   PercentCell,
-  ShortTextCell,
   TextCell
 } from "../tables/cells";
 import {
@@ -59,7 +58,7 @@ const columns: Column<TransactionData>[] = [
     gridWidth: "150px"
   },
   {
-    Header: "Raw",
+    Header: "Code",
     accessor: "originalContext",
     disableSortBy: true,
     disableFilters: false,
@@ -72,18 +71,7 @@ const columns: Column<TransactionData>[] = [
     defaultVisible: true,
     mayToggle: true
   },
-  {
-    Header: "Type",
-    accessor: "prettyContext",
-    disableSortBy: true,
-    disableFilters: false,
-    filter: "fuzzyText",
-    Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
-    defaultVisible: true,
-    mayToggle: true
-  },
+  { accessor: "prettyContext" },
   {
     Header: "Context",
     accessor: "fullContext",
