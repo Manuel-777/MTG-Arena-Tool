@@ -24,14 +24,16 @@ export function syncSettings(
   if (refresh) ipcSend("set_settings", JSON.stringify(settings));
 }
 
-function fixBadPlayerData() {
+async function fixBadPlayerData() {
   // 2020-01-17 discovered with @Thaoden that some old draft decks might be v3
   // probably caused by a bad label handler that was temporarily on stable
   const decks = { ...playerData.decks };
   for (const deck of playerData.deckList) {
     if (!isV2CardsList(deck.mainDeck)) {
       ipcLog("Converting v3 deck: " + deck.id);
-      decks[deck.id] = convertDeckFromV3(deck);
+      const fixedDeck = convertDeckFromV3(deck);
+      decks[deck.id] = fixedDeck;
+      await playerDb.upsert("decks", deck.id, fixedDeck);
     }
   }
   setData({ decks }, false);
@@ -53,7 +55,7 @@ export async function loadPlayerConfig(playerId) {
   const __playerData = _.defaultsDeep(savedData, playerData);
   const { settings } = __playerData;
   setData(__playerData, true);
-  fixBadPlayerData();
+  await fixBadPlayerData();
   ipcSend("renderer_set_bounds", __playerData.windowBounds);
   syncSettings(settings, true);
 
