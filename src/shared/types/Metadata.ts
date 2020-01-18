@@ -13,7 +13,7 @@ export interface Metadata {
   limited_ranked_events: string[];
   standard_ranked_events: string[];
   single_match_events: string[];
-  archetypes: { [id: number]: Archetype };
+  archetypes: Archetype[];
 }
 
 export interface DbCardData {
@@ -62,7 +62,7 @@ export interface CardSet {
 export interface Archetype {
   average: ArchetypeAverage;
   name: string;
-  format: string;
+  format?: string;
 }
 
 interface ArchetypeAverage {

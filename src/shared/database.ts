@@ -153,8 +153,8 @@ class Database {
     return this.metadata ? this.metadata.abilities : {};
   }
 
-  get archetypes(): { [id: number]: Archetype } {
-    return this.metadata ? this.metadata.archetypes : {};
+  get archetypes(): Archetype[] {
+    return this.metadata ? this.metadata.archetypes : [];
   }
 
   get cards(): { [id: number]: DbCardData } {
