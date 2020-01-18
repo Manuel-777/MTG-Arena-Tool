@@ -289,9 +289,11 @@ export function useBaseTableControls<D extends TableData>({
   gridTemplateColumns,
   nextPage,
   pageCount,
+  pageLabel,
   pageIndex,
   pageOptions,
   pageSize,
+  pageSizeOptions,
   previousPage,
   setFilter,
   setPageSize,
@@ -323,6 +325,7 @@ export function useBaseTableControls<D extends TableData>({
   const pagingProps = {
     canPreviousPage,
     canNextPage,
+    pageLabel,
     pageOptions,
     pageCount,
     gotoPage,
@@ -330,7 +333,8 @@ export function useBaseTableControls<D extends TableData>({
     previousPage,
     setPageSize,
     pageIndex,
-    pageSize
+    pageSize,
+    pageSizeOptions
   };
   const headersProps = {
     filtersVisible,
