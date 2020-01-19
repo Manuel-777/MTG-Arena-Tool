@@ -102,12 +102,9 @@ function getEventStats(event: SerializedEvent): EventStats {
   ) {
     stats.eventState = "Completed";
   }
-  if (!eventData) {
-    return stats;
-  }
   if (eventData.ProcessedMatchIds) {
     stats.matchIds = eventData.ProcessedMatchIds.map(getValidMatchId).filter(
-      id => id
+      id => id !== undefined
     ) as string[];
     if (eventData.ProcessedMatchIds.length !== stats.matchIds.length) {
       stats.isMissingMatchData = true;

@@ -100,7 +100,7 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
     (deck: SerializedDeck): DecksData => {
       const id = deck.id ?? "";
       const archivedSortVal = deck.archived ? 1 : deck.custom ? 0.5 : 0;
-      const colorSortVal = deck.colors ? deck.colors.join("") : "";
+      const colorSortVal = deck.colors?.join("") ?? "";
       // compute winrate metrics
       const deckStats: AggregatorStats =
         aggregator.deckStats[id] ?? Aggregator.getDefaultStats();

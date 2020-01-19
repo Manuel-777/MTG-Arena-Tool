@@ -1,4 +1,5 @@
 import React from "react";
+import { Cell } from "react-table";
 import { CSSTransition } from "react-transition-group";
 import { getCardArtCrop } from "../../../shared/util";
 import { ArtTile, MetricText } from "../display";
@@ -7,6 +8,37 @@ import { DecksData } from "./types";
 
 function DeckArt({ url }: { url: string }): JSX.Element {
   return <ArtTile style={{ backgroundImage: `url("${url}")` }} />;
+}
+
+function DecksArtViewCell({
+  cell,
+  hover
+}: {
+  cell: Cell<DecksData>;
+  hover: boolean;
+}): JSX.Element {
+  return (
+    <div
+      className="inner_div"
+      style={hover ? { backgroundColor: "rgba(0,0,0,0.4)" } : undefined}
+      {...cell.getCellProps()}
+    >
+      {cell.column.needsTileLabel && (
+        <MetricText
+          style={{
+            paddingRight: "8px",
+            fontSize: "small",
+            whiteSpace: "nowrap",
+            fontWeight: 300,
+            color: "var(--color-light-50)"
+          }}
+        >
+          {cell.column.render("Header")}:
+        </MetricText>
+      )}
+      {cell.render("Cell")}
+    </div>
+  );
 }
 
 export default function DecksArtViewRow({
@@ -23,7 +55,6 @@ export default function DecksArtViewRow({
   const divProps = { ...otherProps };
   delete divProps.index;
   delete divProps.gridTemplateColumns;
-
   return (
     <div
       className={"decks_table_deck_tile"}
@@ -35,29 +66,12 @@ export default function DecksArtViewRow({
         <DeckArt url={getCardArtCrop(row.values["deckTileId"])} />
       </CSSTransition>
       {row.cells.map(cell => {
-        // cell.hover = hover;
         return (
-          <div
-            className="inner_div"
-            style={hover ? { backgroundColor: "rgba(0,0,0,0.4)" } : undefined}
-            {...cell.getCellProps()}
+          <DecksArtViewCell
             key={cell.column.id + "_" + row.index}
-          >
-            {cell.column.needsTileLabel && (
-              <MetricText
-                style={{
-                  paddingRight: "8px",
-                  fontSize: "small",
-                  whiteSpace: "nowrap",
-                  fontWeight: 300,
-                  color: "var(--color-light-50)"
-                }}
-              >
-                {cell.column.render("Header")}:
-              </MetricText>
-            )}
-            {cell.render("Cell")}
-          </div>
+            cell={cell}
+            hover={hover}
+          />
         );
       })}
       <div className="inner_div"> </div>

@@ -39,9 +39,8 @@ function openMatchDetails(id: string | number): void {
 
 function addTag(matchid: string, tag: string): void {
   const match = pd.match(matchid);
-  if (!match || !tag) return;
   if ([tagPrompt, NO_ARCH, DEFAULT_ARCH].includes(tag)) return;
-  if (match.tags && match.tags.includes(tag)) return;
+  if (match.tags?.includes(tag)) return;
   ipcSend("add_matches_tag", { matchid, tag });
 }
 
@@ -51,8 +50,7 @@ function editTag(tag: string, color: string): void {
 
 function deleteTag(matchid: string, tag: string): void {
   const match = pd.match(matchid);
-  if (!match || !tag) return;
-  if (!match.tags || !match.tags.includes(tag)) return;
+  if (!match.tags?.includes(tag)) return;
   ipcSend("delete_matches_tag", { matchid, tag });
 }
 
@@ -60,9 +58,8 @@ function getNextRank(currentRank: string): undefined | string {
   const rankIndex = (RANKS as any).indexOf(currentRank);
   if (rankIndex < RANKS.length - 1) {
     return RANKS[rankIndex + 1];
-  } else {
-    return undefined;
   }
+  return undefined;
 }
 
 function saveTableState(matchesTableState: TableState<MatchTableData>): void {
@@ -80,6 +77,7 @@ function getStepsUntilNextRank(mode: boolean, winrate: number): string {
   const cs = rr.step;
   const ct = rr.tier;
 
+  // TODO extract rank tier/level props into constants
   let st = 1;
   let stw = 1;
   let stl = 0;
@@ -111,18 +109,8 @@ function getStepsUntilNextRank(mode: boolean, winrate: number): string {
 
   const expectedValue = winrate * stw - (1 - winrate) * stl;
   if (expectedValue <= 0) return "&#x221e";
-
   const stepsNeeded = st * ct - cs;
-  let expected = 0;
-  let n = 0;
-  // console.log("stepsNeeded", stepsNeeded);
-  while (expected <= stepsNeeded) {
-    expected = n * expectedValue;
-    // console.log("stepsNeeded:", stepsNeeded, "expected:", expected, "N:", n);
-    n++;
-  }
-
-  return "~" + n;
+  return "~" + Math.ceil(stepsNeeded / expectedValue);
 }
 
 function renderRanksStats(
@@ -131,7 +119,7 @@ function renderRanksStats(
   isLimited: boolean
 ): void {
   container.innerHTML = "";
-  if (!aggregator || !aggregator.stats?.total) return;
+  if (!aggregator.stats?.total) return;
   const { winrate } = aggregator.stats;
 
   const seasonName = !isLimited ? "constructed" : "limited";
@@ -177,29 +165,25 @@ function updateStatsPanel(
   container.innerHTML = "";
   const filters = aggregator.filters;
   const { date, eventId } = filters;
-  let rankedStats;
-  const showingRanked =
-    date === DATE_SEASON &&
-    (eventId === RANKED_CONST || eventId === RANKED_DRAFT);
-  const isLimited = eventId === RANKED_DRAFT;
 
   const div = createDiv(["ranks_history"]);
   div.style.padding = "0 12px";
 
-  if (showingRanked) {
+  const isLimited = eventId === RANKED_DRAFT;
+  const isConstructed = eventId === RANKED_CONST;
+  const isCurrentSeason = date === DATE_SEASON;
+  if (isCurrentSeason && (isLimited || isConstructed)) {
     const rankStats = createDiv(["ranks_stats"]);
     renderRanksStats(rankStats, aggregator, isLimited);
     rankStats.style.paddingBottom = "16px";
     div.appendChild(rankStats);
+  }
+  const rankedStats = isConstructed
+    ? aggregator.constructedStats
+    : isCurrentSeason && isLimited
+    ? aggregator.limitedStats
+    : undefined;
 
-    rankedStats =
-      eventId === RANKED_CONST
-        ? aggregator.constructedStats
-        : aggregator.limitedStats;
-  }
-  if (eventId === RANKED_CONST) {
-    rankedStats = aggregator.constructedStats;
-  }
   const statsPanel = new StatsPanel(
     "matches_top",
     aggregator,
