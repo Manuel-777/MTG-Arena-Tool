@@ -24,10 +24,10 @@ const dateOptions = [
 ];
 
 function customDateFormatter(filter: Date | string): string {
-  if (dateOptions.includes(String(filter))) {
-    return String(filter);
+  if (typeof filter === "string") {
+    return filter;
   }
-  return `Since ${new Date(filter).toDateString()}`;
+  return `Since ${filter.toDateString()}`;
 }
 
 export default function DateFilter({
