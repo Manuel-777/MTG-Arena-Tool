@@ -35,6 +35,7 @@ export interface DecksTableProps {
   cachedState: TableState<DecksData>;
   cachedTableMode: string;
   data: DecksData[];
+  events: string[];
   deleteTagCallback: (deckid: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
   filterDataCallback: (data: DecksData[]) => void;
@@ -47,6 +48,7 @@ export interface DecksTableProps {
 export interface DecksTableControlsProps extends TableControlsProps<DecksData> {
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
   aggFilters: AggregatorFilters;
+  events: string[];
 }
 
 export type DecksTableCellProps = CellProps<DecksData>;

@@ -134,6 +134,11 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
   );
 }
 
+function getTotalAggEvents(): string[] {
+  const totalAgg = new Aggregator();
+  return totalAgg.events;
+}
+
 export function DecksTab({
   aggFiltersArg
 }: {
@@ -163,6 +168,7 @@ export function DecksTab({
     (id: string): void => openDeckDetails(id, aggFilters),
     [aggFilters]
   );
+  const events = React.useMemo(getTotalAggEvents, []);
 
   return (
     <>
@@ -175,6 +181,7 @@ export function DecksTab({
         <DecksTable
           data={data}
           aggFilters={aggFilters}
+          events={events}
           cachedState={decksTableState}
           cachedTableMode={decksTableMode}
           setAggFiltersCallback={setAggFilters}

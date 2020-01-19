@@ -204,6 +204,7 @@ const columns: Column<DecksData>[] = [
 export default function DecksTable({
   data,
   aggFilters,
+  events,
   setAggFiltersCallback,
   tableModeCallback,
   tableStateCallback,
@@ -253,6 +254,7 @@ export default function DecksTable({
   const { getTableBodyProps, page, prepareRow } = table;
   const decksTableControlsProps: DecksTableControlsProps = {
     aggFilters,
+    events,
     setAggFiltersCallback,
     ...tableControlsProps
   };

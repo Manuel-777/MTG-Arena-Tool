@@ -1,7 +1,7 @@
 import React from "react";
 import { FilterValue } from "react-table";
 import { DECKS_TABLE_MODES } from "../../../shared/constants";
-import { WrappedReactSelect } from "../../../shared/ReactSelect";
+import { WrappedReactSelect, ReactSelect } from "../../../shared/ReactSelect";
 import DateFilter from "../../DateFilter";
 import { MediumTextButton, SmallTextButton } from "../display";
 import ColumnToggles from "../tables/ColumnToggles";
@@ -10,6 +10,7 @@ import { useBaseTableControls } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { DecksTableControlsProps } from "./types";
+import { getReadableEvent } from "../../../shared/util";
 
 const recentFilters = (): { id: string; value: FilterValue }[] => [
   { id: "archivedCol", value: "hideArchived" }
@@ -29,6 +30,7 @@ export default function DecksTableControls(
 ): JSX.Element {
   const {
     aggFilters,
+    events,
     globalFilter,
     preGlobalFilteredRows,
     setAggFiltersCallback,
@@ -59,7 +61,6 @@ export default function DecksTableControls(
         }}
       >
         <div className="decks_table_toggles">
-          <span style={{ paddingBottom: "8px" }}>Filter match results:</span>
           <DateFilter
             prefixId={"decks_top"}
             current={aggFilters.date}
@@ -67,6 +68,16 @@ export default function DecksTableControls(
               setAggFiltersCallback({ ...aggFilters, date })
             }
           />
+          <div className={"select_container"} style={{ marginBottom: "auto" }}>
+            <ReactSelect
+              options={events}
+              current={aggFilters.eventId ?? ""}
+              callback={(eventId): void =>
+                setAggFiltersCallback({ ...aggFilters, eventId })
+              }
+              optionFormatter={getReadableEvent}
+            />
+          </div>
           <span style={{ paddingBottom: "8px" }}>Presets:</span>
           <SmallTextButton
             onClick={(): void => {
