@@ -64,13 +64,14 @@ export interface PagingControlsProps {
   pageSizeOptions?: string[];
 }
 
-export interface TableControlsProps<D extends TableData>
-  extends PagingControlsProps {
-  flatColumns: ColumnInstance<D>[];
+export interface TableControlsProps<D extends TableData> {
   filters: Filters<D>;
+  flatColumns: ColumnInstance<D>[];
   getTableProps: (propGetter?: TablePropGetter<D>) => TableProps;
   globalFilter: FilterValue;
+  pagingProps: PagingControlsProps;
   gridTemplateColumns: string;
+  initialFiltersVisible: FiltersVisible;
   preGlobalFilteredRows: Row<D>[];
   setAllFilters: (
     updater: Filters<D> | ((filters: Filters<D>) => Filters<D>)
@@ -79,9 +80,13 @@ export interface TableControlsProps<D extends TableData>
     columnId: IdType<D>,
     updater: ((filterValue: FilterValue) => FilterValue) | FilterValue
   ) => void;
+  setFiltersVisible: (filters: FiltersVisible) => void;
   setGlobalFilter: (filterValue: FilterValue) => void;
   setTableMode: (tableMode: string) => void;
+  setTogglesVisible: (togglesVisible: boolean) => void;
   tableMode: string;
+  toggleableColumns: ColumnInstance<D>[];
+  togglesVisible: boolean;
   toggleHideColumn: (columnId: IdType<D>, value?: boolean) => void;
   toggleSortBy: (
     columnId: IdType<D>,
@@ -100,6 +105,7 @@ export interface TableHeadersProps<D extends TableData> {
     updater: ((filterValue: FilterValue) => FilterValue) | FilterValue
   ) => void;
   setFiltersVisible: (filters: FiltersVisible) => void;
+  style?: Partial<CSSStyleDeclaration>;
   visibleHeaders: ColumnInstance<D>[];
 }
 

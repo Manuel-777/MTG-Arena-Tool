@@ -1,7 +1,6 @@
 import _ from "lodash";
 import React from "react";
 import {
-  ColumnInstance,
   TableInstance,
   TableState,
   useFilters,
@@ -143,8 +142,9 @@ export function useBaseReactTable<D extends TableData>({
   cachedState
 }: BaseTableProps<D>): {
   table: TableInstance<D>;
-  gridTemplateColumns: string;
   pagingProps: PagingControlsProps;
+  gridTemplateColumns: string;
+  headersProps: TableHeadersProps<D>;
   tableControlsProps: TableControlsProps<D>;
 } {
   const defaultColumn = React.useMemo(
@@ -249,65 +249,6 @@ export function useBaseReactTable<D extends TableData>({
   const gridTemplateColumns = visibleHeaders
     .map(header => header.gridWidth ?? "1fr")
     .join(" ");
-
-  const tableControlsProps: TableControlsProps<D> = {
-    canNextPage,
-    canPreviousPage,
-    filters,
-    flatColumns,
-    getTableProps,
-    globalFilter: state.globalFilter,
-    gotoPage,
-    gridTemplateColumns,
-    nextPage,
-    pageCount,
-    pageIndex,
-    pageOptions,
-    pageSize,
-    preGlobalFilteredRows,
-    previousPage,
-    setAllFilters,
-    setFilter,
-    setGlobalFilter,
-    setPageSize,
-    setTableMode,
-    tableMode,
-    toggleHideColumn,
-    toggleSortBy,
-    visibleHeaders,
-    ...customProps
-  };
-  return { table, gridTemplateColumns, pagingProps, tableControlsProps };
-}
-
-export function useBaseTableControls<D extends TableData>({
-  canNextPage,
-  canPreviousPage,
-  flatColumns,
-  getTableProps,
-  gotoPage,
-  gridTemplateColumns,
-  nextPage,
-  pageCount,
-  pageLabel,
-  pageIndex,
-  pageOptions,
-  pageSize,
-  pageSizeOptions,
-  previousPage,
-  setFilter,
-  setPageSize,
-  visibleHeaders
-}: TableControlsProps<D>): {
-  toggleableColumns: ColumnInstance<D>[];
-  initialFiltersVisible: FiltersVisible;
-  filtersVisible: FiltersVisible;
-  setFiltersVisible: (filters: FiltersVisible) => void;
-  togglesVisible: boolean;
-  setTogglesVisible: (togglesVisible: boolean) => void;
-  pagingProps: PagingControlsProps;
-  headersProps: TableHeadersProps<D>;
-} {
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
     const toggleableColumns = flatColumns.filter(column => column.mayToggle);
     const initialFiltersVisible: FiltersVisible = {};
@@ -322,20 +263,6 @@ export function useBaseTableControls<D extends TableData>({
     initialFiltersVisible
   );
   const [togglesVisible, setTogglesVisible] = React.useState(false);
-  const pagingProps = {
-    canPreviousPage,
-    canNextPage,
-    pageLabel,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-    pageIndex,
-    pageSize,
-    pageSizeOptions
-  };
   const headersProps = {
     filtersVisible,
     getTableProps,
@@ -344,14 +271,35 @@ export function useBaseTableControls<D extends TableData>({
     setFiltersVisible,
     visibleHeaders
   };
-  return {
-    toggleableColumns,
+
+  const tableControlsProps: TableControlsProps<D> = {
+    filters,
+    flatColumns,
+    getTableProps,
+    globalFilter: state.globalFilter,
+    gridTemplateColumns,
     initialFiltersVisible,
-    filtersVisible,
-    setFiltersVisible,
-    togglesVisible,
-    setTogglesVisible,
     pagingProps,
-    headersProps
+    preGlobalFilteredRows,
+    setAllFilters,
+    setFilter,
+    setFiltersVisible,
+    setGlobalFilter,
+    setTableMode,
+    setTogglesVisible,
+    tableMode,
+    toggleableColumns,
+    togglesVisible,
+    toggleHideColumn,
+    toggleSortBy,
+    visibleHeaders,
+    ...customProps
+  };
+  return {
+    table,
+    pagingProps,
+    gridTemplateColumns,
+    headersProps,
+    tableControlsProps
   };
 }

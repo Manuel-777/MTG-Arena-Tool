@@ -209,12 +209,7 @@ export function EventsTab({
 
   return (
     <>
-      <div
-        className={"wrapper_column"}
-        style={{
-          overflowX: "auto"
-        }}
-      >
+      <div className={"wrapper_column"}>
         <EventsTable
           data={data}
           aggFilters={aggFilters}

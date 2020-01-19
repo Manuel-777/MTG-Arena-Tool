@@ -7,12 +7,13 @@ export default function TableHeaders<D extends TableData>({
   gridTemplateColumns,
   setFilter,
   setFiltersVisible,
+  style,
   visibleHeaders
 }: TableHeadersProps<D>): JSX.Element {
   return (
     <div
       className="decks_table_head line_dark"
-      style={{ gridTemplateColumns }}
+      style={{ gridTemplateColumns, ...((style as any) ?? {}) }}
       {...getTableProps()}
     >
       {visibleHeaders.map((column, ii) => (
@@ -20,7 +21,6 @@ export default function TableHeaders<D extends TableData>({
           {...column.getHeaderProps(column.getSortByToggleProps())}
           className={"hover_label"}
           style={{
-            height: "64px",
             gridArea: `1 / ${ii + 1} / 1 / ${ii + 2}`
           }}
           key={column.id}

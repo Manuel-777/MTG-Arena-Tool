@@ -1,6 +1,7 @@
 import startOfDay from "date-fns/startOfDay";
 import React from "react";
 import { Column, useExpanded, useGroupBy } from "react-table";
+import { EVENTS_TABLE_MODE } from "../../../shared/constants";
 import { vaultPercentFormat } from "../../economyUtils";
 import {
   AggregatedContextCell,
@@ -19,6 +20,7 @@ import {
 } from "../tables/filters";
 import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
+import TableHeaders from "../tables/TableHeaders";
 import { BaseTableProps } from "../tables/types";
 import EconomyTableControls from "./EconomyTableControls";
 import { txnSearchFilterFn } from "./filters";
@@ -319,6 +321,7 @@ export default function EconomyTable({
   const {
     table,
     gridTemplateColumns,
+    headersProps,
     pagingProps,
     tableControlsProps
   } = useBaseReactTable(tableProps);
@@ -331,31 +334,38 @@ export default function EconomyTable({
   const economyTableControlsProps: EconomyTableControlsProps = {
     isExpanded,
     setExpanded,
-    ...tableControlsProps,
-    pageSizeOptions,
-    pageLabel
+    ...tableControlsProps
   };
+  const isTableMode = tableMode === EVENTS_TABLE_MODE;
   return (
     <div className="economy_table_wrap" style={{ marginTop: "12px" }}>
       <EconomyTableControls {...economyTableControlsProps} />
-      <div className="economy_table_body" {...getTableBodyProps()}>
-        {page.map((groupRow, groupIndex) => {
-          prepareRow(groupRow);
-          const economyRowProps = {
-            row: groupRow,
-            gridTemplateColumns,
-            tableMode,
-            prepareRow,
-            isExpanded
-          };
-          return (
-            <EconomyTableRow
-              key={groupIndex}
-              index={groupIndex}
-              {...economyRowProps}
-            />
-          );
-        })}
+      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+        <TableHeaders
+          {...headersProps}
+          style={
+            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+          }
+        />
+        <div className="economy_table_body" {...getTableBodyProps()}>
+          {page.map((groupRow, groupIndex) => {
+            prepareRow(groupRow);
+            const economyRowProps = {
+              row: groupRow,
+              gridTemplateColumns,
+              tableMode,
+              prepareRow,
+              isExpanded
+            };
+            return (
+              <EconomyTableRow
+                key={groupIndex}
+                index={groupIndex}
+                {...economyRowProps}
+              />
+            );
+          })}
+        </div>
       </div>
       <PagingControls {...pagingProps} />
     </div>

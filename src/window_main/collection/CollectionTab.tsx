@@ -164,12 +164,7 @@ export function CollectionTab(): JSX.Element {
   );
   return (
     <>
-      <div
-        className={"wrapper_column"}
-        style={{
-          overflowX: "auto"
-        }}
-      >
+      <div className={"wrapper_column"}>
         <CollectionTable
           cachedState={collectionTableState}
           cachedTableMode={collectionTableMode}

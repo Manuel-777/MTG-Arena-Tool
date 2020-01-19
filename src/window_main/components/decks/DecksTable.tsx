@@ -20,6 +20,7 @@ import {
 } from "../tables/filters";
 import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
+import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
 import { LastEditWinRateCell, MissingCardsCell, WinRateCell } from "./cells";
@@ -248,6 +249,7 @@ export default function DecksTable({
   const {
     table,
     gridTemplateColumns,
+    headersProps,
     pagingProps,
     tableControlsProps
   } = useBaseReactTable(tableProps);
@@ -258,27 +260,35 @@ export default function DecksTable({
     setAggFiltersCallback,
     ...tableControlsProps
   };
+  const isTableMode = tableMode === DECKS_TABLE_MODE;
   return (
     <div className="decks_table_wrap">
       <DecksTableControls {...decksTableControlsProps} />
-      <div className="decks_table_body" {...getTableBodyProps()}>
-        {page.map((row, index) => {
-          prepareRow(row);
-          const data = row.original;
-          const RowRenderer =
-            tableMode === DECKS_TABLE_MODE ? TableViewRow : DecksArtViewRow;
-          const onClick = (): void => openDeckCallback(data.id ?? "");
-          return (
-            <RowRenderer
-              onClick={onClick}
-              title={`show ${data.name} details`}
-              row={row}
-              index={index}
-              key={row.index}
-              gridTemplateColumns={gridTemplateColumns}
-            />
-          );
-        })}
+      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+        <TableHeaders
+          {...headersProps}
+          style={
+            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+          }
+        />
+        <div className="decks_table_body" {...getTableBodyProps()}>
+          {page.map((row, index) => {
+            prepareRow(row);
+            const data = row.original;
+            const RowRenderer = isTableMode ? TableViewRow : DecksArtViewRow;
+            const onClick = (): void => openDeckCallback(data.id ?? "");
+            return (
+              <RowRenderer
+                onClick={onClick}
+                title={`show ${data.name} details`}
+                row={row}
+                index={index}
+                key={row.index}
+                gridTemplateColumns={gridTemplateColumns}
+              />
+            );
+          })}
+        </div>
       </div>
       <PagingControls {...pagingProps} />
     </div>

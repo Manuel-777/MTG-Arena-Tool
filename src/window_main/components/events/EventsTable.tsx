@@ -30,6 +30,7 @@ import {
   EventsTableProps,
   EventTableData
 } from "./types";
+import TableHeaders from "../tables/TableHeaders";
 
 const columns: Column<EventTableData>[] = [
   { accessor: "id" },
@@ -207,6 +208,7 @@ export default function EventsTable({
   const {
     table,
     gridTemplateColumns,
+    headersProps,
     pagingProps,
     tableControlsProps
   } = useBaseReactTable(tableProps);
@@ -217,31 +219,40 @@ export default function EventsTable({
     setAggFiltersCallback,
     ...tableControlsProps
   };
+  const isTableMode = tableMode === EVENTS_TABLE_MODE;
   return (
     <div className="decks_table_wrap">
       <EventsTableControls {...eventsTableControlsProps} />
-      <div className="decks_table_body" {...getTableBodyProps()}>
-        {page.map((row, index) => {
-          prepareRow(row);
-          if (tableMode === EVENTS_TABLE_MODE) {
+      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+        <TableHeaders
+          {...headersProps}
+          style={
+            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+          }
+        />
+        <div className="decks_table_body" {...getTableBodyProps()}>
+          {page.map((row, index) => {
+            prepareRow(row);
+            if (tableMode === EVENTS_TABLE_MODE) {
+              return (
+                <TableViewRow
+                  row={row}
+                  index={index}
+                  key={row.index}
+                  gridTemplateColumns={gridTemplateColumns}
+                />
+              );
+            }
             return (
-              <TableViewRow
+              <EventsListViewRow
                 row={row}
                 index={index}
                 key={row.index}
                 gridTemplateColumns={gridTemplateColumns}
               />
             );
-          }
-          return (
-            <EventsListViewRow
-              row={row}
-              index={index}
-              key={row.index}
-              gridTemplateColumns={gridTemplateColumns}
-            />
-          );
-        })}
+          })}
+        </div>
       </div>
       <PagingControls {...pagingProps} />
     </div>

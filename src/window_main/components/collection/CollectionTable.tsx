@@ -21,6 +21,7 @@ import {
 } from "../tables/filters";
 import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
+import TableHeaders from "../tables/TableHeaders";
 import { BaseTableProps } from "../tables/types";
 import {
   InBoostersCell,
@@ -45,6 +46,7 @@ import {
   CollectionTableControlsProps,
   CollectionTableProps
 } from "./types";
+import { auto } from "async";
 
 const legacyModes = [COLLECTION_CHART_MODE, COLLECTION_SETS_MODE];
 
@@ -291,6 +293,7 @@ export default function CollectionTable({
   const {
     table,
     gridTemplateColumns,
+    headersProps,
     pagingProps,
     tableControlsProps
   } = useBaseReactTable(tableProps);
@@ -330,6 +333,7 @@ export default function CollectionTable({
     rows,
     ...tableControlsProps
   };
+  const isTableMode = tableMode === COLLECTION_TABLE_MODE;
   const tableBody = legacyModes.includes(tableMode) ? (
     <div className="decks_table_body" {...getTableBodyProps()}>
       <div ref={legacyContainerRef} />
@@ -338,8 +342,7 @@ export default function CollectionTable({
     <div className="decks_table_body" {...getTableBodyProps()}>
       {page.map((row, index) => {
         prepareRow(row);
-        const RowRenderer =
-          tableMode === COLLECTION_TABLE_MODE ? CardTableViewRow : CardTileRow;
+        const RowRenderer = isTableMode ? CardTableViewRow : CardTileRow;
         return (
           <RowRenderer
             key={row.index}
@@ -357,7 +360,15 @@ export default function CollectionTable({
   return (
     <div className="decks_table_wrap">
       <CollectionTableControls {...collectionTableControlsProps} />
-      {tableBody}
+      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+        <TableHeaders
+          {...headersProps}
+          style={
+            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+          }
+        />
+        {tableBody}
+      </div>
       {!legacyModes.includes(tableMode) && <PagingControls {...pagingProps} />}
     </div>
   );

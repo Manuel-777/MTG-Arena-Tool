@@ -20,6 +20,7 @@ import {
 } from "../tables/filters";
 import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
+import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
 import { ArchetypeCell, OnPlayCell, RankCell } from "./cells";
@@ -322,6 +323,7 @@ export default function MatchesTable({
   const {
     table,
     gridTemplateColumns,
+    headersProps,
     pagingProps,
     tableControlsProps
   } = useBaseReactTable(tableProps);
@@ -332,37 +334,46 @@ export default function MatchesTable({
     setAggFiltersCallback,
     ...tableControlsProps
   };
+  const isTableMode = tableMode === MATCHES_TABLE_MODE;
   return (
     <div className="decks_table_wrap">
       <MatchesTableControls {...matchesTableControlsProps} />
-      <div className="decks_table_body" {...getTableBodyProps()}>
-        {page.map((row, index) => {
-          prepareRow(row);
-          const data = row.original;
-          if (tableMode === MATCHES_TABLE_MODE) {
-            const onClick = (): void => openMatchCallback(data.id ?? "");
+      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+        <TableHeaders
+          {...headersProps}
+          style={
+            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+          }
+        />
+        <div className="decks_table_body" {...getTableBodyProps()}>
+          {page.map((row, index) => {
+            prepareRow(row);
+            const data = row.original;
+            if (isTableMode) {
+              const onClick = (): void => openMatchCallback(data.id ?? "");
+              return (
+                <TableViewRow
+                  onClick={onClick}
+                  title={"show match details"}
+                  row={row}
+                  index={index}
+                  key={row.index}
+                  gridTemplateColumns={gridTemplateColumns}
+                />
+              );
+            }
             return (
-              <TableViewRow
-                onClick={onClick}
-                title={"show match details"}
+              <MatchesListViewRow
                 row={row}
                 index={index}
                 key={row.index}
                 gridTemplateColumns={gridTemplateColumns}
+                openMatchCallback={openMatchCallback}
+                {...customProps}
               />
             );
-          }
-          return (
-            <MatchesListViewRow
-              row={row}
-              index={index}
-              key={row.index}
-              gridTemplateColumns={gridTemplateColumns}
-              openMatchCallback={openMatchCallback}
-              {...customProps}
-            />
-          );
-        })}
+          })}
+        </div>
       </div>
       <PagingControls {...pagingProps} />
     </div>

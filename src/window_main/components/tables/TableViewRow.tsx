@@ -24,11 +24,14 @@ export function TableViewRow<D extends TableData>({
       style={{ ...style, gridTemplateColumns }}
       {...otherProps}
     >
-      {row.cells.map(cell => {
+      {row.cells.map((cell, ii) => {
         return (
           <div
             className="inner_div"
             {...cell.getCellProps()}
+            style={{
+              gridArea: `1 / ${ii + 1} / 1 / ${ii + 2}`
+            }}
             key={cell.column.id + "_" + row.index}
           >
             {cell.isAggregated

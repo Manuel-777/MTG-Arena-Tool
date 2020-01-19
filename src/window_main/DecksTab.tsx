@@ -172,12 +172,7 @@ export function DecksTab({
 
   return (
     <>
-      <div
-        className={"wrapper_column"}
-        style={{
-          overflowX: "auto"
-        }}
-      >
+      <div className={"wrapper_column"}>
         <DecksTable
           data={data}
           aggFilters={aggFilters}

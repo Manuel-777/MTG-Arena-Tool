@@ -307,12 +307,7 @@ export function MatchesTab({
 
   return (
     <>
-      <div
-        className={"wrapper_column"}
-        style={{
-          overflowX: "auto"
-        }}
-      >
+      <div className={"wrapper_column"}>
         <MatchesTable
           data={data}
           aggFilters={aggFilters}

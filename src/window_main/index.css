@@ -3868,6 +3868,7 @@ a:hover {
 
 .decks_table_head {
     display: grid;
+    min-height: 64px;
     color: var(--color-light);
     border-bottom: 1px solid var(--color-light);
     background-color: var(--color-mid-20);
