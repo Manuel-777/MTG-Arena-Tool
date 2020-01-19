@@ -110,20 +110,20 @@ export default class Aggregator {
     );
   }
 
-  private static gatherTags(_decks: any[]): string[] {
+  private static gatherTags(decks: any[]): string[] {
     const tagSet = new Set<string>();
     const formatSet = new Set<string>();
     const counts: Record<string, number> = {};
-    _decks.forEach(deck => {
+    decks.forEach(deck => {
       if (deck.tags) {
         deck.tags.forEach((tag: string) => {
           tagSet.add(tag);
-          counts[tag] = (counts[tag] || 0) + 1;
+          counts[tag] = (counts[tag] ?? 0) + 1;
         });
       }
       if (deck.format) {
         formatSet.add(deck.format);
-        counts[deck.format] = (counts[deck.format] || 0) + 1;
+        counts[deck.format] = (counts[deck.format] ?? 0) + 1;
       }
     });
     const tagList = [...tagSet].filter(tag => tag && !formatSet.has(tag));
@@ -168,22 +168,22 @@ export default class Aggregator {
     this.updateFilters(filters);
   }
 
-  filterDate(_date: any): boolean {
-    const { date } = this.filters;
+  filterDate(date: string | number): boolean {
+    const { date: filterValue } = this.filters;
     let dateFilter = null;
     const now = new Date();
-    if (date === DATE_ALL_TIME) {
+    if (filterValue === DATE_ALL_TIME) {
       return true;
-    } else if (date === DATE_SEASON) {
+    } else if (filterValue === DATE_SEASON) {
       dateFilter = db.season_starts;
-    } else if (date === DATE_LAST_30) {
+    } else if (filterValue === DATE_LAST_30) {
       dateFilter = startOfDay(subDays(now, 30));
-    } else if (date === DATE_LAST_DAY) {
+    } else if (filterValue === DATE_LAST_DAY) {
       dateFilter = subDays(now, 1);
     } else {
-      dateFilter = new Date(date ?? NaN);
+      dateFilter = new Date(filterValue ?? NaN);
     }
-    return isAfter(new Date(_date), dateFilter);
+    return isAfter(new Date(date), dateFilter);
   }
 
   filterDeck(deck: any): boolean {
@@ -196,24 +196,24 @@ export default class Aggregator {
     );
   }
 
-  filterEvent(_eventId: string): boolean {
-    const { eventId } = this.filters;
+  filterEvent(eventId: string): boolean {
+    const { eventId: filterValue } = this.filters;
     return (
-      (eventId === Aggregator.DEFAULT_EVENT && _eventId !== "AIBotMatch") ||
-      (eventId === Aggregator.ALL_EVENT_TRACKS &&
-        !db.single_match_events.includes(_eventId)) ||
-      (eventId === Aggregator.RANKED_CONST &&
-        db.standard_ranked_events.includes(_eventId)) ||
-      (eventId === Aggregator.RANKED_DRAFT &&
-        db.limited_ranked_events.includes(_eventId)) ||
-      eventId === _eventId
+      (filterValue === Aggregator.DEFAULT_EVENT && eventId !== "AIBotMatch") ||
+      (filterValue === Aggregator.ALL_EVENT_TRACKS &&
+        !db.single_match_events.includes(eventId)) ||
+      (filterValue === Aggregator.RANKED_CONST &&
+        db.standard_ranked_events.includes(eventId)) ||
+      (filterValue === Aggregator.RANKED_DRAFT &&
+        db.limited_ranked_events.includes(eventId)) ||
+      filterValue === eventId
     );
   }
 
   filterMatch(match: any): boolean {
     if (!match) return false;
     const { showArchived, matchIds } = this.filters;
-    if (!showArchived && match.archived && match.archived) return false;
+    if (!showArchived && match.archived) return false;
 
     const passesMatchFilter = !matchIds || this.validMatches.has(match.id);
     if (!passesMatchFilter) return false;
@@ -285,7 +285,7 @@ export default class Aggregator {
     this.archs = [Aggregator.DEFAULT_ARCH, Aggregator.NO_ARCH, ...archList];
 
     for (const deckId in this.deckMap) {
-      const deck = pd.deck(deckId) || this.deckMap[deckId];
+      const deck = pd.deck(deckId) ?? this.deckMap[deckId];
       if (deck) {
         this._decks.push(deck);
       }
@@ -308,7 +308,7 @@ export default class Aggregator {
       );
 
       // process rank data
-      if (match.player && match.player.rank) {
+      if (match.player?.rank) {
         const rank = match.player.rank.toLowerCase();
         if (!(rank in this.constructedStats)) {
           this.constructedStats[rank] = {
@@ -330,7 +330,7 @@ export default class Aggregator {
       }
     }
     // process deck data
-    if (match.playerDeck && match.playerDeck.id) {
+    if (match.playerDeck?.id) {
       const id = match.playerDeck.id;
       this.deckMap[id] = match.playerDeck;
       this.deckLastPlayed[id] = dateMaxValid(
@@ -357,7 +357,7 @@ export default class Aggregator {
     // process opponent data
     if (match.oppDeck) {
       const colors = match.oppDeck.colors;
-      if (colors && colors.length) {
+      if (colors?.length) {
         colors.sort();
         if (!(colors in this.colorStats)) {
           this.colorStats[colors] = {
@@ -368,11 +368,8 @@ export default class Aggregator {
         statsToUpdate.push(this.colorStats[colors]);
       }
       // process archetype
-      const tag =
-        match.tags && match.tags.length
-          ? match.tags[0] || Aggregator.NO_ARCH
-          : Aggregator.NO_ARCH;
-      this.archCounts[tag] = (this.archCounts[tag] || 0) + 1;
+      const tag = match.tags?.[0] ?? Aggregator.NO_ARCH;
+      this.archCounts[tag] = (this.archCounts[tag] ?? 0) + 1;
       if (!(tag in this.tagStats)) {
         this.tagStats[tag] = {
           ...Aggregator.getDefaultStats(),
