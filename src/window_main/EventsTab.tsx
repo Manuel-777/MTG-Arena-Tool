@@ -179,7 +179,7 @@ function getEventsData(aggregator: Aggregator): EventTableData[] {
 
 function getTotalAggEvents(): string[] {
   const totalAgg = new Aggregator();
-  return totalAgg.events;
+  return totalAgg.trackEvents;
 }
 
 export function EventsTab({

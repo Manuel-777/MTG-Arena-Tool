@@ -459,6 +459,16 @@ export default class Aggregator {
     ];
   }
 
+  get trackEvents(): string[] {
+    return [
+      Aggregator.ALL_EVENT_TRACKS,
+      Aggregator.RANKED_DRAFT,
+      ...this._eventIds.filter(
+        eventId => !db.single_match_events.includes(eventId)
+      )
+    ];
+  }
+
   get decks(): SerializedDeck[] {
     return [
       { id: Aggregator.DEFAULT_DECK, name: Aggregator.DEFAULT_DECK },
