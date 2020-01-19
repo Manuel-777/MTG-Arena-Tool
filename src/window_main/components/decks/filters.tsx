@@ -9,7 +9,7 @@ export function deckSearchFilterFn(
   columnIds: string[],
   filterValue: FilterValue
 ): Row<DecksData>[] {
-  const tokens = String(filterValue)
+  const tokens = (filterValue + "")
     .split(" ")
     .filter(token => token.length > 2);
   if (tokens.length === 0) {
