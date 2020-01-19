@@ -132,7 +132,7 @@ function renderRanksStats(
 ): void {
   container.innerHTML = "";
   if (!aggregator || !aggregator.stats?.total) return;
-  const { winrate } = aggregator.stats as any;
+  const { winrate } = aggregator.stats;
 
   const seasonName = !isLimited ? "constructed" : "limited";
   const switchSeasonName = isLimited ? "constructed" : "limited";
@@ -287,7 +287,7 @@ function getTotalAggData(): [string[], TagCounts] {
     ...Object.values(db.archetypes).map(arch => arch.name)
   ];
   const tags = [...new Set(allTags)].map(tag => {
-    const count = (totalAgg.archCounts as any)?.[String(tag)] ?? 0;
+    const count = totalAgg.archCounts?.[String(tag)] ?? 0;
     return { tag, q: count };
   });
   return [totalAgg.events, tags];

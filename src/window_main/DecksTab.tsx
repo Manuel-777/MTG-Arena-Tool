@@ -103,16 +103,16 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
       const colorSortVal = deck.colors ? deck.colors.join("") : "";
       // compute winrate metrics
       const deckStats: AggregatorStats =
-        (aggregator.deckStats as any)[id] ?? Aggregator.getDefaultStats();
+        aggregator.deckStats[id] ?? Aggregator.getDefaultStats();
       const recentStats: AggregatorStats =
-        (aggregator.deckRecentStats as any)[id] ?? Aggregator.getDefaultStats();
+        aggregator.deckRecentStats[id] ?? Aggregator.getDefaultStats();
       const winrate100 = Math.round(deckStats.winrate * 100);
       // compute missing card metrics
       const missingWildcards = getDeckMissing(deck);
       const boosterCost = getBoosterCountEstimate(missingWildcards);
       // compute last touch metrics
       const lastUpdated = new Date(deck.lastUpdated ?? NaN);
-      const lastPlayed = (aggregator.deckLastPlayed as any)[id];
+      const lastPlayed = aggregator.deckLastPlayed[id];
       const lastTouched = dateMaxValid(lastUpdated, lastPlayed);
       return {
         ...deck,
