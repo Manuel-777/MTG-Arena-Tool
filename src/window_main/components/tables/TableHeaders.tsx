@@ -12,7 +12,7 @@ export default function TableHeaders<D extends TableData>({
 }: TableHeadersProps<D>): JSX.Element {
   return (
     <div
-      className="react_table_head line_dark"
+      className="med_scroll react_table_head line_dark"
       style={{ ...style, gridTemplateColumns }}
       {...getTableProps()}
     >

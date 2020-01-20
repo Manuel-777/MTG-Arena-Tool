@@ -335,14 +335,24 @@ export default function MatchesTable({
   return (
     <div className="react_table_wrap">
       <MatchesTableControls {...matchesTableControlsProps} />
-      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+      <div
+        className="med_scroll"
+        style={isTableMode ? { overflowX: "auto" } : undefined}
+      >
         <TableHeaders
           {...headersProps}
           style={
-            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+            isTableMode
+              ? { width: "fit-content" }
+              : { overflowX: "auto", overflowY: "hidden" }
           }
         />
-        <div className="react_table_body" {...getTableBodyProps()}>
+        <div
+          className={
+            isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+          }
+          {...getTableBodyProps()}
+        >
           {page.map((row, index) => {
             prepareRow(row);
             const data = row.original;

@@ -334,11 +334,21 @@ export default function CollectionTable({
   };
   const isTableMode = tableMode === COLLECTION_TABLE_MODE;
   const tableBody = legacyModes.includes(tableMode) ? (
-    <div className="react_table_body" {...getTableBodyProps()}>
+    <div
+      className={
+        isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+      }
+      {...getTableBodyProps()}
+    >
       <div ref={legacyContainerRef} />
     </div>
   ) : (
-    <div className="react_table_body" {...getTableBodyProps()}>
+    <div
+      className={
+        isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+      }
+      {...getTableBodyProps()}
+    >
       {page.map((row, index) => {
         prepareRow(row);
         const RowRenderer = isTableMode ? CardTableViewRow : CardTileRow;
@@ -359,11 +369,16 @@ export default function CollectionTable({
   return (
     <div className="react_table_wrap">
       <CollectionTableControls {...collectionTableControlsProps} />
-      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+      <div
+        className="med_scroll"
+        style={isTableMode ? { overflowX: "auto" } : undefined}
+      >
         <TableHeaders
           {...headersProps}
           style={
-            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+            isTableMode
+              ? { width: "fit-content" }
+              : { overflowX: "auto", overflowY: "hidden" }
           }
         />
         {tableBody}

@@ -247,7 +247,7 @@ export function useBaseReactTable<D extends TableData>({
 
   const visibleHeaders = headers.filter(header => header.isVisible);
   const gridTemplateColumns = visibleHeaders
-    .map(header => `minmax(${header.gridWidth ?? "100px"}, auto)`)
+    .map(header => `minmax(${header.gridWidth ?? "140px"}, auto)`)
     .join(" ");
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
     const toggleableColumns = flatColumns.filter(column => column.mayToggle);

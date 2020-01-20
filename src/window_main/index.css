@@ -3881,6 +3881,11 @@ a:hover {
 
 .react_table_body {
     background-color: var(--color-mid-20);
+    width: fit-content;
+}
+
+.react_table_body_no_adjust {
+    background-color: var(--color-mid-20);
 }
 
 .react_table_body_row {

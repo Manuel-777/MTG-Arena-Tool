@@ -339,14 +339,24 @@ export default function EconomyTable({
   return (
     <div className="react_table_wrap" style={{ marginTop: "12px" }}>
       <EconomyTableControls {...economyTableControlsProps} />
-      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+      <div
+        className="med_scroll"
+        style={isTableMode ? { overflowX: "auto" } : undefined}
+      >
         <TableHeaders
           {...headersProps}
           style={
-            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+            isTableMode
+              ? { width: "fit-content" }
+              : { overflowX: "auto", overflowY: "hidden" }
           }
         />
-        <div className="react_table_body" {...getTableBodyProps()}>
+        <div
+          className={
+            isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+          }
+          {...getTableBodyProps()}
+        >
           {page.map((groupRow, groupIndex) => {
             prepareRow(groupRow);
             const economyRowProps = {

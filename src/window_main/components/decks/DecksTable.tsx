@@ -263,14 +263,24 @@ export default function DecksTable({
   return (
     <div className="react_table_wrap">
       <DecksTableControls {...decksTableControlsProps} />
-      <div style={isTableMode ? { overflowX: "auto" } : undefined}>
+      <div
+        className="med_scroll"
+        style={isTableMode ? { overflowX: "auto" } : undefined}
+      >
         <TableHeaders
           {...headersProps}
           style={
-            isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
+            isTableMode
+              ? { width: "fit-content" }
+              : { overflowX: "auto", overflowY: "hidden" }
           }
         />
-        <div className="react_table_body" {...getTableBodyProps()}>
+        <div
+          className={
+            isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+          }
+          {...getTableBodyProps()}
+        >
           {page.map((row, index) => {
             prepareRow(row);
             const data = row.original;

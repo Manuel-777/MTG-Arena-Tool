@@ -180,6 +180,24 @@ label {
     background: #ffe9d3;
 }
 
+.med_scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.med_scroll::-webkit-scrollbar-track {
+    background: #33281E;
+    border-radius: 4px;
+    margin-left: 4px;
+}
+
+.med_scroll::-webkit-scrollbar-thumb {
+    background: #c3a485;
+    border-radius: 4px;
+}
+
+.med_scroll::-webkit-scrollbar-thumb:hover {
+    background: #ffe9d3;
+}
 
 .loading_bar {
     background-color: var(--color-g);
