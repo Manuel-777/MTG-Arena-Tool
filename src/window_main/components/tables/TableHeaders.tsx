@@ -13,7 +13,7 @@ export default function TableHeaders<D extends TableData>({
   return (
     <div
       className="decks_table_head line_dark"
-      style={{ gridTemplateColumns, ...((style as any) ?? {}) }}
+      style={{ ...style, gridTemplateColumns }}
       {...getTableProps()}
     >
       {visibleHeaders.map((column, ii) => (

@@ -105,7 +105,7 @@ export interface TableHeadersProps<D extends TableData> {
     updater: ((filterValue: FilterValue) => FilterValue) | FilterValue
   ) => void;
   setFiltersVisible: (filters: FiltersVisible) => void;
-  style?: Partial<CSSStyleDeclaration>;
+  style?: React.CSSProperties;
   visibleHeaders: ColumnInstance<D>[];
 }
 

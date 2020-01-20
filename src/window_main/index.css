@@ -3431,7 +3431,6 @@ a:hover {
 .list_item_container {
     white-space: nowrap;
     cursor: pointer;
-    padding-left: 16px;
     height: 64px;
     display: flex;
     justify-content: space-between;
