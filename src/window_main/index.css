@@ -3871,6 +3871,7 @@ a:hover {
     color: var(--color-light);
     border-bottom: 1px solid var(--color-light);
     background-color: var(--color-mid-20);
+    margin: 0 auto;
 }
 
 .react_table_head_container {
@@ -3882,6 +3883,7 @@ a:hover {
 .react_table_body {
     background-color: var(--color-mid-20);
     width: fit-content;
+    margin: 0 auto;
 }
 
 .react_table_body_no_adjust {

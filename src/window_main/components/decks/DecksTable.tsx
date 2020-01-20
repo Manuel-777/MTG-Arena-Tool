@@ -47,7 +47,7 @@ const columns: Column<DecksData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     defaultVisible: true
   },
   {
@@ -185,6 +185,7 @@ const columns: Column<DecksData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
+    gridWidth: "100px",
     mayToggle: true
   },
   {
@@ -194,6 +195,7 @@ const columns: Column<DecksData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
+    gridWidth: "100px",
     mayToggle: true
   },
   {
@@ -203,6 +205,7 @@ const columns: Column<DecksData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
+    gridWidth: "100px",
     mayToggle: true
   },
   {
@@ -212,6 +215,7 @@ const columns: Column<DecksData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
+    gridWidth: "100px",
     mayToggle: true
   },
   {
@@ -221,6 +225,7 @@ const columns: Column<DecksData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
+    gridWidth: "100px",
     mayToggle: true
   },
   { accessor: "custom" },
@@ -233,7 +238,7 @@ const columns: Column<DecksData>[] = [
     Filter: ArchiveColumnFilter,
     disableFilters: false,
     Cell: ArchivedCell,
-    gridWidth: "100px",
+    gridWidth: "110px",
     sortType: "basic",
     mayToggle: true,
     defaultVisible: true

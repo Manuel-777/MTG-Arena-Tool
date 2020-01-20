@@ -273,7 +273,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: ArchiveColumnFilter,
     disableFilters: false,
     Cell: ArchivedCell,
-    gridWidth: "100px",
+    gridWidth: "110px",
     sortType: "basic",
     mayToggle: true
   }

@@ -57,7 +57,7 @@ const columns: Column<TransactionData>[] = [
     Aggregated: LocalDateCell,
     sortDescFirst: true,
     defaultVisible: true,
-    gridWidth: "150px"
+    gridWidth: "170px"
   },
   {
     Header: "Code",
@@ -281,7 +281,7 @@ const columns: Column<TransactionData>[] = [
     Filter: ArchiveColumnFilter,
     disableFilters: false,
     Cell: ArchivedCell,
-    gridWidth: "100px",
+    gridWidth: "110px",
     sortType: "basic",
     mayToggle: true,
     defaultVisible: true

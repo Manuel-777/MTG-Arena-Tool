@@ -51,7 +51,11 @@ export function ShortTextCell<D extends TableData>({
 export function TextCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
-  return <LabelText>{cell.value}</LabelText>;
+  let displayName = cell.value ?? "";
+  if (displayName.length > 50) {
+    displayName = displayName.slice(0, 47) + "...";
+  }
+  return <LabelText title={cell.value}>{displayName}</LabelText>;
 }
 
 export function MetricCell<D extends TableData>({
