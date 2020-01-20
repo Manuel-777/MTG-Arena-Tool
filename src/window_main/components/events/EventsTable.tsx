@@ -103,7 +103,6 @@ const columns: Column<EventTableData>[] = [
     Header: "Duration",
     accessor: "duration",
     Cell: DurationCell,
-    gridWidth: "100px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -168,7 +167,6 @@ const columns: Column<EventTableData>[] = [
     disableFilters: false,
     Cell: ArchivedCell,
     sortType: "basic",
-    gridWidth: "100px",
     mayToggle: true
   }
 ];

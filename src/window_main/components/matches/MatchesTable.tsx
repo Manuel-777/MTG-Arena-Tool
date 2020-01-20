@@ -58,7 +58,6 @@ const columns: Column<MatchTableData>[] = [
     filter: "onPlay",
     Filter: OnPlayColumnFilter,
     Cell: OnPlayCell,
-    gridWidth: "100px",
     mayToggle: true
   },
   { accessor: "eventId" },
@@ -236,7 +235,6 @@ const columns: Column<MatchTableData>[] = [
     Header: "Duration",
     accessor: "duration",
     Cell: DurationCell,
-    gridWidth: "100px",
     mayToggle: true
   },
   {
@@ -277,7 +275,6 @@ const columns: Column<MatchTableData>[] = [
     disableFilters: false,
     Cell: ArchivedCell,
     sortType: "basic",
-    gridWidth: "100px",
     mayToggle: true
   }
 ];

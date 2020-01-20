@@ -227,7 +227,6 @@ const columns = [
     filter: "inBoosters",
     Filter: InBoostersColumnFilter,
     Cell: InBoostersCell,
-    gridWidth: "100px",
     mayToggle: true
   },
   {

@@ -196,7 +196,6 @@ const columns: Column<DecksData>[] = [
     disableFilters: false,
     Cell: ArchivedCell,
     sortType: "basic",
-    gridWidth: "100px",
     mayToggle: true,
     defaultVisible: true
   }
