@@ -20,17 +20,6 @@ export function EconomyHeader(): JSX.Element {
 
   return (
     <>
-      {/* <DateFilter
-        className={"economyDateSelect"}
-        prefixId={"query_select"}
-        showArchivedValue={state.showArchived}
-        showArchivedFilter={true}
-        onArchiveClick={onArchiveClicked}
-        options={selectOptions}
-        current={state.filterEconomy}
-        callback={onSelectChange}
-        optionFormatter={selectFormatter}
-      /> */}
       <EconomyValueRecord
         title={"Boosters"}
         iconClassName={"economy_wc_med wc_booster economyIconMargin"}
