@@ -129,12 +129,10 @@ export function rarityFilterFn(
   );
 }
 
-const setCodes = db.standardSetCodes.filter(code => code !== "Arena");
-
 export type SetFilterValue = { [set: string]: boolean };
 
 const defaultSetFilter: SetFilterValue = { other: true };
-setCodes.forEach((code: string) => (defaultSetFilter[code] = true));
+db.standardSetCodes.forEach((code: string) => (defaultSetFilter[code] = true));
 
 export type SetFilterProps = MultiSelectFilterProps<SetFilterValue>;
 
@@ -148,7 +146,7 @@ export function SetFilter(props: SetFilterProps): JSX.Element {
         height: "32px"
       }}
     >
-      {setCodes.map(code => {
+      {db.standardSetCodes.map(code => {
         return (
           <SetSymbol
             key={code}
@@ -199,7 +197,7 @@ export function setFilterFn(
       Object.entries(filterValue).some(
         ([code, value]) => value && row.values.set === code
       ) ||
-      (filterValue.other && !setCodes.includes(row.values.set))
+      (filterValue.other && !db.standardSetCodes.includes(row.values.set))
   );
 }
 
