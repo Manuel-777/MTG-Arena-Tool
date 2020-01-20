@@ -192,12 +192,13 @@ export function setFilterFn(
   id: string,
   filterValue: SetFilterValue
 ): Row<CardsData>[] {
+  const standardSets = new Set(db.standardSetCodes);
   return rows.filter(
     row =>
       Object.entries(filterValue).some(
         ([code, value]) => value && row.values.set === code
       ) ||
-      (filterValue.other && !db.standardSetCodes.includes(row.values.set))
+      (filterValue.other && !standardSets.has(row.values.set))
   );
 }
 
