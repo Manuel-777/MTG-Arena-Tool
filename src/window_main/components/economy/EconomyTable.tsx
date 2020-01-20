@@ -337,7 +337,7 @@ export default function EconomyTable({
   };
   const isTableMode = tableMode === EVENTS_TABLE_MODE;
   return (
-    <div className="react_table_wrap" style={{ marginTop: "12px" }}>
+    <div className="react_table_wrap">
       <EconomyTableControls {...economyTableControlsProps} />
       <div
         className="med_scroll"

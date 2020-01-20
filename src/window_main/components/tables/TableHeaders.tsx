@@ -21,7 +21,8 @@ export default function TableHeaders<D extends TableData>({
           {...column.getHeaderProps(column.getSortByToggleProps())}
           className={"hover_label"}
           style={{
-            gridArea: `1 / ${ii + 1} / 1 / ${ii + 2}`
+            gridArea: `1 / ${ii + 1} / 1 / ${ii + 2}`,
+            cursor: column.disableSortBy ? "default" : "pointer"
           }}
           key={column.id}
         >
