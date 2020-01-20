@@ -23,7 +23,14 @@ import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
-import { LastEditWinRateCell, MissingCardsCell, WinRateCell } from "./cells";
+import {
+  BoosterNeededCell,
+  BoosterNeededHeader,
+  LastEditWinRateCell,
+  WildcardCell,
+  WildcardHeader,
+  WinRateCell
+} from "./cells";
 import DecksArtViewRow from "./DecksArtViewRow";
 import DecksTableControls from "./DecksTableControls";
 import { deckSearchFilterFn } from "./filters";
@@ -75,7 +82,7 @@ const columns: Column<DecksData>[] = [
     filter: "fuzzyText",
     disableSortBy: true,
     Cell: TagsCell,
-    gridWidth: "2fr",
+    gridWidth: "240px",
     mayToggle: true
   },
   {
@@ -173,18 +180,50 @@ const columns: Column<DecksData>[] = [
   { accessor: "lastEditLosses" },
   { accessor: "lastEditTotal" },
   {
-    Header: "Booster Cost",
+    Header: BoosterNeededHeader,
     accessor: "boosterCost",
-    Cell: MissingCardsCell,
+    Cell: BoosterNeededCell,
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true
   },
-  { accessor: "rare" },
-  { accessor: "common" },
-  { accessor: "uncommon" },
-  { accessor: "mythic" },
+  {
+    Header: WildcardHeader,
+    accessor: "common",
+    Cell: WildcardCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true
+  },
+  {
+    Header: WildcardHeader,
+    accessor: "uncommon",
+    Cell: WildcardCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true
+  },
+  {
+    Header: WildcardHeader,
+    accessor: "rare",
+    Cell: WildcardCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true
+  },
+  {
+    Header: WildcardHeader,
+    accessor: "mythic",
+    Cell: WildcardCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true
+  },
   { accessor: "custom" },
   { accessor: "archived" },
   {
@@ -195,6 +234,7 @@ const columns: Column<DecksData>[] = [
     Filter: ArchiveColumnFilter,
     disableFilters: false,
     Cell: ArchivedCell,
+    gridWidth: "100px",
     sortType: "basic",
     mayToggle: true,
     defaultVisible: true

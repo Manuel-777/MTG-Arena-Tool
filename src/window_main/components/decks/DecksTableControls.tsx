@@ -127,7 +127,8 @@ export default function DecksTableControls(
                 "format",
                 "colorSortVal",
                 "boosterCost",
-                "timeUpdated"
+                "rare",
+                "mythic"
               ].includes(column.id);
               toggleHideColumn(column.id, !isVisible);
             }

@@ -166,6 +166,7 @@ const columns: Column<EventTableData>[] = [
     Filter: ArchiveColumnFilter,
     disableFilters: false,
     Cell: ArchivedCell,
+    gridWidth: "100px",
     sortType: "basic",
     mayToggle: true
   }

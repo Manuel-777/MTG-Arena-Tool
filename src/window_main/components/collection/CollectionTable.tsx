@@ -118,7 +118,6 @@ const columns = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    sortType: "alphanumeric",
     Cell: ShortTextCell,
     gridWidth: "200px",
     defaultVisible: true
@@ -151,7 +150,6 @@ const columns = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    sortType: "alphanumeric",
     Cell: TypeCell,
     gridWidth: "250px",
     mayToggle: true
@@ -162,7 +160,6 @@ const columns = [
     disableFilters: false,
     filter: "set",
     Filter: SetColumnFilter,
-    sortType: "alphanumeric",
     Cell: SetCell,
     gridWidth: "200px",
     mayToggle: true,
@@ -175,7 +172,6 @@ const columns = [
     Filter: RarityColumnFilter,
     filter: "rarity",
     Cell: RarityCell,
-    gridWidth: "140px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -213,7 +209,6 @@ const columns = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    sortType: "alphanumeric",
     Cell: ShortTextCell,
     gridWidth: "200px",
     mayToggle: true
@@ -227,6 +222,7 @@ const columns = [
     filter: "inBoosters",
     Filter: InBoostersColumnFilter,
     Cell: InBoostersCell,
+    gridWidth: "100px",
     mayToggle: true
   },
   {
@@ -235,7 +231,7 @@ const columns = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    sortType: "alphanumeric",
+    gridWidth: "100px",
     mayToggle: true
   },
   { accessor: "rank" },

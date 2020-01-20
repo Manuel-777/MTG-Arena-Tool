@@ -70,45 +70,40 @@ export function LastEditWinRateCell({
   return <MetricText title={tooltip}>{value}</MetricText>;
 }
 
-export function MissingCardsCell({ cell }: DecksTableCellProps): JSX.Element {
-  if (!cell.value) {
-    return (
-      <FlexLeftContainer style={{ visibility: "hidden" }}>
-        <MetricText>
-          <BoosterSymbol /> 0
-        </MetricText>
-      </FlexLeftContainer>
-    );
-  }
-  const data = cell.row.values;
-  const ownedWildcards = {
-    common: pd.economy.wcCommon,
-    uncommon: pd.economy.wcUncommon,
-    rare: pd.economy.wcRare,
-    mythic: pd.economy.wcMythic
-  };
+export function BoosterNeededCell({ cell }: DecksTableCellProps): JSX.Element {
   return (
-    <FlexLeftContainer>
-      {CARD_RARITIES.map(cardRarity => {
-        if (cardRarity === "land" || !data[cardRarity]) {
-          return;
-        }
-        return (
-          <MetricText
-            key={cardRarity}
-            title={_.capitalize(cardRarity) + " wildcards needed."}
-            style={{ marginRight: "4px" }}
-          >
-            <RaritySymbol rarity={cardRarity} />{" "}
-            {(ownedWildcards[cardRarity] > 0
-              ? ownedWildcards[cardRarity] + "/"
-              : "") + data[cardRarity]}
-          </MetricText>
-        );
-      })}
-      <MetricText title={"Boosters needed (estimated)"}>
-        <BoosterSymbol /> {Math.round(cell.value)}
-      </MetricText>
-    </FlexLeftContainer>
+    <MetricText
+      title={"Boosters needed (estimated)"}
+      style={cell.value ? undefined : { visibility: "hidden" }}
+    >
+      <BoosterSymbol /> {Math.round(cell.value)}
+    </MetricText>
+  );
+}
+
+export function BoosterNeededHeader(): JSX.Element {
+  return <BoosterSymbol title={"Boosters needed (estimated)"} />;
+}
+
+export function WildcardCell({ cell }: DecksTableCellProps): JSX.Element {
+  const rarity = cell.column.id;
+  const value = cell.value;
+  const owned = pd.economy["wc" + _.capitalize(rarity)];
+  return (
+    <MetricText
+      title={_.capitalize(rarity) + " wildcards needed."}
+      style={cell.value ? undefined : { visibility: "hidden" }}
+    >
+      <RaritySymbol rarity={rarity} /> {(owned > 0 ? owned + "/" : "") + value}
+    </MetricText>
+  );
+}
+
+export function WildcardHeader({ column }: { column: any }): JSX.Element {
+  return (
+    <RaritySymbol
+      rarity={column.id}
+      title={_.capitalize(column.id) + " wildcards needed."}
+    />
   );
 }

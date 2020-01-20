@@ -83,7 +83,7 @@ export default class Aggregator {
   private static finishStats(stats: AggregatorStats): void {
     const { wins, total, duration } = stats;
     if (total) {
-      stats.avgDuration = duration / total;
+      stats.avgDuration = Math.round(duration / total);
     }
     const { winrate, interval } = normalApproximationInterval(total, wins);
     const roundWinrate = (x: number): number => Math.round(x * 100) / 100;

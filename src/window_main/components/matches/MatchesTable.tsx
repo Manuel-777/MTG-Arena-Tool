@@ -58,6 +58,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "onPlay",
     Filter: OnPlayColumnFilter,
     Cell: OnPlayCell,
+    gridWidth: "100px",
     mayToggle: true
   },
   { accessor: "eventId" },
@@ -102,7 +103,6 @@ const columns: Column<MatchTableData>[] = [
     filter: "rank",
     Filter: RankColumnFilter,
     Cell: RankCell,
-    gridWidth: "140px",
     mayToggle: true
   },
   {
@@ -176,7 +176,6 @@ const columns: Column<MatchTableData>[] = [
     filter: "rank",
     Filter: RankColumnFilter,
     Cell: RankCell,
-    gridWidth: "140px",
     mayToggle: true
   },
   {
@@ -274,6 +273,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: ArchiveColumnFilter,
     disableFilters: false,
     Cell: ArchivedCell,
+    gridWidth: "100px",
     sortType: "basic",
     mayToggle: true
   }
