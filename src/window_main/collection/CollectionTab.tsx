@@ -56,27 +56,24 @@ function addCardMenu(div: HTMLElement, card: DbCardData): void {
 
 function getExportString(cardIds: string[]): string {
   const { export_format: exportFormat } = pd.settings;
+  // TODO teach export how to handle all the new optional columns?
   let exportString = "";
   cardIds.forEach(key => {
     let add = exportFormat + "";
     const card = db.card(key);
     if (card) {
-      let name = card.name;
-      name = replaceAll(name, "///", "//");
-      add = add.replace("$Name", '"' + name + '"');
-
-      add = add.replace(
-        "$Count",
-        pd.cards.cards[key] === 9999 ? 1 : pd.cards.cards[key]
-      );
-
-      add = add.replace("$SetName", card.set);
-      if (card.set in db.sets)
-        add = add.replace("$SetCode", db.sets[card.set].code);
-      add = add.replace("$Collector", card.cid);
-      add = add.replace("$Rarity", card.rarity);
-      add = add.replace("$Type", card.type);
-      add = add.replace("$Cmc", card.cmc + "");
+      const name = replaceAll(card.name, "///", "//");
+      const count = pd.cards.cards[key] === 9999 ? 1 : pd.cards.cards[key] ?? 0;
+      const code = db.sets[card.set]?.code ?? "???";
+      add = add
+        .replace("$Name", '"' + name + '"')
+        .replace("$Count", count)
+        .replace("$SetName", card.set)
+        .replace("$SetCode", code)
+        .replace("$Collector", card.cid)
+        .replace("$Rarity", card.rarity)
+        .replace("$Type", card.type)
+        .replace("$Cmc", card.cmc + "");
       exportString += add + "\r\n";
     }
   });
