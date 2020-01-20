@@ -117,8 +117,10 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
     if (!playerData.offline) {
       setData({ offline: true });
     }
-    const text = `Settings dont allow sending data! > (${task.method})`;
-    callback(new Error(text), task);
+    const text = `WARNING >> currently offline or settings prohibit sharing > (${task.method})`;
+    ipcLog(text);
+    callback(undefined, task, undefined, undefined);
+    return;
   }
   const _headers: any = { ...task };
   _headers.token = playerData.settings.token;
