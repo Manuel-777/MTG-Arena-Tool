@@ -334,11 +334,11 @@ export default function CollectionTable({
   };
   const isTableMode = tableMode === COLLECTION_TABLE_MODE;
   const tableBody = legacyModes.includes(tableMode) ? (
-    <div className="decks_table_body" {...getTableBodyProps()}>
+    <div className="react_table_body" {...getTableBodyProps()}>
       <div ref={legacyContainerRef} />
     </div>
   ) : (
-    <div className="decks_table_body" {...getTableBodyProps()}>
+    <div className="react_table_body" {...getTableBodyProps()}>
       {page.map((row, index) => {
         prepareRow(row);
         const RowRenderer = isTableMode ? CardTableViewRow : CardTileRow;
@@ -357,7 +357,7 @@ export default function CollectionTable({
     </div>
   );
   return (
-    <div className="decks_table_wrap">
+    <div className="react_table_wrap">
       <CollectionTableControls {...collectionTableControlsProps} />
       <div style={isTableMode ? { overflowX: "auto" } : undefined}>
         <TableHeaders

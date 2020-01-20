@@ -333,7 +333,7 @@ export default function MatchesTable({
   };
   const isTableMode = tableMode === MATCHES_TABLE_MODE;
   return (
-    <div className="decks_table_wrap">
+    <div className="react_table_wrap">
       <MatchesTableControls {...matchesTableControlsProps} />
       <div style={isTableMode ? { overflowX: "auto" } : undefined}>
         <TableHeaders
@@ -342,7 +342,7 @@ export default function MatchesTable({
             isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
           }
         />
-        <div className="decks_table_body" {...getTableBodyProps()}>
+        <div className="react_table_body" {...getTableBodyProps()}>
           {page.map((row, index) => {
             prepareRow(row);
             const data = row.original;

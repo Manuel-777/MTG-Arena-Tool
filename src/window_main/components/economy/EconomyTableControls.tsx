@@ -33,7 +33,7 @@ export default function EconomyTableControls(
         paddingBottom: "8px"
       }}
     >
-      <div className="decks_table_toggles">
+      <div className="react_table_toggles">
         <EconomyHeader />
         <CheckboxContainer title={"In boosters only"}>
           <span>expand transactions</span>
@@ -57,7 +57,7 @@ export default function EconomyTableControls(
         toggleableColumns={toggleableColumns}
         togglesVisible={togglesVisible}
       />
-      <div className="decks_table_search_cont">
+      <div className="react_table_search_cont">
         <WrappedReactSelect
           current={tableMode}
           options={ECONOMY_TABLE_MODES}

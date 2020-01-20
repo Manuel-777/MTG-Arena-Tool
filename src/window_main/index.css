@@ -3845,11 +3845,11 @@ a:hover {
     height: 16px;
 }
 
-.decks_table_wrap {
+.react_table_wrap {
     padding: 16px;
 }
 
-.decks_table_toggles {
+.react_table_toggles {
     display: flex;
     flex-wrap: wrap;
     width: -webkit-fill-available;
@@ -3857,7 +3857,7 @@ a:hover {
     align-items: center;
 }
 
-.decks_table_search_cont {
+.react_table_search_cont {
     display: flex;
     margin: 4px auto;
     width: -webkit-fill-available;
@@ -3865,7 +3865,7 @@ a:hover {
     align-items: center;
 }
 
-.decks_table_head {
+.react_table_head {
     display: grid;
     min-height: 64px;
     color: var(--color-light);
@@ -3873,29 +3873,29 @@ a:hover {
     background-color: var(--color-mid-20);
 }
 
-.decks_table_head_container {
+.react_table_head_container {
     margin-top: 8px;
     display: flex;
     justify-content: center;   
 }
 
-.decks_table_body {
+.react_table_body {
     background-color: var(--color-mid-20);
 }
 
-.decks_table_body_row {
+.react_table_body_row {
     display: grid;
     height: 32px;
     color: var(--color-light);
     -webkit-transition: all .1s ease-out;
 }
 
-.decks_table_body_row:hover {
+.react_table_body_row:hover {
     background-color: rgba(0,0,0,0.4);
     cursor: pointer;
 }
 
-.decks_table_body_row .inner_div {
+.react_table_body_row .inner_div {
     display: flex;
     padding: 2px;
     margin-left: 8px;

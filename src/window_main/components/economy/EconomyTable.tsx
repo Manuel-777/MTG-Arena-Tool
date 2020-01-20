@@ -337,7 +337,7 @@ export default function EconomyTable({
   };
   const isTableMode = tableMode === EVENTS_TABLE_MODE;
   return (
-    <div className="decks_table_wrap" style={{ marginTop: "12px" }}>
+    <div className="react_table_wrap" style={{ marginTop: "12px" }}>
       <EconomyTableControls {...economyTableControlsProps} />
       <div style={isTableMode ? { overflowX: "auto" } : undefined}>
         <TableHeaders
@@ -346,7 +346,7 @@ export default function EconomyTable({
             isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
           }
         />
-        <div className="decks_table_body" {...getTableBodyProps()}>
+        <div className="react_table_body" {...getTableBodyProps()}>
           {page.map((groupRow, groupIndex) => {
             prepareRow(groupRow);
             const economyRowProps = {

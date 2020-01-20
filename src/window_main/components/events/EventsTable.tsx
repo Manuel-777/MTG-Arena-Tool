@@ -219,7 +219,7 @@ export default function EventsTable({
   };
   const isTableMode = tableMode === EVENTS_TABLE_MODE;
   return (
-    <div className="decks_table_wrap">
+    <div className="react_table_wrap">
       <EventsTableControls {...eventsTableControlsProps} />
       <div style={isTableMode ? { overflowX: "auto" } : undefined}>
         <TableHeaders
@@ -228,7 +228,7 @@ export default function EventsTable({
             isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
           }
         />
-        <div className="decks_table_body" {...getTableBodyProps()}>
+        <div className="react_table_body" {...getTableBodyProps()}>
           {page.map((row, index) => {
             prepareRow(row);
             if (tableMode === EVENTS_TABLE_MODE) {

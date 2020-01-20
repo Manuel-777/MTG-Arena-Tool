@@ -11,7 +11,7 @@ export default function ColumnToggles<D extends TableData>({
   togglesVisible: boolean;
 }): JSX.Element {
   return (
-    <div className="decks_table_toggles">
+    <div className="react_table_toggles">
       {togglesVisible &&
         toggleableColumns.map(column => (
           <CheckboxContainer key={column.id}>

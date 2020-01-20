@@ -12,7 +12,7 @@ export default function TableHeaders<D extends TableData>({
 }: TableHeadersProps<D>): JSX.Element {
   return (
     <div
-      className="decks_table_head line_dark"
+      className="react_table_head line_dark"
       style={{ ...style, gridTemplateColumns }}
       {...getTableProps()}
     >
@@ -25,7 +25,7 @@ export default function TableHeaders<D extends TableData>({
           }}
           key={column.id}
         >
-          <div className={"decks_table_head_container"}>
+          <div className={"react_table_head_container"}>
             <div
               className={
                 column.isSorted

@@ -54,7 +54,7 @@ export default function DecksTableControls(
         paddingBottom: "8px"
       }}
     >
-      <div className="decks_table_toggles">
+      <div className="react_table_toggles">
         <DateFilter
           prefixId={"decks_top"}
           current={aggFilters.date}
@@ -146,7 +146,7 @@ export default function DecksTableControls(
         toggleableColumns={toggleableColumns}
         togglesVisible={togglesVisible}
       />
-      <div className="decks_table_search_cont">
+      <div className="react_table_search_cont">
         <WrappedReactSelect
           current={tableMode}
           options={DECKS_TABLE_MODES}

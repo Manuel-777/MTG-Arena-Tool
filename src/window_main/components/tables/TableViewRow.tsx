@@ -20,7 +20,7 @@ export function TableViewRow<D extends TableData>({
   );
   return (
     <div
-      className={(className ?? "") + " decks_table_body_row " + lineClass}
+      className={(className ?? "") + " react_table_body_row " + lineClass}
       style={{ ...style, gridTemplateColumns }}
       {...otherProps}
     >

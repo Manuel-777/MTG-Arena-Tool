@@ -60,7 +60,7 @@ export default function CollectionTableControls(
         paddingBottom: "8px"
       }}
     >
-      <div className="decks_table_toggles">
+      <div className="react_table_toggles">
         <SmallTextButton onClick={exportRows}>Export</SmallTextButton>
         <span style={{ paddingBottom: "8px", marginLeft: "12px" }}>
           Presets:
@@ -143,7 +143,7 @@ export default function CollectionTableControls(
         toggleableColumns={toggleableColumns}
         togglesVisible={togglesVisible}
       />
-      <div className="decks_table_search_cont">
+      <div className="react_table_search_cont">
         <WrappedReactSelect
           key={tableMode}
           current={tableMode}

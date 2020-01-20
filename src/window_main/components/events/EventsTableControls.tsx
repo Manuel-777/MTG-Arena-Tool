@@ -43,7 +43,7 @@ export default function EventsTableControls(
         paddingBottom: "8px"
       }}
     >
-      <div className="decks_table_toggles">
+      <div className="react_table_toggles">
         <DateFilter
           prefixId={"decks_top"}
           current={aggFilters.date}
@@ -82,7 +82,7 @@ export default function EventsTableControls(
         toggleableColumns={toggleableColumns}
         togglesVisible={togglesVisible}
       />
-      <div className="decks_table_search_cont">
+      <div className="react_table_search_cont">
         <WrappedReactSelect
           key={tableMode}
           current={tableMode}

@@ -261,7 +261,7 @@ export default function DecksTable({
   };
   const isTableMode = tableMode === DECKS_TABLE_MODE;
   return (
-    <div className="decks_table_wrap">
+    <div className="react_table_wrap">
       <DecksTableControls {...decksTableControlsProps} />
       <div style={isTableMode ? { overflowX: "auto" } : undefined}>
         <TableHeaders
@@ -270,7 +270,7 @@ export default function DecksTable({
             isTableMode ? undefined : { overflowX: "auto", overflowY: "hidden" }
           }
         />
-        <div className="decks_table_body" {...getTableBodyProps()}>
+        <div className="react_table_body" {...getTableBodyProps()}>
           {page.map((row, index) => {
             prepareRow(row);
             const data = row.original;
