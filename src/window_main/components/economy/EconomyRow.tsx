@@ -264,7 +264,6 @@ function CardPoolAddedEconomyValueRecord(
   props: CardPoolAddedEconomyValueRecordProps
 ): JSX.Element {
   const { addedCardIds, aetherizedCardIds } = props;
-
   return (
     <>
       <InventoryCardList cardsList={addedCardIds} isAetherized={false} />
@@ -276,24 +275,26 @@ function CardPoolAddedEconomyValueRecord(
 function InventoryCardList(props: InventoryCardListProps): JSX.Element {
   const { cardsList, isAetherized } = props;
   const uniqueCardList = countDupesArray(cardsList);
+  const cardCounts = Object.entries(uniqueCardList);
+  cardCounts.sort((a: [string, number], b: [string, number]): number =>
+    collectionSortRarity(a[0], b[0])
+  );
   return (
     <>
-      {Object.entries(uniqueCardList).map(
-        ([grpId, quantity]: [string, number]) => {
-          const card = db.card(grpId);
-          if (!card) {
-            return <></>;
-          }
-          return (
-            <InventoryCard
-              key={grpId}
-              card={card}
-              quantity={quantity}
-              isAetherized={isAetherized}
-            />
-          );
+      {cardCounts.map(([grpId, quantity]: [string, number]) => {
+        const card = db.card(grpId);
+        if (!card || quantity === 0) {
+          return <></>;
         }
-      )}
+        return (
+          <InventoryCard
+            key={grpId}
+            card={card}
+            quantity={quantity}
+            isAetherized={isAetherized}
+          />
+        );
+      })}
     </>
   );
 }
@@ -310,7 +311,6 @@ function FlexRight(props: FlexRightProps): JSX.Element {
   const {
     checkAetherized,
     checkBoosterAdded,
-    checkCardsAdded,
     checkGemsEarnt,
     checkGoldEarnt,
     checkSkinsAdded,
@@ -331,15 +331,7 @@ function FlexRight(props: FlexRightProps): JSX.Element {
     );
 
   const checkCards =
-    checkCardsAdded &&
-    change.delta.cardsAdded &&
-    change.delta.cardsAdded.length > 0;
-
-  if (checkCards) {
-    // presort here
-    change.delta.cardsAdded.sort(collectionSortRarity);
-  }
-
+    change.delta.cardsAdded && change.delta.cardsAdded.length > 0;
   const checkAether =
     checkAetherized &&
     change.aetherizedCards &&
