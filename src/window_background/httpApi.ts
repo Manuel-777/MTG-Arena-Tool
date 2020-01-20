@@ -195,7 +195,7 @@ function handleAuthResponse(
   results?: string,
   parsedResult?: any
 ): void {
-  if (error) {
+  if (error || !parsedResult) {
     syncSettings({ token: "" }, false);
     appDb.upsert("", "email", "");
     appDb.upsert("", "token", "");
@@ -203,7 +203,7 @@ function handleAuthResponse(
     ipcSend("toggle_login", true);
     ipcSend("clear_pwd", 1);
     ipcPop({
-      text: error.message,
+      text: error?.message,
       time: 3000,
       progress: -1
     });
