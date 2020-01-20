@@ -46,7 +46,6 @@ const columns: Column<DecksData>[] = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    sortType: "alphanumeric",
     Cell: ShortTextCell,
     gridWidth: "200px",
     defaultVisible: true

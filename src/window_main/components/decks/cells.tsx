@@ -1,20 +1,15 @@
 import format from "date-fns/format";
 import _ from "lodash";
 import React from "react";
-import { CARD_RARITIES } from "../../../shared/constants";
+import { HeaderProps } from "react-table";
 import pd from "../../../shared/player-data";
 import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass
 } from "../../renderer-util";
-import {
-  BoosterSymbol,
-  FlexLeftContainer,
-  MetricText,
-  RaritySymbol
-} from "../display";
-import { DecksTableCellProps } from "./types";
+import { BoosterSymbol, MetricText, RaritySymbol } from "../display";
+import { DecksData, DecksTableCellProps } from "./types";
 
 export function WinRateCell({ cell }: DecksTableCellProps): JSX.Element {
   const { total, interval, winrate, winrateLow, winrateHigh } = cell.row.values;
@@ -99,7 +94,9 @@ export function WildcardCell({ cell }: DecksTableCellProps): JSX.Element {
   );
 }
 
-export function WildcardHeader({ column }: { column: any }): JSX.Element {
+export function WildcardHeader({
+  column
+}: HeaderProps<DecksData>): JSX.Element {
   return (
     <RaritySymbol
       rarity={column.id}
