@@ -119,7 +119,7 @@ const columns = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     defaultVisible: true
   },
   { accessor: "colors" },
@@ -151,7 +151,7 @@ const columns = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: TypeCell,
-    gridWidth: "250px",
+    gridWidth: "230px",
     mayToggle: true
   },
   {
@@ -161,7 +161,7 @@ const columns = [
     filter: "set",
     Filter: SetColumnFilter,
     Cell: SetCell,
-    gridWidth: "200px",
+    gridWidth: "230px",
     mayToggle: true,
     defaultVisible: true
   },

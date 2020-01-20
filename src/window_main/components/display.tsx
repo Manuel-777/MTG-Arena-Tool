@@ -81,6 +81,21 @@ export const LabelText = styled.div`
   white-space: nowrap;
 `;
 
+export function BriefText({
+  value,
+  maxLength
+}: {
+  value?: string;
+  maxLength?: number;
+}): JSX.Element {
+  let displayName = value ?? "";
+  const cutoff = maxLength ?? 25;
+  if (displayName.length > cutoff) {
+    displayName = displayName.slice(0, cutoff - 3) + "...";
+  }
+  return <LabelText title={value}>{displayName}</LabelText>;
+}
+
 export const MetricText = styled.div`
   display: inline-block;
   line-height: 32px;

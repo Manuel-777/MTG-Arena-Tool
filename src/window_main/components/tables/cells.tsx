@@ -15,7 +15,8 @@ import {
   NewTag,
   TagBubble,
   TagBubbleWithClose,
-  useColorpicker
+  useColorpicker,
+  BriefText
 } from "../display";
 import { TableData, TagCounts } from "./types";
 
@@ -38,24 +39,14 @@ export function ColorsCell<D extends TableData>({
 export function ShortTextCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
-  let displayName = cell.value ?? "";
-  if (displayName.includes("?=?Loc/Decks/Precon/")) {
-    displayName = displayName.replace("?=?Loc/Decks/Precon/", "");
-  }
-  if (displayName.length > 25) {
-    displayName = displayName.slice(0, 22) + "...";
-  }
-  return <LabelText title={cell.value}>{displayName}</LabelText>;
+  const displayName = (cell.value ?? "").replace("?=?Loc/Decks/Precon/", "");
+  return <BriefText value={displayName} />;
 }
 
 export function TextCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
-  let displayName = cell.value ?? "";
-  if (displayName.length > 50) {
-    displayName = displayName.slice(0, 47) + "...";
-  }
-  return <LabelText title={cell.value}>{displayName}</LabelText>;
+  return <BriefText value={cell.value} maxLength={50} />;
 }
 
 export function MetricCell<D extends TableData>({

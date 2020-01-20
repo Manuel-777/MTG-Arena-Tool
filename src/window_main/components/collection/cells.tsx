@@ -6,7 +6,8 @@ import {
   LabelText,
   RaritySymbol,
   SetSymbol,
-  TypeSymbol
+  TypeSymbol,
+  BriefText
 } from "../display";
 import { CollectionTableCellProps } from "./types";
 
@@ -33,20 +34,19 @@ export function SetCell({ cell }: CollectionTableCellProps): JSX.Element {
   return (
     <FlexLeftContainer>
       <SetSymbol set={set} />
-      <LabelText>{set}</LabelText>
+      <BriefText value={set} />
     </FlexLeftContainer>
   );
 }
 
 export function TypeCell({ cell }: CollectionTableCellProps): JSX.Element {
-  const data = cell.row.values;
-  const type = data.type;
+  const type = cell.value;
   return (
     <FlexLeftContainer>
       <div className="type_icon_cont">
         <TypeSymbol type={type} />
       </div>
-      <LabelText>{type}</LabelText>
+      <BriefText value={type} />
     </FlexLeftContainer>
   );
 }
