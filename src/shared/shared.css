@@ -181,18 +181,18 @@ label {
 }
 
 .med_scroll::-webkit-scrollbar {
-    height: 4px;
+    height: 6px;
 }
 
 .med_scroll::-webkit-scrollbar-track {
     background: #33281E;
-    border-radius: 4px;
-    margin-left: 4px;
+    border-radius: 6px;
+    margin-left: 6px;
 }
 
 .med_scroll::-webkit-scrollbar-thumb {
     background: #c3a485;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .med_scroll::-webkit-scrollbar-thumb:hover {
