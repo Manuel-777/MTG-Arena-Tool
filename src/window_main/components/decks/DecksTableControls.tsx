@@ -115,7 +115,7 @@ export default function DecksTableControls(
           onClick={(): void => {
             setAllFilters(defaultFilters);
             setFiltersVisible(initialFiltersVisible);
-            toggleSortBy("boosterCost", true, true);
+            toggleSortBy("boosterCost", true, false);
             toggleSortBy("mythic", true, true);
             toggleSortBy("rare", true, true);
             for (const column of toggleableColumns) {
