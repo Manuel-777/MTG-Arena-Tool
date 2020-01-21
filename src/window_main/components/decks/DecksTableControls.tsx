@@ -97,6 +97,7 @@ export default function DecksTableControls(
               winrate100: true
             });
             toggleSortBy("winrate100", true, false);
+            toggleSortBy("wins", true, true);
             for (const column of toggleableColumns) {
               const isVisible = [
                 "format",

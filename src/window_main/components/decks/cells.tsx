@@ -94,7 +94,7 @@ export function WildcardHeader({
   return (
     <RaritySymbol
       rarity={column.id}
-      title={_.capitalize(column.id) + " wildcards needed."}
+      title={_.capitalize(column.id) + " wildcards needed"}
     />
   );
 }
