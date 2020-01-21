@@ -10,17 +10,13 @@ import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import { DecksTableControlsProps } from "./types";
 
-const recentFilters = (): { id: string; value: FilterValue }[] => [
+const defaultFilters = (): { id: string; value: FilterValue }[] => [
   { id: "archivedCol", value: "hideArchived" }
 ];
 const bestFilters = (): { id: string; value: FilterValue }[] => [
   { id: "archivedCol", value: "hideArchived" },
   { id: "wins", value: [5, undefined] },
   { id: "winrate100", value: [50, undefined] }
-];
-const wantedFilters = (): { id: string; value: FilterValue }[] => [
-  { id: "archivedCol", value: "hideArchived" },
-  { id: "boosterCost", value: [1, undefined] }
 ];
 
 export default function DecksTableControls(
@@ -75,7 +71,7 @@ export default function DecksTableControls(
         <span style={{ paddingBottom: "8px" }}>Presets:</span>
         <SmallTextButton
           onClick={(): void => {
-            setAllFilters(recentFilters);
+            setAllFilters(defaultFilters);
             setFiltersVisible(initialFiltersVisible);
             toggleSortBy("timeTouched", true, false);
             for (const column of toggleableColumns) {
@@ -83,6 +79,7 @@ export default function DecksTableControls(
                 "format",
                 "colorSortVal",
                 "timeTouched",
+                "total",
                 "lastEditWinrate"
               ].includes(column.id);
               toggleHideColumn(column.id, !isVisible);
@@ -116,12 +113,11 @@ export default function DecksTableControls(
         </SmallTextButton>
         <SmallTextButton
           onClick={(): void => {
-            setAllFilters(wantedFilters);
-            setFiltersVisible({
-              ...initialFiltersVisible,
-              boosterCost: true
-            });
-            toggleSortBy("boosterCost", true, false);
+            setAllFilters(defaultFilters);
+            setFiltersVisible(initialFiltersVisible);
+            toggleSortBy("boosterCost", true, true);
+            toggleSortBy("mythic", true, true);
+            toggleSortBy("rare", true, true);
             for (const column of toggleableColumns) {
               const isVisible = [
                 "format",
