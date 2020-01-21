@@ -67,10 +67,7 @@ export function LastEditWinRateCell({
 
 export function BoosterNeededCell({ cell }: DecksTableCellProps): JSX.Element {
   return (
-    <MetricText
-      title={"Boosters needed (estimated)"}
-      style={cell.value ? undefined : { visibility: "hidden" }}
-    >
+    <MetricText title={"Boosters needed (estimated)"}>
       <BoosterSymbol /> {Math.round(cell.value)}
     </MetricText>
   );
@@ -85,10 +82,7 @@ export function WildcardCell({ cell }: DecksTableCellProps): JSX.Element {
   const value = cell.value;
   const owned = pd.economy["wc" + _.capitalize(rarity)];
   return (
-    <MetricText
-      title={_.capitalize(rarity) + " wildcards needed."}
-      style={cell.value ? undefined : { visibility: "hidden" }}
-    >
+    <MetricText title={_.capitalize(rarity) + " wildcards needed."}>
       <RaritySymbol rarity={rarity} /> {(owned > 0 ? owned + "/" : "") + value}
     </MetricText>
   );
