@@ -85,6 +85,14 @@ export default function AutosuggestInput({
     (): void => setSuggestions([]),
     []
   );
+  const onSuggestionSelected = React.useCallback(
+    (event, { suggestionValue, method }): void => {
+      if (method === "click") {
+        submitCallback(suggestionValue);
+      }
+    },
+    [submitCallback]
+  );
   const onBlur = React.useCallback(
     (
       e: React.FocusEvent<HTMLElement>,
@@ -118,6 +126,7 @@ export default function AutosuggestInput({
         suggestions={suggestions}
         onSuggestionsFetchRequested={onSuggestionsFetchRequested}
         onSuggestionsClearRequested={onSuggestionsClearRequested}
+        onSuggestionSelected={onSuggestionSelected}
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={SuggestionItem}
         inputProps={inputProps}
