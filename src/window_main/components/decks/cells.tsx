@@ -80,10 +80,10 @@ export function BoosterNeededHeader(): JSX.Element {
 export function WildcardCell({ cell }: DecksTableCellProps): JSX.Element {
   const rarity = cell.column.id;
   const value = cell.value;
-  const owned = pd.economy["wc" + _.capitalize(rarity)];
+  const owned = pd.economy["wc" + _.capitalize(rarity)] ?? 0;
   return (
-    <MetricText title={_.capitalize(rarity) + " wildcards needed."}>
-      <RaritySymbol rarity={rarity} /> {(owned > 0 ? owned + "/" : "") + value}
+    <MetricText title={_.capitalize(rarity) + " wildcards (owned/needed)"}>
+      <RaritySymbol rarity={rarity} /> {owned + "/" + value}
     </MetricText>
   );
 }
