@@ -31,6 +31,7 @@ export default function MatchesTableControls(
     setTogglesVisible,
     tableMode,
     toggleableColumns,
+    toggleHideColumn,
     toggleSortBy,
     togglesVisible
   } = props;
@@ -66,6 +67,9 @@ export default function MatchesTableControls(
             setAllFilters(defaultFilters);
             setFiltersVisible({});
             toggleSortBy("timestamp", true, false);
+            for (const column of toggleableColumns) {
+              toggleHideColumn(column.id, !column.defaultVisible);
+            }
           }}
         >
           Reset

@@ -70,7 +70,6 @@ const columns: Column<TransactionData>[] = [
     aggregate: "count",
     Aggregated: AggregatedContextCell,
     gridWidth: "400px",
-    defaultVisible: true,
     mayToggle: true
   },
   { accessor: "prettyContext" },
@@ -283,8 +282,7 @@ const columns: Column<TransactionData>[] = [
     Cell: ArchivedCell,
     gridWidth: "110px",
     sortType: "basic",
-    mayToggle: true,
-    defaultVisible: true
+    mayToggle: true
   }
 ];
 

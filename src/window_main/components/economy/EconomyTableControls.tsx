@@ -1,12 +1,21 @@
 import React from "react";
+import { FilterValue } from "react-table";
 import { ECONOMY_TABLE_MODES } from "../../../shared/constants";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
-import { CheckboxContainer, MediumTextButton } from "../display";
+import {
+  CheckboxContainer,
+  MediumTextButton,
+  SmallTextButton
+} from "../display";
 import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import { EconomyHeader } from "./EconomyHeader";
 import { EconomyTableControlsProps } from "./types";
+
+const defaultFilters = (): { id: string; value: FilterValue }[] => [
+  { id: "archivedCol", value: "hideArchived" }
+];
 
 export default function EconomyTableControls(
   props: EconomyTableControlsProps
@@ -16,12 +25,16 @@ export default function EconomyTableControls(
     isExpanded,
     pagingProps,
     preGlobalFilteredRows,
+    setAllFilters,
     setExpanded,
+    setFiltersVisible,
     setGlobalFilter,
     setTableMode,
     setTogglesVisible,
     tableMode,
     toggleableColumns,
+    toggleHideColumn,
+    toggleSortBy,
     togglesVisible
   } = props;
   return (
@@ -36,7 +49,7 @@ export default function EconomyTableControls(
       <div className="react_table_toggles">
         <EconomyHeader />
         <CheckboxContainer title={"In boosters only"}>
-          <span>expand transactions</span>
+          <span>show transactions</span>
           <input
             type="checkbox"
             checked={isExpanded}
@@ -46,6 +59,19 @@ export default function EconomyTableControls(
           />
           <span className={"checkmark"} />
         </CheckboxContainer>
+        <SmallTextButton
+          onClick={(): void => {
+            setAllFilters(defaultFilters);
+            setFiltersVisible({});
+            for (const column of toggleableColumns) {
+              toggleHideColumn(column.id, !column.defaultVisible);
+            }
+            toggleSortBy("timestamp", true, false);
+          }}
+          style={{ marginLeft: "12px" }}
+        >
+          Reset
+        </SmallTextButton>
         <MediumTextButton
           onClick={(): void => setTogglesVisible(!togglesVisible)}
           style={{ margin: "0 0 5px 12px" }}

@@ -18,6 +18,14 @@ const bestFilters = (): { id: string; value: FilterValue }[] => [
   { id: "wins", value: [5, undefined] },
   { id: "winrate100", value: [50, undefined] }
 ];
+const craftColumns = new Set([
+  "colorSortVal",
+  "boosterCost",
+  "rare",
+  "mythic",
+  "uncommon",
+  "common"
+]);
 
 export default function DecksTableControls(
   props: DecksTableControlsProps
@@ -75,15 +83,10 @@ export default function DecksTableControls(
             setFiltersVisible(initialFiltersVisible);
             toggleSortBy("timeTouched", true, false);
             for (const column of toggleableColumns) {
-              const isVisible = [
-                "format",
-                "colorSortVal",
-                "timeTouched",
-                "total",
-                "lastEditWinrate"
-              ].includes(column.id);
-              toggleHideColumn(column.id, !isVisible);
+              toggleHideColumn(column.id, !column.defaultVisible);
             }
+            toggleHideColumn("total", false);
+            toggleHideColumn("lastEditWinrate", false);
           }}
         >
           Recent
@@ -99,15 +102,11 @@ export default function DecksTableControls(
             toggleSortBy("winrate100", true, false);
             toggleSortBy("wins", true, true);
             for (const column of toggleableColumns) {
-              const isVisible = [
-                "format",
-                "colorSortVal",
-                "losses",
-                "winrate100",
-                "wins"
-              ].includes(column.id);
-              toggleHideColumn(column.id, !isVisible);
+              toggleHideColumn(column.id, !column.defaultVisible);
             }
+            toggleHideColumn("wins", false);
+            toggleHideColumn("losses", false);
+            toggleHideColumn("archivedCol", true);
           }}
         >
           Best
@@ -120,13 +119,7 @@ export default function DecksTableControls(
             toggleSortBy("mythic", true, true);
             toggleSortBy("rare", true, true);
             for (const column of toggleableColumns) {
-              const isVisible = [
-                "format",
-                "colorSortVal",
-                "boosterCost",
-                "rare",
-                "mythic"
-              ].includes(column.id);
+              const isVisible = craftColumns.has(column.id);
               toggleHideColumn(column.id, !isVisible);
             }
           }}

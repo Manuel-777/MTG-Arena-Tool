@@ -74,14 +74,7 @@ export default function CollectionTableControls(
             });
             toggleSortBy("grpId", true, false);
             for (const column of toggleableColumns) {
-              const isVisible = [
-                "colorSortVal",
-                "cmc",
-                "set",
-                "rarity",
-                "owned"
-              ].includes(column.id);
-              toggleHideColumn(column.id, !isVisible);
+              toggleHideColumn(column.id, !column.defaultVisible);
             }
           }}
         >
@@ -96,14 +89,7 @@ export default function CollectionTableControls(
             });
             toggleSortBy("grpId", true, false);
             for (const column of toggleableColumns) {
-              const isVisible = [
-                "colorSortVal",
-                "cmc",
-                "set",
-                "rarity",
-                "owned"
-              ].includes(column.id);
-              toggleHideColumn(column.id, !isVisible);
+              toggleHideColumn(column.id, !column.defaultVisible);
             }
           }}
         >
@@ -118,15 +104,10 @@ export default function CollectionTableControls(
             });
             toggleSortBy("grpId", true, false);
             for (const column of toggleableColumns) {
-              const isVisible = [
-                "colorSortVal",
-                "cmc",
-                "set",
-                "rarity",
-                "wanted"
-              ].includes(column.id);
-              toggleHideColumn(column.id, !isVisible);
+              toggleHideColumn(column.id, !column.defaultVisible);
             }
+            toggleHideColumn("wanted", false);
+            toggleHideColumn("cmc", true);
           }}
         >
           Wanted

@@ -31,6 +31,7 @@ export default function EventsTableControls(
     setTogglesVisible,
     tableMode,
     toggleableColumns,
+    toggleHideColumn,
     toggleSortBy,
     togglesVisible
   } = props;
@@ -65,6 +66,9 @@ export default function EventsTableControls(
           onClick={(): void => {
             setAllFilters(defaultFilters);
             setFiltersVisible({});
+            for (const column of toggleableColumns) {
+              toggleHideColumn(column.id, !column.defaultVisible);
+            }
             toggleSortBy("timestamp", true, false);
           }}
         >
