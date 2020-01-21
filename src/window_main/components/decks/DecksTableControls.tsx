@@ -106,6 +106,7 @@ export default function DecksTableControls(
             }
             toggleHideColumn("wins", false);
             toggleHideColumn("losses", false);
+            toggleHideColumn("winrate100", false);
             toggleHideColumn("archivedCol", true);
           }}
         >

@@ -161,7 +161,6 @@ const columns: Column<DecksData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
-    defaultVisible: true,
     needsTileLabel: true
   },
   { accessor: "winrate" },

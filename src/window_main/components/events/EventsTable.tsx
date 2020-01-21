@@ -153,8 +153,7 @@ const columns: Column<EventTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: TextCell,
-    mayToggle: true,
-    defaultVisible: true
+    mayToggle: true
   },
   { accessor: "custom" },
   { accessor: "archived" },
