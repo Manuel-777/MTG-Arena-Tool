@@ -190,17 +190,7 @@ const columns: Column<DecksData>[] = [
   },
   {
     Header: WildcardHeader,
-    accessor: "common",
-    Cell: WildcardCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    gridWidth: "100px",
-    mayToggle: true
-  },
-  {
-    Header: WildcardHeader,
-    accessor: "uncommon",
+    accessor: "mythic",
     Cell: WildcardCell,
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
@@ -220,7 +210,17 @@ const columns: Column<DecksData>[] = [
   },
   {
     Header: WildcardHeader,
-    accessor: "mythic",
+    accessor: "uncommon",
+    Cell: WildcardCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    gridWidth: "100px",
+    mayToggle: true
+  },
+  {
+    Header: WildcardHeader,
+    accessor: "common",
     Cell: WildcardCell,
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
