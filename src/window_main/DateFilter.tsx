@@ -50,7 +50,7 @@ export default function DateFilter({
         callback(filter);
         ipcSend("save_user_settings", {
           last_date_filter: filter,
-          skip_refresh: true
+          skipRefresh: true
         });
       }
     },
