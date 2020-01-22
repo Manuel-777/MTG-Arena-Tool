@@ -104,12 +104,12 @@ export const MetricText = styled.div`
   font-weight: 300;
 `;
 
-interface TagBubbleProps {
+interface TagBubbleDivProps {
   backgroundColor: string;
   fontStyle: string;
 }
 
-export const TagBubble = styled.div<TagBubbleProps>`
+export const TagBubbleDiv = styled.div<TagBubbleDivProps>`
   font-family: var(--sub-font-name);
   cursor: pointer;
   color: black;
@@ -136,7 +136,7 @@ export const TagBubble = styled.div<TagBubbleProps>`
   }
 `;
 
-const TagBubbleWithCloseContainer = styled(TagBubble)`
+const TagBubbleWithCloseDiv = styled(TagBubbleDiv)`
   padding-right: 0;
 `;
 
@@ -167,29 +167,36 @@ export function useColorpicker(
   };
 }
 
-interface TagBubbleWithCloseProps {
+interface TagBubbleProps {
   parentId: string;
+  fontStyle?: string;
+  hideCloseButton?: boolean;
+  title?: string;
   tag: string;
   editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (deckid: string, tag: string) => void;
+  deleteTagCallback?: (deckid: string, tag: string) => void;
 }
 
-export function TagBubbleWithClose({
+export function TagBubble({
   parentId,
+  fontStyle,
+  hideCloseButton,
+  title,
   tag,
   editTagCallback,
   deleteTagCallback
-}: TagBubbleWithCloseProps): JSX.Element {
+}: TagBubbleProps): JSX.Element {
   const backgroundColor = getTagColor(tag);
   const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
     null
   );
+  const Renderer = hideCloseButton ? TagBubbleDiv : TagBubbleWithCloseDiv;
   return (
-    <TagBubbleWithCloseContainer
+    <Renderer
       backgroundColor={backgroundColor}
-      fontStyle={"normal"}
+      fontStyle={fontStyle ?? "normal"}
       ref={containerRef}
-      title={"change tag color"}
+      title={title ?? "change tag color"}
       onClick={useColorpicker(
         containerRef,
         tag,
@@ -198,25 +205,27 @@ export function TagBubbleWithClose({
       )}
     >
       {tag}
-      <div
-        className={"deck_tag_close"}
-        title={"delete tag"}
-        onClick={(e): void => {
-          e.stopPropagation();
-          deleteTagCallback(parentId, tag);
-        }}
-      />
-    </TagBubbleWithCloseContainer>
+      {deleteTagCallback && !hideCloseButton && (
+        <div
+          className={"deck_tag_close"}
+          title={"delete tag"}
+          onClick={(e): void => {
+            e.stopPropagation();
+            deleteTagCallback(parentId, tag);
+          }}
+        />
+      )}
+    </Renderer>
   );
 }
 
-export function renderTagBubbleWithClose(
+export function renderTagBubble(
   parent: Element,
-  props: TagBubbleWithCloseProps
+  props: TagBubbleProps
 ): HTMLDivElement {
   const container = createDiv([]);
   container.style.alignSelf = "center";
-  mountReactComponent(<TagBubbleWithClose {...props} />, container);
+  mountReactComponent(<TagBubble {...props} />, container);
   parent.appendChild(container);
   return container;
 }
@@ -226,7 +235,7 @@ interface NewTagProps {
   addTagCallback: (id: string, tag: string) => void;
   tagPrompt: string;
   tags: TagCounts;
-  title: string;
+  title?: string;
 }
 
 export function NewTag({
@@ -238,7 +247,7 @@ export function NewTag({
 }: NewTagProps): JSX.Element {
   const backgroundColor = getTagColor();
   return (
-    <TagBubble
+    <TagBubbleDiv
       backgroundColor={backgroundColor}
       fontStyle={"italic"}
       title={title}
@@ -250,7 +259,7 @@ export function NewTag({
         submitCallback={(val: string): void => addTagCallback(parentId, val)}
         tags={tags}
       />
-    </TagBubble>
+    </TagBubbleDiv>
   );
 }
 

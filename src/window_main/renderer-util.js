@@ -4,11 +4,13 @@ import path from "path";
 import { app, ipcRenderer as ipc, remote, shell } from "electron";
 const { dialog } = remote;
 import _ from "lodash";
+import format from "date-fns/format";
 import anime from "animejs";
 import striptags from "striptags";
 import Picker from "vanilla-picker";
 import Pikaday from "pikaday";
 import {
+  CARD_RARITIES,
   COLORS_ALL,
   MANA,
   MANA_COLORS,
@@ -34,7 +36,9 @@ import { addCardHover } from "../shared/cardHover";
 import {
   deckTypesStats,
   formatRank,
+  getBoosterCountEstimate,
   getCardArtCrop,
+  get_deck_missing,
   get_rank_index_16,
   getCardImage,
   getReadableEvent,
@@ -977,6 +981,110 @@ function createReplayShareButton(draft) {
   );
   replayShareButton.title = "share draft replay";
   return replayShareButton;
+}
+
+export function attachDeckData(listItem, deck) {
+  // Deck name
+  if (deck.name.indexOf("?=?Loc/Decks/Precon/") != -1) {
+    deck.name = deck.name.replace("?=?Loc/Decks/Precon/", "");
+  }
+  const deckNameDiv = createDiv(["list_deck_name"], deck.name);
+  listItem.leftTop.appendChild(deckNameDiv);
+
+  // Deck colors
+  deck.colors.forEach(function(color) {
+    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
+    listItem.leftBottom.appendChild(m);
+  });
+
+  // Last touched
+  const lastTouch = new Date(deck.timeTouched);
+  const deckLastTouchedDiv = createDiv(
+    ["list_deck_winrate"],
+    `<i style="opacity:0.6">updated/played:</i> ${localTimeSince(lastTouch)}`
+  );
+  deckLastTouchedDiv.style.marginLeft = "18px";
+  deckLastTouchedDiv.style.marginRight = "auto";
+  deckLastTouchedDiv.style.lineHeight = "18px";
+  listItem.centerBottom.appendChild(deckLastTouchedDiv);
+
+  // Deck winrates
+  if (deck.total > 0) {
+    const deckWinrateDiv = createDiv(["list_deck_winrate"]);
+    let interval, tooltip;
+    if (deck.total >= 20) {
+      // sample Size is large enough to use Wald Interval
+      interval = formatPercent(deck.interval);
+      tooltip = formatWinrateInterval(
+        formatPercent(deck.winrateLow),
+        formatPercent(deck.winrateHigh)
+      );
+    } else {
+      // sample size is too small (garbage results)
+      interval = "???";
+      tooltip = "play at least 20 matches to estimate actual winrate";
+    }
+    let colClass = getWinrateClass(deck.winrate);
+    deckWinrateDiv.innerHTML = `${deck.wins}:${
+      deck.losses
+    } (<span class="${colClass}_bright">${formatPercent(
+      deck.winrate
+    )}</span> <i style="opacity:0.6;">&plusmn; ${interval}</i>)`;
+    deckWinrateDiv.title = tooltip;
+    listItem.rightTop.appendChild(deckWinrateDiv);
+
+    const deckWinrateLastDiv = createDiv(
+      ["list_deck_winrate"],
+      "Since last edit: "
+    );
+    deckWinrateLastDiv.style.opacity = 0.6;
+
+    if (deck.lastEditTotal > 0) {
+      colClass = getWinrateClass(deck.lastEditWinrate);
+      deckWinrateLastDiv.innerHTML += `<span class="${colClass}_bright">${formatPercent(
+        deck.lastEditWinrate
+      )}</span>`;
+      deckWinrateLastDiv.title = `${formatPercent(
+        deck.lastEditWinrate
+      )} winrate since ${format(new Date(deck.lastUpdated), "Pp")}`;
+    } else {
+      deckWinrateLastDiv.innerHTML += "<span>--</span>";
+      deckWinrateLastDiv.title = "no data yet";
+    }
+    listItem.rightBottom.appendChild(deckWinrateLastDiv);
+  }
+
+  // Deck crafting cost
+  const ownedWildcards = {
+    common: pd.economy.wcCommon,
+    uncommon: pd.economy.wcUncommon,
+    rare: pd.economy.wcRare,
+    mythic: pd.economy.wcMythic
+  };
+  const missingWildcards = get_deck_missing(deck);
+  let wc;
+  let n = 0;
+  const boosterCost = getBoosterCountEstimate(missingWildcards);
+  CARD_RARITIES.filter(rarity => rarity !== "land").forEach(cardRarity => {
+    cardRarity = cardRarity.toLowerCase();
+    if (missingWildcards[cardRarity]) {
+      n++;
+      wc = createDiv(["wc_explore_cost", "wc_" + cardRarity]);
+      wc.title = _.capitalize(cardRarity) + " wildcards needed.";
+      wc.innerHTML =
+        (ownedWildcards[cardRarity] > 0
+          ? ownedWildcards[cardRarity] + "/"
+          : "") + missingWildcards[cardRarity];
+      listItem.right.appendChild(wc);
+      listItem.right.style.flexDirection = "row";
+      listItem.right.style.marginRight = "16px";
+    }
+  });
+  if (n !== 0) {
+    const bo = createDiv(["bo_explore_cost"], Math.round(boosterCost));
+    bo.title = "Boosters needed (estimated)";
+    listItem.right.appendChild(bo);
+  }
 }
 
 export function attachDraftData(listItem, draft) {

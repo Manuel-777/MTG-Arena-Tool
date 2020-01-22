@@ -823,8 +823,13 @@ export const MATCHES_TABLE_MODE = "Table View";
 export const MATCHES_TABLE_MODES = [MATCHES_LIST_MODE, MATCHES_TABLE_MODE];
 
 export const DECKS_ART_MODE = "Deck Art View";
+export const DECKS_LIST_MODE = "List View";
 export const DECKS_TABLE_MODE = "Table View";
-export const DECKS_TABLE_MODES = [DECKS_ART_MODE, DECKS_TABLE_MODE];
+export const DECKS_TABLE_MODES = [
+  DECKS_LIST_MODE,
+  DECKS_ART_MODE,
+  DECKS_TABLE_MODE
+];
 
 export const COLLECTION_CARD_MODE = "Card View";
 export const COLLECTION_CHART_MODE = "Chart View";

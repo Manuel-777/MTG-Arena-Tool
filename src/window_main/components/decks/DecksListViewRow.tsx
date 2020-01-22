@@ -1,28 +1,28 @@
 import React from "react";
 import { DEFAULT_TILE } from "../../../shared/constants";
 import ListItem from "../../listItem";
-import { attachMatchData } from "../../renderer-util";
+import { attachDeckData } from "../../renderer-util";
 import { renderNewTag, renderTagBubble } from "../display";
 import { useLegacyRenderer } from "../tables/hooks";
 import { TagCounts } from "../tables/types";
-import { MatchesTableRowProps, SerializedMatch } from "./types";
+import { DecksTableRowProps, DecksData } from "./types";
 
-const tagPrompt = "Set archetype";
-
-const byId = (id: string): HTMLElement | null => document.getElementById(id);
+const tagPrompt = "Add";
 
 function renderData(
   container: HTMLElement,
-  match: SerializedMatch,
+  deck: DecksData,
   tags: TagCounts,
-  openMatchCallback: (matchId: string | number) => void,
+  openDeckCallback: (deckId: string | number) => void,
   archiveCallback: (id: string | number) => void,
   addTagCallback: (id: string, tag: string) => void,
   editTagCallback: (tag: string, color: string) => void,
   deleteTagCallback: (id: string, tag: string) => void
 ): void {
   container.innerHTML = "";
-  const tileGrpid = match.playerDeck.deckTileId ?? DEFAULT_TILE;
+  const tileGrpid = deck.deckTileId ?? DEFAULT_TILE;
+
+  const parentId = deck.id ?? "";
 
   // e.stopPropagation will not work across React/non-React boundary???
   // hack to manually prevent tag clicks from causing a drilldown action
@@ -34,7 +34,7 @@ function renderData(
     if (disableDrilldown) {
       return;
     }
-    openMatchCallback(match.id);
+    openDeckCallback(parentId);
   };
   const onTagHoverIn = (): void => {
     setDisableDrilldown(true);
@@ -42,69 +42,75 @@ function renderData(
   const onTagHoverOut = (): void => {
     setDisableDrilldown(false);
   };
+  const customizeTag = (tag: HTMLElement): void => {
+    tag.style.marginRight = "8px";
+    // hack to manually prevent tag clicks from causing a drilldown action
+    tag.addEventListener("mouseover", onTagHoverIn);
+    tag.addEventListener("mouseout", onTagHoverOut);
+  };
 
   const listItem = new ListItem(
     tileGrpid,
-    match.id,
+    parentId,
     onRowClick,
     archiveCallback,
-    match.archived
+    deck.archived
   );
   listItem.divideLeft();
+  listItem.divideCenter();
   listItem.divideRight();
-
-  attachMatchData(listItem, match);
+  attachDeckData(listItem, deck);
   container.appendChild(listItem.container);
 
-  // Render tag
-  const tagsDiv = byId("matches_tags_" + match.id);
-  if (!tagsDiv) {
-    return;
-  }
-  if (match.tags && match.tags.length) {
-    match.tags.forEach((tag: string) => {
+  const tagsDiv = listItem.centerTop;
+  tagsDiv.classList.add("deck_tags_container");
+  const formatBubble = renderTagBubble(tagsDiv, {
+    parentId,
+    tag: deck.format ?? "unknown",
+    editTagCallback,
+    fontStyle: "italic",
+    hideCloseButton: true
+  });
+  customizeTag(formatBubble);
+  if (deck.tags?.length) {
+    deck.tags.forEach((tag: string) => {
       const tagBubble = renderTagBubble(tagsDiv, {
-        parentId: match.id,
+        parentId,
         tag,
         editTagCallback,
         deleteTagCallback
       });
-      // hack to manually prevent tag clicks from causing a drilldown action
-      tagBubble.addEventListener("mouseover", onTagHoverIn);
-      tagBubble.addEventListener("mouseout", onTagHoverOut);
+      customizeTag(tagBubble);
     });
-  } else {
-    const tagBubble = renderNewTag(tagsDiv, {
-      parentId: match.id,
-      addTagCallback,
-      tagPrompt,
-      tags,
-      title: "set custom match archetype"
-    });
-    // hack to manually prevent tag clicks from causing a drilldown action
-    tagBubble.addEventListener("mouseover", onTagHoverIn);
-    tagBubble.addEventListener("mouseout", onTagHoverOut);
   }
+  const tagBubble = renderNewTag(tagsDiv, {
+    parentId,
+    addTagCallback,
+    tagPrompt,
+    tags,
+    title: "Add custom deck tag"
+  });
+  customizeTag(tagBubble);
 }
 
-export default function MatchesListViewRow({
+export default function DecksListViewRow({
   row,
   tags,
-  openMatchCallback,
+  openDeckCallback,
   archiveCallback,
   addTagCallback,
   editTagCallback,
   deleteTagCallback
-}: MatchesTableRowProps): JSX.Element {
+}: DecksTableRowProps): JSX.Element {
   const containerRef = useLegacyRenderer(
     renderData,
     row.original,
     tags,
-    openMatchCallback,
+    openDeckCallback,
     archiveCallback,
     addTagCallback,
     editTagCallback,
     deleteTagCallback
   );
-  return <div title={"show match details"} ref={containerRef} />;
+  return <div title={"show deck details"} ref={containerRef} />;
 }

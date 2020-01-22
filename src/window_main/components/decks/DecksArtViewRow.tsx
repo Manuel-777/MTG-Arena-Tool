@@ -4,7 +4,7 @@ import { CSSTransition } from "react-transition-group";
 import { getCardArtCrop } from "../../../shared/util";
 import { ArtTile, MetricText } from "../display";
 import { TableViewRowProps } from "../tables/types";
-import { DecksData } from "./types";
+import { DecksData, DecksTableRowProps } from "./types";
 
 function DeckArt({ url }: { url: string }): JSX.Element {
   return <ArtTile style={{ backgroundImage: `url("${url}")` }} />;
@@ -43,8 +43,14 @@ function DecksArtViewCell({
 
 export default function DecksArtViewRow({
   row,
+  openDeckCallback,
   ...otherProps
-}: TableViewRowProps<DecksData>): JSX.Element {
+}: DecksTableRowProps): JSX.Element {
+  const deck = row.original;
+  const parentId = deck.id ?? "";
+  const onRowClick = (): void => {
+    openDeckCallback(parentId);
+  };
   const [hover, setHover] = React.useState(false);
   const mouseEnter = React.useCallback(() => {
     setHover(true);
@@ -58,6 +64,8 @@ export default function DecksArtViewRow({
   return (
     <div
       className={"decks_table_deck_tile"}
+      onClick={onRowClick}
+      title={"show deck details"}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
       {...divProps}

@@ -1,6 +1,6 @@
 import React from "react";
 import { Column } from "react-table";
-import { DECKS_TABLE_MODE } from "../../../shared/constants";
+import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -32,6 +32,7 @@ import {
   WinRateCell
 } from "./cells";
 import DecksArtViewRow from "./DecksArtViewRow";
+import DecksListViewRow from "./DecksListViewRow";
 import DecksTableControls from "./DecksTableControls";
 import { deckSearchFilterFn } from "./filters";
 import { DecksData, DecksTableControlsProps, DecksTableProps } from "./types";
@@ -327,16 +328,30 @@ export default function DecksTable({
           {page.map((row, index) => {
             prepareRow(row);
             const data = row.original;
-            const RowRenderer = isTableMode ? TableViewRow : DecksArtViewRow;
-            const onClick = (): void => openDeckCallback(data.id ?? "");
+            if (isTableMode) {
+              const onClick = (): void => openDeckCallback(data.id ?? "");
+              return (
+                <TableViewRow
+                  onClick={onClick}
+                  title={"show deck details"}
+                  row={row}
+                  index={index}
+                  key={row.index}
+                  gridTemplateColumns={gridTemplateColumns}
+                />
+              );
+            }
+            const RowRenderer =
+              tableMode === DECKS_ART_MODE ? DecksArtViewRow : DecksListViewRow;
             return (
               <RowRenderer
-                onClick={onClick}
-                title={`show ${data.name} details`}
                 row={row}
                 index={index}
                 key={row.index}
                 gridTemplateColumns={gridTemplateColumns}
+                openDeckCallback={openDeckCallback}
+                tags={tags}
+                {...customProps}
               />
             );
           })}

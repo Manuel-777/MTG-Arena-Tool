@@ -13,8 +13,8 @@ import {
 } from "../shared/util";
 import Aggregator, {
   AggregatorFilters,
-  dateMaxValid,
-  AggregatorStats
+  AggregatorStats,
+  dateMaxValid
 } from "./aggregator";
 import DecksTable from "./components/decks/DecksTable";
 import { DecksData } from "./components/decks/types";
@@ -29,7 +29,10 @@ import {
 } from "./renderer-util";
 import StatsPanel from "./stats-panel";
 
-function openDeckDetails(id: string, filters: AggregatorFilters): void {
+function openDeckDetails(
+  id: string | number,
+  filters: AggregatorFilters
+): void {
   const deck = pd.deck(id);
   if (!deck) return;
   openDeck(deck, { ...filters, deckId: id });
@@ -61,8 +64,8 @@ function deleteTag(deckid: string, tag: string): void {
   ipcSend("delete_tag", { deckid, tag });
 }
 
-function toggleDeckArchived(id: string): void {
-  ipcSend("toggle_deck_archived", id);
+function toggleDeckArchived(id: string | number): void {
+  ipcSend("toggle_deck_archived", id + "");
 }
 
 function saveTableState(decksTableState: TableState<DecksData>): void {
@@ -116,6 +119,7 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
       const lastTouched = dateMaxValid(lastUpdated, lastPlayed);
       return {
         ...deck,
+        format: getReadableFormat(deck.format),
         ...deckStats,
         winrate100,
         ...missingWildcards,
@@ -165,7 +169,7 @@ export function DecksTab({
     updateSidebarCallback: updateStatsPanel
   });
   const openDeckCallback = React.useCallback(
-    (id: string): void => openDeckDetails(id, aggFilters),
+    (id: string | number): void => openDeckDetails(id, aggFilters),
     [aggFilters]
   );
   const events = React.useMemo(getTotalAggEvents, []);

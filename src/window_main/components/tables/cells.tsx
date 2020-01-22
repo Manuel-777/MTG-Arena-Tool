@@ -4,19 +4,17 @@ import { Cell, CellProps } from "react-table";
 import LocalTime from "../../../shared/time-components/LocalTime";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { toDDHHMMSS, toMMSS } from "../../../shared/util";
-import { formatNumber, formatPercent, getTagColor } from "../../renderer-util";
+import { formatNumber, formatPercent } from "../../renderer-util";
 import {
   ArchiveSymbol,
+  BriefText,
   ColoredArchivedSymbol,
   FlexLeftContainer,
   LabelText,
   ManaSymbol,
   MetricText,
   NewTag,
-  TagBubble,
-  TagBubbleWithClose,
-  useColorpicker,
-  BriefText
+  TagBubble
 } from "../display";
 import { TableData, TagCounts } from "./types";
 
@@ -143,26 +141,15 @@ export function FormatCell<D extends TableData>({
   cell: Cell<D>;
   editTagCallback: (tag: string, color: string) => void;
 }): JSX.Element {
-  const backgroundColor = getTagColor(cell.value);
-  const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
-    null
-  );
   return (
     <FlexLeftContainer>
       <TagBubble
-        backgroundColor={backgroundColor}
+        tag={cell.value}
         fontStyle={"italic"}
-        ref={containerRef}
-        title={"change tag color"}
-        onClick={useColorpicker(
-          containerRef,
-          cell.value,
-          backgroundColor,
-          editTagCallback
-        )}
-      >
-        {cell.value || "unknown"}
-      </TagBubble>
+        hideCloseButton
+        parentId={cell.row.original.id}
+        editTagCallback={editTagCallback}
+      />
     </FlexLeftContainer>
   );
 }
@@ -190,7 +177,7 @@ export function TagsCell<D extends TableData>({
   return (
     <FlexLeftContainer style={{ flexWrap: "wrap" }}>
       {cell.value.map((tag: string) => (
-        <TagBubbleWithClose
+        <TagBubble
           key={tag}
           tag={tag}
           parentId={parentId}
