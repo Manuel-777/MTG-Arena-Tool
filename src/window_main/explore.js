@@ -303,6 +303,8 @@ function drawFilters() {
     }
     const manabutton = createDiv(classes);
     manabutton.style.backgroundImage = "url(../images/" + s + "20.png)";
+    manabutton.style.height = "20px";
+    manabutton.style.width = "40px";
     manabutton.addEventListener("click", function() {
       if ([...manabutton.classList].includes("mana_filter_on")) {
         manabutton.classList.remove("mana_filter_on");
