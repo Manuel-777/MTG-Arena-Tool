@@ -6,7 +6,7 @@ import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { DbCardData } from "../../../shared/types/Metadata";
 import { getCardArtCrop, openScryfallCard } from "../../../shared/util";
 import createShareButton from "../../createShareButton";
-import { draftShareLink } from "../../renderer-util";
+import { draftShareLink, getDraftCardHighlights } from "../../renderer-util";
 import ListItem, { ListItemProps } from "../ListItem";
 import { useLegacyRenderer } from "../tables/hooks";
 
@@ -69,12 +69,7 @@ export function DraftListItem({
   const left = {
     top: <div className={"list_deck_name"}>{draft.set} draft</div>
   };
-  const highlightCards: DbCardData[] = draft.pickedCards
-    .map((cardId: number) => db.card(cardId))
-    .filter(
-      (card?: DbCardData) =>
-        card?.rarity === "rare" || card?.rarity === "mythic"
-    );
+  const highlightCards: DbCardData[] = getDraftCardHighlights(draft);
   const center = (
     <div className={"flex_item"} style={{ margin: "auto" }}>
       {highlightCards.map((card, index) => (

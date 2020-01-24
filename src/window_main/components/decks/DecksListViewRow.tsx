@@ -10,7 +10,7 @@ import {
   getWinrateClass
 } from "../../renderer-util";
 import { NewTag, TagBubble } from "../display";
-import ListItem, { ListItemProps } from "../ListItem";
+import ListItem, { ListItemProps, ListItemSection } from "../ListItem";
 import { TagCounts } from "../tables/types";
 import { DecksData, DecksTableRowProps } from "./types";
 
@@ -108,7 +108,7 @@ export function DeckListItem({
 
   // RIGHT SECTION
   const missingCards = deck.common + deck.uncommon + deck.rare + deck.mythic;
-  let right;
+  let right: ListItemSection;
   if (missingCards > 0) {
     // Deck crafting cost
     const ownedWildcards: Record<string, number> = {
@@ -123,7 +123,7 @@ export function DeckListItem({
           const cardRarity = rarity.toLowerCase();
           const missing =
             ((deck as unknown) as Record<string, number>)[cardRarity] ?? 0;
-          if (missing) {
+          if (missing > 0) {
             return (
               <div
                 key={rarity}

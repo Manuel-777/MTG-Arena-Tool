@@ -847,6 +847,12 @@ function localTimeSince(date) {
   </relative-time>`;
 }
 
+export function getDraftCardHighlights(draft) {
+  return draft.pickedCards
+    .map(cardId => db.card(cardId))
+    .filter(card => card?.rarity === "rare" || card?.rarity === "mythic");
+}
+
 export function draftShareLink(id, draft) {
   const shareExpire = byId("expire_select")?.value ?? "One day";
   const draftData = JSON.stringify(draft);

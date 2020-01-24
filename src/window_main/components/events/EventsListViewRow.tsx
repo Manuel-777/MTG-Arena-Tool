@@ -3,7 +3,6 @@ import compareDesc from "date-fns/compareDesc";
 import React from "react";
 import { CSSTransition } from "react-transition-group";
 import { EASING_DEFAULT, MANA } from "../../../shared/constants";
-import db from "../../../shared/database";
 import pd from "../../../shared/player-data";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { DbCardData } from "../../../shared/types/Metadata";
@@ -11,7 +10,11 @@ import { toMMSS } from "../../../shared/util";
 import ListItem, { ListItemProps } from "../../components/ListItem";
 import { openDraft } from "../../draft-details";
 import { openMatch } from "../../match-details";
-import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
+import {
+  getDraftCardHighlights,
+  getEventWinLossClass,
+  toggleArchived
+} from "../../renderer-util";
 import { MatchListItem } from "../matches/MatchesListViewRow";
 import { TableViewRowProps } from "../tables/types";
 import { DraftCardIcon, DraftListItem } from "./DraftListItem";
@@ -75,12 +78,7 @@ export function EventListItem({
   const draftId = event.id + "-draft";
   if (pd.draftExists(draftId)) {
     const draft = pd.draft(draftId);
-    const highlightCards: DbCardData[] = draft.pickedCards
-      .map((cardId: number) => db.card(cardId))
-      .filter(
-        (card?: DbCardData) =>
-          card?.rarity === "rare" || card?.rarity === "mythic"
-      );
+    const highlightCards: DbCardData[] = getDraftCardHighlights(draft);
     center = (
       <div className={"flex_item"} style={{ margin: "auto" }}>
         {highlightCards.map((card, index) => (
