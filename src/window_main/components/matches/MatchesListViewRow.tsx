@@ -1,110 +1,143 @@
 import React from "react";
-import { DEFAULT_TILE } from "../../../shared/constants";
-import ListItem from "../../listItem";
-import { attachMatchData } from "../../renderer-util";
-import { renderNewTag, renderTagBubble } from "../display";
-import { useLegacyRenderer } from "../tables/hooks";
+import { DEFAULT_TILE, MANA } from "../../../shared/constants";
+import RelativeTime from "../../../shared/time-components/RelativeTime";
+import { formatRank, getReadableEvent, toMMSS } from "../../../shared/util";
+import ListItem from "../../components/ListItem";
+import { BinarySymbol, NewTag, RankSymbol, TagBubble } from "../display";
+import { ListItemProps } from "../ListItem";
 import { TagCounts } from "../tables/types";
 import { MatchesTableRowProps, SerializedMatch } from "./types";
 
-const tagPrompt = "Set archetype";
-
-const byId = (id: string): HTMLElement | null => document.getElementById(id);
-
-function renderData(
-  container: HTMLElement,
-  match: SerializedMatch,
-  tags: TagCounts,
-  openMatchCallback: (matchId: string | number) => void,
-  archiveCallback: (id: string | number) => void,
-  addTagCallback: (id: string, tag: string) => void,
-  editTagCallback: (tag: string, color: string) => void,
-  deleteTagCallback: (id: string, tag: string) => void
-): void {
-  container.innerHTML = "";
-  const tileGrpid = match.playerDeck.deckTileId ?? DEFAULT_TILE;
-
-  // e.stopPropagation will not work across React/non-React boundary???
-  // hack to manually prevent tag clicks from causing a drilldown action
-  let disableDrilldown = false;
-  const setDisableDrilldown = (value: boolean): void => {
-    disableDrilldown = value;
-  };
-  const onRowClick = (): void => {
-    if (disableDrilldown) {
-      return;
-    }
-    openMatchCallback(match.id);
-  };
-  const onTagHoverIn = (): void => {
-    setDisableDrilldown(true);
-  };
-  const onTagHoverOut = (): void => {
-    setDisableDrilldown(false);
-  };
-
-  const listItem = new ListItem(
-    tileGrpid,
-    match.id,
-    onRowClick,
-    archiveCallback,
-    match.archived
-  );
-  listItem.divideLeft();
-  listItem.divideRight();
-
-  attachMatchData(listItem, match);
-  container.appendChild(listItem.container);
-
-  // Render tag
-  const tagsDiv = byId("matches_tags_" + match.id);
-  if (!tagsDiv) {
-    return;
-  }
-  if (match.tags && match.tags.length) {
-    match.tags.forEach((tag: string) => {
-      const tagBubble = renderTagBubble(tagsDiv, {
-        parentId: match.id,
-        tag,
-        editTagCallback,
-        deleteTagCallback
-      });
-      // hack to manually prevent tag clicks from causing a drilldown action
-      tagBubble.addEventListener("mouseover", onTagHoverIn);
-      tagBubble.addEventListener("mouseout", onTagHoverOut);
-    });
-  } else {
-    const tagBubble = renderNewTag(tagsDiv, {
-      parentId: match.id,
-      addTagCallback,
-      tagPrompt,
-      tags,
-      title: "set custom match archetype"
-    });
-    // hack to manually prevent tag clicks from causing a drilldown action
-    tagBubble.addEventListener("mouseover", onTagHoverIn);
-    tagBubble.addEventListener("mouseout", onTagHoverOut);
-  }
-}
-
 export default function MatchesListViewRow({
   row,
+  ...otherProps
+}: MatchesTableRowProps): JSX.Element {
+  return <MatchListItem match={row.original} {...otherProps} />;
+}
+
+export interface MatchListItemProps {
+  match: SerializedMatch;
+  tags?: TagCounts;
+  openMatchCallback: (deckId: string | number) => void;
+  archiveCallback?: (id: string | number) => void;
+  addTagCallback?: (id: string, tag: string) => void;
+  editTagCallback?: (tag: string, color: string) => void;
+  deleteTagCallback?: (id: string, tag: string) => void;
+}
+
+export function MatchListItem({
+  match,
   tags,
   openMatchCallback,
   archiveCallback,
   addTagCallback,
   editTagCallback,
   deleteTagCallback
-}: MatchesTableRowProps): JSX.Element {
-  const containerRef = useLegacyRenderer(
-    renderData,
-    row.original,
-    tags,
-    openMatchCallback,
-    archiveCallback,
-    addTagCallback,
-    editTagCallback,
-    deleteTagCallback
-  );
-  return <div title={"show match details"} ref={containerRef} />;
+}: MatchListItemProps): JSX.Element {
+  const grpId = match.playerDeck.deckTileId ?? DEFAULT_TILE;
+  const parentId = match.id;
+  const onClick = (): void => openMatchCallback(parentId);
+  const onClickDelete = archiveCallback
+    ? (): void => archiveCallback(parentId)
+    : undefined;
+
+  // LEFT SECTION
+  let displayName = match.playerDeck.name ?? "";
+  if (displayName.includes("?=?Loc/Decks/Precon/")) {
+    displayName = displayName.replace("?=?Loc/Decks/Precon/", "");
+  }
+  const left = {
+    top: (
+      <>
+        <div className={"list_deck_name"}>{displayName}</div>
+        <div className={"list_deck_name_it"}>
+          {getReadableEvent(match.eventId)}
+        </div>
+      </>
+    ),
+    bottom: (
+      <>
+        {match.playerDeck.colors?.map((color, index) => (
+          <div key={index} className={"mana_s20 mana_" + MANA[color]} />
+        ))}
+      </>
+    )
+  };
+
+  // RIGHT SECTION
+  const oppName = (match.opponent.name ?? "-#000000").slice(0, -6);
+  const timestamp = new Date(match.date);
+  const onThePlay = match.player.seat === match.onThePlay;
+  const right = {
+    top: (
+      <>
+        <div className={"list_match_title"}>vs {oppName}</div>
+        <RankSymbol
+          rank={match.opponent.rank}
+          title={formatRank(match.opponent)}
+        />
+      </>
+    ),
+    bottom: (
+      <>
+        <div className={"list_match_time"}>
+          <RelativeTime datetime={timestamp.toISOString()} />{" "}
+          {toMMSS(match.duration) + " long"}
+        </div>
+        {match.oppDeck.colors?.map((color, index) => (
+          <div key={index} className={"mana_s20 mana_" + MANA[color]} />
+        ))}
+        <div className={"matches_tags"}>
+          {editTagCallback &&
+            deleteTagCallback &&
+            match.tags?.map((tag: string) => {
+              const tagProps = {
+                parentId,
+                tag,
+                editTagCallback,
+                deleteTagCallback
+              };
+              return <TagBubble key={tag} {...tagProps} />;
+            })}
+          {tags && addTagCallback && match.tags?.length === 0 && (
+            <NewTag
+              parentId={parentId}
+              addTagCallback={addTagCallback}
+              tagPrompt={"Set archetype"}
+              tags={tags}
+              title={"set custom match archetype"}
+            />
+          )}
+        </div>
+      </>
+    ),
+    after: (
+      <>
+        <div
+          className={
+            "list_match_result " +
+            (match.player.win > match.opponent.win ? "green" : "red")
+          }
+        >
+          {match.player.win}:{match.opponent.win}
+        </div>
+        {!!match.onThePlay && (
+          <BinarySymbol
+            isOn={onThePlay}
+            title={onThePlay ? "On the play" : "On the draw"}
+          />
+        )}
+      </>
+    )
+  };
+
+  const listItemProps: ListItemProps = {
+    grpId,
+    left,
+    right,
+    onClick,
+    onClickDelete,
+    archived: match.archived
+  };
+  return <ListItem {...listItemProps} title={"show match details"} />;
 }

@@ -707,10 +707,10 @@ span.top_nav_item_text {
 }
 
 .list_match_result {
-font-family:  var(--main-font-name);
+    font-family:  var(--main-font-name);
     font-size: 20px;
     line-height: 64px;
-    margin-right: 8px;
+    margin: 0 8px;
 }
 
 .list_match_result_score {
@@ -793,10 +793,29 @@ font-family:  var(--main-font-name);
 
 .list_event_expand {
     width: calc(100% - 32px);
-    height: 0px;
+    max-height: 0px;
     overflow: hidden;
     margin-left: 16px;
-    -webkit-transition: all .2s ease-in;
+    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+}
+.list_event_expanded-enter {
+    max-height: 0px;
+}
+.list_event_expanded-enter-active {
+    max-height: 800px;
+}
+.list_event_expanded-enter-done {
+    max-height: 800px;
+}
+.list_event_expanded-exit {
+    max-height: 800px;
+}
+.list_event_expanded-exit-active {
+    max-height: 0px;
+}
+.list_event_expanded-exit-done {
+    max-height: 0px;
 }
 
 .about {
@@ -923,7 +942,7 @@ a:hover {
 
 .matches_tags {
     display: flex;
-    margin: 1px -10px 0px 8px;
+    margin: 1px 0px 0px 8px;
 }
 
 .list_deck_name {

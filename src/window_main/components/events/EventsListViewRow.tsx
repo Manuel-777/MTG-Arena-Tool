@@ -1,25 +1,20 @@
 import anime from "animejs";
 import compareDesc from "date-fns/compareDesc";
 import React from "react";
-import { DEFAULT_TILE, EASING_DEFAULT, MANA } from "../../../shared/constants";
+import { CSSTransition } from "react-transition-group";
+import { EASING_DEFAULT, MANA } from "../../../shared/constants";
 import db from "../../../shared/database";
-import { createDiv, queryElementsByClass } from "../../../shared/dom-fns";
 import pd from "../../../shared/player-data";
+import RelativeTime from "../../../shared/time-components/RelativeTime";
+import { DbCardData } from "../../../shared/types/Metadata";
 import { toMMSS } from "../../../shared/util";
+import ListItem, { ListItemProps } from "../../components/ListItem";
 import { openDraft } from "../../draft-details";
-import ListItem from "../../listItem";
 import { openMatch } from "../../match-details";
-import {
-  attachDraftData,
-  attachMatchData,
-  createDraftRares,
-  getEventWinLossClass,
-  localTimeSince,
-  toggleArchived
-} from "../../renderer-util";
-import { SerializedMatch } from "../matches/types";
-import { useLegacyRenderer } from "../tables/hooks";
+import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
+import { MatchListItem } from "../matches/MatchesListViewRow";
 import { TableViewRowProps } from "../tables/types";
+import { DraftCardIcon, DraftListItem } from "./DraftListItem";
 import { EventTableData } from "./types";
 
 function handleOpenMatch(id: string | number): void {
@@ -42,37 +37,61 @@ function handleOpenDraft(id: string | number): void {
   });
 }
 
-function attachEventData(listItem: ListItem, event: EventTableData): void {
+export default function EventsListViewRow({
+  row
+}: TableViewRowProps<EventTableData>): JSX.Element {
+  return <EventListItem event={row.original} />;
+}
+
+export function EventListItem({
+  event
+}: {
+  event: EventTableData;
+}): JSX.Element {
   const { stats } = event;
   const { eventState, displayName, duration } = stats;
+  const grpId = event.CourseDeck.deckTileId;
+  const parentId = event.id;
+  const [expanded, setExpanded] = React.useState(false);
+  const onClick = (): void => setExpanded(!expanded);
+  const onClickDelete = event.custom
+    ? (): void => toggleArchived(parentId)
+    : undefined;
 
-  const deckNameDiv = createDiv(["list_deck_name"], displayName);
-  listItem.leftTop.appendChild(deckNameDiv);
-
-  event.CourseDeck.colors.forEach(color => {
-    const m = createDiv(["mana_s20", `mana_${MANA[color]}`]);
-    listItem.leftBottom.appendChild(m);
-  });
-
-  listItem.rightTop.appendChild(
-    createDiv(
-      eventState === "Completed"
-        ? ["list_event_phase"]
-        : ["list_event_phase_red"],
-      eventState
+  // LEFT SECTION
+  const left = {
+    top: <div className={"list_deck_name"}>{displayName}</div>,
+    bottom: (
+      <>
+        {event.CourseDeck.colors.map((color, index) => (
+          <div key={index} className={"mana_s20 mana_" + MANA[color]} />
+        ))}
+      </>
     )
-  );
+  };
 
-  listItem.rightBottom.appendChild(
-    createDiv(
-      ["list_match_time"],
-      localTimeSince(new Date(event.date)) +
-        " " +
-        toMMSS(duration ?? 0) +
-        " long"
-    )
-  );
+  // CENTER SECTION
+  let center;
+  const draftId = event.id + "-draft";
+  if (pd.draftExists(draftId)) {
+    const draft = pd.draft(draftId);
+    const highlightCards: DbCardData[] = draft.pickedCards
+      .map((cardId: number) => db.card(cardId))
+      .filter(
+        (card?: DbCardData) =>
+          card?.rarity === "rare" || card?.rarity === "mythic"
+      );
+    center = (
+      <div className={"flex_item"} style={{ margin: "auto" }}>
+        {highlightCards.map(card => (
+          <DraftCardIcon key={card.id} card={card} />
+        ))}
+      </div>
+    );
+  }
 
+  // RIGHT SECTION
+  const timestamp = new Date(event.date);
   let { wins, losses } = stats;
   wins = wins || 0;
   losses = losses || 0;
@@ -81,110 +100,80 @@ function attachEventData(listItem: ListItem, event: EventTableData): void {
     CurrentWins: wins,
     CurrentLosses: losses
   });
+  const right = {
+    top: (
+      <div
+        className={
+          eventState === "Completed"
+            ? "list_event_phase"
+            : "list_event_phase_red"
+        }
+      >
+        {eventState}
+      </div>
+    ),
+    bottom: (
+      <>
+        <div className={"list_match_time"}>
+          <RelativeTime datetime={timestamp.toISOString()} />{" "}
+          {toMMSS(duration) + " long"}
+        </div>
+      </>
+    ),
+    after: <div className={"list_match_result " + winLossClass}>{wl}</div>
+  };
 
-  const resultDiv = createDiv(["list_match_result", winLossClass], wl);
-  resultDiv.style.marginLeft = "8px";
-  listItem.right.after(resultDiv);
-
-  const draftId = event.id + "-draft";
-  if (pd.draftExists(draftId)) {
-    const draft = pd.draft(draftId);
-    const draftRares = createDraftRares(draft);
-    listItem.center.appendChild(draftRares);
-  }
+  const listItemProps: ListItemProps = {
+    grpId,
+    left,
+    center,
+    right,
+    onClick,
+    onClickDelete,
+    archived: event.archived
+  };
+  return (
+    <>
+      <ListItem
+        {...listItemProps}
+        title={(expanded ? "collapse" : "expand") + " event"}
+      />
+      <CSSTransition
+        classNames="list_event_expanded"
+        in={!!expanded}
+        mountOnEnter
+        timeout={0}
+      >
+        <div className={"list_event_expand"}>
+          <EventSubItems event={event} />
+        </div>
+      </CSSTransition>
+    </>
+  );
 }
 
-// Given the data of a match will return a data row to be
-// inserted into one of the screens.
-function createMatchRow(match: SerializedMatch): HTMLElement {
-  let tileGrpid, clickCallback;
-  if (match.type == "match") {
-    tileGrpid = match.playerDeck.deckTileId ?? DEFAULT_TILE;
-    clickCallback = handleOpenMatch;
-  } else {
-    tileGrpid = db.sets[match.set]?.tile ?? DEFAULT_TILE;
-    clickCallback = handleOpenDraft;
-  }
-
-  const matchRow = new ListItem(tileGrpid, match.id, clickCallback);
-  matchRow.divideLeft();
-  matchRow.divideRight();
-
-  if (match.type === "match") {
-    attachMatchData(matchRow, match);
-    matchRow.container.title = "show match details";
-  } else {
-    attachDraftData(matchRow, match);
-    matchRow.container.title = "show draft details";
-  }
-
-  return matchRow.container;
-}
-
-// This code is executed when an event row is clicked and adds
-// rows below the event for every match in that event.
-export function expandEvent(event: EventTableData): void {
-  const expandDiv = queryElementsByClass(event.id + "exp")[0];
-  if (expandDiv.hasAttribute("style")) {
-    expandDiv.removeAttribute("style");
-    setTimeout(function() {
-      expandDiv.innerHTML = "";
-    }, 200);
-    return;
-  } else {
-    expandDiv.innerHTML = "";
-  }
-
+function EventSubItems({ event }: { event: EventTableData }): JSX.Element {
   const matchRows = event.stats.matchIds.map(pd.match);
   matchRows.sort((a, b) => {
     if (!a || !b) return 0;
     return compareDesc(new Date(a.date), new Date(b.date));
   });
   const draftId = event.id + "-draft";
-  if (pd.draftExists(draftId)) {
-    matchRows.unshift(pd.draft(draftId));
-  }
-  matchRows.forEach(match => {
-    const row = createMatchRow(match);
-    expandDiv.appendChild(row);
-  });
-
-  const newHeight = matchRows.length * 64 + 16;
-
-  expandDiv.style.height = `${newHeight}px`;
-}
-
-export function renderEventRow(
-  container: HTMLElement,
-  event: EventTableData
-): void {
-  const tileGrpid = event.CourseDeck.deckTileId;
-  let listItem;
-  const clickCallback = (): void => expandEvent(event);
-  if (event.custom) {
-    listItem = new ListItem(
-      tileGrpid,
-      event.id,
-      clickCallback,
-      toggleArchived,
-      event.archived
-    );
-  } else {
-    listItem = new ListItem(tileGrpid, event.id, clickCallback);
-  }
-  listItem.divideLeft();
-  listItem.divideRight();
-  attachEventData(listItem, event);
-
-  const divExp = createDiv([event.id + "exp", "list_event_expand"]);
-
-  container.appendChild(listItem.container);
-  container.appendChild(divExp);
-}
-
-export default function EventsListViewRow({
-  row
-}: TableViewRowProps<EventTableData>): JSX.Element {
-  const containerRef = useLegacyRenderer(renderEventRow, row.original);
-  return <div title={"show event details"} ref={containerRef} />;
+  return (
+    <>
+      {pd.draftExists(draftId) && (
+        <DraftListItem
+          draft={pd.draft(draftId)}
+          openDraftCallback={handleOpenDraft}
+        />
+      )}
+      {matchRows.map(match => (
+        <MatchListItem
+          key={match.id}
+          match={match}
+          openMatchCallback={handleOpenMatch}
+        />
+      ))}
+    </>
+  );
 }
