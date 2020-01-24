@@ -21,6 +21,10 @@ export interface ListItemProps {
   archived?: boolean;
 }
 
+function isSplitNode(section: ListItemSection): section is SplitNode {
+  return !!section && typeof section === "object" && "top" in section;
+}
+
 function ItemSection({
   section,
   className
@@ -28,18 +32,14 @@ function ItemSection({
   section: ListItemSection;
   className: string;
 }): JSX.Element {
-  if (
-    typeof section === "object" &&
-    ((section as any)["top"] || (section as any)["bottom"])
-  ) {
-    const splitNode = section as SplitNode;
+  if (isSplitNode(section)) {
     return (
       <>
         <div className={className} style={{ flexDirection: "column" }}>
-          <div className={"flex_top"}>{splitNode.top}</div>
-          <div className={"flex_bottom"}>{splitNode.bottom}</div>
+          <div className={"flex_top"}>{section.top}</div>
+          <div className={"flex_bottom"}>{section.bottom}</div>
         </div>
-        {splitNode.after}
+        {section.after}
       </>
     );
   }
