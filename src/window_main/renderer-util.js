@@ -852,7 +852,6 @@ export function draftShareLink(id, draft) {
   const draftData = JSON.stringify(draft);
   let expire = 0;
   switch (shareExpire) {
-    default:
     case "One day":
       expire = 0;
       break;
@@ -864,6 +863,9 @@ export function draftShareLink(id, draft) {
       break;
     case "Never":
       expire = -1;
+      break;
+    default:
+      expire = 0;
       break;
   }
   showLoadingBars();
