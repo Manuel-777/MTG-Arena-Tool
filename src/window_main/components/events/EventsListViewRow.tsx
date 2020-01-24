@@ -83,8 +83,8 @@ export function EventListItem({
       );
     center = (
       <div className={"flex_item"} style={{ margin: "auto" }}>
-        {highlightCards.map(card => (
-          <DraftCardIcon key={card.id} card={card} />
+        {highlightCards.map((card, index) => (
+          <DraftCardIcon key={index} card={card} />
         ))}
       </div>
     );
