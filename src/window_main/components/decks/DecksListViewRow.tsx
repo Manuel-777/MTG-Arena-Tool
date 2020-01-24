@@ -31,82 +31,7 @@ export interface DeckListItemProps {
   deleteTagCallback: (id: string, tag: string) => void;
 }
 
-export function DeckListItem({
-  deck,
-  tags,
-  openDeckCallback,
-  archiveCallback,
-  addTagCallback,
-  editTagCallback,
-  deleteTagCallback
-}: DeckListItemProps): JSX.Element {
-  const grpId = deck.deckTileId ?? DEFAULT_TILE;
-  const parentId = deck.id ?? "";
-  const onClick = (): void => openDeckCallback(parentId);
-  const onClickDelete = deck.custom
-    ? (): void => archiveCallback(parentId)
-    : undefined;
-
-  // LEFT SECTION
-  let displayName = deck.name ?? "";
-  if (displayName.includes("?=?Loc/Decks/Precon/")) {
-    displayName = displayName.replace("?=?Loc/Decks/Precon/", "");
-  }
-  const left = {
-    top: <div className={"list_deck_name"}>{displayName}</div>,
-    bottom: (
-      <>
-        {deck.colors?.map((color, index) => (
-          <div key={index} className={"mana_s20 mana_" + MANA[color]} />
-        ))}
-      </>
-    )
-  };
-
-  // CENTER SECTION
-  const formatProps = {
-    parentId,
-    tag: deck.format ?? "unknown",
-    editTagCallback,
-    fontStyle: "italic",
-    hideCloseButton: true
-  };
-  const newTagProps = {
-    parentId,
-    addTagCallback,
-    tagPrompt: "Add",
-    tags,
-    title: "Add custom deck tag"
-  };
-  const lastTouch = new Date(deck.timeTouched);
-  const center = {
-    top: (
-      <div className={"deck_tags_container"}>
-        <TagBubble {...formatProps} />
-        {deck.tags?.map((tag: string) => {
-          const tagProps = {
-            parentId,
-            tag,
-            editTagCallback,
-            deleteTagCallback
-          };
-          return <TagBubble key={tag} {...tagProps} />;
-        })}
-        <NewTag {...newTagProps} />
-      </div>
-    ),
-    bottom: (
-      <div
-        className={"list_deck_winrate"}
-        style={{ marginLeft: "18px", marginRight: "auto", lineHeight: "18px" }}
-      >
-        <i style={{ opacity: 0.6 }}>updated/played:</i>{" "}
-        <RelativeTime datetime={lastTouch.toISOString()} />
-      </div>
-    )
-  };
-
-  // RIGHT SECTION
+function getRightSection(deck: DecksData): ListItemSection | undefined {
   const missingCards = deck.common + deck.uncommon + deck.rare + deck.mythic;
   let right: ListItemSection;
   if (missingCards > 0) {
@@ -199,6 +124,86 @@ export function DeckListItem({
       )
     };
   }
+  return right;
+}
+
+export function DeckListItem({
+  deck,
+  tags,
+  openDeckCallback,
+  archiveCallback,
+  addTagCallback,
+  editTagCallback,
+  deleteTagCallback
+}: DeckListItemProps): JSX.Element {
+  const grpId = deck.deckTileId ?? DEFAULT_TILE;
+  const parentId = deck.id ?? "";
+  const onClick = (): void => openDeckCallback(parentId);
+  const onClickDelete = deck.custom
+    ? (): void => archiveCallback(parentId)
+    : undefined;
+
+  // LEFT SECTION
+  let displayName = deck.name ?? "";
+  if (displayName.includes("?=?Loc/Decks/Precon/")) {
+    displayName = displayName.replace("?=?Loc/Decks/Precon/", "");
+  }
+  const left = {
+    top: <div className={"list_deck_name"}>{displayName}</div>,
+    bottom: (
+      <>
+        {deck.colors?.map((color, index) => (
+          <div key={index} className={"mana_s20 mana_" + MANA[color]} />
+        ))}
+      </>
+    )
+  };
+
+  // CENTER SECTION
+  const formatProps = {
+    parentId,
+    tag: deck.format ?? "unknown",
+    editTagCallback,
+    fontStyle: "italic",
+    hideCloseButton: true
+  };
+  const newTagProps = {
+    parentId,
+    addTagCallback,
+    tagPrompt: "Add",
+    tags,
+    title: "Add custom deck tag"
+  };
+  const lastTouch = new Date(deck.timeTouched);
+  const center = {
+    top: (
+      <div className={"deck_tags_container"}>
+        <TagBubble {...formatProps} />
+        {deck.tags?.map((tag: string) => {
+          const tagProps = {
+            parentId,
+            tag,
+            editTagCallback,
+            deleteTagCallback
+          };
+          return <TagBubble key={tag} {...tagProps} />;
+        })}
+        <NewTag {...newTagProps} />
+      </div>
+    ),
+    bottom: (
+      <div
+        className={"list_deck_winrate"}
+        style={{ marginLeft: "18px", marginRight: "auto", lineHeight: "18px" }}
+      >
+        <i style={{ opacity: 0.6 }}>updated/played:</i>{" "}
+        <RelativeTime datetime={lastTouch.toISOString()} />
+      </div>
+    )
+  };
+
+  // RIGHT SECTION
+  const right = getRightSection(deck);
 
   const listItemProps: ListItemProps = {
     grpId,
