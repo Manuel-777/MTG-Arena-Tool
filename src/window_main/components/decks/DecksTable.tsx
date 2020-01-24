@@ -32,7 +32,7 @@ import {
   WinRateCell
 } from "./cells";
 import DecksArtViewRow from "./DecksArtViewRow";
-import DecksListViewRow from "./DecksListViewRow";
+import { ListItemDeck } from "../ListItem";
 import DecksTableControls from "./DecksTableControls";
 import { deckSearchFilterFn } from "./filters";
 import { DecksData, DecksTableControlsProps, DecksTableProps } from "./types";
@@ -342,7 +342,7 @@ export default function DecksTable({
               );
             }
             const RowRenderer =
-              tableMode === DECKS_ART_MODE ? DecksArtViewRow : DecksListViewRow;
+              tableMode === DECKS_ART_MODE ? DecksArtViewRow : ListItemDeck;
             return (
               <RowRenderer
                 row={row}
