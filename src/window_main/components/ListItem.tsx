@@ -32,18 +32,17 @@ function ItemSection({
   section: ListItemSection;
   className: string;
 }): JSX.Element {
-  if (isSplitNode(section)) {
-    return (
-      <>
-        <div className={className} style={{ flexDirection: "column" }}>
-          <div className={"flex_top"}>{section.top}</div>
-          <div className={"flex_bottom"}>{section.bottom}</div>
-        </div>
-        {section.after}
-      </>
-    );
-  }
-  return <div className={className}>{section}</div>;
+  return isSplitNode(section) ? (
+    <>
+      <div className={className} style={{ flexDirection: "column" }}>
+        <div className={"flex_top"}>{section.top}</div>
+        <div className={"flex_bottom"}>{section.bottom}</div>
+      </div>
+      {section.after}
+    </>
+  ) : (
+    <div className={className}>{section}</div>
+  );
 }
 
 export default function ListItem({
