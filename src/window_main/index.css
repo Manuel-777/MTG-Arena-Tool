@@ -3465,7 +3465,7 @@ a:hover {
 }
 
 .list_item_image {
-    min-width: 128px;
+    width: 128px;
     height: 64px;
     margin: 0px 16px 0px 0px;
     opacity: 0.66;
@@ -3473,13 +3473,29 @@ a:hover {
     background-size: 200px;
     background-position-x: center;
     background-position-y: -10px;
-    -webkit-transition: .2s ease-out;
-    transition: width opacity;
+    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
 }
-
-.list_item_image:hover {
+.list_item_image_hover-enter {
+    opacity: 0.66;
+}
+.list_item_image_hover-enter-active {
     opacity: 1;
     width: 200px;
+}
+.list_item_image_hover-enter-done {
+    opacity: 1;
+    width: 200px;
+}
+.list_item_image_hover-exit {
+    opacity: 1;
+    width: 200px;
+}
+.list_item_image_hover-exit-active {
+    opacity: 0.66;
+}
+.list_item_image_hover-exit-done {
+    opacity: 0.66;
 }
 
 .list_item_archive {
@@ -3488,14 +3504,33 @@ a:hover {
     overflow: hidden;
     background: var(--color-r) url(../images/hide.png) no-repeat left;
     -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
 }
-
 .list_item_unarchive {
     width: 4px;
     margin-left: 8px;
     overflow: hidden;
     background: var(--color-g) url(../images/show.png) no-repeat left;
     -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+}
+.list_item_archive_hover-enter {
+    width: 4px;
+}
+.list_item_archive_hover-enter-active {
+    width: 32px;
+}
+.list_item_archive_hover-enter-done {
+    width: 32px;
+}
+.list_item_archive_hover-exit {
+    width: 32px;
+}
+.list_item_archive_hover-exit-active {
+    width: 4px;
+}
+.list_item_archive_hover-exit-done {
+    width: 4px;
 }
 
 .overlay_section {
