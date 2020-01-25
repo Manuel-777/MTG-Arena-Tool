@@ -5,11 +5,11 @@ import {
   Filters,
   FilterValue,
   IdType,
+  PluginHook,
   Row,
   TablePropGetter,
   TableProps,
-  TableState,
-  PluginHook
+  TableState
 } from "react-table";
 
 export type TagCount = { tag: string; q: number };
@@ -114,4 +114,12 @@ export interface TableViewRowProps<D extends TableData>
   row: Row<D>;
   index: number;
   gridTemplateColumns: string;
+}
+
+export interface ListViewRowProps<D extends TableData> {
+  row: Row<D>;
+  grpId?: number;
+  title?: string;
+  openCallback: (id: string | number) => void;
+  archiveCallback: (id: string | number) => void;
 }

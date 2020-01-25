@@ -1,6 +1,15 @@
 import React from "react";
 import { Column } from "react-table";
-import { EVENTS_TABLE_MODE } from "../../../shared/constants";
+import {
+  EVENTS_TABLE_MODE,
+  LIST_ITEM_LEFT_BOTTOM,
+  LIST_ITEM_LEFT_TOP,
+  LIST_ITEM_RIGHT_AFTER,
+  LIST_ITEM_RIGHT_BOTTOM,
+  LIST_ITEM_RIGHT_TOP,
+  LIST_ITEM_CENTER_AFTER,
+  LIST_ITEM_LEFT_AFTER
+} from "../../../shared/constants";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -10,7 +19,8 @@ import {
   MetricCell,
   RelativeTimeCell,
   ShortTextCell,
-  TextCell
+  SubTextCell,
+  WinrateMetricCell
 } from "../tables/cells";
 import {
   ArchiveColumnFilter,
@@ -20,17 +30,22 @@ import {
 } from "../tables/filters";
 import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
+import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
+import { StateCell, CardHighlightsCell } from "./cells";
 import EventsListViewRow from "./EventsListViewRow";
 import EventsTableControls from "./EventsTableControls";
-import { eventSearchFilterFn } from "./filters";
+import {
+  eventSearchFilterFn,
+  EventStateColumnFilter,
+  eventStateFilterFn
+} from "./filters";
 import {
   EventsTableControlsProps,
   EventsTableProps,
   EventTableData
 } from "./types";
-import TableHeaders from "../tables/TableHeaders";
 
 const columns: Column<EventTableData>[] = [
   { accessor: "id" },
@@ -41,17 +56,8 @@ const columns: Column<EventTableData>[] = [
     Cell: RelativeTimeCell,
     sortDescFirst: true,
     mayToggle: true,
-    defaultVisible: true
-  },
-  {
-    Header: "Code",
-    accessor: "InternalEventName",
-    disableFilters: false,
-    filter: "fuzzyText",
-    Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
-    mayToggle: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
   },
   {
     Header: "Event",
@@ -62,17 +68,19 @@ const columns: Column<EventTableData>[] = [
     Cell: ShortTextCell,
     gridWidth: "200px",
     mayToggle: true,
-    defaultVisible: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
   },
   {
-    Header: "Format",
-    accessor: "format",
+    Header: "Code",
+    accessor: "InternalEventName",
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    Cell: FormatCell,
-    gridWidth: "150px",
-    mayToggle: true
+    Cell: SubTextCell,
+    gridWidth: "200px",
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
   },
   { accessor: "CourseDeck" },
   { accessor: "deckId" },
@@ -82,10 +90,10 @@ const columns: Column<EventTableData>[] = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    Cell: ShortTextCell,
+    Cell: SubTextCell,
     gridWidth: "200px",
     mayToggle: true,
-    defaultVisible: true
+    listItemSection: LIST_ITEM_LEFT_TOP
   },
   { accessor: "colors" },
   {
@@ -97,34 +105,35 @@ const columns: Column<EventTableData>[] = [
     Cell: ColorsCell,
     gridWidth: "150px",
     mayToggle: true,
-    defaultVisible: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
+  },
+  {
+    Header: "Format",
+    accessor: "format",
+    disableFilters: false,
+    filter: "fuzzyText",
+    Filter: TextBoxFilter,
+    Cell: FormatCell,
+    gridWidth: "150px",
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
+  },
+  {
+    id: "cardHighlights",
+    accessor: "id", // unused
+    Cell: CardHighlightsCell,
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_AFTER
   },
   {
     Header: "Duration",
     accessor: "duration",
     Cell: DurationCell,
     mayToggle: true,
-    defaultVisible: true
-  },
-  {
-    Header: "Won",
-    accessor: "wins",
-    Cell: MetricCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    mayToggle: true,
-    defaultVisible: true
-  },
-  {
-    Header: "Lost",
-    accessor: "losses",
-    Cell: MetricCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    mayToggle: true,
-    defaultVisible: true
+    defaultVisible: true,
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
   },
   {
     Header: "Games Won",
@@ -133,7 +142,9 @@ const columns: Column<EventTableData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
-    mayToggle: true
+    mayToggle: true,
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
   },
   {
     Header: "Games Lost",
@@ -142,18 +153,46 @@ const columns: Column<EventTableData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
-    mayToggle: true
+    mayToggle: true,
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
   },
   { accessor: "isMissingMatchData" },
   { accessor: "CurrentEventState" },
   {
     Header: "State",
-    accessor: "eventState",
+    accessor: "isComplete",
     disableFilters: false,
-    filter: "fuzzyText",
-    Filter: TextBoxFilter,
-    Cell: TextCell,
-    mayToggle: true
+    filter: "eventState",
+    Filter: EventStateColumnFilter,
+    Cell: StateCell,
+    gridWidth: "100px",
+    mayToggle: true,
+    defaultVisible: true,
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
+  },
+  {
+    Header: "Won",
+    accessor: "wins",
+    Cell: WinrateMetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
+  },
+  {
+    Header: "Lost",
+    accessor: "losses",
+    Cell: WinrateMetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   { accessor: "custom" },
   { accessor: "archived" },
@@ -188,9 +227,11 @@ export default function EventsTable({
     tableMode,
     tableModeCallback
   ]);
+  const customFilterTypes = { eventState: eventStateFilterFn };
   const tableProps: BaseTableProps<EventTableData> = {
     cachedState,
     columns,
+    customFilterTypes,
     customProps: { editTagCallback },
     data,
     defaultState: {
@@ -215,7 +256,10 @@ export default function EventsTable({
     aggFilters,
     events,
     setAggFiltersCallback,
-    ...tableControlsProps
+    ...tableControlsProps,
+    toggleableColumns: tableControlsProps.toggleableColumns.filter(
+      column => column.id !== "cardHighlights"
+    )
   };
   const isTableMode = tableMode === EVENTS_TABLE_MODE;
   return (

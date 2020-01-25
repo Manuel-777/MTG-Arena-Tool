@@ -27,6 +27,7 @@ export interface MatchTableData extends SerializedMatch, TableData {
   isOnPlay: boolean;
   leaderboardPlace?: number;
   losses: number;
+  oppArenaId: string;
   oppArchetype: string;
   oppColors: number[];
   oppColorSortVal: string;

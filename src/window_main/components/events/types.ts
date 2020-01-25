@@ -33,12 +33,12 @@ export interface EventInstanceData {
   CurrentWins: number;
   CurrentLosses?: number;
   ProcessedMatchIds?: string[];
+  isComplete: boolean;
 }
 
 export interface EventStats {
   displayName: string;
   duration?: number;
-  eventState: string;
   gameWins?: number;
   gameLosses?: number;
   isMissingMatchData: boolean;

@@ -1,6 +1,6 @@
 import React from "react";
 import { FilterValue } from "react-table";
-import { EVENTS_TABLE_MODES } from "../../../shared/constants";
+import { EVENTS_TABLE_MODES, EVENTS_LIST_MODE } from "../../../shared/constants";
 import { ReactSelect, WrappedReactSelect } from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
 import DateFilter from "../../DateFilter";
@@ -91,7 +91,10 @@ export default function EventsTableControls(
           key={tableMode}
           current={tableMode}
           options={EVENTS_TABLE_MODES}
-          callback={setTableMode}
+          callback={(mode): void => {
+            toggleHideColumn("cardHighlights", mode !== EVENTS_LIST_MODE);
+            setTableMode(mode);
+          }}
           className={"events_table_mode"}
         />
         <GlobalFilter

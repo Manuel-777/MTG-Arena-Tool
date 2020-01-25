@@ -59,6 +59,7 @@ export interface DraftListItemProps {
   openDraftCallback: (deckId: string | number) => void;
 }
 
+// TODO consider refactoring this into some kind of ListViewRow???
 export function DraftListItem({
   draft,
   openDraftCallback

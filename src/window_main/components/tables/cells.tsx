@@ -4,7 +4,11 @@ import { Cell, CellProps } from "react-table";
 import LocalTime from "../../../shared/time-components/LocalTime";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { toDDHHMMSS, toMMSS } from "../../../shared/util";
-import { formatNumber, formatPercent } from "../../renderer-util";
+import {
+  formatNumber,
+  formatPercent,
+  getEventWinLossClass
+} from "../../renderer-util";
 import {
   ArchiveSymbol,
   BriefText,
@@ -37,14 +41,25 @@ export function ColorsCell<D extends TableData>({
 export function ShortTextCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
-  const displayName = (cell.value ?? "").replace("?=?Loc/Decks/Precon/", "");
-  return <BriefText value={displayName} />;
+  return <BriefText value={cell.value} />;
 }
 
 export function TextCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
   return <BriefText value={cell.value} maxLength={50} />;
+}
+
+export function SubTextCell<D extends TableData>({
+  cell
+}: CellProps<D>): JSX.Element {
+  return (
+    <BriefText
+      value={cell.value}
+      maxLength={50}
+      style={{ fontFamily: "var(--main-font-name-it)", opacity: 0.5 }}
+    />
+  );
 }
 
 export function MetricCell<D extends TableData>({
@@ -54,6 +69,24 @@ export function MetricCell<D extends TableData>({
     <MetricText style={cell.value === 0 ? { opacity: 0.6 } : undefined}>
       {cell.value && formatNumber(cell.value)}
     </MetricText>
+  );
+}
+
+export function WinrateMetricCell<D extends TableData>({
+  cell
+}: CellProps<D>): JSX.Element {
+  const data = cell.row.original;
+  const winLossClass = getEventWinLossClass({
+    CurrentWins: data.wins,
+    CurrentLosses: data.losses
+  });
+  return (
+    <div
+      className={"list_match_result " + winLossClass}
+      style={cell.value === 0 ? { opacity: 0.6 } : undefined}
+    >
+      {cell.value && formatNumber(cell.value)}
+    </div>
   );
 }
 

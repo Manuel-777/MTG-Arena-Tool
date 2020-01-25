@@ -79,6 +79,7 @@ declare module "react-table" {
     percentFormatOptions?: any;
     divideBy100?: boolean;
     needsTileLabel?: boolean;
+    listItemSection?: number;
   }
 
   export interface ColumnInstance<D extends object = {}>

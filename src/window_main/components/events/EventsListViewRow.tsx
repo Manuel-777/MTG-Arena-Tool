@@ -2,22 +2,15 @@ import anime from "animejs";
 import compareDesc from "date-fns/compareDesc";
 import React from "react";
 import { CSSTransition } from "react-transition-group";
-import { EASING_DEFAULT, MANA } from "../../../shared/constants";
+import { EASING_DEFAULT } from "../../../shared/constants";
 import pd from "../../../shared/player-data";
-import RelativeTime from "../../../shared/time-components/RelativeTime";
-import { DbCardData } from "../../../shared/types/Metadata";
-import { toMMSS } from "../../../shared/util";
-import ListItem, { ListItemProps } from "../../components/ListItem";
 import { openDraft } from "../../draft-details";
 import { openMatch } from "../../match-details";
-import {
-  getDraftCardHighlights,
-  getEventWinLossClass,
-  toggleArchived
-} from "../../renderer-util";
+import { toggleArchived } from "../../renderer-util";
 import { MatchListItem } from "../matches/MatchesListViewRow";
-import { TableViewRowProps } from "../tables/types";
-import { DraftCardIcon, DraftListItem } from "./DraftListItem";
+import { ListViewRow } from "../tables/ListViewRow";
+import { ListViewRowProps, TableViewRowProps } from "../tables/types";
+import { DraftListItem } from "./DraftListItem";
 import { EventTableData } from "./types";
 
 function handleOpenMatch(id: string | number): void {
@@ -43,99 +36,20 @@ function handleOpenDraft(id: string | number): void {
 export default function EventsListViewRow({
   row
 }: TableViewRowProps<EventTableData>): JSX.Element {
-  return <EventListItem event={row.original} />;
-}
-
-export function EventListItem({
-  event
-}: {
-  event: EventTableData;
-}): JSX.Element {
-  const { stats } = event;
-  const { eventState, displayName, duration } = stats;
+  const event = row.original;
   const grpId = event.CourseDeck.deckTileId;
-  const parentId = event.id;
   const [expanded, setExpanded] = React.useState(false);
-  const onClick = (): void => setExpanded(!expanded);
-  const onClickDelete = event.custom
-    ? (): void => toggleArchived(parentId)
-    : undefined;
-
-  // LEFT SECTION
-  const left = {
-    top: <div className={"list_deck_name"}>{displayName}</div>,
-    bottom: (
-      <>
-        {event.CourseDeck.colors.map((color, index) => (
-          <div key={index} className={"mana_s20 mana_" + MANA[color]} />
-        ))}
-      </>
-    )
-  };
-
-  // CENTER SECTION
-  let center;
-  const draftId = event.id + "-draft";
-  if (pd.draftExists(draftId)) {
-    const draft = pd.draft(draftId);
-    const highlightCards: DbCardData[] = getDraftCardHighlights(draft);
-    center = (
-      <div className={"flex_item"} style={{ margin: "auto" }}>
-        {highlightCards.map((card, index) => (
-          <DraftCardIcon key={index} card={card} />
-        ))}
-      </div>
-    );
-  }
-
-  // RIGHT SECTION
-  const timestamp = new Date(event.date);
-  let { wins, losses } = stats;
-  wins = wins || 0;
-  losses = losses || 0;
-  const wl = `${wins}:${losses}`;
-  const winLossClass = getEventWinLossClass({
-    CurrentWins: wins,
-    CurrentLosses: losses
-  });
-  const right = {
-    top: (
-      <div
-        className={
-          eventState === "Completed"
-            ? "list_event_phase"
-            : "list_event_phase_red"
-        }
-      >
-        {eventState}
-      </div>
-    ),
-    bottom: (
-      <>
-        <div className={"list_match_time"}>
-          <RelativeTime datetime={timestamp.toISOString()} />{" "}
-          {toMMSS(duration) + " long"}
-        </div>
-      </>
-    ),
-    after: <div className={"list_match_result " + winLossClass}>{wl}</div>
-  };
-
-  const listItemProps: ListItemProps = {
+  const openCallback = (): void => setExpanded(!expanded);
+  const listProps: ListViewRowProps<EventTableData> = {
+    row,
     grpId,
-    left,
-    center,
-    right,
-    onClick,
-    onClickDelete,
-    archived: event.archived
+    title: (expanded ? "collapse" : "expand") + " event",
+    openCallback,
+    archiveCallback: toggleArchived
   };
   return (
     <>
-      <ListItem
-        {...listItemProps}
-        title={(expanded ? "collapse" : "expand") + " event"}
-      />
+      <ListViewRow {...listProps} />
       <CSSTransition
         classNames="list_event_expanded"
         in={!!expanded}

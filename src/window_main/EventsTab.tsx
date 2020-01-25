@@ -87,7 +87,6 @@ function getEventStats(event: SerializedEvent): EventStats {
   const stats: EventStats = {
     displayName: getReadableEvent(event.InternalEventName),
     duration: 0,
-    eventState: "In Progress",
     gameWins: 0,
     gameLosses: 0,
     isMissingMatchData: false,
@@ -95,13 +94,6 @@ function getEventStats(event: SerializedEvent): EventStats {
     matchIds: [],
     wins: 0
   };
-  if (
-    event.custom ||
-    event.CurrentEventState === "DoneWithMatches" ||
-    event.CurrentEventState === 2
-  ) {
-    stats.eventState = "Completed";
-  }
   if (eventData.ProcessedMatchIds) {
     stats.matchIds = eventData.ProcessedMatchIds.map(getValidMatchId).filter(
       id => id !== undefined
@@ -157,6 +149,10 @@ function getEventsData(aggregator: Aggregator): EventTableData[] {
         const timestamp = new Date(event.date ?? NaN);
         const colors = event.CourseDeck.colors ?? [];
         const stats = getEventStats(event);
+        const isComplete =
+          event.custom ||
+          event.CurrentEventState === "DoneWithMatches" ||
+          event.CurrentEventState === 2;
         return {
           ...event,
           ...stats,
@@ -166,6 +162,7 @@ function getEventsData(aggregator: Aggregator): EventTableData[] {
           colorSortVal: colors.join(""),
           deckId: event.CourseDeck.id ?? "",
           deckName: event.CourseDeck.name ?? "",
+          isComplete,
           format: db.events_format[event.InternalEventName] ?? "unknown",
           stats,
           timestamp: isValid(timestamp) ? timestamp.getTime() : NaN

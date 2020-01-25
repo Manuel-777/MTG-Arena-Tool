@@ -1,6 +1,13 @@
 import React from "react";
 import { Column } from "react-table";
-import { MATCHES_TABLE_MODE } from "../../../shared/constants";
+import {
+  LIST_ITEM_LEFT_BOTTOM,
+  LIST_ITEM_LEFT_TOP,
+  LIST_ITEM_RIGHT_AFTER,
+  LIST_ITEM_RIGHT_BOTTOM,
+  LIST_ITEM_RIGHT_TOP,
+  MATCHES_TABLE_MODE
+} from "../../../shared/constants";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -10,7 +17,9 @@ import {
   MetricCell,
   PercentCell,
   RelativeTimeCell,
-  ShortTextCell
+  ShortTextCell,
+  SubTextCell,
+  WinrateMetricCell
 } from "../tables/cells";
 import {
   ArchiveColumnFilter,
@@ -48,90 +57,13 @@ const columns: Column<MatchTableData>[] = [
     Cell: RelativeTimeCell,
     sortDescFirst: true,
     mayToggle: true,
-    defaultVisible: true
-  },
-  { accessor: "onThePlay" },
-  {
-    Header: "Flip",
-    accessor: "isOnPlay",
-    disableFilters: false,
-    filter: "onPlay",
-    Filter: OnPlayColumnFilter,
-    Cell: OnPlayCell,
-    gridWidth: "100px",
-    mayToggle: true
-  },
-  { accessor: "eventId" },
-  {
-    Header: "Event",
-    accessor: "eventName",
-    disableFilters: false,
-    filter: "fuzzyText",
-    Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
-    mayToggle: true,
-    defaultVisible: true
-  },
-  {
-    Header: "Format",
-    accessor: "format",
-    disableFilters: false,
-    filter: "fuzzyText",
-    Filter: TextBoxFilter,
-    Cell: FormatCell,
-    gridWidth: "150px",
-    mayToggle: true
-  },
-  {
-    Header: "Best of",
-    accessor: "bestOf",
-    Cell: MetricCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    mayToggle: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
   },
   { accessor: "gameStats" },
   { accessor: "toolVersion" },
   { accessor: "toolRunFromSource" },
   { accessor: "player" },
-  {
-    Header: "My Rank",
-    accessor: "rank",
-    disableFilters: false,
-    filter: "rank",
-    Filter: RankColumnFilter,
-    Cell: RankCell,
-    mayToggle: true
-  },
-  {
-    Header: "My Tier",
-    accessor: "tier",
-    Cell: MetricCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    mayToggle: true
-  },
-  {
-    Header: "My Mythic %",
-    accessor: "percentile",
-    Cell: PercentCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    mayToggle: true
-  },
-  {
-    Header: "My Mythic #",
-    accessor: "leaderboardPlace",
-    Cell: MetricCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    mayToggle: true
-  },
   { accessor: "playerDeck" },
   { accessor: "deckId" },
   {
@@ -143,7 +75,61 @@ const columns: Column<MatchTableData>[] = [
     Cell: ShortTextCell,
     gridWidth: "200px",
     mayToggle: true,
-    defaultVisible: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
+  },
+  {
+    Header: "My Rank",
+    accessor: "rank",
+    disableFilters: false,
+    filter: "rank",
+    Filter: RankColumnFilter,
+    Cell: RankCell,
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
+  },
+  {
+    Header: "My Tier",
+    accessor: "tier",
+    Cell: MetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
+  },
+  {
+    Header: "My Mythic %",
+    accessor: "percentile",
+    Cell: PercentCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
+  },
+  {
+    Header: "My Mythic #",
+    accessor: "leaderboardPlace",
+    Cell: MetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
+  },
+  { accessor: "eventId" },
+  {
+    Header: "Event",
+    accessor: "eventName",
+    disableFilters: false,
+    filter: "fuzzyText",
+    Filter: TextBoxFilter,
+    Cell: SubTextCell,
+    gridWidth: "200px",
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
   },
   { accessor: "colors" },
   {
@@ -154,7 +140,30 @@ const columns: Column<MatchTableData>[] = [
     filter: "colors",
     Cell: ColorsCell,
     gridWidth: "150px",
-    mayToggle: true
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
+  },
+  {
+    Header: "Format",
+    accessor: "format",
+    disableFilters: false,
+    filter: "fuzzyText",
+    Filter: TextBoxFilter,
+    Cell: FormatCell,
+    gridWidth: "150px",
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
+  },
+  {
+    Header: "Best of",
+    accessor: "bestOf",
+    Cell: MetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
   },
   { accessor: "opponent" },
   { accessor: "oppDeck" },
@@ -167,7 +176,19 @@ const columns: Column<MatchTableData>[] = [
     Cell: ShortTextCell,
     gridWidth: "200px",
     mayToggle: true,
-    defaultVisible: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
+  },
+  {
+    Header: "Op. ID",
+    accessor: "oppArenaId",
+    disableFilters: false,
+    filter: "fuzzyText",
+    Filter: TextBoxFilter,
+    Cell: SubTextCell,
+    gridWidth: "200px",
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
   },
   {
     Header: "Op. Rank",
@@ -176,7 +197,9 @@ const columns: Column<MatchTableData>[] = [
     filter: "rank",
     Filter: RankColumnFilter,
     Cell: RankCell,
-    mayToggle: true
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
   },
   {
     Header: "Op. Tier",
@@ -185,7 +208,8 @@ const columns: Column<MatchTableData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
   },
   {
     Header: "Op. Mythic %",
@@ -194,7 +218,8 @@ const columns: Column<MatchTableData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
   },
   {
     Header: "Op. Mythic #",
@@ -203,7 +228,16 @@ const columns: Column<MatchTableData>[] = [
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
+  },
+  {
+    Header: "Duration",
+    accessor: "duration",
+    Cell: DurationCell,
+    mayToggle: true,
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
   },
   { accessor: "oppColors" },
   {
@@ -215,7 +249,8 @@ const columns: Column<MatchTableData>[] = [
     Cell: ColorsCell,
     gridWidth: "150px",
     mayToggle: true,
-    defaultVisible: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
   },
   { accessor: "oppArchetype" },
   {
@@ -228,40 +263,53 @@ const columns: Column<MatchTableData>[] = [
     Cell: ArchetypeCell,
     gridWidth: "200px",
     mayToggle: true,
-    defaultVisible: true
-  },
-  {
-    Header: "Duration",
-    accessor: "duration",
-    Cell: DurationCell,
-    mayToggle: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
   },
   {
     Header: "Won",
     accessor: "wins",
-    Cell: MetricCell,
+    Cell: WinrateMetricCell,
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
-    mayToggle: true
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   {
     Header: "Lost",
     accessor: "losses",
-    Cell: MetricCell,
+    Cell: WinrateMetricCell,
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
-    mayToggle: true
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   {
     Header: "Drawn",
     accessor: "draws",
-    Cell: MetricCell,
+    Cell: WinrateMetricCell,
     disableFilters: false,
     Filter: NumberRangeColumnFilter,
     filter: "between",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
+  },
+  { accessor: "onThePlay" },
+  {
+    Header: "Flip",
+    accessor: "isOnPlay",
+    disableFilters: false,
+    filter: "onPlay",
+    Filter: OnPlayColumnFilter,
+    Cell: OnPlayCell,
+    gridWidth: "100px",
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   { accessor: "custom" },
   { accessor: "archived" },

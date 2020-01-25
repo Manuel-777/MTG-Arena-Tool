@@ -20,6 +20,8 @@ const bestFilters = (): { id: string; value: FilterValue }[] => [
 ];
 const craftColumns = new Set([
   "colorSortVal",
+  "format",
+  "timeUpdated",
   "boosterCost",
   "rare",
   "mythic",
@@ -85,7 +87,6 @@ export default function DecksTableControls(
             for (const column of toggleableColumns) {
               toggleHideColumn(column.id, !column.defaultVisible);
             }
-            toggleHideColumn("total", false);
             toggleHideColumn("lastEditWinrate", false);
           }}
         >
@@ -104,10 +105,7 @@ export default function DecksTableControls(
             for (const column of toggleableColumns) {
               toggleHideColumn(column.id, !column.defaultVisible);
             }
-            toggleHideColumn("wins", false);
-            toggleHideColumn("losses", false);
             toggleHideColumn("winrate100", false);
-            toggleHideColumn("archivedCol", true);
           }}
         >
           Best

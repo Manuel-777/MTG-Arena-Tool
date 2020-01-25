@@ -34,7 +34,10 @@ function ItemSection({
 }): JSX.Element {
   return isSplitNode(section) ? (
     <>
-      <div className={className} style={{ flexDirection: "column" }}>
+      <div
+        className={className}
+        style={{ flexDirection: "column", marginRight: "16px" }}
+      >
         <div className={"flex_top"}>{section.top}</div>
         <div className={"flex_bottom"}>{section.bottom}</div>
       </div>

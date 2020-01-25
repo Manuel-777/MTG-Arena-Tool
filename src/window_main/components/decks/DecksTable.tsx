@@ -1,6 +1,14 @@
 import React from "react";
 import { Column } from "react-table";
-import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
+import {
+  DECKS_ART_MODE,
+  DECKS_TABLE_MODE,
+  LIST_ITEM_LEFT_BOTTOM,
+  LIST_ITEM_LEFT_TOP,
+  LIST_ITEM_RIGHT_AFTER,
+  LIST_ITEM_RIGHT_BOTTOM,
+  LIST_ITEM_RIGHT_TOP
+} from "../../../shared/constants";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -10,7 +18,8 @@ import {
   MetricCell,
   RelativeTimeCell,
   ShortTextCell,
-  TagsCell
+  TagsCell,
+  WinrateMetricCell
 } from "../tables/cells";
 import {
   ArchiveColumnFilter,
@@ -49,20 +58,9 @@ const columns: Column<DecksData>[] = [
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
     gridWidth: "210px",
-    defaultVisible: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
   },
-  {
-    Header: "Colors",
-    disableFilters: false,
-    accessor: "colorSortVal",
-    Filter: ColorColumnFilter,
-    filter: "colors",
-    Cell: ColorsCell,
-    gridWidth: "150px",
-    mayToggle: true,
-    defaultVisible: true
-  },
-  { accessor: "colors" },
   {
     Header: "Format",
     accessor: "format",
@@ -72,7 +70,8 @@ const columns: Column<DecksData>[] = [
     Cell: FormatCell,
     gridWidth: "150px",
     mayToggle: true,
-    defaultVisible: true
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
   },
   {
     Header: "Tags",
@@ -83,15 +82,31 @@ const columns: Column<DecksData>[] = [
     disableSortBy: true,
     Cell: TagsCell,
     gridWidth: "240px",
-    mayToggle: true
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_TOP
   },
+  {
+    Header: "Colors",
+    disableFilters: false,
+    accessor: "colorSortVal",
+    Filter: ColorColumnFilter,
+    filter: "colors",
+    Cell: ColorsCell,
+    gridWidth: "150px",
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
+  },
+  { accessor: "colors" },
   {
     Header: "Last Updated",
     accessor: "timeUpdated",
     Cell: RelativeTimeCell,
     sortDescFirst: true,
     mayToggle: true,
-    needsTileLabel: true
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
   },
   {
     Header: "Last Played",
@@ -99,7 +114,8 @@ const columns: Column<DecksData>[] = [
     Cell: RelativeTimeCell,
     sortDescFirst: true,
     mayToggle: true,
-    needsTileLabel: true
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
   },
   {
     Header: "Last Touched",
@@ -108,27 +124,8 @@ const columns: Column<DecksData>[] = [
     sortDescFirst: true,
     mayToggle: true,
     defaultVisible: true,
-    needsTileLabel: true
-  },
-  {
-    Header: "Won",
-    accessor: "wins",
-    Cell: MetricCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    mayToggle: true,
-    needsTileLabel: true
-  },
-  {
-    Header: "Lost",
-    accessor: "losses",
-    Cell: MetricCell,
-    disableFilters: false,
-    Filter: NumberRangeColumnFilter,
-    filter: "between",
-    mayToggle: true,
-    needsTileLabel: true
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_LEFT_BOTTOM
   },
   {
     Header: "Total",
@@ -138,22 +135,13 @@ const columns: Column<DecksData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
-    needsTileLabel: true
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
   },
-  {
-    Header: "Total Duration",
-    accessor: "duration",
-    Cell: DurationCell,
-    mayToggle: true,
-    needsTileLabel: true
-  },
-  {
-    Header: "Avg. Duration",
-    accessor: "avgDuration",
-    Cell: DurationCell,
-    mayToggle: true,
-    needsTileLabel: true
-  },
+  { accessor: "winrate" },
+  { accessor: "interval", sortInverted: true },
+  { accessor: "winrateLow" },
+  { accessor: "winrateHigh" },
   {
     Header: "Winrate",
     accessor: "winrate100",
@@ -162,18 +150,32 @@ const columns: Column<DecksData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
-    needsTileLabel: true
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_TOP
   },
-  { accessor: "winrate" },
-  { accessor: "interval", sortInverted: true },
-  { accessor: "winrateLow" },
-  { accessor: "winrateHigh" },
+  {
+    Header: "Total Duration",
+    accessor: "duration",
+    Cell: DurationCell,
+    mayToggle: true,
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
+  },
+  {
+    Header: "Avg. Duration",
+    accessor: "avgDuration",
+    Cell: DurationCell,
+    mayToggle: true,
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
+  },
   {
     Header: "Since last edit",
     accessor: "lastEditWinrate",
     Cell: LastEditWinRateCell,
     mayToggle: true,
-    needsTileLabel: true
+    needsTileLabel: true,
+    listItemSection: LIST_ITEM_RIGHT_BOTTOM
   },
   { accessor: "lastEditWins" },
   { accessor: "lastEditLosses" },
@@ -186,7 +188,8 @@ const columns: Column<DecksData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     gridWidth: "100px",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   {
     Header: WildcardHeader,
@@ -196,7 +199,8 @@ const columns: Column<DecksData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     gridWidth: "100px",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   {
     Header: WildcardHeader,
@@ -206,7 +210,8 @@ const columns: Column<DecksData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     gridWidth: "100px",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   {
     Header: WildcardHeader,
@@ -216,7 +221,8 @@ const columns: Column<DecksData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     gridWidth: "100px",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   {
     Header: WildcardHeader,
@@ -226,7 +232,30 @@ const columns: Column<DecksData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     gridWidth: "100px",
-    mayToggle: true
+    mayToggle: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
+  },
+  {
+    Header: "Won",
+    accessor: "wins",
+    Cell: WinrateMetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
+  },
+  {
+    Header: "Lost",
+    accessor: "losses",
+    Cell: WinrateMetricCell,
+    disableFilters: false,
+    Filter: NumberRangeColumnFilter,
+    filter: "between",
+    mayToggle: true,
+    defaultVisible: true,
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   },
   { accessor: "custom" },
   { accessor: "archived" },
@@ -241,7 +270,7 @@ const columns: Column<DecksData>[] = [
     gridWidth: "110px",
     sortType: "basic",
     mayToggle: true,
-    defaultVisible: true
+    listItemSection: LIST_ITEM_RIGHT_AFTER
   }
 ];
 

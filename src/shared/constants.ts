@@ -810,6 +810,17 @@ export const DATE_LAST_30 = "Last 30 Days";
 export const DATE_SEASON = "Current Season";
 export const DATE_ALL_TIME = "All Time";
 
+// ListItem location constants for List Views
+export const LIST_ITEM_LEFT_TOP = 1;
+export const LIST_ITEM_LEFT_BOTTOM = 2;
+export const LIST_ITEM_LEFT_AFTER = 3;
+export const LIST_ITEM_CENTER_TOP = 4;
+export const LIST_ITEM_CENTER_BOTTOM = 5;
+export const LIST_ITEM_CENTER_AFTER = 6;
+export const LIST_ITEM_RIGHT_TOP = 7;
+export const LIST_ITEM_RIGHT_BOTTOM = 8;
+export const LIST_ITEM_RIGHT_AFTER = 9;
+
 export const ECONOMY_LIST_MODE = "List View";
 export const ECONOMY_TABLE_MODE = "Table View";
 export const ECONOMY_TABLE_MODES = [ECONOMY_LIST_MODE, ECONOMY_TABLE_MODE];

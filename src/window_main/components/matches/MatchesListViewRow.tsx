@@ -3,43 +3,42 @@ import { DEFAULT_TILE, MANA } from "../../../shared/constants";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { formatRank, getReadableEvent, toMMSS } from "../../../shared/util";
 import ListItem from "../../components/ListItem";
-import { BinarySymbol, NewTag, RankSymbol, TagBubble } from "../display";
+import { BinarySymbol, RankSymbol } from "../display";
 import { ListItemProps } from "../ListItem";
-import { TagCounts } from "../tables/types";
-import { MatchesTableRowProps, SerializedMatch } from "./types";
+import { ListViewRow } from "../tables/ListViewRow";
+import { ListViewRowProps } from "../tables/types";
+import { MatchesTableRowProps, MatchTableData, SerializedMatch } from "./types";
 
 export default function MatchesListViewRow({
   row,
+  openMatchCallback,
   ...otherProps
 }: MatchesTableRowProps): JSX.Element {
-  return <MatchListItem match={row.original} {...otherProps} />;
+  const match = row.original;
+  const grpId = match.playerDeck.deckTileId ?? DEFAULT_TILE;
+  const listProps: ListViewRowProps<MatchTableData> = {
+    row,
+    grpId,
+    title: "show match details",
+    openCallback: openMatchCallback,
+    ...otherProps
+  };
+  return <ListViewRow {...listProps} />;
 }
 
 export interface MatchListItemProps {
   match: SerializedMatch;
-  tags?: TagCounts;
   openMatchCallback: (deckId: string | number) => void;
-  archiveCallback?: (id: string | number) => void;
-  addTagCallback?: (id: string, tag: string) => void;
-  editTagCallback?: (tag: string, color: string) => void;
-  deleteTagCallback?: (id: string, tag: string) => void;
 }
 
+// TODO consider refactoring this into some kind of ListViewRow???
 export function MatchListItem({
   match,
-  tags,
-  openMatchCallback,
-  archiveCallback,
-  addTagCallback,
-  editTagCallback,
-  deleteTagCallback
+  openMatchCallback
 }: MatchListItemProps): JSX.Element {
   const grpId = match.playerDeck.deckTileId ?? DEFAULT_TILE;
   const parentId = match.id;
   const onClick = (): void => openMatchCallback(parentId);
-  const onClickDelete = archiveCallback
-    ? (): void => archiveCallback(parentId)
-    : undefined;
 
   // LEFT SECTION
   let displayName = match.playerDeck.name ?? "";
@@ -87,28 +86,6 @@ export function MatchListItem({
         {match.oppDeck.colors?.map((color, index) => (
           <div key={index} className={"mana_s20 mana_" + MANA[color]} />
         ))}
-        <div className={"matches_tags"}>
-          {editTagCallback &&
-            deleteTagCallback &&
-            match.tags?.map((tag: string) => {
-              const tagProps = {
-                parentId,
-                tag,
-                editTagCallback,
-                deleteTagCallback
-              };
-              return <TagBubble key={tag} {...tagProps} />;
-            })}
-          {tags && addTagCallback && match.tags?.length === 0 && (
-            <NewTag
-              parentId={parentId}
-              addTagCallback={addTagCallback}
-              tagPrompt={"Set archetype"}
-              tags={tags}
-              title={"set custom match archetype"}
-            />
-          )}
-        </div>
       </>
     ),
     after: (
@@ -136,7 +113,6 @@ export function MatchListItem({
     left,
     right,
     onClick,
-    onClickDelete,
     archived: match.archived
   };
   return <ListItem {...listItemProps} title={"show match details"} />;

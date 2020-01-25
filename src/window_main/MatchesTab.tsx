@@ -224,6 +224,8 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
         const timestamp = new Date(match.date ?? NaN);
         const colors = match.playerDeck.colors ?? [];
         const oppColors = match.oppDeck.colors ?? [];
+        const oppArenaId = match.opponent.name ?? "-#000000";
+        const oppName = oppArenaId.slice(0, -6);
         return {
           ...match,
           archivedSortVal: match.archived ? 1 : 0,
@@ -242,7 +244,8 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
           oppColors,
           oppColorSortVal: oppColors.join(""),
           oppLeaderboardPlace: match.opponent.leaderboardPlace,
-          oppName: match.opponent.name ?? "",
+          oppArenaId,
+          oppName,
           oppPercentile: match.opponent.percentile
             ? match.opponent.percentile / 100
             : undefined,
