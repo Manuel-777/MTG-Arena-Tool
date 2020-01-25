@@ -33,7 +33,6 @@ export interface EventInstanceData {
   CurrentWins: number;
   CurrentLosses?: number;
   ProcessedMatchIds?: string[];
-  isComplete: boolean;
 }
 
 export interface EventStats {
@@ -53,6 +52,7 @@ export interface EventTableData extends TableData, SerializedEvent, EventStats {
   colorSortVal: string;
   deckId: string;
   deckName: string;
+  isComplete: boolean;
   stats: EventStats;
   timestamp: number;
 }

@@ -1,6 +1,9 @@
 import React from "react";
 import { FilterValue } from "react-table";
-import { EVENTS_TABLE_MODES, EVENTS_LIST_MODE } from "../../../shared/constants";
+import {
+  EVENTS_LIST_MODE,
+  EVENTS_TABLE_MODES
+} from "../../../shared/constants";
 import { ReactSelect, WrappedReactSelect } from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
 import DateFilter from "../../DateFilter";
