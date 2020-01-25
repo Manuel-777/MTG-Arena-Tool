@@ -30,7 +30,6 @@ function ListViewCell<D extends TableData>({
       {cell.column.needsTileLabel && (
         <MetricText
           style={{
-            paddingRight: "8px",
             fontSize: "small",
             whiteSpace: "nowrap",
             fontWeight: 300,

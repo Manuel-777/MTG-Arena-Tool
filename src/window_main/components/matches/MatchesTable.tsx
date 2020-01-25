@@ -73,7 +73,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true,
     listItemSection: LIST_ITEM_LEFT_TOP
@@ -96,6 +96,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
+    needsTileLabel: true,
     listItemSection: LIST_ITEM_LEFT_TOP
   },
   {
@@ -106,6 +107,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
+    needsTileLabel: true,
     listItemSection: LIST_ITEM_LEFT_TOP
   },
   {
@@ -116,6 +118,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
+    needsTileLabel: true,
     listItemSection: LIST_ITEM_LEFT_TOP
   },
   { accessor: "eventId" },
@@ -126,7 +129,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: SubTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true,
     listItemSection: LIST_ITEM_LEFT_TOP
@@ -163,6 +166,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
+    needsTileLabel: true,
     listItemSection: LIST_ITEM_LEFT_BOTTOM
   },
   { accessor: "opponent" },
@@ -174,7 +178,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true,
     listItemSection: LIST_ITEM_RIGHT_TOP
@@ -186,7 +190,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: SubTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     listItemSection: LIST_ITEM_RIGHT_TOP
   },
@@ -209,6 +213,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
+    needsTileLabel: true,
     listItemSection: LIST_ITEM_RIGHT_TOP
   },
   {
@@ -219,6 +224,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
+    needsTileLabel: true,
     listItemSection: LIST_ITEM_RIGHT_TOP
   },
   {
@@ -229,6 +235,7 @@ const columns: Column<MatchTableData>[] = [
     Filter: NumberRangeColumnFilter,
     filter: "between",
     mayToggle: true,
+    needsTileLabel: true,
     listItemSection: LIST_ITEM_RIGHT_TOP
   },
   {

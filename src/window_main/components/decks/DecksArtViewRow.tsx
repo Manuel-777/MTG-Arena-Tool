@@ -43,8 +43,7 @@ function DecksArtViewCell({
 
 export default function DecksArtViewRow({
   row,
-  openDeckCallback,
-  ...otherProps
+  openDeckCallback
 }: DecksTableRowProps): JSX.Element {
   const deck = row.original;
   const parentId = deck.id ?? "";
@@ -58,9 +57,6 @@ export default function DecksArtViewRow({
   const mouseLeave = React.useCallback(() => {
     setHover(false);
   }, []);
-  const divProps = { ...otherProps };
-  delete divProps.index;
-  delete divProps.gridTemplateColumns;
   return (
     <div
       className={"decks_table_deck_tile"}
@@ -68,7 +64,6 @@ export default function DecksArtViewRow({
       title={"show deck details"}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
-      {...divProps}
     >
       <CSSTransition classNames="deckTileHover" in={!!hover} timeout={200}>
         <DeckArt url={getCardArtCrop(row.values["deckTileId"])} />

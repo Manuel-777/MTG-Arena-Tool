@@ -7,7 +7,6 @@ import {
   LIST_ITEM_RIGHT_AFTER,
   LIST_ITEM_RIGHT_BOTTOM,
   LIST_ITEM_RIGHT_TOP,
-  LIST_ITEM_CENTER_AFTER,
   LIST_ITEM_LEFT_AFTER
 } from "../../../shared/constants";
 import {
@@ -66,7 +65,7 @@ const columns: Column<EventTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true,
     listItemSection: LIST_ITEM_LEFT_TOP
@@ -78,7 +77,7 @@ const columns: Column<EventTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: SubTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     listItemSection: LIST_ITEM_LEFT_TOP
   },
@@ -91,7 +90,7 @@ const columns: Column<EventTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: SubTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     listItemSection: LIST_ITEM_LEFT_TOP
   },

@@ -252,17 +252,6 @@ export function TagBubble({
   );
 }
 
-export function renderTagBubble(
-  parent: Element,
-  props: TagBubbleProps
-): HTMLDivElement {
-  const container = createDiv([]);
-  container.style.alignSelf = "center";
-  mountReactComponent(<TagBubble {...props} />, container);
-  parent.appendChild(container);
-  return container;
-}
-
 interface NewTagProps {
   parentId: string;
   addTagCallback: (id: string, tag: string) => void;
@@ -282,6 +271,7 @@ export function NewTag({
   return (
     <TagBubbleDiv
       backgroundColor={backgroundColor}
+      style={{ opacity: 0.6 }}
       fontStyle={"italic"}
       title={title}
       onClick={(e): void => e.stopPropagation()}
@@ -294,17 +284,6 @@ export function NewTag({
       />
     </TagBubbleDiv>
   );
-}
-
-export function renderNewTag(
-  parent: Element,
-  props: NewTagProps
-): HTMLDivElement {
-  const container = createDiv([]);
-  container.style.alignSelf = "center";
-  mountReactComponent(<NewTag {...props} />, container);
-  parent.appendChild(container);
-  return container;
 }
 
 const ManaSymbolBase = styled.div.attrs<ManaSymbolProps>(props => ({

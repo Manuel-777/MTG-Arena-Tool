@@ -3,7 +3,7 @@ import { DEFAULT_TILE, MANA } from "../../../shared/constants";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { formatRank, getReadableEvent, toMMSS } from "../../../shared/util";
 import ListItem from "../../components/ListItem";
-import { BinarySymbol, RankSymbol } from "../display";
+import { BinarySymbol, MetricText, RankSymbol } from "../display";
 import { ListItemProps } from "../ListItem";
 import { ListViewRow } from "../tables/ListViewRow";
 import { ListViewRowProps } from "../tables/types";
@@ -70,7 +70,7 @@ export function MatchListItem({
   const right = {
     top: (
       <>
-        <div className={"list_match_title"}>vs {oppName}</div>
+        <div className={"list_match_title"}>{oppName}</div>
         <RankSymbol
           rank={match.opponent.rank}
           title={formatRank(match.opponent)}
@@ -81,7 +81,18 @@ export function MatchListItem({
       <>
         <div className={"list_match_time"}>
           <RelativeTime datetime={timestamp.toISOString()} />{" "}
-          {toMMSS(match.duration) + " long"}
+          <MetricText
+            style={{
+              fontSize: "small",
+              whiteSpace: "nowrap",
+              fontWeight: 300,
+              color: "var(--color-light-50)",
+              marginRight: "8px"
+            }}
+          >
+            Duration:
+          </MetricText>
+          {toMMSS(match.duration)}
         </div>
         {match.oppDeck.colors?.map((color, index) => (
           <div key={index} className={"mana_s20 mana_" + MANA[color]} />
@@ -96,7 +107,7 @@ export function MatchListItem({
             (match.player.win > match.opponent.win ? "green" : "red")
           }
         >
-          {match.player.win}:{match.opponent.win}
+          {match.player.win}&nbsp;&nbsp;&nbsp;{match.opponent.win}
         </div>
         {!!match.onThePlay && (
           <BinarySymbol
