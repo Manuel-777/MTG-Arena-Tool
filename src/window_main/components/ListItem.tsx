@@ -2,6 +2,12 @@ import React from "react";
 import { getCardArtCrop } from "../../shared/util";
 import { DecksTableRowProps } from "./decks/types";
 import ManaCost from "./ManaCost";
+import {
+  formatPercent,
+  formatWinrateInterval,
+  getWinrateClass
+} from "../renderer-util";
+import format from "date-fns/format";
 
 export function ListItemDeck({
   row,
@@ -22,6 +28,37 @@ export function ListItemDeck({
     setHover(false);
   }, []);
 
+  if (deck.name?.indexOf("?=?Loc/Decks/Precon/") != -1) {
+    deck.name = deck.name?.replace("?=?Loc/Decks/Precon/", "");
+  }
+
+  const lastTouch = new Date(deck.timeTouched);
+  const deckLastTouchedStyle = {
+    marginLeft: "18px",
+    marginRight: "auto",
+    lineHeight: "18px",
+    opacity: 0.6
+  };
+
+  // Deck winrates
+  let winrateInterval = "???";
+  let winrateTooltip = "play at least 20 matches to estimate actual winrate";
+  let winrateEditTooltip = "no data yet";
+  if (deck.total > 0) {
+    if (deck.total >= 20) {
+      winrateInterval = formatPercent(deck.interval);
+      winrateTooltip = formatWinrateInterval(
+        formatPercent(deck.winrateLow),
+        formatPercent(deck.winrateHigh)
+      );
+    }
+    if (deck.lastEditTotal > 0) {
+      winrateEditTooltip = `${formatPercent(
+        deck.lastEditWinrate
+      )} winrate since ${format(new Date(deck.lastUpdated || 0), "Pp")}`;
+    }
+  }
+
   return (
     <ListItem
       click={onRowClick}
@@ -35,8 +72,47 @@ export function ListItemDeck({
           <ManaCost class="mana_s20" colors={deck.colors || []} />
         </FlexBottom>
       </Column>
-      <Column class="list_item_center">?</Column>
-      <Column class="list_item_right">?</Column>
+
+      <Column class="list_item_center">
+        <FlexTop> </FlexTop>
+        <FlexBottom>
+          <i style={deckLastTouchedStyle}>
+            <relative-time datetime={lastTouch.toISOString()}>
+              updated/played: {lastTouch.toString()}
+            </relative-time>
+          </i>
+        </FlexBottom>
+      </Column>
+      <Column class="list_item_right">
+        {deck.total > 0 ? (
+          <>
+            <FlexTop title={winrateTooltip} innerClass="list_deck_winrate">
+              {deck.wins}:{deck.losses} (
+              <span className={getWinrateClass(deck.winrate) + "_bright"}>
+                {formatPercent(deck.winrate)}
+              </span>{" "}
+              <i style={{ opacity: 0.6 }}>&plusmn; {winrateInterval}</i>)
+            </FlexTop>
+            <FlexBottom
+              title={winrateEditTooltip}
+              innerClass="list_deck_winrate"
+            >
+              Since last edit:{" "}
+              {deck.lastEditTotal > 0 ? (
+                <span
+                  className={getWinrateClass(deck.lastEditWinrate) + "_bright"}
+                >
+                  {formatPercent(deck.lastEditWinrate)}
+                </span>
+              ) : (
+                <span>---</span>
+              )}
+            </FlexBottom>
+          </>
+        ) : (
+          <></>
+        )}
+      </Column>
     </ListItem>
   );
 }
@@ -105,6 +181,7 @@ export function Column(props: ColumnProps): JSX.Element {
 }
 
 interface FlexProps extends JSX.ElementChildrenAttribute {
+  title?: string;
   innerClass?: string;
 }
 
@@ -115,7 +192,9 @@ export function FlexTop(props: FlexProps): JSX.Element {
   return (
     <div className="flex_top">
       {props.innerClass ? (
-        <div className={props.innerClass}>{props.children}</div>
+        <div title={props.title} className={props.innerClass}>
+          {props.children}
+        </div>
       ) : (
         props.children
       )}
@@ -127,7 +206,9 @@ export function FlexBottom(props: FlexProps): JSX.Element {
   return (
     <div className="flex_bottom">
       {props.innerClass ? (
-        <div className={props.innerClass}>{props.children}</div>
+        <div title={props.title} className={props.innerClass}>
+          {props.children}
+        </div>
       ) : (
         props.children
       )}
