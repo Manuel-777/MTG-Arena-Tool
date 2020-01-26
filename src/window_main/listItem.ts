@@ -27,7 +27,7 @@ class ListItem {
     isArchived = false
   ) {
     this.id = id;
-  
+
     this.container = createDiv(["list_item_container", id]);
     this.left = createDiv(["list_item_left"]);
     this.center = createDiv(["list_item_center"]);
