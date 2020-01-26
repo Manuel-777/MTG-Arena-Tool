@@ -9,7 +9,7 @@ import {
 } from "../renderer-util";
 import format from "date-fns/format";
 import { TagBubble } from "./display";
-
+import WildcardsCost from "./WildcardsCost";
 export function ListItemDeck({
   row,
   openDeckCallback,
@@ -128,7 +128,7 @@ export function ListItemDeck({
             </FlexBottom>
           </>
         ) : (
-          <></>
+          <WildcardsCost deck={deck} />
         )}
       </Column>
     </ListItem>
