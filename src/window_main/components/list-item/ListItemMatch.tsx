@@ -13,6 +13,7 @@ import { DEFAULT_TILE } from "../../../shared/constants";
 import ManaCost from "../ManaCost";
 import { getReadableEvent, toMMSS } from "../../../shared/util";
 import RankSmall from "../RankSmall";
+import ResultDetails from "../ResultDetails";
 import { TagBubble, NewTag } from "../display";
 
 export default function MatchesTable({
@@ -38,8 +39,6 @@ export default function MatchesTable({
   const mouseLeave = React.useCallback(() => {
     setHover(false);
   }, []);
-
-  const onThePlay = match.player.seat == match.onThePlay ? true : false;
 
   return (
     <ListItem
@@ -104,10 +103,7 @@ export default function MatchesTable({
         </FlexBottom>
       </Column>
 
-      <div
-        title={onThePlay ? "On the play" : "On the draw"}
-        className={onThePlay ? "ontheplay" : "onthedraw"}
-      />
+      <ResultDetails match={match} />
 
       <Column class="list_match_result">
         <div

@@ -8,7 +8,6 @@ interface RankSmallProps {
 
 export default function RankSmall(props: RankSmallProps): JSX.Element {
   const { rank, style } = props;
-  console.log(rank);
 
   const getRankStyle = (): React.CSSProperties => {
     return {
