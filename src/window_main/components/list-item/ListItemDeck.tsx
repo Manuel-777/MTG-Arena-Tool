@@ -50,10 +50,8 @@ export function ListItemDeck({
 
   const lastTouch = new Date(deck.timeTouched);
   const deckLastTouchedStyle = {
-    marginLeft: "18px",
     marginRight: "auto",
-    lineHeight: "18px",
-    opacity: 0.6
+    lineHeight: "18px"
   };
 
   // Deck winrates
@@ -106,10 +104,11 @@ export function ListItemDeck({
             }
           )}
         </FlexTop>
-        <FlexBottom>
+        <FlexBottom innerClass="list_deck_last">
+          updated/played:{" "}
           <i style={deckLastTouchedStyle}>
             <relative-time datetime={lastTouch.toISOString()}>
-              updated/played: {lastTouch.toString()}
+              {lastTouch.toString()}
             </relative-time>
           </i>
         </FlexBottom>

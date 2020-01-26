@@ -961,6 +961,17 @@ a:hover {
     opacity: 0.5;
 }
 
+.list_deck_last {
+    -webkit-user-select: none;
+    margin-left: 14px;
+    margin-right: 18px;
+    line-height: 32px;
+    font-family: var(--sub-font-name);
+    color: var(--color-light);
+    font-weight: 300;
+    text-align: right;
+}
+
 .list_deck_winrate {
     -webkit-user-select: none;
     margin-left: auto;
