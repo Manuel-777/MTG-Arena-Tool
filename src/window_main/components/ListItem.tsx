@@ -8,10 +8,13 @@ import {
   getWinrateClass
 } from "../renderer-util";
 import format from "date-fns/format";
+import { TagBubble } from "./display";
 
 export function ListItemDeck({
   row,
-  openDeckCallback
+  openDeckCallback,
+  editTagCallback,
+  deleteTagCallback
 }: DecksTableRowProps): JSX.Element {
   const deck = row.original;
   const parentId = deck.id ?? "";
@@ -74,7 +77,22 @@ export function ListItemDeck({
       </Column>
 
       <Column class="list_item_center">
-        <FlexTop> </FlexTop>
+        <FlexTop innerClass="deck_tags_container">
+          {[...(deck.tags ? deck.tags : []), deck.format || ""].map(
+            (tag: string) => {
+              return (
+                <TagBubble
+                  hideCloseButton
+                  key={tag}
+                  tag={tag}
+                  parentId={deck.id || ""}
+                  editTagCallback={editTagCallback}
+                  deleteTagCallback={deleteTagCallback}
+                ></TagBubble>
+              );
+            }
+          )}
+        </FlexTop>
         <FlexBottom>
           <i style={deckLastTouchedStyle}>
             <relative-time datetime={lastTouch.toISOString()}>
