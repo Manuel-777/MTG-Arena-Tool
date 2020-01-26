@@ -12,6 +12,7 @@ import { TagBubble } from "./display";
 import WildcardsCost from "./WildcardsCost";
 export function ListItemDeck({
   row,
+  archiveCallback,
   openDeckCallback,
   editTagCallback,
   deleteTagCallback
@@ -131,6 +132,12 @@ export function ListItemDeck({
           <WildcardsCost deck={deck} />
         )}
       </Column>
+      <ArchiveButton
+        archiveCallback={archiveCallback}
+        dataId={deck.id || ""}
+        hover={hover}
+        isArchived={deck.archived || false}
+      />
     </ListItem>
   );
 }
@@ -231,5 +238,39 @@ export function FlexBottom(props: FlexProps): JSX.Element {
         props.children
       )}
     </div>
+  );
+}
+
+interface ArchiveButtonProps {
+  archiveCallback: (id: string) => void;
+  hover: boolean;
+  isArchived: boolean;
+  dataId: string;
+}
+
+function archiveButtonStyle(hover: boolean): React.CSSProperties {
+  return hover
+    ? {
+        width: "32px"
+      }
+    : {
+        width: "4px"
+      };
+}
+
+export function ArchiveButton(props: ArchiveButtonProps): JSX.Element {
+  const { isArchived, archiveCallback, dataId } = props;
+
+  return (
+    <div
+      onClick={(e): void => {
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
+        archiveCallback(dataId);
+      }}
+      className={isArchived ? "list_item_unarchive" : "list_item_archive"}
+      title={isArchived ? "restore" : "archive (will not delete data)"}
+      style={archiveButtonStyle(props.hover)}
+    ></div>
   );
 }
