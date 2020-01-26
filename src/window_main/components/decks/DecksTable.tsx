@@ -32,7 +32,7 @@ import {
   WinRateCell
 } from "./cells";
 import DecksArtViewRow from "./DecksArtViewRow";
-import { ListItemDeck } from "../ListItem";
+import { ListItemDeck } from "../list-item/ListItemDeck";
 import DecksTableControls from "./DecksTableControls";
 import { deckSearchFilterFn } from "./filters";
 import { DecksData, DecksTableControlsProps, DecksTableProps } from "./types";

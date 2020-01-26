@@ -1,15 +1,24 @@
 import React from "react";
-import { getCardArtCrop } from "../../shared/util";
-import { DecksTableRowProps } from "./decks/types";
-import ManaCost from "./ManaCost";
+
+import { DecksTableRowProps } from "../decks/types";
+import ManaCost from "../ManaCost";
 import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass
-} from "../renderer-util";
+} from "../../renderer-util";
 import format from "date-fns/format";
-import { TagBubble } from "./display";
-import WildcardsCost from "./WildcardsCost";
+import { TagBubble } from "../display";
+import WildcardsCost from "../WildcardsCost";
+import {
+  ListItem,
+  Column,
+  HoverTile,
+  FlexTop,
+  FlexBottom,
+  ArchiveButton
+} from "./ListItem";
+
 export function ListItemDeck({
   row,
   archiveCallback,
@@ -34,6 +43,9 @@ export function ListItemDeck({
 
   if (deck.name?.indexOf("?=?Loc/Decks/Precon/") != -1) {
     deck.name = deck.name?.replace("?=?Loc/Decks/Precon/", "");
+  }
+  if (deck.name?.indexOf("Decks/Precon_") != -1) {
+    deck.name = deck.name?.replace("Decks/Precon_", "");
   }
 
   const lastTouch = new Date(deck.timeTouched);
@@ -139,138 +151,5 @@ export function ListItemDeck({
         isArchived={deck.archived || false}
       />
     </ListItem>
-  );
-}
-
-interface ListItemnProps extends JSX.ElementChildrenAttribute {
-  click: VoidFunction;
-  mouseEnter: VoidFunction;
-  mouseLeave: VoidFunction;
-}
-
-export function ListItem(props: ListItemnProps): JSX.Element {
-  const { click, mouseEnter, mouseLeave } = props;
-  return (
-    <div
-      onClick={click}
-      onMouseEnter={mouseEnter}
-      onMouseLeave={mouseLeave}
-      className="list_item_container"
-    >
-      {props.children}
-    </div>
-  );
-}
-
-function getHoverStyle(hover: boolean): React.CSSProperties {
-  return hover
-    ? {
-        opacity: "1",
-        width: "200px"
-      }
-    : {
-        opacity: "0.66",
-        width: "128px"
-      };
-}
-
-interface HoverTileProps {
-  hover: boolean;
-  grpId: number;
-}
-
-export function HoverTile(props: HoverTileProps): JSX.Element {
-  const { hover, grpId } = props;
-
-  return (
-    <div
-      className="list_item_image"
-      style={{
-        backgroundImage: `url(${getCardArtCrop(grpId)})`,
-        ...getHoverStyle(hover)
-      }}
-    ></div>
-  );
-}
-
-interface ColumnProps extends JSX.ElementChildrenAttribute {
-  class: string;
-}
-
-export function Column(props: ColumnProps): JSX.Element {
-  return (
-    <div style={{ flexDirection: "column" }} className={props.class}>
-      {props.children}
-    </div>
-  );
-}
-
-interface FlexProps extends JSX.ElementChildrenAttribute {
-  title?: string;
-  innerClass?: string;
-}
-
-// These two are technically equal, but I like the way
-// of using them as different components, it makes coding
-// complex list items prettier.
-export function FlexTop(props: FlexProps): JSX.Element {
-  return (
-    <div className="flex_top">
-      {props.innerClass ? (
-        <div title={props.title} className={props.innerClass}>
-          {props.children}
-        </div>
-      ) : (
-        props.children
-      )}
-    </div>
-  );
-}
-
-export function FlexBottom(props: FlexProps): JSX.Element {
-  return (
-    <div className="flex_bottom">
-      {props.innerClass ? (
-        <div title={props.title} className={props.innerClass}>
-          {props.children}
-        </div>
-      ) : (
-        props.children
-      )}
-    </div>
-  );
-}
-
-interface ArchiveButtonProps {
-  archiveCallback: (id: string) => void;
-  hover: boolean;
-  isArchived: boolean;
-  dataId: string;
-}
-
-function archiveButtonStyle(hover: boolean): React.CSSProperties {
-  return hover
-    ? {
-        width: "32px"
-      }
-    : {
-        width: "4px"
-      };
-}
-
-export function ArchiveButton(props: ArchiveButtonProps): JSX.Element {
-  const { isArchived, archiveCallback, dataId } = props;
-
-  return (
-    <div
-      onClick={(e): void => {
-        e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation();
-        archiveCallback(dataId);
-      }}
-      className={isArchived ? "list_item_unarchive" : "list_item_archive"}
-      title={isArchived ? "restore" : "archive (will not delete data)"}
-      style={archiveButtonStyle(props.hover)}
-    ></div>
   );
 }
