@@ -53,12 +53,17 @@ export function HoverTile(props: HoverTileProps): JSX.Element {
 }
 
 interface ColumnProps extends JSX.ElementChildrenAttribute {
-  class: string;
+  style?: React.CSSProperties;
+  class?: string;
 }
 
 export function Column(props: ColumnProps): JSX.Element {
+  const style = props.style || {};
   return (
-    <div style={{ flexDirection: "column" }} className={props.class}>
+    <div
+      style={{ ...style, flexDirection: "column" }}
+      className={props.class || ""}
+    >
       {props.children}
     </div>
   );
@@ -66,12 +71,14 @@ export function Column(props: ColumnProps): JSX.Element {
 
 interface FlexProps extends JSX.ElementChildrenAttribute {
   title?: string;
+  style?: React.CSSProperties;
   innerClass?: string;
 }
 
 export function FlexTop(props: FlexProps): JSX.Element {
+  const style = props.style || {};
   return (
-    <div className="flex_top">
+    <div style={style} className="flex_top">
       {props.innerClass ? (
         <div title={props.title} className={props.innerClass}>
           {props.children}

@@ -117,7 +117,6 @@ export const TagBubbleDiv = styled.div<TagBubbleDivProps>`
   white-space: nowrap;
   opacity: 0.8;
   margin-right: 12px;
-  margin-bottom: 4px;
   height: 20px;
   line-height: 20px;
   text-indent: 8px;

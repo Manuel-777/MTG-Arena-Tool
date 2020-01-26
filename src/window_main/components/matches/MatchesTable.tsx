@@ -31,7 +31,7 @@ import {
   RankColumnFilter,
   rankFilterFn
 } from "./filters";
-import MatchesListViewRow from "./MatchesListViewRow";
+import ListItemMatch from "../list-item/ListItemMatch";
 import MatchesTableControls from "./MatchesTableControls";
 import {
   MatchesTableControlsProps,
@@ -370,7 +370,7 @@ export default function MatchesTable({
               );
             }
             return (
-              <MatchesListViewRow
+              <ListItemMatch
                 row={row}
                 index={index}
                 key={row.index}
