@@ -1,13 +1,13 @@
-import _ from "lodash";
 import { shell } from "electron";
-
-import { IPC_BACKGROUND } from "../shared/constants";
-
-import { ipc_send as ipcSend, setData } from "./background-util";
-import globals from "./globals";
+import _ from "lodash";
+import { IPC_BACKGROUND, IPC_OVERLAY } from "../shared/constants";
 import { playerDb, playerDbLegacy } from "../shared/db/LocalDatabase";
 import playerData from "../shared/player-data";
+import { isV2CardsList } from "../shared/types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
+import { ipc_send as ipcSend, setData } from "./backgroundUtil";
+import globals from "./globals";
+import { convertDeckFromV3 } from "./labels";
 
 const ipcLog = message => ipcSend("ipc_log", message);
 const ipcPop = args => ipcSend("popup", args);
@@ -22,6 +22,21 @@ export function syncSettings(
   const settings = { ...playerData.settings, ...dirtySettings };
   setData({ settings }, refresh);
   if (refresh) ipcSend("set_settings", JSON.stringify(settings));
+}
+
+async function fixBadPlayerData() {
+  // 2020-01-17 discovered with @Thaoden that some old draft decks might be v3
+  // probably caused by a bad label handler that was temporarily on stable
+  const decks = { ...playerData.decks };
+  for (const deck of playerData.deckList) {
+    if (!isV2CardsList(deck.mainDeck)) {
+      ipcLog("Converting v3 deck: " + deck.id);
+      const fixedDeck = convertDeckFromV3(deck);
+      decks[deck.id] = fixedDeck;
+      await playerDb.upsert("decks", deck.id, fixedDeck);
+    }
+  }
+  setData({ decks }, false);
 }
 
 // Loads this player's configuration file
@@ -40,15 +55,27 @@ export async function loadPlayerConfig(playerId) {
   const __playerData = _.defaultsDeep(savedData, playerData);
   const { settings } = __playerData;
   setData(__playerData, true);
+  await fixBadPlayerData();
   ipcSend("renderer_set_bounds", __playerData.windowBounds);
   syncSettings(settings, true);
+
+  // populate draft overlays with last draft if possible
+  if (playerData.draftList.length) {
+    const lastDraft = playerData.draftList[playerData.draftList.length - 1];
+    ipcSend("set_draft_cards", lastDraft, IPC_OVERLAY);
+  }
+
   ipcLog("...found all documents in player database.");
   ipcPop({ text: "Player history loaded.", time: 3000, progress: -1 });
 
-  globals.watchingLog = true;
-  ipcLog("Starting Arena Log Watcher: " + settings.logUri);
-  globals.stopWatchingLog = arenaLogWatcher.startWatchingLog(settings.logUri);
-  ipcLog("Calling back to http-api...");
+  // Only if watcher is not initialized
+  // Could happen when using multi accounts
+  if (globals.watchingLog == false) {
+    globals.watchingLog = true;
+    ipcLog("Starting Arena Log Watcher: " + settings.logUri);
+    globals.stopWatchingLog = arenaLogWatcher.startWatchingLog(settings.logUri);
+    ipcLog("Calling back to http-api...");
+  }
 }
 
 function ipcUpgradeProgress(progress) {
@@ -80,7 +107,7 @@ async function migrateIfNecessary() {
     // ensure blended user settings migrate
     setData(__playerData, false);
     syncSettings(settings, false);
-    ipcSend("save_user_settings", { skip_refresh: true }, IPC_BACKGROUND);
+    ipcSend("save_user_settings", { skipRefresh: true }, IPC_BACKGROUND);
     const dataToMigrate = playerData.data;
     const totalDocs = Object.values(dataToMigrate).length;
     ipcUpgradeProgress(0);

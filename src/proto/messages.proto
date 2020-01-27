@@ -1,10 +1,14 @@
 syntax = "proto3";
 
+// MtGA 1.02.01.00
+
+message AIConfig {
+	MatchConfig matchConfig = 1;
+	SettingsMessage defaultSettings = 2;
+	repeated DeckConfig deckConfigs = 3;
+}
+
 message AIConfigData {
-	repeated ValueHeuristicDefinition configureValueHeuristics = 11;
-	repeated OrderingHeuristicDefinition configureOrderingHeuristics = 12;
-	repeated ValueHeuristicParameter valueHeuristicParameters = 16;
-	repeated OrderingHeuristicParameter orderingHeuristicParameters = 17;
 	AIMode mode = 1;
 	AIConfigOption tracingEnabled = 2;
 	AIConfigOption viewOpponentHand = 3;
@@ -15,9 +19,13 @@ message AIConfigData {
 	uint32 timeoutInMilliseconds = 8;
 	uint32 transpositionTableSizeInKB = 9;
 	uint32 randomSeed = 10;
+	repeated ValueHeuristicDefinition configureValueHeuristics = 11;
+	repeated OrderingHeuristicDefinition configureOrderingHeuristics = 12;
 	AIConfigOption configureHistoryOn = 13;
 	AIConfigYesNo allowOpponentUndo = 14;
 	AIConfigYesNo allowOpponentControl = 15;
+	repeated ValueHeuristicParameter valueHeuristicParameters = 16;
+	repeated OrderingHeuristicParameter orderingHeuristicParameters = 17;
 	uint32 diagnosticMode = 18;
 	uint32 randomOrderingRange = 19;
 	bool transEnable = 20;
@@ -25,345 +33,251 @@ message AIConfigData {
 }
 
 enum AIConfigOption {
-    AIConfigOption_None =  0;
-    AIConfigOption_Inactive =  1;
-    AIConfigOption_Active =  2;
+	AIConfigOption_None = 0;
+	AIConfigOption_Inactive = 1;
+	AIConfigOption_Active = 2;
 }
 
 enum AIConfigYesNo {
-    AIConfigYesNo_None =  0;
-    AIConfigYesNo_No =  1;
-    AIConfigYesNo_Yes =  2;
-}
-
-message AIConfigureRequest {
-	uint32 aiID = 1;
-	AIConfigData aiConfigData = 2;
-}
-
-message AIConfigureResponse {
-	uint32 aiID = 1;
-	GRETHHostErrorCode result = 2;
-}
-
-message AICreateRequest {
-	string matchID = 3;
-	uint32 aiID = 1;
-	uint32 systemSeatId = 2;
-	uint32 gameID = 4;
-	uint32 majorVer = 5;
-	uint32 minorVer = 6;
-	uint32 revisionVer = 7;
-	uint32 buildVer = 8;
-}
-
-message AICreateResponse {
-	uint32 aiID = 1;
-	GRETHHostErrorCode result = 2;
-}
-
-message AIDestroyRequest {
-	uint32 aiID = 1;
-}
-
-message AIDestroyResponse {
-	uint32 aiID = 1;
-	GRETHHostErrorCode result = 2;
-}
-
-message AIFatalError {
-	bytes errorMessage = 2;
-	uint32 aiID = 1;
+	AIConfigYesNo_None = 0;
+	AIConfigYesNo_No = 1;
+	AIConfigYesNo_Yes = 2;
 }
 
 enum AIMode {
-    AIMode_None =  0;
-    AIMode_Goldfish =  1;
-    AIMode_Gameplay =  2;
-    AIMode_Random =  3;
+	AIMode_None = 0;
+	AIMode_Goldfish = 1;
+	AIMode_Gameplay = 2;
+	AIMode_Random = 3;
 }
 
 message AIReconfigureData {
-	repeated ValueHeuristicDefinition configureValueHeuristics = 7;
-	repeated OrderingHeuristicDefinition configureOrderingHeuristics = 8;
-	repeated ValueHeuristicParameter valueHeuristicParameters = 9;
-	repeated OrderingHeuristicParameter orderingHeuristicParameters = 10;
 	AIConfigOption tracingEnabled = 1;
 	uint32 maximumDepth = 2;
 	uint32 maximumBreadth = 3;
 	uint32 maximumNodeExpansion = 4;
 	uint32 transpositionTableSizeInKB = 5;
 	uint32 randomSeed = 6;
+	repeated ValueHeuristicDefinition configureValueHeuristics = 7;
+	repeated OrderingHeuristicDefinition configureOrderingHeuristics = 8;
+	repeated ValueHeuristicParameter valueHeuristicParameters = 9;
+	repeated OrderingHeuristicParameter orderingHeuristicParameters = 10;
 	bool transEnable = 11;
 	bool concedeOnException = 12;
 }
 
-enum AbilityCategory {
-    AbilityCategory_None =  0;
-    AbilityCategory_Activated =  1;
-    AbilityCategory_Triggered =  2;
-    AbilityCategory_Static =  3;
-    AbilityCategory_Spell =  4;
-    AbilityCategory_AdditionalCost =  5;
-    AbilityCategory_ActivatedTest =  6;
-    AbilityCategory_Chained =  7;
-    AbilityCategory_AlternativeCost =  8;
-    AbilityCategory_OpeningHandAction =  9;
-}
-
-enum AbilityGameAdjustments {
-    AbilityGameAdjustments_None =  0;
-    AbilityGameAdjustments_LoadSideboards =  1;
-}
-
-enum AbilityPaymentType {
-    AbilityPaymentType_None =  0;
-    AbilityPaymentType_TapSymbol =  1;
-    AbilityPaymentType_Loyalty =  2;
-}
-
-enum AbilitySubCategory {
-    AbilitySubCategory_None =  0;
-    AbilitySubCategory_Mana =  1;
-    AbilitySubCategory_Loyalty =  2;
-    AbilitySubCategory_Payment =  3;
-    AbilitySubCategory_Crew =  4;
-    AbilitySubCategory_Embalm =  5;
-    AbilitySubCategory_Cycling =  6;
-    AbilitySubCategory_Transform =  7;
-    AbilitySubCategory_Explore =  8;
-    AbilitySubCategory_Eternalize =  9;
-    AbilitySubCategory_EnterTheBattlefield =  10;
-    AbilitySubCategory_Surveil =  11;
-}
-
 enum AbilityType {
-    AbilityType_None = 0;
-    AbilityType_Deathtouch = 1;
-    AbilityType_Defender = 2;
-    AbilityType_DoubleStrike = 3;
-    AbilityType_Enchant = 4;
-    AbilityType_Equip = 5;
-    AbilityType_FirstStrike = 6;
-    AbilityType_Flash = 7;
-    AbilityType_Flying = 8;
-    AbilityType_Haste = 9;
-    AbilityType_Hexproof = 10;
-    AbilityType_Intimidate = 11;
-    AbilityType_Lifelink = 12;
-    AbilityType_Reach = 13;
-    AbilityType_Trample = 14;
-    AbilityType_Vigilance = 15;
-    AbilityType_Landwalk = 16;
-    AbilityType_ProtectionFrom = 21;
-    AbilityType_Shroud = 22;
-    AbilityType_Banding = 23;
-    AbilityType_Rampage = 24;
-    AbilityType_CumulativeUpkeep = 25;
-    AbilityType_Flanking = 26;
-    AbilityType_Phasing = 27;
-    AbilityType_Buyback = 28;
-    AbilityType_Shadow = 29;
-    AbilityType_Cycling = 30;
-    AbilityType_Echo = 31;
-    AbilityType_Horsemanship = 32;
-    AbilityType_Fading = 33;
-    AbilityType_Kicker = 34;
-    AbilityType_Flashback = 35;
-    AbilityType_Madness = 36;
-    AbilityType_Morph = 37;
-    AbilityType_Fear = 38;
-    AbilityType_Amplify = 39;
-    AbilityType_Provoke = 40;
-    AbilityType_Storm = 41;
-    AbilityType_AffinityFor = 42;
-    AbilityType_Entwine = 43;
-    AbilityType_Modular = 44;
-    AbilityType_Sunburst = 45;
-    AbilityType_Bushido = 46;
-    AbilityType_Soulshift = 47;
-    AbilityType_Splice = 48;
-    AbilityType_Offering = 49;
-    AbilityType_Ninjitsu = 50;
-    AbilityType_Epic = 51;
-    AbilityType_Convoke = 52;
-    AbilityType_Dredge = 53;
-    AbilityType_Transmute = 54;
-    AbilityType_Bloodthirst = 55;
-    AbilityType_Haunt = 56;
-    AbilityType_Replicate = 57;
-    AbilityType_Forecast = 58;
-    AbilityType_Graft = 59;
-    AbilityType_Recover = 60;
-    AbilityType_Ripple = 61;
-    AbilityType_SplitSecond = 62;
-    AbilityType_Suspend = 63;
-    AbilityType_Vanishing = 64;
-    AbilityType_Absorb = 65;
-    AbilityType_AuraSwap = 66;
-    AbilityType_Delve = 67;
-    AbilityType_Fortify = 68;
-    AbilityType_Frenzy = 69;
-    AbilityType_Gravestorm = 70;
-    AbilityType_Poisonous = 71;
-    AbilityType_Transfigure = 72;
-    AbilityType_Champion = 73;
-    AbilityType_Changeling = 74;
-    AbilityType_Evoke = 75;
-    AbilityType_Hideaway = 76;
-    AbilityType_Prowl = 77;
-    AbilityType_Reinforce = 78;
-    AbilityType_Conspire = 79;
-    AbilityType_Persist = 80;
-    AbilityType_Wither = 81;
-    AbilityType_Retrace = 82;
-    AbilityType_Devour = 83;
-    AbilityType_Exalted = 84;
-    AbilityType_Unearth = 85;
-    AbilityType_Cascade = 86;
-    AbilityType_Annihilator = 87;
-    AbilityType_LevelUp = 88;
-    AbilityType_Rebound = 89;
-    AbilityType_TotemArmor = 90;
-    AbilityType_Infect = 91;
-    AbilityType_BattleCry = 92;
-    AbilityType_LivingWeapon = 93;
-    AbilityType_Undying = 94;
-    AbilityType_Miracle = 95;
-    AbilityType_Soulbond = 96;
-    AbilityType_Overload = 97;
-    AbilityType_Scavenge = 98;
-    AbilityType_Unleash = 99;
-    AbilityType_Cipher = 100;
-    AbilityType_Evolve = 101;
-    AbilityType_Extort = 102;
-    AbilityType_Fuse = 103;
-    AbilityType_Indestructible = 104;
-    AbilityType_Regenerate = 105;
-    AbilityType_EnterZone_Tapped = 106;
-    AbilityType_EnterZone_Controlled = 107;
-    AbilityType_EnterZone_Attached = 108;
-    AbilityType_Level = 109;
-    AbilityType_EnterZone_WithCounters = 110;
-    AbilityType_TurnFaceUp_WithCounters = 111;
-    AbilityType_PlaneswalkerLoyaltyReplacement = 114;
-    AbilityType_Multikicker = 122;
-    AbilityType_BasicLandcycling = 123;
-    AbilityType_Forestcycling = 124;
-    AbilityType_Islandcycling = 125;
-    AbilityType_Mountaincycling = 126;
-    AbilityType_Plainscycling = 127;
-    AbilityType_Slivercycling = 128;
-    AbilityType_Swampcycling = 129;
-    AbilityType_Wizardcycling = 130;
-    AbilityType_Monstrosity = 134;
-    AbilityType_Tribute = 135;
-    AbilityType_Outlast = 136;
-    AbilityType_Prowess = 137;
-    AbilityType_Bolster = 138;
-    AbilityType_PlaneswalkerDamageRedirection = 139;
-    AbilityType_OrderObjectsEnteringGraveyard = 140;
-    AbilityType_OrderObjectsEnteringLibrary = 141;
-    AbilityType_Menace = 142;
-    AbilityType_Skulk = 143;
-    AbilityType_Ingest = 144;
-    AbilityType_Manifest = 145;
-    AbilityType_Emerge = 147;
-    AbilityType_Deliverance = 148;
-    AbilityType_CastWithoutPayingManaCost = 149;
-    AbilityType_Megamorph = 150;
-    AbilityType_Devoid = 151;
-    AbilityType_SacrificeClue = 152;
-    AbilityType_Escalate = 153;
-    AbilityType_Fabricate = 154;
-    AbilityType_Crew = 156;
-    AbilityType_Improvise = 157;
-    AbilityType_ChooseZoneForMutuallyExclusiveZoneTransfers = 158;
-    AbilityType_Aftermath = 159;
-    AbilityType_Embalm = 160;
-    AbilityType_TapForImprovise = 161;
-    AbilityType_Exert = 162;
-    AbilityType_Eternalize = 163;
-    AbilityType_Afflict = 164;
-    AbilityType_Ascend = 165;
-    AbilityType_SagaChapter = 166;
-    AbilityType_SagaLoreReplacement = 167;
-    AbilityType_SagaLoreTurn = 168;
-    AbilityType_Surveil = 169;
-    AbilityType_Jumpstart = 170;
-    AbilityType_Mentor = 171;
-    AbilityType_TapForConvoke = 172;
-    AbilityType_Placeholder1 = 173;
-    AbilityType_Placeholder2 = 174;
-    AbilityType_Placeholder3 = 175;
-    AbilityType_Placeholder4 = 176;
-    AbilityType_Placeholder5 = 177;
-    AbilityType_Twiddle_Test = 989;
-    AbilityType_Donate_Test = 990;
-    AbilityType_Bounce_Test = 991;
-    AbilityType_DrawCard_Test = 992;
-    AbilityType_AddCost_Test = 993;
-    AbilityType_DeployBears_Test = 994;
-    AbilityType_EndTurn_Test = 995;
-    AbilityType_Wish_Test = 996;
-    AbilityType_PutLibrary_Test = 997;
-    AbilityType_GainHaste_Test = 998;
-    AbilityType_AddWUBRG_Test = 999;
-    AbilityType_IntrinsicMana_W = 1001;
-    AbilityType_IntrinsicMana_U = 1002;
-    AbilityType_IntrinsicMana_B = 1003;
-    AbilityType_IntrinsicMana_R = 1004;
-    AbilityType_IntrinsicMana_G = 1005;
-    AbilityType_AutoGen = 1006;
-}
-
-enum AbilityWord {
-    AbilityWord_None =  0;
-    AbilityWord_Battalion =  1;
-    AbilityWord_Bloodrush =  2;
-    AbilityWord_Channel =  3;
-    AbilityWord_Chroma =  4;
-    AbilityWord_Cohort =  5;
-    AbilityWord_Constellation =  6;
-    AbilityWord_Converge =  7;
-    AbilityWord_CouncilsDilemma =  8;
-    AbilityWord_Delirium =  9;
-    AbilityWord_Domain =  10;
-    AbilityWord_FatefulHour =  11;
-    AbilityWord_Ferocious =  12;
-    AbilityWord_Formidable =  13;
-    AbilityWord_Grandeur =  14;
-    AbilityWord_Hellbent =  15;
-    AbilityWord_Heroic =  16;
-    AbilityWord_Imprint =  17;
-    AbilityWord_Inspired =  18;
-    AbilityWord_JoinForces =  19;
-    AbilityWord_Kinship =  20;
-    AbilityWord_Landfall =  21;
-    AbilityWord_Lieutenant =  22;
-    AbilityWord_Metalcraft =  23;
-    AbilityWord_Morbid =  24;
-    AbilityWord_Parley =  25;
-    AbilityWord_Radiance =  26;
-    AbilityWord_Raid =  27;
-    AbilityWord_Rally =  28;
-    AbilityWord_SpellMastery =  29;
-    AbilityWord_Strive =  30;
-    AbilityWord_Sweep =  31;
-    AbilityWord_TemptingOffer =  32;
-    AbilityWord_Threshold =  33;
-    AbilityWord_WillOfTheCouncil =  34;
-    AbilityWord_Revolt =  35;
-    AbilityWord_Enrage =  36;
-    AbilityWord_Historic =  37;
-    AbilityWord_Undergrowth =  38;
+	AbilityType_None = 0;
+	AbilityType_Deathtouch = 1;
+	AbilityType_Defender = 2;
+	AbilityType_DoubleStrike = 3;
+	AbilityType_Enchant = 4;
+	AbilityType_Equip = 5;
+	AbilityType_FirstStrike = 6;
+	AbilityType_Flash = 7;
+	AbilityType_Flying = 8;
+	AbilityType_Haste = 9;
+	AbilityType_Hexproof = 10;
+	AbilityType_Intimidate = 11;
+	AbilityType_Lifelink = 12;
+	AbilityType_Reach = 13;
+	AbilityType_Trample = 14;
+	AbilityType_Vigilance = 15;
+	AbilityType_Landwalk = 16;
+	AbilityType_ProtectionFrom = 21;
+	AbilityType_Shroud = 22;
+	AbilityType_Banding = 23;
+	AbilityType_Rampage = 24;
+	AbilityType_CumulativeUpkeep = 25;
+	AbilityType_Flanking = 26;
+	AbilityType_Phasing = 27;
+	AbilityType_Buyback = 28;
+	AbilityType_Shadow = 29;
+	AbilityType_Cycling = 30;
+	AbilityType_Echo = 31;
+	AbilityType_Horsemanship = 32;
+	AbilityType_Fading = 33;
+	AbilityType_Kicker = 34;
+	AbilityType_Flashback = 35;
+	AbilityType_Madness = 36;
+	AbilityType_Morph = 37;
+	AbilityType_Fear = 38;
+	AbilityType_Amplify = 39;
+	AbilityType_Provoke = 40;
+	AbilityType_Storm = 41;
+	AbilityType_AffinityFor = 42;
+	AbilityType_Entwine = 43;
+	AbilityType_Modular = 44;
+	AbilityType_Sunburst = 45;
+	AbilityType_Bushido = 46;
+	AbilityType_Soulshift = 47;
+	AbilityType_Splice = 48;
+	AbilityType_Offering = 49;
+	AbilityType_Ninjitsu = 50;
+	AbilityType_Epic = 51;
+	AbilityType_Convoke = 52;
+	AbilityType_Dredge = 53;
+	AbilityType_Transmute = 54;
+	AbilityType_Bloodthirst = 55;
+	AbilityType_Haunt = 56;
+	AbilityType_Replicate = 57;
+	AbilityType_Forecast = 58;
+	AbilityType_Graft = 59;
+	AbilityType_Recover = 60;
+	AbilityType_Ripple = 61;
+	AbilityType_SplitSecond = 62;
+	AbilityType_Suspend = 63;
+	AbilityType_Vanishing = 64;
+	AbilityType_Absorb = 65;
+	AbilityType_AuraSwap = 66;
+	AbilityType_Delve = 67;
+	AbilityType_Fortify = 68;
+	AbilityType_Frenzy = 69;
+	AbilityType_Gravestorm = 70;
+	AbilityType_Poisonous = 71;
+	AbilityType_Transfigure = 72;
+	AbilityType_Champion = 73;
+	AbilityType_Changeling = 74;
+	AbilityType_Evoke = 75;
+	AbilityType_Hideaway = 76;
+	AbilityType_Prowl = 77;
+	AbilityType_Reinforce = 78;
+	AbilityType_Conspire = 79;
+	AbilityType_Persist = 80;
+	AbilityType_Wither = 81;
+	AbilityType_Retrace = 82;
+	AbilityType_Devour = 83;
+	AbilityType_Exalted = 84;
+	AbilityType_Unearth = 85;
+	AbilityType_Cascade = 86;
+	AbilityType_Annihilator = 87;
+	AbilityType_LevelUp = 88;
+	AbilityType_Rebound = 89;
+	AbilityType_TotemArmor = 90;
+	AbilityType_Infect = 91;
+	AbilityType_BattleCry = 92;
+	AbilityType_LivingWeapon = 93;
+	AbilityType_Undying = 94;
+	AbilityType_Miracle = 95;
+	AbilityType_Soulbond = 96;
+	AbilityType_Overload = 97;
+	AbilityType_Scavenge = 98;
+	AbilityType_Unleash = 99;
+	AbilityType_Cipher = 100;
+	AbilityType_Evolve = 101;
+	AbilityType_Extort = 102;
+	AbilityType_Fuse = 103;
+	AbilityType_Indestructible = 104;
+	AbilityType_Regenerate = 105;
+	AbilityType_EnterZone_Tapped = 106;
+	AbilityType_EnterZone_Controlled = 107;
+	AbilityType_EnterZone_Attached = 108;
+	AbilityType_Level = 109;
+	AbilityType_EnterZone_WithCounters = 110;
+	AbilityType_TurnFaceUp_WithCounters = 111;
+	AbilityType_PlaneswalkerLoyaltyReplacement = 114;
+	AbilityType_CastCommanderFromCommandZone = 115;
+	AbilityType_CommanderZoneTransferReplacement = 116;
+	AbilityType_Multikicker = 122;
+	AbilityType_BasicLandcycling = 123;
+	AbilityType_Forestcycling = 124;
+	AbilityType_Islandcycling = 125;
+	AbilityType_Mountaincycling = 126;
+	AbilityType_Plainscycling = 127;
+	AbilityType_Slivercycling = 128;
+	AbilityType_Swampcycling = 129;
+	AbilityType_Wizardcycling = 130;
+	AbilityType_Monstrosity = 134;
+	AbilityType_Tribute = 135;
+	AbilityType_Outlast = 136;
+	AbilityType_Prowess = 137;
+	AbilityType_Bolster = 138;
+	AbilityType_PlaneswalkerDamageRedirection = 139;
+	AbilityType_OrderObjectsEnteringGraveyard = 140;
+	AbilityType_OrderObjectsEnteringLibrary = 141;
+	AbilityType_Menace = 142;
+	AbilityType_Skulk = 143;
+	AbilityType_Ingest = 144;
+	AbilityType_Manifest = 145;
+	AbilityType_Emerge = 147;
+	AbilityType_Deliverance = 148;
+	AbilityType_CastWithoutPayingManaCost = 149;
+	AbilityType_Megamorph = 150;
+	AbilityType_Devoid = 151;
+	AbilityType_SacrificeClue = 152;
+	AbilityType_Escalate = 153;
+	AbilityType_Fabricate = 154;
+	AbilityType_Crew = 156;
+	AbilityType_Improvise = 157;
+	AbilityType_ChooseZoneForMutuallyExclusiveZoneTransfers = 158;
+	AbilityType_Aftermath = 159;
+	AbilityType_Embalm = 160;
+	AbilityType_TapForImprovise = 161;
+	AbilityType_Exert = 162;
+	AbilityType_Eternalize = 163;
+	AbilityType_Afflict = 164;
+	AbilityType_Ascend = 165;
+	AbilityType_SagaChapter = 166;
+	AbilityType_SagaLoreReplacement = 167;
+	AbilityType_SagaLoreTurn = 168;
+	AbilityType_Surveil = 169;
+	AbilityType_Jumpstart = 170;
+	AbilityType_Mentor = 171;
+	AbilityType_TapForConvoke = 172;
+	AbilityType_Afterlife = 173;
+	AbilityType_Spectacle = 174;
+	AbilityType_Riot = 175;
+	AbilityType_Adapt = 176;
+	AbilityType_AffinityForArtifacts = 177;
+	AbilityType_Scry1 = 178;
+	AbilityType_Scry2 = 179;
+	AbilityType_Scry3 = 180;
+	AbilityType_Scry4 = 181;
+	AbilityType_ScryX = 182;
+	AbilityType_SacrificeTreasure = 183;
+	AbilityType_ProtectionFromChosen = 184;
+	AbilityType_ProtectionFromW = 185;
+	AbilityType_ProtectionFromU = 186;
+	AbilityType_ProtectionFromB = 187;
+	AbilityType_ProtectionFromR = 188;
+	AbilityType_ProtectionFromG = 189;
+	AbilityType_HexproofFromChosen = 190;
+	AbilityType_HexproofFromW = 191;
+	AbilityType_HexproofFromU = 192;
+	AbilityType_HexproofFromB = 193;
+	AbilityType_HexproofFromR = 194;
+	AbilityType_HexproofFromG = 195;
+	AbilityType_Adventure = 196;
+	AbilityType_SacrificeFood = 197;
+	AbilityType_Placeholder15 = 198;
+	AbilityType_Placeholder16 = 199;
+	AbilityType_Fight = 200;
+	AbilityType_Placeholder1 = 201;
+	AbilityType_Placeholder2 = 202;
+	AbilityType_Placeholder3 = 203;
+	AbilityType_Placeholder4 = 204;
+	AbilityType_Placeholder5 = 205;
+	AbilityType_GildCards_Test = 988;
+	AbilityType_Twiddle_Test = 989;
+	AbilityType_Donate_Test = 990;
+	AbilityType_Bounce_Test = 991;
+	AbilityType_DrawCard_Test = 992;
+	AbilityType_AddCost_Test = 993;
+	AbilityType_DeployBears_Test = 994;
+	AbilityType_EndTurn_Test = 995;
+	AbilityType_Wish_Test = 996;
+	AbilityType_PutLibrary_Test = 997;
+	AbilityType_GainHaste_Test = 998;
+	AbilityType_AddWUBRG_Test = 999;
+	AbilityType_IntrinsicMana_W = 1001;
+	AbilityType_IntrinsicMana_U = 1002;
+	AbilityType_IntrinsicMana_B = 1003;
+	AbilityType_IntrinsicMana_R = 1004;
+	AbilityType_IntrinsicMana_G = 1005;
+	AbilityType_AutoGen = 1006;
 }
 
 message Action {
-	repeated AutoTapAction autoTapActions = 7;
-	repeated ManaPaymentOption manaPaymentOptions = 10;
-	repeated ManaRequirement manaCost = 11;
-	repeated uint32 holdSources = 16;
 	ActionType actionType = 1;
 	uint32 grpId = 2;
 	uint32 instanceId = 3;
@@ -371,12 +285,19 @@ message Action {
 	uint32 abilityGrpId = 6;
 	uint32 sourceId = 8;
 	uint32 alternativeGrpId = 9;
+	repeated ManaPaymentOption manaPaymentOptions = 10;
+	repeated ManaRequirement manaCost = 11;
 	bool shouldStop = 12;
 	uint32 disqualifyingSourceId = 13;
 	uint32 selectionType = 14;
 	uint32 selection = 15;
 	uint32 alternativeSourceZcid = 17;
-	bool isHidden = 18;
+	Visibility visibility = 18;
+	repeated TargetSelection targets = 19;
+	repeated ManaPaymentCondition manaPaymentConditions = 20;
+	AutoTapSolution autoTapSolution = 21;
+	repeated uint32 costSelectionIds = 22;
+	repeated Counter costCounters = 23;
 }
 
 message ActionCostReq {
@@ -394,10 +315,10 @@ message ActionCostResp {
 }
 
 enum ActionCostType {
-    ActionCostType_None =  0;
-    ActionCostType_Select =  1;
-    ActionCostType_SelectCounter =  2;
-    ActionCostType_Autoselect =  3;
+	ActionCostType_None = 0;
+	ActionCostType_Select = 1;
+	ActionCostType_SelectCounter = 2;
+	ActionCostType_Autoselect = 3;
 }
 
 message ActionInfo {
@@ -407,22 +328,23 @@ message ActionInfo {
 }
 
 enum ActionType {
-    ActionType_None =  0;
-    ActionType_Cast =  1;
-    ActionType_Activate =  2;
-    ActionType_Play =  3;
-    ActionType_Activate_Mana =  4;
-    ActionType_Pass =  5;
-    ActionType_Activate_Test =  6;
-    ActionType_Mode =  7;
-    ActionType_Special_TurnFaceUp =  8;
-    ActionType_ResolutionCost =  9;
-    ActionType_CastLeft =  10;
-    ActionType_CastRight =  11;
-    ActionType_Make_Payment =  12;
-    ActionType_CastingTimeOption =  13;
-    ActionType_CombatCost =  14;
-    ActionType_OpeningHandAction =  15;
+	ActionType_None = 0;
+	ActionType_Cast = 1;
+	ActionType_Activate = 2;
+	ActionType_Play = 3;
+	ActionType_Activate_Mana = 4;
+	ActionType_Pass = 5;
+	ActionType_Activate_Test = 6;
+	ActionType_Mode = 7;
+	ActionType_Special_TurnFaceUp = 8;
+	ActionType_ResolutionCost = 9;
+	ActionType_CastLeft = 10;
+	ActionType_CastRight = 11;
+	ActionType_Make_Payment = 12;
+	ActionType_CastingTimeOption = 13;
+	ActionType_CombatCost = 14;
+	ActionType_OpeningHandAction = 15;
+	ActionType_CastAdventure = 16;
 }
 
 message ActionsAvailableReq {
@@ -431,114 +353,108 @@ message ActionsAvailableReq {
 }
 
 enum AllowCancel {
-    AllowCancel_None =  0;
-    AllowCancel_Continue =  1;
-    AllowCancel_Abort =  2;
-    AllowCancel_No =  3;
-}
-
-message AlternativeCost {
-	repeated ManaRequirement manaCost = 4;
-	uint32 index = 1;
-	uint32 grpId = 2;
-	uint32 localizationId = 3;
-}
-
-message AlternativeCostReq {
-	repeated AlternativeCost costs = 2;
-	uint32 instanceId = 1;
-}
-
-message AlternativeCostResp {
-	uint32 index = 1;
+	AllowCancel_None = 0;
+	AllowCancel_Continue = 1;
+	AllowCancel_Abort = 2;
+	AllowCancel_No = 3;
 }
 
 message AnnotationInfo {
+	uint32 id = 1;
+	uint32 affectorId = 2;
 	repeated uint32 affectedIds = 3;
 	repeated AnnotationType type = 4;
 	repeated KeyValuePairInfo details = 6;
-	repeated uint32 ignoreForSeatIds = 8;
-	uint32 id = 1;
-	uint32 affectorId = 2;
 	bool allowRedaction = 7;
+	repeated uint32 ignoreForSeatIds = 8;
 }
 
 enum AnnotationType {
-    AnnotationType_None =  0;
-    AnnotationType_ZoneTransfer =  1;
-    AnnotationType_LossOfGame =  2;
-    AnnotationType_DamageDealt =  3;
-    AnnotationType_TappedUntappedPermanent =  4;
-    AnnotationType_ModifiedPower =  5;
-    AnnotationType_ModifiedToughness =  6;
-    AnnotationType_ModifiedColor =  7;
-    AnnotationType_PhaseOrStepModified =  8;
-    AnnotationType_AddAbility =  9;
-    AnnotationType_ModifiedLife =  10;
-    AnnotationType_CreateAttachment =  11;
-    AnnotationType_RemoveAttachment =  12;
-    AnnotationType_ObjectIdChanged =  13;
-    AnnotationType_Counter =  14;
-    AnnotationType_ControllerChanged =  15;
-    AnnotationType_CounterAdded =  16;
-    AnnotationType_CounterRemoved =  17;
-    AnnotationType_LayeredEffectCreated =  18;
-    AnnotationType_LayeredEffectDestroyed =  19;
-    AnnotationType_Attachment =  20;
-    AnnotationType_Haunt =  21;
-    AnnotationType_CopiedObject =  22;
-    AnnotationType_RemoveAbility =  23;
-    AnnotationType_WinTheGame =  24;
-    AnnotationType_ModifiedType =  25;
-    AnnotationType_TargetSpec =  26;
-    AnnotationType_TextChange =  27;
-    AnnotationType_FaceDown =  28;
-    AnnotationType_TurnPermanent =  29;
-    AnnotationType_DynamicAbility =  30;
-    AnnotationType_ObjectsSelected =  31;
-    AnnotationType_TriggeringObject =  32;
-    AnnotationType_DamageSource =  33;
-    AnnotationType_ManaPaid =  34;
-    AnnotationType_TokenCreated =  35;
-    AnnotationType_AbilityInstanceCreated =  36;
-    AnnotationType_AbilityInstanceDeleted =  37;
-    AnnotationType_DisplayCardUnderCard =  38;
-    AnnotationType_AbilityWordActive =  39;
-    AnnotationType_LinkInfo =  40;
-    AnnotationType_TokenDeleted =  41;
-    AnnotationType_Qualification =  42;
-    AnnotationType_ResolutionStart =  43;
-    AnnotationType_ResolutionComplete =  44;
-    AnnotationType_Designation =  45;
-    AnnotationType_GainDesignation =  46;
-    AnnotationType_CardRevealed =  47;
-    AnnotationType_NewTurnStarted =  48;
-    AnnotationType_ManaDetails =  49;
-    AnnotationType_DisqualifiedEffect =  50;
-    AnnotationType_LayeredEffect =  51;
-    AnnotationType_PendingEffect =  52;
-    AnnotationType_ShouldntPlay =  53;
-    AnnotationType_UseOrCostsManaCost =  54;
-    AnnotationType_RemainingSelections =  55;
-    AnnotationType_Shuffle =  56;
-    AnnotationType_CoinFlip =  57;
-    AnnotationType_ChooseRandom =  58;
-    AnnotationType_RevealedCardCreated =  59;
-    AnnotationType_RevealedCardDeleted =  60;
-    AnnotationType_SuspendLike =  61;
-    AnnotationType_ReplacementEffect =  62;
-    AnnotationType_EnteredZoneThisTurn =  63;
-    AnnotationType_CastingTimeOption =  64;
-    AnnotationType_Scry =  65;
-    AnnotationType_PredictedDirectDamage =  66;
-    AnnotationType_SwitchPowerToughness =  67;
-    AnnotationType_SupplementalText =  68;
+	AnnotationType_None = 0;
+	AnnotationType_ZoneTransfer = 1;
+	AnnotationType_LossOfGame = 2;
+	AnnotationType_DamageDealt = 3;
+	AnnotationType_TappedUntappedPermanent = 4;
+	AnnotationType_ModifiedPower = 5;
+	AnnotationType_ModifiedToughness = 6;
+	AnnotationType_ModifiedColor = 7;
+	AnnotationType_PhaseOrStepModified = 8;
+	AnnotationType_AddAbility = 9;
+	AnnotationType_ModifiedLife = 10;
+	AnnotationType_CreateAttachment = 11;
+	AnnotationType_RemoveAttachment = 12;
+	AnnotationType_ObjectIdChanged = 13;
+	AnnotationType_Counter = 14;
+	AnnotationType_ControllerChanged = 15;
+	AnnotationType_CounterAdded = 16;
+	AnnotationType_CounterRemoved = 17;
+	AnnotationType_LayeredEffectCreated = 18;
+	AnnotationType_LayeredEffectDestroyed = 19;
+	AnnotationType_Attachment = 20;
+	AnnotationType_Haunt = 21;
+	AnnotationType_CopiedObject = 22;
+	AnnotationType_RemoveAbility = 23;
+	AnnotationType_WinTheGame = 24;
+	AnnotationType_ModifiedType = 25;
+	AnnotationType_TargetSpec = 26;
+	AnnotationType_TextChange = 27;
+	AnnotationType_FaceDown = 28;
+	AnnotationType_TurnPermanent = 29;
+	AnnotationType_DynamicAbility = 30;
+	AnnotationType_ObjectsSelected = 31;
+	AnnotationType_TriggeringObject = 32;
+	AnnotationType_DamageSource = 33;
+	AnnotationType_ManaPaid = 34;
+	AnnotationType_TokenCreated = 35;
+	AnnotationType_AbilityInstanceCreated = 36;
+	AnnotationType_AbilityInstanceDeleted = 37;
+	AnnotationType_DisplayCardUnderCard = 38;
+	AnnotationType_AbilityWordActive = 39;
+	AnnotationType_LinkInfo = 40;
+	AnnotationType_TokenDeleted = 41;
+	AnnotationType_Qualification = 42;
+	AnnotationType_ResolutionStart = 43;
+	AnnotationType_ResolutionComplete = 44;
+	AnnotationType_Designation = 45;
+	AnnotationType_GainDesignation = 46;
+	AnnotationType_CardRevealed = 47;
+	AnnotationType_NewTurnStarted = 48;
+	AnnotationType_ManaDetails = 49;
+	AnnotationType_DisqualifiedEffect = 50;
+	AnnotationType_LayeredEffect = 51;
+	AnnotationType_MiscContinuousEffect = 52;
+	AnnotationType_ShouldntPlay = 53;
+	AnnotationType_UseOrCostsManaCost = 54;
+	AnnotationType_RemainingSelections = 55;
+	AnnotationType_Shuffle = 56;
+	AnnotationType_CoinFlip = 57;
+	AnnotationType_ChoiceResult = 58;
+	AnnotationType_RevealedCardCreated = 59;
+	AnnotationType_RevealedCardDeleted = 60;
+	AnnotationType_SuspendLike = 61;
+	AnnotationType_ReplacementEffect = 62;
+	AnnotationType_EnteredZoneThisTurn = 63;
+	AnnotationType_CastingTimeOption = 64;
+	AnnotationType_Scry = 65;
+	AnnotationType_PredictedDirectDamage = 66;
+	AnnotationType_SwitchPowerToughness = 67;
+	AnnotationType_SupplementalText = 68;
+	AnnotationType_PendingEffect = 69;
+	AnnotationType_AttachmentCreated = 70;
+	AnnotationType_PowerToughnessModCreated = 71;
+	AnnotationType_SyntheticEvent = 72;
+	AnnotationType_UserActionTaken = 73;
+	AnnotationType_DelayedTriggerAffectees = 74;
+	AnnotationType_InstanceRevealedToOpponent = 75;
+	AnnotationType_ModifiedName = 76;
+	AnnotationType_ReplacementEffectApplied = 77;
+	AnnotationType_ReferencedObjects = 78;
 }
 
 enum Answer {
-    Answer_None =  0;
-    Answer_Yes =  1;
-    Answer_No =  2;
+	Answer_None = 0;
+	Answer_Yes = 1;
+	Answer_No = 2;
 }
 
 message AnyLobbyMessage {
@@ -559,22 +475,22 @@ message AnyMessage {
 }
 
 message AnyServiceMessage {
-	AnyServiceMessageTypesUserContext userContext = 2;
+	message RequestContext {
+	}
+
+	message UserContext {
+		string userId = 1;
+		repeated string userRoles = 2;
+		AuthenticationType authenticationType = 3;
+	}
+
+	UserContext userContext = 2;
 	oneof message {
 		ClientToMatchServiceMessage clientToMatchServiceMessage = 10;
 		MatchServiceToClientMessage matchServiceToClientMessage = 11;
 		ClientToLobbyMessage clientToLobbyMessage = 12;
 		LobbyToClientMessage lobbyToClientMessage = 13;
 	}
-}
-
-message AnyServiceMessageTypesRequestContext {
-}
-
-message AnyServiceMessageTypesUserContext {
-	string userId = 1;
-	repeated string userRoles = 2;
-	AuthenticationType authenticationType = 3;
 }
 
 message AnyToGREMessage {
@@ -586,7 +502,6 @@ message AnyToGREMessage {
 }
 
 message AssignDamageConfirmation {
-	repeated InvalidDamageAssignment invalidAssignments = 2;
 	ResultCode result = 1;
 }
 
@@ -599,17 +514,17 @@ message AssignDamageResp {
 }
 
 message AttackInfo {
-	repeated OrderedDamageAssignment orderedBlockers = 4;
 	uint32 targetId = 1;
 	bool damageOrdered = 2;
 	bool damageAssigned = 3;
+	repeated OrderedDamageAssignment orderedBlockers = 4;
 	uint32 alternativeGrpId = 5;
 }
 
 enum AttackState {
-    AttackState_None =  0;
-    AttackState_Declared =  1;
-    AttackState_Attacking =  2;
+	AttackState_None = 0;
+	AttackState_Declared = 1;
+	AttackState_Attacking = 2;
 }
 
 message AttackWarning {
@@ -619,15 +534,15 @@ message AttackWarning {
 }
 
 enum AttackWarningType {
-    AttackWarningType_None =  0;
-    AttackWarningType_MustAttackWithAtLeastOne =  1;
-    AttackWarningType_CannotAttackAlone =  2;
-    AttackWarningType_MustAttack =  3;
+	AttackWarningType_None = 0;
+	AttackWarningType_MustAttackWithAtLeastOne = 1;
+	AttackWarningType_CannotAttackAlone = 2;
+	AttackWarningType_MustAttack = 3;
 }
 
 message Attacker {
-	repeated DamageRecipient legalDamageRecipients = 2;
 	uint32 attackerInstanceId = 1;
+	repeated DamageRecipient legalDamageRecipients = 2;
 	DamageRecipient selectedDamageRecipient = 3;
 	uint32 alternativeGrpId = 4;
 	bool autoAttacked = 5;
@@ -649,9 +564,8 @@ message AuthenticateResponse {
 }
 
 enum AuthenticationType {
-    AuthenticationType_Invalid =  0;
-    AuthenticationType_PlayFabImpersonation =  1;
-    AuthenticationType_Service =  2;
+	AuthenticationType_Invalid = 0;
+	AuthenticationType_Service = 2;
 }
 
 message AutoAnswer {
@@ -664,20 +578,25 @@ message AutoAnswer {
 }
 
 enum AutoPassOption {
-    AutoPassOption_None =  0;
-    AutoPassOption_Turn =  1;
-    AutoPassOption_UnlessAction =  2;
-    AutoPassOption_EndStep =  3;
-    AutoPassOption_Clear =  4;
-    AutoPassOption_UnlessOpponentAction =  5;
-    AutoPassOption_ResolveMyStackEffects =  6;
-    AutoPassOption_FullControl =  7;
+	AutoPassOption_None = 0;
+	AutoPassOption_Turn = 1;
+	AutoPassOption_UnlessAction = 2;
+	AutoPassOption_EndStep = 3;
+	AutoPassOption_Clear = 4;
+	AutoPassOption_UnlessOpponentAction = 5;
+	AutoPassOption_ResolveMyStackEffects = 6;
+	AutoPassOption_FullControl = 7;
+	AutoPassOption_ArenaDefault = 8;
 }
 
 enum AutoPassPriority {
-    AutoPassPriority_None =  0;
-    AutoPassPriority_No =  1;
-    AutoPassPriority_Yes =  2;
+	AutoPassPriority_None = 0;
+	AutoPassPriority_No = 1;
+	AutoPassPriority_Yes = 2;
+}
+
+message AutoRespondPermission {
+	repeated uint32 seatIds = 1;
 }
 
 message AutoTapAction {
@@ -688,10 +607,19 @@ message AutoTapAction {
 	CostCategory costCategory = 5;
 }
 
+message AutoTapActionsAvailableReq {
+	repeated AutoTapSolution autoTapSolutions = 2;
+}
+
+message AutoTapSolution {
+	repeated AutoTapAction autoTapActions = 1;
+	repeated ManaPaymentCondition manaPaymentConditions = 2;
+}
+
 enum AutoTapStopsSetting {
-    AutoTapStopsSetting_None =  0;
-    AutoTapStopsSetting_Enable =  1;
-    AutoTapStopsSetting_Disable =  2;
+	AutoTapStopsSetting_None = 0;
+	AutoTapStopsSetting_Enable = 1;
+	AutoTapStopsSetting_Disable = 2;
 }
 
 message AutoYield {
@@ -701,39 +629,25 @@ message AutoYield {
 	SettingStatus status = 4;
 }
 
-enum BasicLandType {
-    BasicLandType_None =  0;
-    BasicLandType_Plains =  1;
-    BasicLandType_Island =  2;
-    BasicLandType_Swamp =  3;
-    BasicLandType_Mountain =  4;
-    BasicLandType_Forest =  5;
-}
-
-message BehaviorTree {
-	Node root = 1;
-}
-
 message BinaryGameState {
-	bytes instanceData = 2;
-	repeated ClientToGREMessage clientActions = 3;
-	bytes internalGREData = 4;
 	GameStateMessage gameStateMsg = 1;
+	bytes instanceData = 2;
+	bytes internalGREData = 4;
 }
 
 message BlockInfo {
 	repeated uint32 attackerIds = 1;
-	repeated OrderedDamageAssignment orderedAttackers = 4;
 	bool damageOrdered = 2;
 	bool damageAssigned = 3;
+	repeated OrderedDamageAssignment orderedAttackers = 4;
 }
 
 enum BlockState {
-    BlockState_None =  0;
-    BlockState_Declared =  1;
-    BlockState_Blocking =  2;
-    BlockState_Blocked =  3;
-    BlockState_Unblocked =  4;
+	BlockState_None = 0;
+	BlockState_Declared = 1;
+	BlockState_Blocking = 2;
+	BlockState_Blocked = 3;
+	BlockState_Unblocked = 4;
 }
 
 message BlockWarning {
@@ -743,116 +657,131 @@ message BlockWarning {
 }
 
 enum BlockWarningType {
-    BlockWarningType_None =  0;
-    BlockWarningType_InsufficientBlockers =  1;
-    BlockWarningType_CannotBlockAlone =  2;
-    BlockWarningType_MustBeBlocked =  3;
-    BlockWarningType_MustBlock =  4;
-    BlockWarningType_MustBeBlockedByAll =  5;
+	BlockWarningType_None = 0;
+	BlockWarningType_InsufficientBlockers = 1;
+	BlockWarningType_CannotBlockAlone = 2;
+	BlockWarningType_MustBeBlocked = 3;
+	BlockWarningType_MustBlock = 4;
+	BlockWarningType_MustBeBlockedByAll = 5;
 }
 
 message Blocker {
+	uint32 blockerInstanceId = 1;
 	repeated uint32 attackerInstanceIds = 2;
 	repeated uint32 selectedAttackerInstanceIds = 3;
-	uint32 blockerInstanceId = 1;
 	uint32 minAttackers = 4;
 	uint32 maxAttackers = 5;
 	bool mustBlock = 6;
 }
 
 message CLIPSConfiguration {
-	string initFile = 4;
-	string metricsFile = 7;
-	string logFile = 8;
 	bool enableWatch = 1;
 	bool enableMetrics = 2;
 	bool enableLogging = 3;
+	string initFile = 4;
 	int32 maxFiringLimit = 5;
 	int32 warningFiringLimit = 6;
+	string metricsFile = 7;
+	string logFile = 8;
 }
 
 message CancelActionReq {
 }
 
 enum CardColor {
-    CardColor_Colorless =  0;
-    CardColor_White =  1;
-    CardColor_Blue =  2;
-    CardColor_Black =  3;
-    CardColor_Red =  4;
-    CardColor_Green =  5;
-    CardColor_Land =  6;
-    CardColor_Artifact =  7;
+	CardColor_Colorless = 0;
+	CardColor_White = 1;
+	CardColor_Blue = 2;
+	CardColor_Black = 3;
+	CardColor_Red = 4;
+	CardColor_Green = 5;
+	CardColor_Land = 6;
+	CardColor_Artifact = 7;
+}
+
+message CardConfig {
+	uint32 count = 1;
+	string title = 2;
+	string expansionCode = 3;
 }
 
 enum CardMechanicType {
-    CardMechanicType_None = 0;
-    CardMechanicType_AddAbility = 2;
-    CardMechanicType_AddAttachment = 3;
-    CardMechanicType_DealDamage = 4;
-    CardMechanicType_DestroyPermanent = 5;
-    CardMechanicType_Discard = 6;
-    CardMechanicType_DrawCard = 7;
-    CardMechanicType_LossOfGame = 8;
-    CardMechanicType_SetColor = 9;
-    CardMechanicType_ModifyLife = 10;
-    CardMechanicType_ModifyPower = 11;
-    CardMechanicType_ModifyToughness = 12;
-    CardMechanicType_PhaseOrStepTransition = 13;
-    CardMechanicType_PutCounterOnObject = 14;
-    CardMechanicType_CreateToken = 15;
-    CardMechanicType_RemoveCounterFromObject = 16;
-    CardMechanicType_ResolveAbility = 17;
-    CardMechanicType_Reveal = 18;
-    CardMechanicType_TapPermanent = 19;
-    CardMechanicType_UntapPermanent = 21;
-    CardMechanicType_ZoneTransfer = 22;
-    CardMechanicType_RegeneratePermanent = 23;
-    CardMechanicType_SacrificePermanent = 24;
-    CardMechanicType_SetController = 25;
-    CardMechanicType_DeclaredAttacker = 26;
-    CardMechanicType_DeclaredBlocker = 27;
-    CardMechanicType_BecomeTarget = 28;
-    CardMechanicType_AddToManaPool = 29;
-    CardMechanicType_EnterZone = 30;
-    CardMechanicType_ShuffleLibrary = 31;
-    CardMechanicType_CounterObjectOnStack = 32;
-    CardMechanicType_ExileGameObject = 33;
-    CardMechanicType_DamageDealt = 34;
-    CardMechanicType_PhaseInPermanent = 35;
-    CardMechanicType_PhaseOutPermanent = 36;
-    CardMechanicType_AttackerBlocked = 37;
-    CardMechanicType_AttackersSubmitted = 38;
-    CardMechanicType_BlockersDetermined = 39;
-    CardMechanicType_SetPower = 40;
-    CardMechanicType_SetToughness = 41;
-    CardMechanicType_BeginTurn = 42;
-    CardMechanicType_TurnFaceUp = 43;
-    CardMechanicType_Transform = 44;
-    CardMechanicType_Dredge = 45;
-    CardMechanicType_Explore = 46;
-    CardMechanicType_Provoke = 47;
+	CardMechanicType_None = 0;
+	CardMechanicType_AddAbility = 2;
+	CardMechanicType_AddAttachment = 3;
+	CardMechanicType_DealDamage = 4;
+	CardMechanicType_DestroyPermanent = 5;
+	CardMechanicType_Discard = 6;
+	CardMechanicType_DrawCard = 7;
+	CardMechanicType_LossOfGame = 8;
+	CardMechanicType_SetColor = 9;
+	CardMechanicType_ModifyLife = 10;
+	CardMechanicType_ModifyPower = 11;
+	CardMechanicType_ModifyToughness = 12;
+	CardMechanicType_PhaseOrStepTransition = 13;
+	CardMechanicType_PutCounterOnObject = 14;
+	CardMechanicType_CreateToken = 15;
+	CardMechanicType_RemoveCounterFromObject = 16;
+	CardMechanicType_ResolveAbility = 17;
+	CardMechanicType_Reveal = 18;
+	CardMechanicType_TapPermanent = 19;
+	CardMechanicType_UntapPermanent = 21;
+	CardMechanicType_ZoneTransfer = 22;
+	CardMechanicType_RegeneratePermanent = 23;
+	CardMechanicType_SacrificePermanent = 24;
+	CardMechanicType_SetController = 25;
+	CardMechanicType_DeclaredAttacker = 26;
+	CardMechanicType_DeclaredBlocker = 27;
+	CardMechanicType_BecomeTarget = 28;
+	CardMechanicType_AddToManaPool = 29;
+	CardMechanicType_EnterZone = 30;
+	CardMechanicType_ShuffleLibrary = 31;
+	CardMechanicType_CounterObjectOnStack = 32;
+	CardMechanicType_ExileGameObject = 33;
+	CardMechanicType_DamageDealt = 34;
+	CardMechanicType_PhaseInPermanent = 35;
+	CardMechanicType_PhaseOutPermanent = 36;
+	CardMechanicType_AttackerBlocked = 37;
+	CardMechanicType_AttackersSubmitted = 38;
+	CardMechanicType_BlockersDetermined = 39;
+	CardMechanicType_SetPower = 40;
+	CardMechanicType_SetToughness = 41;
+	CardMechanicType_BeginTurn = 42;
+	CardMechanicType_TurnFaceUp = 43;
+	CardMechanicType_Transform = 44;
+	CardMechanicType_Dredge = 45;
+	CardMechanicType_Explore = 46;
+	CardMechanicType_Provoke = 47;
+	CardMechanicType_Riot = 48;
+	CardMechanicType_Placeholder1 = 49;
+	CardMechanicType_Placeholder2 = 50;
+	CardMechanicType_Placeholder3 = 51;
+	CardMechanicType_Placeholder4 = 52;
+	CardMechanicType_Placeholder5 = 53;
+}
+
+message CardSkinTuple {
+	uint32 catalogId = 1;
+	string skinCode = 2;
 }
 
 enum CardType {
-    CardType_None =  0;
-    CardType_Artifact =  1;
-    CardType_Creature =  2;
-    CardType_Enchantment =  3;
-    CardType_Instant =  4;
-    CardType_Land =  5;
-    CardType_Phenomenon =  6;
-    CardType_Plane =  7;
-    CardType_Planeswalker =  8;
-    CardType_Scheme =  9;
-    CardType_Sorcery =  10;
-    CardType_Tribal =  11;
-    CardType_Vanguard =  12;
+	CardType_None = 0;
+	CardType_Artifact = 1;
+	CardType_Creature = 2;
+	CardType_Enchantment = 3;
+	CardType_Instant = 4;
+	CardType_Land = 5;
+	CardType_Phenomenon = 6;
+	CardType_Plane = 7;
+	CardType_Planeswalker = 8;
+	CardType_Scheme = 9;
+	CardType_Sorcery = 10;
+	CardType_Tribal = 11;
+	CardType_Vanguard = 12;
 }
 
 message CastingTimeOptionReq {
-	repeated ManaRequirement manaCost = 13;
-	repeated AutoTapAction autoTapActions = 14;
 	uint32 ctoId = 1;
 	CastingTimeOptionType castingTimeOptionType = 2;
 	uint32 affectedId = 3;
@@ -865,6 +794,8 @@ message CastingTimeOptionReq {
 	SelectManaTypeReq selectManaTypeReq = 10;
 	ModalReq modalReq = 11;
 	SelectNReq selectNReq = 12;
+	repeated ManaRequirement manaCost = 13;
+	AutoTapSolution autoTapSolution = 15;
 }
 
 message CastingTimeOptionResp {
@@ -877,19 +808,20 @@ message CastingTimeOptionResp {
 }
 
 enum CastingTimeOptionType {
-    CastingTimeOptionType_None =  0;
-    CastingTimeOptionType_Done =  1;
-    CastingTimeOptionType_ChooseX =  2;
-    CastingTimeOptionType_Kicker =  3;
-    CastingTimeOptionType_Multikicker =  4;
-    CastingTimeOptionType_AdditionalCost =  5;
-    CastingTimeOptionType_OptionalCost =  6;
-    CastingTimeOptionType_Replicate =  7;
-    CastingTimeOptionType_Conspire =  8;
-    CastingTimeOptionType_ManaType =  9;
-    CastingTimeOptionType_Modal =  10;
-    CastingTimeOptionType_ChooseOrCost =  11;
-    CastingTimeOptionType_Selection =  12;
+	CastingTimeOptionType_None = 0;
+	CastingTimeOptionType_Done = 1;
+	CastingTimeOptionType_ChooseX = 2;
+	CastingTimeOptionType_Kicker = 3;
+	CastingTimeOptionType_Multikicker = 4;
+	CastingTimeOptionType_AdditionalCost = 5;
+	CastingTimeOptionType_OptionalCost = 6;
+	CastingTimeOptionType_Replicate = 7;
+	CastingTimeOptionType_Conspire = 8;
+	CastingTimeOptionType_ManaType = 9;
+	CastingTimeOptionType_Modal = 10;
+	CastingTimeOptionType_ChooseOrCost = 11;
+	CastingTimeOptionType_Selection = 12;
+	CastingTimeOptionType_CastThroughAbility = 13;
 }
 
 message CastingTimeOptionsReq {
@@ -904,27 +836,21 @@ message CheckpointConfiguration {
 	bool enabled = 1;
 }
 
-message Choice {
-	repeated PromptParameter parameters = 2;
-	uint32 choiceId = 1;
-	uint32 responseValue = 3;
-}
-
 enum ChoicePersistence {
-    ChoicePersistence_None =  0;
-    ChoicePersistence_ChooseOnce =  1;
-    ChoicePersistence_ChooseAlways =  2;
+	ChoicePersistence_None = 0;
+	ChoicePersistence_ChooseOnce = 1;
+	ChoicePersistence_ChooseAlways = 2;
 }
 
 message ChooseModalResp {
-	repeated uint32 grpIds = 2;
 	uint32 abilityGrpId = 1;
+	repeated uint32 grpIds = 2;
 }
 
 message ChooseStartingPlayerReq {
+	TeamType teamType = 1;
 	repeated uint32 systemSeatIds = 2;
 	repeated uint32 teamIds = 3;
-	TeamType teamType = 1;
 	Prompt prompt = 4;
 }
 
@@ -944,59 +870,59 @@ message ClearLobbyUserStatusResponse {
 
 message ClientInfo {
 	string clientId = 1;
+	ClientType clientType = 2;
 	string clientVersion = 10;
 	string clientLocation = 11;
 	string clientLanguage = 12;
-	ClientType clientType = 2;
 }
 
 enum ClientMessageType {
-    ClientMessageType_None = 0;
-    ClientMessageType_ConnectReq = 1;
-    ClientMessageType_CancelActionReq = 5;
-    ClientMessageType_ChooseModalResp = 6;
-    ClientMessageType_ConcedeReq = 7;
-    ClientMessageType_EnterSideboardingReq = 8;
-    ClientMessageType_ForceDrawReq = 9;
-    ClientMessageType_GetSettingsReq = 11;
-    ClientMessageType_GroupResp = 12;
-    ClientMessageType_MulliganResp = 13;
-    ClientMessageType_OrderResp = 14;
-    ClientMessageType_PerformActionResp = 15;
-    ClientMessageType_ControlReq = 17;
-    ClientMessageType_SelectNResp = 18;
-    ClientMessageType_SetSettingsReq = 20;
-    ClientMessageType_UndoReq = 22;
-    ClientMessageType_ChooseStartingPlayerResp = 24;
-    ClientMessageType_OptionalActionResp = 25;
-    ClientMessageType_AllowForceDrawResp = 26;
-    ClientMessageType_RevealHandResp = 28;
-    ClientMessageType_DeclareAttackersResp = 30;
-    ClientMessageType_SubmitAttackersReq = 31;
-    ClientMessageType_DeclareBlockersResp = 32;
-    ClientMessageType_SubmitBlockersReq = 33;
-    ClientMessageType_OrderCombatDamageResp = 34;
-    ClientMessageType_AssignDamageResp = 35;
-    ClientMessageType_SelectTargetsResp = 36;
-    ClientMessageType_SubmitTargetsReq = 37;
-    ClientMessageType_DrawCardResp = 38;
-    ClientMessageType_SelectReplacementResp = 39;
-    ClientMessageType_SelectNGroupResp = 40;
-    ClientMessageType_AlternativeCostResp = 41;
-    ClientMessageType_DistributionResp = 42;
-    ClientMessageType_NumericInputResp = 43;
-    ClientMessageType_SearchResp = 44;
-    ClientMessageType_ActionCostResp = 45;
-    ClientMessageType_CastingTimeOptionsResp = 46;
-    ClientMessageType_SelectManaTypeResp = 47;
-    ClientMessageType_SelectFromGroupsResp = 48;
-    ClientMessageType_SearchFromGroupsResp = 49;
-    ClientMessageType_GatherResp = 50;
-    ClientMessageType_SubmitPaymentResp = 51;
-    ClientMessageType_AutoResp = 52;
-    ClientMessageType_UIMessage = 53;
-    ClientMessageType_SubmitDeckResp = 54;
-    ClientMessageType_TakeTimeoutReq = 55;
+	ClientMessageType_None = 0;
+	ClientMessageType_ConnectReq = 1;
+	ClientMessageType_CancelActionReq = 5;
+	ClientMessageType_ChooseModalResp = 6;
+	ClientMessageType_ConcedeReq = 7;
+	ClientMessageType_EnterSideboardingReq = 8;
+	ClientMessageType_ForceDrawReq = 9;
+	ClientMessageType_GetSettingsReq = 11;
+	ClientMessageType_GroupResp = 12;
+	ClientMessageType_MulliganResp = 13;
+	ClientMessageType_OrderResp = 14;
+	ClientMessageType_PerformActionResp = 15;
+	ClientMessageType_ControlReq = 17;
+	ClientMessageType_SelectNResp = 18;
+	ClientMessageType_SetSettingsReq = 20;
+	ClientMessageType_UndoReq = 22;
+	ClientMessageType_ChooseStartingPlayerResp = 24;
+	ClientMessageType_OptionalActionResp = 25;
+	ClientMessageType_AllowForceDrawResp = 26;
+	ClientMessageType_RevealHandResp = 28;
+	ClientMessageType_DeclareAttackersResp = 30;
+	ClientMessageType_SubmitAttackersReq = 31;
+	ClientMessageType_DeclareBlockersResp = 32;
+	ClientMessageType_SubmitBlockersReq = 33;
+	ClientMessageType_OrderCombatDamageResp = 34;
+	ClientMessageType_AssignDamageResp = 35;
+	ClientMessageType_SelectTargetsResp = 36;
+	ClientMessageType_SubmitTargetsReq = 37;
+	ClientMessageType_DrawCardResp = 38;
+	ClientMessageType_SelectReplacementResp = 39;
+	ClientMessageType_SelectNGroupResp = 40;
+	ClientMessageType_DistributionResp = 42;
+	ClientMessageType_NumericInputResp = 43;
+	ClientMessageType_SearchResp = 44;
+	ClientMessageType_ActionCostResp = 45;
+	ClientMessageType_CastingTimeOptionsResp = 46;
+	ClientMessageType_SelectManaTypeResp = 47;
+	ClientMessageType_SelectFromGroupsResp = 48;
+	ClientMessageType_SearchFromGroupsResp = 49;
+	ClientMessageType_GatherResp = 50;
+	ClientMessageType_SubmitPaymentResp = 51;
+	ClientMessageType_AutoResp = 52;
+	ClientMessageType_UIMessage = 53;
+	ClientMessageType_SubmitDeckResp = 54;
+	ClientMessageType_TakeTimeoutReq = 55;
+	ClientMessageType_PerformAutoTapActionsResp = 56;
 }
 
 message ClientSessionInfo {
@@ -1006,10 +932,6 @@ message ClientSessionInfo {
 	string userName = 4;
 	string screenName = 5;
 	ClientInfo clientInfo = 10;
-}
-
-message ClientSync {
-	uint32 systemSeatId = 1;
 }
 
 message ClientToFrontDoorMessage {
@@ -1044,7 +966,6 @@ message ClientToGREMessage {
 	SelectTargetsResp selectTargetsResp = 26;
 	SelectReplacementResp selectReplacementResp = 27;
 	SelectNGroupResp selectNGroupResp = 28;
-	AlternativeCostResp alternativeCostResp = 29;
 	DistributionResp distributionResp = 30;
 	NumericInputResp numericInputResp = 31;
 	SearchResp searchResp = 32;
@@ -1058,6 +979,7 @@ message ClientToGREMessage {
 	UIMessage uiMessage = 40;
 	SubmitDeckResp submitDeckResp = 41;
 	ControlReq controlReq = 42;
+	PerformAutoTapActionsResp performAutoTapActionsResp = 43;
 	uint32 timerId = 100;
 }
 
@@ -1096,43 +1018,28 @@ message ClientToMatchDoorConnectRequest {
 }
 
 message ClientToMatchServiceMessage {
-	string transactionId = 4;
-	bytes payload = 100;
 	int32 requestId = 1;
 	ClientToMatchServiceMessageType clientToMatchServiceMessageType = 2;
 	int64 timestamp = 3;
+	string transactionId = 4;
+	bytes payload = 100;
 }
 
 enum ClientToMatchServiceMessageType {
-    ClientToMatchServiceMessageType_None = 0;
-    ClientToMatchServiceMessageType_ClientToMatchDoorConnectRequest = 1;
-    ClientToMatchServiceMessageType_ClientToGREMessage = 2;
-    ClientToMatchServiceMessageType_ClientToGREUIMessage = 3;
-    ClientToMatchServiceMessageType_AuthenticateRequest = 4;
-    ClientToMatchServiceMessageType_CreateMatchGameRoomRequest = 5;
-    ClientToMatchServiceMessageType_EchoRequest = 8;
+	ClientToMatchServiceMessageType_None = 0;
+	ClientToMatchServiceMessageType_ClientToMatchDoorConnectRequest = 1;
+	ClientToMatchServiceMessageType_ClientToGREMessage = 2;
+	ClientToMatchServiceMessageType_ClientToGREUIMessage = 3;
+	ClientToMatchServiceMessageType_AuthenticateRequest = 4;
+	ClientToMatchServiceMessageType_CreateMatchGameRoomRequest = 5;
+	ClientToMatchServiceMessageType_EchoRequest = 8;
 }
 
 enum ClientType {
-    ClientType_Invalid =  0;
-    ClientType_User =  1;
-    ClientType_Service =  2;
-    ClientType_Familiar =  3;
-}
-
-enum CoinFace {
-    CoinFace_None =  0;
-    CoinFace_Heads =  1;
-    CoinFace_Tails =  2;
-}
-
-enum Color {
-    Color_None =  0;
-    Color_White =  1;
-    Color_Blue =  2;
-    Color_Black =  3;
-    Color_Red =  4;
-    Color_Green =  5;
+	ClientType_Invalid = 0;
+	ClientType_User = 1;
+	ClientType_Service = 2;
+	ClientType_Familiar = 3;
 }
 
 message CombatDamageOrder {
@@ -1147,25 +1054,9 @@ message CombatDamageOrderAssignment {
 	Prompt decisionPrompt = 3;
 }
 
-message Composite {
-	oneof message {
-		Sequence sequence = 1;
-		Selector selector = 2;
-		Parallel parallel = 3;
-	}
-}
-
 message ConcedeReq {
 	MatchScope scope = 1;
 	uint32 gameNumber = 2;
-}
-
-message ConfigureRequest {
-	GeneralConfiguration general = 1;
-}
-
-message ConfigureResponse {
-	GRETHHostErrorCode result = 1;
 }
 
 message ConnectReq {
@@ -1187,34 +1078,34 @@ message ConnectResp {
 	ProtoVersion protoVer = 6;
 	uint32 seatId = 7;
 	SettingsMessage settings = 8;
+	DeckMessage deckMessage = 9;
 }
 
 enum ConnectionState {
-    ConnectionState_Invalid =  0;
-    ConnectionState_Open =  1;
-    ConnectionState_Closed =  2;
-    ConnectionState_Connecting =  3;
-    ConnectionState_Closing =  4;
+	ConnectionState_Invalid = 0;
+	ConnectionState_Open = 1;
+	ConnectionState_Closed = 2;
+	ConnectionState_Connecting = 3;
+	ConnectionState_Closing = 4;
 }
 
 enum ConnectionStateChangedEventType {
-    ConnectionStateChangedEventType_Invalid =  0;
-    ConnectionStateChangedEventType_Connected =  1;
-    ConnectionStateChangedEventType_Disconnected =  2;
+	ConnectionStateChangedEventType_Invalid = 0;
+	ConnectionStateChangedEventType_Connected = 1;
+	ConnectionStateChangedEventType_Disconnected = 2;
 }
 
 enum ConnectionStatus {
-    ConnectionStatus_None =  0;
-    ConnectionStatus_Success =  1;
-    ConnectionStatus_AlreadyConnected =  2;
-    ConnectionStatus_GameOver =  3;
-    ConnectionStatus_GRPVersionIncompat =  4;
+	ConnectionStatus_None = 0;
+	ConnectionStatus_Success = 1;
+	ConnectionStatus_GRPVersionIncompat = 2;
+	ConnectionStatus_ProtoVersionIncompat = 3;
 }
 
 enum ConstructedMatchType {
-    Precon =  0;
-    Unranked =  1;
-    Ranked =  2;
+	Precon = 0;
+	Unranked = 1;
+	Ranked = 2;
 }
 
 message ContinuationToken {
@@ -1229,192 +1120,184 @@ message ControlReq {
 }
 
 enum ControllerType {
-    ControllerType_None =  0;
-    ControllerType_Player =  1;
-    ControllerType_AI =  2;
-    ControllerType_AI_Goldfish =  3;
-    ControllerType_AI_PetRock =  4;
+	ControllerType_None = 0;
+	ControllerType_Player = 1;
+	ControllerType_AI = 2;
+	ControllerType_AI_Goldfish = 3;
+	ControllerType_AI_PetRock = 4;
 }
 
 message CorrelationInfo {
 	string correlationId = 1;
-	map<string, string> correlationContext = 5;
 }
 
 message CosmeticConfig {
-	string data = 2;
 	uint32 seatId = 1;
+	string data = 2;
 }
 
 message CosmeticInfo {
-	string data = 2;
 	uint32 seatId = 1;
+	string data = 2;
 }
 
 enum CostCategory {
-    CostCategory_None =  0;
-    CostCategory_Executable =  1;
-    CostCategory_Predictable =  2;
-}
-
-enum CostType {
-    CostType_None =  0;
-    CostType_Mana =  1;
-    CostType_TapSelf =  2;
-    CostType_SacSelf =  3;
-    CostType_Action =  4;
-    CostType_Loyalty =  5;
-    CostType_DiscardSelf =  6;
-    CostType_Life =  7;
-    CostType_ExileSelf =  8;
-    CostType_UntapSelf =  9;
-    CostType_Or =  10;
+	CostCategory_None = 0;
+	CostCategory_Automatic = 1;
+	CostCategory_Confirmation = 2;
+	CostCategory_Manual = 3;
 }
 
 message Counter {
-	CounterType type = 1;
-	uint32 count = 2;
-	uint32 id = 3;
-	uint32 markedObject = 4;
+	uint32 id = 1;
+	CounterType type = 2;
+	uint32 count = 3;
+	uint32 sourceId = 4;
+}
+
+message CounterPair {
+	int32 instanceId = 1;
+	int32 counterType = 2;
 }
 
 enum CounterType {
-    CounterType_None = 0;
-    CounterType_P1P1 = 1;
-    CounterType_M1M1 = 2;
-    CounterType_Poison = 3;
-    CounterType_Wind = 4;
-    CounterType_Time = 5;
-    CounterType_Fade = 6;
-    CounterType_Loyalty = 7;
-    CounterType_Wish = 8;
-    CounterType_Age = 9;
-    CounterType_Aim = 10;
-    CounterType_Arrow = 11;
-    CounterType_Arrowhead = 12;
-    CounterType_Awakening = 13;
-    CounterType_Blaze = 14;
-    CounterType_Blood = 15;
-    CounterType_Bounty = 16;
-    CounterType_Bribery = 17;
-    CounterType_Carrion = 18;
-    CounterType_Charge = 19;
-    CounterType_Control = 20;
-    CounterType_Corpse = 21;
-    CounterType_Credit = 22;
-    CounterType_Cube = 23;
-    CounterType_Currency = 24;
-    CounterType_Death = 25;
-    CounterType_Delay = 26;
-    CounterType_Depletion = 27;
-    CounterType_Despair = 28;
-    CounterType_Devotion = 29;
-    CounterType_Divinity = 30;
-    CounterType_Doom = 31;
-    CounterType_Dream = 32;
-    CounterType_Echo = 33;
-    CounterType_Elixir = 34;
-    CounterType_Energy = 35;
-    CounterType_Eon = 36;
-    CounterType_Eyeball = 37;
-    CounterType_Fate = 38;
-    CounterType_Feather = 39;
-    CounterType_Filibuster = 40;
-    CounterType_Flame = 41;
-    CounterType_Flood = 42;
-    CounterType_Fungus = 43;
-    CounterType_Fuse = 44;
-    CounterType_Glyph = 45;
-    CounterType_Gold = 46;
-    CounterType_Growth = 47;
-    CounterType_Hatchling = 48;
-    CounterType_Healing = 49;
-    CounterType_Hoofprint = 50;
-    CounterType_Hourglass = 51;
-    CounterType_Hunger = 52;
-    CounterType_Ice = 53;
-    CounterType_Infection = 54;
-    CounterType_Intervention = 55;
-    CounterType_Javelin = 56;
-    CounterType_Ki = 57;
-    CounterType_Level = 58;
-    CounterType_Luck = 59;
-    CounterType_Magnet = 60;
-    CounterType_Mannequin = 61;
-    CounterType_Matrix = 62;
-    CounterType_May = 63;
-    CounterType_Mine = 64;
-    CounterType_Mining = 65;
-    CounterType_Mire = 66;
-    CounterType_Muster = 67;
-    CounterType_Net = 68;
-    CounterType_Omen = 69;
-    CounterType_Ore = 70;
-    CounterType_Page = 71;
-    CounterType_Pain = 72;
-    CounterType_Paralyzation = 73;
-    CounterType_Petal = 74;
-    CounterType_Petrification = 75;
-    CounterType_Phylactery = 76;
-    CounterType_Pin = 77;
-    CounterType_Plague = 78;
-    CounterType_Polyp = 79;
-    CounterType_Pressure = 80;
-    CounterType_Pupa = 81;
-    CounterType_Quest = 82;
-    CounterType_Scream = 83;
-    CounterType_Scroll = 84;
-    CounterType_Shell = 85;
-    CounterType_Shield = 86;
-    CounterType_Shred = 87;
-    CounterType_Sleep = 88;
-    CounterType_Sleight = 89;
-    CounterType_Slime = 90;
-    CounterType_Soot = 91;
-    CounterType_Spell = 92;
-    CounterType_Spore = 93;
-    CounterType_Storage = 94;
-    CounterType_Strife = 95;
-    CounterType_Study = 96;
-    CounterType_Theft = 97;
-    CounterType_Tide = 98;
-    CounterType_Tower = 100;
-    CounterType_Training = 101;
-    CounterType_Trap = 102;
-    CounterType_Treasure = 103;
-    CounterType_Verse = 104;
-    CounterType_Vitality = 105;
-    CounterType_Wage = 106;
-    CounterType_Winch = 107;
-    CounterType_Lore = 108;
-    CounterType_P1P2 = 109;
-    CounterType_P0P1 = 110;
-    CounterType_P0P2 = 111;
-    CounterType_P1P0 = 112;
-    CounterType_P2P2 = 113;
-    CounterType_M0M1 = 114;
-    CounterType_M0M2 = 115;
-    CounterType_M1M0 = 116;
-    CounterType_M2M1 = 117;
-    CounterType_M2M2 = 118;
-    CounterType_Manifestation = 119;
-    CounterType_Gem = 120;
-    CounterType_Crystal = 121;
-    CounterType_Isolation = 122;
-    CounterType_Hour = 123;
-    CounterType_Unity = 124;
-    CounterType_Velocity = 125;
-    CounterType_Brick = 126;
-    CounterType_Landmark = 127;
-    CounterType_Prey = 128;
-    CounterType_Silver = 129;
-    CounterType_Egg = 130;
-    CounterType_Hit = 131;
-    CounterType_PlaceholderCounterType1 = 132;
-    CounterType_PlaceholderCounterType2 = 133;
-    CounterType_PlaceholderCounterType3 = 134;
-    CounterType_PlaceholderCounterType4 = 135;
-    CounterType_PlaceholderCounterType5 = 136;
+	CounterType_None = 0;
+	CounterType_P1P1 = 1;
+	CounterType_M1M1 = 2;
+	CounterType_Poison = 3;
+	CounterType_Wind = 4;
+	CounterType_Time = 5;
+	CounterType_Fade = 6;
+	CounterType_Loyalty = 7;
+	CounterType_Wish = 8;
+	CounterType_Age = 9;
+	CounterType_Aim = 10;
+	CounterType_Arrow = 11;
+	CounterType_Arrowhead = 12;
+	CounterType_Awakening = 13;
+	CounterType_Blaze = 14;
+	CounterType_Blood = 15;
+	CounterType_Bounty = 16;
+	CounterType_Bribery = 17;
+	CounterType_Carrion = 18;
+	CounterType_Charge = 19;
+	CounterType_Control = 20;
+	CounterType_Corpse = 21;
+	CounterType_Credit = 22;
+	CounterType_Cube = 23;
+	CounterType_Currency = 24;
+	CounterType_Death = 25;
+	CounterType_Delay = 26;
+	CounterType_Depletion = 27;
+	CounterType_Despair = 28;
+	CounterType_Devotion = 29;
+	CounterType_Divinity = 30;
+	CounterType_Doom = 31;
+	CounterType_Dream = 32;
+	CounterType_Echo = 33;
+	CounterType_Elixir = 34;
+	CounterType_Energy = 35;
+	CounterType_Eon = 36;
+	CounterType_Eyeball = 37;
+	CounterType_Fate = 38;
+	CounterType_Feather = 39;
+	CounterType_Filibuster = 40;
+	CounterType_Flame = 41;
+	CounterType_Flood = 42;
+	CounterType_Fungus = 43;
+	CounterType_Fuse = 44;
+	CounterType_Glyph = 45;
+	CounterType_Gold = 46;
+	CounterType_Growth = 47;
+	CounterType_Hatchling = 48;
+	CounterType_Healing = 49;
+	CounterType_Hoofprint = 50;
+	CounterType_Hourglass = 51;
+	CounterType_Hunger = 52;
+	CounterType_Ice = 53;
+	CounterType_Infection = 54;
+	CounterType_Intervention = 55;
+	CounterType_Javelin = 56;
+	CounterType_Ki = 57;
+	CounterType_Level = 58;
+	CounterType_Luck = 59;
+	CounterType_Magnet = 60;
+	CounterType_Mannequin = 61;
+	CounterType_Matrix = 62;
+	CounterType_May = 63;
+	CounterType_Mine = 64;
+	CounterType_Mining = 65;
+	CounterType_Mire = 66;
+	CounterType_Muster = 67;
+	CounterType_Net = 68;
+	CounterType_Omen = 69;
+	CounterType_Ore = 70;
+	CounterType_Page = 71;
+	CounterType_Pain = 72;
+	CounterType_Paralyzation = 73;
+	CounterType_Petal = 74;
+	CounterType_Petrification = 75;
+	CounterType_Phylactery = 76;
+	CounterType_Pin = 77;
+	CounterType_Plague = 78;
+	CounterType_Polyp = 79;
+	CounterType_Pressure = 80;
+	CounterType_Pupa = 81;
+	CounterType_Quest = 82;
+	CounterType_Scream = 83;
+	CounterType_Scroll = 84;
+	CounterType_Shell = 85;
+	CounterType_Shield = 86;
+	CounterType_Shred = 87;
+	CounterType_Sleep = 88;
+	CounterType_Sleight = 89;
+	CounterType_Slime = 90;
+	CounterType_Soot = 91;
+	CounterType_Spell = 92;
+	CounterType_Spore = 93;
+	CounterType_Storage = 94;
+	CounterType_Strife = 95;
+	CounterType_Study = 96;
+	CounterType_Theft = 97;
+	CounterType_Tide = 98;
+	CounterType_Tower = 100;
+	CounterType_Training = 101;
+	CounterType_Trap = 102;
+	CounterType_Treasure = 103;
+	CounterType_Verse = 104;
+	CounterType_Vitality = 105;
+	CounterType_Wage = 106;
+	CounterType_Winch = 107;
+	CounterType_Lore = 108;
+	CounterType_P1P2 = 109;
+	CounterType_P0P1 = 110;
+	CounterType_P0P2 = 111;
+	CounterType_P1P0 = 112;
+	CounterType_P2P2 = 113;
+	CounterType_M0M1 = 114;
+	CounterType_M0M2 = 115;
+	CounterType_M1M0 = 116;
+	CounterType_M2M1 = 117;
+	CounterType_M2M2 = 118;
+	CounterType_Manifestation = 119;
+	CounterType_Gem = 120;
+	CounterType_Crystal = 121;
+	CounterType_Isolation = 122;
+	CounterType_Hour = 123;
+	CounterType_Unity = 124;
+	CounterType_Velocity = 125;
+	CounterType_Brick = 126;
+	CounterType_Landmark = 127;
+	CounterType_Prey = 128;
+	CounterType_Silver = 129;
+	CounterType_Egg = 130;
+	CounterType_Hit = 131;
+	CounterType_Knowledge = 132;
+	CounterType_PlaceholderCounterType1 = 133;
+	CounterType_PlaceholderCounterType2 = 134;
+	CounterType_PlaceholderCounterType3 = 135;
+	CounterType_PlaceholderCounterType4 = 136;
+	CounterType_PlaceholderCounterType5 = 137;
 }
 
 message CreateMatchGameRoomRequest {
@@ -1430,9 +1313,9 @@ message CreateMatchGameRoomResponseV2 {
 }
 
 message DamageAssigner {
-	repeated DamageAssignment assignments = 3;
 	uint32 instanceId = 1;
 	uint32 totalDamage = 2;
+	repeated DamageAssignment assignments = 3;
 	Prompt decisionPrompt = 4;
 	bool canIgnoreBlockers = 5;
 }
@@ -1445,10 +1328,10 @@ message DamageAssignment {
 }
 
 enum DamageRecType {
-    DamageRecType_None =  0;
-    DamageRecType_Team =  1;
-    DamageRecType_Player =  2;
-    DamageRecType_PlanesWalker =  3;
+	DamageRecType_None = 0;
+	DamageRecType_Team = 1;
+	DamageRecType_Player = 2;
+	DamageRecType_PlanesWalker = 3;
 }
 
 message DamageRecipient {
@@ -1458,11 +1341,21 @@ message DamageRecipient {
 	uint32 planeswalkerInstanceId = 4;
 }
 
-enum DamageType {
-    DamageType_None =  0;
-    DamageType_Combat =  1;
-    DamageType_Direct =  2;
-    DamageType_Fight =  3;
+message DeckConfig {
+	uint32 seatId = 1;
+	repeated CardConfig deckCards = 2;
+	repeated CardConfig sideboardCards = 3;
+	repeated CardConfig commanderCards = 4;
+	string deckFilePath = 5;
+}
+
+message DeckConstraintInfo {
+	uint32 minDeckSize = 1;
+	uint32 maxDeckSize = 2;
+	uint32 minSideboardSize = 3;
+	uint32 maxSideboardSize = 4;
+	uint32 minCommanderSize = 5;
+	uint32 maxCommanderSize = 6;
 }
 
 message DeckInfo {
@@ -1477,72 +1370,45 @@ message DeckInfo {
 message DeckMessage {
 	repeated uint32 deckCards = 1;
 	repeated uint32 sideboardCards = 2;
+	repeated uint32 commanderCards = 3;
 }
 
 message DeclareAttackersReq {
 	repeated Attacker attackers = 1;
-	repeated AttackWarning attackWarnings = 4;
-	repeated ManaRequirement manaCost = 5;
 	bool hasRequirements = 2;
 	bool hasRestrictions = 3;
+	repeated AttackWarning attackWarnings = 4;
+	repeated ManaRequirement manaCost = 5;
+	repeated Attacker autoAttackers = 6;
 }
 
 message DeclareAttackersResp {
 	repeated Attacker selectedAttackers = 1;
+	bool autoDeclare = 2;
+	DamageRecipient autoDeclareDamageRecipient = 3;
 }
 
 message DeclareBlockersReq {
 	repeated Blocker blockers = 1;
-	repeated BlockWarning blockWarnings = 4;
 	bool hasRequirements = 2;
 	bool hasRestrictions = 3;
+	repeated BlockWarning blockWarnings = 4;
 }
 
 message DeclareBlockersResp {
 	repeated Blocker selectedBlockers = 1;
 }
 
-message Decorator {
-	oneof message {
-		Loop loop = 1;
-		Inverter inverter = 2;
-	}
-}
-
 message DeleteQueueRequest {
-	string eventId = 2;
 	QueueType queueType = 1;
+	string eventId = 2;
 }
 
 message DeleteQueueResponse {
 }
 
-enum Designations {
-    Designation_Commander =  0;
-    Designation_Monarch =  1;
-    Designation_Monstrous =  2;
-    Designation_PlanarController =  3;
-    Designation_Renowned =  4;
-    Designation_CitysBlessing =  5;
-}
-
-enum DetermineOptionsState {
-    DetermineOptionsState_None =  0;
-    DetermineOptionsState_Modal =  1;
-    DetermineOptionsState_TargetLimiting =  2;
-    DetermineOptionsState_NonMana =  3;
-    DetermineOptionsState_Mana =  4;
-}
-
 message DieRollResultsResp {
 	repeated PlayerDieRoll playerDieRolls = 1;
-}
-
-enum DifficultyLevel {
-    DifficultyLevel_None =  0;
-    DifficultyLevel_Easy =  1;
-    DifficultyLevel_Moderate =  2;
-    DifficultyLevel_Hard =  3;
 }
 
 message Distribution {
@@ -1551,17 +1417,19 @@ message Distribution {
 }
 
 message DistributionReq {
-	repeated uint32 targetIds = 5;
-	repeated uint32 existingDistributionValues = 6;
 	uint32 optionIndex = 1;
 	uint32 minAmount = 2;
 	uint32 maxAmount = 3;
 	uint32 minPerTarget = 4;
+	repeated uint32 targetIds = 5;
+	repeated uint32 existingDistributionValues = 6;
+	repeated uint32 requiredDistributionValues = 7;
+	repeated uint32 validSelectedTargetIds = 8;
 }
 
 message DistributionResp {
-	repeated Distribution distributions = 2;
 	uint32 optionIndex = 1;
+	repeated Distribution distributions = 2;
 }
 
 message DraftGameRoomConfig {
@@ -1585,13 +1453,13 @@ message DropMatchmakingResponse {
 }
 
 enum DropMatchmakingResponseCode {
-    DropUnknownError =  0;
-    DropSuccess =  1;
-    DropErrorNotJoined =  2;
-    DropErrorEventNotFound =  3;
-    DropErrorCourseNotFound =  4;
-    DropServiceError =  5;
-    DropErrorUnavailable =  6;
+	DropUnknownError = 0;
+	DropSuccess = 1;
+	DropErrorNotJoined = 2;
+	DropErrorEventNotFound = 3;
+	DropErrorCourseNotFound = 4;
+	DropServiceError = 5;
+	DropErrorUnavailable = 6;
 }
 
 message DropMatchmakingResponseV2 {
@@ -1599,15 +1467,11 @@ message DropMatchmakingResponseV2 {
 }
 
 message DropQueueRequest {
-	string eventId = 2;
 	QueueType queueType = 1;
+	string eventId = 2;
 }
 
 message DropQueueResponse {
-}
-
-message DummyResponse {
-	uint32 dummy = 1;
 }
 
 message EchoRequest {
@@ -1622,66 +1486,69 @@ message EdictalMessage {
 	ClientToGREMessage edictMessage = 1;
 }
 
-message EffectViolationBlocking {
-	repeated Blocker blocker = 4;
-	uint32 affectedInstanceId = 1;
-	Prompt prompt = 2;
-	ResultCode result = 3;
-}
-
-message EndTurn {
-}
-
 enum FailureReason {
-    FailureReason_None =  0;
-    FailureReason_Expired =  1;
-    FailureReason_OutOfTurn =  2;
-    FailureReason_ReqRespMismatch =  3;
-    FailureReason_ActionNotBatchable =  4;
-    FailureReason_ActionInvalid =  5;
-    FailureReason_IncompleteMessage =  6;
-    FailureReason_IllegalOption =  7;
-    FailureReason_UnrecognizedValue =  8;
-    FailureReason_TargetsUnavailable =  9;
-    FailureReason_TargetIndexOutOfRange =  10;
-    FailureReason_TargetIllegal =  11;
-    FailureReason_UnrecognizedManaId =  12;
-    FailureReason_InvalidOptionSelection =  13;
-    FailureReason_UnexpectedMessage =  14;
-    FailureReason_LimitViolation =  15;
-    FailureReason_RestrictionViolated =  16;
-    FailureReason_RequirementViolated =  17;
-    FailureReason_UnpayableCost =  18;
-    FailureReason_InvalidSeatId =  19;
-    FailureReason_InvalidTeamId =  20;
-    FailureReason_InvalidMatchState =  21;
-    FailureReason_InvalidMatchScope =  22;
-    FailureReason_InvalidDeck =  23;
-    FailureReason_InvalidCancelState =  24;
-    FailureReason_InvalidUndoState =  25;
-    FailureReason_PermissionDenied =  26;
-    FailureReason_NoTimeout =  27;
-    FailureReason_InvalidColor =  28;
-    FailureReason_InvalidManaColor =  29;
-    FailureReason_InvalidCoinFace =  30;
-    FailureReason_InvalidCard =  31;
-    FailureReason_InvalidCardName =  32;
-    FailureReason_InvalidCardType =  33;
-    FailureReason_InvalidSubType =  34;
-    FailureReason_InvalidSuperType =  35;
-    FailureReason_InvalidCounterType =  36;
-    FailureReason_InvalidAbilityType =  37;
-    FailureReason_InvalidBasicLandType =  38;
-    FailureReason_InvalidOptionIndex =  39;
-    FailureReason_InvalidOptionContext =  40;
+	FailureReason_None = 0;
+	FailureReason_Expired = 1;
+	FailureReason_OutOfTurn = 2;
+	FailureReason_ReqRespMismatch = 3;
+	FailureReason_ActionNotBatchable = 4;
+	FailureReason_ActionInvalid = 5;
+	FailureReason_IncompleteMessage = 6;
+	FailureReason_IllegalOption = 7;
+	FailureReason_UnrecognizedValue = 8;
+	FailureReason_TargetsUnavailable = 9;
+	FailureReason_TargetIndexOutOfRange = 10;
+	FailureReason_TargetIllegal = 11;
+	FailureReason_UnrecognizedManaId = 12;
+	FailureReason_InvalidOptionSelection = 13;
+	FailureReason_UnexpectedMessage = 14;
+	FailureReason_LimitViolation = 15;
+	FailureReason_RestrictionViolated = 16;
+	FailureReason_RequirementViolated = 17;
+	FailureReason_UnpayableCost = 18;
+	FailureReason_InvalidSeatId = 19;
+	FailureReason_InvalidTeamId = 20;
+	FailureReason_InvalidMatchState = 21;
+	FailureReason_InvalidMatchScope = 22;
+	FailureReason_InvalidDeck = 23;
+	FailureReason_InvalidCancelState = 24;
+	FailureReason_InvalidUndoState = 25;
+	FailureReason_PermissionDenied = 26;
+	FailureReason_NoTimeout = 27;
+	FailureReason_InvalidColor = 28;
+	FailureReason_InvalidManaColor = 29;
+	FailureReason_InvalidCoinFace = 30;
+	FailureReason_InvalidCard = 31;
+	FailureReason_InvalidCardName = 32;
+	FailureReason_InvalidCardType = 33;
+	FailureReason_InvalidSubType = 34;
+	FailureReason_InvalidSuperType = 35;
+	FailureReason_InvalidCounterType = 36;
+	FailureReason_InvalidAbilityType = 37;
+	FailureReason_InvalidBasicLandType = 38;
+	FailureReason_InvalidOptionIndex = 39;
+	FailureReason_InvalidOptionContext = 40;
+	FailureReason_InvalidSideboard = 41;
+	FailureReason_InvalidCommander = 42;
+	FailureReason_DuplicateAttacker = 43;
+	FailureReason_UnexpectedDamageRecipient = 44;
+	FailureReason_InvalidAttacker = 45;
+	FailureReason_RedundantAttacker = 46;
+	FailureReason_InvalidBatchAttack = 47;
+	FailureReason_MissingDamageRecipient = 48;
+	FailureReason_InvalidDamageRecipient = 49;
+	FailureReason_InvalidObjective = 50;
+	FailureReason_InvalidAlternativeAttack = 51;
+	FailureReason_MissingAttackers = 52;
+	FailureReason_UnexpectedAttackers = 53;
 }
 
 message FinalMatchResult {
 	string matchId = 1;
-	repeated ResultSpec resultList = 5;
-	string errorMessage = 10;
 	ResultSpec matchForceResult = 2;
 	MatchCompletedReasonType matchCompletedReason = 3;
+	repeated ResultSpec resultList = 5;
+	string errorMessage = 10;
 }
 
 message ForceDrawReq {
@@ -1698,6 +1565,9 @@ message GRECancelScheduledMessage {
 	uint32 timerId = 1;
 }
 
+message GRECheckpointRequest {
+}
+
 message GREConfigRequest {
 	GREConfiguration greConfiguration = 1;
 }
@@ -1709,8 +1579,8 @@ message GREConfiguration {
 }
 
 message GRECreateRequest {
-	string matchID = 2;
 	uint32 greID = 1;
+	string matchID = 2;
 	uint32 gameID = 3;
 	uint32 majorVer = 4;
 	uint32 minorVer = 5;
@@ -1732,24 +1602,17 @@ message GREDestroyResponse {
 	GRETHHostErrorCode result = 2;
 }
 
+message GREElapseTimeRequest {
+	uint32 timerId = 1;
+	uint32 timeMs = 2;
+}
+
 message GREExpireTimerRequest {
 	uint32 timerId = 1;
 }
 
-message GREFatalError {
-	bytes errorMessage = 2;
-	uint32 greID = 1;
-}
-
 message GREForceResultRequest {
 	ResultSpec result = 1;
-}
-
-message GREGameLoggerConfigureRequest {
-	string loadFilename = 1;
-	string loadPath = 2;
-	string saveFilename = 3;
-	string savePath = 4;
 }
 
 message GREInterpretRequest {
@@ -1757,58 +1620,54 @@ message GREInterpretRequest {
 }
 
 enum GREMessageType {
-    GREMessageType_None = 0;
-    GREMessageType_GameStateMessage = 1;
-    GREMessageType_ActionsAvailableReq = 2;
-    GREMessageType_ChooseStartingPlayerReq = 6;
-    GREMessageType_ConnectResp = 7;
-    GREMessageType_GetSettingsResp = 9;
-    GREMessageType_SetSettingsResp = 10;
-    GREMessageType_GroupReq = 11;
-    GREMessageType_IllegalRequest = 12;
-    GREMessageType_ModalReq = 14;
-    GREMessageType_MulliganReq = 15;
-    GREMessageType_OptionReq = 16;
-    GREMessageType_OrderReq = 17;
-    GREMessageType_PromptReq = 18;
-    GREMessageType_RevealHandReq = 21;
-    GREMessageType_SelectNReq = 22;
-    GREMessageType_AllowForceDraw = 24;
-    GREMessageType_BinaryGameState = 25;
-    GREMessageType_DeclareAttackersReq = 26;
-    GREMessageType_SubmitAttackersResp = 27;
-    GREMessageType_DeclareBlockersReq = 28;
-    GREMessageType_SubmitBlockersResp = 29;
-    GREMessageType_AssignDamageReq = 30;
-    GREMessageType_AssignDamageConfirmation = 31;
-    GREMessageType_OrderCombatDamageReq = 32;
-    GREMessageType_OrderDamageConfirmation = 33;
-    GREMessageType_SelectTargetsReq = 34;
-    GREMessageType_SubmitTargetsResp = 35;
-    GREMessageType_PayCostsReq = 36;
-    GREMessageType_IntermissionReq = 37;
-    GREMessageType_DieRollResultsResp = 38;
-    GREMessageType_SelectReplacementReq = 39;
-    GREMessageType_SelectNGroupReq = 40;
-    GREMessageType_AlternativeCostReq = 41;
-    GREMessageType_DistributionReq = 42;
-    GREMessageType_NumericInputReq = 43;
-    GREMessageType_SearchReq = 44;
-    GREMessageType_OptionalActionMessage = 45;
-    GREMessageType_CastingTimeOptionsReq = 46;
-    GREMessageType_SelectManaTypeReq = 47;
-    GREMessageType_SelectFromGroupsReq = 48;
-    GREMessageType_SearchFromGroupsReq = 49;
-    GREMessageType_GatherReq = 50;
-    GREMessageType_QueuedGameStateMessage = 51;
-    GREMessageType_UIMessage = 52;
-    GREMessageType_SubmitDeckReq = 53;
-    GREMessageType_EdictalMessage = 54;
-    GREMessageType_TimeoutMessage = 55;
-}
-
-message GREReplacePlayer {
-	uint32 systemSeatId = 1;
+	GREMessageType_None = 0;
+	GREMessageType_GameStateMessage = 1;
+	GREMessageType_ActionsAvailableReq = 2;
+	GREMessageType_ChooseStartingPlayerReq = 6;
+	GREMessageType_ConnectResp = 7;
+	GREMessageType_GetSettingsResp = 9;
+	GREMessageType_SetSettingsResp = 10;
+	GREMessageType_GroupReq = 11;
+	GREMessageType_IllegalRequest = 12;
+	GREMessageType_ModalReq = 14;
+	GREMessageType_MulliganReq = 15;
+	GREMessageType_OptionReq = 16;
+	GREMessageType_OrderReq = 17;
+	GREMessageType_PromptReq = 18;
+	GREMessageType_RevealHandReq = 21;
+	GREMessageType_SelectNReq = 22;
+	GREMessageType_AllowForceDraw = 24;
+	GREMessageType_BinaryGameState = 25;
+	GREMessageType_DeclareAttackersReq = 26;
+	GREMessageType_SubmitAttackersResp = 27;
+	GREMessageType_DeclareBlockersReq = 28;
+	GREMessageType_SubmitBlockersResp = 29;
+	GREMessageType_AssignDamageReq = 30;
+	GREMessageType_AssignDamageConfirmation = 31;
+	GREMessageType_OrderCombatDamageReq = 32;
+	GREMessageType_OrderDamageConfirmation = 33;
+	GREMessageType_SelectTargetsReq = 34;
+	GREMessageType_SubmitTargetsResp = 35;
+	GREMessageType_PayCostsReq = 36;
+	GREMessageType_IntermissionReq = 37;
+	GREMessageType_DieRollResultsResp = 38;
+	GREMessageType_SelectReplacementReq = 39;
+	GREMessageType_SelectNGroupReq = 40;
+	GREMessageType_DistributionReq = 42;
+	GREMessageType_NumericInputReq = 43;
+	GREMessageType_SearchReq = 44;
+	GREMessageType_OptionalActionMessage = 45;
+	GREMessageType_CastingTimeOptionsReq = 46;
+	GREMessageType_SelectManaTypeReq = 47;
+	GREMessageType_SelectFromGroupsReq = 48;
+	GREMessageType_SearchFromGroupsReq = 49;
+	GREMessageType_GatherReq = 50;
+	GREMessageType_QueuedGameStateMessage = 51;
+	GREMessageType_UIMessage = 52;
+	GREMessageType_SubmitDeckReq = 53;
+	GREMessageType_EdictalMessage = 54;
+	GREMessageType_TimeoutMessage = 55;
+	GREMessageType_TimerStateMessage = 56;
 }
 
 message GREResumeMatchRequest {
@@ -1821,21 +1680,12 @@ message GREScheduledMessage {
 	ServerToGREMessage message = 3;
 }
 
+message GREStartDelayedTimerMessage {
+	uint32 seatId = 1;
+}
+
 message GREStartMatchRequest {
 	MatchConfig matchConfig = 1;
-}
-
-message GRESubmitDeckRequest {
-	repeated uint32 deckCards = 2;
-	repeated uint32 sideboardCards = 3;
-	uint32 systemSeatId = 1;
-}
-
-enum GRETHHostEmulatorErrorCodes {
-    GRETHHostEmulatorErrorCode_Success =  0;
-    GRETHHostEmulatorErrorCode_Timeout =  1;
-    GRETHHostEmulatorErrorCode_UnknownID =  2;
-    GRETHHostEmulatorErrorCode_IDInUse =  3;
 }
 
 message GRETHHostEmulatorLaunch {
@@ -1843,14 +1693,14 @@ message GRETHHostEmulatorLaunch {
 	string executablePath = 2;
 	string sharedLibraryFilename = 3;
 	string greIRFilename = 4;
+	uint32 linkID = 5;
+	uint32 hostID = 6;
+	uint32 sutID = 7;
 	string logFilename = 8;
 	string syslogIPAddress = 9;
 	string syslogTCPPort = 10;
 	string syslogProcID = 11;
 	string outFilename = 12;
-	uint32 linkID = 5;
-	uint32 hostID = 6;
-	uint32 sutID = 7;
 	bool enableRedaction = 13;
 }
 
@@ -1870,22 +1720,17 @@ message GRETHHostEmulatorShutdownResp {
 }
 
 enum GRETHHostErrorCode {
-    GRETHHostErrorCode_Success =  0;
-    GRETHHostErrorCode_NullPayload =  1;
-    GRETHHostErrorCode_ParseFailed =  2;
-    GRETHHostErrorCode_IncompletePayload =  3;
-    GRETHHostErrorCode_GreCreateFailed =  4;
-    GRETHHostErrorCode_GreDestroyFailed =  5;
-    GRETHHostErrorCode_AICreateFailed =  6;
-    GRETHHostErrorCode_AIDestroyFailed =  7;
-    GRETHHostErrorCode_UnrecognizedGreID =  8;
-    GRETHHostErrorCode_InvalidPointer =  9;
-    GRETHHostErrorCode_UnknownError =  10;
-}
-
-enum GRETHHostOperationMode {
-    GRETHHostOperationMode_Normal =  0;
-    GRETHHostOperationMode_Loopback =  1;
+	GRETHHostErrorCode_Success = 0;
+	GRETHHostErrorCode_NullPayload = 1;
+	GRETHHostErrorCode_ParseFailed = 2;
+	GRETHHostErrorCode_IncompletePayload = 3;
+	GRETHHostErrorCode_GreCreateFailed = 4;
+	GRETHHostErrorCode_GreDestroyFailed = 5;
+	GRETHHostErrorCode_AICreateFailed = 6;
+	GRETHHostErrorCode_AIDestroyFailed = 7;
+	GRETHHostErrorCode_UnrecognizedGreID = 8;
+	GRETHHostErrorCode_InvalidPointer = 9;
+	GRETHHostErrorCode_UnknownError = 10;
 }
 
 message GRETickMessage {
@@ -1904,10 +1749,6 @@ message GRETimerExpiredMessage {
 	}
 }
 
-message GRETimerExpiredNotification {
-	uint32 timerID = 1;
-}
-
 message GREToAnyMessage {
 	int64 timestamp = 1;
 	oneof message {
@@ -1917,8 +1758,8 @@ message GREToAnyMessage {
 }
 
 message GREToClientMessage {
-	repeated uint32 systemSeatIds = 2;
 	GREMessageType type = 1;
+	repeated uint32 systemSeatIds = 2;
 	uint32 msgId = 3;
 	uint32 gameStateId = 4;
 	GameStateMessage gameStateMessage = 5;
@@ -1930,6 +1771,7 @@ message GREToClientMessage {
 	GroupReq groupReq = 11;
 	SelectNReq selectNReq = 12;
 	ModalReq modalReq = 13;
+	MulliganReq mulliganReq = 14;
 	GetSettingsResp getSettingsResp = 16;
 	SetSettingsResp setSettingsResp = 17;
 	ConnectResp connectResp = 18;
@@ -1951,7 +1793,6 @@ message GREToClientMessage {
 	DieRollResultsResp dieRollResultsResp = 37;
 	SelectReplacementReq selectReplacementReq = 38;
 	SelectNGroupReq selectNGroupReq = 39;
-	AlternativeCostReq alternativeCostReq = 40;
 	DistributionReq distributionReq = 41;
 	NumericInputReq numericInputReq = 42;
 	SearchReq searchReq = 43;
@@ -1966,6 +1807,8 @@ message GREToClientMessage {
 	SubmitDeckReq submitDeckReq = 52;
 	EdictalMessage edictalMessage = 53;
 	TimeoutMessage timeoutMessage = 54;
+	TimerStateMessage timerStateMessage = 55;
+	bool allowUndo = 56;
 }
 
 message GREToServerMessage {
@@ -1979,20 +1822,8 @@ message GREToServerMessage {
 	}
 }
 
-enum GameFormat {
-    GameFormat_None = 0;
-    GameFormat_Block = 1;
-    GameFormat_Standard = 2;
-    GameFormat_Modern = 3;
-    GameFormat_Legacy = 4;
-    GameFormat_Vintage = 5;
-    GameFormat_Draft = 7;
-    GameFormat_Sealed = 8;
-}
-
 message GameInfo {
 	string matchID = 1;
-	repeated ResultSpec results = 13;
 	uint32 gameNumber = 3;
 	GameStage stage = 5;
 	GameType type = 6;
@@ -2002,8 +1833,11 @@ message GameInfo {
 	uint32 maxTimeoutCount = 10;
 	uint32 maxPipCount = 11;
 	uint32 timeoutDurationSec = 12;
+	repeated ResultSpec results = 13;
 	SuperFormat superFormat = 14;
 	MulliganType mulliganType = 15;
+	uint32 freeMulliganCount = 16;
+	DeckConstraintInfo deckConstraintInfo = 17;
 }
 
 message GameMetrics {
@@ -2011,12 +1845,6 @@ message GameMetrics {
 }
 
 message GameObjectInfo {
-	repeated SuperType superTypes = 9;
-	repeated CardType cardTypes = 10;
-	repeated SubType subtypes = 11;
-	repeated CardColor color = 12;
-	repeated uint32 viewers = 26;
-	repeated uint32 abilities = 30;
 	uint32 instanceId = 1;
 	uint32 grpId = 2;
 	int32 groupId = 3;
@@ -2025,6 +1853,10 @@ message GameObjectInfo {
 	Visibility visibility = 6;
 	uint32 ownerSeatId = 7;
 	uint32 controllerSeatId = 8;
+	repeated SuperType superTypes = 9;
+	repeated CardType cardTypes = 10;
+	repeated SubType subtypes = 11;
+	repeated CardColor color = 12;
 	Int32Value power = 13;
 	Int32Value toughness = 14;
 	bool isCopy = 16;
@@ -2035,54 +1867,61 @@ message GameObjectInfo {
 	uint32 damage = 23;
 	AttackInfo attackInfo = 24;
 	BlockInfo blockInfo = 25;
+	repeated uint32 viewers = 26;
 	UInt32Value loyalty = 27;
 	uint32 objectSourceGrpId = 28;
 	uint32 name = 29;
+	repeated uint32 abilities = 30;
 	uint32 parentId = 31;
 	uint32 overlayGrpId = 32;
+	bool isFacedown = 33;
+	string skinCode = 34;
+	UInt32Value loyaltyUsed = 35;
 }
 
 enum GameObjectType {
-    GameObjectType_None =  0;
-    GameObjectType_Card =  1;
-    GameObjectType_Token =  2;
-    GameObjectType_Ability =  3;
-    GameObjectType_Emblem =  4;
-    GameObjectType_SplitCard =  5;
-    GameObjectType_SplitLeft =  6;
-    GameObjectType_SplitRight =  7;
-    GameObjectType_RevealedCard =  8;
+	GameObjectType_None = 0;
+	GameObjectType_Card = 1;
+	GameObjectType_Token = 2;
+	GameObjectType_Ability = 3;
+	GameObjectType_Emblem = 4;
+	GameObjectType_SplitCard = 5;
+	GameObjectType_SplitLeft = 6;
+	GameObjectType_SplitRight = 7;
+	GameObjectType_RevealedCard = 8;
+	GameObjectType_TriggerHolder = 9;
+	GameObjectType_Adventure = 10;
 }
 
 enum GameRoomType {
-    GameRoomType_Invalid =  0;
-    GameRoomType_Match =  1;
-    GameRoomType_Draft =  2;
+	GameRoomType_Invalid = 0;
+	GameRoomType_Match = 1;
+	GameRoomType_Draft = 2;
 }
 
 enum GameStage {
-    GameStage_None =  0;
-    GameStage_Start =  1;
-    GameStage_Play =  2;
-    GameStage_GameOver =  3;
+	GameStage_None = 0;
+	GameStage_Start = 1;
+	GameStage_Play = 2;
+	GameStage_GameOver = 3;
 }
 
 message GameStateMessage {
+	GameStateType type = 1;
+	uint32 gameStateId = 2;
+	GameInfo gameInfo = 3;
 	repeated TeamInfo teams = 4;
 	repeated PlayerInfo players = 5;
+	TurnInfo turnInfo = 6;
 	repeated ZoneInfo zones = 7;
 	repeated GameObjectInfo gameObjects = 8;
 	repeated AnnotationInfo annotations = 9;
 	repeated uint32 diffDeletedInstanceIds = 10;
-	repeated TimerInfo timers = 13;
-	repeated ActionInfo actions = 15;
-	GameStateType type = 1;
-	uint32 gameStateId = 2;
-	GameInfo gameInfo = 3;
-	TurnInfo turnInfo = 6;
 	uint32 pendingMessageCount = 11;
 	uint32 prevGameStateId = 12;
+	repeated TimerInfo timers = 13;
 	GameStateUpdate update = 14;
+	repeated ActionInfo actions = 15;
 }
 
 message GameStateRedactorConfiguration {
@@ -2091,48 +1930,49 @@ message GameStateRedactorConfiguration {
 }
 
 enum GameStateType {
-    GameStateType_None =  0;
-    GameStateType_Full =  1;
-    GameStateType_Diff =  2;
-    GameStateType_Binary =  3;
+	GameStateType_None = 0;
+	GameStateType_Full = 1;
+	GameStateType_Diff = 2;
+	GameStateType_Binary = 3;
 }
 
 enum GameStateUpdate {
-    GameStateUpdate_None =  0;
-    GameStateUpdate_Send =  1;
-    GameStateUpdate_SendAndRecord =  2;
-    GameStateUpdate_SendHiFi =  3;
-    GameStateUpdate_Undo =  4;
-    GameStateUpdate_Restore =  5;
+	GameStateUpdate_None = 0;
+	GameStateUpdate_Send = 1;
+	GameStateUpdate_SendAndRecord = 2;
+	GameStateUpdate_SendHiFi = 3;
+	GameStateUpdate_Undo = 4;
+	GameStateUpdate_Restore = 5;
 }
 
 enum GameType {
-    GameType_None =  0;
-    GameType_Duel =  1;
-    GameType_MultiPlayer =  2;
-    GameType_Solitaire =  3;
+	GameType_None = 0;
+	GameType_Duel = 1;
+	GameType_MultiPlayer = 2;
+	GameType_Solitaire = 3;
 }
 
 enum GameVariant {
-    GameVariant_None =  0;
-    GameVariant_Normal =  1;
-    GameVariant_Planechase =  2;
-    GameVariant_Vanguard =  3;
-    GameVariant_Commander =  4;
-    GameVariant_Archenemy =  5;
-    GameVariant_TeamVsTeam =  6;
-    GameVariant_TwoHeadedGiant =  7;
+	GameVariant_None = 0;
+	GameVariant_Normal = 1;
+	GameVariant_Planechase = 2;
+	GameVariant_Vanguard = 3;
+	GameVariant_Commander = 4;
+	GameVariant_Archenemy = 5;
+	GameVariant_TeamVsTeam = 6;
+	GameVariant_TwoHeadedGiant = 7;
+	GameVariant_Brawl = 8;
 }
 
 message GatherReq {
-	repeated GatherSource sources = 3;
 	uint32 optionIndex = 1;
 	uint32 destinationId = 2;
+	repeated GatherSource sources = 3;
 }
 
 message GatherResp {
-	repeated Gathering gatherings = 2;
 	uint32 optionIndex = 1;
+	repeated Gathering gatherings = 2;
 }
 
 message GatherSource {
@@ -2146,15 +1986,10 @@ message Gathering {
 	uint32 amount = 2;
 }
 
-message GeneralConfiguration {
-	GRETHHostOperationMode operationMode = 1;
-	uint32 maxLogLevel = 2;
-}
-
 message GetGameRoomIdsRequest {
 	string eventId = 1;
-	repeated MatchGameRoomStateType gameRoomStateTypeFilter = 5;
 	GameRoomType gameRoomType = 2;
+	repeated MatchGameRoomStateType gameRoomStateTypeFilter = 5;
 	bool includeInvisibleRooms = 7;
 	bool includeReservedRooms = 8;
 	SortFilterPagingOptions sortFilterPagingOptions = 10;
@@ -2208,6 +2043,7 @@ message Group {
 	SubZoneType subZoneType = 4;
 	int32 minSelect = 5;
 	int32 maxSelect = 6;
+	bool isFacedown = 7;
 }
 
 message GroupReq {
@@ -2231,52 +2067,33 @@ message GroupSpecification {
 	ZoneType zoneType = 3;
 	SubZoneType subZoneType = 4;
 	Prompt prompt = 5;
+	bool isFacedown = 6;
 }
 
 enum GroupType {
-    GroupType_None =  0;
-    GroupType_Ordered =  1;
-    GroupType_Arbitrary =  2;
+	GroupType_None = 0;
+	GroupType_Ordered = 1;
+	GroupType_Arbitrary = 2;
 }
 
 enum Grouping {
-    Grouping_None =  0;
-    Grouping_Single =  1;
-    Grouping_Batchable =  2;
+	Grouping_None = 0;
+	Grouping_Single = 1;
+	Grouping_Batchable = 2;
 }
 
 enum GroupingContext {
-    GroupingContext_None =  0;
-    GroupingContext_Scry =  1;
-    GroupingContext_Surveil =  2;
+	GroupingContext_None = 0;
+	GroupingContext_Scry = 1;
+	GroupingContext_Surveil = 2;
+	GroupingContext_LondonMulligan = 3;
 }
 
 enum GroupingStyle {
-    GroupingStyle_None =  0;
-    GroupingStyle_SingleGroup =  1;
-    GroupingStyle_AllGroups =  2;
-    GroupingStyle_Mixed =  3;
-}
-
-enum HeuristicPriority {
-    HeuristicPriority_None = 0;
-    HeuristicPriority_TargetCreature = 10;
-    HeuristicPriority_TargetPlaneswalker = 11;
-    HeuristicPriority_TargetPlayer = 12;
-    HeuristicPriority_ObjectScore = 13;
-}
-
-enum HighlightType {
-    HighlightType_None =  0;
-    HighlightType_Cold =  1;
-    HighlightType_Tepid =  2;
-    HighlightType_Hot =  3;
-}
-
-enum IRFormat {
-    IRFormat_None =  0;
-    IRFormat_SuperTypes =  1;
-    IRFormat_SideboardCards =  2;
+	GroupingStyle_None = 0;
+	GroupingStyle_SingleGroup = 1;
+	GroupingStyle_AllGroups = 2;
+	GroupingStyle_Mixed = 3;
 }
 
 message IRLoaderConfiguration {
@@ -2284,9 +2101,9 @@ message IRLoaderConfiguration {
 }
 
 enum IdType {
-    IdType_None =  0;
-    IdType_InstanceId =  1;
-    IdType_PromptParameterIndex =  2;
+	IdType_None = 0;
+	IdType_InstanceId = 1;
+	IdType_PromptParameterIndex = 2;
 }
 
 message IllegalRequestMessage {
@@ -2306,42 +2123,10 @@ message IntermissionReq {
 	ResultSpec result = 5;
 }
 
-message InvalidAttacker {
-	ResultCode result = 1;
-	Attacker attack = 2;
-	Prompt decisionPrompt = 3;
-}
-
-message InvalidBlocker {
-	ResultCode result = 1;
-	Blocker block = 2;
-	Prompt decisionPrompt = 3;
-}
-
-message InvalidCombatDamageOrderAssignment {
-	ResultCode result = 1;
-	CombatDamageOrderAssignment order = 2;
-}
-
-message InvalidDamageAssignment {
-	ResultCode result = 1;
-	DamageAssigner assignment = 2;
-}
-
-message InvalidTargetSelection {
-	TargetSelection target = 1;
-	ResultCode result = 2;
-	Prompt decisionPrompt = 3;
-}
-
-message Inverter {
-	Node child = 1;
-}
-
 message JoinConstructedMatchmakingRequest {
-	string deckId = 3;
 	ConstructedMatchType matchType = 1;
 	int32 numberOfGames = 2;
+	string deckId = 3;
 }
 
 message JoinMatchGameRoomRequest {
@@ -2367,15 +2152,15 @@ message JoinMatchmakingResponse {
 }
 
 enum JoinMatchmakingResponseCode {
-    JoinUnknownError =  0;
-    JoinSuccess =  1;
-    JoinErrorAlreadyJoined =  2;
-    JoinErrorEventNotFound =  3;
-    JoinErrorCourseNotFound =  4;
-    JoinServiceError =  5;
-    JoinErrorUnavailable =  6;
-    JoinErrorNoValidDeck =  7;
-    JoinErrorCourseNotActive =  8;
+	JoinUnknownError = 0;
+	JoinSuccess = 1;
+	JoinErrorAlreadyJoined = 2;
+	JoinErrorEventNotFound = 3;
+	JoinErrorCourseNotFound = 4;
+	JoinServiceError = 5;
+	JoinErrorUnavailable = 6;
+	JoinErrorNoValidDeck = 7;
+	JoinErrorCourseNotActive = 8;
 }
 
 message JoinMatchmakingResponseV2 {
@@ -2383,11 +2168,11 @@ message JoinMatchmakingResponseV2 {
 }
 
 message JoinQueueRequest {
+	QueueType queueType = 1;
 	string eventId = 2;
 	string deckId = 3;
-	string courseId = 5;
 	string matchmakingFilter = 4;
-	QueueType queueType = 1;
+	string courseId = 5;
 }
 
 message JoinQueueResponse {
@@ -2396,6 +2181,7 @@ message JoinQueueResponse {
 
 message KeyValuePairInfo {
 	string key = 1;
+	KeyValuePairValueType type = 2;
 	repeated uint32 valueUint32 = 3;
 	repeated int32 valueInt32 = 4;
 	repeated uint64 valueUint64 = 5;
@@ -2404,40 +2190,18 @@ message KeyValuePairInfo {
 	repeated string valueString = 8;
 	repeated float valueFloat = 9;
 	repeated double valueDouble = 10;
-	KeyValuePairValueType type = 2;
 }
 
 enum KeyValuePairValueType {
-    KeyValuePairValueType_None =  0;
-    KeyValuePairValueType_uint32 =  1;
-    KeyValuePairValueType_int32 =  2;
-    KeyValuePairValueType_uint64 =  3;
-    KeyValuePairValueType_int64 =  4;
-    KeyValuePairValueType_bool =  5;
-    KeyValuePairValueType_string =  6;
-    KeyValuePairValueType_float =  7;
-    KeyValuePairValueType_double =  8;
-}
-
-enum LinkType {
-    LinkType_None =  0;
-    LinkType_Exile =  1;
-    LinkType_Sacrifice =  2;
-    LinkType_Choose =  3;
-    LinkType_Haunt =  4;
-    LinkType_Reveal =  5;
-    LinkType_Kicker =  6;
-    LinkType_Target =  7;
-}
-
-enum LinkedFace {
-    LinkedFace_None =  0;
-    LinkedFace_DFC_Front =  1;
-    LinkedFace_DFC_Back =  2;
-    LinkedFace_MeldCard =  3;
-    LinkedFace_MeldedPermanent =  4;
-    LinkedFace_SplitCard =  5;
-    LinkedFace_SplitHalf =  6;
+	KeyValuePairValueType_None = 0;
+	KeyValuePairValueType_uint32 = 1;
+	KeyValuePairValueType_int32 = 2;
+	KeyValuePairValueType_uint64 = 3;
+	KeyValuePairValueType_int64 = 4;
+	KeyValuePairValueType_bool = 5;
+	KeyValuePairValueType_string = 6;
+	KeyValuePairValueType_float = 7;
+	KeyValuePairValueType_double = 8;
 }
 
 message LobbyDraftInfo {
@@ -2449,33 +2213,33 @@ message LobbyDraftInfo {
 }
 
 message LobbyError {
-	string errorMessage = 3;
 	LobbyErrorCode lobbyErrorCode = 2;
+	string errorMessage = 3;
 }
 
 enum LobbyErrorCode {
-    LobbyErrorCode_Invalid = 0;
-    LobbyErrorCode_Success = 1;
-    LobbyErrorCode_ProtobufParseError = 11;
-    LobbyErrorCode_InvalidMessageType = 12;
-    LobbyErrorCode_InvalidMessageField = 13;
-    LobbyErrorCode_BufferOverflow = 14;
-    LobbyErrorCode_Unauthorized = 20;
-    LobbyErrorCode_Forbidden = 21;
-    LobbyErrorCode_OperationCanceled = 30;
-    LobbyErrorCode_RequestTimeout = 31;
-    LobbyErrorCode_InvalidOperation = 32;
-    LobbyErrorCode_NotFound = 40;
-    LobbyErrorCode_UserNotFound = 41;
-    LobbyErrorCode_QueueNotFound = 42;
-    LobbyErrorCode_DeckNotFound = 43;
-    LobbyErrorCode_EventNotFound = 44;
-    LobbyErrorCode_AlreadyInQueue = 50;
-    LobbyErrorCode_AlreadyInMatch = 51;
-    LobbyErrorCode_DraftStartError = 60;
-    LobbyErrorCode_InternalServerError = 500;
-    LobbyErrorCode_NotImplemented = 501;
-    LobbyErrorCode_ServiceUnavailable = 503;
+	LobbyErrorCode_Invalid = 0;
+	LobbyErrorCode_Success = 1;
+	LobbyErrorCode_ProtobufParseError = 11;
+	LobbyErrorCode_InvalidMessageType = 12;
+	LobbyErrorCode_InvalidMessageField = 13;
+	LobbyErrorCode_BufferOverflow = 14;
+	LobbyErrorCode_Unauthorized = 20;
+	LobbyErrorCode_Forbidden = 21;
+	LobbyErrorCode_OperationCanceled = 30;
+	LobbyErrorCode_RequestTimeout = 31;
+	LobbyErrorCode_InvalidOperation = 32;
+	LobbyErrorCode_NotFound = 40;
+	LobbyErrorCode_UserNotFound = 41;
+	LobbyErrorCode_QueueNotFound = 42;
+	LobbyErrorCode_DeckNotFound = 43;
+	LobbyErrorCode_EventNotFound = 44;
+	LobbyErrorCode_AlreadyInQueue = 50;
+	LobbyErrorCode_AlreadyInMatch = 51;
+	LobbyErrorCode_DraftStartError = 60;
+	LobbyErrorCode_InternalServerError = 500;
+	LobbyErrorCode_NotImplemented = 501;
+	LobbyErrorCode_ServiceUnavailable = 503;
 }
 
 message LobbyMatchCompletedEvent {
@@ -2516,8 +2280,8 @@ message LobbyMatchPlayerInfo {
 }
 
 message LobbyServiceInfo {
-	string environmentId = 2;
 	ServiceFabricServiceInfo serviceFabricServiceInfo = 1;
+	string environmentId = 2;
 }
 
 message LobbyToClientMessage {
@@ -2565,75 +2329,65 @@ message LobbyUserQueueInfo {
 }
 
 enum LobbyUserStateType {
-    LobbyUserStateType_Invalid = 0;
-    LobbyUserStateType_Idle = 1;
-    LobbyUserStateType_JoiningQueue = 2;
-    LobbyUserStateType_JoinedQueue = 3;
-    LobbyUserStateType_DroppingQueue = 4;
-    LobbyUserStateType_Matchmade = 10;
-    LobbyUserStateType_InDraft = 15;
-    LobbyUserStateType_CreatingMatch = 20;
-    LobbyUserStateType_PlayingMatch = 21;
-}
-
-message Loop {
-	Node child = 1;
-}
-
-message LoopbackRequest {
-	string contents = 1;
-}
-
-message LoopbackResponse {
-	string contents = 1;
-	GRETHHostErrorCode result = 2;
+	LobbyUserStateType_Invalid = 0;
+	LobbyUserStateType_Idle = 1;
+	LobbyUserStateType_JoiningQueue = 2;
+	LobbyUserStateType_JoinedQueue = 3;
+	LobbyUserStateType_DroppingQueue = 4;
+	LobbyUserStateType_Matchmade = 10;
+	LobbyUserStateType_InDraft = 15;
+	LobbyUserStateType_CreatingMatch = 20;
+	LobbyUserStateType_PlayingMatch = 21;
 }
 
 enum ManaColor {
-    ManaColor_None =  0;
-    ManaColor_White =  1;
-    ManaColor_Blue =  2;
-    ManaColor_Black =  3;
-    ManaColor_Red =  4;
-    ManaColor_Green =  5;
-    ManaColor_Phyrexian =  6;
-    ManaColor_Generic =  7;
-    ManaColor_X =  8;
-    ManaColor_Y =  9;
-    ManaColor_TwoGeneric =  10;
-    ManaColor_AnyColor =  11;
-    ManaColor_Colorless =  12;
+	ManaColor_None = 0;
+	ManaColor_White = 1;
+	ManaColor_Blue = 2;
+	ManaColor_Black = 3;
+	ManaColor_Red = 4;
+	ManaColor_Green = 5;
+	ManaColor_Phyrexian = 6;
+	ManaColor_Generic = 7;
+	ManaColor_X = 8;
+	ManaColor_Y = 9;
+	ManaColor_TwoGeneric = 10;
+	ManaColor_AnyColor = 11;
+	ManaColor_Colorless = 12;
 }
 
 message ManaInfo {
-	repeated ManaInfoTypesSpec specs = 4;
+	message Spec {
+		ManaSpecType type = 1;
+	}
+
 	uint32 manaId = 1;
 	ManaColor color = 2;
 	uint32 srcInstanceId = 3;
+	repeated Spec specs = 4;
 	uint32 abilityGrpId = 5;
 }
 
-message ManaInfoTypesSpec {
-	ManaSpecType type = 1;
-}
-
-message ManaPayment {
-	ManaColor color = 1;
-	uint32 count = 2;
+message ManaPaymentCondition {
+	repeated ManaColor colors = 1;
+	repeated ManaSpecType specs = 2;
+	uint32 abilityGrpId = 3;
 }
 
 message ManaPaymentOption {
-	repeated ManaPayment payments = 1;
 	repeated ManaInfo mana = 2;
 	uint32 maxActivations = 3;
 	uint32 optionIndex = 4;
+	bool haveReplacementsBeenApplied = 5;
+	bool haveTriggersBeenApplied = 6;
+	bool isUnpredictable = 7;
 }
 
 enum ManaPaymentStrategyType {
-    ManaPaymentStrategyType_None =  0;
-    ManaPaymentStrategyType_Auto =  1;
-    ManaPaymentStrategyType_Manual =  2;
-    ManaPaymentStrategyType_Legacy =  3;
+	ManaPaymentStrategyType_None = 0;
+	ManaPaymentStrategyType_Auto = 1;
+	ManaPaymentStrategyType_Manual = 2;
+	ManaPaymentStrategyType_Legacy = 3;
 }
 
 message ManaRequirement {
@@ -2645,54 +2399,52 @@ message ManaRequirement {
 }
 
 enum ManaSelectionType {
-    ManaSelectionType_None =  0;
-    ManaSelectionType_Auto =  1;
-    ManaSelectionType_Manual =  2;
+	ManaSelectionType_None = 0;
+	ManaSelectionType_Auto = 1;
+	ManaSelectionType_Manual = 2;
 }
 
 enum ManaSpecType {
-    ManaSpecType_None =  0;
-    ManaSpecType_FromBasic =  1;
-    ManaSpecType_Predictive =  2;
-    ManaSpecType_Restricted =  3;
-    ManaSpecType_Trigger =  4;
-    ManaSpecType_FromCreature =  5;
-    ManaSpecType_FromSnow =  6;
-    ManaSpecType_DoesNotEmpty =  7;
-    ManaSpecType_AdditionalEffect =  8;
+	ManaSpecType_None = 0;
+	ManaSpecType_FromBasic = 1;
+	ManaSpecType_Predictive = 2;
+	ManaSpecType_Restricted = 3;
+	ManaSpecType_Trigger = 4;
+	ManaSpecType_FromCreature = 5;
+	ManaSpecType_FromSnow = 6;
+	ManaSpecType_DoesNotEmpty = 7;
+	ManaSpecType_AdditionalEffect = 8;
 }
 
 enum MatchCompletedReasonType {
-    MatchCompletedReasonType_Invalid = 0;
-    MatchCompletedReasonType_Success = 1;
-    MatchCompletedReasonType_ForceResultRequest = 2;
-    MatchCompletedReasonType_Canceled = 3;
-    MatchCompletedReasonType_PlayerJoinTimeout = 10;
-    MatchCompletedReasonType_PlayerInactivityTimeout = 11;
-    MatchCompletedReasonType_PlayerDisconnectTimeout = 12;
-    MatchCompletedReasonType_SystemShutdown = 30;
-    MatchCompletedReasonType_GreError = 31;
-    MatchCompletedReasonType_ServiceFabricError = 33;
-    MatchCompletedReasonType_CodeContractError = 34;
-    MatchCompletedReasonType_UnknownServerError = 40;
+	MatchCompletedReasonType_Invalid = 0;
+	MatchCompletedReasonType_Success = 1;
+	MatchCompletedReasonType_ForceResultRequest = 2;
+	MatchCompletedReasonType_Canceled = 3;
+	MatchCompletedReasonType_PlayerJoinTimeout = 10;
+	MatchCompletedReasonType_PlayerInactivityTimeout = 11;
+	MatchCompletedReasonType_PlayerDisconnectTimeout = 12;
+	MatchCompletedReasonType_SystemShutdown = 30;
+	MatchCompletedReasonType_GreError = 31;
+	MatchCompletedReasonType_ServiceFabricError = 33;
+	MatchCompletedReasonType_CodeContractError = 34;
+	MatchCompletedReasonType_UnknownServerError = 40;
 }
 
 message MatchConfig {
-	repeated TeamConfig teams = 6;
-	repeated TimerConfig timerConfigs = 11;
-	repeated CosmeticConfig cosmeticConfigs = 14;
 	GameType gameType = 1;
 	GameVariant gameVariant = 2;
 	MatchWinCondition winCondition = 3;
-	uint32 matchOptionBitmask = 4;
 	uint32 maxPlayerHandSize = 5;
-	uint32 matchTimeLimitSec = 7;
-	uint32 inactivityTimeLimitSec = 8;
+	repeated TeamConfig teams = 6;
 	TestConfig testConfig = 9;
 	MulliganType mulliganType = 10;
+	repeated TimerConfig timerConfigs = 11;
 	TimerPackage timerPackage = 12;
 	TimeoutConfig timeoutConfig = 13;
+	repeated CosmeticConfig cosmeticConfigs = 14;
 	SuperFormat superFormat = 15;
+	DeckConstraintInfo deckConstraintInfo = 16;
 }
 
 message MatchControllerClientSessionSettings {
@@ -2700,10 +2452,10 @@ message MatchControllerClientSessionSettings {
 }
 
 enum MatchControllerEventType {
-    MatchControllerEventType_Invalid =  0;
-    MatchControllerEventType_MatchGameRoomStateChanged =  1;
-    MatchControllerEventType_MatchControllerStateChanged =  2;
-    MatchControllerEventType_MatchControllerHealthReport =  3;
+	MatchControllerEventType_Invalid = 0;
+	MatchControllerEventType_MatchGameRoomStateChanged = 1;
+	MatchControllerEventType_MatchControllerStateChanged = 2;
+	MatchControllerEventType_MatchControllerHealthReport = 3;
 }
 
 message MatchControllerGetSettingsRequest {
@@ -2721,8 +2473,8 @@ message MatchControllerHealthReport {
 }
 
 message MatchControllerServiceInfo {
-	string environmentId = 2;
 	ServiceFabricServiceInfo serviceFabricServiceInfo = 1;
+	string environmentId = 2;
 	MatchControllerState matchControllerState = 3;
 }
 
@@ -2743,13 +2495,13 @@ message MatchControllerSettings {
 }
 
 enum MatchControllerState {
-    MatchControllerState_Invalid = 0;
-    MatchControllerState_Opening = 1;
-    MatchControllerState_Running = 2;
-    MatchControllerState_Recovering = 3;
-    MatchControllerState_Draining = 4;
-    MatchControllerState_Closing = 20;
-    MatchControllerState_Closed = 21;
+	MatchControllerState_Invalid = 0;
+	MatchControllerState_Opening = 1;
+	MatchControllerState_Running = 2;
+	MatchControllerState_Recovering = 3;
+	MatchControllerState_Draining = 4;
+	MatchControllerState_Closing = 20;
+	MatchControllerState_Closed = 21;
 }
 
 message MatchControllerStateChangedEvent {
@@ -2762,32 +2514,32 @@ message MatchGameRoomConfig {
 	string eventId = 2;
 	repeated MatchGameRoomPlayerInfo reservedPlayers = 8;
 	string matchId = 11;
+	MatchConfig matchConfig = 12;
+	GREConfiguration greConfig = 13;
+	bool isVisible = 20;
 	string password = 21;
 	string greIrBinPath = 30;
 	string greHostLoggerLevel = 31;
 	string greRecorderConfig = 32;
-	MatchConfig matchConfig = 12;
-	GREConfiguration greConfig = 13;
-	bool isVisible = 20;
 	int32 joinRoomTimeoutSecs = 35;
 	int32 playerDisconnectTimeoutSecs = 36;
 }
 
 message MatchGameRoomInfo {
 	string gameRoomId = 1;
+	MatchGameRoomConfig gameRoomConfig = 2;
+	MatchGameRoomStateType stateType = 3;
+	FinalMatchResult finalMatchResult = 4;
 	repeated ResultSpec interimMatchResultList = 5;
 	repeated MatchGameRoomPlayerInfo players = 6;
 	repeated MatchPlayerMetrics playerMetrics = 7;
 	string matchControllerUri = 8;
 	string matchClusterUri = 9;
-	string creatorId = 21;
-	MatchGameRoomConfig gameRoomConfig = 2;
-	MatchGameRoomStateType stateType = 3;
-	FinalMatchResult finalMatchResult = 4;
 	int64 createdTimestamp = 10;
 	int64 updatedTimestamp = 11;
 	int64 matchResultSavedTimestamp = 12;
 	ClientType creatorClientType = 20;
+	string creatorId = 21;
 }
 
 message MatchGameRoomOpponentConnectionStateChangedEvent {
@@ -2800,12 +2552,12 @@ message MatchGameRoomOpponentConnectionStateChangedEvent {
 message MatchGameRoomPlayerInfo {
 	string userId = 1;
 	string playerName = 2;
-	string courseId = 10;
-	string deckId = 11;
-	string clientAuthToken = 12;
 	int32 systemSeatId = 3;
 	int32 teamId = 4;
 	UserConnectionInfo connectionInfo = 5;
+	string courseId = 10;
+	string deckId = 11;
+	string clientAuthToken = 12;
 	int64 joinTimestamp = 20;
 	int64 inactivityTimeoutTimestamp = 21;
 	int64 disconnectTimeoutTimestamp = 22;
@@ -2817,15 +2569,15 @@ message MatchGameRoomStateChangedEvent {
 }
 
 enum MatchGameRoomStateType {
-    MatchGameRoomStateType_Invalid = 0;
-    MatchGameRoomStateType_WaitingForPlayersToJoin = 1;
-    MatchGameRoomStateType_StartPending = 2;
-    MatchGameRoomStateType_WaitingForGreConnections = 3;
-    MatchGameRoomStateType_Playing = 5;
-    MatchGameRoomStateType_MatchCompleted = 15;
-    MatchGameRoomStateType_MatchResultsProcessed = 20;
-    MatchGameRoomStateType_GameRoomClosing = 21;
-    MatchGameRoomStateType_GameRoomClosed = 22;
+	MatchGameRoomStateType_Invalid = 0;
+	MatchGameRoomStateType_WaitingForPlayersToJoin = 1;
+	MatchGameRoomStateType_StartPending = 2;
+	MatchGameRoomStateType_WaitingForGreConnections = 3;
+	MatchGameRoomStateType_Playing = 5;
+	MatchGameRoomStateType_MatchCompleted = 15;
+	MatchGameRoomStateType_MatchResultsProcessed = 20;
+	MatchGameRoomStateType_GameRoomClosing = 21;
+	MatchGameRoomStateType_GameRoomClosed = 22;
 }
 
 message MatchPlayerMetrics {
@@ -2839,35 +2591,35 @@ message MatchResultSaved {
 }
 
 enum MatchScope {
-    MatchScope_None =  0;
-    MatchScope_Game =  1;
-    MatchScope_Match =  2;
+	MatchScope_None = 0;
+	MatchScope_Game = 1;
+	MatchScope_Match = 2;
 }
 
 message MatchServiceError {
-	string errorMessage = 3;
 	MatchServiceErrorCode errorCode = 2;
+	string errorMessage = 3;
 }
 
 enum MatchServiceErrorCode {
-    MatchServiceErrorCode_Invalid = 0;
-    MatchServiceErrorCode_Success = 1;
-    MatchServiceErrorCode_GreError = 100;
-    MatchServiceErrorCode_OperationCanceled = 101;
-    MatchServiceErrorCode_InvalidUser = 102;
-    MatchServiceErrorCode_InvalidState = 103;
-    MatchServiceErrorCode_CreateRoomFailed = 104;
-    MatchServiceErrorCode_AuthRequired = 105;
-    MatchServiceErrorCode_NotFound = 106;
-    MatchServiceErrorCode_ServiceFabricTransactionError = 107;
-    MatchServiceErrorCode_BadRequest = 108;
-    MatchServiceErrorCode_GameRoomFull = 110;
-    MatchServiceErrorCode_NotAuthorized = 111;
-    MatchServiceErrorCode_BufferOverflow = 112;
-    MatchServiceErrorCode_ImmutableProperty = 113;
-    MatchServiceErrorCode_ServerBusy = 114;
-    MatchServiceErrorCode_RequestQueueOverflow = 115;
-    MatchServiceErrorCode_UnknownServerError = 500;
+	MatchServiceErrorCode_Invalid = 0;
+	MatchServiceErrorCode_Success = 1;
+	MatchServiceErrorCode_GreError = 100;
+	MatchServiceErrorCode_OperationCanceled = 101;
+	MatchServiceErrorCode_InvalidUser = 102;
+	MatchServiceErrorCode_InvalidState = 103;
+	MatchServiceErrorCode_CreateRoomFailed = 104;
+	MatchServiceErrorCode_AuthRequired = 105;
+	MatchServiceErrorCode_NotFound = 106;
+	MatchServiceErrorCode_ServiceFabricTransactionError = 107;
+	MatchServiceErrorCode_BadRequest = 108;
+	MatchServiceErrorCode_GameRoomFull = 110;
+	MatchServiceErrorCode_NotAuthorized = 111;
+	MatchServiceErrorCode_BufferOverflow = 112;
+	MatchServiceErrorCode_ImmutableProperty = 113;
+	MatchServiceErrorCode_ServerBusy = 114;
+	MatchServiceErrorCode_RequestQueueOverflow = 115;
+	MatchServiceErrorCode_UnknownServerError = 500;
 }
 
 message MatchServiceToClientMessage {
@@ -2875,14 +2627,14 @@ message MatchServiceToClientMessage {
 	int32 requestId = 3;
 	int64 timestamp = 4;
 	oneof message {
-		LobbyError error = 7;
+		MatchServiceError error = 7;
 		GreToClientEvent greToClientEvent = 8;
 		MatchGameRoomStateChangedEvent matchGameRoomStateChangedEvent = 9;
 		MatchControllerStateChangedEvent matchControllerStateChangedEvent = 10;
 		MatchControllerHealthReport matchControllerHealthReport = 11;
 		MatchGameRoomOpponentConnectionStateChangedEvent opponentConnectionStateChangedEvent = 12;
 		AuthenticateResponse authenticateResponse = 100;
-		LobbyServiceInfo serviceInfoResponse = 101;
+		MatchControllerServiceInfo serviceInfoResponse = 101;
 		MatchControllerGetSettingsResponse getSettingsResponse = 110;
 		MatchControllerSetSettingsResponse setSettingsResponse = 111;
 		CreateMatchGameRoomResponse createMatchGameRoomResponse = 200;
@@ -2896,60 +2648,36 @@ message MatchServiceToClientMessage {
 }
 
 enum MatchState {
-    MatchState_None =  0;
-    MatchState_GameInProgress =  1;
-    MatchState_GameComplete =  2;
-    MatchState_MatchComplete =  3;
-    MatchState_Sideboarding =  4;
+	MatchState_None = 0;
+	MatchState_GameInProgress = 1;
+	MatchState_GameComplete = 2;
+	MatchState_MatchComplete = 3;
+	MatchState_Sideboarding = 4;
 }
 
 enum MatchWinCondition {
-    MatchWinCondition_None =  0;
-    MatchWinCondition_SingleElimination =  1;
-    MatchWinCondition_Best2of3 =  2;
-    MatchWinCondition_Best3of5 =  3;
-}
-
-enum MayCast {
-    MayCast_InstantsOnly =  0;
-    MayCast_AnySpell =  1;
-}
-
-enum MayPlay {
-    MayPlay_Spells =  0;
-    MayPlay_SpellsAndLands =  1;
+	MatchWinCondition_None = 0;
+	MatchWinCondition_SingleElimination = 1;
+	MatchWinCondition_Best2of3 = 2;
+	MatchWinCondition_Best3of5 = 3;
 }
 
 enum MechanicType {
-    MechanicType_None = 0;
-    MechanicType_CombatEnhancingSorcery = 1;
-    MechanicType_CombatEnhancingInstant = 2;
-    MechanicType_Haste = 3;
-    MechanicType_Flash = 4;
-    MechanicType_ReplaceOpponentBeginningPhase = 5;
-    MechanicType_ReplaceAIBeginningPhase = 6;
-    MechanicType_DirectDamagePlayer = 7;
-    MechanicType_Evasion = 9;
-    MechanicType_MustAttack = 10;
-    MechanicType_MustBlock = 11;
-    MechanicType_CombatEnhancingAbility = 12;
-    MechanicType_Main2Creature = 13;
-    MechanicType_DirectDamageCreature_Sorcery = 14;
-    MechanicType_DirectDamageCreature_Instant = 15;
-}
-
-enum MessageIdType {
-    MessageIdType_None =  0;
-    MessageIdType_Prompt =  1;
-    MessageIdType_Choice =  2;
-    MessageIdType_LocalizationId =  3;
-}
-
-enum MiscellaneousTerm {
-    MiscellaneousTerm_None =  0;
-    MiscellaneousTerm_Scry =  1;
-    MiscellaneousTerm_Historic =  2;
-    MiscellaneousTerm_Surveil =  3;
+	MechanicType_None = 0;
+	MechanicType_CombatEnhancingSorcery = 1;
+	MechanicType_CombatEnhancingInstant = 2;
+	MechanicType_Haste = 3;
+	MechanicType_Flash = 4;
+	MechanicType_ReplaceOpponentBeginningPhase = 5;
+	MechanicType_ReplaceAIBeginningPhase = 6;
+	MechanicType_DirectDamagePlayer = 7;
+	MechanicType_Evasion = 9;
+	MechanicType_MustAttack = 10;
+	MechanicType_MustBlock = 11;
+	MechanicType_CombatEnhancingAbility = 12;
+	MechanicType_Main2Creature = 13;
+	MechanicType_DirectDamageCreature_Sorcery = 14;
+	MechanicType_DirectDamageCreature_Instant = 15;
 }
 
 message ModalOption {
@@ -2958,17 +2686,23 @@ message ModalOption {
 
 message ModalReq {
 	repeated ModalOption modalOptions = 1;
-	repeated ModalOption excludedOptions = 6;
 	uint32 abilityGrpId = 2;
 	uint32 minSel = 3;
 	uint32 maxSel = 4;
 	bool repeatedSelectAllowed = 5;
+	repeated ModalOption excludedOptions = 6;
 }
 
 enum MulliganOption {
-    MulliganOption_None =  0;
-    MulliganOption_Mulligan =  1;
-    MulliganOption_AcceptHand =  2;
+	MulliganOption_None = 0;
+	MulliganOption_Mulligan = 1;
+	MulliganOption_AcceptHand = 2;
+}
+
+message MulliganReq {
+	MulliganType mulliganType = 1;
+	uint32 freeMulliganCount = 2;
+	uint32 mulliganCount = 3;
 }
 
 message MulliganResp {
@@ -2976,17 +2710,10 @@ message MulliganResp {
 }
 
 enum MulliganType {
-    MulliganType_None =  0;
-    MulliganType_Paris =  1;
-    MulliganType_Vancouver =  2;
-}
-
-message Node {
-	oneof message {
-		Composite composite = 1;
-		Decorator decorator = 2;
-		Task task = 3;
-	}
+	MulliganType_None = 0;
+	MulliganType_Paris = 1;
+	MulliganType_Vancouver = 2;
+	MulliganType_London = 3;
 }
 
 message NumericInputReq {
@@ -3005,6 +2732,11 @@ message OnChat {
 	string text = 1;
 }
 
+message OnGenericEvent {
+	string category = 1;
+	string payload = 2;
+}
+
 message OnHover {
 	uint32 objectId = 1;
 }
@@ -3018,50 +2750,50 @@ message OnShuffle {
 }
 
 enum OptionContext {
-    OptionContext_None =  0;
-    OptionContext_ManaAbility =  1;
-    OptionContext_Payment =  2;
-    OptionContext_Stacking =  3;
-    OptionContext_Targeting =  4;
-    OptionContext_Resolution =  5;
-    OptionContext_TurnBased =  6;
-    OptionContext_Replacement =  7;
-    OptionContext_ActivateCast =  8;
-    OptionContext_TurnFaceUp =  9;
+	OptionContext_None = 0;
+	OptionContext_ManaAbility = 1;
+	OptionContext_Payment = 2;
+	OptionContext_Stacking = 3;
+	OptionContext_Targeting = 4;
+	OptionContext_Resolution = 5;
+	OptionContext_TurnBased = 6;
+	OptionContext_Replacement = 7;
+	OptionContext_ActivateCast = 8;
+	OptionContext_TurnFaceUp = 9;
 }
 
 enum OptionResponse {
-    OptionResponse_None =  0;
-    OptionResponse_Allow_Yes =  1;
-    OptionResponse_Cancel_No =  2;
+	OptionResponse_None = 0;
+	OptionResponse_Allow_Yes = 1;
+	OptionResponse_Cancel_No = 2;
 }
 
 enum OptionType {
-    OptionType_None =  0;
-    OptionType_Modal =  1;
-    OptionType_Splice =  2;
-    OptionType_AlternativeCost =  3;
-    OptionType_Numeric =  4;
-    OptionType_VariableCost =  5;
-    OptionType_ManaType =  6;
-    OptionType_Order =  7;
-    OptionType_Search =  8;
-    OptionType_Group =  9;
-    OptionType_Select =  10;
-    OptionType_SelectGroup =  11;
-    OptionType_Distribution =  12;
-    OptionType_OptionalAction =  13;
-    OptionType_ActionsAvailable =  14;
-    OptionType_SelectFromGroups =  15;
-    OptionType_SearchFromGroups =  16;
-    OptionType_Gathering =  17;
+	OptionType_None = 0;
+	OptionType_Modal = 1;
+	OptionType_Splice = 2;
+	OptionType_AlternativeCost = 3;
+	OptionType_Numeric = 4;
+	OptionType_VariableCost = 5;
+	OptionType_ManaType = 6;
+	OptionType_Order = 7;
+	OptionType_Search = 8;
+	OptionType_Group = 9;
+	OptionType_Select = 10;
+	OptionType_SelectGroup = 11;
+	OptionType_Distribution = 12;
+	OptionType_OptionalAction = 13;
+	OptionType_ActionsAvailable = 14;
+	OptionType_SelectFromGroups = 15;
+	OptionType_SearchFromGroups = 16;
+	OptionType_Gathering = 17;
 }
 
 message OptionalActionMessage {
-	repeated CardMechanicType optionalActionTypes = 4;
 	Prompt prompt = 1;
-	uint32 systemSeatId = 2;
 	uint32 sourceId = 3;
+	repeated CardMechanicType optionalActionTypes = 4;
+	repeated uint32 recipientIds = 5;
 }
 
 message OptionalResp {
@@ -3072,23 +2804,22 @@ message OptionalResp {
 }
 
 message OrderCombatDamageReq {
-	repeated CombatDamageOrder orders = 2;
 	OrderCombatDamageType orderDamageType = 1;
+	repeated CombatDamageOrder orders = 2;
 }
 
 message OrderCombatDamageResp {
-	repeated CombatDamageOrderAssignment orders = 2;
 	OrderCombatDamageType orderDamageType = 1;
+	repeated CombatDamageOrderAssignment orders = 2;
 }
 
 enum OrderCombatDamageType {
-    OrderCombatDamageType_None =  0;
-    OrderCombatDamageType_Attacker =  1;
-    OrderCombatDamageType_Blocker =  2;
+	OrderCombatDamageType_None = 0;
+	OrderCombatDamageType_Attacker = 1;
+	OrderCombatDamageType_Blocker = 2;
 }
 
 message OrderDamageConfirmation {
-	repeated InvalidCombatDamageOrderAssignment invalidOrders = 3;
 	ResultCode result = 1;
 	OrderCombatDamageType orderDamageType = 2;
 }
@@ -3119,29 +2850,29 @@ message OrderedDamageAssignment {
 }
 
 enum OrderingContext {
-    OrderingContext_None =  0;
-    OrderingContext_OrderingForBottom =  1;
-    OrderingContext_OrderingForTop =  2;
+	OrderingContext_None = 0;
+	OrderingContext_OrderingForBottom = 1;
+	OrderingContext_OrderingForTop = 2;
 }
 
 enum OrderingFunctionType {
-    OrderingFunctionType_None =  0;
-    OrderingFunctionType_ConstantValue =  1;
-    OrderingFunctionType_ObjectScore =  2;
-    OrderingFunctionType_CheckCardMechanic =  3;
-    OrderingFunctionType_CheckBlockers =  4;
-    OrderingFunctionType_CheckAttackers =  5;
-    OrderingFunctionType_CheckCardMechanicIfNoAttackers =  6;
-    OrderingFunctionType_CheckAbilityMechanic =  7;
-    OrderingFunctionType_CheckAbilityMechanicIfNoAttackers =  8;
-    OrderingFunctionType_CheckPredefinedCardMechanics =  9;
-    OrderingFunctionType_CheckPredefinedAbilityMechanics =  10;
-    OrderingFunctionType_CheckPredefinedCardMechanicsIfNoAttackers =  11;
-    OrderingFunctionType_CheckPredefinedAbilityMechanicsIfNoAttackers =  12;
-    OrderingFunctionType_Mulligan =  13;
-    OrderingFunctionType_PlayLand =  14;
-    OrderingFunctionType_CheckHasAbility =  15;
-    OrderingFunctionType_ManaSelect =  16;
+	OrderingFunctionType_None = 0;
+	OrderingFunctionType_ConstantValue = 1;
+	OrderingFunctionType_ObjectScore = 2;
+	OrderingFunctionType_CheckCardMechanic = 3;
+	OrderingFunctionType_CheckBlockers = 4;
+	OrderingFunctionType_CheckAttackers = 5;
+	OrderingFunctionType_CheckCardMechanicIfNoAttackers = 6;
+	OrderingFunctionType_CheckAbilityMechanic = 7;
+	OrderingFunctionType_CheckAbilityMechanicIfNoAttackers = 8;
+	OrderingFunctionType_CheckPredefinedCardMechanics = 9;
+	OrderingFunctionType_CheckPredefinedAbilityMechanics = 10;
+	OrderingFunctionType_CheckPredefinedCardMechanicsIfNoAttackers = 11;
+	OrderingFunctionType_CheckPredefinedAbilityMechanicsIfNoAttackers = 12;
+	OrderingFunctionType_Mulligan = 13;
+	OrderingFunctionType_PlayLand = 14;
+	OrderingFunctionType_CheckHasAbility = 15;
+	OrderingFunctionType_ManaSelect = 16;
 }
 
 message OrderingHeuristicDefinition {
@@ -3162,44 +2893,35 @@ message OrderingHeuristicParameter {
 }
 
 enum OrderingParameterId {
-    OrderingParameterId_None = 0;
-    OrderingParameterId_BestSingleBlock = 1;
-    OrderingParameterId_GoodSingleBlock = 2;
-    OrderingParameterId_GoodSingleTrade = 3;
-    OrderingParameterId_GoodMultiTrade = 4;
-    OrderingParameterId_ChumpBlock = 5;
-    OrderingParameterId_PlayerDeath = 6;
-    OrderingParameterId_MustBlock = 7;
-    OrderingParameterId_AttackWithEvasion = 9;
-    OrderingParameterId_MustAttack = 10;
-    OrderingParameterId_FavorableTrade = 11;
-    OrderingParameterId_UnfavorableTrade = 12;
-    OrderingParameterId_OpponentDamage = 13;
+	OrderingParameterId_None = 0;
+	OrderingParameterId_BestSingleBlock = 1;
+	OrderingParameterId_GoodSingleBlock = 2;
+	OrderingParameterId_GoodSingleTrade = 3;
+	OrderingParameterId_GoodMultiTrade = 4;
+	OrderingParameterId_ChumpBlock = 5;
+	OrderingParameterId_PlayerDeath = 6;
+	OrderingParameterId_MustBlock = 7;
+	OrderingParameterId_AttackWithEvasion = 9;
+	OrderingParameterId_MustAttack = 10;
+	OrderingParameterId_FavorableTrade = 11;
+	OrderingParameterId_UnfavorableTrade = 12;
+	OrderingParameterId_OpponentDamage = 13;
 }
 
 enum OrderingType {
-    OrderingType_None =  0;
-    OrderingType_OrderAsIndicated =  1;
-    OrderingType_OrderArbitraryOnce =  2;
-    OrderingType_OrderArbitraryAlways =  3;
-    OrderingType_PromptAlways =  4;
-}
-
-message Parallel {
-	repeated Node children = 1;
+	OrderingType_None = 0;
+	OrderingType_OrderAsIndicated = 1;
+	OrderingType_OrderArbitraryOnce = 2;
+	OrderingType_OrderArbitraryAlways = 3;
+	OrderingType_PromptAlways = 4;
 }
 
 enum ParameterType {
-    ParameterType_None =  0;
-    ParameterType_NonLocalizedString =  1;
-    ParameterType_Number =  2;
-    ParameterType_Reference =  3;
-    ParameterType_RepeatedNumber =  4;
-    ParameterType_PromptId =  5;
-    ParameterType_Priority =  6;
-}
-
-message Pass {
+	ParameterType_None = 0;
+	ParameterType_NonLocalizedString = 1;
+	ParameterType_Number = 2;
+	ParameterType_Reference = 3;
+	ParameterType_PromptId = 5;
 }
 
 message PayCostsReq {
@@ -3208,11 +2930,7 @@ message PayCostsReq {
 	SelectNReq paymentSelection = 3;
 	ActionCostReq actionCostReq = 4;
 	SubmitPaymentReq submitPaymentReq = 5;
-}
-
-enum PerformActionFor {
-    PerformActionFor_Attackers =  0;
-    PerformActionFor_Blockers =  1;
+	AutoTapActionsAvailableReq autoTapActionsReq = 6;
 }
 
 message PerformActionResp {
@@ -3223,25 +2941,30 @@ message PerformActionResp {
 	SettingKey mapTo = 5;
 }
 
+message PerformAutoTapActionsResp {
+	uint32 index = 1;
+}
+
 enum Phase {
-    Phase_None =  0;
-    Phase_Beginning =  1;
-    Phase_Main1 =  2;
-    Phase_Combat =  3;
-    Phase_Main2 =  4;
-    Phase_Ending =  5;
+	Phase_None = 0;
+	Phase_Beginning = 1;
+	Phase_Main1 = 2;
+	Phase_Combat = 3;
+	Phase_Main2 = 4;
+	Phase_Ending = 5;
 }
 
 message PlayerConfig {
+	uint32 systemSeatId = 1;
 	repeated uint32 deckCards = 2;
 	repeated uint32 sideboardCards = 3;
-	repeated uint32 commandEmblems = 9;
-	uint32 systemSeatId = 1;
-	uint32 undoPermissionBitmask = 4;
-	uint32 controlPermissionBitmask = 5;
 	uint32 startingLifeTotal = 6;
 	bool startingHandSizeSpecified = 7;
 	uint32 startingHandSize = 8;
+	repeated uint32 commandEmblems = 9;
+	repeated uint32 jazzMusicians = 10;
+	repeated CardSkinTuple skins = 11;
+	ShuffleRestriction shuffleRestriction = 12;
 }
 
 message PlayerDieRoll {
@@ -3250,25 +2973,27 @@ message PlayerDieRoll {
 }
 
 message PlayerInfo {
-	repeated ManaInfo manaPool = 6;
-	repeated uint32 timerIds = 11;
 	int32 lifeTotal = 1;
 	uint32 systemSeatNumber = 2;
+	repeated ManaInfo manaPool = 6;
 	uint32 maxHandSize = 7;
+	uint32 mulliganCount = 8;
 	uint32 turnNumber = 9;
 	uint32 teamId = 10;
+	repeated uint32 timerIds = 11;
 	uint32 controllerSeatId = 12;
 	ControllerType controllerType = 13;
 	uint32 timeoutCount = 14;
 	uint32 pipCount = 15;
 	ClientMessageType pendingMessageType = 16;
+	uint32 startingLifeTotal = 17;
 }
 
 enum PlayerIs {
-    PlayerIs_None =  0;
-    PlayerIs_DontCare =  1;
-    PlayerIs_AI =  2;
-    PlayerIs_Opponent =  3;
+	PlayerIs_None = 0;
+	PlayerIs_DontCare = 1;
+	PlayerIs_AI = 2;
+	PlayerIs_Opponent = 3;
 }
 
 message PlayerMetricKeyValuePair {
@@ -3277,275 +3002,75 @@ message PlayerMetricKeyValuePair {
 }
 
 message PlayerMetrics {
-	repeated KeyValuePairInfo metrics = 2;
 	uint32 playerId = 1;
-}
-
-enum PlayerOrTeam {
-    PlayerOrTeam_Player =  0;
-    PlayerOrTeam_Team =  1;
+	repeated KeyValuePairInfo metrics = 2;
 }
 
 enum PresenceState {
-    PresenceState_Invalid =  0;
-    PresenceState_Offline =  1;
-    PresenceState_Online =  2;
+	PresenceState_Invalid = 0;
+	PresenceState_Offline = 1;
+	PresenceState_Online = 2;
 }
 
 message Prompt {
-	repeated PromptParameter parameters = 2;
-	repeated Choice choices = 3;
 	uint32 promptId = 1;
-}
-
-enum PromptMessage {
-    PromptMessage_None =  0;
-    PromptMessage_GameStateMessage =  1;
-    PromptMessage_ActionsAvailableReq =  2;
-    PromptMessage_IllegalRequest =  3;
-    PromptMessage_MatchState =  4;
-    PromptMessage_OptionReq =  5;
-    PromptMessage_DeclareAttackersReq =  6;
-    PromptMessage_DeclareBlockersReq =  7;
-    PromptMessage_AssignDamageReq =  8;
-    PromptMessage_OrderCombatDamageReq =  9;
-    PromptMessage_SelectTargetsReq =  10;
-    PromptMessage_PayCostReq =  11;
-    PromptMessage_InvalidSelection =  12;
-    PromptMessage_InvalidOrdering =  13;
-    PromptMessage_Discard =  14;
-    PromptMessage_WaitingForActionsAvailableReq =  15;
-    PromptMessage_WaitingForDeclareAttackersReq =  16;
-    PromptMessage_WaitingForDeclareBlockersReq =  17;
-    PromptMessage_WaitingForAssignDamageReq =  18;
-    PromptMessage_WaitingForOrderCombatDamageReq =  19;
-    PromptMessage_WaitingForSelectTargetsReq =  20;
-    PromptMessage_WaitingForPayCostReq =  21;
-    PromptMessage_WaitingForDiscard =  22;
-    PromptMessage_SelectOptionsReq =  23;
-    PromptMessage_WaitingForSelectOptionsReq =  24;
-    PromptMessage_GameResultWinLoss =  25;
-    PromptMessage_GameResultDraw =  26;
-    PromptMessage_MatchResultWinLoss =  27;
-    PromptMessage_MatchResultDraw =  28;
-    PromptMessage_IntermissionRevealHand =  29;
-    PromptMessage_IntermissionDrawCard =  30;
-    PromptMessage_IntermissionBeginSideboarding =  31;
-    PromptMessage_ChooseStarting =  32;
-    PromptMessage_WaitingForChooseStarting =  33;
-    PromptMessage_MulliganOrAcceptHand =  34;
-    PromptMessage_WaitingForMulliganOrAcceptHand =  35;
-    PromptMessage_Mulliganed =  36;
-    PromptMessage_AcceptedHand =  37;
-    PromptMessage_ChoiceMulligan =  38;
-    PromptMessage_ChoiceKeep =  39;
-    PromptMessage_GroupReq =  40;
-    PromptMessage_WaitingForGroupReq =  41;
-    PromptMessage_OrderReq =  42;
-    PromptMessage_WaitingForOrderReq =  43;
-    PromptMessage_SelectNGroupReq =  44;
-    PromptMessage_WaitingForSelectNGroupReq =  45;
-    PromptMessage_CoinFlip =  46;
-    PromptMessage_ChoiceHeads =  47;
-    PromptMessage_ChoiceTails =  48;
-    PromptMessage_WaitingForSearchReq =  49;
-    PromptMessage_WaitingForOptionalActionReq =  50;
-    PromptMessage_XCostReq =  51;
-    PromptMessage_WaitingForNumericReq =  52;
-    PromptMessage_MinimumBlockersNotMet =  53;
-    PromptMessage_DoModularAbility =  54;
-    PromptMessage_WaitingForDoModularAbility =  55;
-    PromptMessage_MoveCountersMessage =  56;
-    PromptMessage_WaitingForMoveCounters =  57;
-    PromptMessage_DoRecover =  58;
-    PromptMessage_WaitingForDoRecover =  59;
-    PromptMessage_DoEchoPayment =  60;
-    PromptMessage_WaitingForDoEchoPayment =  61;
-    PromptMessage_DoProvokeAbility =  62;
-    PromptMessage_WaitingForDoProvokeAbility =  63;
-    PromptMessage_DoCascadeAbility =  64;
-    PromptMessage_WaitingForDoCascadeAbility =  65;
-    PromptMessage_DoSoulshift =  66;
-    PromptMessage_WaitingForSoulshift =  67;
-    PromptMessage_ApplyPlaneswalkerRedirection =  68;
-    PromptMessage_WaitingForApplyPlaneswalkerRedirect =  69;
-    PromptMessage_PlaneswalkerUniqueness =  70;
-    PromptMessage_WaitingForPlaneswalkerUniqueness =  71;
-    PromptMessage_LegendRule =  72;
-    PromptMessage_WaitingForLegendRule =  73;
-    PromptMessage_SelectReplacement =  74;
-    PromptMessage_WaitingForSelectReplacement =  75;
-    PromptMessage_ApplyUnleash =  76;
-    PromptMessage_WaitingForUnleash =  77;
-    PromptMessage_ChooseObjectToCopy =  78;
-    PromptMessage_WaitingForChooseObjectToCopy =  79;
-    PromptMessage_SelectManaTypeReq =  80;
-    PromptMessage_WaitingForSelectManaTypeReq =  81;
-    PromptMessage_WaitingForDistributionReq =  82;
-    PromptMessage_ChooseModalReq =  83;
-    PromptMessage_WaitingForChooseModalReq =  84;
-    PromptMessage_OrderObjectEnteringGraveyard =  85;
-    PromptMessage_OrderObjectEnteringLibrary =  86;
-    PromptMessage_WaitingForOrderObjectEnteringZone =  87;
-    PromptMessage_ChooseCreaturesForConspire =  88;
-    PromptMessage_ApplyDredge =  89;
-    PromptMessage_WaitingForDredge =  90;
-    PromptMessage_OrderObjectEnteringBattlefield =  91;
-    PromptMessage_Scry =  92;
-    PromptMessage_WaitingForScry =  93;
-    PromptMessage_UnpayableCost =  94;
-    PromptMessage_CastForMadnessCost =  95;
-    PromptMessage_SacrificeClue =  96;
-    PromptMessage_SelectFromGroupsReq =  97;
-    PromptMessage_WaitingForSelectFromGroupsReq =  98;
-    PromptMessage_SelectPermanentsToUntap =  99;
-    PromptMessage_WaitingForSelectPermanentsToUntap =  100;
-    PromptMessage_UnboundedLoopDetectedActive =  101;
-    PromptMessage_UnboundedLoopDetectedNotActive =  102;
-    PromptMessage_InfiniteLoopDetected =  103;
-    PromptMessage_ClickOKToContinue =  104;
-    PromptMessage_WaitingForPlayer =  105;
-    PromptMessage_GatherReq =  106;
-    PromptMessage_WaitingForGatherReq =  107;
-    PromptMessage_SelectZoneForMutuallyExclusiveZoneTransfers =  108;
-    PromptMessage_WaitingForPlayerToSelectMutuallyExclusiveZone =  109;
-    PromptMessage_PutOrRemoveCounters =  110;
-    PromptMessage_SelectZonesToSearch =  111;
-    PromptMessage_ChooseAction =  112;
-    PromptMessage_ChooseTargetForNextCopy =  113;
-    PromptMessage_PerformOpeningHandActions =  114;
-    PromptMessage_DoExplorePutCardInGraveyard =  115;
-    PromptMessage_WaitingForExplorePutCardInGraveyard =  116;
-    PromptMessage_Warning_InsufficientBlockers =  117;
-    PromptMessage_ChooseAColor =  118;
-    PromptMessage_Warning_BlockerCannotBlockAlone =  119;
-    PromptMessage_Warning_AttackerCannotAttackAlone =  120;
-    PromptMessage_Warning_AttackerMustBeBlocked =  121;
-    PromptMessage_Warning_MustAttackWithAtLeastOne =  122;
-    PromptMessage_SelectAnAttackee =  123;
-    PromptMessage_Warning_MustAttack =  124;
-    PromptMessage_Warning_MustBlock =  125;
-    PromptMessage_CitysBlessingDesignation =  126;
-    PromptMessage_AssignDamageReqCanIgnoreBlockers =  127;
-    PromptMessage_SelectAnAttachee =  128;
-    PromptMessage_Surveil =  129;
-    PromptMessage_Warning_AttackerMustBeBlockedByAll =  130;
-    PromptMessage_Placeholder1 =  131;
-    PromptMessage_Placeholder2 =  132;
-    PromptMessage_Placeholder3 =  133;
-    PromptMessage_Placeholder4 =  134;
-    PromptMessage_Placeholder5 =  135;
+	repeated PromptParameter parameters = 2;
 }
 
 message PromptParameter {
 	string parameterName = 1;
-	string stringValue = 4;
-	repeated int32 repeatedNumbers = 6;
 	ParameterType type = 2;
 	Reference reference = 3;
+	string stringValue = 4;
 	int32 numberValue = 5;
+	repeated int32 repeatedNumbers = 6;
 	int32 promptId = 7;
 }
 
-enum PromptPriority {
-    PromptPriority_None =  0;
-    PromptPriority_Persist =  1;
-}
-
 enum ProtoVersion {
-    ProtoVersion_None =  0;
-    ProtoVersion_HiFiGameStates =  1;
-    ProtoVersion_PreviousGameStateId =  2;
-    ProtoVersion_Timers =  3;
-    ProtoVersion_ManaRequirement =  4;
-    ProtoVersion_AutoTapActions =  5;
-    ProtoVersion_UIMessages =  6;
-    ProtoVersion_AutoTapStopsSetting =  7;
-    ProtoVersion_Sideboarding =  8;
-    ProtoVersion_AutoOptionalPaymentCancellationSetting =  9;
-    ProtoVersion_CostCategory =  10;
-    ProtoVersion_TimersV2 =  11;
-    ProtoVersion_Control =  12;
-    ProtoVersion_TimersV3 =  13;
-    ProtoVersion_AutoAcceptHand =  14;
-    ProtoVersion_TimersV4 =  15;
-    ProtoVersion_TimersV5 =  16;
-    ProtoVersion_ManaPaymentStrategyType =  17;
-    ProtoVersion_TimersV6 =  18;
-    ProtoVersion_TimersV7 =  19;
-    ProtoVersion_TimersV8 =  20;
-    ProtoVersion_TransientStops =  21;
-    ProtoVersion_Cosmetics =  22;
-    ProtoVersion_ResultSpec =  23;
-    ProtoVersion_ResultReason =  24;
-    ProtoVersion_SuperFormat =  25;
-    ProtoVersion_AutoSelectReplacementSetting =  26;
-    ProtoVersion_MulliganType =  27;
-    ProtoVersion_PendingMessageType =  28;
-}
-
-enum QualificationType {
-    QualificationType_None = 0;
-    QualificationType_CostToCast = 1;
-    QualificationType_CantBeCountered = 10;
-    QualificationType_CantBeActivated = 11;
-    QualificationType_CantBeRegenerated = 12;
-    QualificationType_CantBeEnchanted = 13;
-    QualificationType_CantBeEquipped = 14;
-    QualificationType_CantBeDestroyed = 15;
-    QualificationType_CantBePrevented = 16;
-    QualificationType_CantBeTheTargetOf = 17;
-    QualificationType_CantBeSacrificed = 19;
-    QualificationType_CantGenericEffect = 20;
-    QualificationType_CantUntap = 21;
-    QualificationType_CantDraw = 22;
-    QualificationType_CantPlay = 23;
-    QualificationType_CantCycle = 24;
-    QualificationType_CantCast = 25;
-    QualificationType_CantSearch = 26;
-    QualificationType_CantHave = 27;
-    QualificationType_CantEnter = 28;
-    QualificationType_CantAttack = 30;
-    QualificationType_CantBlock = 31;
-    QualificationType_CantBeBlocked = 32;
-    QualificationType_MustBlockAttacker = 33;
-    QualificationType_MustAttack = 34;
-    QualificationType_BlockedByMaxCount = 39;
-    QualificationType_BlockedByMinCount = 40;
-    QualificationType_MustAttackSpecific = 41;
-    QualificationType_BlockIfAble = 42;
-    QualificationType_AbleToAttack = 43;
-    QualificationType_AttackThatCombatIfAble = 44;
-    QualificationType_MayPlay = 47;
-    QualificationType_CantTransform = 48;
-    QualificationType_CanAttack = 49;
-    QualificationType_CantCrew = 50;
-    QualificationType_CantBlockUnlessAlso = 52;
-    QualificationType_CantActivate = 53;
-    QualificationType_MaxAttackers = 54;
-    QualificationType_MaxBlockers = 55;
-    QualificationType_CantAttackUnlessAlso = 56;
-    QualificationType_CanOnlyAttackAlone = 57;
-    QualificationType_IfAttacks = 58;
-    QualificationType_AttackCost = 59;
-    QualificationType_BlockCost = 60;
-    QualificationType_CantCauseAbilitiesToTrigger = 61;
-    QualificationType_AssignCombatDamageWithToughness = 62;
-    QualificationType_PlayerMustAttackElementsOfList = 63;
-    QualificationType_CantLoseTheGame = 64;
-    QualificationType_CantLoseMana = 65;
-    QualificationType_MayPlayAdditionalLands = 66;
-    QualificationType_AssignCombatDamageAsThoughWerentBlocked = 67;
-    QualificationType_MayPlayValidItems = 68;
-    QualificationType_CanBeTheTargetOf = 69;
+	ProtoVersion_None = 0;
+	ProtoVersion_HiFiGameStates = 1;
+	ProtoVersion_PreviousGameStateId = 2;
+	ProtoVersion_Timers = 3;
+	ProtoVersion_ManaRequirement = 4;
+	ProtoVersion_AutoTapActions = 5;
+	ProtoVersion_UIMessages = 6;
+	ProtoVersion_AutoTapStopsSetting = 7;
+	ProtoVersion_Sideboarding = 8;
+	ProtoVersion_AutoOptionalPaymentCancellationSetting = 9;
+	ProtoVersion_CostCategory = 10;
+	ProtoVersion_TimersV2 = 11;
+	ProtoVersion_Control = 12;
+	ProtoVersion_TimersV3 = 13;
+	ProtoVersion_AutoAcceptHand = 14;
+	ProtoVersion_TimersV4 = 15;
+	ProtoVersion_TimersV5 = 16;
+	ProtoVersion_ManaPaymentStrategyType = 17;
+	ProtoVersion_TimersV6 = 18;
+	ProtoVersion_TimersV7 = 19;
+	ProtoVersion_TimersV8 = 20;
+	ProtoVersion_TransientStops = 21;
+	ProtoVersion_Cosmetics = 22;
+	ProtoVersion_ResultSpec = 23;
+	ProtoVersion_ResultReason = 24;
+	ProtoVersion_SuperFormat = 25;
+	ProtoVersion_AutoSelectReplacementSetting = 26;
+	ProtoVersion_MulliganType = 27;
+	ProtoVersion_PendingMessageType = 28;
+	ProtoVersion_AutoDeclareAttackersThatMustAttackSetting = 29;
+	ProtoVersion_DeceptiveActions = 30;
+	ProtoVersion_PerformAutoTapActions = 31;
+	ProtoVersion_MulliganReq = 32;
+	ProtoVersion_AutoTapSolution = 33;
+	ProtoVersion_ManaPaymentDeprecated = 34;
 }
 
 message QueueInfo {
 	string eventId = 2;
+	QueueType queueType = 3;
 	string queueServiceBaseUri = 5;
 	string queueServiceErrorCallbackUri = 6;
 	string queueServiceOutputCallbackUri = 7;
-	QueueType queueType = 3;
 	int32 minimumPlayerCount = 10;
 	int32 playerBatchSize = 11;
 	int32 triggerCadenceMs = 12;
@@ -3554,32 +3079,24 @@ message QueueInfo {
 }
 
 enum QueueType {
-    QueueType_Invalid =  0;
-    QueueType_MatchQueue =  1;
-    QueueType_DraftQueue =  2;
-}
-
-enum ReasonFaceDown {
-    ReasonFaceDown_None =  0;
-    ReasonFaceDown_MovedFaceDown =  1;
-    ReasonFaceDown_Morph =  2;
-    ReasonFaceDown_Manifest =  3;
-    ReasonFaceDown_TurnedFaceDown =  4;
+	QueueType_Invalid = 0;
+	QueueType_MatchQueue = 1;
+	QueueType_DraftQueue = 2;
 }
 
 message Reference {
-	string field = 3;
-	string debugValue = 4;
 	ReferenceType type = 1;
 	uint32 id = 2;
+	string field = 3;
+	string debugValue = 4;
 }
 
 enum ReferenceType {
-    ReferenceType_None =  0;
-    ReferenceType_InstanceId =  1;
-    ReferenceType_CatalogId =  2;
-    ReferenceType_LocalizationId =  3;
-    ReferenceType_PlayerSeatId =  4;
+	ReferenceType_None = 0;
+	ReferenceType_InstanceId = 1;
+	ReferenceType_CatalogId = 2;
+	ReferenceType_LocalizationId = 3;
+	ReferenceType_PlayerSeatId = 4;
 }
 
 message ReplacementEffect {
@@ -3590,53 +3107,37 @@ message ReplacementEffect {
 	uint32 replacementEffectId = 6;
 }
 
-enum ReplacementEffectSpawnerType {
-    ReplacementEffectSpawnerType_None =  0;
-    ReplacementEffectSpawnerType_PreventDamage =  1;
-}
-
 message ReportResultMessage {
 	ResultSpec result = 1;
 }
 
-enum RequiresConfirmation {
-    RequiresConfirmation_None =  0;
-    RequiresConfirmation_Sacrifice =  1;
-    RequiresConfirmation_PayLife =  2;
-    RequiresConfirmation_Discard =  3;
-    RequiresConfirmation_Exile =  4;
-    RequiresConfirmation_Target =  5;
-    RequiresConfirmation_Selection =  6;
-    RequiresConfirmation_ForOpponent =  7;
-}
-
 enum ResultCode {
-    ResultCode_None =  0;
-    ResultCode_Success =  1;
-    ResultCode_Failure =  2;
-    ResultCode_CannotAttack =  3;
-    ResultCode_AttackCostUnpaid =  4;
-    ResultCode_CannotBlock =  5;
-    ResultCode_IllegalBlock =  6;
-    ResultCode_OrderMismatch =  7;
-    ResultCode_MissingDamageSource =  8;
-    ResultCode_InvalidDamageSource =  9;
-    ResultCode_NonlethalAssignment =  10;
-    ResultCode_InvalidAssignment =  11;
-    ResultCode_TooManyTargets =  12;
-    ResultCode_NotEnoughTargets =  13;
-    ResultCode_IllegalTarget =  14;
-    ResultCode_RestrictionViolated =  15;
-    ResultCode_RequirementViolated =  16;
+	ResultCode_None = 0;
+	ResultCode_Success = 1;
+	ResultCode_Failure = 2;
+	ResultCode_CannotAttack = 3;
+	ResultCode_AttackCostUnpaid = 4;
+	ResultCode_CannotBlock = 5;
+	ResultCode_IllegalBlock = 6;
+	ResultCode_OrderMismatch = 7;
+	ResultCode_MissingDamageSource = 8;
+	ResultCode_InvalidDamageSource = 9;
+	ResultCode_NonlethalAssignment = 10;
+	ResultCode_InvalidAssignment = 11;
+	ResultCode_TooManyTargets = 12;
+	ResultCode_NotEnoughTargets = 13;
+	ResultCode_IllegalTarget = 14;
+	ResultCode_RestrictionViolated = 15;
+	ResultCode_RequirementViolated = 16;
 }
 
 enum ResultReason {
-    ResultReason_None =  0;
-    ResultReason_Game =  1;
-    ResultReason_Concede =  2;
-    ResultReason_Timeout =  3;
-    ResultReason_Loop =  4;
-    ResultReason_Force =  5;
+	ResultReason_None = 0;
+	ResultReason_Game = 1;
+	ResultReason_Concede = 2;
+	ResultReason_Timeout = 3;
+	ResultReason_Loop = 4;
+	ResultReason_Force = 5;
 }
 
 message ResultSpec {
@@ -3647,56 +3148,64 @@ message ResultSpec {
 }
 
 enum ResultType {
-    ResultType_None =  0;
-    ResultType_Suspended =  1;
-    ResultType_Draw =  2;
-    ResultType_WinLoss =  3;
+	ResultType_None = 0;
+	ResultType_Suspended = 1;
+	ResultType_Draw = 2;
+	ResultType_WinLoss = 3;
 }
 
 message SearchFromGroupsReq {
-	repeated uint32 zonesToSearch = 4;
-	repeated Group groups = 5;
 	uint32 optionIndex = 1;
 	uint32 minFind = 2;
 	uint32 maxFind = 3;
+	repeated uint32 zonesToSearch = 4;
+	repeated Group groups = 5;
 	GroupingStyle groupingStyle = 6;
 }
 
 message SearchFromGroupsResp {
-	repeated uint32 itemsFound = 2;
 	uint32 optionIndex = 1;
+	repeated uint32 itemsFound = 2;
 }
 
 message SearchReq {
-	repeated uint32 zonesToSearch = 4;
-	repeated uint32 itemsToSearch = 5;
-	repeated uint32 itemsSought = 6;
 	uint32 optionIndex = 1;
 	uint32 minFind = 2;
 	uint32 maxFind = 3;
+	repeated uint32 zonesToSearch = 4;
+	repeated uint32 itemsToSearch = 5;
+	repeated uint32 itemsSought = 6;
 }
 
 message SearchResp {
-	repeated uint32 itemsFound = 2;
 	uint32 optionIndex = 1;
+	repeated uint32 itemsFound = 2;
 }
 
 enum SelectAction {
-    SelectAction_None =  0;
-    SelectAction_Select =  1;
-    SelectAction_Unselect =  2;
+	SelectAction_None = 0;
+	SelectAction_Select = 1;
+	SelectAction_Unselect = 2;
 }
 
 message SelectCountersReq {
-	repeated Counter counters = 4;
 	uint32 minSel = 1;
 	uint32 maxSel = 2;
 	SelectionContext context = 3;
+	OptionType optionType = 4;
+	OptionContext optionContext = 5;
+	SelectionListType listType = 6;
+	repeated CounterPair counterPairs = 7;
+	uint32 idx = 8;
+	uint32 sourceId = 9;
 }
 
 message SelectCountersResp {
-	repeated Counter counters = 2;
-	SelectionContext context = 1;
+	uint32 idx = 1;
+	SelectionContext context = 2;
+	OptionContext optionContext = 3;
+	OptionType optionType = 4;
+	repeated CounterPair selections = 5;
 }
 
 message SelectFromGroupsReq {
@@ -3705,60 +3214,63 @@ message SelectFromGroupsReq {
 	uint32 minTotalSel = 5;
 	uint32 maxTotalSel = 6;
 	GroupingStyle groupingStyle = 7;
+	repeated uint32 unfilteredIds = 8;
 }
 
 message SelectFromGroupsResp {
-	repeated uint32 ids = 2;
 	uint32 idx = 1;
+	repeated uint32 ids = 2;
 }
 
 message SelectManaTypeReq {
-	repeated ManaColor manaColors = 2;
 	uint32 index = 1;
+	repeated ManaColor manaColors = 2;
 }
 
 message SelectManaTypeResp {
-	repeated ManaColor manaColors = 2;
 	uint32 index = 1;
+	repeated ManaColor manaColors = 2;
 	ManaColor manaColor = 3;
 }
 
 message SelectNGroupReq {
-	repeated Group groups = 3;
 	uint32 minSel = 1;
 	uint32 maxSel = 2;
+	repeated Group groups = 3;
 	uint32 idx = 4;
 }
 
 message SelectNGroupResp {
-	repeated uint32 selectedgroupids = 2;
 	uint32 idx = 1;
+	repeated uint32 selectedgroupids = 2;
 }
 
 message SelectNReq {
-	repeated uint32 ids = 7;
-	repeated int32 weights = 8;
-	repeated uint32 unfilteredIds = 14;
 	int32 minSel = 1;
 	uint32 maxSel = 2;
 	SelectionContext context = 3;
 	OptionType optionType = 4;
 	OptionContext optionContext = 5;
 	SelectionListType listType = 6;
+	repeated uint32 ids = 7;
+	repeated int32 weights = 8;
 	StaticList staticList = 9;
 	uint32 idx = 10;
 	Prompt prompt = 11;
 	IdType idType = 12;
 	bool choicesAreRepeatable = 13;
+	repeated uint32 unfilteredIds = 14;
 	uint32 sourceId = 15;
+	repeated uint32 hotIds = 16;
+	SelectionValidationType validationType = 17;
 }
 
 message SelectNResp {
-	repeated uint32 ids = 5;
 	uint32 idx = 1;
 	SelectionContext context = 2;
 	OptionContext optionContext = 3;
 	OptionType optionType = 4;
+	repeated uint32 ids = 5;
 	OrderingType useArbitrary = 6;
 }
 
@@ -3773,6 +3285,7 @@ message SelectReplacementResp {
 
 message SelectTargetsReq {
 	repeated TargetSelection targets = 1;
+	uint32 sourceId = 2;
 }
 
 message SelectTargetsResp {
@@ -3781,30 +3294,29 @@ message SelectTargetsResp {
 }
 
 enum SelectionContext {
-    SelectionContext_None =  0;
-    SelectionContext_Discard =  1;
-    SelectionContext_ManaPool =  2;
-    SelectionContext_Resolution =  3;
-    SelectionContext_TriggeredAbility =  4;
-    SelectionContext_Modal =  5;
-    SelectionContext_Replacement =  6;
-    SelectionContext_NonMana_Payment =  7;
-    SelectionContext_ManaFromAbility =  8;
+	SelectionContext_None = 0;
+	SelectionContext_Discard = 1;
+	SelectionContext_ManaPool = 2;
+	SelectionContext_Resolution = 3;
+	SelectionContext_TriggeredAbility = 4;
+	SelectionContext_Modal = 5;
+	SelectionContext_Replacement = 6;
+	SelectionContext_NonMana_Payment = 7;
+	SelectionContext_ManaFromAbility = 8;
 }
 
 enum SelectionListType {
-    SelectionListType_None =  0;
-    SelectionListType_Static =  1;
-    SelectionListType_Dynamic =  2;
-    SelectionListType_StaticSubset =  3;
+	SelectionListType_None = 0;
+	SelectionListType_Static = 1;
+	SelectionListType_Dynamic = 2;
+	SelectionListType_StaticSubset = 3;
 }
 
-message Selector {
-	repeated Node children = 1;
-}
-
-message Sequence {
-	repeated Node children = 1;
+enum SelectionValidationType {
+	SelectionValidationType_None = 0;
+	SelectionValidationType_NonRepeatable = 1;
+	SelectionValidationType_ArbitraryRepeats = 2;
+	SelectionValidationType_ConstrainedRepeats = 3;
 }
 
 message ServerToGREMessage {
@@ -3813,14 +3325,16 @@ message ServerToGREMessage {
 		GREConfigRequest configRequest = 2;
 		GREStartMatchRequest startMatchRequest = 3;
 		GREResumeMatchRequest resumeMatchRequest = 4;
-		GRESubmitDeckRequest submitDeckRequest = 5;
+		GRECheckpointRequest checkpointRequest = 5;
 		GREForceResultRequest forceResultRequest = 6;
 		GREDestroyRequest destroyRequest = 7;
 		GRETimerExpiredMessage timerExpired = 8;
 		GRETickMessage tick = 9;
-		Timeout timeout = 10;
+		GRETimeoutMessage timeout = 10;
 		GREInterpretRequest interpretRequest = 11;
 		GREExpireTimerRequest expireTimerRequest = 12;
+		GREElapseTimeRequest elapseTimeRequest = 13;
+		GREStartDelayedTimerMessage startDelayedTimerMessage = 14;
 	}
 }
 
@@ -3832,13 +3346,13 @@ message ServiceFabricConfigPackageInfo {
 message ServiceFabricServiceInfo {
 	string serviceName = 1;
 	string serviceTypeName = 2;
+	int64 replicaOrInstanceId = 3;
 	string partitionId = 4;
 	string nodeName = 5;
 	string codePackageVersion = 6;
 	repeated ServiceFabricConfigPackageInfo configPackages = 7;
 	string exeAssemblyVersion = 10;
 	string gatewayUrl = 20;
-	int64 replicaOrInstanceId = 3;
 }
 
 message ServiceInfoRequest {
@@ -3846,6 +3360,7 @@ message ServiceInfoRequest {
 
 message SetSettingsReq {
 	SettingsMessage settings = 1;
+	uint32 turnNumber = 2;
 }
 
 message SetSettingsResp {
@@ -3853,36 +3368,40 @@ message SetSettingsResp {
 }
 
 enum Setting {
-    Setting_None =  0;
-    Setting_Enable =  1;
-    Setting_Disable =  2;
+	Setting_None = 0;
+	Setting_Enable = 1;
+	Setting_Disable = 2;
 }
 
 enum SettingKey {
-    SettingKey_None =  0;
-    SettingKey_ByAbility =  1;
-    SettingKey_ByCardTitle =  2;
+	SettingKey_None = 0;
+	SettingKey_ByAbility = 1;
+	SettingKey_ByCardTitle = 2;
 }
 
 enum SettingScope {
-    SettingScope_None =  0;
-    SettingScope_AnyPlayer =  1;
-    SettingScope_Opponents =  2;
-    SettingScope_Team =  3;
+	SettingScope_None = 0;
+	SettingScope_AnyPlayer = 1;
+	SettingScope_Opponents = 2;
+	SettingScope_Team = 3;
 }
 
 enum SettingStatus {
-    SettingStatus_None =  0;
-    SettingStatus_Set =  1;
-    SettingStatus_Clear =  2;
+	SettingStatus_None = 0;
+	SettingStatus_Set = 1;
+	SettingStatus_Clear = 2;
+}
+
+message SettingsConfig {
+	uint32 seatId = 1;
+	SettingsMessage defaultSettings = 2;
+	string settingsFilePath = 3;
 }
 
 message SettingsMessage {
 	repeated Stop stops = 1;
 	repeated AutoYield yields = 2;
 	repeated AutoAnswer answers = 3;
-	repeated Stop transientStops = 15;
-	repeated CosmeticInfo cosmetics = 16;
 	AutoPassOption autoPassOption = 4;
 	OrderingType graveyardOrder = 5;
 	SettingStatus clearAllStops = 6;
@@ -3894,25 +3413,28 @@ message SettingsMessage {
 	AutoTapStopsSetting autoTapStopsSetting = 12;
 	Setting autoOptionalPaymentCancellationSetting = 13;
 	ManaPaymentStrategyType manaPaymentStrategyType = 14;
+	repeated Stop transientStops = 15;
+	repeated CosmeticInfo cosmetics = 16;
 	Setting autoSelectReplacementSetting = 17;
+	Setting autoDeclareAttackersThatMustAttackSetting = 18;
 }
 
 enum ShuffleRestriction {
-    ShuffleRestriction_None =  0;
-    ShuffleRestriction_OpeningHand =  1;
-    ShuffleRestriction_All =  2;
+	ShuffleRestriction_None = 0;
+	ShuffleRestriction_OpeningHand = 1;
+	ShuffleRestriction_All = 2;
 }
 
 enum SmartStopsSetting {
-    SmartStopsSetting_None =  0;
-    SmartStopsSetting_Enable =  1;
-    SmartStopsSetting_Disable =  2;
+	SmartStopsSetting_None = 0;
+	SmartStopsSetting_Enable = 1;
+	SmartStopsSetting_Disable = 2;
 }
 
 enum SortBy {
-    SortBy_None =  0;
-    SortBy_HighToLow =  1;
-    SortBy_LowToHigh =  2;
+	SortBy_None = 0;
+	SortBy_HighToLow = 1;
+	SortBy_LowToHigh = 2;
 }
 
 message SortFilterPagingOptions {
@@ -3924,35 +3446,35 @@ message SortFilterPagingOptions {
 }
 
 enum StaticList {
-    StaticList_None =  0;
-    StaticList_CardColors =  1;
-    StaticList_ManaColors =  2;
-    StaticList_SuperTypes =  3;
-    StaticList_CardTypes =  4;
-    StaticList_SubTypes =  5;
-    StaticList_Colors =  6;
-    StaticList_CoinFaces =  7;
-    StaticList_WishCards =  8;
-    StaticList_BasicLandTypes =  9;
-    StaticList_CreatureTypes =  10;
-    StaticList_CounterTypes =  11;
-    StaticList_Keywords =  12;
-    StaticList_CardNames =  13;
+	StaticList_None = 0;
+	StaticList_CardColors = 1;
+	StaticList_ManaColors = 2;
+	StaticList_SuperTypes = 3;
+	StaticList_CardTypes = 4;
+	StaticList_SubTypes = 5;
+	StaticList_Colors = 6;
+	StaticList_CoinFaces = 7;
+	StaticList_WishCards = 8;
+	StaticList_BasicLandTypes = 9;
+	StaticList_CreatureTypes = 10;
+	StaticList_CounterTypes = 11;
+	StaticList_Keywords = 12;
+	StaticList_CardNames = 13;
 }
 
 enum Step {
-    Step_None =  0;
-    Step_Untap =  1;
-    Step_Upkeep =  2;
-    Step_Draw =  3;
-    Step_BeginCombat =  4;
-    Step_DeclareAttack =  5;
-    Step_DeclareBlock =  6;
-    Step_CombatDamage =  7;
-    Step_EndCombat =  8;
-    Step_End =  9;
-    Step_Cleanup =  10;
-    Step_FirstStrikeDamage =  11;
+	Step_None = 0;
+	Step_Untap = 1;
+	Step_Upkeep = 2;
+	Step_Draw = 3;
+	Step_BeginCombat = 4;
+	Step_DeclareAttack = 5;
+	Step_DeclareBlock = 6;
+	Step_CombatDamage = 7;
+	Step_EndCombat = 8;
+	Step_End = 9;
+	Step_Cleanup = 10;
+	Step_FirstStrikeDamage = 11;
 }
 
 message Stop {
@@ -3962,392 +3484,413 @@ message Stop {
 }
 
 enum StopType {
-    StopType_None =  0;
-    StopType_UpkeepStep =  1;
-    StopType_DrawStep =  2;
-    StopType_PrecombatMainPhase =  3;
-    StopType_BeginCombatStep =  4;
-    StopType_DeclareAttackersStep =  5;
-    StopType_DeclareBlockersStep =  6;
-    StopType_CombatDamageStep =  7;
-    StopType_EndCombatStep =  8;
-    StopType_PostcombatMainPhase =  9;
-    StopType_EndStep =  10;
-    StopType_FirstStrikeDamageStep =  11;
+	StopType_None = 0;
+	StopType_UpkeepStep = 1;
+	StopType_DrawStep = 2;
+	StopType_PrecombatMainPhase = 3;
+	StopType_BeginCombatStep = 4;
+	StopType_DeclareAttackersStep = 5;
+	StopType_DeclareBlockersStep = 6;
+	StopType_CombatDamageStep = 7;
+	StopType_EndCombatStep = 8;
+	StopType_PostcombatMainPhase = 9;
+	StopType_EndStep = 10;
+	StopType_FirstStrikeDamageStep = 11;
 }
 
 enum SubType {
-    SubType_None = 0;
-    SubType_Angel = 1;
-    SubType_Archer = 2;
-    SubType_Archon = 3;
-    SubType_Artificer = 4;
-    SubType_Assassin = 5;
-    SubType_Aura = 6;
-    SubType_Basilisk = 7;
-    SubType_Bat = 8;
-    SubType_Bear = 9;
-    SubType_Beast = 10;
-    SubType_Berserker = 11;
-    SubType_Bird = 12;
-    SubType_Boar = 13;
-    SubType_Cat = 14;
-    SubType_Chandra = 15;
-    SubType_Cleric = 16;
-    SubType_Construct = 17;
-    SubType_Crocodile = 18;
-    SubType_Demon = 19;
-    SubType_Djinn = 20;
-    SubType_Dragon = 21;
-    SubType_Drake = 22;
-    SubType_Druid = 23;
-    SubType_Fish = 24;
-    SubType_Elemental = 25;
-    SubType_Elephant = 26;
-    SubType_Elf = 27;
-    SubType_Equipment = 28;
-    SubType_Forest = 29;
-    SubType_Garruk = 30;
-    SubType_Gate = 31;
-    SubType_Giant = 32;
-    SubType_Gideon = 33;
-    SubType_Goblin = 34;
-    SubType_Golem = 35;
-    SubType_Griffin = 36;
-    SubType_Horse = 37;
-    SubType_Hound = 38;
-    SubType_Human = 39;
-    SubType_Hydra = 40;
-    SubType_Illusion = 41;
-    SubType_Insect = 42;
-    SubType_Island = 43;
-    SubType_Jace = 44;
-    SubType_Knight = 45;
-    SubType_Merfolk = 46;
-    SubType_Minotaur = 47;
-    SubType_Monk = 48;
-    SubType_Mountain = 49;
-    SubType_Ogre = 50;
-    SubType_Ooze = 51;
-    SubType_Pegasus = 52;
-    SubType_Phoenix = 53;
-    SubType_Plains = 54;
-    SubType_Rhino = 55;
-    SubType_Rogue = 56;
-    SubType_Salamander = 57;
-    SubType_Scout = 58;
-    SubType_Serpent = 59;
-    SubType_Shade = 60;
-    SubType_Shaman = 61;
-    SubType_Siren = 62;
-    SubType_Skeleton = 63;
-    SubType_Soldier = 64;
-    SubType_Sorin = 65;
-    SubType_Sphinx = 66;
-    SubType_Spider = 67;
-    SubType_Spirit = 68;
-    SubType_Swamp = 69;
-    SubType_Tower = 70;
-    SubType_Treefolk = 71;
-    SubType_Troll = 72;
-    SubType_Urzas = 73;
-    SubType_Vampire = 74;
-    SubType_Vedalken = 75;
-    SubType_Wall = 76;
-    SubType_Warrior = 77;
-    SubType_Wizard = 78;
-    SubType_Wolf = 79;
-    SubType_Wurm = 80;
-    SubType_Zombie = 81;
-    SubType_Mine = 82;
-    SubType_Power_Plant = 83;
-    SubType_Saproling = 84;
-    SubType_Avatar = 85;
-    SubType_Sliver = 86;
-    SubType_Samurai = 87;
-    SubType_Pest = 88;
-    SubType_Thalakos = 89;
-    SubType_Dauthi = 90;
-    SubType_Minion = 91;
-    SubType_Advisor = 92;
-    SubType_Ajani = 93;
-    SubType_Alara = 94;
-    SubType_Ally = 95;
-    SubType_Antelope = 97;
-    SubType_Ape = 98;
-    SubType_Arcane = 99;
-    SubType_Arkhos = 100;
-    SubType_Ashiok = 101;
-    SubType_AssemblyWorker = 102;
-    SubType_Atog = 103;
-    SubType_Aurochs = 104;
-    SubType_Azgol = 105;
-    SubType_Badger = 106;
-    SubType_Barbarian = 107;
-    SubType_Beeble = 108;
-    SubType_Belenon = 109;
-    SubType_Bolas = 110;
-    SubType_Bolass = 111;
-    SubType_Bringer = 112;
-    SubType_Brushwagg = 113;
-    SubType_Camel = 114;
-    SubType_Carrier = 115;
-    SubType_Centaur = 116;
-    SubType_Cephalid = 117;
-    SubType_Chimera = 118;
-    SubType_Cockatrice = 119;
-    SubType_Crab = 120;
-    SubType_Curse = 121;
-    SubType_Cyclops = 122;
-    SubType_Desert = 123;
-    SubType_Devil = 124;
-    SubType_Dominaria = 125;
-    SubType_Domri = 126;
-    SubType_Dreadnought = 127;
-    SubType_Drone = 128;
-    SubType_Dryad = 129;
-    SubType_Dwarf = 130;
-    SubType_Efreet = 131;
-    SubType_Elder = 132;
-    SubType_Eldrazi = 133;
-    SubType_Elk = 134;
-    SubType_Elspeth = 135;
-    SubType_Equilor = 136;
-    SubType_Ergamon = 137;
-    SubType_Eye = 138;
-    SubType_Fabacin = 139;
-    SubType_Faerie = 140;
-    SubType_Ferret = 141;
-    SubType_Flagbearer = 142;
-    SubType_Fortification = 143;
-    SubType_Fox = 144;
-    SubType_Frog = 145;
-    SubType_Fungus = 146;
-    SubType_Gargoyle = 147;
-    SubType_Gnome = 148;
-    SubType_Goat = 149;
-    SubType_God = 150;
-    SubType_Gorgon = 151;
-    SubType_Gremlin = 152;
-    SubType_Hag = 153;
-    SubType_Harpy = 154;
-    SubType_Hellion = 155;
-    SubType_Hippo = 156;
-    SubType_Hippogriff = 157;
-    SubType_Homarid = 158;
-    SubType_Homunculus = 159;
-    SubType_Horror = 160;
-    SubType_Hyena = 161;
-    SubType_Imp = 162;
-    SubType_Incarnation = 163;
-    SubType_Innistrad = 164;
-    SubType_Iquatana = 165;
-    SubType_Ir = 166;
-    SubType_Jellyfish = 167;
-    SubType_Juggernaut = 168;
-    SubType_Kaldheim = 169;
-    SubType_Kamigawa = 170;
-    SubType_Karn = 171;
-    SubType_Karsus = 172;
-    SubType_Kavu = 173;
-    SubType_Kephalai = 174;
-    SubType_Kirin = 175;
-    SubType_Kithkin = 176;
-    SubType_Kobold = 177;
-    SubType_Kolbahan = 178;
-    SubType_Kor = 179;
-    SubType_Koth = 180;
-    SubType_Kraken = 181;
-    SubType_Kyneth = 182;
-    SubType_Lair = 183;
-    SubType_Lammasu = 184;
-    SubType_Leech = 185;
-    SubType_Leviathan = 186;
-    SubType_Lhurgoyf = 187;
-    SubType_Licid = 188;
-    SubType_Liliana = 189;
-    SubType_Lizard = 190;
-    SubType_Locus = 191;
-    SubType_Lorwyn = 192;
-    SubType_Luvion = 193;
-    SubType_Manticore = 194;
-    SubType_Masticore = 195;
-    SubType_Meditation = 196;
-    SubType_Mercadia = 197;
-    SubType_Mercenary = 198;
-    SubType_Metathran = 199;
-    SubType_Mirrodin = 200;
-    SubType_Moag = 201;
-    SubType_Monger = 202;
-    SubType_Mongoose = 203;
-    SubType_Mongseng = 204;
-    SubType_Moonfolk = 205;
-    SubType_Muraganda = 206;
-    SubType_Mutant = 207;
-    SubType_Myr = 208;
-    SubType_Mystic = 209;
-    SubType_Nautilus = 210;
-    SubType_Nephilim = 211;
-    SubType_New = 212;
-    SubType_Nightmare = 213;
-    SubType_Nightstalker = 214;
-    SubType_Ninja = 215;
-    SubType_Nissa = 216;
-    SubType_Noggle = 217;
-    SubType_Nomad = 218;
-    SubType_Nymph = 219;
-    SubType_Octopus = 220;
-    SubType_Orc = 221;
-    SubType_Orgg = 222;
-    SubType_Ouphe = 223;
-    SubType_Ox = 224;
-    SubType_Oyster = 225;
-    SubType_Phelddagrif = 226;
-    SubType_Phyrexia = 227;
-    SubType_Pirate = 228;
-    SubType_Plant = 229;
-    SubType_Praetor = 230;
-    SubType_Pyrulea = 231;
-    SubType_Rabbit = 232;
-    SubType_Rabiah = 233;
-    SubType_Ral = 234;
-    SubType_Rat = 235;
-    SubType_Rath = 236;
-    SubType_Ravnica = 237;
-    SubType_Realm = 238;
-    SubType_Rebel = 239;
-    SubType_Regatha = 240;
-    SubType_Rigger = 241;
-    SubType_Sable = 242;
-    SubType_Sarkhan = 243;
-    SubType_Satyr = 244;
-    SubType_Scarecrow = 245;
-    SubType_Scorpion = 246;
-    SubType_Segovia = 247;
-    SubType_Serras = 248;
-    SubType_Shadowmoor = 249;
-    SubType_Shandalar = 250;
-    SubType_Shapeshifter = 251;
-    SubType_Sheep = 252;
-    SubType_Shrine = 253;
-    SubType_Slith = 254;
-    SubType_Slug = 255;
-    SubType_Snake = 256;
-    SubType_Soltari = 257;
-    SubType_Spawn = 258;
-    SubType_Specter = 259;
-    SubType_Spellshaper = 260;
-    SubType_Spike = 261;
-    SubType_Sponge = 262;
-    SubType_Squid = 263;
-    SubType_Squirrel = 264;
-    SubType_Starfish = 265;
-    SubType_Surrakar = 266;
-    SubType_Tamiyo = 267;
-    SubType_Tezzeret = 268;
-    SubType_Thopter = 269;
-    SubType_Thrull = 270;
-    SubType_Tibalt = 271;
-    SubType_Trap = 272;
-    SubType_Turtle = 273;
-    SubType_Ulgrotha = 274;
-    SubType_Unicorn = 275;
-    SubType_Valla = 276;
-    SubType_Venser = 277;
-    SubType_Viashino = 278;
-    SubType_Volver = 279;
-    SubType_Vraska = 280;
-    SubType_Vryn = 281;
-    SubType_Weird = 282;
-    SubType_Werewolf = 283;
-    SubType_Whale = 284;
-    SubType_Wildfire = 285;
-    SubType_Wolverine = 286;
-    SubType_Wombat = 287;
-    SubType_Worm = 288;
-    SubType_Wraith = 289;
-    SubType_Xenagos = 290;
-    SubType_Xerex = 291;
-    SubType_Yeti = 292;
-    SubType_Zendikar = 293;
-    SubType_Zubera = 294;
-    SubType_Germ = 295;
-    SubType_Contraption = 296;
-    SubType_Citizen = 297;
-    SubType_Coward = 298;
-    SubType_Deserter = 299;
-    SubType_Prism = 300;
-    SubType_Reflection = 301;
-    SubType_Sand = 302;
-    SubType_Serf = 303;
-    SubType_Dack = 304;
-    SubType_Kiora = 305;
-    SubType_AllCreatureTypes = 306;
-    SubType_Blinkmoth = 307;
-    SubType_Camarid = 308;
-    SubType_Caribou = 309;
-    SubType_Graveborn = 310;
-    SubType_Lamia = 311;
-    SubType_Orb = 312;
-    SubType_Pentavite = 313;
-    SubType_Pincher = 314;
-    SubType_Splinter = 315;
-    SubType_Survivor = 316;
-    SubType_Tetravite = 317;
-    SubType_Triskelavite = 318;
-    SubType_Scion = 319;
-    SubType_Processor = 320;
-    SubType_Arlinn = 321;
-    SubType_Mole = 322;
-    SubType_Nahiri = 323;
-    SubType_Clue = 324;
-    SubType_Teferi = 325;
-    SubType_Daretti = 326;
-    SubType_Freyalise = 327;
-    SubType_Nixilis = 328;
-    SubType_Narset = 329;
-    SubType_Ugin = 330;
-    SubType_Vehicle = 331;
-    SubType_Servo = 332;
-    SubType_Dovin = 333;
-    SubType_Saheeli = 334;
-    SubType_Monkey = 335;
-    SubType_Aetherborn = 336;
-    SubType_Pilot = 337;
-    SubType_Jackal = 338;
-    SubType_Naga = 339;
-    SubType_Cartouche = 340;
-    SubType_Samut = 341;
-    SubType_Dinosaur = 342;
-    SubType_Treasure = 343;
-    SubType_Huatli = 344;
-    SubType_Angrath = 345;
-    SubType_Trilobite = 346;
-    SubType_Saga = 347;
-    SubType_Jaya = 348;
-    SubType_Vivien = 349;
-    SubType_Egg = 350;
-    SubType_PlaceholderSubType1 = 351;
-    SubType_PlaceholderSubType2 = 352;
-    SubType_PlaceholderSubType3 = 353;
-    SubType_PlaceholderSubType4 = 354;
-    SubType_PlaceholderSubType5 = 355;
+	SubType_None = 0;
+	SubType_Angel = 1;
+	SubType_Archer = 2;
+	SubType_Archon = 3;
+	SubType_Artificer = 4;
+	SubType_Assassin = 5;
+	SubType_Aura = 6;
+	SubType_Basilisk = 7;
+	SubType_Bat = 8;
+	SubType_Bear = 9;
+	SubType_Beast = 10;
+	SubType_Berserker = 11;
+	SubType_Bird = 12;
+	SubType_Boar = 13;
+	SubType_Cat = 14;
+	SubType_Chandra = 15;
+	SubType_Cleric = 16;
+	SubType_Construct = 17;
+	SubType_Crocodile = 18;
+	SubType_Demon = 19;
+	SubType_Djinn = 20;
+	SubType_Dragon = 21;
+	SubType_Drake = 22;
+	SubType_Druid = 23;
+	SubType_Fish = 24;
+	SubType_Elemental = 25;
+	SubType_Elephant = 26;
+	SubType_Elf = 27;
+	SubType_Equipment = 28;
+	SubType_Forest = 29;
+	SubType_Garruk = 30;
+	SubType_Gate = 31;
+	SubType_Giant = 32;
+	SubType_Gideon = 33;
+	SubType_Goblin = 34;
+	SubType_Golem = 35;
+	SubType_Griffin = 36;
+	SubType_Horse = 37;
+	SubType_Hound = 38;
+	SubType_Human = 39;
+	SubType_Hydra = 40;
+	SubType_Illusion = 41;
+	SubType_Insect = 42;
+	SubType_Island = 43;
+	SubType_Jace = 44;
+	SubType_Knight = 45;
+	SubType_Merfolk = 46;
+	SubType_Minotaur = 47;
+	SubType_Monk = 48;
+	SubType_Mountain = 49;
+	SubType_Ogre = 50;
+	SubType_Ooze = 51;
+	SubType_Pegasus = 52;
+	SubType_Phoenix = 53;
+	SubType_Plains = 54;
+	SubType_Rhino = 55;
+	SubType_Rogue = 56;
+	SubType_Salamander = 57;
+	SubType_Scout = 58;
+	SubType_Serpent = 59;
+	SubType_Shade = 60;
+	SubType_Shaman = 61;
+	SubType_Siren = 62;
+	SubType_Skeleton = 63;
+	SubType_Soldier = 64;
+	SubType_Sorin = 65;
+	SubType_Sphinx = 66;
+	SubType_Spider = 67;
+	SubType_Spirit = 68;
+	SubType_Swamp = 69;
+	SubType_Tower = 70;
+	SubType_Treefolk = 71;
+	SubType_Troll = 72;
+	SubType_Urzas = 73;
+	SubType_Vampire = 74;
+	SubType_Vedalken = 75;
+	SubType_Wall = 76;
+	SubType_Warrior = 77;
+	SubType_Wizard = 78;
+	SubType_Wolf = 79;
+	SubType_Wurm = 80;
+	SubType_Zombie = 81;
+	SubType_Mine = 82;
+	SubType_Power_Plant = 83;
+	SubType_Saproling = 84;
+	SubType_Avatar = 85;
+	SubType_Sliver = 86;
+	SubType_Samurai = 87;
+	SubType_Pest = 88;
+	SubType_Thalakos = 89;
+	SubType_Dauthi = 90;
+	SubType_Minion = 91;
+	SubType_Advisor = 92;
+	SubType_Ajani = 93;
+	SubType_Alara = 94;
+	SubType_Ally = 95;
+	SubType_Antelope = 97;
+	SubType_Ape = 98;
+	SubType_Arcane = 99;
+	SubType_Arkhos = 100;
+	SubType_Ashiok = 101;
+	SubType_AssemblyWorker = 102;
+	SubType_Atog = 103;
+	SubType_Aurochs = 104;
+	SubType_Azgol = 105;
+	SubType_Badger = 106;
+	SubType_Barbarian = 107;
+	SubType_Beeble = 108;
+	SubType_Belenon = 109;
+	SubType_Bolas = 110;
+	SubType_Bolass = 111;
+	SubType_Bringer = 112;
+	SubType_Brushwagg = 113;
+	SubType_Camel = 114;
+	SubType_Carrier = 115;
+	SubType_Centaur = 116;
+	SubType_Cephalid = 117;
+	SubType_Chimera = 118;
+	SubType_Cockatrice = 119;
+	SubType_Crab = 120;
+	SubType_Curse = 121;
+	SubType_Cyclops = 122;
+	SubType_Desert = 123;
+	SubType_Devil = 124;
+	SubType_Dominaria = 125;
+	SubType_Domri = 126;
+	SubType_Dreadnought = 127;
+	SubType_Drone = 128;
+	SubType_Dryad = 129;
+	SubType_Dwarf = 130;
+	SubType_Efreet = 131;
+	SubType_Elder = 132;
+	SubType_Eldrazi = 133;
+	SubType_Elk = 134;
+	SubType_Elspeth = 135;
+	SubType_Equilor = 136;
+	SubType_Ergamon = 137;
+	SubType_Eye = 138;
+	SubType_Fabacin = 139;
+	SubType_Faerie = 140;
+	SubType_Ferret = 141;
+	SubType_Flagbearer = 142;
+	SubType_Fortification = 143;
+	SubType_Fox = 144;
+	SubType_Frog = 145;
+	SubType_Fungus = 146;
+	SubType_Gargoyle = 147;
+	SubType_Gnome = 148;
+	SubType_Goat = 149;
+	SubType_God = 150;
+	SubType_Gorgon = 151;
+	SubType_Gremlin = 152;
+	SubType_Hag = 153;
+	SubType_Harpy = 154;
+	SubType_Hellion = 155;
+	SubType_Hippo = 156;
+	SubType_Hippogriff = 157;
+	SubType_Homarid = 158;
+	SubType_Homunculus = 159;
+	SubType_Horror = 160;
+	SubType_Hyena = 161;
+	SubType_Imp = 162;
+	SubType_Incarnation = 163;
+	SubType_Innistrad = 164;
+	SubType_Iquatana = 165;
+	SubType_Ir = 166;
+	SubType_Jellyfish = 167;
+	SubType_Juggernaut = 168;
+	SubType_Kaldheim = 169;
+	SubType_Kamigawa = 170;
+	SubType_Karn = 171;
+	SubType_Karsus = 172;
+	SubType_Kavu = 173;
+	SubType_Kephalai = 174;
+	SubType_Kirin = 175;
+	SubType_Kithkin = 176;
+	SubType_Kobold = 177;
+	SubType_Kolbahan = 178;
+	SubType_Kor = 179;
+	SubType_Koth = 180;
+	SubType_Kraken = 181;
+	SubType_Kyneth = 182;
+	SubType_Lair = 183;
+	SubType_Lammasu = 184;
+	SubType_Leech = 185;
+	SubType_Leviathan = 186;
+	SubType_Lhurgoyf = 187;
+	SubType_Licid = 188;
+	SubType_Liliana = 189;
+	SubType_Lizard = 190;
+	SubType_Locus = 191;
+	SubType_Lorwyn = 192;
+	SubType_Luvion = 193;
+	SubType_Manticore = 194;
+	SubType_Masticore = 195;
+	SubType_Meditation = 196;
+	SubType_Mercadia = 197;
+	SubType_Mercenary = 198;
+	SubType_Metathran = 199;
+	SubType_Mirrodin = 200;
+	SubType_Moag = 201;
+	SubType_Monger = 202;
+	SubType_Mongoose = 203;
+	SubType_Mongseng = 204;
+	SubType_Moonfolk = 205;
+	SubType_Muraganda = 206;
+	SubType_Mutant = 207;
+	SubType_Myr = 208;
+	SubType_Mystic = 209;
+	SubType_Nautilus = 210;
+	SubType_Nephilim = 211;
+	SubType_New = 212;
+	SubType_Nightmare = 213;
+	SubType_Nightstalker = 214;
+	SubType_Ninja = 215;
+	SubType_Nissa = 216;
+	SubType_Noggle = 217;
+	SubType_Nomad = 218;
+	SubType_Nymph = 219;
+	SubType_Octopus = 220;
+	SubType_Orc = 221;
+	SubType_Orgg = 222;
+	SubType_Ouphe = 223;
+	SubType_Ox = 224;
+	SubType_Oyster = 225;
+	SubType_Phelddagrif = 226;
+	SubType_Phyrexia = 227;
+	SubType_Pirate = 228;
+	SubType_Plant = 229;
+	SubType_Praetor = 230;
+	SubType_Pyrulea = 231;
+	SubType_Rabbit = 232;
+	SubType_Rabiah = 233;
+	SubType_Ral = 234;
+	SubType_Rat = 235;
+	SubType_Rath = 236;
+	SubType_Ravnica = 237;
+	SubType_Realm = 238;
+	SubType_Rebel = 239;
+	SubType_Regatha = 240;
+	SubType_Rigger = 241;
+	SubType_Sable = 242;
+	SubType_Sarkhan = 243;
+	SubType_Satyr = 244;
+	SubType_Scarecrow = 245;
+	SubType_Scorpion = 246;
+	SubType_Segovia = 247;
+	SubType_Serras = 248;
+	SubType_Shadowmoor = 249;
+	SubType_Shandalar = 250;
+	SubType_Shapeshifter = 251;
+	SubType_Sheep = 252;
+	SubType_Shrine = 253;
+	SubType_Slith = 254;
+	SubType_Slug = 255;
+	SubType_Snake = 256;
+	SubType_Soltari = 257;
+	SubType_Spawn = 258;
+	SubType_Specter = 259;
+	SubType_Spellshaper = 260;
+	SubType_Spike = 261;
+	SubType_Sponge = 262;
+	SubType_Squid = 263;
+	SubType_Squirrel = 264;
+	SubType_Starfish = 265;
+	SubType_Surrakar = 266;
+	SubType_Tamiyo = 267;
+	SubType_Tezzeret = 268;
+	SubType_Thopter = 269;
+	SubType_Thrull = 270;
+	SubType_Tibalt = 271;
+	SubType_Trap = 272;
+	SubType_Turtle = 273;
+	SubType_Ulgrotha = 274;
+	SubType_Unicorn = 275;
+	SubType_Valla = 276;
+	SubType_Venser = 277;
+	SubType_Viashino = 278;
+	SubType_Volver = 279;
+	SubType_Vraska = 280;
+	SubType_Vryn = 281;
+	SubType_Weird = 282;
+	SubType_Werewolf = 283;
+	SubType_Whale = 284;
+	SubType_Wildfire = 285;
+	SubType_Wolverine = 286;
+	SubType_Wombat = 287;
+	SubType_Worm = 288;
+	SubType_Wraith = 289;
+	SubType_Xenagos = 290;
+	SubType_Xerex = 291;
+	SubType_Yeti = 292;
+	SubType_Zendikar = 293;
+	SubType_Zubera = 294;
+	SubType_Germ = 295;
+	SubType_Contraption = 296;
+	SubType_Citizen = 297;
+	SubType_Coward = 298;
+	SubType_Deserter = 299;
+	SubType_Prism = 300;
+	SubType_Reflection = 301;
+	SubType_Sand = 302;
+	SubType_Serf = 303;
+	SubType_Dack = 304;
+	SubType_Kiora = 305;
+	SubType_AllCreatureTypes = 306;
+	SubType_Blinkmoth = 307;
+	SubType_Camarid = 308;
+	SubType_Caribou = 309;
+	SubType_Graveborn = 310;
+	SubType_Lamia = 311;
+	SubType_Orb = 312;
+	SubType_Pentavite = 313;
+	SubType_Pincher = 314;
+	SubType_Splinter = 315;
+	SubType_Survivor = 316;
+	SubType_Tetravite = 317;
+	SubType_Triskelavite = 318;
+	SubType_Scion = 319;
+	SubType_Processor = 320;
+	SubType_Arlinn = 321;
+	SubType_Mole = 322;
+	SubType_Nahiri = 323;
+	SubType_Clue = 324;
+	SubType_Teferi = 325;
+	SubType_Daretti = 326;
+	SubType_Freyalise = 327;
+	SubType_Nixilis = 328;
+	SubType_Narset = 329;
+	SubType_Ugin = 330;
+	SubType_Vehicle = 331;
+	SubType_Servo = 332;
+	SubType_Dovin = 333;
+	SubType_Saheeli = 334;
+	SubType_Monkey = 335;
+	SubType_Aetherborn = 336;
+	SubType_Pilot = 337;
+	SubType_Jackal = 338;
+	SubType_Naga = 339;
+	SubType_Cartouche = 340;
+	SubType_Samut = 341;
+	SubType_Dinosaur = 342;
+	SubType_Treasure = 343;
+	SubType_Huatli = 344;
+	SubType_Angrath = 345;
+	SubType_Trilobite = 346;
+	SubType_Saga = 347;
+	SubType_Jaya = 348;
+	SubType_Vivien = 349;
+	SubType_Egg = 350;
+	SubType_Kaya = 351;
+	SubType_Aminatou = 352;
+	SubType_Estrid = 353;
+	SubType_Rowan = 354;
+	SubType_Will = 355;
+	SubType_Windgrace = 356;
+	SubType_Yanggu = 357;
+	SubType_Yanling = 358;
+	SubType_Army = 359;
+	SubType_Teyo = 360;
+	SubType_Kasmina = 361;
+	SubType_Davriel = 362;
+	SubType_Food = 363;
+	SubType_Mouse = 364;
+	SubType_Noble = 365;
+	SubType_Peasant = 366;
+	SubType_Oko = 367;
+	SubType_Warlock = 368;
+	SubType_Adventure = 369;
+	SubType_PlaceholderSubType1 = 370;
+	SubType_PlaceholderSubType2 = 371;
+	SubType_PlaceholderSubType3 = 372;
+	SubType_PlaceholderSubType4 = 373;
+	SubType_PlaceholderSubType5 = 374;
+	SubType_PlaceholderSubType6 = 375;
+	SubType_PlaceholderSubType7 = 376;
+	SubType_PlaceholderSubType8 = 377;
+	SubType_PlaceholderSubType9 = 378;
+	SubType_PlaceholderSubType10 = 379;
 }
 
 enum SubZoneType {
-    SubZoneType_None =  0;
-    SubZoneType_Top =  1;
-    SubZoneType_Bottom =  2;
+	SubZoneType_None = 0;
+	SubZoneType_Top = 1;
+	SubZoneType_Bottom = 2;
 }
 
 message SubmitAttackersResp {
-	repeated InvalidAttacker invalidAttackers = 2;
 	ResultCode result = 1;
 }
 
 message SubmitBlockersResp {
-	repeated InvalidBlocker invalidBlockers = 2;
-	repeated EffectViolationBlocking effectViolationBlocking = 3;
 	ResultCode result = 1;
 }
 
@@ -4366,23 +3909,22 @@ message SubmitPaymentResp {
 }
 
 message SubmitTargetsResp {
-	repeated InvalidTargetSelection invalidSelections = 2;
 	ResultCode result = 1;
 }
 
 enum SuperFormat {
-    SuperFormat_None =  0;
-    SuperFormat_Limited =  1;
-    SuperFormat_Constructed =  2;
+	SuperFormat_None = 0;
+	SuperFormat_Limited = 1;
+	SuperFormat_Constructed = 2;
 }
 
 enum SuperType {
-    SuperType_None =  0;
-    SuperType_Basic =  1;
-    SuperType_Legendary =  2;
-    SuperType_Ongoing =  3;
-    SuperType_Snow =  4;
-    SuperType_World =  5;
+	SuperType_None = 0;
+	SuperType_Basic = 1;
+	SuperType_Legendary = 2;
+	SuperType_Ongoing = 3;
+	SuperType_Snow = 4;
+	SuperType_World = 5;
 }
 
 message Target {
@@ -4397,8 +3939,8 @@ message TargetInfo {
 }
 
 message TargetSelection {
-	repeated Target targets = 2;
 	uint32 targetIdx = 1;
+	repeated Target targets = 2;
 	uint32 minTargets = 3;
 	uint32 maxTargets = 4;
 	uint32 selectedTargets = 5;
@@ -4406,37 +3948,28 @@ message TargetSelection {
 }
 
 enum TargetType {
-    TargetType_None =  0;
-    TargetType_Player =  1;
-    TargetType_GameObject =  2;
-}
-
-message Task {
-	oneof message {
-		Timeout timeout = 1;
-		EndTurn endTurn = 2;
-		Pass pass = 3;
-	}
+	TargetType_None = 0;
+	TargetType_Player = 1;
+	TargetType_GameObject = 2;
 }
 
 message TeamConfig {
-	repeated PlayerConfig players = 2;
 	uint32 teamID = 1;
+	repeated PlayerConfig players = 2;
 }
 
 message TeamInfo {
-	repeated uint32 playerIds = 2;
 	uint32 id = 1;
+	repeated uint32 playerIds = 2;
 }
 
 enum TeamType {
-    TeamType_None =  0;
-    TeamType_Individual =  1;
-    TeamType_SharedTeam =  2;
+	TeamType_None = 0;
+	TeamType_Individual = 1;
+	TeamType_SharedTeam = 2;
 }
 
 message TestConfig {
-	repeated uint32 randomSeeds = 13;
 	ShuffleRestriction shuffleRestriction = 1;
 	uint32 startingPlayer = 2;
 	bool useSpecifiedSeed = 3;
@@ -4444,10 +3977,10 @@ message TestConfig {
 	bool useZeroManaCostForCasting = 5;
 	uint32 useMaxLandsPerTurn = 6;
 	TreeOfCongress treeOfCongress = 7;
-	bool useLibraryRNG = 9;
 	bool disableGameStateQueueingDuringCancelableActions = 10;
 	bool disableHiFiGameStates = 11;
 	bool disableTimers = 12;
+	repeated uint32 randomSeeds = 13;
 	uint32 freeMulliganCount = 14;
 	uint32 randomDrawCount = 15;
 	float minRandomDrawDistance = 16;
@@ -4456,9 +3989,9 @@ message TestConfig {
 	bool enableAutoPlay = 19;
 	bool disableUnexpectedMessageRecovery = 20;
 	bool disableSideboarding = 21;
-}
-
-message Timeout {
+	uint32 candidateShuffleCount = 22;
+	uint32 bestCandidateShuffleCount = 23;
+	AutoRespondPermission autoRespondPermission = 24;
 }
 
 message TimeoutConfig {
@@ -4476,30 +4009,31 @@ message TimeoutMessage {
 }
 
 enum TimeoutType {
-    TimeoutType_None =  0;
-    TimeoutType_ChessClock =  1;
-    TimeoutType_Inactivity =  2;
+	TimeoutType_None = 0;
+	TimeoutType_ChessClock = 1;
+	TimeoutType_Inactivity = 2;
 }
 
 enum TimerBehavior {
-    TimerBehavior_None =  0;
-    TimerBehavior_Timeout =  1;
-    TimerBehavior_AutoRespond =  2;
-    TimerBehavior_TakeControl =  3;
-    TimerBehavior_ReleaseControl =  4;
-    TimerBehavior_Start =  5;
-    TimerBehavior_Restart =  6;
-    TimerBehavior_Stop =  7;
-    TimerBehavior_Reset =  8;
-    TimerBehavior_Activate =  9;
-    TimerBehavior_Deactivate =  10;
+	TimerBehavior_None = 0;
+	TimerBehavior_Timeout = 1;
+	TimerBehavior_AutoRespond = 2;
+	TimerBehavior_TakeControl = 3;
+	TimerBehavior_ReleaseControl = 4;
+	TimerBehavior_Start = 5;
+	TimerBehavior_Restart = 6;
+	TimerBehavior_Stop = 7;
+	TimerBehavior_Reset = 8;
+	TimerBehavior_Activate = 9;
+	TimerBehavior_Deactivate = 10;
+	TimerBehavior_StartDelayedTimer = 11;
 }
 
 message TimerConfig {
-	repeated TimerControl controls = 6;
 	TimerType type = 1;
 	uint32 durationSec = 4;
 	TimerBehavior behavior = 5;
+	repeated TimerControl controls = 6;
 	uint32 warningThresholdSec = 7;
 	uint32 maxDurationSec = 8;
 }
@@ -4510,37 +4044,37 @@ message TimerControl {
 }
 
 enum TimerEvent {
-    TimerEvent_None =  0;
-    TimerEvent_OnRequestSent =  1;
-    TimerEvent_OnResponseReceived =  2;
-    TimerEvent_OnExpiration =  3;
-    TimerEvent_OnMatchStart =  4;
-    TimerEvent_OnGameStart =  5;
-    TimerEvent_OnPlayStart =  6;
-    TimerEvent_OnTurnChanged =  7;
-    TimerEvent_OnActivePlayer =  8;
-    TimerEvent_OnNonActivePlayer =  9;
-    TimerEvent_Beginning =  10;
-    TimerEvent_Main1 =  11;
-    TimerEvent_Combat =  12;
-    TimerEvent_Main2 =  13;
-    TimerEvent_Ending =  14;
-    TimerEvent_OnWin =  15;
-    TimerEvent_OnLoss =  16;
-    TimerEvent_OnDraw =  17;
-    TimerEvent_OnGameOver =  18;
-    TimerEvent_OnMatchOver =  19;
-    TimerEvent_OnTurnOver =  20;
-    TimerEvent_Upkeep =  21;
-    TimerEvent_Draw =  22;
-    TimerEvent_BeginCombat =  23;
-    TimerEvent_DeclareAttack =  24;
-    TimerEvent_DeclareBlock =  25;
-    TimerEvent_CombatDamage =  26;
-    TimerEvent_EndCombat =  27;
-    TimerEvent_End =  28;
-    TimerEvent_Cleanup =  29;
-    TimerEvent_FirstStrikeDamage =  30;
+	TimerEvent_None = 0;
+	TimerEvent_OnRequestSent = 1;
+	TimerEvent_OnResponseReceived = 2;
+	TimerEvent_OnExpiration = 3;
+	TimerEvent_OnMatchStart = 4;
+	TimerEvent_OnGameStart = 5;
+	TimerEvent_OnPlayStart = 6;
+	TimerEvent_OnTurnChanged = 7;
+	TimerEvent_OnActivePlayer = 8;
+	TimerEvent_OnNonActivePlayer = 9;
+	TimerEvent_Beginning = 10;
+	TimerEvent_Main1 = 11;
+	TimerEvent_Combat = 12;
+	TimerEvent_Main2 = 13;
+	TimerEvent_Ending = 14;
+	TimerEvent_OnWin = 15;
+	TimerEvent_OnLoss = 16;
+	TimerEvent_OnDraw = 17;
+	TimerEvent_OnGameOver = 18;
+	TimerEvent_OnMatchOver = 19;
+	TimerEvent_OnTurnOver = 20;
+	TimerEvent_Upkeep = 21;
+	TimerEvent_Draw = 22;
+	TimerEvent_BeginCombat = 23;
+	TimerEvent_DeclareAttack = 24;
+	TimerEvent_DeclareBlock = 25;
+	TimerEvent_CombatDamage = 26;
+	TimerEvent_EndCombat = 27;
+	TimerEvent_End = 28;
+	TimerEvent_Cleanup = 29;
+	TimerEvent_FirstStrikeDamage = 30;
 }
 
 message TimerInfo {
@@ -4555,22 +4089,32 @@ message TimerInfo {
 }
 
 enum TimerPackage {
-    TimerPackage_None =  0;
-    TimerPackage_V1 =  1;
-    TimerPackage_V2 =  2;
-    TimerPackage_V3 =  3;
-    TimerPackage_V4 =  4;
-    TimerPackage_V5 =  5;
+	TimerPackage_None = 0;
+	TimerPackage_V1 = 1;
+	TimerPackage_V2 = 2;
+	TimerPackage_V3 = 3;
+	TimerPackage_V4 = 4;
+	TimerPackage_V5 = 5;
+	TimerPackage_DirectChallenge = 6;
+	TimerPackage_Default = 7;
+	TimerPackage_BestOfThree = 8;
+}
+
+message TimerStateMessage {
+	uint32 seatId = 1;
+	repeated TimerInfo timers = 2;
 }
 
 enum TimerType {
-    TimerType_None =  0;
-    TimerType_Decision =  1;
-    TimerType_Inactivity =  2;
-    TimerType_ActivePlayer =  3;
-    TimerType_NonActivePlayer =  4;
-    TimerType_Prologue =  5;
-    TimerType_Epilogue =  6;
+	TimerType_None = 0;
+	TimerType_Decision = 1;
+	TimerType_Inactivity = 2;
+	TimerType_ActivePlayer = 3;
+	TimerType_NonActivePlayer = 4;
+	TimerType_Prologue = 5;
+	TimerType_Epilogue = 6;
+	TimerType_Delay = 7;
+	TimerType_MatchClock = 8;
 }
 
 message TreeOfCongress {
@@ -4589,20 +4133,13 @@ message TurnInfo {
 	Step nextStep = 9;
 }
 
-enum TypeCategory {
-    TypeCategory_None = 0;
-    TypeCategory_Color = 3;
-    TypeCategory_CardType = 5;
-    TypeCategory_SubType = 6;
-    TypeCategory_SuperType = 7;
-}
-
 message UIMessage {
 	repeated uint32 seatIds = 1;
 	OnSelect onSelect = 2;
 	OnHover onHover = 3;
 	OnShuffle onShuffle = 4;
 	OnChat onChat = 5;
+	OnGenericEvent onGenericEvent = 6;
 }
 
 message UInt32Value {
@@ -4632,60 +4169,35 @@ message ValueHeuristicParameter {
 }
 
 enum Visibility {
-    Visibility_None =  0;
-    Visibility_Public =  1;
-    Visibility_Private =  2;
-    Visibility_Hidden =  3;
-}
-
-enum WellKnownCatalogId {
-    WellKnownCatalogId_None =  0;
-    WellKnownCatalogId_Token =  1;
-    WellKnownCatalogId_Emblem =  2;
-    WellKnownCatalogId_StandardCardBack =  3;
-    WellKnownCatalogId_Obscured =  4;
-    WellKnownCatalogId_DelayedTriggerAbilityHolder =  5;
-}
-
-enum WishCards {
-    WishCards_None = 0;
-    WishCards_GriffinSentinel = 41200;
-    WishCards_Divination = 41202;
-    WishCards_DjinnOfWishes = 41204;
-    WishCards_DoomBlade = 41205;
-    WishCards_ZombieGoliath = 41210;
-    WishCards_WordOfSeizing = 53011;
+	Visibility_None = 0;
+	Visibility_Public = 1;
+	Visibility_Private = 2;
+	Visibility_Hidden = 3;
+	Visibility_Deceptive = 4;
 }
 
 message ZoneInfo {
-	repeated uint32 objectInstanceIds = 5;
-	repeated uint32 viewers = 6;
 	uint32 zoneId = 1;
 	ZoneType type = 2;
 	Visibility visibility = 3;
 	uint32 ownerSeatId = 4;
-}
-
-enum ZonePermissions {
-    ZonePermissions_None =  0;
-    ZonePermissions_Hand =  1;
-    ZonePermissions_Library =  2;
-    ZonePermissions_All =  3;
+	repeated uint32 objectInstanceIds = 5;
+	repeated uint32 viewers = 6;
 }
 
 enum ZoneType {
-    ZoneType_None =  0;
-    ZoneType_Library =  1;
-    ZoneType_Hand =  2;
-    ZoneType_Battlefield =  3;
-    ZoneType_Stack =  4;
-    ZoneType_Graveyard =  5;
-    ZoneType_Exile =  6;
-    ZoneType_Command =  7;
-    ZoneType_Revealed =  8;
-    ZoneType_Limbo =  9;
-    ZoneType_Sideboard =  10;
-    ZoneType_Pending =  11;
-    ZoneType_PhasedOut =  12;
+	ZoneType_None = 0;
+	ZoneType_Library = 1;
+	ZoneType_Hand = 2;
+	ZoneType_Battlefield = 3;
+	ZoneType_Stack = 4;
+	ZoneType_Graveyard = 5;
+	ZoneType_Exile = 6;
+	ZoneType_Command = 7;
+	ZoneType_Revealed = 8;
+	ZoneType_Limbo = 9;
+	ZoneType_Sideboard = 10;
+	ZoneType_Pending = 11;
+	ZoneType_PhasedOut = 12;
 }
 

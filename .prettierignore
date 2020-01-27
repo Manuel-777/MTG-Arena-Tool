@@ -1,7 +1,6 @@
 # See https://prettier.io/docs/en/ignore.html for more about ignoring files.
 
 # dependencies
-src/shared/autocomplete.js
 src/window_background/messages_pb.js
 
 # assets

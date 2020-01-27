@@ -2,21 +2,20 @@ import React, { useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 
 import { ARENA_MODE_DRAFT } from "../shared/constants";
-import db from "../shared/database";
 import { getCardImage } from "../shared/util";
 import DraftRatings from "../shared/DraftRatings";
 
 import {
   getEditModeClass,
   useEditModeOnRef,
-  OddsData,
   SettingsData
 } from "./overlayUtil";
 import { DbCardData } from "../shared/types/Metadata";
+import { Chances } from "../window_background/types/decks";
 
 const NO_IMG_URL = "./images/nocard.png";
 
-function GroupedLandsDetails(props: { odds: OddsData }): JSX.Element {
+function GroupedLandsDetails(props: { odds: Chances }): JSX.Element {
   const { landW, landU, landB, landR, landG } = props.odds;
   const manaChanceDiv = function(value: number, color: string): JSX.Element {
     return (
@@ -45,7 +44,7 @@ export interface CardDetailsWindowletProps {
   cardsSizeHoverCard: number;
   editMode: boolean;
   handleToggleEditMode: () => void;
-  odds?: OddsData;
+  odds?: Chances;
   overlayHover: { x: number; y: number };
   overlayScale: number;
   settings: SettingsData;
@@ -73,11 +72,11 @@ export default function CardDetailsWindowlet(
   } = props;
 
   // TODO remove group lands hack
-  const isCardGroupedLands = card && card.id === 100 && odds;
+  const isCardGroupedLands = card?.id === 100 && odds;
   // TODO support split cards
   let name = "";
   let images = {};
-  if (card) {
+  if (card !== undefined) {
     name = card.name;
     images = card.images;
   }

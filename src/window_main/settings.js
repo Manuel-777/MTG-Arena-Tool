@@ -33,8 +33,7 @@ import {
   createLabel,
   queryElements as $$
 } from "../shared/dom-fns";
-import * as deckDrawer from "../shared/deck-drawer";
-import { showWhatsNew } from "./whats-new";
+import * as deckDrawer from "./DeckDrawer";
 import createSelect from "./createSelect";
 import { getCardImage } from "../shared/util";
 const byId = id => document.getElementById(id);
@@ -650,9 +649,7 @@ function appendOverlay(section) {
     overlaySettingsNav.style.display = "flex";
 
     const overlaySettingsIcon = createDiv(["overlay_icon"]);
-    overlaySettingsIcon.style.backgroundColor = `var(--color-${
-      COLORS_ALL[index]
-    })`;
+    overlaySettingsIcon.style.backgroundColor = `var(--color-${COLORS_ALL[index]})`;
     overlaySettingsIcon.style.flexShrink = 0;
     overlaySettingsNav.appendChild(overlaySettingsIcon);
     overlaySettingsNav.appendChild(
@@ -1328,12 +1325,14 @@ function appendAbout(section) {
   updateButton.addEventListener("click", () => ipcSend("updates_check", true));
   about.appendChild(updateButton);
 
-  const whatsNewLink = createDiv(
+  const ReleaseNotesLink = createDiv(
     ["message_sub_15", "white", "release_notes_link"],
-    "What's new?"
+    "Release Notes"
   );
-  whatsNewLink.addEventListener("click", showWhatsNew);
-  about.appendChild(whatsNewLink);
+  ReleaseNotesLink.addEventListener("click", () => {
+    shell.openExternal("https://mtgatool.com/release-notes");
+  });
+  about.appendChild(ReleaseNotesLink);
 
   const linkDiv = createDiv(["flex_item"]);
   linkDiv.style.margin = "64px auto 0px auto";

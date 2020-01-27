@@ -17,8 +17,8 @@ function LogEntry(props: LogEntryProps): JSX.Element {
   const { initialTime, log, setHoverCardCallback } = props;
   const [isMouseHovering, setMouseHovering] = useState(false);
   const fullCard = db.card(log.grpId);
-  let dfcCard: any;
-  if (fullCard && fullCard.dfcId) {
+  let dfcCard: DbCardData | undefined;
+  if (fullCard?.dfcId !== undefined) {
     dfcCard = db.card(fullCard.dfcId);
   }
   const handleMouseEnter = useCallback((): void => {
@@ -31,7 +31,10 @@ function LogEntry(props: LogEntryProps): JSX.Element {
   }, [setHoverCardCallback]);
   const handleMouseClick = useCallback((): void => {
     let _card = fullCard;
-    if (fullCard && [FACE_SPLIT_FULL, FACE_ADVENTURE_MAIN].includes(fullCard.dfc)) {
+    if (
+      fullCard &&
+      [FACE_SPLIT_FULL, FACE_ADVENTURE_MAIN].includes(fullCard.dfc)
+    ) {
       _card = dfcCard || fullCard;
     }
     openScryfallCard(_card);

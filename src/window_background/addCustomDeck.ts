@@ -1,4 +1,4 @@
-import { setData } from "./background-util";
+import { setData } from "./backgroundUtil";
 import { playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/player-data";
 
@@ -6,7 +6,7 @@ export interface Deck {
   id: string;
 }
 
-type StoreShim = { set:(key: string, value: any) => void };
+type StoreShim = { set: (key: string, value: any) => void };
 
 const addCustomDeck = function(customDeck: Deck): void {
   const id = customDeck.id;

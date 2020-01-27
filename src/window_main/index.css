@@ -557,7 +557,7 @@ span.top_nav_item_text {
 }
 
 
-.visualView, .openDeck, .openHistory, .exportDeck, .exportDeckStandard, .centered {
+.visualView, .openDeck, .openMatches, .exportDeck, .exportDeckStandard, .centered {
         display: block;
     margin: 16px auto !important;
 }
@@ -745,7 +745,7 @@ font-family:  var(--main-font-name);
 }
 
 .list_economy {
-    cursor: pointer;
+    cursor: default;
     padding-left: 16px;
     height: 64px;
     opacity: 0.66;
@@ -914,14 +914,14 @@ a:hover {
     justify-content: space-between;
 }
 
-.history_top {
+.matches_top {
     display: flex;
     min-height: 64px;
     margin-left: 16px;
     justify-content: space-between;
 }
 
-.history_tags {
+.matches_tags {
     display: flex;
     margin: 1px -10px 0px 8px;
 }
@@ -1026,11 +1026,11 @@ a:hover {
     display: flex;
 }
 
-.deck_tags_container {
-    margin: 6px 16px;
-    display: flex;
-    flex-wrap: wrap;
-    flex-grow: 2;
+.deck_tags_container {	
+    margin: 6px 16px;	
+    display: flex;	
+    flex-wrap: wrap;	
+    flex-grow: 2;	
 }
 
 .deck_tag_input {
@@ -1270,47 +1270,6 @@ a:hover {
 .wc_mythic      { background-image: var(--wc_mythic_png); }
 .wc_booster     { background-image: var(--booster_png); height: 34px; line-height: 34px; }
 
-.inventory {
-    padding-left: 8px;
-    padding-right: 8px;
-    width: calc(100% - 16px);
-    height: calc(100% - 122px);
-    overflow: auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-}
-
-.inventory_filters_basic {
-    display: flex;
-    align-items: center;
-    padding: 16px 32px;
-    height: 90px;
-    background-color: rgba(0, 0, 0, 0.2);
-    justify-content: space-between;
-}
-
-.inventory_filters {
-    padding: 0px 32px;
-    overflow: hidden;
-    height: 0px;
-    background-color: rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    -webkit-transition: all .2s ease-in;
-}
-
-.inventory_flex {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.inventory_flex_half {
-    display: flex;
-    flex-direction: column;
-    width: calc(50% - 16px);
-}
-
 .inventory_card {
     width: 140px;
     display: inline-block;
@@ -1485,10 +1444,21 @@ a:hover {
 
 .icon_search_inclusive {
     display: -webkit-inline-box;
+    background: center no-repeat url('../images/create.png');
+    background-size: contain;
+    margin: auto 2px auto 2px;
+    background-repeat: no-repeat;
+    filter: drop-shadow(-1px 1px black);
+    vertical-align: middle;
+}
+
+.icon_search_booster {
+    display: -webkit-inline-box;
     width: 20px;
     margin-right: 16px;
     height: 20px;
-    background: center no-repeat url('../images/create.png');
+    background: center no-repeat var(--booster_png);
+    background-size: contain;
 }
 
 .wc_search_icon {
@@ -1500,11 +1470,17 @@ a:hover {
 }
 
 .paging_container {
-    margin: 16px 24px;
+    margin: 8px;
     display: flex;
     width: 100%;
     height: 24px;
     justify-content: center;
+    align-items: center;
+}
+
+.paging_text {
+    color: var(--color-light);
+    white-space: nowrap;
 }
 
 .paging_button {
@@ -1528,6 +1504,7 @@ a:hover {
     text-align: center;
     line-height: 24px;
     border-radius: 4px;
+    border: none;
     color: var(--color-light-20);
     background-color: var(--color-mid-40);
 }
@@ -1546,24 +1523,33 @@ a:hover {
 
 
 .main_stats {
-    margin: 16px 16px 16px 32px;
-    min-width: 320px;
+    padding: 12px;
+    min-width: 240px;
+    width: -webkit-fill-available;
     display: block;
     text-align: center;
 }
 
-.main_stats.sub_stats {
-    margin: 16px;
-    width: -webkit-fill-available;
+.set_stats {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.set_stats:hover {
+    opacity: 1;
+    background-color: rgba(0,0,0,0.4);
 }
 
 .stats_set_completion {
-    cursor: pointer;
-    max-width: 320px;
+    max-width: 400px;
     margin: 24px auto;
     display: flex;
     flex-direction: column;
-    opacity: 0.7;
+}
+
+.stats_set_completion.stats_sidebar {
+    cursor: default;
+    max-width: 240px;
 }
 
 .stats_set_icon {
@@ -1588,7 +1574,6 @@ a:hover {
 }
 
 .stats_set_details {
-    cursor: pointer;
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
@@ -1596,7 +1581,6 @@ a:hover {
 }
 
 .stats_set_details span {
-    cursor: pointer;
     line-height: 24px;
     margin: 0 6px;
     font-size: 13px;
@@ -1605,7 +1589,6 @@ a:hover {
 }
 
 .stats_rarity_icon {
-    cursor: pointer;
     /*width: 24px;*/
     height: 24px;
     background-repeat: no-repeat;
@@ -1615,7 +1598,6 @@ a:hover {
 }
 
 .stats_rarity_icon span {
-    cursor: pointer;
     line-height: 24px;
     display: flex;
     font-size: 15px;
@@ -1633,11 +1615,15 @@ a:hover {
 .stats_set_bar:after {
     content: '';
     left: 0;
-    width: 320px;
+    width: 400px;
     background-color: rgb(99, 79, 53);
     height: 2px;
     position: absolute;
     z-index: -1;
+}
+
+.stats_sidebar .stats_set_bar:after {
+    width: 240px;
 }
 
 .sets_container {
@@ -1645,11 +1631,6 @@ a:hover {
     justify-content: center;
     display: flex;
     width: 100%;
-}
-
-.main_buttons_container {
-    display: flex;
-    justify-content: center;
 }
 
 .buttons_container {
@@ -1883,9 +1864,7 @@ a:hover {
     align-self: center;
     opacity: 1;
     background-repeat: no-repeat;
-    width: 40px;
-    margin: 0 auto;
-    height: 20px;
+    margin: 0 2px;
     cursor: pointer;
     background-position: center;
     background-size: contain;
@@ -1909,11 +1888,11 @@ a:hover {
     margin: 6px 20px;
 }
 
-.mana_filter:hover, .mana_filter_search:hover, .mana_filters_explore:hover, .rank_filter:hover {
+.mana_filter:hover, .mana_filter_search:hover, .mana_filters_explore:hover, .rank_filter:hover, .rarity_filter:hover, .set_filter:hover {
     opacity: 1;
 }
 
-.mana_filter_on, .rank_filter_on {
+.mana_filter_on, .rank_filter_on, .rarity_filter_on, .set_filter_on {
     opacity: 0.4;
 }
 
@@ -1930,13 +1909,6 @@ a:hover {
     -webkit-transition: all .3s ease-in-out;
 }
 
-.input_container_inventory {
-    display: flex;
-    height: 24px;
-    width: 100%;
-    margin: 8px 0px;
-}
-
 .input_container_explore {
     display: flex;
     height: 24px;
@@ -1945,7 +1917,7 @@ a:hover {
     align-self: center;
 }
 
-.input_container_inventory label, .input_container_explore label {
+.input_container_explore label {
     white-space: pre;
 }
 
@@ -1956,7 +1928,7 @@ a:hover {
     margin: 8px 16px;
 }
 
-.input_container input, .input_container_inventory input, .input_container_explore input {
+.input_container input, .input_container_explore input {
     background-color: var(--color-mid-40);
     border: 1px solid var(--color-light-50);
     display: inline-table;
@@ -1972,7 +1944,7 @@ a:hover {
     padding-left: 4px;
 }
 
-.input_container input:focus, .input_container_inventory input:focus, .input_container_explore input:focus {
+.input_container input:focus, .input_container_explore input:focus {
     outline-style: none;
 }
 
@@ -2511,6 +2483,15 @@ a:hover {
     margin: 0 8px 0 8px;
 }
 
+.react-autosuggest__container {
+    height: 32px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-self: flex-start;
+    margin: 0;
+}
+
 .select_button {
     display: flex;
     color: var(--color-light);
@@ -2577,6 +2558,31 @@ a:hover {
     box-shadow: rgba(0, 0, 0, 0.25) 0px 10px 16px 0px;
 }
 
+.react-autosuggest__suggestions-list {
+    color: var(--color-light);
+    cursor: pointer;
+    position: absolute;
+    max-height: 384px;
+    overflow-y: auto;
+    top: 21px;
+    right: 0px;
+    left: 0px;
+    z-index: 999;
+    margin: -2px;
+    padding: 0 4px;
+    background-color: hsla(29, 22%, 30%, 1);
+    border: 1px solid var(--color-light-50);
+    border-top: 0px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 10px 16px 0px;
+    width: 180px;
+}
+
+.react-autosuggest__input {
+    border: none;
+    height: 17px;
+    background-color: inherit;
+}
+
 .select_option {
     display: flex;
     justify-content: space-between;
@@ -2591,7 +2597,7 @@ a:hover {
     width: 100%;
 }
 
-.select_option:hover {
+.select_option:hover, .react-autosuggest__suggestion--highlighted {
     background: var(--color-light-50);
 }
 
@@ -3179,6 +3185,10 @@ a:hover {
     background: url(../images/swap.png) no-repeat center;
 }
 
+.line_lighter {
+    background-color: var(--color-mid-66);
+}
+
 .line_light {
     background-color: var(--color-mid-40);
 }
@@ -3428,7 +3438,6 @@ a:hover {
 .list_item_container {
     white-space: nowrap;
     cursor: pointer;
-    padding-left: 16px;
     height: 64px;
     display: flex;
     justify-content: space-between;
@@ -3826,4 +3835,108 @@ a:hover {
 
 .inventory_card_quantity {
     color: var(--color-light);
+}
+
+.sort_asc {
+    background-image: url(../images/icon_sort.png);
+    background-size: cover;
+    width: 16px;
+    height: 16px;
+}
+
+.sort_desc {
+    background-image: url(../images/icon_sort.png);
+    background-size: cover;
+    transform: rotate(180deg);
+    width: 16px;
+    height: 16px;
+}
+
+.react_table_wrap {
+    padding: 16px;
+}
+
+.react_table_toggles {
+    display: flex;
+    flex-wrap: wrap;
+    width: -webkit-fill-available;
+    justify-content: center;
+    align-items: center;
+}
+
+.react_table_search_cont {
+    display: flex;
+    margin: 4px auto;
+    width: -webkit-fill-available;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.react_table_head {
+    display: grid;
+    min-height: 64px;
+    color: var(--color-light);
+    border-bottom: 1px solid var(--color-light);
+    background-color: var(--color-mid-20);
+    margin: 0 auto;
+}
+
+.react_table_head_container {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;   
+}
+
+.react_table_body {
+    background-color: var(--color-mid-20);
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.react_table_body_no_adjust {
+    background-color: var(--color-mid-20);
+}
+
+.react_table_body_row {
+    display: grid;
+    height: 32px;
+    color: var(--color-light);
+    -webkit-transition: all .1s ease-out;
+}
+
+.react_table_body_row:hover {
+    background-color: rgba(0,0,0,0.4);
+    cursor: pointer;
+}
+
+.react_table_body_row .inner_div {
+    display: flex;
+    padding: 2px;
+    margin-left: 8px;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+}
+
+.decks_table_deck_tile {
+    display: inline-block;
+    height: 32px;
+    width: 208px;
+    color: var(--color-light);
+    -webkit-transition: all .1s ease-out;
+    cursor: pointer;
+}
+
+.decks_table_deck_tile .inner_div {
+    display: flex;
+    padding: 2px;
+    padding-left: 10px;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.hover_label:hover {
+    background-color: rgba(0,0,0,0.4);
+    cursor: pointer;
 }

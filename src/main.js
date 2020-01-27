@@ -14,8 +14,9 @@ import { appDb } from "./shared/db/LocalDatabase";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
+import electronDebug from "electron-debug";
 // Adds debug features like hotkeys for triggering dev tools and reload
-require("electron-debug")({ showDevTools: false });
+electronDebug({ showDevTools: false });
 console.log(process.platform);
 
 const debugBack = false;
@@ -68,15 +69,8 @@ app.on("ready", () => {
       dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
     });
     startApp();
-    require("devtron").install();
     const dotenv = require("dotenv");
     dotenv.config();
-    if (process.env.REACTDEVTOOLSEXT) {
-      // To enable REACT dev tools createa an .env file
-      // and add REACTDEVTOOLSEXT="path"
-      // where path is the path to your chrome extension folder
-      electron.BrowserWindow.addDevToolsExtension(process.env.REACTDEVTOOLSEXT);
-    }
   }
 });
 
@@ -174,12 +168,7 @@ function startApp() {
 
   ipc.on("ipc_switch", function(event, method, from, arg, to) {
     if (debugIPC && method != "log_read") {
-      if (
-        debugIPC == 2 &&
-        method != "set_status" &&
-        method != "set_db" &&
-        method != "background_set_history_data"
-      ) {
+      if (debugIPC == 2 && method != "set_status" && method != "set_db") {
         console.log("IPC ", method + ": " + JSON.stringify(arg));
       } else {
         console.log("IPC ", method, "From:", from, "To:", to);

@@ -1,19 +1,16 @@
 import _ from "lodash";
-import React, { useEffect } from "react";
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 import { queryElements as $$ } from "../shared/dom-fns";
-import { openTab, clickNav } from "./tabControl";
+import { clickNav } from "./tabControl";
 import pd from "../shared/player-data";
 
-import {
-    get_rank_index,
-    formatRank
-} from "../shared/util";
+import { get_rank_index as getRankIndex, formatRank } from "../shared/util";
 
 import {
   MAIN_HOME,
   MAIN_DECKS,
-  MAIN_HISTORY,
+  MAIN_MATCHES,
   MAIN_EVENTS,
   MAIN_EXPLORE,
   MAIN_ECONOMY,
@@ -23,55 +20,85 @@ import {
 } from "../shared/constants";
 
 interface TopNavItemProps {
-  currentTab: number,
-  compact: boolean,
-  id: number,
-  callback: (id:number) => void,
-  title: string
+  currentTab: number;
+  compact: boolean;
+  id: number;
+  callback: (id: number) => void;
+  title: string;
 }
 
-function TopNavItem(props:TopNavItemProps) {
-  const {currentTab, compact, id, callback, title} = props;
+function TopNavItem(props: TopNavItemProps): JSX.Element {
+  const { currentTab, compact, id, callback, title } = props;
 
-  const clickTab = React.useCallback((tabId: number) => (event: React.MouseEvent<HTMLDivElement>) => {
-    clickNav(tabId);
-    callback(tabId);
-  }, [props.id, props.callback]);
+  const clickTab = React.useCallback(
+    (tabId: number) => (): void => {
+      clickNav(tabId);
+      callback(tabId);
+    },
+    [props.id, props.callback]
+  );
 
   return compact ? (
-    <div className={(currentTab === id ? "item_selected" : "") + " top_nav_item_no_label top_nav_item it" + id} onClick={clickTab(id)}>
-      <div className={"top_nav_icon icon_" + id} title={_.camelCase(title)}></div>
+    <div
+      className={
+        (currentTab === id ? "item_selected" : "") +
+        " top_nav_item_no_label top_nav_item it" +
+        id
+      }
+      onClick={clickTab(id)}
+    >
+      <div
+        className={"top_nav_icon icon_" + id}
+        title={_.camelCase(title)}
+      ></div>
     </div>
   ) : (
-    <div className={(currentTab === id ? "item_selected" : "") + " top_nav_item it" + id + (title == "" ? " top_nav_item_no_label" : "")} onClick={clickTab(id)}>
-      {title !== "" ? (<span className={"top_nav_item_text"}>{title}</span>) : 
-      (<div className={"top_nav_icon icon_" + id} title={_.camelCase(title)}></div>)}
+    <div
+      className={
+        (currentTab === id ? "item_selected" : "") +
+        " top_nav_item it" +
+        id +
+        (title == "" ? " top_nav_item_no_label" : "")
+      }
+      onClick={clickTab(id)}
+    >
+      {title !== "" ? (
+        <span className={"top_nav_item_text"}>{title}</span>
+      ) : (
+        <div
+          className={"top_nav_icon icon_" + id}
+          title={_.camelCase(title)}
+        ></div>
+      )}
     </div>
   );
 }
 
-interface topRankProps {
-  currentTab: number,
-  id: number,
-  rank: any | null,
-  callback: (id:number) => void,
-  rankClass: string
+interface TopRankProps {
+  currentTab: number;
+  id: number;
+  rank: any | null;
+  callback: (id: number) => void;
+  rankClass: string;
 }
 
-function TopRankIcon(props:topRankProps) {
-  const {currentTab, id, rank, callback, rankClass} = props;
-  
+function TopRankIcon(props: TopRankProps): JSX.Element {
+  const { currentTab, id, rank, callback, rankClass } = props;
+
   const selected = currentTab === id;
 
-  const clickTab = React.useCallback((tabId) => (event: React.MouseEvent<HTMLDivElement>) => {
-    clickNav(tabId);
-    callback(tabId);
-  }, [props.id, props.callback]);
+  const clickTab = React.useCallback(
+    tabId => (): void => {
+      clickNav(tabId);
+      callback(tabId);
+    },
+    [props.id, props.callback]
+  );
 
   if (rank == null) {
     // No rank badge, default to beginner and remove interactions
     const rankStyle = {
-        backgroundPosition: "0px 0px"
+      backgroundPosition: "0px 0px"
     };
     return (
       <div className="top_nav_item">
@@ -82,22 +109,25 @@ function TopRankIcon(props:topRankProps) {
 
   const propTitle = formatRank(rank);
   const rankStyle = {
-    backgroundPosition: get_rank_index(rank.rank, rank.tier) * -48 + "px 0px"
+    backgroundPosition: getRankIndex(rank.rank, rank.tier) * -48 + "px 0px"
   };
 
   return (
-    <div className={(selected ? "item_selected" : "") + " top_nav_item"} onClick={clickTab(id)}>
+    <div
+      className={(selected ? "item_selected" : "") + " top_nav_item"}
+      onClick={clickTab(id)}
+    >
       <div style={rankStyle} title={propTitle} className={rankClass}></div>
     </div>
   );
 }
 
-interface patreonProps {
-  patreon: boolean,
-  patreonTier: number
+interface PatreonProps {
+  patreon: boolean;
+  patreonTier: number;
 }
 
-function PatreonBadge(props: patreonProps) {
+function PatreonBadge(props: PatreonProps): JSX.Element {
   const { patreonTier } = props;
 
   let title = "Patreon Basic Tier";
@@ -107,33 +137,35 @@ function PatreonBadge(props: patreonProps) {
   if (patreonTier === 4) title = "Patreon Vintage Tier";
 
   const style = {
-    backgroundPosition: (-40 * patreonTier) + "px 0px"
+    backgroundPosition: -40 * patreonTier + "px 0px"
   };
 
-  return (
-    <div title={title} style={style} className="top_patreon" ></div>
-  );
+  return <div title={title} style={style} className="top_patreon"></div>;
 }
 
-function TopNav() {
+function TopNav(): JSX.Element {
   const [compact, setCompact] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState(pd.settings.last_open_tab);
-  const topNavIconsRef:any = React.useRef(null);
+  const topNavIconsRef: any = React.useRef(null);
 
   const defaultTab = {
     compact: compact,
     currentTab: currentTab,
     callback: setCurrentTab
-  }
+  };
 
-  const homeTab = {...defaultTab, id: MAIN_HOME, title:""};
-  const myDecksTab = {...defaultTab, id: MAIN_DECKS, title:"MY DECKS"};
-  const historyTab = {...defaultTab, id: MAIN_HISTORY, title:"HISTORY"};
-  const eventsTab = {...defaultTab, id: MAIN_EVENTS, title:"EVENTS"};
-  const exploreTab = {...defaultTab, id: MAIN_EXPLORE, title:"EXPLORE"};
-  const economyTab = {...defaultTab, id: MAIN_ECONOMY, title:"ECONOMY"};
-  const collectionTab = {...defaultTab, id: MAIN_COLLECTION, title:"COLLECTION"};
-  
+  const homeTab = { ...defaultTab, id: MAIN_HOME, title: "" };
+  const myDecksTab = { ...defaultTab, id: MAIN_DECKS, title: "DECKS" };
+  const matchesTab = { ...defaultTab, id: MAIN_MATCHES, title: "MATCHES" };
+  const eventsTab = { ...defaultTab, id: MAIN_EVENTS, title: "EVENTS" };
+  const exploreTab = { ...defaultTab, id: MAIN_EXPLORE, title: "EXPLORE" };
+  const economyTab = { ...defaultTab, id: MAIN_ECONOMY, title: "ECONOMY" };
+  const collectionTab = {
+    ...defaultTab,
+    id: MAIN_COLLECTION,
+    title: "COLLECTION"
+  };
+
   const contructedNav = {
     callback: setCurrentTab,
     currentTab: currentTab,
@@ -165,42 +197,43 @@ function TopNav() {
     patreonTier: pd.patreon_tier
   };
 
-  let userName = pd.name.slice(0, -6);
-  let userNumerical = pd.name.slice(-6);
+  const userName = pd.name.slice(0, -6);
+  const userNumerical = pd.name.slice(-6);
 
   return (
     <div className="top_nav">
       <div ref={topNavIconsRef} className="top_nav_icons">
-        <TopNavItem {...homeTab}/>
-        <TopNavItem {...myDecksTab}/>
-        <TopNavItem {...historyTab}/>
-        <TopNavItem {...eventsTab}/>
-        <TopNavItem {...exploreTab}/>
-        <TopNavItem {...economyTab}/>
-        <TopNavItem {...collectionTab}/>
+        <TopNavItem {...homeTab} />
+        <TopNavItem {...myDecksTab} />
+        <TopNavItem {...matchesTab} />
+        <TopNavItem {...eventsTab} />
+        <TopNavItem {...exploreTab} />
+        <TopNavItem {...economyTab} />
+        <TopNavItem {...collectionTab} />
       </div>
       <div className="top_nav_info">
         <div className="top_userdata_container">
-          <TopRankIcon {...contructedNav}/>
-          <TopRankIcon {...limitedNav}/>
-          { pd.patreon ? <PatreonBadge {...patreon} /> : null }
-          <div className="top_username" title={"Arena username"}>{userName}</div>
-          <div className="top_username_id" title={"Arena user ID"}>{userNumerical}</div>
+          <TopRankIcon {...contructedNav} />
+          <TopRankIcon {...limitedNav} />
+          {pd.patreon ? <PatreonBadge {...patreon} /> : null}
+          <div className="top_username" title={"Arena username"}>
+            {userName}
+          </div>
+          <div className="top_username_id" title={"Arena user ID"}>
+            {userNumerical}
+          </div>
         </div>
       </div>
-  </div>
+    </div>
   );
 }
 
 export default function createTopNav(parent: Element): boolean {
-  ReactDOM.render(
-    <TopNav />,
-    parent
-  );
+  ReactDOM.render(<TopNav />, parent);
   return true;
 }
 
-export function updateTopBar() {
+export function updateTopBar(): void {
   const topNavDiv = $$(".top_nav_container")[0];
   createTopNav(topNavDiv);
 

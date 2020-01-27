@@ -1,48 +1,56 @@
 import * as React from "react";
 
-import pd from "./player-data";
+import playerData from "./player-data";
 import { cardHasType } from "./cardTypes";
 import { DbCardData } from "./types/Metadata";
 
-function OwnershipInfinity(props: { owned: number; acquired: number }) {
-  const { owned, acquired } = props;
-  let title = "";
-  // Show infinity for basics
-  if (owned > 0) title = `∞ copies in collection`;
-  else title = `0 copies in collection`;
+function OwnershipInfinity(props: OwnershipProps): JSX.Element {
+  const { owned, acquired, wanted } = props;
+  let title = (owned > 0 ? "∞" : "0") + " copies in collection";
   if (acquired) {
     title += ` (∞ recent)`;
   }
   let color = "gray";
+  if (wanted > 0) color = "blue";
   if (owned > 0) color = "green";
   if (acquired > 0) color = "orange";
   return <div className={`inventory_card_infinity_${color}`} title={title} />;
 }
 
-interface OwnershipStarProps {
+interface OwnershipProps {
   owned: number;
   acquired: number;
+  wanted: number;
+}
+
+interface OwnershipStarProps extends OwnershipProps {
   copyIndex: number;
   title: string;
 }
 
-function OwnershipStar(props: OwnershipStarProps) {
-  const { owned, acquired, copyIndex, title } = props;
+function OwnershipStar(props: OwnershipStarProps): JSX.Element {
+  const { owned, acquired, wanted, copyIndex, title } = props;
   let color = "gray"; // default unowned
   if (copyIndex < owned) {
     color = "green"; // owned copy
   }
-  if (acquired && copyIndex >= owned - acquired && copyIndex < owned) {
+  if (copyIndex >= owned - acquired && copyIndex < owned) {
     color = "orange"; // owned and newly acquired copy
+  }
+  if (copyIndex >= owned && copyIndex < owned + wanted) {
+    color = "blue"; // not owned and wanted copy
   }
   return <div className={`inventory_card_quantity_${color}`} title={title} />;
 }
 
-function MultiCardOwnership(props: { owned: number; acquired: number }) {
-  const { owned, acquired } = props;
-  let title = `${owned || 0}/4 copies in collection`;
-  if (acquired) {
+function MultiCardOwnership(props: OwnershipProps): JSX.Element {
+  const { owned, acquired, wanted } = props;
+  let title = `${owned}/4 copies in collection`;
+  if (acquired !== 0) {
     title += ` (${acquired} recent)`;
+  }
+  if (wanted !== 0) {
+    title += ", " + wanted + " more wanted";
   }
   const possibleCopiesIndex = [0, 1, 2, 3];
   return (
@@ -53,6 +61,7 @@ function MultiCardOwnership(props: { owned: number; acquired: number }) {
           copyIndex={copyIndex}
           key={"inventory_card_quantity_" + copyIndex}
           owned={owned}
+          wanted={wanted}
           title={title}
         />
       ))}
@@ -60,18 +69,19 @@ function MultiCardOwnership(props: { owned: number; acquired: number }) {
   );
 }
 
-export default function OwnershipStars(props: { card: DbCardData }) {
+export default function OwnershipStars(props: {
+  card: DbCardData;
+  wanted?: number;
+}): JSX.Element {
   const { card } = props;
   if (!card || !card.type) {
     return <></>;
   }
-  const isbasic = cardHasType(card, "Basic Land");
-  const playerData = pd as any;
-  const owned = playerData.cards.cards[card.id];
-  const acquired = playerData.cardsNew[card.id];
+  const owned = playerData.cards.cards[card.id] ?? 0;
+  const acquired = playerData.cardsNew[card.id] ?? 0;
+  const wanted = props.wanted ?? 0;
   // TODO add custom logic to handle rats and petitioners
-  if (isbasic) {
-    return <OwnershipInfinity owned={owned} acquired={acquired} />;
-  }
-  return <MultiCardOwnership owned={owned} acquired={acquired} />;
+  const isbasic = cardHasType(card, "Basic Land");
+  const Renderer = isbasic ? OwnershipInfinity : MultiCardOwnership;
+  return <Renderer owned={owned} acquired={acquired} wanted={wanted} />;
 }

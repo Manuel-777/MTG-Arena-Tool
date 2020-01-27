@@ -27,7 +27,10 @@ export function ipcSend(
   arg: any,
   to = IPC_MAIN
 ): void {
-  ipc.send("ipc_switch", method, from, arg, to);
+  // This is crude but works..
+  if (process && process.type === "renderer") {
+    ipc.send("ipc_switch", method, from, arg, to);
+  }
 }
 
 function logInfo(message: string): void {

@@ -42,7 +42,7 @@ import {
   parseWotcTimeFallback,
   setData,
   updateLoading
-} from "./background-util";
+} from "./backgroundUtil";
 import {
   ARENA_MODE_MATCH,
   ARENA_MODE_DRAFT,

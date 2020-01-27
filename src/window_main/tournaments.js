@@ -1,7 +1,7 @@
 import anime from "animejs";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
 import createSelect from "./createSelect";
-import * as deckDrawer from "../shared/deck-drawer";
+import * as deckDrawer from "./DeckDrawer";
 import { EASING_DEFAULT } from "../shared/constants";
 import {
   compare_cards,
@@ -203,7 +203,7 @@ function showTournamentRegister(mainDiv, tou) {
       .filter(deck => !deck.custom)
       .filter(deck => getBoosterCountEstimate(get_deck_missing(deck)) === 0);
 
-    validDecks.sort(new Aggregator({ onlyCurrentDecks: true }).compareDecks);
+    validDecks.sort(new Aggregator().compareDecks);
     const deckSelect = createSelect(
       deckSelectContainer,
       validDecks.map(deck => deck.id),

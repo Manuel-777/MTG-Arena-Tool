@@ -10,13 +10,12 @@ import {
   OVERLAY_SEEN
 } from "../shared/constants";
 
-import { LogData, MatchData, OverlaySettingsData } from "./overlayUtil";
+import { LogData, OverlaySettingsData } from "./overlayUtil";
 import ActionLog from "./ActionLog";
 import Clock from "./Clock";
 import DeckList from "./DeckList";
 import { DbCardData } from "../shared/types/Metadata";
-
-const manaColorMap: { [key: number]: string } = MANA;
+import { MatchData } from "../window_background/types/currentMatch";
 
 export interface MatchElementsProps {
   actionLog: LogData[];
@@ -101,10 +100,7 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
       {!!settings.title && !!visibleDeck && (
         <div className="overlay_deckcolors">
           {visibleDeck.colors.get().map((color: number) => (
-            <div
-              className={"mana_s20 mana_" + manaColorMap[color]}
-              key={color}
-            />
+            <div className={"mana_s20 mana_" + MANA[color]} key={color} />
           ))}
         </div>
       )}

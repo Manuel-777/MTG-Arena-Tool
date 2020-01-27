@@ -2,7 +2,7 @@ import { shell } from "electron";
 import db from "../shared/database";
 import pd from "../shared/player-data";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
-import { addCardHover } from "../shared/card-hover";
+import { addCardHover } from "../shared/cardHover";
 import { toHHMMSS, toDDHHMMSS, timestamp } from "../shared/util";
 import { tournamentCreate } from "./tournaments";
 import {
@@ -264,9 +264,8 @@ export function openHomeTab(arg, opentab = true) {
     let setsContainer = createDiv(["top_wildcards_sets_cont"]);
     orderedSets.forEach(set => {
       let setbutton = createDiv(["set_filter"]);
-      setbutton.style.backgroundImage = `url(data:image/svg+xml;base64,${
-        db.sets[set].svg
-      })`;
+      const svgData = db.sets[set].svg;
+      setbutton.style.backgroundImage = `url(data:image/svg+xml;base64,${svgData})`;
       if (filteredWildcardsSet !== set) {
         setbutton.classList.add("set_filter_on");
       }

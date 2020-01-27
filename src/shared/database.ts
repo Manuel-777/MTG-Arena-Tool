@@ -2,9 +2,16 @@ import path from "path";
 import { app, remote, ipcRenderer as ipc } from "electron";
 import fs from "fs";
 import _ from "lodash";
-import { Metadata, Archetype, DbCardData, CardSet, RewardsDate } from "./types/Metadata";
+import {
+  Metadata,
+  Archetype,
+  DbCardData,
+  CardSet,
+  RewardsDate
+} from "./types/Metadata";
 import { Season, Rank, RankClassInfo } from "./types/Season";
 import { ArenaV3Deck } from "./types/Deck";
+import { STANDARD_CUTOFF_DATE } from "./constants";
 
 const cachePath: string | null =
   app || (remote && remote.app)
@@ -147,8 +154,8 @@ class Database {
     return this.metadata ? this.metadata.abilities : {};
   }
 
-  get archetypes(): { [id: number]: Archetype } {
-    return this.metadata ? this.metadata.archetypes : {};
+  get archetypes(): Archetype[] {
+    return this.metadata ? this.metadata.archetypes : [];
   }
 
   get cards(): { [id: number]: DbCardData } {
@@ -156,11 +163,13 @@ class Database {
   }
 
   get cardIds(): number[] {
-    return this.cards ? Object.keys(this.cards).map(k => parseInt(k)) : [] as number[];
+    return this.cards
+      ? Object.keys(this.cards).map(k => parseInt(k))
+      : ([] as number[]);
   }
 
   get cardList(): DbCardData[] {
-    return this.cards ? Object.values(this.cards) : [] as DbCardData[];
+    return this.cards ? Object.values(this.cards) : ([] as DbCardData[]);
   }
 
   get events(): { [id: string]: string } {
@@ -168,11 +177,13 @@ class Database {
   }
 
   get eventIds(): string[] {
-    return this.metadata ? Object.keys(this.metadata.events) : [] as string[];
+    return this.metadata ? Object.keys(this.metadata.events) : ([] as string[]);
   }
 
   get eventList(): string[] {
-    return this.metadata ? Object.values(this.metadata.events) : [] as string[];
+    return this.metadata
+      ? Object.values(this.metadata.events)
+      : ([] as string[]);
   }
 
   get events_format(): { [id: string]: string } {
@@ -201,6 +212,13 @@ class Database {
     return new Date(this.season.currentSeason.seasonEndTime);
   }
 
+  get defaultSet(): CardSet | undefined {
+    if (!this.metadata) {
+      return undefined;
+    }
+    return this.metadata.sets[""];
+  }
+
   get sets(): { [id: string]: CardSet } {
     if (!this.metadata) {
       return {};
@@ -212,17 +230,39 @@ class Database {
     );
   }
 
+  get sortedSetCodes(): string[] {
+    const setCodes = Object.keys(this.sets);
+    setCodes.sort(
+      (a, b) =>
+        new Date(this.sets[b].release).getTime() -
+        new Date(this.sets[a].release).getTime()
+    );
+    return setCodes;
+  }
+
+  get standardSetCodes(): string[] {
+    return this.sortedSetCodes.filter(
+      code =>
+        this.sets[code].collation !== -1 &&
+        new Date(this.sets[code].release) > new Date(STANDARD_CUTOFF_DATE)
+    );
+  }
+
   get version() {
     return this.metadata ? this.metadata.version : 0;
   }
 
-  card(id: number | string) {
-    if (!this.metadata || !this.metadata.cards) {
-      return false;
+  card(id?: number | string): DbCardData | undefined {
+    if (id === undefined) {
+      return undefined;
+    }
+
+    if (!this.metadata?.cards) {
+      return undefined;
     }
 
     let numId = typeof id === "number" ? id : parseInt(id);
-    return this.metadata.cards[numId] || false;
+    return this.metadata.cards[numId] || undefined;
   }
 
   event(id: string) {

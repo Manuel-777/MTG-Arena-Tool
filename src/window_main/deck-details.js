@@ -4,7 +4,7 @@ import { MANA, CARD_RARITIES, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
 import pd from "../shared/player-data";
 import { createDiv, createSpan, queryElements as $$ } from "../shared/dom-fns";
-import * as deckDrawer from "../shared/deck-drawer";
+import * as deckDrawer from "./DeckDrawer";
 import {
   deckManaCurve,
   deckTypesStats,
@@ -151,12 +151,12 @@ function deckStatsSection(deck) {
   }
 
   if (pd.deckChanges(deck.id).length) {
-    const openHistory = createDiv(
-      ["button_simple", "openHistory"],
+    const openMatches = createDiv(
+      ["button_simple", "openMatches"],
       "History of changes"
     );
-    openHistory.addEventListener("click", () => setChangesTimeline(deck.id));
-    stats.appendChild(openHistory);
+    openMatches.addEventListener("click", () => setChangesTimeline(deck.id));
+    stats.appendChild(openMatches);
   }
 
   const exportDeck = createDiv(

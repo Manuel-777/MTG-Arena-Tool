@@ -14,7 +14,7 @@ import {
   getRankColorClass,
   openScryfallCard
 } from "./util";
-import { addCardHover } from "./card-hover";
+import { addCardHover } from "./cardHover";
 import { DbCardData, Rarity } from "./types/Metadata";
 import _ from "lodash";
 
@@ -36,7 +36,7 @@ function isNumber(n: number | string): boolean {
 }
 
 function frameClassName(card: DbCardData): string {
-  const frame = card ? card.frame.concat().sort() : [];
+  const frame = card?.frame.concat().sort() ?? [];
   if (frame.length === 0) {
     return "tile_c";
   } else if (frame.length <= 2) {
@@ -94,7 +94,10 @@ function getArenaQuantityDisplay(quantity: any): [number, number, JSX.Element] {
   return [ww, ll, quantityElement];
 }
 
-function CostSymbols(props: { card: DbCardData; dfcCard?: DbCardData }): JSX.Element {
+function CostSymbols(props: {
+  card: DbCardData;
+  dfcCard?: DbCardData;
+}): JSX.Element {
   const { card, dfcCard } = props;
   const costSymbols: JSX.Element[] = [];
   let prevc = true;
@@ -247,19 +250,19 @@ function FlatQuantityDisplay(props: { quantity: any }): JSX.Element {
   }
 }
 
-interface WildcardsNeededProps{
-  card:DbCardData;
-  deck:Deck;
-  isSideboard:boolean;
-  listStyle:"flat"|"arena";
-  ww?:number;
+interface WildcardsNeededProps {
+  card: DbCardData;
+  deck: Deck;
+  isSideboard: boolean;
+  listStyle: "flat" | "arena";
+  ww?: number;
 }
 
-interface MissingCardsProps{
-  missing:number;
-  cardRarity:Rarity;
-  listStyle:"flat"|"arena";
-  ww?:number;
+interface MissingCardsProps {
+  missing: number;
+  cardRarity: Rarity;
+  listStyle: "flat" | "arena";
+  ww?: number;
 }
 
 function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
@@ -268,38 +271,34 @@ function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
     const missing = getWildcardsMissing(deck, card.id, isSideboard);
     const cardRarity = card.rarity;
 
-
     if (missing > 0) {
-      return MissingCardSprite({missing, cardRarity, listStyle, ww});
+      return MissingCardSprite({ missing, cardRarity, listStyle, ww });
     }
   }
   return <></>;
 }
 
-function MissingCardSprite(props:MissingCardsProps):JSX.Element{
-  const{missing, cardRarity, listStyle, ww} = props;
+function MissingCardSprite(props: MissingCardsProps): JSX.Element {
+  const { missing, cardRarity, listStyle, ww } = props;
 
   const xoff = CARD_RARITIES.indexOf(cardRarity) * -24;
   const yoff = missing * -24;
 
   var className = "not_owned_sprite";
-  if(listStyle === "flat"){
+  if (listStyle === "flat") {
     className += "_flat";
   }
 
-  const style:React.CSSProperties =
-  {backgroundPosition: `${xoff}px ${yoff}px`};
-  if(ww){
+  const style: React.CSSProperties = {
+    backgroundPosition: `${xoff}px ${yoff}px`
+  };
+  if (ww) {
     style.left = `calc(0px - 100% + ${ww - 14}px)`;
   }
 
   return (
-    <div
-    className={className}
-    title={missing + " missing"}
-    style={style}
-    />
-    );
+    <div className={className} title={missing + " missing"} style={style} />
+  );
 }
 
 function FlatCardTile(props: CardTileProps): JSX.Element {
@@ -400,7 +399,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
           card={card}
           deck={deck}
           isSideboard={isSideboard}
-          listStyle = "flat"
+          listStyle="flat"
         />
       )}
     </div>

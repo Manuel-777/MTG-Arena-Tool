@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define */
 import fs from "fs";
 import path from "path";
 import { app, ipcRenderer as ipc, remote, shell } from "electron";
 const { dialog } = remote;
 import _ from "lodash";
+import format from "date-fns/format";
 import anime from "animejs";
 import striptags from "striptags";
 import Picker from "vanilla-picker";
 import Pikaday from "pikaday";
 import {
+  CARD_RARITIES,
   COLORS_ALL,
   MANA,
   MANA_COLORS,
@@ -27,13 +30,15 @@ import {
   createSpan,
   queryElements as $$
 } from "../shared/dom-fns";
-import * as deckDrawer from "../shared/deck-drawer";
+import * as deckDrawer from "./DeckDrawer";
 import { cardType } from "../shared/cardTypes";
-import { addCardHover } from "../shared/card-hover";
+import { addCardHover } from "../shared/cardHover";
 import {
   deckTypesStats,
   formatRank,
+  getBoosterCountEstimate,
   getCardArtCrop,
+  get_deck_missing,
   get_rank_index_16,
   getCardImage,
   getReadableEvent,
@@ -114,31 +119,31 @@ function getTagColor(tag) {
 }
 
 function makeResizable(div, resizeCallback, finalCallback) {
-  var m_pos;
+  let mPos;
   let finalWidth;
 
-  let resize = function(e) {
-    var parent = div.parentNode;
-    var dx = m_pos - e.x;
-    m_pos = e.x;
-    let newWidth = Math.max(10, parseInt(parent.style.width) + dx);
+  const resize = function(e) {
+    const parent = div.parentNode;
+    const dx = mPos - e.x;
+    mPos = e.x;
+    const newWidth = Math.max(10, parseInt(parent.style.width) + dx);
     parent.style.width = `${newWidth}px`;
     parent.style.flex = `0 0 ${newWidth}px`;
     if (resizeCallback instanceof Function) resizeCallback(newWidth);
     finalWidth = newWidth;
   };
 
-  let saveWidth = function(width) {
+  const saveWidth = function(width) {
     ipcSend("save_user_settings", {
       right_panel_width: width,
-      skip_refresh: true
+      skipRefresh: true
     });
   };
 
   div.addEventListener(
     "mousedown",
     event => {
-      m_pos = event.x;
+      mPos = event.x;
       document.addEventListener("mousemove", resize, false);
     },
     false
@@ -183,7 +188,7 @@ function drawDeck(div, deck, showWildcards = false) {
   const unique = makeId(4);
 
   if (deck.commandZoneGRPIds && deck.commandZoneGRPIds.length > 0) {
-    let separator = deckDrawer.cardSeparator(`Commander`);
+    const separator = deckDrawer.cardSeparator(`Commander`);
     div.appendChild(separator);
 
     deck.commandZoneGRPIds.forEach((id, index) => {
@@ -266,7 +271,7 @@ function drawDeck(div, deck, showWildcards = false) {
   const sideboardSize = _.sumBy(deck.sideboard, "quantity");
   if (sideboardSize) {
     // draw a separator for the sideboard
-    let separator = deckDrawer.cardSeparator(`Sideboard (${sideboardSize})`);
+    const separator = deckDrawer.cardSeparator(`Sideboard (${sideboardSize})`);
     div.appendChild(separator);
 
     // draw the cards
@@ -290,11 +295,11 @@ function drawDeck(div, deck, showWildcards = false) {
 }
 
 function drawCardList(div, cards) {
-  let unique = makeId(4);
-  let counts = {};
+  const unique = makeId(4);
+  const counts = {};
   cards.forEach(cardId => (counts[cardId] = (counts[cardId] || 0) + 1));
   Object.keys(counts).forEach(cardId => {
-    let tile = deckDrawer.cardTile(
+    const tile = deckDrawer.cardTile(
       pd.settings.card_tile_style,
       cardId,
       unique,
@@ -492,7 +497,7 @@ function openActionLog(actionLogId) {
   const actionLogContainer = createDiv(["action_log_container"]);
 
   const actionLogFile = path.join(actionLogDir, actionLogId + ".txt");
-  let str = fs.readFileSync(actionLogFile).toString();
+  const str = fs.readFileSync(actionLogFile).toString();
 
   const actionLog = str.split("\n");
   for (let line = 1; line < actionLog.length - 1; line += 3) {
@@ -658,8 +663,8 @@ function closeDialog() {
 
 function showColorpicker(
   color,
-  onChange = () => {},
-  onDone = () => {},
+  onChange = color => {},
+  onDone = color => {},
   onCancel = () => {},
   pickerOptions = {}
 ) {
@@ -808,8 +813,8 @@ function getEventWinLossClass(wlGate) {
 }
 
 function compareWinrates(a, b) {
-  let _a = a.wins / a.losses;
-  let _b = b.wins / b.losses;
+  const _a = a.wins / a.losses;
+  const _b = b.wins / b.losses;
 
   if (_a < _b) return 1;
   if (_a > _b) return -1;
@@ -824,10 +829,10 @@ function compareColorWinrates(a, b) {
   if (a.length < b.length) return -1;
   if (a.length > b.length) return 1;
 
-  let sa = a.reduce(function(_a, _b) {
+  const sa = a.reduce(function(_a, _b) {
     return _a + _b;
   }, 0);
-  let sb = b.reduce(function(_a, _b) {
+  const sb = b.reduce(function(_a, _b) {
     return _a + _b;
   }, 0);
   if (sa < sb) return -1;
@@ -875,7 +880,7 @@ function attachMatchData(listItem, match) {
   oppRank.title = formatRank(match.opponent);
   listItem.rightTop.appendChild(oppRank);
 
-  let date = !match.date
+  const date = !match.date
     ? "Unknown date - "
     : localTimeSince(new Date(match.date));
   // Match time
@@ -891,8 +896,8 @@ function attachMatchData(listItem, match) {
     listItem.rightBottom.appendChild(m);
   });
 
-  const tagsDiv = createDiv(["history_tags"], "", {
-    id: "history_tags_" + match.id
+  const tagsDiv = createDiv(["matches_tags"], "", {
+    id: "matches_tags_" + match.id
   });
   listItem.rightBottom.appendChild(tagsDiv);
 
@@ -923,7 +928,7 @@ function createDraftSetDiv(draft) {
 }
 
 export function createRoundCard(card, rarityOverlay = false) {
-  var roundCard = createDiv([
+  const roundCard = createDiv([
     "round_card",
     card.rarity,
     `rarity-overlay${rarityOverlay ? "" : "-none"}`
@@ -944,8 +949,8 @@ export function createRoundCard(card, rarityOverlay = false) {
   return roundCard;
 }
 
-function createDraftRares(draft) {
-  var draftRares = createDiv(["flex_item"]);
+export function createDraftRares(draft) {
+  const draftRares = createDiv(["flex_item"]);
   draftRares.style.margin = "auto";
   if (!draft.pickedCards) return draftRares;
 
@@ -965,7 +970,7 @@ function createDraftTimeDiv(draft) {
   );
 }
 
-function createReplayDiv(draft) {
+function createReplayDiv() {
   return createDiv(["list_match_replay"], "See replay");
 }
 
@@ -974,12 +979,116 @@ function createReplayShareButton(draft) {
     ["list_draft_share", draft.id + "dr"],
     () => draftShareLink(draft.id, draft)
   );
+  replayShareButton.title = "share draft replay";
   return replayShareButton;
 }
 
-export function attachDraftData(listItem, draft) {
-  console.log("Draft: ", draft);
+export function attachDeckData(listItem, deck) {
+  // Deck name
+  if (deck.name.indexOf("?=?Loc/Decks/Precon/") != -1) {
+    deck.name = deck.name.replace("?=?Loc/Decks/Precon/", "");
+  }
+  const deckNameDiv = createDiv(["list_deck_name"], deck.name);
+  listItem.leftTop.appendChild(deckNameDiv);
 
+  // Deck colors
+  deck.colors.forEach(function(color) {
+    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
+    listItem.leftBottom.appendChild(m);
+  });
+
+  // Last touched
+  const lastTouch = new Date(deck.timeTouched);
+  const deckLastTouchedDiv = createDiv(
+    ["list_deck_winrate"],
+    `<i style="opacity:0.6">updated/played:</i> ${localTimeSince(lastTouch)}`
+  );
+  deckLastTouchedDiv.style.marginLeft = "18px";
+  deckLastTouchedDiv.style.marginRight = "auto";
+  deckLastTouchedDiv.style.lineHeight = "18px";
+  listItem.centerBottom.appendChild(deckLastTouchedDiv);
+
+  // Deck winrates
+  if (deck.total > 0) {
+    const deckWinrateDiv = createDiv(["list_deck_winrate"]);
+    let interval, tooltip;
+    if (deck.total >= 20) {
+      // sample Size is large enough to use Wald Interval
+      interval = formatPercent(deck.interval);
+      tooltip = formatWinrateInterval(
+        formatPercent(deck.winrateLow),
+        formatPercent(deck.winrateHigh)
+      );
+    } else {
+      // sample size is too small (garbage results)
+      interval = "???";
+      tooltip = "play at least 20 matches to estimate actual winrate";
+    }
+    let colClass = getWinrateClass(deck.winrate);
+    deckWinrateDiv.innerHTML = `${deck.wins}:${
+      deck.losses
+    } (<span class="${colClass}_bright">${formatPercent(
+      deck.winrate
+    )}</span> <i style="opacity:0.6;">&plusmn; ${interval}</i>)`;
+    deckWinrateDiv.title = tooltip;
+    listItem.rightTop.appendChild(deckWinrateDiv);
+
+    const deckWinrateLastDiv = createDiv(
+      ["list_deck_winrate"],
+      "Since last edit: "
+    );
+    deckWinrateLastDiv.style.opacity = 0.6;
+
+    if (deck.lastEditTotal > 0) {
+      colClass = getWinrateClass(deck.lastEditWinrate);
+      deckWinrateLastDiv.innerHTML += `<span class="${colClass}_bright">${formatPercent(
+        deck.lastEditWinrate
+      )}</span>`;
+      deckWinrateLastDiv.title = `${formatPercent(
+        deck.lastEditWinrate
+      )} winrate since ${format(new Date(deck.lastUpdated), "Pp")}`;
+    } else {
+      deckWinrateLastDiv.innerHTML += "<span>--</span>";
+      deckWinrateLastDiv.title = "no data yet";
+    }
+    listItem.rightBottom.appendChild(deckWinrateLastDiv);
+  }
+
+  // Deck crafting cost
+  const ownedWildcards = {
+    common: pd.economy.wcCommon,
+    uncommon: pd.economy.wcUncommon,
+    rare: pd.economy.wcRare,
+    mythic: pd.economy.wcMythic
+  };
+  const missingWildcards = get_deck_missing(deck);
+  let wc;
+  let n = 0;
+  const boosterCost = getBoosterCountEstimate(missingWildcards);
+  CARD_RARITIES.filter(rarity => rarity !== "land").forEach(cardRarity => {
+    cardRarity = cardRarity.toLowerCase();
+    if (missingWildcards[cardRarity]) {
+      n++;
+      wc = createDiv(["wc_explore_cost", "wc_" + cardRarity]);
+      wc.title = _.capitalize(cardRarity) + " wildcards needed.";
+      wc.innerHTML =
+        (ownedWildcards[cardRarity] > 0
+          ? ownedWildcards[cardRarity] + "/"
+          : "") + missingWildcards[cardRarity];
+      listItem.right.appendChild(wc);
+      listItem.right.style.flexDirection = "row";
+      listItem.right.style.marginRight = "16px";
+    }
+  });
+  if (n !== 0) {
+    const bo = createDiv(["bo_explore_cost"], Math.round(boosterCost));
+    bo.title = "Boosters needed (estimated)";
+    listItem.right.appendChild(bo);
+  }
+}
+
+export function attachDraftData(listItem, draft) {
+  // console.log("Draft: ", draft);
   const draftSetDiv = createDraftSetDiv(draft);
   const draftRares = createDraftRares(draft);
   const draftTimeDiv = createDraftTimeDiv(draft);
@@ -995,7 +1104,7 @@ export function attachDraftData(listItem, draft) {
 
 function draftShareLink(id, draft) {
   const shareExpire = byId("expire_select").value;
-  let draftData = JSON.stringify(draft);
+  const draftData = JSON.stringify(draft);
   let expire = 0;
   switch (shareExpire) {
     case "One day":

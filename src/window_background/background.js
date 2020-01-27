@@ -9,9 +9,9 @@ import { rememberDefaults } from "../shared/db/databaseUtil";
 import playerData from "../shared/player-data";
 import { getReadableFormat } from "../shared/util";
 import { HIDDEN_PW, MAIN_DECKS } from "../shared/constants";
-import { ipc_send, setData, unleakString } from "./background-util";
+import { ipc_send, setData, unleakString } from "./backgroundUtil";
 import { createDeck } from "./data";
-import * as mtgaLog from "./mtga-log";
+import * as mtgaLog from "./mtgaLog";
 import globals from "./globals";
 import addCustomDeck from "./addCustomDeck";
 import forceDeckUpdate from "./forceDeckUpdate";
@@ -36,7 +36,6 @@ if (!remote.app.isPackaged) {
       });
     }
   });
-  require("devtron").install();
   const Sentry = require("@sentry/electron");
   Sentry.init({
     dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
@@ -238,8 +237,8 @@ ipc.on("save_user_settings", function(event, settings) {
   // console.log("save_user_settings");
   ipc_send("show_loading");
   let refresh = true;
-  if (settings.skip_refresh) {
-    delete settings.skip_refresh;
+  if (settings.skipRefresh) {
+    delete settings.skipRefresh;
     refresh = false;
   }
   syncSettings(settings, refresh);
@@ -363,7 +362,7 @@ ipc.on("add_tag", (event, arg) => {
   playerDb.upsert("", "decks_tags", decks_tags);
 });
 
-ipc.on("delete_history_tag", (event, arg) => {
+ipc.on("delete_matches_tag", (event, arg) => {
   const { matchid, tag } = arg;
   const match = playerData.match(matchid);
   if (!match || !tag) return;
@@ -378,7 +377,7 @@ ipc.on("delete_history_tag", (event, arg) => {
   playerDb.upsert(matchid, "tags", tags);
 });
 
-ipc.on("add_history_tag", (event, arg) => {
+ipc.on("add_matches_tag", (event, arg) => {
   const { matchid, tag } = arg;
   const match = playerData.match(matchid);
   if (!match || !tag) return;
@@ -505,7 +504,7 @@ async function logLoop() {
 
     // Get player Id
     strCheck = '\\"playerId\\": \\"';
-    if (value.includes(strCheck)) {
+    if (value.includes(strCheck) && parsedData.arenaId == undefined) {
       parsedData.arenaId = debugArenaID
         ? debugArenaID
         : unleakString(dataChop(value, strCheck, '\\"'));
@@ -513,13 +512,13 @@ async function logLoop() {
 
     // Get User name
     strCheck = '\\"screenName\\": \\"';
-    if (value.includes(strCheck)) {
+    if (value.includes(strCheck) && parsedData.name == undefined) {
       parsedData.name = unleakString(dataChop(value, strCheck, '\\"'));
     }
 
     // Get Client Version
     strCheck = '\\"clientVersion\\": "\\';
-    if (value.includes(strCheck)) {
+    if (value.includes(strCheck) && parsedData.arenaVersion == undefined) {
       parsedData.arenaVersion = unleakString(dataChop(value, strCheck, '\\"'));
     }
     /*

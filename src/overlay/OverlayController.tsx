@@ -3,7 +3,7 @@ import React, { useEffect, useCallback, useState } from "react";
 import { Howl, Howler } from "howler";
 import striptags from "striptags";
 
-import pd from "../shared/player-data";
+import playerData from "../shared/player-data";
 import Deck from "../shared/deck";
 import {
   ARENA_MODE_IDLE,
@@ -15,10 +15,10 @@ import {
 import {
   DraftData,
   LogData,
-  MatchData,
   OverlaySettingsData,
   SettingsData
 } from "./overlayUtil";
+import { MatchData } from "../window_background/types/currentMatch";
 import CardDetailsWindowlet from "./CardDetailsWindowlet";
 import OverlayWindowlet from "./OverlayWindowlet";
 import { DbCardData } from "../shared/types/Metadata";
@@ -70,13 +70,11 @@ export default function OverlayController(): JSX.Element {
   const [draft, setDraft] = useState(undefined as undefined | DraftData);
   const [draftState, setDraftState] = useState({ packN: 0, pickN: 0 });
   const [turnPriority, setTurnPriority] = useState(1);
-  const playerData = (pd as unknown) as {
-    settings: SettingsData;
-    cardsSizeHoverCard: number;
-  };
   const [settings, setSettings] = useState(playerData.settings as SettingsData);
   const [lastBeep, setLastBeep] = useState(Date.now());
-  const [hoverCard, setHoverCard] = useState(undefined as undefined | DbCardData);
+  const [hoverCard, setHoverCard] = useState(
+    undefined as undefined | DbCardData
+  );
 
   const {
     overlay_scale: overlayScale,
@@ -103,13 +101,13 @@ export default function OverlayController(): JSX.Element {
     }
   }, [lastBeep, soundPriorityVolume]);
 
-  const handleToggleEditMode = useCallback(() => ipcSend("toggle_edit_mode"), []);
+  const handleToggleEditMode = useCallback(
+    () => ipcSend("toggle_edit_mode"),
+    []
+  );
 
   // Note: no useCallback because of dependency on deep overlays state
-  const handleSetEditMode = (
-    event: unknown,
-    _editMode: boolean
-  ) => {
+  const handleSetEditMode = (event: unknown, _editMode: boolean) => {
     // Save current windowlet dimensions before we leave edit mode
     if (editMode && !_editMode) {
       // Compute current dimensions of overlay windowlets in DOM
@@ -143,7 +141,7 @@ export default function OverlayController(): JSX.Element {
       ipcSend("save_user_settings", {
         overlays: newOverlays,
         overlayHover: newOverlayHover,
-        skip_refresh: true
+        skipRefresh: true
       });
     }
     setEditMode(_editMode);

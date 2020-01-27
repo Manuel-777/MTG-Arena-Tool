@@ -1,6 +1,6 @@
 import _ from "lodash";
-import nthLastIndexOf from "./nth-last-index-of";
-import * as jsonText from "./json-text";
+import nthLastIndexOf from "./nthLastIndexOf";
+import * as jsonText from "./jsonText";
 import sha1 from "js-sha1";
 
 const LABEL_JSON_PATTERNS = [
@@ -37,10 +37,12 @@ export default function ArenaLogDecoder() {
     let bufferUsed = false;
     let match;
     while ((match = logEntryPattern.exec(buffer))) {
+      const position = bufferDiscarded + match.index;
       const [type, length, entry] = parseLogEntry(
         buffer,
         match[0],
-        match.index
+        match.index,
+        position
       );
       switch (type) {
         case "invalid":
@@ -53,7 +55,7 @@ export default function ArenaLogDecoder() {
           bufferUsed = match.index + length;
           callback({
             ...entry,
-            position: bufferDiscarded + match.index
+            position
           });
           break;
       }
@@ -73,7 +75,7 @@ export default function ArenaLogDecoder() {
   }
 }
 
-function parseLogEntry(text, matchText, position) {
+function parseLogEntry(text, matchText, position, absPosition) {
   let rematches;
 
   if ((rematches = matchText.match(LABEL_ARROW_JSON_PATTERN))) {
@@ -105,7 +107,7 @@ function parseLogEntry(text, matchText, position) {
       {
         type: "label_arrow_json",
         ..._.mapValues(rematches.groups, unleakString),
-        hash: sha1(jsonString),
+        hash: sha1(jsonString + absPosition),
         json: () => {
           try {
             // console.log(jsonString, jsonStart, jsonLen);
@@ -124,7 +126,7 @@ function parseLogEntry(text, matchText, position) {
     ];
   }
 
-  for (let pattern of LABEL_JSON_PATTERNS) {
+  for (const pattern of LABEL_JSON_PATTERNS) {
     rematches = matchText.match(pattern);
     if (!rematches) continue;
 
@@ -156,7 +158,7 @@ function parseLogEntry(text, matchText, position) {
       {
         type: "label_json",
         ..._.mapValues(rematches.groups, unleakString),
-        hash: sha1(jsonString),
+        hash: sha1(jsonString + absPosition),
         text: jsonString,
         json: () => {
           try {

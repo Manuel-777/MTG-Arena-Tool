@@ -18,7 +18,7 @@ NO, do not ever input your MTG Arena credentials anywhere except MTG Arena itsel
 
 ### I can see some of my previous games in history, but not all of them
 
-MTG Arena Tool reads trough your entire log file at startup, that means it can read past games even when you did not have it running then. The log file is cleared by MTGA every time you initiate it, so with MTG Arena Tool you will probably see past games but only a few.
+MTG Arena Tool reads through your entire log file at startup, that means it can read past games even when you did not have it running then. The log file is cleared by MTGA every time you initiate it, so with MTG Arena Tool you will probably see past games but only a few.
 
 ### Where are draft scores taken from?
 

@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import { starts, length } from "../json-text";
+import { starts, length } from "../jsonText";
 
 describe("starts", () => {
   it("returns a boolean indicating if the text at the specified position in a string starts JSON", () => {

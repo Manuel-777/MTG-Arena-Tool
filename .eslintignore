@@ -1,7 +1,6 @@
 # See https://eslint.org/docs/user-guide/configuring#eslintignore for more about ignoring files.
 
 # dependencies
-src/shared/autocomplete.js
 src/window_background/messages_pb.js
 
 # assets

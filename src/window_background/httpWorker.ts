@@ -2,12 +2,11 @@ import qs from "qs";
 import http, { RequestOptions } from "https";
 import { IncomingMessage } from "http";
 
-import pd from "../shared/player-data";
+import playerData from "../shared/player-data";
 import globals from "./globals";
-import { ipc_send as ipcSend, setData } from "./background-util";
+import { ipc_send as ipcSend, setData } from "./backgroundUtil";
 
 const serverAddress = "mtgatool.com";
-export const playerData = pd as any;
 
 export interface HttpTask {
   reqId: string;
@@ -118,8 +117,10 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
     if (!playerData.offline) {
       setData({ offline: true });
     }
-    const text = `Settings dont allow sending data! > (${task.method})`;
-    callback(new Error(text), task);
+    const text = `WARNING >> currently offline or settings prohibit sharing > (${task.method})`;
+    ipcLog(text);
+    callback(undefined, task, undefined, undefined);
+    return;
   }
   const _headers: any = { ...task };
   _headers.token = playerData.settings.token;
@@ -138,9 +139,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
   let results = "";
   const req = http.request(options, function(res: IncomingMessage) {
     if (res.statusCode && (res.statusCode < 200 || res.statusCode > 299)) {
-      const text = `Server error with request. (${task.method}: ${
-        res.statusCode
-      })`;
+      const text = `Server error with request. (${task.method}: ${res.statusCode})`;
       callback(new Error(text), task);
       return;
     } else {
@@ -162,9 +161,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
             return;
           }
           if (parsedResult && parsedResult.error) {
-            const text = `Server returned error code. (${task.method}: ${
-              parsedResult.error
-            })`;
+            const text = `Server returned error code. (${task.method}: ${parsedResult.error})`;
             callback(new Error(text), task, results, parsedResult);
             return;
           }

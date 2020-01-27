@@ -1,62 +1,84 @@
-import React from 'react';
-import {
-    COLORS_BRIEF,
-    COLORS_LONG
-} from "../shared/constants";
+import React from "react";
+import { COLORS_BRIEF } from "../shared/constants";
+import { ManaSymbol } from "./components/display";
 
 export type ManaFilterKeys = "w" | "u" | "b" | "r" | "g" | "multi";
 
-export type ColorFilter = { [key in ManaFilterKeys] : boolean };
+export type ColorFilter = { [key in ManaFilterKeys]: boolean };
 
 export interface ManaFilterProps {
-    filterKey: string;
-    prefixId: string;
-    filters: { [key: string]:  ColorFilter}
-    onFilterChanged: (colors: ColorFilter) => void;
+  filterKey: string;
+  prefixId: string;
+  filters: { [key: string]: ColorFilter };
+  onFilterChanged: (colors: ColorFilter) => void;
+  symbolSize?: number;
 }
 
-export default function ManaFilter(props: ManaFilterProps) {
-    const { filterKey, prefixId, filters } = props;
-    const colors = filters[filterKey];
+export default function ManaFilter(props: ManaFilterProps): JSX.Element {
+  const { filterKey, prefixId, filters } = props;
+  const colors = filters[filterKey];
 
-    const filterLabels: { [key in ManaFilterKeys] : string } = {
-        w: "White",
-        u: "Blue",
-        b: "Black",
-        r: "Red",
-        g: "Green",
-        multi: "Allow unselected colors"
-    };
-
-    const onClickColorFilter = React.useCallback((code: ManaFilterKeys) => (event: React.MouseEvent<HTMLDivElement>) => {
-        if (event.currentTarget.classList.contains("mana_filter_on")) {
-            event.currentTarget.classList.remove("mana_filter_on");
-            colors[code] = true;
-          } else {
-            event.currentTarget.classList.add("mana_filter_on");
-            colors[code] = false;
-          }
-          props.onFilterChanged(colors);
-    }, [props.onFilterChanged]);
-
-    const allFilters: ManaFilterKeys[] = [...COLORS_BRIEF, "multi"];
-    const allFiltersLong = [...COLORS_LONG, "multi"];
-    const manasStyles = {
-        display: "flex",
-        margin: "8px",
-        width: "150px",
-        height: "32px",
-    }
-
-    return (
-        <div className={prefixId + "_query_mana"} style={manasStyles}>
-            {allFilters.map((code, index) => {
-                const classNamesList = "mana_" + allFiltersLong[index] + " mana_filter" + (code === "multi" ? " icon_search_inclusive" : "") + (colors[code] ? "" : " mana_filter_on");
-                const additionalStyles = {
-                    width: "30px"
-                }
-                return <div key={code} onClick={onClickColorFilter(code)} className={classNamesList} style={additionalStyles} title={filterLabels[code]}/>
-            })}
-        </div>
-    )
+  const filterLabels: { [key in ManaFilterKeys]: string } = {
+    w: "White",
+    u: "Blue",
+    b: "Black",
+    r: "Red",
+    g: "Green",
+    multi: "Allow unselected colors"
   };
+
+  const onClickColorFilter = React.useCallback(
+    (code: ManaFilterKeys) => (
+      event: React.MouseEvent<HTMLDivElement>
+    ): void => {
+      colors[code] = event.currentTarget.classList.contains("mana_filter_on");
+      event.currentTarget.classList.toggle("mana_filter_on");
+      props.onFilterChanged(colors);
+    },
+    [props.onFilterChanged]
+  );
+
+  const allFilters: ManaFilterKeys[] = [...COLORS_BRIEF, "multi"];
+  const symbolSize = props.symbolSize ?? 20;
+
+  return (
+    <div
+      className={prefixId + "_query_mana"}
+      style={{
+        display: "flex",
+        height: symbolSize + 4 + "px"
+      }}
+    >
+      {allFilters.map((code, index) => {
+        const classNamesList =
+          "mana_filter" + (colors[code] ? "" : " mana_filter_on");
+        return (
+          <div
+            key={code}
+            onClick={onClickColorFilter(code)}
+            className={classNamesList}
+            title={filterLabels[code]}
+          >
+            {code === "multi" ? (
+              <div
+                className={"icon_search_inclusive"}
+                style={{
+                  width: symbolSize + 2 + "px",
+                  height: symbolSize + 2 + "px"
+                }}
+              />
+            ) : (
+              <ManaSymbol
+                colorIndex={index + 1}
+                style={{
+                  width: symbolSize + "px",
+                  height: symbolSize + "px"
+                }}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}

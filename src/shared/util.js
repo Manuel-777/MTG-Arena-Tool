@@ -371,6 +371,20 @@ export function getCardsMissingCount(deck, grpid) {
   return mainMissing + sideboardMissing;
 }
 
+export function getMissingCardCounts(deck) {
+  const missingCards = {};
+  const allCardIds = new Set(
+    [...deck.mainDeck, ...deck.sideboard].map(card => card.id)
+  );
+  allCardIds.forEach(grpid => {
+    const missing = getCardsMissingCount(deck, grpid);
+    if (missing > 0) {
+      missingCards[grpid] = missing;
+    }
+  });
+  return missingCards;
+}
+
 export function getBoosterCountEstimate(neededWildcards) {
   let boosterCost = 0;
   const boosterEstimates = {

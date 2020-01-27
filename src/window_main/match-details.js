@@ -7,7 +7,7 @@ import { MANA, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
 import pd from "../shared/player-data";
 import { createDiv, queryElements as $$ } from "../shared/dom-fns";
-import * as deckDrawer from "../shared/deck-drawer";
+import * as deckDrawer from "./DeckDrawer";
 import {
   get_deck_export,
   get_deck_export_txt,
@@ -18,7 +18,7 @@ import {
 import {
   hypergeometricSignificance,
   hypergeometricRange
-} from "../shared/stats-fns";
+} from "../shared/statsFns";
 import {
   actionLogDir,
   changeBackground,
@@ -231,8 +231,10 @@ function openMatch(id) {
             unique + game.deckSize,
             unknownCards + "x"
           );
-          cardDiv.appendChild(tile);
-          libraryDiv.appendChild(cardDiv);
+          if (tile) {
+            cardDiv.appendChild(tile);
+            libraryDiv.appendChild(cardDiv);
+          }
         }
 
         const handExplanation = createDiv(

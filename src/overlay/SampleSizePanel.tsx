@@ -1,9 +1,10 @@
 import React, { useCallback } from "react";
 
 import { CARD_TYPES } from "../shared/constants";
+import { Chances } from "../window_background/types/decks";
 
 export interface SampleSizePanelProps {
-  cardOdds: { [key: string]: number };
+  cardOdds: Chances;
   cardsLeft: number;
   setOddsCallback: (option: number) => void;
 }
@@ -40,9 +41,38 @@ export default function SampleSizePanel(
       </div>
       <div className="chance_title" />
       {CARD_TYPES.map(type => {
-        const abbrev = type.slice(0, 3);
-        const field = "chance" + abbrev;
-        const value = cardOdds[field] ? cardOdds[field] / 100 : 0;
+        let value = 0;
+        let field = "";
+        switch (type) {
+          case "Creatures":
+            value = cardOdds["chanceCre"] / 100;
+            field = "chanceCre";
+            break;
+          case "Lands":
+            value = cardOdds["chanceLan"] / 100;
+            field = "chanceLan";
+            break;
+          case "Instants":
+            value = cardOdds["chanceIns"] / 100;
+            field = "chanceIns";
+            break;
+          case "Sorceries":
+            value = cardOdds["chanceSor"] / 100;
+            field = "chanceSor";
+            break;
+          case "Enchantments":
+            value = cardOdds["chanceEnc"] / 100;
+            field = "chanceEnc";
+            break;
+          case "Artifacts":
+            value = cardOdds["chanceArt"] / 100;
+            field = "chanceArt";
+            break;
+          case "Planeswalkers":
+            value = cardOdds["chancePla"] / 100;
+            field = "chancePla";
+            break;
+        }
         const display = value.toLocaleString([], {
           style: "percent",
           maximumSignificantDigits: 2
