@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/camelcase */
-import { IPC_OVERLAY } from "../shared/constants.js";
+import { IPC_OVERLAY } from "../shared/constants";
 import { objectClone } from "../shared/util";
 import { ipc_send } from "./backgroundUtil";
 import Deck from "../shared/deck";
