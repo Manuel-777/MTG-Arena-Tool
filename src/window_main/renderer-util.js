@@ -28,7 +28,7 @@ import {
   createSpan,
   queryElements as $$
 } from "../shared/dom-fns";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import {
   deckTypesStats,
   getCardArtCrop,
@@ -46,7 +46,7 @@ let popTimeout = null;
 let dialogHandler = null;
 let unmountPoints = [];
 // quick and dirty shared state object for main renderer process
-// (for state shared across processes, use database or player-data)
+// (for state shared across processes, use database or PlayerData)
 const localState = {
   authToken: "",
   collectionTableMode: pd.settings.collectionTableMode,

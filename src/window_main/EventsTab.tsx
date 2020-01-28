@@ -4,7 +4,7 @@ import React from "react";
 import { TableState } from "react-table";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { getReadableEvent } from "../shared/util";
 import { EventInstanceData, InternalEvent } from "../types/event";
 import Aggregator, { AggregatorFilters } from "./aggregator";
@@ -120,15 +120,15 @@ function getEventStats(event: InternalEvent): EventStats {
     }
     // some of the data is wierd. Games which last years or have no data.
     if (match.duration && match.duration < 3600) {
-      stats.duration += match.duration;
+      stats.duration = (stats.duration ?? 0) + match.duration;
     }
     if (match.player.win > match.opponent.win) {
       stats.wins++;
     } else if (match.player.win < match.opponent.win) {
       stats.losses++;
     }
-    stats.gameWins += match.player.win;
-    stats.gameLosses += match.opponent.win;
+    stats.gameWins = (stats.gameWins ?? 0) + match.player.win;
+    stats.gameLosses = (stats.gameLosses ?? 0) + match.opponent.win;
   });
   if (stats.isMissingMatchData) {
     // If the data is corrupt fallback on wlgate data.

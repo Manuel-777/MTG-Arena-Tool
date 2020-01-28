@@ -1,8 +1,16 @@
-import { ipcRenderer as ipc, remote } from "electron";
+/* eslint-disable @typescript-eslint/camelcase */
 import isValid from "date-fns/isValid";
 import parseISO from "date-fns/parseISO";
+import { ipcRenderer as ipc, remote } from "electron";
 import _ from "lodash";
+import { InternalDeck } from "../types/Deck";
+import { InternalEvent } from "../types/event";
+import { InternalEconomyTransaction } from "../types/inventory";
+import { InternalMatch } from "../types/match";
+import { InternalRank, InternalRankUpdate } from "../types/rank";
 import {
+  BLACK,
+  BLUE,
   CARD_TILE_FLAT,
   COLLECTION_CARD_MODE,
   DATE_LAST_30,
@@ -10,19 +18,18 @@ import {
   DEFAULT_TILE,
   ECONOMY_LIST_MODE,
   EVENTS_LIST_MODE,
-  MATCHES_LIST_MODE,
-  BLACK,
-  BLUE,
   GREEN,
-  RED,
-  WHITE,
-  OVERLAY_LEFT,
-  OVERLAY_FULL,
-  OVERLAY_SEEN,
+  MATCHES_LIST_MODE,
   OVERLAY_DRAFT,
-  OVERLAY_LOG
+  OVERLAY_FULL,
+  OVERLAY_LEFT,
+  OVERLAY_LOG,
+  OVERLAY_SEEN,
+  RED,
+  WHITE
 } from "./constants";
 import db from "./database";
+import { MergedSettings } from "../types/settings";
 
 const playerDataDefault = {
   name: "",
@@ -35,7 +42,19 @@ const playerDataDefault = {
   last_log_timestamp: null,
   last_log_format: "",
   appDbPath: "",
-  playerDbPath: ""
+  playerDbPath: "",
+  settings: {
+    email: "",
+    token: "",
+    toolVersion: 0,
+    auto_login: false,
+    launch_to_tray: false,
+    remember_me: true,
+    beta_channel: false,
+    metadata_lang: "en",
+    log_locale_format: "",
+    logUri: ""
+  }
 };
 
 const overlayCfg = {
@@ -99,6 +118,7 @@ const defaultCfg = {
     skip_firstpass: false,
     overlay_scale: 100,
     overlay_ontop: true,
+    overlayHover: { x: 0, y: 0 },
     enable_keyboard_shortcuts: true,
     shortcut_overlay_1: "Alt+Shift+1",
     shortcut_overlay_2: "Alt+Shift+2",
@@ -178,7 +198,10 @@ const defaultCfg = {
       step: 0,
       won: 0,
       lost: 0,
-      drawn: 0
+      drawn: 0,
+      percentile: 0,
+      leaderboardPlace: 0,
+      seasonOrdinal: 0
     },
     limited: {
       rank: "",
@@ -186,7 +209,10 @@ const defaultCfg = {
       step: 0,
       won: 0,
       lost: 0,
-      drawn: 0
+      drawn: 0,
+      percentile: 0,
+      leaderboardPlace: 0,
+      seasonOrdinal: 0
     }
   },
   deck_changes: {},
@@ -209,33 +235,33 @@ const defaultDeck = JSON.parse(
 );
 
 // Cannot use Deck/ColorList classes because it would cause circular dependency
-// tweaked for heavy use in player-data/aggregator
-function getDeckColors(deck) {
+// tweaked for heavy use in PlayerData/Aggregator
+function getDeckColors(deck: InternalDeck): number[] {
   if (deck.colors && deck.colors instanceof Array) {
     // if field exists, assume it was correctly pre-computed by latest code
     return deck.colors;
   }
 
-  const colorSet = new Set();
+  const colorSet = new Set<number>();
 
-  deck.mainDeck.forEach(card => {
+  deck.mainDeck.forEach((card: { id: number; quantity: number }) => {
     if (card.quantity < 1) {
       return;
     }
 
-    let cardData = db.card(card.id);
+    const cardData = db.card(card.id);
 
     if (!cardData) {
       return;
     }
 
-    let isLand = cardData.type.indexOf("Land") !== -1;
-    let frame = cardData.frame;
+    const isLand = cardData.type.indexOf("Land") !== -1;
+    const frame = cardData.frame;
     if (isLand && frame.length < 3) {
-      frame.forEach(colorIndex => colorSet.add(colorIndex));
+      frame.forEach((colorIndex: number) => colorSet.add(colorIndex));
     }
-
-    cardData.cost.forEach(cost => {
+    // TODO this does not work with multi-color symbols
+    cardData.cost.forEach((cost: string) => {
       if (cost === "w") {
         colorSet.add(WHITE);
       } else if (cost === "u") {
@@ -255,10 +281,10 @@ function getDeckColors(deck) {
   return colorIndices;
 }
 
-function prettierDeckData(deckData) {
+function prettierDeckData(deckData: InternalDeck): InternalDeck {
   // many precon descriptions are total garbage
   // manually update them with generic descriptions
-  const prettyDescriptions = {
+  const prettyDescriptions: Record<string, string> = {
     "Decks/Precon/Precon_EPP_BG_Desc": "Golgari Swarm",
     "Decks/Precon/Precon_EPP_BR_Desc": "Cult of Rakdos",
     "Decks/Precon/Precon_EPP_GU_Desc": "Simic Combine",
@@ -290,62 +316,74 @@ function prettierDeckData(deckData) {
   return deckData;
 }
 
-class PlayerData {
+class PlayerData implements Record<string, any> {
+  private static instance?: PlayerData = undefined;
+
+  public arenaVersion = "";
+  public userName = "";
+  public cards: {
+    cards_time: number;
+    cards_before: Record<string, number>;
+    cards: Record<string, number>;
+  } = defaultCfg.cards;
+  public cardsNew: Record<string, number> = {};
+  public deck_changes: Record<string, any> = {};
+  public static_decks: string[] = [];
+  public static_events: string[] = [];
+  public decks: Record<string, InternalDeck> = {};
+  public decks_tags: Record<string, string[]> = {};
+  public name = "";
+  public arenaId = "";
+  public rank: InternalRank = defaultCfg.rank;
+  public economy = defaultCfg.economy;
+  public seasonal: Record<string, InternalRankUpdate> = {};
+  public seasonal_rank: Record<string, any> = {};
+  public courses_index: string[] = [];
+  public deck_changes_index: string[] = [];
+  public matches_index: string[] = [];
+  public economy_index: string[] = [];
+  public draft_index: string[] = [];
+  public offline = false;
+  public patreon = false;
+  public patreon_tier = -1;
+  public settings: MergedSettings = {
+    ...playerDataDefault.settings,
+    ...defaultCfg.settings
+  };
+
+  public last_log_timestamp = "";
+  public last_log_format = "";
+  public appDbPath = "";
+  public playerDbPath = "";
+  public defaultCfg = { ...defaultCfg };
+
   constructor() {
     if (PlayerData.instance) return PlayerData.instance;
 
-    this.handleSetData = this.handleSetData.bind(this);
-    if (ipc) ipc.on("set_player_data", this.handleSetData);
-
-    // This is to make TS happy, not sure if it breaks the defaultCfg assignment?
-    this.defaultCfg = defaultCfg;
-    this.appDbPath = "";
-    this.playerDbPath = "";
-    this.last_log_timestamp = null;
-    this.transaction = this.transaction.bind(this);
     this.deck = this.deck.bind(this);
-    this.arenaVersion = undefined;
-    this.userName = undefined;
-    this.cards = undefined;
-    this.cardsNew = undefined;
-    this.deck_changes = undefined;
-    this.decks = undefined;
-    this.name = undefined;
-    this.arenaId = undefined;
-    this.rank = undefined;
-    this.economy = undefined;
-    this.seasonal = undefined;
-    this.courses_index = [];
-    this.deck_changes_index = [];
-    this.matches_index = [];
-    this.economy_index = [];
-    this.draft_index = [];
-    this.offline = false;
-    this.patreon = false;
-    this.patreon_tier = -1;
-    this.settings = undefined;
-    this.draft = this.draft.bind(this);
-    this.event = this.event.bind(this);
-    this.match = this.match.bind(this);
-    this.transactionExists = this.transactionExists.bind(this);
-    this.deckExists = this.deckExists.bind(this);
     this.deckChangeExists = this.deckChangeExists.bind(this);
+    this.deckChanges = this.deckChanges.bind(this);
+    this.deckExists = this.deckExists.bind(this);
+    this.draft = this.draft.bind(this);
     this.draftExists = this.draftExists.bind(this);
+    this.event = this.event.bind(this);
     this.eventExists = this.eventExists.bind(this);
+    this.handleSetData = this.handleSetData.bind(this);
+    this.match = this.match.bind(this);
     this.matchExists = this.matchExists.bind(this);
     this.seasonalExists = this.seasonalExists.bind(this);
-    this.deckChanges = this.deckChanges.bind(this);
+    this.transaction = this.transaction.bind(this);
+    this.transactionExists = this.transactionExists.bind(this);
 
+    if (ipc) ipc.on("set_player_data", this.handleSetData);
     Object.assign(this, {
       ...playerDataDefault,
-      ...defaultCfg,
-      defaultCfg: { ...defaultCfg }
+      ...defaultCfg
     });
-
     PlayerData.instance = this;
   }
 
-  handleSetData(_event, arg) {
+  handleSetData(event: unknown, arg: any): void {
     try {
       arg = JSON.parse(arg);
       Object.assign(this, arg);
@@ -354,38 +392,42 @@ class PlayerData {
     }
   }
 
-  get cardsSize() {
+  get cardsSize(): number {
     return 100 + this.settings.cards_size * 15;
   }
 
-  get cardsSizeHoverCard() {
+  get cardsSizeHoverCard(): number {
     return 100 + this.settings.cards_size_hover_card * 15;
   }
 
-  get transactionList() {
+  get transactionList(): InternalEconomyTransaction[] {
     return this.economy_index
       .filter(this.transactionExists)
-      .map(this.transaction);
+      .map(this.transaction) as InternalEconomyTransaction[];
   }
 
-  get deckList() {
-    return Object.keys(this.decks).map(this.deck);
+  get deckList(): InternalDeck[] {
+    return Object.keys(this.decks).map(this.deck) as InternalDeck[];
   }
 
-  get draftList() {
+  get draftList(): any[] {
     return this.draft_index.filter(this.draftExists).map(this.draft);
   }
 
-  get eventList() {
-    return this.courses_index.filter(this.eventExists).map(this.event);
+  get eventList(): InternalEvent[] {
+    return this.courses_index
+      .filter(this.eventExists)
+      .map(this.event) as InternalEvent[];
   }
 
-  get matchList() {
-    return this.matches_index.filter(this.matchExists).map(this.match);
+  get matchList(): InternalMatch[] {
+    return this.matches_index
+      .filter(this.matchExists)
+      .map(this.match) as InternalMatch[];
   }
 
-  get data() {
-    const data = {};
+  get data(): Record<string, any> {
+    const data: Record<string, any> = {};
     const blacklistKeys = [
       ...Object.keys(playerDataDefault),
       "defaultCfg",
@@ -420,26 +462,28 @@ class PlayerData {
     return data;
   }
 
-  transaction(id) {
-    if (!this.transactionExists(id)) return false;
+  transaction(id?: string): InternalEconomyTransaction | undefined {
+    if (!id || !this.transactionExists(id)) return undefined;
+    const data = this as Record<string, any>;
+    const txnData = data[id];
     return {
-      ...this[id],
+      ...txnData,
       // Some old data stores the raw original context in ".originalContext"
       // All NEW data stores this in ".context" and ".originalContext" is blank.
-      originalContext: this[id].originalContext || this[id].context
+      originalContext: txnData.originalContext ?? txnData.context
     };
   }
 
-  transactionExists(id) {
-    return id in this;
+  transactionExists(id?: string): boolean {
+    return !!id && id in this;
   }
 
-  deckChangeExists(id) {
-    return id in this.deck_changes;
+  deckChangeExists(id?: string): boolean {
+    return !!id && id in this.deck_changes;
   }
 
-  deck(id) {
-    if (!this.deckExists(id)) return false;
+  deck(id?: string): InternalDeck | undefined {
+    if (!id || !this.deckExists(id)) return undefined;
     const preconData = db.preconDecks[id] || {};
     const deckData = {
       ...preconData,
@@ -460,51 +504,59 @@ class PlayerData {
     return prettierDeckData(deckData);
   }
 
-  deckExists(id) {
-    return id in this.decks;
+  deckExists(id?: string): boolean {
+    return !!id && id in this.decks;
   }
 
-  deckChanges(id) {
+  deckChanges(id?: string): any[] {
     if (!this.deckExists(id)) return [];
     return this.deck_changes_index
       .map(id => this.deck_changes[id])
       .filter(change => change && change.deckId === id);
   }
 
-  draft(id) {
-    if (!this.draftExists(id)) return false;
-    return { ...this[id], type: "draft" };
+  draft(id?: string): any {
+    if (!id || !this.draftExists(id)) return undefined;
+    const data = this as Record<string, any>;
+    const draftData = data[id];
+    return { ...draftData, type: "draft" };
   }
 
-  draftExists(id) {
-    return this.draft_index.includes(id) && id in this;
+  draftExists(id?: string): boolean {
+    return !!id && this.draft_index.includes(id) && id in this;
   }
 
-  event(id) {
-    if (!this.eventExists(id)) return false;
+  event(id?: string): InternalEvent | undefined {
+    if (!id || !this.eventExists(id)) return undefined;
+    const data = this as Record<string, any>;
+    const eventData = data[id];
     return {
-      ...this[id],
+      ...eventData,
       custom: !this.static_events.includes(id),
       type: "Event"
     };
   }
 
-  eventExists(id) {
-    return id in this;
+  eventExists(id?: string): boolean {
+    return !!id && id in this;
   }
 
-  seasonalExists(id) {
-    return id in this.seasonal;
+  seasonalExists(id?: string): boolean {
+    return !!id && id in this.seasonal;
   }
 
   // I was not sure weter it was correct to include this here or in the
   // utilities file. here its easier to handle the data.
-  addSeasonalRank(rank, seasonOrdinal, type = "constructed") {
+  addSeasonalRank(
+    rank: InternalRankUpdate,
+    seasonOrdinal: any,
+    type = "constructed"
+  ): any {
     if (!seasonOrdinal && rank.seasonOrdinal) {
       seasonOrdinal = rank.seasonOrdinal;
     }
 
-    let seasonTag = seasonOrdinal + "_" + type.toLowerCase();
+    const seasonTag = seasonOrdinal + "_" + type.toLowerCase();
     if (!this.seasonal_rank[seasonTag]) {
       this.seasonal_rank[seasonTag] = [];
     }
@@ -520,9 +572,10 @@ class PlayerData {
     return this.seasonal_rank;
   }
 
-  match(id) {
-    if (!this.matchExists(id)) return false;
-    const matchData = this[id];
+  match(id?: string): InternalMatch | undefined {
+    if (!id || !this.matchExists(id)) return undefined;
+    const data = this as Record<string, any>;
+    const matchData = data[id];
     let preconData = {};
     if (matchData.playerDeck && matchData.playerDeck.id in db.preconDecks) {
       preconData = db.preconDecks[matchData.playerDeck.id];
@@ -546,8 +599,8 @@ class PlayerData {
     };
   }
 
-  matchExists(id) {
-    return id in this;
+  matchExists(id?: string): boolean {
+    return !!id && id in this;
   }
 }
 

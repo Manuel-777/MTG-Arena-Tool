@@ -1,7 +1,7 @@
 import anime from "animejs";
 import { DRAFT_RANKS, EASING_DEFAULT, PACK_SIZES } from "../shared/constants";
 import db from "../shared/database";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import {
   createDiv,
   createImg,

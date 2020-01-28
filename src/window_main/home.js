@@ -1,6 +1,6 @@
 import { shell } from "electron";
 import db from "../shared/database";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { queryElements as $$, createDiv } from "../shared/dom-fns";
 import { addCardHover } from "../shared/cardHover";
 import { toHHMMSS, toDDHHMMSS, timestamp } from "../shared/util";

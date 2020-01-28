@@ -2,7 +2,7 @@ import anime from "animejs";
 import _ from "lodash";
 import { MANA, CARD_RARITIES, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { createDiv, createSpan, queryElements as $$ } from "../shared/dom-fns";
 import * as deckDrawer from "./DeckDrawer";
 import {

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import { ipcSend } from "../../renderer-util";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import _ from "lodash";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { CARD_TILE_ARENA, CARD_TILE_FLAT } from "../../../shared/constants";
@@ -113,7 +113,7 @@ export default function SectionVisual(): JSX.Element {
         <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={[CARD_TILE_ARENA, CARD_TILE_FLAT]}
-          current={pd.settings.card_tile_style}
+          current={pd.settings.card_tile_style + ""}
           optionFormatter={getCardStyleName}
           callback={setCardStyle}
         />
@@ -126,7 +126,7 @@ export default function SectionVisual(): JSX.Element {
               isSideboard={false}
               quantity={4}
               showWildcards={false}
-              style={parseInt(pd.settings.card_tile_style)}
+              style={parseInt(pd.settings.card_tile_style + "")}
             />
           )}
         </div>
@@ -144,8 +144,7 @@ export default function SectionVisual(): JSX.Element {
 
       <div className="slidecontainer_settings">
         <label style={{ width: "400px" }} className="card_size_container">
-          {`Hover card size: ${100 +
-            Math.round(parseInt(hoverCardSize)) * 15}px`}
+          {`Hover card size: ${100 + Math.round(hoverCardSize) * 15}px`}
         </label>
         <Slider
           min={0}
@@ -159,7 +158,7 @@ export default function SectionVisual(): JSX.Element {
       <div className="slidecontainer_settings">
         <label style={{ width: "400px" }} className="card_size_container">
           {`Collection card size: ${100 +
-            Math.round(parseInt(collectionCardSize)) * 15}px`}
+            Math.round(collectionCardSize) * 15}px`}
         </label>
         <Slider
           min={0}

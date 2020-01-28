@@ -12,7 +12,7 @@ import { playerDb } from "../shared/db/LocalDatabase";
 import CardsList from "../shared/cardsList";
 import { get_deck_colors, objectClone } from "../shared/util";
 import * as greToClientInterpreter from "./greToClientInterpreter";
-import playerData from "../shared/player-data";
+import playerData from "../shared/PlayerData";
 import sha1 from "js-sha1";
 import globals from "./globals";
 import getNameBySeat from "./getNameBySeat";

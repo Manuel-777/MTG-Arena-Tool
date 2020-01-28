@@ -1,5 +1,5 @@
 import React from "react";
-import pd from "../../shared/player-data";
+import pd from "../../shared/PlayerData";
 import {
   get_deck_missing as getDeckMissing,
   getBoosterCountEstimate

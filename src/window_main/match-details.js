@@ -5,7 +5,7 @@ import anime from "animejs";
 import _ from "lodash";
 import { MANA, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { createDiv, queryElements as $$ } from "../shared/dom-fns";
 import * as deckDrawer from "./DeckDrawer";
 import {

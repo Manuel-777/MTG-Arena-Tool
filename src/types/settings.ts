@@ -29,6 +29,7 @@ export interface OverlaySettingsData {
 export interface AppSettings {
   auto_login: boolean;
   beta_channel: boolean;
+  close_to_tray: boolean;
   email: string;
   launch_to_tray: boolean;
   log_locale_format: string;
@@ -54,19 +55,24 @@ export interface SettingsData {
   decksTableState?: TableState<DecksData>;
   economyTableMode: string;
   economyTableState?: TableState<TransactionData>;
+  enable_keyboard_shortcuts: boolean;
   eventsTableMode: string;
   eventsTableState?: TableState<EventTableData>;
   export_format: string;
   last_date_filter: string;
   last_open_tab: number;
+  last_settings_overlay_section: number;
+  last_settings_section: number;
   matchesTableMode: string;
   matchesTableState?: TableState<MatchTableData>;
   metadata_lang: string;
   overlay_back_color: string;
+  overlay_ontop: boolean;
   overlay_scale: number;
   overlayHover: { x: number; y: number };
   overlays: OverlaySettingsData[];
   right_panel_width: number;
+  startup: boolean;
   skip_firstpass: boolean;
   sound_priority: boolean;
   sound_priority_volume: number;

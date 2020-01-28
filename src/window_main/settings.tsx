@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import {
   changeBackground,
   hideLoadingBars,

@@ -14,7 +14,7 @@ import {
   toHHMMSS,
   urlDecode
 } from "../shared/util";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import Aggregator from "./aggregator";
 import {
   pop,

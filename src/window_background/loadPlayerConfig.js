@@ -2,7 +2,7 @@ import { shell } from "electron";
 import _ from "lodash";
 import { IPC_BACKGROUND, IPC_OVERLAY } from "../shared/constants";
 import { playerDb, playerDbLegacy } from "../shared/db/LocalDatabase";
-import playerData from "../shared/player-data";
+import playerData from "../shared/PlayerData";
 import { isV2CardsList } from "../types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
 import { ipc_send as ipcSend, setData } from "./backgroundUtil";

@@ -1,7 +1,7 @@
 import { shell } from "electron";
 import React from "react";
 import { CARD_RARITIES } from "../../../shared/constants";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import { ReactSelect } from "../../../shared/ReactSelect";
 import {
   ALL_CARDS,

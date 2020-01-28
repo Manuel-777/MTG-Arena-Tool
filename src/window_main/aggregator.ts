@@ -12,7 +12,7 @@ import {
   DATE_SEASON
 } from "../shared/constants";
 import db from "../shared/database";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { normalApproximationInterval } from "../shared/statsFns";
 import { getReadableEvent, getRecentDeckName } from "../shared/util";
 import { InternalDeck } from "../types/Deck";
@@ -342,8 +342,8 @@ export default class Aggregator {
         new Date(match.date),
         this.deckLastPlayed[id]
       );
-      if (pd.deckExists(id)) {
-        const currentDeck = pd.deck(match.playerDeck.id);
+      const currentDeck = pd.deck(match.playerDeck.id);
+      if (currentDeck) {
         if (!(id in this.deckStats)) {
           this.deckStats[id] = Aggregator.getDefaultStats();
         }

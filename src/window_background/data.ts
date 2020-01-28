@@ -3,7 +3,7 @@ import _ from "lodash";
 import { DEFAULT_TILE } from "../shared/constants";
 import database from "../shared/database";
 import Deck from "../shared/deck";
-import playerData from "../shared/player-data";
+import playerData from "../shared/PlayerData";
 import { objectClone } from "../shared/util";
 import { MatchData, matchDataDefault } from "../types/currentMatch";
 import { InternalMatch } from "../types/match";
@@ -142,7 +142,7 @@ function matchIsLimited(match: MatchData): boolean {
 // Given match data calculates derived data for storage.
 // This is called when a match is complete.
 export function completeMatch(
-  match: InternalMatch,
+  match: Partial<InternalMatch>,
   matchData: MatchData,
   matchEndTime: number
 ): InternalMatch | undefined {
@@ -206,7 +206,7 @@ export function completeMatch(
   match.toolVersion = globals.toolVersion;
   match.toolRunFromSource = !electron.remote.app.isPackaged;
 
-  return match;
+  return match as InternalMatch;
 }
 
 // Deck Creation

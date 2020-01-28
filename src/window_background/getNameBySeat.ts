@@ -1,4 +1,4 @@
-import playerData from "../shared/player-data";
+import playerData from "../shared/PlayerData";
 import globals from "./globals";
 
 const suffixLength = "#12345".length;
