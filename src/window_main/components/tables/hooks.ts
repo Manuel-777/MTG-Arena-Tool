@@ -165,21 +165,19 @@ export function useBaseReactTable<D extends TableData>({
     [customFilterTypes]
   );
   const initialState: TableState<D> = React.useMemo(() => {
-    // default hidden columns
-    const hiddenColumns = columns
-      .filter(column => !column.defaultVisible)
-      .map(column => column.id ?? column.accessor);
     const state = _.defaultsDeep(cachedState, {
       pageSize: 25,
-      ...defaultState,
-      hiddenColumns
+      hiddenColumns: [],
+      ...defaultState
     });
     // ensure data-only columns are all invisible
+    const hiddenColumns = new Set(state.hiddenColumns);
     for (const column of columns) {
       if (!column.defaultVisible && !column.mayToggle) {
-        state.hiddenColumns.push(column.id ?? column.accessor);
+        hiddenColumns.add(column.id ?? column.accessor);
       }
     }
+    state.hiddenColumns = [...hiddenColumns];
     return state;
   }, [cachedState, columns, defaultState]);
 
