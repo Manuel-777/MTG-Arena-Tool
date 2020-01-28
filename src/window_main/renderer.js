@@ -281,7 +281,7 @@ ipc.on("force_open_tab", function(event, arg) {
   setLocalState({ lastDataIndex: 0, lastScrollTop: 0 });
   openTab(arg);
   ipcSend("save_user_settings", {
-    skip_refresh: true
+    skipRefresh: true
   });
   updateTopBar();
 });

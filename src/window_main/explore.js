@@ -3,7 +3,7 @@ import anime from "animejs";
 import {
   CARD_RARITIES,
   MANA,
-  COLORS_BRIEF,
+  COLORS_LONG,
   DEFAULT_TILE,
   RANKS,
   RANKS_SORT,
@@ -295,14 +295,16 @@ function drawFilters() {
    *  Mana filter
    **/
   const manas = createDiv(["mana_filters_explore"]);
-  COLORS_BRIEF.forEach(function(s, i) {
+  COLORS_LONG.forEach(function(s, i) {
     const mi = [1, 2, 3, 4, 5];
     let classes = ["mana_filter"];
     if (!inputMana.includes(mi[i])) {
       classes.push("mana_filter_on");
     }
     const manabutton = createDiv(classes);
-    manabutton.style.backgroundImage = "url(../images/" + s + "20.png)";
+    manabutton.classList.add("mana_" + s);
+    manabutton.style.height = "20px";
+    manabutton.style.width = "40px";
     manabutton.addEventListener("click", function() {
       if ([...manabutton.classList].includes("mana_filter_on")) {
         manabutton.classList.remove("mana_filter_on");

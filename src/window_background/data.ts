@@ -3,7 +3,7 @@ import database from "../shared/database";
 import electron from "electron";
 import getOpponentDeck from "./getOpponentDeck";
 import globals from "./globals";
-import playerData from "../shared/player-data.js";
+import playerData from "../shared/player-data";
 import { DEFAULT_TILE } from "../shared/constants";
 import { MatchCreatedEvent } from "../shared/types/MatchCreatedEvent";
 import { objectClone } from "../shared/util";

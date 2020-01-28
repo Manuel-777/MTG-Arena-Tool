@@ -1,7 +1,7 @@
 import { ipc_send } from "./backgroundUtil";
 import fs from "fs";
 import path from "path";
-import { IPC_OVERLAY } from "../shared/constants.js";
+import { IPC_OVERLAY } from "../shared/constants";
 import globals from "./globals";
 import format from "date-fns/format";
 

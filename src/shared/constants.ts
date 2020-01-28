@@ -660,6 +660,7 @@ export const STANDARD_CUTOFF_DATE = "2018-10-04"; // day before GRN release
 
 export const COLORS_ALL = ["w", "u", "b", "r", "g", "c"] as const;
 export const COLORS_BRIEF = ["w", "u", "b", "r", "g"] as const;
+export const COLORS_LONG = ["white", "blue", "black", "red", "green"] as const;
 export const RANKS = [
   "Bronze",
   "Silver",

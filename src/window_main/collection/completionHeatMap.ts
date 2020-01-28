@@ -10,7 +10,7 @@ import {
   BLACK,
   GREEN,
   RED
-} from "../../shared/constants.js";
+} from "../../shared/constants";
 
 import { CardStats } from "./collectionStats";
 

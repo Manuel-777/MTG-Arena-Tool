@@ -237,8 +237,7 @@ ipc.on("save_user_settings", function(event, settings) {
   // console.log("save_user_settings");
   ipc_send("show_loading");
   let refresh = true;
-  if (settings.skip_refresh || settings.skipRefresh) {
-    delete settings.skip_refresh;
+  if (settings.skipRefresh) {
     delete settings.skipRefresh;
     refresh = false;
   }

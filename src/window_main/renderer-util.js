@@ -136,7 +136,7 @@ function makeResizable(div, resizeCallback, finalCallback) {
   const saveWidth = function(width) {
     ipcSend("save_user_settings", {
       right_panel_width: width,
-      skip_refresh: true
+      skipRefresh: true
     });
   };
 

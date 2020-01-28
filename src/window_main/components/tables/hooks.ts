@@ -175,11 +175,13 @@ export function useBaseReactTable<D extends TableData>({
       hiddenColumns
     });
     // ensure data-only columns are all invisible
+    const hiddenSet = new Set(state.hiddenColumns);
     for (const column of columns) {
       if (!column.defaultVisible && !column.mayToggle) {
-        state.hiddenColumns.push(column.id ?? column.accessor);
+        hiddenSet.add(column.id ?? column.accessor);
       }
     }
+    state.hiddenColumns = [...hiddenSet];
     return state;
   }, [cachedState, columns, defaultState]);
 

@@ -131,7 +131,7 @@ export function clickNav(id: number): void {
   ipcSend("save_user_settings", {
     last_open_tab: sidebarActive,
     last_date_filter: filters.date,
-    skip_refresh: true
+    skipRefresh: true
   });
 }
 

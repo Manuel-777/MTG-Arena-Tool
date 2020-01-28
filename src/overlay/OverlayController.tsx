@@ -141,7 +141,7 @@ export default function OverlayController(): JSX.Element {
       ipcSend("save_user_settings", {
         overlays: newOverlays,
         overlayHover: newOverlayHover,
-        skip_refresh: true
+        skipRefresh: true
       });
     }
     setEditMode(_editMode);
