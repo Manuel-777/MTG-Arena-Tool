@@ -847,82 +847,6 @@ function localTimeSince(date) {
   </relative-time>`;
 }
 
-function attachMatchData(listItem, match) {
-  // Deck name
-  const deckNameDiv = createDiv(["list_deck_name"], match.playerDeck.name);
-  listItem.leftTop.appendChild(deckNameDiv);
-
-  // Event name
-  const eventNameDiv = createDiv(
-    ["list_deck_name_it"],
-    getReadableEvent(match.eventId)
-  );
-  listItem.leftTop.appendChild(eventNameDiv);
-
-  match.playerDeck.colors.forEach(color => {
-    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    listItem.leftBottom.appendChild(m);
-  });
-
-  // Opp name
-  if (match.opponent.name == null) match.opponent.name = "-#000000";
-  const oppNameDiv = createDiv(
-    ["list_match_title"],
-    "vs " + match.opponent.name.slice(0, -6)
-  );
-  listItem.rightTop.appendChild(oppNameDiv);
-
-  // Opp rank
-  const oppRank = createDiv(["ranks_16"]);
-  oppRank.style.marginRight = "0px";
-  oppRank.style.backgroundPosition =
-    get_rank_index_16(match.opponent.rank) * -16 + "px 0px";
-  oppRank.title = formatRank(match.opponent);
-  listItem.rightTop.appendChild(oppRank);
-
-  const date = !match.date
-    ? "Unknown date - "
-    : localTimeSince(new Date(match.date));
-  // Match time
-  const matchTime = createDiv(
-    ["list_match_time"],
-    date + " " + toMMSS(match.duration) + " long"
-  );
-  listItem.rightBottom.appendChild(matchTime);
-
-  // Opp colors
-  match.oppDeck.colors.forEach(color => {
-    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    listItem.rightBottom.appendChild(m);
-  });
-
-  const tagsDiv = createDiv(["matches_tags"], "", {
-    id: "matches_tags_" + match.id
-  });
-  listItem.rightBottom.appendChild(tagsDiv);
-
-  // Result
-  const resultDiv = createDiv(
-    [
-      "list_match_result",
-      match.player.win > match.opponent.win ? "green" : "red"
-    ],
-    `${match.player.win}:${match.opponent.win}`
-  );
-  listItem.right.after(resultDiv);
-
-  // On the play/draw
-  if (match.onThePlay) {
-    let onThePlay = false;
-    if (match.player.seat == match.onThePlay) {
-      onThePlay = true;
-    }
-    const div = createDiv([onThePlay ? "ontheplay" : "onthedraw"]);
-    div.title = onThePlay ? "On the play" : "On the draw";
-    listItem.right.after(div);
-  }
-}
-
 function createDraftSetDiv(draft) {
   return createDiv(["list_deck_name"], draft.set + " draft");
 }
@@ -1083,6 +1007,5 @@ export {
   compareWinrates,
   compareColorWinrates,
   localTimeSince,
-  attachMatchData,
   showOfflineSplash
 };

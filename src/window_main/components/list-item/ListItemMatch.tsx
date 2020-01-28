@@ -72,8 +72,8 @@ export default function MatchesTable({
         </FlexTop>
         <FlexBottom style={{ alignItems: "center" }}>
           <div className="list_match_time">
-            <relative-time datetime={new Date(match.date).toISOString()}>
-              {match.date.toString()}
+            <relative-time datetime={new Date(match.date || 0).toISOString()}>
+              {match.date?.toString() ?? ""}
             </relative-time>{" "}
             {" " + toMMSS(match.duration) + " long"}
           </div>

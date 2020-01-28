@@ -22,7 +22,7 @@ import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
-import EventsListViewRow from "./EventsListViewRow";
+import { ListItemEvent } from "../list-item/ListItemEvent";
 import EventsTableControls from "./EventsTableControls";
 import { eventSearchFilterFn } from "./filters";
 import {
@@ -252,7 +252,7 @@ export default function EventsTable({
               );
             }
             return (
-              <EventsListViewRow
+              <ListItemEvent
                 row={row}
                 index={index}
                 key={row.index}
