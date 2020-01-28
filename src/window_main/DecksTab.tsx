@@ -18,6 +18,7 @@ import Aggregator, {
 } from "./aggregator";
 import DecksTable from "./components/decks/DecksTable";
 import { DecksData } from "./components/decks/types";
+import { isHidingArchived } from "./components/tables/filters";
 import { useAggregatorAndSidePanel } from "./components/tables/hooks";
 import { openDeck } from "./deck-details";
 import mountReactComponent from "./mountReactComponent";
@@ -149,7 +150,7 @@ export function DecksTab({
   aggFiltersArg: AggregatorFilters;
 }): JSX.Element {
   const { decksTableMode, decksTableState } = pd.settings;
-  const showArchived = decksTableState?.filters?.archivedCol !== "hideArchived";
+  const showArchived = !isHidingArchived(decksTableState);
   const getDataAggFilters = (data: DecksData[]): AggregatorFilters => {
     const deckId = data.map(deck => deck.id).filter(id => id) as string[];
     return { deckId };

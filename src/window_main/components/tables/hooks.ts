@@ -14,7 +14,8 @@ import Aggregator, { AggregatorFilters } from "../../aggregator";
 import {
   archivedFilterFn,
   colorsFilterFn,
-  fuzzyTextFilterFn
+  fuzzyTextFilterFn,
+  isHidingArchived
 } from "../tables/filters";
 import {
   BaseTableProps,
@@ -169,16 +170,14 @@ export function useBaseReactTable<D extends TableData>({
     const hiddenColumns = columns
       .filter(column => !column.defaultVisible)
       .map(column => column.id ?? column.accessor);
-    const state = _.defaultsDeep(cachedState, {
-      pageSize: 25,
-      ...defaultState,
-      hiddenColumns
-    });
+    const state =
+      cachedState ?? _.defaults(defaultState, { pageSize: 25, hiddenColumns });
     // ensure data-only columns are all invisible
-    const hiddenSet = new Set(state.hiddenColumns);
+    const hiddenSet = new Set(state.hiddenColumns ?? []);
     for (const column of columns) {
-      if (!column.defaultVisible && !column.mayToggle) {
-        hiddenSet.add(column.id ?? column.accessor);
+      const id = column.id ?? column.accessor;
+      if (id && !column.defaultVisible && !column.mayToggle) {
+        hiddenSet.add(id + "");
       }
     }
     state.hiddenColumns = [...hiddenSet];
@@ -304,4 +303,22 @@ export function useBaseReactTable<D extends TableData>({
     headersProps,
     tableControlsProps
   };
+}
+
+export function useAggregatorArchiveFilter<D extends TableData>(
+  table: TableInstance<D>,
+  aggFilters: AggregatorFilters,
+  setAggFiltersCallback: (filters: AggregatorFilters) => void
+): void {
+  const {
+    state: { filters }
+  } = table;
+  React.useEffect(() => {
+    if (isHidingArchived({ filters }) === !!aggFilters.showArchived) {
+      setAggFiltersCallback({
+        ...aggFilters,
+        showArchived: !isHidingArchived({ filters })
+      });
+    }
+  }, [aggFilters, setAggFiltersCallback, filters]);
 }

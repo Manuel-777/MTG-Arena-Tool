@@ -10,6 +10,7 @@ import { getReadableEvent } from "../shared/util";
 import Aggregator, { AggregatorFilters } from "./aggregator";
 import MatchesTable from "./components/matches/MatchesTable";
 import { MatchTableData, SerializedMatch } from "./components/matches/types";
+import { isHidingArchived } from "./components/tables/filters";
 import { useAggregatorAndSidePanel } from "./components/tables/hooks";
 import { TagCounts } from "./components/tables/types";
 import { openMatch } from "./match-details";
@@ -283,8 +284,7 @@ export function MatchesTab({
   aggFiltersArg: AggregatorFilters;
 }): JSX.Element {
   const { matchesTableMode, matchesTableState } = pd.settings;
-  const showArchived =
-    matchesTableState?.filters?.archivedCol !== "hideArchived";
+  const showArchived = !isHidingArchived(matchesTableState);
   const getDataAggFilters = (data: MatchTableData[]): AggregatorFilters => {
     const matchIds = data.map(match => match.id);
     return { matchIds };
