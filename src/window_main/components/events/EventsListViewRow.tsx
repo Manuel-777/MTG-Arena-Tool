@@ -11,7 +11,6 @@ import ListItem from "../../listItem";
 import { openMatch } from "../../match-details";
 import {
   attachDraftData,
-  attachMatchData,
   createDraftRares,
   getEventWinLossClass,
   localTimeSince,
@@ -94,33 +93,6 @@ function attachEventData(listItem: ListItem, event: EventTableData): void {
   }
 }
 
-// Given the data of a match will return a data row to be
-// inserted into one of the screens.
-function createMatchRow(match: SerializedMatch): HTMLElement {
-  let tileGrpid, clickCallback;
-  if (match.type == "match") {
-    tileGrpid = match.playerDeck.deckTileId ?? DEFAULT_TILE;
-    clickCallback = handleOpenMatch;
-  } else {
-    tileGrpid = db.sets[match.set]?.tile ?? DEFAULT_TILE;
-    clickCallback = handleOpenDraft;
-  }
-
-  const matchRow = new ListItem(tileGrpid, match.id, clickCallback);
-  matchRow.divideLeft();
-  matchRow.divideRight();
-
-  if (match.type === "match") {
-    attachMatchData(matchRow, match);
-    matchRow.container.title = "show match details";
-  } else {
-    attachDraftData(matchRow, match);
-    matchRow.container.title = "show draft details";
-  }
-
-  return matchRow.container;
-}
-
 // This code is executed when an event row is clicked and adds
 // rows below the event for every match in that event.
 export function expandEvent(event: EventTableData): void {
@@ -144,10 +116,12 @@ export function expandEvent(event: EventTableData): void {
   if (pd.draftExists(draftId)) {
     matchRows.unshift(pd.draft(draftId));
   }
+  /*
   matchRows.forEach(match => {
     const row = createMatchRow(match);
     expandDiv.appendChild(row);
   });
+  */
 
   const newHeight = matchRows.length * 64 + 16;
 

@@ -79,27 +79,28 @@ export default function MatchesTable({
           </div>
 
           <ManaCost class="mana_s20" colors={match.oppDeck.colors || []} />
-
-          {match.tags && match.tags.length ? (
-            match.tags.map((tag: any) => {
-              return (
-                <TagBubble
-                  key={tag}
-                  tag={tag}
-                  parentId={match.id}
-                  editTagCallback={editTagCallback}
-                  deleteTagCallback={deleteTagCallback}
-                />
-              );
-            })
-          ) : (
-            <NewTag
-              tagPrompt="Add"
-              tags={tags}
-              addTagCallback={addTagCallback}
-              parentId={match.id}
-            />
-          )}
+          <div style={{ marginLeft: "8px" }}>
+            {match.tags && match.tags.length ? (
+              match.tags.map((tag: any) => {
+                return (
+                  <TagBubble
+                    key={tag}
+                    tag={tag}
+                    parentId={match.id}
+                    editTagCallback={editTagCallback}
+                    deleteTagCallback={deleteTagCallback}
+                  />
+                );
+              })
+            ) : (
+              <NewTag
+                tagPrompt="Add"
+                tags={tags}
+                addTagCallback={addTagCallback}
+                parentId={match.id}
+              />
+            )}
+          </div>
         </FlexBottom>
       </Column>
 
