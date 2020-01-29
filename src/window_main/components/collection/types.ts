@@ -12,7 +12,7 @@ export interface CardsData extends DbCardData {
 }
 
 export interface CollectionTableProps {
-  cachedState: TableState<CardsData>;
+  cachedState?: TableState<CardsData>;
   cachedTableMode: string;
   cardHoverCallback: (cardDiv: HTMLElement, card: DbCardData) => void;
   contextMenuCallback: (cardDiv: HTMLElement, card: DbCardData) => void;

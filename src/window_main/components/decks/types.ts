@@ -3,6 +3,7 @@ import { SerializedDeck } from "../../../shared/types/Deck";
 import { AggregatorFilters, AggregatorStats } from "../../aggregator";
 import {
   TableControlsProps,
+  TableData,
   TableViewRowProps,
   TagCounts
 } from "../tables/types";
@@ -17,7 +18,8 @@ export interface MissingWildcards {
 export interface DecksData
   extends SerializedDeck,
     AggregatorStats,
-    MissingWildcards {
+    MissingWildcards,
+    TableData {
   winrate100: number;
   archivedSortVal: number;
   avgDuration: number;
@@ -36,7 +38,7 @@ export interface DecksTableProps {
   addTagCallback: (id: string, tag: string) => void;
   archiveCallback: (id: string | number) => void;
   aggFilters: AggregatorFilters;
-  cachedState: TableState<DecksData>;
+  cachedState?: TableState<DecksData>;
   cachedTableMode: string;
   data: DecksData[];
   events: string[];
