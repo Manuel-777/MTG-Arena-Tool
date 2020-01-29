@@ -37,8 +37,7 @@ export function ColorsCell<D extends TableData>({
 export function ShortTextCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
-  const displayName = (cell.value ?? "").replace("?=?Loc/Decks/Precon/", "");
-  return <BriefText value={displayName} />;
+  return <BriefText value={cell.value} />;
 }
 
 export function TextCell<D extends TableData>({
@@ -47,6 +46,17 @@ export function TextCell<D extends TableData>({
   return <BriefText value={cell.value} maxLength={50} />;
 }
 
+export function SubTextCell<D extends TableData>({
+  cell
+}: CellProps<D>): JSX.Element {
+  return (
+    <BriefText
+      value={cell.value}
+      maxLength={50}
+      style={{ fontFamily: "var(--main-font-name-it)", opacity: 0.5 }}
+    />
+  );
+}
 export function MetricCell<D extends TableData>({
   cell
 }: CellProps<D>): JSX.Element {
