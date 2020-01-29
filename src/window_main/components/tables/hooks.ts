@@ -11,6 +11,7 @@ import {
 } from "react-table";
 import pd from "../../../shared/player-data";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
+import { getLocalState, setLocalState } from "../../renderer-util";
 import {
   archivedFilterFn,
   colorsFilterFn,
@@ -61,6 +62,27 @@ export function useLegacyRenderer(
     }
   }, [containerRef, renderEventRow, rendererArgs]);
   return containerRef;
+}
+
+export function useLastScrollTop(): [
+  React.RefObject<HTMLDivElement>,
+  () => void
+] {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (containerRef?.current) {
+      const { lastScrollTop } = getLocalState();
+      if (lastScrollTop) {
+        containerRef.current.scrollTop = lastScrollTop;
+      }
+    }
+  }, [containerRef]);
+  const onScroll = React.useCallback(() => {
+    if (containerRef?.current) {
+      setLocalState({ lastScrollTop: containerRef.current.scrollTop });
+    }
+  }, []);
+  return [containerRef, onScroll];
 }
 
 export function useAggregatorAndSidePanel<D extends TableData>({

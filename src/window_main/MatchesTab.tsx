@@ -10,7 +10,10 @@ import { getReadableEvent } from "../shared/util";
 import Aggregator, { AggregatorFilters } from "./aggregator";
 import MatchesTable from "./components/matches/MatchesTable";
 import { MatchTableData, SerializedMatch } from "./components/matches/types";
-import { useAggregatorAndSidePanel } from "./components/tables/hooks";
+import {
+  useAggregatorAndSidePanel,
+  useLastScrollTop
+} from "./components/tables/hooks";
 import { TagCounts } from "./components/tables/types";
 import { openMatch } from "./match-details";
 import mountReactComponent from "./mountReactComponent";
@@ -304,10 +307,11 @@ export function MatchesTab({
     updateSidebarCallback: updateStatsPanel
   });
   const [events, tags] = React.useMemo(getTotalAggData, []);
+  const [containerRef, onScroll] = useLastScrollTop();
 
   return (
     <>
-      <div className={"wrapper_column"}>
+      <div className={"wrapper_column"} ref={containerRef} onScroll={onScroll}>
         <MatchesTable
           data={data}
           aggFilters={aggFilters}
