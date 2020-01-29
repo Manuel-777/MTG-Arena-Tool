@@ -10,7 +10,8 @@ import {
   MetricCell,
   PercentCell,
   RelativeTimeCell,
-  ShortTextCell
+  ShortTextCell,
+  SubTextCell
 } from "../tables/cells";
 import {
   ArchiveColumnFilter,
@@ -68,8 +69,8 @@ const columns: Column<MatchTableData>[] = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
+    Cell: SubTextCell,
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -141,7 +142,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -165,9 +166,19 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
+  },
+  {
+    Header: "Op. ID",
+    accessor: "oppArenaId",
+    disableFilters: false,
+    filter: "fuzzyText",
+    Filter: TextBoxFilter,
+    Cell: SubTextCell,
+    gridWidth: "210px",
+    mayToggle: true
   },
   {
     Header: "Op. Rank",
@@ -226,7 +237,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     disableSortBy: true,
     Cell: ArchetypeCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
