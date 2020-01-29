@@ -10,6 +10,7 @@ import {
   MetricCell,
   RelativeTimeCell,
   ShortTextCell,
+  SubTextCell,
   TextCell
 } from "../tables/cells";
 import {
@@ -20,6 +21,7 @@ import {
 } from "../tables/filters";
 import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
+import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
 import EventsListViewRow from "./EventsListViewRow";
@@ -30,7 +32,6 @@ import {
   EventsTableProps,
   EventTableData
 } from "./types";
-import TableHeaders from "../tables/TableHeaders";
 
 const columns: Column<EventTableData>[] = [
   { accessor: "id" },
@@ -49,8 +50,8 @@ const columns: Column<EventTableData>[] = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
+    Cell: SubTextCell,
+    gridWidth: "210px",
     mayToggle: true
   },
   {
@@ -60,7 +61,7 @@ const columns: Column<EventTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -82,8 +83,8 @@ const columns: Column<EventTableData>[] = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
+    Cell: SubTextCell,
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
