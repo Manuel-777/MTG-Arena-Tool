@@ -37,8 +37,14 @@ function getPickedCards(draft, draftPosition) {
 }
 
 let arrowsChange = null;
-export { openDraft };
-function openDraft(id, draftPosition = 1) {
+export function openDraft(id, draftPosition = 1) {
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: EASING_DEFAULT,
+    duration: 350
+  });
+
   // console.log("OPEN DRAFT", id, draftPosition);
   const draft = pd.draft(id);
   if (!draft) return;

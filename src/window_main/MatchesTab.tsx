@@ -1,8 +1,7 @@
-import anime from "animejs";
 import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
-import { DATE_SEASON, EASING_DEFAULT, RANKS } from "../shared/constants";
+import { DATE_SEASON, RANKS } from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
@@ -29,12 +28,6 @@ const tagPrompt = "Set archetype";
 
 function openMatchDetails(id: string | number): void {
   openMatch(id);
-  anime({
-    targets: ".moving_ux",
-    left: "-100%",
-    easing: EASING_DEFAULT,
-    duration: 350
-  });
 }
 
 function addTag(matchid: string, tag: string): void {

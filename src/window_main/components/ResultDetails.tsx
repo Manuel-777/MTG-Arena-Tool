@@ -7,7 +7,6 @@ interface ResultDetailsProps {
 
 export default function ResultDetails(props: ResultDetailsProps): JSX.Element {
   const { match } = props;
-  console.log(match);
 
   const colStyle: React.CSSProperties = {
     display: "flex",

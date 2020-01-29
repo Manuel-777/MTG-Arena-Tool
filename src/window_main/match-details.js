@@ -33,8 +33,14 @@ import createShareButton from "./createShareButton";
 
 const byId = id => document.getElementById(id);
 
-export { openMatch };
-function openMatch(id) {
+export function openMatch(id) {
+  anime({
+    targets: ".moving_ux",
+    left: "-100%",
+    easing: EASING_DEFAULT,
+    duration: 350
+  });
+
   const match = pd.match(id);
   if (!match) return;
   const deck = match.playerDeck;

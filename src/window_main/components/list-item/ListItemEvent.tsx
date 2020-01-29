@@ -14,22 +14,25 @@ import {
   FlexBottom,
   ArchiveButton
 } from "./ListItem";
+import ListItemMatch from "./ListItemMatch";
+import ListItemDraft from "./ListItemDraft";
 import { DEFAULT_TILE } from "../../../shared/constants";
-import { getEventWinLossClass } from "../../renderer-util";
+import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
 import { DbCardData } from "../../../shared/types/Metadata";
 import RoundCard from "../RoundCard";
+import { compareDesc } from "date-fns";
+import { openMatch } from "../../match-details";
+import { openDraft } from "../../draft-details";
 
 export function ListItemEvent({
   row
 }: TableViewRowProps<EventTableData>): JSX.Element {
   const event = row.original;
 
-  const onRowClick = (): void => {
-    console.log("click / expand");
-  };
+  const [expanded, setExpanded] = React.useState(false);
 
-  const archiveCallback = (eventId: string): void => {
-    console.log("archive " + eventId);
+  const onRowClick = (): void => {
+    setExpanded(!expanded);
   };
 
   const [hover, setHover] = React.useState(false);
@@ -57,69 +60,106 @@ export function ListItemEvent({
     ];
   }
 
+  const matchRows = event.stats.matchIds.map(pd.match);
+  matchRows.sort((a, b) => {
+    if (!a || !b) return 0;
+    return compareDesc(new Date(a.date), new Date(b.date));
+  });
+  if (pd.draftExists(draftId)) {
+    matchRows.unshift(pd.draft(draftId));
+  }
+
   return (
-    <ListItem
-      click={onRowClick}
-      mouseEnter={mouseEnter}
-      mouseLeave={mouseLeave}
-    >
-      <HoverTile
-        hover={hover}
-        grpId={event.CourseDeck.deckTileId || DEFAULT_TILE}
-      />
-      <Column class="list_item_left">
-        <FlexTop innerClass="list_deck_name">
-          {db.events[event.InternalEventName] ||
-            event.displayName ||
-            event.InternalEventName ||
-            "Unknown"}
-        </FlexTop>
-        <FlexBottom>
-          <ManaCost class="mana_s20" colors={event.colors || []} />
-        </FlexBottom>
-      </Column>
-
-      <div
-        style={{ flexGrow: 1, display: "flex", justifyContent: "center" }}
-        className="list_item_center"
+    <>
+      <ListItem
+        click={onRowClick}
+        mouseEnter={mouseEnter}
+        mouseLeave={mouseLeave}
       >
-        {draftRares}
-      </div>
+        <HoverTile
+          hover={hover}
+          grpId={event.CourseDeck.deckTileId || DEFAULT_TILE}
+        />
+        <Column class="list_item_left">
+          <FlexTop innerClass="list_deck_name">
+            {db.events[event.InternalEventName] ||
+              event.displayName ||
+              event.InternalEventName ||
+              "Unknown"}
+          </FlexTop>
+          <FlexBottom>
+            <ManaCost class="mana_s20" colors={event.colors || []} />
+          </FlexBottom>
+        </Column>
 
-      <Column class="list_item_right">
-        <FlexTop
-          innerClass={
-            event.eventState == "Completed"
-              ? "list_event_phase"
-              : "list_event_phase_red"
-          }
-        >
-          {event.eventState}
-        </FlexTop>
-        <FlexBottom innerClass="list_match_time">
-          <relative-time datetime={new Date(event.date).toISOString()}>
-            {event.date.toString()}
-          </relative-time>
-        </FlexBottom>
-      </Column>
-
-      <Column class="list_match_result">
         <div
-          className={getEventWinLossClass({
-            CurrentWins: event.wins,
-            CurrentLosses: event.losses
-          })}
+          style={{ flexGrow: 1, display: "flex", justifyContent: "center" }}
+          className="list_item_center"
         >
-          {event.wins}:{event.losses}
+          {draftRares}
         </div>
-      </Column>
 
-      <ArchiveButton
-        archiveCallback={archiveCallback}
-        dataId={event.id || ""}
-        hover={hover}
-        isArchived={event.archived || false}
-      />
-    </ListItem>
+        <Column class="list_item_right">
+          <FlexTop
+            innerClass={
+              event.eventState == "Completed"
+                ? "list_event_phase"
+                : "list_event_phase_red"
+            }
+          >
+            {event.eventState}
+          </FlexTop>
+          <FlexBottom innerClass="list_match_time">
+            <relative-time datetime={new Date(event.date).toISOString()}>
+              {event.date.toString()}
+            </relative-time>
+          </FlexBottom>
+        </Column>
+
+        <Column class="list_match_result">
+          <div
+            className={getEventWinLossClass({
+              CurrentWins: event.wins,
+              CurrentLosses: event.losses
+            })}
+          >
+            {event.wins}:{event.losses}
+          </div>
+        </Column>
+
+        <ArchiveButton
+          archiveCallback={toggleArchived}
+          dataId={event.id || ""}
+          hover={hover}
+          isArchived={event.archived || false}
+        />
+      </ListItem>
+      <div
+        style={expanded ? { height: matchRows.length * 64 + "px" } : {}}
+        className="list_event_expand"
+      >
+        {matchRows.map((match, index) => {
+          if (match.type == "draft") {
+            console.log(">> ", match);
+          }
+          return match.type == "match" ? (
+            <ListItemMatch
+              key={match.id}
+              tags={match.tags}
+              // This lints red but works, maybe we should just pass the match to it?
+              row={{ original: match }}
+              index={index}
+              openMatchCallback={openMatch}
+            />
+          ) : (
+            <ListItemDraft
+              key={match.id}
+              draft={match}
+              openDraftCallback={openDraft}
+            />
+          );
+        })}
+      </div>
+    </>
   );
 }

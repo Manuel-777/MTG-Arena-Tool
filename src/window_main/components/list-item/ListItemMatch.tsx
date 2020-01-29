@@ -15,10 +15,10 @@ import { getReadableEvent, toMMSS } from "../../../shared/util";
 import RankSmall from "../RankSmall";
 import ResultDetails from "../ResultDetails";
 import { TagBubble, NewTag } from "../display";
+import { toggleArchived } from "../../renderer-util";
 
-export default function MatchesTable({
+export default function ListItemMatch({
   row,
-  archiveCallback,
   openMatchCallback,
   addTagCallback,
   editTagCallback,
@@ -115,7 +115,7 @@ export default function MatchesTable({
       </Column>
 
       <ArchiveButton
-        archiveCallback={archiveCallback}
+        archiveCallback={toggleArchived}
         dataId={match.id || ""}
         hover={hover}
         isArchived={match.archived || false}
