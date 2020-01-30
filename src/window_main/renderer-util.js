@@ -210,7 +210,7 @@ function drawDeck(div, deck, showWildcards = false) {
   // draw maindeck grouped by cardType
   const cardsByGroup = _(deck.mainDeck)
     .map(card => ({ data: db.card(card.id), ...card }))
-    .filter(card => card.data.type)
+    .filter(card => card.data && card.data.type)
     .groupBy(card => {
       const type = cardType(card.data);
       switch (type) {
@@ -278,6 +278,7 @@ function drawDeck(div, deck, showWildcards = false) {
     _(deck.sideboard)
       .filter(card => card.quantity > 0)
       .map(card => ({ data: db.card(card.id), ...card }))
+      .filter(card => card.data)
       .orderBy(["data.cmc", "data.name"])
       .forEach(card => {
         const tile = deckDrawer.cardTile(
