@@ -129,6 +129,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
     ipcLog(
       "SEND >> " + task.method + ", " + _headers.reqId + ", " + _headers.token
     );
+    console.log("SEND", _headers);
   }
   // console.log("POST", _headers);
   const postData = qs.stringify(_headers);
@@ -150,6 +151,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
         try {
           if (globals.debugNet && task.method !== "notifications") {
             ipcLog("RECV << " + task.method + ", " + results.slice(0, 100));
+            console.log("RECV", results);
           }
           const parsedResult = JSON.parse(results);
           // TODO remove this hack for get_database_version

@@ -104,7 +104,7 @@ function getCollectionData(): CardsData[] {
       });
     });
   return db.cardList
-    .filter(card => card.collectible && card.rarity !== "land")
+    .filter(card => card.collectible)
     .map(
       (card): CardsData => {
         const owned = pd.cards.cards[card.id] ?? 0;

@@ -977,7 +977,7 @@ function createReplayDiv() {
 function createReplayShareButton(draft) {
   const replayShareButton = createShareButton(
     ["list_draft_share", draft.id + "dr"],
-    () => draftShareLink(draft.id, draft)
+    shareExpire => draftShareLink(draft.id, draft, shareExpire)
   );
   replayShareButton.title = "share draft replay";
   return replayShareButton;
@@ -1102,8 +1102,7 @@ export function attachDraftData(listItem, draft) {
   listItem.right.after(replayShareButton);
 }
 
-function draftShareLink(id, draft) {
-  const shareExpire = byId("expire_select").value;
+function draftShareLink(id, draft, shareExpire) {
   const draftData = JSON.stringify(draft);
   let expire = 0;
   switch (shareExpire) {
