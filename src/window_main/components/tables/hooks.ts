@@ -170,8 +170,12 @@ export function useBaseReactTable<D extends TableData>({
     const hiddenColumns = columns
       .filter(column => !column.defaultVisible)
       .map(column => column.id ?? column.accessor);
-    const state =
-      cachedState ?? _.defaults(defaultState, { pageSize: 25, hiddenColumns });
+    const mergedDefault = _.defaults(defaultState, {
+      pageSize: 25,
+      hiddenColumns
+    }) as TableState<D>;
+    const state = cachedState ?? mergedDefault;
+
     // ensure data-only columns are all invisible
     const hiddenSet = new Set(state.hiddenColumns ?? []);
     for (const column of columns) {
