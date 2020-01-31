@@ -14,6 +14,7 @@ import {
   EventTableData,
   SerializedEvent
 } from "./components/events/types";
+import { isHidingArchived } from "./components/tables/filters";
 import { useAggregatorAndSidePanel } from "./components/tables/hooks";
 import mountReactComponent from "./mountReactComponent";
 import {
@@ -185,8 +186,7 @@ export function EventsTab({
   aggFiltersArg: AggregatorFilters;
 }): JSX.Element {
   const { eventsTableMode, eventsTableState } = pd.settings;
-  const showArchived =
-    eventsTableState?.filters?.archivedCol !== "hideArchived";
+  const showArchived = !isHidingArchived(eventsTableState);
   const getDataAggFilters = (data: EventTableData[]): AggregatorFilters => {
     const matchIds = _.flatten(data.map(event => event.stats.matchIds));
     return { matchIds };

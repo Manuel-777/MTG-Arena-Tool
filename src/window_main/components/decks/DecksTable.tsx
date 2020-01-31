@@ -18,7 +18,7 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import { useBaseReactTable } from "../tables/hooks";
+import { useAggregatorArchiveFilter, useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
@@ -296,6 +296,7 @@ export default function DecksTable({
     pagingProps,
     tableControlsProps
   } = useBaseReactTable(tableProps);
+  useAggregatorArchiveFilter(table, aggFilters, setAggFiltersCallback);
   const { getTableBodyProps, page, prepareRow } = table;
   const decksTableControlsProps: DecksTableControlsProps = {
     aggFilters,

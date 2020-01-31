@@ -1,18 +1,18 @@
 import _ from "lodash";
 import matchSorter from "match-sorter";
 import React from "react";
-import { ColumnInstance, FilterValue, Row } from "react-table";
+import { ColumnInstance, FilterValue, Row, TableState } from "react-table";
 import { COLORS_ALL, COLORS_BRIEF } from "../../../shared/constants";
 import { SerializedDeck } from "../../../shared/types/Deck";
 import ManaFilter, { ColorFilter, ManaFilterKeys } from "../../ManaFilter";
 import {
+  BinarySymbol,
   CheckboxContainer,
   InputContainer,
-  MetricText,
-  BinarySymbol
+  MetricText
 } from "../display";
-import { TableData, MultiSelectFilterProps } from "./types";
 import { useMultiSelectFilter } from "./hooks";
+import { MultiSelectFilterProps, TableData } from "./types";
 
 export function TextBoxFilter<D extends TableData>({
   column: { id, filterValue, preFilteredRows, setFilter }
@@ -283,4 +283,14 @@ export function archivedFilterFn<D extends TableData>(
     return rows.filter(row => !row.values.archived);
   }
   return rows;
+}
+
+export function isHidingArchived<D extends TableData>(
+  state?: Partial<TableState<D>>
+): boolean {
+  return (
+    state?.filters?.some(
+      filter => filter.id === "archivedCol" && filter.value === "hideArchived"
+    ) ?? false
+  );
 }
