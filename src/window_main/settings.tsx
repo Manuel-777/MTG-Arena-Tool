@@ -32,10 +32,8 @@ import {
   SETTINGS_LOGIN
 } from "../shared/constants";
 
-import * as deckDrawer from "./DeckDrawer";
-import createSelect from "./createSelect";
-import { getCardImage } from "../shared/util";
 import mountReactComponent from "./mountReactComponent";
+import SectionBehaviour from "./settings/SectionBehaviour";
 
 let lastSettingsSection = 1;
 const updateState = "";
@@ -101,10 +99,6 @@ function SettingsNav(props: SettingsNavProps): JSX.Element {
   );
 }
 
-function BehaviousData(): JSX.Element {
-  return <></>;
-}
-
 function SectionData(): JSX.Element {
   return <></>;
 }
@@ -153,7 +147,7 @@ function Settings(props: SettingsProps): JSX.Element {
   tabs[SETTINGS_BEHAVIOUR] = {
     ...defaultTab,
     id: SETTINGS_BEHAVIOUR,
-    component: BehaviousData,
+    component: SectionBehaviour,
     title: "Behaviour"
   };
   tabs[SETTINGS_ARENA_DATA] = {
