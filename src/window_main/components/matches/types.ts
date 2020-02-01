@@ -68,12 +68,11 @@ export interface MatchesTableControlsProps
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
 }
 
-export interface MatchesTableRowProps
-  extends TableViewRowProps<MatchTableData> {
+export interface ListItemMatchProps {
   tags: TagCounts;
+  match: SerializedMatch;
   openMatchCallback: (matchId: string | number) => void;
-  archiveCallback: (id: string | number) => void;
-  addTagCallback: (id: string, tag: string) => void;
-  editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (id: string, tag: string) => void;
+  addTagCallback?: (id: string, tag: string) => void;
+  editTagCallback?: (tag: string, color: string) => void;
+  deleteTagCallback?: (id: string, tag: string) => void;
 }

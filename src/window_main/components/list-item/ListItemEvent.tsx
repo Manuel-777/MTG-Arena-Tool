@@ -138,17 +138,12 @@ export function ListItemEvent({
         style={expanded ? { height: matchRows.length * 64 + "px" } : {}}
         className="list_event_expand"
       >
-        {matchRows.map((match, index) => {
-          if (match.type == "draft") {
-            console.log(">> ", match);
-          }
+        {matchRows.map(match => {
           return match.type == "match" ? (
             <ListItemMatch
               key={match.id}
               tags={match.tags}
-              // This lints red but works, maybe we should just pass the match to it?
-              row={{ original: match }}
-              index={index}
+              match={match}
               openMatchCallback={openMatch}
             />
           ) : (

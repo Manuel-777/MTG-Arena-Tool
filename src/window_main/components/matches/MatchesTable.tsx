@@ -372,10 +372,8 @@ export default function MatchesTable({
             }
             return (
               <ListItemMatch
-                row={row}
-                index={index}
+                match={row.original}
                 key={row.index}
-                gridTemplateColumns={gridTemplateColumns}
                 openMatchCallback={openMatchCallback}
                 {...customProps}
               />

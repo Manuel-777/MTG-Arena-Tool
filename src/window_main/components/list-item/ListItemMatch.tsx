@@ -8,7 +8,7 @@ import {
   FlexBottom,
   ArchiveButton
 } from "./ListItem";
-import { MatchesTableRowProps } from "../matches/types";
+import { ListItemMatchProps } from "../matches/types";
 import { DEFAULT_TILE } from "../../../shared/constants";
 import ManaCost from "../ManaCost";
 import { getReadableEvent, toMMSS } from "../../../shared/util";
@@ -18,14 +18,13 @@ import { TagBubble, NewTag } from "../display";
 import { toggleArchived } from "../../renderer-util";
 
 export default function ListItemMatch({
-  row,
+  match,
   openMatchCallback,
   addTagCallback,
   editTagCallback,
   deleteTagCallback,
   tags
-}: MatchesTableRowProps): JSX.Element {
-  const match = row.original;
+}: ListItemMatchProps): JSX.Element {
   const parentId = match.id ?? "";
 
   const onRowClick = (): void => {
@@ -79,28 +78,32 @@ export default function ListItemMatch({
           </div>
 
           <ManaCost class="mana_s20" colors={match.oppDeck.colors || []} />
-          <div style={{ marginLeft: "8px" }}>
-            {match.tags && match.tags.length ? (
-              match.tags.map((tag: any) => {
-                return (
-                  <TagBubble
-                    key={tag}
-                    tag={tag}
-                    parentId={match.id}
-                    editTagCallback={editTagCallback}
-                    deleteTagCallback={deleteTagCallback}
-                  />
-                );
-              })
-            ) : (
-              <NewTag
-                tagPrompt="Add"
-                tags={tags}
-                addTagCallback={addTagCallback}
-                parentId={match.id}
-              />
-            )}
-          </div>
+          {addTagCallback && editTagCallback ? (
+            <div style={{ marginLeft: "8px" }}>
+              {match.tags && match.tags.length ? (
+                match.tags.map((tag: any) => {
+                  return (
+                    <TagBubble
+                      key={tag}
+                      tag={tag}
+                      parentId={match.id}
+                      editTagCallback={editTagCallback}
+                      deleteTagCallback={deleteTagCallback}
+                    />
+                  );
+                })
+              ) : (
+                <NewTag
+                  tagPrompt="Add"
+                  tags={tags}
+                  addTagCallback={addTagCallback}
+                  parentId={match.id}
+                />
+              )}
+            </div>
+          ) : (
+            <></>
+          )}
         </FlexBottom>
       </Column>
 
