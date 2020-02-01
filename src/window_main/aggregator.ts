@@ -58,11 +58,9 @@ export default class Aggregator {
   // Ranked filter values
   public static RANKED_CONST = "Ranked Constructed";
   public static RANKED_DRAFT = "Ranked Limited";
-  // Draft-related filter values
-  public static ALL_DRAFTS = "All Drafts";
-  public static DRAFT_REPLAYS = "Draft Replays";
   // Event-related filter values
   public static ALL_EVENT_TRACKS = "All Event Tracks";
+  public static ALL_DRAFTS = "All Drafts";
   // Archetype filter values
   public static NO_ARCH = "No Archetype";
 
@@ -200,6 +198,7 @@ export default class Aggregator {
     const { eventId: filterValue } = this.filters;
     return (
       (filterValue === Aggregator.DEFAULT_EVENT && eventId !== "AIBotMatch") ||
+      (filterValue === Aggregator.ALL_DRAFTS && eventId?.includes("Draft")) ||
       (filterValue === Aggregator.ALL_EVENT_TRACKS &&
         !db.single_match_events.includes(eventId)) ||
       (filterValue === Aggregator.RANKED_CONST &&
@@ -212,13 +211,16 @@ export default class Aggregator {
 
   filterMatch(match: any): boolean {
     if (!match) return false;
-    const { showArchived, matchIds } = this.filters;
+    const { eventId, showArchived, matchIds } = this.filters;
     if (!showArchived && match.archived) return false;
 
     const passesMatchFilter = !matchIds || this.validMatches.has(match.id);
     if (!passesMatchFilter) return false;
 
-    const passesEventFilter = this.filterEvent(match.eventId);
+    const passesEventFilter =
+      this.filterEvent(match.eventId) ||
+      (eventId === Aggregator.ALL_DRAFTS && Aggregator.isDraftMatch(match));
+
     if (!passesEventFilter) return false;
 
     const passesPlayerDeckFilter = this.filterDeck(match.playerDeck);
@@ -448,10 +450,9 @@ export default class Aggregator {
   get events(): string[] {
     return [
       Aggregator.DEFAULT_EVENT,
+      Aggregator.ALL_DRAFTS,
       Aggregator.RANKED_CONST,
       Aggregator.RANKED_DRAFT,
-      Aggregator.ALL_DRAFTS,
-      Aggregator.DRAFT_REPLAYS,
       ...this._eventIds
     ];
   }
@@ -459,6 +460,7 @@ export default class Aggregator {
   get trackEvents(): string[] {
     return [
       Aggregator.ALL_EVENT_TRACKS,
+      Aggregator.ALL_DRAFTS,
       Aggregator.RANKED_DRAFT,
       ...this._eventIds.filter(
         eventId => !db.single_match_events.includes(eventId)

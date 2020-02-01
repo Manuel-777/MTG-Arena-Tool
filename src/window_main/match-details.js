@@ -89,7 +89,7 @@ export function openMatch(id) {
     if (!pd.offline) {
       const actionLogShareButton = createShareButton(
         ["list_log_share", match.id + "al"],
-        () => logShareLink(match.id)
+        shareExpire => logShareLink(match.id, shareExpire)
       );
       flc.appendChild(actionLogShareButton);
     } else {
@@ -375,11 +375,10 @@ export function openMatch(id) {
   });
 }
 
-function logShareLink(id) {
+function logShareLink(id, shareExpire) {
   const actionLogFile = path.join(actionLogDir, id + ".txt");
   let log = fs.readFileSync(actionLogFile).toString("base64");
 
-  const shareExpire = byId("expire_select").value;
   let expire = 0;
   switch (shareExpire) {
     case "One day":

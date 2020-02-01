@@ -288,7 +288,7 @@ export function openDeck(deck = currentOpenDeck, filters = currentFilters) {
   if (!pd.offline) {
     const deckShareButton = createShareButton(
       ["list_log_share", deck.id + "al"],
-      () => deckShareLink(deck)
+      shareExpire => deckShareLink(deck, shareExpire)
     );
     top.appendChild(deckShareButton);
   } else {
@@ -341,10 +341,8 @@ export function openDeck(deck = currentOpenDeck, filters = currentFilters) {
 }
 
 //
-function deckShareLink(deck) {
+function deckShareLink(deck, shareExpire) {
   let deckString = JSON.stringify(deck);
-
-  const shareExpire = byId("expire_select").value;
   let expire = 0;
   switch (shareExpire) {
     case "One day":

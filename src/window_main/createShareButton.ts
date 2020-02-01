@@ -7,7 +7,7 @@ const byId = (id: string) =>
 
 export default function createShareButton(
   classNames: string[],
-  callback: () => void
+  callback: (option: string) => void
 ) {
   let button = createDiv(classNames);
   button.addEventListener("click", (e: MouseEvent) => {
@@ -17,7 +17,7 @@ export default function createShareButton(
   return button;
 }
 
-function createShareDialog(callback: () => void) {
+function createShareDialog(callback: (option: string) => void) {
   const cont = createDiv(["dialog_content"]);
   cont.style.width = "500px";
 
@@ -46,5 +46,5 @@ function createShareDialog(callback: () => void) {
   );
 
   openDialog(cont);
-  callback();
+  callback("");
 }
