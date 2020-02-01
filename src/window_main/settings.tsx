@@ -93,7 +93,12 @@ function SettingsNav(props: SettingsNavProps): JSX.Element {
   };
 
   return (
-    <div className="settings_nav" onClick={click}>
+    <div
+      className={
+        "settings_nav" + (props.currentTab == props.id ? " nav_selected" : "")
+      }
+      onClick={click}
+    >
       {props.title}
     </div>
   );
@@ -195,10 +200,7 @@ function Settings(props: SettingsProps): JSX.Element {
 
   return (
     <>
-      <div
-        style={{ paddingTop: "16px" }}
-        className="wrapper_column sidebar_column_r"
-      >
+      <div className="wrapper_column sidebar_column_r">
         <SettingsNav {...tabs[SETTINGS_BEHAVIOUR]} />
         <SettingsNav {...tabs[SETTINGS_ARENA_DATA]} />
         <SettingsNav {...tabs[SETTINGS_OVERLAY]} />

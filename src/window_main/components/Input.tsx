@@ -15,7 +15,7 @@ export default function Inpu(props: InputProps): JSX.Element {
   return (
     <label className="but_container_label">
       {label}
-      <div style={{ width: "50%" }}>
+      <div className="input_container">
         <input
           type="text"
           autoComplete={autocomplete}
