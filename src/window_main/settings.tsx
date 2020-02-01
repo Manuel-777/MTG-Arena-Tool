@@ -33,7 +33,7 @@ import {
 } from "../shared/constants";
 
 import mountReactComponent from "./mountReactComponent";
-import SectionBehaviour from "./settings/SectionBehaviour";
+import SectionBehaviour from "./components/settings/SectionBehaviour";
 
 let lastSettingsSection = 1;
 const updateState = "";

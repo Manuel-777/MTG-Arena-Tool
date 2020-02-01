@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import Checkbox from "../components/Checkbox";
-import pd from "../../shared/player-data";
-import { ipcSend } from "../renderer-util";
+import Checkbox from "../Checkbox";
+import Input from "../Input";
+import pd from "../../../shared/player-data";
+import { ipcSend } from "../../renderer-util";
 
 function clickBetaChannel(value: boolean): void {
   ipcSend("save_app_settings", {
@@ -40,6 +41,12 @@ function clickCloseToTray(value: boolean): void {
   });
 }
 
+function changeExportFormat(value: string): void {
+  ipcSend("save_user_settings", {
+    export_format: value
+  });
+}
+
 export default function SectionBehaviour(): JSX.Element {
   return (
     <>
@@ -73,6 +80,18 @@ export default function SectionBehaviour(): JSX.Element {
         value={pd.settings.close_to_tray}
         callback={clickCloseToTray}
       />
+      <Input
+        label="Export Format:"
+        value={pd.settings.export_format}
+        placeholder="$Name,$Count,$SetName,$SetCode,$Rarity,$Type"
+        callback={changeExportFormat}
+      />
+      <div className="settings_note">
+        <i>
+          Possible variables: $Name, $Count, $SetName, $SetCode, $Collector,
+          $Rarity, $Type, $Cmc
+        </i>
+      </div>
     </>
   );
 }
