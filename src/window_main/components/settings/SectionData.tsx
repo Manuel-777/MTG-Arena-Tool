@@ -55,7 +55,7 @@ function setCardsLanguage(filter: string): void {
 function arenaLogClick(logUriInput: any): void {
   // This is hackish, what we want to do is obtain the ref to the input
   // but the input is a React function component, so we cant do a ref to it.
-  // So we get the parent ref and then DON to it.
+  // So we get the parent ref and then DOM to it.
   logUriInput = logUriInput.getElementsByTagName("INPUT")[0];
   if (document.activeElement === logUriInput) return;
   const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
@@ -125,7 +125,7 @@ export default function SectionData(): JSX.Element {
         <div className="open_button" />
         <Input
           contStyle={{ margin: "3px", width: "70%" }}
-          callback={arenaLogCallback}
+          callbackEnter={arenaLogCallback}
           placeholder={pd.settings.logUri}
           value={pd.settings.logUri}
         />

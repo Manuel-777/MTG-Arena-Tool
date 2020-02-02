@@ -6,18 +6,40 @@ interface InputProps {
   value: string;
   placeholder: string;
   autocomplete?: string;
-  callback: (value: string) => void;
+  callback?: (value: string) => void;
+  callbackEnter?: (value: string) => void;
 }
 
 export default function Input(props: InputProps): JSX.Element {
-  const { label, value, contStyle, callback, placeholder } = props;
+  const {
+    label,
+    value,
+    contStyle,
+    callback,
+    callbackEnter,
+    placeholder
+  } = props;
   const autocomplete = props.autocomplete || "off";
+
+  const callbackHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (callback) {
+      callback(e.target.value);
+    }
+  };
+
+  const keyUpHandler = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.keyCode == 13 && callbackEnter) {
+      callbackEnter(e.currentTarget.value);
+    }
+  };
 
   const inputInner = (): JSX.Element => {
     return (
       <div style={contStyle || {}} className="input_container">
         <input
           type="text"
+          onKeyUp={keyUpHandler}
+          onChange={callbackHandler}
           autoComplete={autocomplete}
           placeholder={placeholder}
           value={value}
