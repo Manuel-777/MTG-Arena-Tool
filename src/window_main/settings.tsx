@@ -144,6 +144,7 @@ function Settings(props: SettingsProps): JSX.Element {
     title: "Login"
   };
 
+  const CurrentSettings = tabs[currentTab].component;
   return (
     <>
       <div className="wrapper_column sidebar_column_r">
@@ -158,7 +159,7 @@ function Settings(props: SettingsProps): JSX.Element {
       </div>
       <div className="wrapper_column settings_page">
         <div className="settings_title">{tabs[currentTab].title}</div>
-        {tabs[currentTab].component()}
+        <CurrentSettings />
       </div>
     </>
   );
