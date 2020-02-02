@@ -354,9 +354,7 @@ export function onLabelOutLogInfo(entry) {
       game.handsDrawn = payload.mulliganedHands.map(hand =>
         hand.map(card => card.grpId)
       );
-      game.handsDrawn.push(
-        game.shuffledOrder.slice(0, 7 - game.handsDrawn.length)
-      );
+      game.handsDrawn.push(game.shuffledOrder.slice(0, 7));
 
       if (globals.gameNumberCompleted > 1) {
         const originalDeck = globals.currentMatch.player.originalDeck.clone();
@@ -423,7 +421,7 @@ export function onLabelOutLogInfo(entry) {
       game.handLands = game.handsDrawn.map(
         hand => hand.filter(card => db.card(card).type.includes("Land")).length
       );
-      const handSize = 8 - game.handsDrawn.length;
+      const handSize = 7;
       let deckSize = 0;
       let landsInDeck = 0;
       const multiCardPositions = { "2": {}, "3": {}, "4": {} };

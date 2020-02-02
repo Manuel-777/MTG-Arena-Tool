@@ -116,6 +116,11 @@ function openMatch(id) {
   mainDiv.appendChild(fld);
 
   if (match.gameStats) {
+    const mulliganType =
+      match.eventId === "Lore_WAR3_Singleton" ||
+      match.date > "2019-07-02T15:00:00.000Z"
+        ? "london"
+        : "vancouver";
     match.gameStats.forEach((game, gameIndex) => {
       if (game && game.sideboardChanges) {
         const separator1 = deckDrawer.cardSeparator(
@@ -161,15 +166,18 @@ function openMatch(id) {
       if (game) {
         game.handsDrawn.forEach((hand, i) => {
           const handDiv = createDiv(["cardlist"]);
+          if (i === game.handsDrawn.length - 1 && mulliganType === "london") {
+            hand = game.shuffledOrder.slice(0, 7);
+          }
           drawCardList(handDiv, hand);
           handsDiv.appendChild(handDiv);
           let landText, landTooltip;
-          if (game.bestOf === 1 && i === 0) {
+          if (match.bestOf === 1) {
             landText = "Land Percentile: Unknown";
             landTooltip = `This hand was drawn with weighted odds that
-              Wizards of the Coast has not disclosed because it is the first
-              hand in a best-of-one match. It should be more likely to have a
-              close to average number of lands, but only they could calculate
+              Wizards of the Coast has not disclosed because it is in a
+              best-of-one match. It should be more likely to have a close
+              to average number of lands, but only they could calculate
               the exact odds.`;
           } else {
             const likelihood = hypergeometricSignificance(
@@ -201,7 +209,8 @@ function openMatch(id) {
         mainDiv.appendChild(separator6);
         const libraryDiv = createDiv(["library_list"]);
         const unique = makeId(4);
-        const handSize = 8 - game.handsDrawn.length;
+        const handSize =
+          mulliganType === "london" ? 7 : 8 - game.handsDrawn.length;
 
         game.shuffledOrder.forEach((cardId, libraryIndex) => {
           const rowShades =
