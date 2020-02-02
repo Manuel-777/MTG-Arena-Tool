@@ -296,6 +296,9 @@ class PlayerData {
     this.handleSetData = this.handleSetData.bind(this);
     if (ipc) ipc.on("set_player_data", this.handleSetData);
 
+    this.appDbPath = "";
+    this.playerDbPath = "";
+    this.last_log_timestamp = null;
     this.transaction = this.transaction.bind(this);
     this.deck = this.deck.bind(this);
     this.arenaVersion = undefined;
