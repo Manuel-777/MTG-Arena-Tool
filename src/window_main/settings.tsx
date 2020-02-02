@@ -1,27 +1,14 @@
-import _ from "lodash";
+/* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import db from "../shared/database";
 import pd from "../shared/player-data";
 import {
   changeBackground,
   hideLoadingBars,
-  resetMainContainer
+  resetMainContainer,
+  ipcSend
 } from "./renderer-util";
 
 import {
-  CARD_TILE_ARENA,
-  CARD_TILE_FLAT,
-  COLORS_ALL,
-  OVERLAY_FULL,
-  OVERLAY_LEFT,
-  OVERLAY_ODDS,
-  OVERLAY_MIXED,
-  OVERLAY_SEEN,
-  OVERLAY_DRAFT,
-  OVERLAY_DRAFT_BREW,
-  OVERLAY_LOG,
-  OVERLAY_DRAFT_MODES,
-  SHORTCUT_NAMES,
   SETTINGS_BEHAVIOUR,
   SETTINGS_ARENA_DATA,
   SETTINGS_OVERLAY,
@@ -34,50 +21,7 @@ import {
 
 import mountReactComponent from "./mountReactComponent";
 import SectionBehaviour from "./components/settings/SectionBehaviour";
-
-let lastSettingsSection = 1;
-const updateState = "";
-let currentOverlay = 0;
-
-const LANGUAGES = [
-  "en",
-  "es",
-  "br",
-  "de",
-  "fr",
-  "it",
-  "js",
-  "ru",
-  "ko-kr",
-  "zh-cn"
-];
-
-function getLanguageName(lang: string): string {
-  switch (lang) {
-    case "en":
-      return "English";
-    case "es":
-      return "Spanish";
-    case "br":
-      return "Portuguese";
-    case "de":
-      return "Deutsche";
-    case "fr":
-      return "French";
-    case "it":
-      return "Italian";
-    case "js":
-      return "Japanese";
-    case "ru":
-      return "Russian";
-    case "ko-kr":
-      return "Korean";
-    case "zh-cn":
-      return "Chinese (simplified)";
-    default:
-      return "-";
-  }
-}
+import SectionData from "./components/settings/SectionData";
 
 interface SettingsNavProps {
   component: () => JSX.Element;
@@ -88,7 +32,7 @@ interface SettingsNavProps {
 }
 
 function SettingsNav(props: SettingsNavProps): JSX.Element {
-  const click = () => {
+  const click = (): void => {
     props.callback(props.id);
   };
 
@@ -102,10 +46,6 @@ function SettingsNav(props: SettingsNavProps): JSX.Element {
       {props.title}
     </div>
   );
-}
-
-function SectionData(): JSX.Element {
-  return <></>;
 }
 
 function SectionOverlay(): JSX.Element {
@@ -148,6 +88,12 @@ function Settings(props: SettingsProps): JSX.Element {
     callback: setCurrentTab
   };
 
+  React.useEffect(() => {
+    ipcSend("save_app_settings_nosync", {
+      last_settings_section: currentTab
+    });
+  }, [currentTab]);
+
   const tabs: SettingsNavProps[] = [];
   tabs[SETTINGS_BEHAVIOUR] = {
     ...defaultTab,
@@ -159,7 +105,7 @@ function Settings(props: SettingsProps): JSX.Element {
     ...defaultTab,
     id: SETTINGS_ARENA_DATA,
     component: SectionData,
-    title: "Data"
+    title: "Arena Data"
   };
   tabs[SETTINGS_OVERLAY] = {
     ...defaultTab,
@@ -219,13 +165,11 @@ function Settings(props: SettingsProps): JSX.Element {
 }
 
 export function openSettingsTab(
-  openSection = lastSettingsSection,
+  openSection = pd.settings.last_settings_section,
   scrollTop = 0
 ): void {
-  if (openSection !== -1) {
-    lastSettingsSection = openSection;
-  } else {
-    openSection = lastSettingsSection;
+  if (openSection == -1) {
+    openSection = pd.settings.last_settings_section;
   }
   changeBackground("default");
   hideLoadingBars();
@@ -233,8 +177,4 @@ export function openSettingsTab(
   const mainDiv = resetMainContainer() as HTMLElement;
   mainDiv.classList.add("flex_item");
   mountReactComponent(<Settings openSection={openSection} />, mainDiv);
-}
-
-export function setCurrentOverlaySettings(index: number): void {
-  currentOverlay = index;
 }

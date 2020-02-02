@@ -1,21 +1,21 @@
 import React from "react";
 
 interface InputProps {
-  label: string;
+  label?: string;
+  contStyle?: React.CSSProperties;
   value: string;
   placeholder: string;
   autocomplete?: string;
   callback: (value: string) => void;
 }
 
-export default function Inpu(props: InputProps): JSX.Element {
-  const { label, value, callback, placeholder } = props;
+export default function Input(props: InputProps): JSX.Element {
+  const { label, value, contStyle, callback, placeholder } = props;
   const autocomplete = props.autocomplete || "off";
 
-  return (
-    <label className="but_container_label">
-      {label}
-      <div className="input_container">
+  const inputInner = (): JSX.Element => {
+    return (
+      <div style={contStyle || {}} className="input_container">
         <input
           type="text"
           autoComplete={autocomplete}
@@ -23,6 +23,19 @@ export default function Inpu(props: InputProps): JSX.Element {
           value={value}
         />
       </div>
-    </label>
+    );
+  };
+
+  return (
+    <>
+      {label ? (
+        <label className="but_container_label">
+          {label}
+          {inputInner()}
+        </label>
+      ) : (
+        inputInner()
+      )}
+    </>
   );
 }

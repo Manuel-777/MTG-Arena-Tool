@@ -66,6 +66,7 @@ const defaultCfg = {
   cards: { cards_time: 0, cards_before: {}, cards: {} },
   cardsNew: {},
   settings: {
+    last_settings_section: 1,
     sound_priority: false,
     sound_priority_volume: 1,
     cards_quality: "small",

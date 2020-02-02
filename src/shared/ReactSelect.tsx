@@ -5,13 +5,14 @@ export interface ReactSelectProps {
   current: string;
   callback: (option: string) => void;
   options: string[];
+  style?: React.CSSProperties;
 }
 
-export function ReactSelect(props: ReactSelectProps) {
+export function ReactSelect(props: ReactSelectProps): JSX.Element {
   const formatterFunc =
     typeof props.optionFormatter === "function"
       ? props.optionFormatter
-      : (inString: string) => inString;
+      : (inString: string): string => inString;
 
   const [currentOption, setCurrentOption] = React.useState(props.current);
   const [optionsOpen, setOptionsOpen] = React.useState(false);
@@ -26,14 +27,14 @@ export function ReactSelect(props: ReactSelectProps) {
       setOptionsOpen(!optionsOpen);
       props.callback && props.callback(event.currentTarget.value);
     },
-    [props.callback, optionsOpen]
+    [optionsOpen, props]
   );
 
   const buttonClassNames =
     "button_reset select_button" + (optionsOpen ? " active" : "");
 
   return (
-    <>
+    <div className="select_container" style={props.style || {}}>
       <button
         key={currentOption}
         className={buttonClassNames}
@@ -59,7 +60,7 @@ export function ReactSelect(props: ReactSelectProps) {
             })}
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -69,10 +70,12 @@ export interface WrappedReactSelectProps extends ReactSelectProps {
 
 // This is essentially what createSelect does, but reacty.
 // This should go away once createSelect goes away and is replaced by just ReactSelect.
-export function WrappedReactSelect(props: WrappedReactSelectProps) {
+export function WrappedReactSelect(
+  props: WrappedReactSelectProps
+): JSX.Element {
   const { className, ...other } = props;
   return (
-    <div className={"select_container " + className}>
+    <div className={className}>
       <ReactSelect {...other} />
     </div>
   );
