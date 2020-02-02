@@ -24,6 +24,10 @@ const ownedFilters = (): FilterValue[] => [
 const wantedFilters = (): FilterValue[] => [
   { id: "wanted", value: [1, undefined] }
 ];
+const draftFilters = (): FilterValue[] => [
+  { id: "set", value: standardSetsFilter },
+  { id: "booster", value: { true: true, false: false } }
+];
 
 const legacyModes = [COLLECTION_CHART_MODE, COLLECTION_SETS_MODE];
 
@@ -111,6 +115,24 @@ export default function CollectionTableControls(
           }}
         >
           Wanted
+        </SmallTextButton>
+        <SmallTextButton
+          onClick={(): void => {
+            setAllFilters(draftFilters);
+            setFiltersVisible({
+              ...initialFiltersVisible,
+              booster: true
+            });
+            toggleSortBy("grpId", true, false);
+            for (const column of toggleableColumns) {
+              toggleHideColumn(column.id, !column.defaultVisible);
+            }
+            toggleHideColumn("booster", false);
+            toggleHideColumn("cmc", true);
+            setTableMode(COLLECTION_SETS_MODE);
+          }}
+        >
+          Draft
         </SmallTextButton>
         <MediumTextButton
           onClick={(): void => setTogglesVisible(!togglesVisible)}
