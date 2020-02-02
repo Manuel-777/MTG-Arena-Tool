@@ -52,7 +52,11 @@ function setCardsLanguage(filter: string): void {
   ipcSend("save_app_settings", { metadata_lang: filter.toLowerCase() });
 }
 
-function arenaLogClick(logUriInput): void {
+function arenaLogClick(logUriInput: any): void {
+  // This is hackish, what we want to do is obtain the ref to the input
+  // but the input is a React function component, so we cant do a ref to it.
+  // So we get the parent ref and then DON to it.
+  logUriInput = logUriInput.getElementsByTagName("INPUT")[0];
   if (document.activeElement === logUriInput) return;
   const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
     title: "Arena Log Location",
@@ -83,6 +87,14 @@ function arenaLogCallback(value: string): void {
 }
 
 export default function SectionData(): JSX.Element {
+  const arenaLogRef = React.useRef(null);
+
+  const arenaLogClickHandle = (): void => {
+    if (arenaLogRef.current) {
+      arenaLogClick(arenaLogRef.current);
+    }
+  };
+
   return (
     <>
       <label className="but_container_label">
@@ -104,7 +116,11 @@ export default function SectionData(): JSX.Element {
           <p>Card names when exporting will also be changed.</p>
         </i>
       </div>
-      <label className="but_container_label" onClick={arenaLogClick}>
+      <label
+        ref={arenaLogRef}
+        className="but_container_label"
+        onClick={arenaLogClickHandle}
+      >
         Arena Log:
         <div className="open_button" />
         <Input
