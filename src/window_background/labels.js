@@ -1,11 +1,11 @@
 import _ from "lodash";
 import differenceInDays from "date-fns/differenceInDays";
 import {
-  IPC_OVERLAY,
-  ARENA_MODE_MATCH,
   ARENA_MODE_DRAFT,
   ARENA_MODE_IDLE,
-  CONSTRUCTED_EVENTS
+  ARENA_MODE_MATCH,
+  CONSTRUCTED_EVENTS,
+  IPC_OVERLAY
 } from "../shared/constants";
 import db from "../shared/database";
 import { playerDb } from "../shared/db/LocalDatabase";
@@ -17,15 +17,10 @@ import sha1 from "js-sha1";
 import globals from "./globals";
 import getNameBySeat from "./getNameBySeat";
 import Deck from "../shared/deck";
-import {
-  ipc_send,
-  normaliseFields,
-  parseWotcTimeFallback,
-  setData
-} from "./backgroundUtil";
+import { ipc_send, parseWotcTimeFallback, setData } from "./backgroundUtil";
 import actionLog from "./actionLog";
 import addCustomDeck from "./addCustomDeck";
-import { createDraft, createMatch, completeMatch } from "./data";
+import { completeMatch, createDraft, createMatch } from "./data";
 
 let logLanguage = "English";
 
