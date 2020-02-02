@@ -277,6 +277,42 @@ export function convertDeckFromV3(deck) {
   return deck;
 }
 
+export function getSideboardChanges(newDeck, originalDeck, previousGamesStats) {
+  const sideboardChanges = {
+    added: [],
+    removed: []
+  };
+
+  const mainDiff = {};
+  newDeck.mainboard.get().forEach(card => {
+    mainDiff[card.id] = (mainDiff[card.id] || 0) + card.quantity;
+  });
+  originalDeck.mainboard.get().forEach(card => {
+    mainDiff[card.id] = (mainDiff[card.id] || 0) - card.quantity;
+  });
+
+  previousGamesStats.forEach((stats, i) => {
+    if (i !== 0) {
+      let prevChanges = stats.sideboardChanges;
+      prevChanges.added.forEach(id => (mainDiff[id] = (mainDiff[id] || 0) - 1));
+      prevChanges.removed.forEach(
+        id => (mainDiff[id] = (mainDiff[id] || 0) + 1)
+      );
+    }
+  });
+
+  Object.keys(mainDiff).forEach(id => {
+    let quantity = mainDiff[id];
+    for (let i = 0; i < quantity; i++) {
+      sideboardChanges.added.push(id);
+    }
+    for (let i = 0; i > quantity; i--) {
+      sideboardChanges.removed.push(id);
+    }
+  });
+  return sideboardChanges;
+}
+
 export function onLabelOutLogInfo(entry) {
   const json = entry.json();
   if (!json) return;
@@ -362,61 +398,11 @@ export function onLabelOutLogInfo(entry) {
         const originalDeck = globals.currentMatch.player.originalDeck.clone();
         const newDeck = globals.currentMatch.player.deck.clone();
 
-        const sideboardChanges = {
-          added: [],
-          removed: []
-        };
-        //console.log(originalDeck, newDeck);
-
-        const mainDiff = {};
-        newDeck.mainboard.get().forEach(card => {
-          mainDiff[card.id] = (mainDiff[card.id] || 0) + card.quantity;
-        });
-        originalDeck.mainboard.get().forEach(card => {
-          if (mainDiff[card.id]) {
-            mainDiff[card.id] -= card.quantity;
-          }
-        });
-
-        Object.keys(mainDiff).forEach(id => {
-          for (let i = 0; i < mainDiff[id]; i++) {
-            sideboardChanges.added.push(id);
-          }
-          //console.log(mainDiff[id] + " - " + db.card(id).name);
-        });
-
-        const sideDiff = {};
-        newDeck.sideboard.get().forEach(card => {
-          sideDiff[card.id] = (sideDiff[card.id] || 0) + card.quantity;
-        });
-        originalDeck.sideboard.get().forEach(card => {
-          if (sideDiff[card.id]) {
-            sideDiff[card.id] -= card.quantity;
-          }
-        });
-
-        Object.keys(sideDiff).forEach(id => {
-          for (let i = 0; i < sideDiff[id]; i++) {
-            sideboardChanges.removed.push(id);
-          }
-          //console.log(sideDiff[id] + " - " + db.card(id).name);
-        });
-
-        /*
-        globals.matchGameStats.forEach((stats, i) => {
-          if (i !== 0) {
-            let prevChanges = stats.sideboardChanges;
-            prevChanges.added.forEach(
-              id => (deckDiff[id] = (deckDiff[id] || 0) - 1)
-            );
-            prevChanges.removed.forEach(
-              id => (deckDiff[id] = (deckDiff[id] || 0) + 1)
-            );
-          }
-        });
-        */
-
-        game.sideboardChanges = sideboardChanges;
+        game.sideboardChanges = getSideboardChanges(
+          newDeck,
+          originalDeck,
+          globals.matchGameStats
+        );
         game.deck = newDeck.clone().getSave();
       }
 
@@ -523,7 +509,6 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
   }
 
   if (payload.submitdeckresp) {
-    //console.log("Client To GRE: ", payload);
     // Get sideboard changes
     const deckResp = payload.submitdeckresp.deck;
 

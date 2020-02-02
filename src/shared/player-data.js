@@ -59,7 +59,7 @@ const overlayCfg = {
   type_counts: false
 };
 
-const primaryBounds = remote.screen.getPrimaryDisplay().bounds;
+const primaryBounds = remote ? remote.screen.getPrimaryDisplay().bounds : {};
 
 const defaultCfg = {
   windowBounds: { width: 800, height: 600, x: 0, y: 0 },

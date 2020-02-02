@@ -18,7 +18,8 @@ export const settingsDefaults = {
   logUri: ""
 };
 
-export const USER_DATA_DIR = (app || remote.app).getPath("userData");
+export const USER_DATA_DIR =
+  app || remote ? (app || remote.app).getPath("userData") : "./userData";
 
 // Begin of IPC messages recievers
 export function ipcSend(

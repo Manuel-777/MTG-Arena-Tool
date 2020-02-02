@@ -34,7 +34,7 @@ class CardsList {
   private list: v2cardsList;
 
   // This should take anyCardsList as an argument?
-  constructor(newList: any[]) {
+  constructor(newList: any[] = []) {
     this.list = [];
     if (isV2CardsList(newList)) {
       this.list = newList.map((obj: CardObject) => {
@@ -47,9 +47,8 @@ class CardsList {
       });
     } else {
       newList.forEach(id => {
-        this.list.push({ quantity: 1, id: id, measurable: true, chance: 0 });
+        this.add(id);
       });
-      this.removeDuplicates(true);
     }
   }
 
@@ -65,20 +64,24 @@ class CardsList {
       throw new Error("quantity must be a number");
     }
     if (merge) {
-      this.list.forEach(card => {
+      for (let card of this.list) {
         if (card.id == grpId) {
           card.quantity += quantity;
           return card;
         }
-      });
+      }
     }
 
-    this.list.push({
-      quantity: quantity,
-      id: grpId,
-      measurable: true,
-      chance: 0
-    });
+    if (this.list.length > 0 && this.list[this.list.length - 1].id == grpId) {
+      this.list[this.list.length - 1].quantity += quantity;
+    } else {
+      this.list.push({
+        quantity: quantity,
+        id: grpId,
+        measurable: true,
+        chance: 0
+      });
+    }
     return this.list[this.list.length - 1];
   }
 

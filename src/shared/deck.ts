@@ -66,7 +66,10 @@ class Deck {
    * @param func sort function.
    */
   sortMainboard(func: any): void {
-    this.mainboard.get().sort(func);
+    // TODO: Move this to UI-only code before adding any use of it so that the
+    //       order saved to file and server will accurately match the order
+    //       read from Arena's log.
+    //this.mainboard.get().sort(func);
   }
 
   /**
@@ -74,7 +77,10 @@ class Deck {
    * @param func sort function.
    */
   sortSideboard(func: any): void {
-    this.sideboard.get().sort(func);
+    // TODO: Move this to UI-only code before adding any use of it so that the
+    //       order saved to file and server will accurately match the order
+    //       read from Arena's log.
+    //this.sideboard.get().sort(func);
   }
 
   getMainboard(): CardsList {
