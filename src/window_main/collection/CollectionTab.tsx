@@ -92,9 +92,12 @@ function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   for (const filter of filters) {
     if (filter.id === "booster") {
       hasCorrectBoosterFilter = filter.value?.true && !filter.value?.false;
-    }
-    if (filter.id === "rarity") {
+    } else if (filter.id === "rarity") {
       hasCorrectRarityFilter = filter.value?.mythic && filter.value?.rare;
+    } else if (filter.id === "set") {
+      continue; // this is fine
+    } else {
+      return false; // no other filters allowed
     }
   }
   return hasCorrectBoosterFilter && hasCorrectRarityFilter;
