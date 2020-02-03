@@ -1,13 +1,16 @@
 import _ from "lodash";
 import React from "react";
 import {
+  Row,
+  SortByFn,
   TableInstance,
   TableState,
   useFilters,
   useGlobalFilter,
   usePagination,
   useSortBy,
-  useTable
+  useTable,
+  IdType
 } from "react-table";
 import pd from "../../../shared/player-data";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
@@ -49,6 +52,20 @@ export function useMultiSelectFilter<D>(
     [filterValue, onFilterChanged]
   );
   return [filterValue, onClickMultiFilter];
+}
+
+export function useEnumSort<D extends TableData>(
+  enums: readonly string[]
+): SortByFn<D> {
+  return React.useCallback(
+    (rowA: Row<D>, rowB: Row<D>, columnId: IdType<D>): 0 | 1 | -1 => {
+      const indexDiff =
+        enums.indexOf(rowA.values[columnId]) -
+        enums.indexOf(rowB.values[columnId]);
+      return indexDiff < 0 ? -1 : indexDiff > 0 ? 1 : 0;
+    },
+    [enums]
+  );
 }
 
 export function useLegacyRenderer(
