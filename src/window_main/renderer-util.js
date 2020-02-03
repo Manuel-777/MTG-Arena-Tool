@@ -60,6 +60,7 @@ let unmountPoints = [];
 // (for state shared across processes, use database or player-data)
 const localState = {
   authToken: "",
+  collectionTableMode: pd.settings.collectionTableMode,
   discordTag: null,
   lastDataIndex: 0,
   lastScrollHandler: null,

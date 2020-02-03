@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { shell } from "electron";
 import Colors from "../../shared/colors";
-import { CARD_RARITIES } from "../../shared/constants";
+import { CARD_RARITIES, COLLECTION_SETS_MODE } from "../../shared/constants";
 import db from "../../shared/database";
 import { createDiv, createLabel, createInput } from "../../shared/dom-fns";
 import pd from "../../shared/player-data";
 import { getMissingCardCounts } from "../../shared/util";
 import createSelect from "../createSelect";
-import { formatNumber } from "../renderer-util";
+import { formatNumber, getLocalState } from "../renderer-util";
 import database from "../../shared/database";
 
 const ALL_CARDS = "All cards";
@@ -338,90 +339,96 @@ export function createInventoryStats(
     missing[rarity] = countStats.total - countStats.owned;
   });
 
-  const constantsLabel = createDiv(["deck_name"], "Draft Estimator*:");
-  constantsLabel.style.width = "100%";
-  mainstats.appendChild(constantsLabel);
+  const { collectionTableMode } = getLocalState();
+  if (collectionTableMode === COLLECTION_SETS_MODE) {
+    const constantsLabel = createDiv(["deck_name"], "Draft Estimator*:");
+    constantsLabel.style.width = "100%";
+    mainstats.appendChild(constantsLabel);
 
-  // Rares-per-draft Factor
-  const rareLabel = createLabel(["but_container_label"], "rares/draft:");
-  const rareInputCont = createDiv(["input_container"]);
-  const rareInput = createInput([], "", {
-    type: "text",
-    id: "collection_rares_per_draft",
-    autocomplete: "off",
-    placeholder: "3",
-    value: rareDraftFactor
-  });
-  rareInput.addEventListener("keyup", blurIfEnterKey(rareInput));
-  rareInput.addEventListener("focusout", () => {
-    const inputEl = byId("collection_rares_per_draft");
-    if (inputEl) {
-      const inputValue = (inputEl as HTMLInputElement).value;
-      rareDraftFactor = parseFloat(inputValue);
-      updateCallback();
-    }
-  });
-  rareInputCont.appendChild(rareInput);
-  rareLabel.appendChild(rareInputCont);
-  mainstats.appendChild(rareLabel);
+    // Rares-per-draft Factor
+    const rareLabel = createLabel(["but_container_label"], "rares/draft:");
+    const rareInputCont = createDiv(["input_container"]);
+    const rareInput = createInput([], "", {
+      type: "text",
+      id: "collection_rares_per_draft",
+      autocomplete: "off",
+      placeholder: "3",
+      value: rareDraftFactor
+    });
+    rareInput.addEventListener("keyup", blurIfEnterKey(rareInput));
+    rareInput.addEventListener("focusout", () => {
+      const inputEl = byId("collection_rares_per_draft");
+      if (inputEl) {
+        const inputValue = (inputEl as HTMLInputElement).value;
+        rareDraftFactor = parseFloat(inputValue);
+        updateCallback();
+      }
+    });
+    rareInputCont.appendChild(rareInput);
+    rareLabel.appendChild(rareInputCont);
+    mainstats.appendChild(rareLabel);
 
-  // Mythics-per-draft Factor
-  const mythicLabel = createLabel(["but_container_label"], "mythics/draft:");
-  const mythicInputCont = createDiv(["input_container"]);
-  const mythicInput = createInput([], "", {
-    type: "text",
-    id: "collection_mythics_per_draft",
-    autocomplete: "off",
-    placeholder: "3",
-    value: mythicDraftFactor
-  });
-  mythicInput.addEventListener("keyup", blurIfEnterKey(mythicInput));
-  mythicInput.addEventListener("focusout", () => {
-    const inputEl = byId("collection_mythics_per_draft");
-    if (inputEl) {
-      const inputValue = (inputEl as HTMLInputElement).value;
-      mythicDraftFactor = parseFloat(inputValue);
-      updateCallback();
-    }
-  });
-  mythicInputCont.appendChild(mythicInput);
-  mythicLabel.appendChild(mythicInputCont);
-  mainstats.appendChild(mythicLabel);
+    // Mythics-per-draft Factor
+    const mythicLabel = createLabel(["but_container_label"], "mythics/draft:");
+    const mythicInputCont = createDiv(["input_container"]);
+    const mythicInput = createInput([], "", {
+      type: "text",
+      id: "collection_mythics_per_draft",
+      autocomplete: "off",
+      placeholder: "3",
+      value: mythicDraftFactor
+    });
+    mythicInput.addEventListener("keyup", blurIfEnterKey(mythicInput));
+    mythicInput.addEventListener("focusout", () => {
+      const inputEl = byId("collection_mythics_per_draft");
+      if (inputEl) {
+        const inputValue = (inputEl as HTMLInputElement).value;
+        mythicDraftFactor = parseFloat(inputValue);
+        updateCallback();
+      }
+    });
+    mythicInputCont.appendChild(mythicInput);
+    mythicLabel.appendChild(mythicInputCont);
+    mainstats.appendChild(mythicLabel);
 
-  // Boosters-per-draft Factor
-  const boosterLabel = createLabel(["but_container_label"], "boosters/draft:");
-  const boosterInputCont = createDiv(["input_container"]);
-  const boosterInput = createInput([], "", {
-    type: "text",
-    id: "collection_boosters_per_draft",
-    autocomplete: "off",
-    placeholder: "3",
-    value: boosterWinFactor
-  });
-  boosterInput.addEventListener("keyup", blurIfEnterKey(boosterInput));
-  boosterInput.addEventListener("focusout", () => {
-    const inputEl = byId("collection_boosters_per_draft");
-    if (inputEl) {
-      const inputValue = (inputEl as HTMLInputElement).value;
-      boosterWinFactor = parseFloat(inputValue);
-      updateCallback();
-    }
-  });
-  boosterInputCont.appendChild(boosterInput);
-  boosterLabel.appendChild(boosterInputCont);
-  mainstats.appendChild(boosterLabel);
+    // Boosters-per-draft Factor
+    const boosterLabel = createLabel(
+      ["but_container_label"],
+      "boosters/draft:"
+    );
+    const boosterInputCont = createDiv(["input_container"]);
+    const boosterInput = createInput([], "", {
+      type: "text",
+      id: "collection_boosters_per_draft",
+      autocomplete: "off",
+      placeholder: "3",
+      value: boosterWinFactor
+    });
+    boosterInput.addEventListener("keyup", blurIfEnterKey(boosterInput));
+    boosterInput.addEventListener("focusout", () => {
+      const inputEl = byId("collection_boosters_per_draft");
+      if (inputEl) {
+        const inputValue = (inputEl as HTMLInputElement).value;
+        boosterWinFactor = parseFloat(inputValue);
+        updateCallback();
+      }
+    });
+    boosterInputCont.appendChild(boosterInput);
+    boosterLabel.appendChild(boosterInputCont);
+    mainstats.appendChild(boosterLabel);
 
-  const creditLink = createDiv(
-    ["settings_note"],
-    "<i><a>*[original by caliban on mtggoldfish]</a></i>"
-  );
-  creditLink.style.opacity = "0.6";
-  creditLink.addEventListener("click", () =>
-    shell.openExternal(
-      "https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2"
-    )
-  );
-  mainstats.appendChild(creditLink);
+    const creditLink = createDiv(
+      ["settings_note"],
+      "<i><a>*[original by caliban on mtggoldfish]</a></i>"
+    );
+    creditLink.style.opacity = "0.6";
+    creditLink.addEventListener("click", () =>
+      shell.openExternal(
+        "https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2"
+      )
+    );
+    mainstats.appendChild(creditLink);
+  }
 
   flex.appendChild(mainstats);
   container.appendChild(top);
@@ -569,7 +576,7 @@ export function createWantedStats(
     const draftCompleteIcon = createDiv(["stats_set_icon", "icon_2"]);
     draftCompleteIcon.style.height = "30px";
     const draftCompleteSpan = document.createElement("span");
-    draftCompleteSpan.innerHTML = `<i>drafts to complete set: ~${rareEstimate} for rares, ~${mythicEstimate} for mythics</i>`;
+    draftCompleteSpan.innerHTML = `<i>drafts to complete set*: ~${rareEstimate} for rares, ~${mythicEstimate} for mythics</i>`;
     draftCompleteSpan.style.fontSize = "13px";
     draftCompleteIcon.appendChild(draftCompleteSpan);
     draftCompleteDiv.appendChild(draftCompleteIcon);

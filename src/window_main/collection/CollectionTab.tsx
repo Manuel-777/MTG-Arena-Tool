@@ -20,7 +20,8 @@ import {
   hideLoadingBars,
   ipcSend,
   makeResizable,
-  resetMainContainer
+  resetMainContainer,
+  setLocalState
 } from "../renderer-util";
 import {
   CollectionStats,
@@ -91,6 +92,7 @@ function saveTableState(collectionTableState: TableState<CardsData>): void {
 
 function saveTableMode(collectionTableMode: string): void {
   ipcSend("save_user_settings", { collectionTableMode, skipRefresh: true });
+  setLocalState({ collectionTableMode });
 }
 
 function getCollectionData(): CardsData[] {
