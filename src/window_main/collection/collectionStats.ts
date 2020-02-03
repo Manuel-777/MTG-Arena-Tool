@@ -339,8 +339,8 @@ export function createInventoryStats(
     missing[rarity] = countStats.total - countStats.owned;
   });
 
-  const { collectionTableMode } = getLocalState();
-  if (collectionTableMode === COLLECTION_SETS_MODE) {
+  const { collectionTableMode, isBoosterMathValid } = getLocalState();
+  if (isBoosterMathValid && collectionTableMode === COLLECTION_SETS_MODE) {
     const constantsLabel = createDiv(["deck_name"], "Draft Estimator*:");
     constantsLabel.style.width = "100%";
     mainstats.appendChild(constantsLabel);
@@ -460,6 +460,7 @@ export function createWantedStats(
     setStats["rare"].unique - setStats["rare"].complete;
   const unownedUniqueMythics =
     setStats["mythic"].unique - setStats["mythic"].complete;
+  const { isBoosterMathValid } = getLocalState();
 
   if (unownedUniqueRares || unownedUniqueMythics) {
     // estimate stockpiled unowned rares and mythics
@@ -480,26 +481,40 @@ export function createWantedStats(
     }
 
     // estimate unowned rares and mythics in next draft pool (P1P1, P2P1, P3P1)
-    const newRares = (
-      (chanceBoosterHasRare * unownedUniqueRares * 3) /
-      setStats["rare"].unique
-    ).toFixed(2);
-    const newMythics = (
-      (chanceBoosterHasMythic * unownedUniqueMythics * 3) /
-      setStats["mythic"].unique
-    ).toFixed(2);
-    const draftNewDiv = createDiv(["stats_set_completion"]);
-    const draftNewIcon = createDiv(["stats_set_icon", "economy_ticket"]);
-    draftNewIcon.style.height = "30px";
-    const draftNewSpan = document.createElement("span");
-    draftNewSpan.innerHTML = `<i>next draft pool: ~${newRares} new rares, ~${newMythics} new mythics</i>`;
-    draftNewSpan.style.fontSize = "13px";
-    draftNewIcon.appendChild(draftNewSpan);
-    draftNewDiv.appendChild(draftNewIcon);
-    container.appendChild(draftNewDiv);
+    if (isBoosterMathValid) {
+      const newRares = (
+        (chanceBoosterHasRare * unownedUniqueRares * 3) /
+        setStats["rare"].unique
+      ).toFixed(2);
+      const newMythics = (
+        (chanceBoosterHasMythic * unownedUniqueMythics * 3) /
+        setStats["mythic"].unique
+      ).toFixed(2);
+      const draftNewDiv = createDiv(["stats_set_completion"]);
+      const draftNewIcon = createDiv(["stats_set_icon", "economy_ticket"]);
+      draftNewIcon.style.height = "30px";
+      const draftNewSpan = document.createElement("span");
+      draftNewSpan.innerHTML = `<i>next draft pool: ~${newRares} new rares, ~${newMythics} new mythics</i>`;
+      draftNewSpan.style.fontSize = "13px";
+      draftNewIcon.appendChild(draftNewSpan);
+      draftNewDiv.appendChild(draftNewIcon);
+      container.appendChild(draftNewDiv);
+    }
   }
 
-  if (setStats["rare"].uniqueWanted || setStats["mythic"].uniqueWanted) {
+  if (!isBoosterMathValid) {
+    const helpDiv = createDiv(["stats_set_completion"]);
+    const helpIcon = createDiv(["stats_set_icon", "notification"]);
+    helpIcon.style.height = "30px";
+    helpIcon.style.display = "initial";
+    helpIcon.style.alignSelf = "initial";
+    const helpSpan = document.createElement("span");
+    helpSpan.innerHTML = `<i>use "Boosters" preset to show additional stats</i>`;
+    helpSpan.style.fontSize = "13px";
+    helpIcon.appendChild(helpSpan);
+    helpDiv.appendChild(helpIcon);
+    container.appendChild(helpDiv);
+  } else if (setStats["rare"].uniqueWanted || setStats["mythic"].uniqueWanted) {
     const wantedText =
       "<abbr title='missing copy of a card in a current deck'>wanted</abbr>";
 
@@ -557,7 +572,7 @@ export function createWantedStats(
   // estimate remaining drafts to collect entire set
   // https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2
   // D = (T - P*7/8*11/12 - R)/(N+W*7/8*11/12)
-  if (unownedUniqueRares || unownedUniqueMythics) {
+  if (isBoosterMathValid && (unownedUniqueRares || unownedUniqueMythics)) {
     const remainingRares =
       setStats["rare"].total - setStats["rare"].owned - setStats.boosterRares;
     const rareEstimate = Math.ceil(

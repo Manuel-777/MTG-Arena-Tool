@@ -1,6 +1,6 @@
 import { remote } from "electron";
 import React from "react";
-import { TableState } from "react-table";
+import { TableState, Filters } from "react-table";
 import { addCardHover } from "../../shared/cardHover";
 import Colors from "../../shared/colors";
 import { DRAFT_RANKS } from "../../shared/constants";
@@ -86,7 +86,24 @@ function exportCards(cardIds: string[]): void {
   ipcSend("export_csvtxt", { str: exportString, name: "cards" });
 }
 
+function isBoosterMathValid(filters: Filters<CardsData>): boolean {
+  let hasCorrectBoosterFilter = false;
+  let hasCorrectRarityFilter = true;
+  for (const filter of filters) {
+    if (filter.id === "booster") {
+      hasCorrectBoosterFilter = filter.value?.true && !filter.value?.false;
+    }
+    if (filter.id === "rarity") {
+      hasCorrectRarityFilter = filter.value?.mythic && filter.value?.rare;
+    }
+  }
+  return hasCorrectBoosterFilter && hasCorrectRarityFilter;
+}
+
 function saveTableState(collectionTableState: TableState<CardsData>): void {
+  setLocalState({
+    isBoosterMathValid: isBoosterMathValid(collectionTableState.filters)
+  });
   ipcSend("save_user_settings", { collectionTableState, skipRefresh: true });
 }
 
@@ -148,6 +165,9 @@ export function CollectionTab(): JSX.Element {
     right_panel_width: panelWidth
   } = pd.settings;
   const data = React.useMemo(() => getCollectionData(), []);
+  setLocalState({
+    isBoosterMathValid: isBoosterMathValid(collectionTableState.filters)
+  });
 
   const sidePanelWidth = panelWidth + "px";
   const rightPanelRef = React.useRef<HTMLDivElement>(null);

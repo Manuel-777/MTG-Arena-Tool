@@ -13,6 +13,9 @@ import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import { CollectionTableControlsProps } from "./types";
 
+const boostersFilters = (): FilterValue[] => [
+  { id: "booster", value: { true: true, false: false } }
+];
 const standardSetsFilter: FilterValue = {};
 db.standardSetCodes.forEach(code => (standardSetsFilter[code] = true));
 const standardFilters = (): FilterValue[] => [
@@ -23,10 +26,6 @@ const ownedFilters = (): FilterValue[] => [
 ];
 const wantedFilters = (): FilterValue[] => [
   { id: "wanted", value: [1, undefined] }
-];
-const draftFilters = (): FilterValue[] => [
-  { id: "set", value: standardSetsFilter },
-  { id: "booster", value: { true: true, false: false } }
 ];
 
 const legacyModes = [COLLECTION_CHART_MODE, COLLECTION_SETS_MODE];
@@ -69,6 +68,23 @@ export default function CollectionTableControls(
         <span style={{ paddingBottom: "8px", marginLeft: "12px" }}>
           Presets:
         </span>
+        <SmallTextButton
+          onClick={(): void => {
+            setAllFilters(boostersFilters);
+            setFiltersVisible({
+              ...initialFiltersVisible,
+              booster: true
+            });
+            toggleSortBy("grpId", true, false);
+            for (const column of toggleableColumns) {
+              toggleHideColumn(column.id, !column.defaultVisible);
+            }
+            toggleHideColumn("booster", false);
+            toggleHideColumn("cmc", true);
+          }}
+        >
+          Boosters
+        </SmallTextButton>
         <SmallTextButton
           onClick={(): void => {
             setAllFilters(standardFilters);
@@ -115,24 +131,6 @@ export default function CollectionTableControls(
           }}
         >
           Wanted
-        </SmallTextButton>
-        <SmallTextButton
-          onClick={(): void => {
-            setAllFilters(draftFilters);
-            setFiltersVisible({
-              ...initialFiltersVisible,
-              booster: true
-            });
-            toggleSortBy("grpId", true, false);
-            for (const column of toggleableColumns) {
-              toggleHideColumn(column.id, !column.defaultVisible);
-            }
-            toggleHideColumn("booster", false);
-            toggleHideColumn("cmc", true);
-            setTableMode(COLLECTION_SETS_MODE);
-          }}
-        >
-          Draft
         </SmallTextButton>
         <MediumTextButton
           onClick={(): void => setTogglesVisible(!togglesVisible)}
