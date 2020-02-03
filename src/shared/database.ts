@@ -12,6 +12,7 @@ import {
 import { Season, Rank, RankClassInfo } from "./types/Season";
 import { ArenaV3Deck } from "./types/Deck";
 import { STANDARD_CUTOFF_DATE } from "./constants";
+import format from "date-fns/format";
 
 const cachePath: string | null =
   app || (remote && remote.app)
@@ -110,6 +111,11 @@ class Database {
   handleSetDb(_event: Event | null, arg: string) {
     try {
       this.metadata = JSON.parse(arg) as Metadata;
+      for (const event of this.playBrawlEvents) {
+        this.metadata.events[event] = "Play Brawl";
+        this.metadata.events_format[event] = "Brawl";
+        this.metadata.single_match_events.push(event);
+      }
     } catch (e) {
       console.log("Error parsing metadata", e);
     }
@@ -200,6 +206,18 @@ class Database {
 
   get single_match_events(): string[] {
     return this.metadata ? this.metadata.single_match_events : [];
+  }
+
+  get playBrawlEvents(): string[] {
+    const prefix = "Play_Brawl_";
+    const endDate = new Date();
+    const currentDate = new Date("2019-11-06T16:00:00Z"); // first Wednesday brawl
+    const events = [];
+    while (currentDate < endDate) {
+      events.push(prefix + format(currentDate, "yyyyMMdd"));
+      currentDate.setDate(currentDate.getDate() + 7); // repeat every Wednesday
+    }
+    return events;
   }
 
   get season_starts(): Date {
