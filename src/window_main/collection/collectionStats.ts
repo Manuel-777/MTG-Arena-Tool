@@ -1,3 +1,4 @@
+import { shell } from "electron";
 import Colors from "../../shared/colors";
 import { CARD_RARITIES } from "../../shared/constants";
 import db from "../../shared/database";
@@ -106,7 +107,7 @@ export interface CollectionStats {
 
 const chanceBoosterHasMythic = 0.125; // assume 1/8 of packs have a mythic
 const chanceBoosterHasRare = 1 - chanceBoosterHasMythic;
-const chanceNotWildCard = 11 / 12; // TODO this is wrong, should be 23/24
+const chanceNotWildCard = 11 / 12; // assume (1/24 mythic + 1/24 rare) WC instead of card
 export function estimateBoosterRares(boosterCount: number): number {
   return boosterCount * chanceBoosterHasRare * chanceNotWildCard;
 }
@@ -337,7 +338,7 @@ export function createInventoryStats(
     missing[rarity] = countStats.total - countStats.owned;
   });
 
-  const constantsLabel = createDiv(["deck_name"], "Draft Estimator:");
+  const constantsLabel = createDiv(["deck_name"], "Draft Estimator*:");
   constantsLabel.style.width = "100%";
   mainstats.appendChild(constantsLabel);
 
@@ -409,6 +410,18 @@ export function createInventoryStats(
   boosterInputCont.appendChild(boosterInput);
   boosterLabel.appendChild(boosterInputCont);
   mainstats.appendChild(boosterLabel);
+
+  const creditLink = createDiv(
+    ["settings_note"],
+    "<i><a>*[original by caliban on mtggoldfish]</a></i>"
+  );
+  creditLink.style.opacity = "0.6";
+  creditLink.addEventListener("click", () =>
+    shell.openExternal(
+      "https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2"
+    )
+  );
+  mainstats.appendChild(creditLink);
 
   flex.appendChild(mainstats);
   container.appendChild(top);
