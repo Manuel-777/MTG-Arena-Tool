@@ -56,14 +56,17 @@ function getDeckCurve(deck: Deck): any[] {
 export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
   const manaCounts = getDeckCurve(deck);
-  const curveMax = Math.max(
-    ...manaCounts
-      .filter(v => {
-        if (v == undefined) return false;
-        return true;
-      })
-      .map(v => v[0] || 0)
-  );
+  let curveMax = 0;
+  let cmcMax = 0;
+  manaCounts.forEach((cmcPile, index) => {
+    if (cmcPile === undefined) {
+      return;
+    }
+    if (cmcPile[0] > 0) {
+      curveMax = Math.max(curveMax, cmcPile[0]);
+      cmcMax = Math.max(cmcMax, index);
+    }
+  });
   // console.log("deckManaCurve", manaCounts, curveMax);
 
   return (
