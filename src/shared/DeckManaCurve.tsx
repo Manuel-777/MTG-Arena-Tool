@@ -73,7 +73,9 @@ export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
                 key={"mana_curve_column_" + i}
                 style={{ height: (total * 100) / curveMax + "%" }}
               >
-                <div className="mana_curve_number">{total}</div>
+                <div className="mana_curve_number">
+                  {total > 0 ? total : ""}
+                </div>
                 {MANA_COLORS.map((mc, ind) => {
                   if (ind < 5 && cost[ind + 1] > 0) {
                     return (
