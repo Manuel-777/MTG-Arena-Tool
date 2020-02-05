@@ -4,18 +4,16 @@ import { MANA_COLORS } from "./constants";
 import db from "./database";
 import { CardObject } from "./types/Deck";
 
+const MAX_CMC = 7; // cap at 7+ cmc bucket
+
 function add(a: number, b: number): number {
   return a + b;
 }
 
-function getDefaultCount(): number[] {
-  return [0, 0, 0, 0, 0, 0];
-}
-
 function getDeckCurve(deck: Deck): number[][] {
   const curve: number[][] = [];
-  for (let i = 0; i < 8; i++) {
-    curve[i] = getDefaultCount();
+  for (let i = 0; i < MAX_CMC + 1; i++) {
+    curve[i] = [0, 0, 0, 0, 0, 0];
   }
 
   if (!deck.getMainboard()) return curve;
@@ -27,7 +25,7 @@ function getDeckCurve(deck: Deck): number[][] {
       const cardObj = db.card(card.id);
       if (!cardObj) return;
 
-      const cmc = Math.min(7, cardObj.cmc); // cap at 7+ cmc bucket
+      const cmc = Math.min(MAX_CMC, cardObj.cmc);
       if (!cardObj.type.includes("Land")) {
         cardObj.cost.forEach((c: string): void => {
           if (c.includes("w")) curve[cmc][1] += card.quantity;
@@ -46,17 +44,7 @@ function getDeckCurve(deck: Deck): number[][] {
 export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
   const manaCounts = getDeckCurve(deck);
-  let curveMax = 0;
-  let cmcMax = 0;
-  manaCounts.forEach((cmcPile, index) => {
-    if (cmcPile === undefined) {
-      return;
-    }
-    if (cmcPile[0] > 0) {
-      curveMax = Math.max(curveMax, cmcPile[0]);
-      cmcMax = Math.max(cmcMax, index);
-    }
-  });
+  const curveMax = Math.max(...manaCounts.map(v => v[0]));
   // console.log("deckManaCurve", manaCounts, curveMax);
 
   return (
@@ -107,9 +95,9 @@ export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
                   className={"mana_s16 mana_" + i}
                   style={{ margin: "auto" }}
                 >
-                  <span style={{ paddingLeft: "20px", alignSelf: "center" }}>
-                    {i === 7 && "+"}
-                  </span>
+                  {i === MAX_CMC && (
+                    <span style={{ paddingLeft: "20px" }}>+</span>
+                  )}
                 </div>
               </div>
             );
