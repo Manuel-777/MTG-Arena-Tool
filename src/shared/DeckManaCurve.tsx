@@ -1,17 +1,23 @@
 import * as React from "react";
-
+import Deck from "../shared/deck";
 import { MANA_COLORS } from "./constants";
 import db from "./database";
-import Deck from "../shared/deck";
-import { CardData } from "../overlay/overlayUtil";
 import { CardObject } from "./types/Deck";
 
 function add(a: number, b: number): number {
   return a + b;
 }
 
-function getDeckCurve(deck: Deck): any[] {
-  const curve: any[] = [];
+function getDefaultCount(): number[] {
+  return [0, 0, 0, 0, 0, 0];
+}
+
+function getDeckCurve(deck: Deck): number[][] {
+  const curve: number[][] = [];
+  for (let i = 0; i < 8; i++) {
+    curve[i] = getDefaultCount();
+  }
+
   if (!deck.getMainboard()) return curve;
 
   deck
@@ -21,9 +27,7 @@ function getDeckCurve(deck: Deck): any[] {
       const cardObj = db.card(card.id);
       if (!cardObj) return;
 
-      const cmc = cardObj.cmc;
-      if (!curve[cmc]) curve[cmc] = [0, 0, 0, 0, 0, 0];
-
+      const cmc = Math.min(7, cardObj.cmc); // cap at 7+ cmc bucket
       if (!cardObj.type.includes("Land")) {
         cardObj.cost.forEach((c: string): void => {
           if (c.includes("w")) curve[cmc][1] += card.quantity;
@@ -32,23 +36,9 @@ function getDeckCurve(deck: Deck): any[] {
           if (c.includes("r")) curve[cmc][4] += card.quantity;
           if (c.includes("g")) curve[cmc][5] += card.quantity;
         });
-
         curve[cmc][0] += card.quantity;
       }
     });
-  /*
-  // Do not account sideboard?
-  deck.sideboard.forEach(function(card) {
-    var grpid = card.id;
-    var cmc = db.card(grpid).cmc;
-    if (curve[cmc] == undefined)  curve[cmc] = 0;
-    curve[cmc] += card.quantity
-
-    if (db.card(grpid).rarity !== 'land') {
-      curve[cmc] += card.quantity
-    }
-  });
-  */
   //console.log(curve);
   return curve;
 }
@@ -83,9 +73,7 @@ export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
                 key={"mana_curve_column_" + i}
                 style={{ height: (total * 100) / curveMax + "%" }}
               >
-                <div className="mana_curve_number">
-                  {total > 0 ? total : ""}
-                </div>
+                <div className="mana_curve_number">{total}</div>
                 {MANA_COLORS.map((mc, ind) => {
                   if (ind < 5 && cost[ind + 1] > 0) {
                     return (
@@ -116,7 +104,11 @@ export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
                 <div
                   className={"mana_s16 mana_" + i}
                   style={{ margin: "auto" }}
-                />
+                >
+                  <span style={{ paddingLeft: "20px", alignSelf: "center" }}>
+                    {i === 7 && "+"}
+                  </span>
+                </div>
               </div>
             );
           })}
