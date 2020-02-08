@@ -923,7 +923,7 @@ export function attachDraftData(listItem, draft) {
   listItem.right.after(replayShareButton);
 }
 
-function draftShareLink(id, draft, shareExpire) {
+export function draftShareLink(id, draft, shareExpire) {
   const draftData = JSON.stringify(draft);
   let expire = 0;
   switch (shareExpire) {
@@ -945,6 +945,56 @@ function draftShareLink(id, draft, shareExpire) {
   }
   showLoadingBars();
   ipcSend("request_draft_link", { expire, id, draftData });
+}
+
+export function deckShareLink(deck, shareExpire) {
+  const deckString = JSON.stringify(deck);
+  let expire = 0;
+  switch (shareExpire) {
+    case "One day":
+      expire = 0;
+      break;
+    case "One week":
+      expire = 1;
+      break;
+    case "One month":
+      expire = 2;
+      break;
+    case "Never":
+      expire = -1;
+      break;
+    default:
+      expire = 0;
+      break;
+  }
+  showLoadingBars();
+  ipcSend("request_deck_link", { expire, deckString });
+}
+
+export function logShareLink(id, shareExpire) {
+  const actionLogFile = path.join(actionLogDir, id + ".txt");
+  const log = fs.readFileSync(actionLogFile).toString("base64");
+
+  let expire = 0;
+  switch (shareExpire) {
+    case "One day":
+      expire = 0;
+      break;
+    case "One week":
+      expire = 1;
+      break;
+    case "One month":
+      expire = 2;
+      break;
+    case "Never":
+      expire = -1;
+      break;
+    default:
+      expire = 0;
+      break;
+  }
+  showLoadingBars();
+  ipcSend("request_log_link", { expire, log, id });
 }
 
 function showOfflineSplash() {
