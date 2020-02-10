@@ -26,6 +26,7 @@ import {
 import actionLog from "./actionLog";
 import addCustomDeck from "./addCustomDeck";
 import { createDraft, createMatch, completeMatch } from "./data";
+import { getDeckChanges } from "./getDeckChanges";
 
 let logLanguage = "English";
 
@@ -359,61 +360,11 @@ export function onLabelOutLogInfo(entry) {
       if (globals.gameNumberCompleted > 1) {
         const originalDeck = globals.currentMatch.player.originalDeck.clone();
         const newDeck = globals.currentMatch.player.deck.clone();
-
-        const sideboardChanges = {
-          added: [],
-          removed: []
-        };
-        //console.log(originalDeck, newDeck);
-
-        const mainDiff = {};
-        newDeck.mainboard.get().forEach(card => {
-          mainDiff[card.id] = (mainDiff[card.id] || 0) + card.quantity;
-        });
-        originalDeck.mainboard.get().forEach(card => {
-          if (mainDiff[card.id]) {
-            mainDiff[card.id] -= card.quantity;
-          }
-        });
-
-        Object.keys(mainDiff).forEach(id => {
-          for (let i = 0; i < mainDiff[id]; i++) {
-            sideboardChanges.added.push(id);
-          }
-          //console.log(mainDiff[id] + " - " + db.card(id).name);
-        });
-
-        const sideDiff = {};
-        newDeck.sideboard.get().forEach(card => {
-          sideDiff[card.id] = (sideDiff[card.id] || 0) + card.quantity;
-        });
-        originalDeck.sideboard.get().forEach(card => {
-          if (sideDiff[card.id]) {
-            sideDiff[card.id] -= card.quantity;
-          }
-        });
-
-        Object.keys(sideDiff).forEach(id => {
-          for (let i = 0; i < sideDiff[id]; i++) {
-            sideboardChanges.removed.push(id);
-          }
-          //console.log(sideDiff[id] + " - " + db.card(id).name);
-        });
-
-        /*
-        globals.matchGameStats.forEach((stats, i) => {
-          if (i !== 0) {
-            let prevChanges = stats.sideboardChanges;
-            prevChanges.added.forEach(
-              id => (deckDiff[id] = (deckDiff[id] || 0) - 1)
-            );
-            prevChanges.removed.forEach(
-              id => (deckDiff[id] = (deckDiff[id] || 0) + 1)
-            );
-          }
-        });
-        */
-
+        const sideboardChanges = getDeckChanges(
+          newDeck,
+          originalDeck,
+          globals.matchGameStats
+        );
         game.sideboardChanges = sideboardChanges;
         game.deck = newDeck.clone().getSave();
       }
