@@ -1,3 +1,8 @@
+export default function dummy(): void {
+  return;
+}
+// Deprecating in favor of event.ts
+/*
 export interface Season {
   currentSeason: SeasonInfo;
   limitedRankInfo: RankClassInfo[];
@@ -40,3 +45,4 @@ export interface RankClassInfo {
   level: number;
   steps: number;
 }
+*/

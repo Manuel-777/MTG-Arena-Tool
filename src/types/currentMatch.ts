@@ -1,5 +1,5 @@
-import { Chances } from "./decks";
-import Deck from "../../shared/deck";
+import { Chances } from "./Chances";
+import Deck from "../shared/deck";
 import {
   GameInfo,
   GreMessage,
@@ -12,6 +12,7 @@ import {
   Timer,
   Result
 } from "./greInterpreter";
+import { InternalDeck } from "./Deck";
 
 export interface MatchPlayer {
   seat: number;
@@ -210,3 +211,28 @@ export const matchDataDefault: MatchData = {
     leaderboardPlace: 0
   }
 };
+
+export interface MatchGameStats {
+  time: number;
+  winner: number;
+  win: boolean;
+  shuffledOrder: number[];
+  handsDrawn: number[][];
+  handLands: number[];
+  cardsCast: CardCast[];
+  deckSize: number;
+  landsInDeck: number;
+  multiCardPositions: {
+    [pos: string]: {
+      [grpId: string]: number[];
+    };
+  };
+  librarySize: number;
+  landsInLibrary: number;
+  libraryLands: number[];
+  sideboardChanges: {
+    added: string[];
+    removed: string[];
+  };
+  deck: InternalDeck;
+}

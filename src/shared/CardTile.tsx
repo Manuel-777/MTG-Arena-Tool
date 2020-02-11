@@ -15,8 +15,7 @@ import {
   openScryfallCard
 } from "./util";
 import { addCardHover } from "./cardHover";
-import { DbCardData, Rarity } from "./types/Metadata";
-import _ from "lodash";
+import { DbCardData, Rarity } from "../types/Metadata";
 
 export interface CardTileProps {
   card: DbCardData;

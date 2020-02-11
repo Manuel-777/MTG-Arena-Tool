@@ -1,4 +1,4 @@
-import { CARD_RARITIES } from "../constants";
+import { CARD_RARITIES } from "../shared/constants";
 
 export interface Metadata {
   cards: { [id: number]: DbCardData };
@@ -43,10 +43,7 @@ export interface DbCardData {
 export type Rarity = typeof CARD_RARITIES[number];
 
 interface ImageLinks {
-  small: string;
-  normal: string;
-  large: string;
-  art_crop: string;
+  [key: string]: string;
 }
 
 export interface CardSet {

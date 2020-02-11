@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-
 import {
   MANA,
   OVERLAY_DRAFT,
@@ -7,10 +6,10 @@ import {
   PACK_SIZES
 } from "../shared/constants";
 import Deck from "../shared/deck";
-
-import { DraftData, DraftState, OverlaySettingsData } from "./overlayUtil";
+import { DraftData, DraftState } from "../types/draft";
+import { DbCardData } from "../types/Metadata";
+import { OverlaySettingsData } from "../types/settings";
 import DeckList from "./DeckList";
-import { DbCardData } from "../shared/types/Metadata";
 
 const packSizeMap: { [key: string]: number } = PACK_SIZES;
 

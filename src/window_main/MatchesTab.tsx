@@ -6,9 +6,10 @@ import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
 import { getReadableEvent } from "../shared/util";
+import { InternalMatch } from "../types/match";
 import Aggregator, { AggregatorFilters } from "./aggregator";
 import MatchesTable from "./components/matches/MatchesTable";
-import { MatchTableData, SerializedMatch } from "./components/matches/types";
+import { MatchTableData } from "./components/matches/types";
 import { isHidingArchived } from "./components/tables/filters";
 import {
   useAggregatorAndSidePanel,
@@ -203,7 +204,7 @@ function updateStatsPanel(
 
 function getMatchesData(aggregator: Aggregator): MatchTableData[] {
   return pd.matchList
-    .filter((match: SerializedMatch) => {
+    .filter((match: InternalMatch) => {
       // legacy filter logic
       if (match == undefined) {
         return false;
@@ -217,7 +218,7 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
       return aggregator.filterMatch(match);
     })
     .map(
-      (match: SerializedMatch): MatchTableData => {
+      (match: InternalMatch): MatchTableData => {
         const timestamp = new Date(match.date ?? NaN);
         const colors = match.playerDeck.colors ?? [];
         const oppColors = match.oppDeck.colors ?? [];
@@ -229,7 +230,7 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
           custom: true,
           colors,
           colorSortVal: colors.join(""),
-          deckId: match.playerDeck.id ?? "",
+          deckId: match.playerDeck.id,
           deckName: match.playerDeck.name ?? "",
           deckFormat: match.playerDeck.format ?? "",
           eventName: getReadableEvent(match.eventId),

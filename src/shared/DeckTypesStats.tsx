@@ -3,7 +3,7 @@ import * as React from "react";
 import { CARD_TYPES, CARD_TYPE_CODES } from "./constants";
 import db from "./database";
 import Deck from "../shared/deck";
-import { CardObject } from "../shared/types/Deck";
+import { CardObject } from "../types/Deck";
 
 function getDeckTypesAmount(deck: Deck): { [key: string]: number } {
   const types = { art: 0, cre: 0, enc: 0, ins: 0, lan: 0, pla: 0, sor: 0 };

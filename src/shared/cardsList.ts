@@ -1,8 +1,12 @@
 import _ from "lodash";
-import db from "./database";
+import {
+  anyCardsList,
+  CardObject,
+  isV2CardsList,
+  v2cardsList
+} from "../types/Deck";
 import Colors from "./colors";
-import { CardObject, v2cardsList, isV2CardsList } from "./types/Deck";
-import { DbCardData } from "./types/Metadata";
+import db from "./database";
 
 interface CardTypesCount {
   art: number;
@@ -33,8 +37,7 @@ class CardsList {
    **/
   private list: v2cardsList;
 
-  // This should take anyCardsList as an argument?
-  constructor(newList: any[]) {
+  constructor(newList: anyCardsList) {
     this.list = [];
     if (isV2CardsList(newList)) {
       this.list = newList.map((obj: CardObject) => {

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { toMMSS, toHHMMSS } from "../shared/util";
-import { PriorityTimers } from "../window_background/types/currentMatch";
+import { PriorityTimers } from "../types/currentMatch";
 
 const CLOCK_MODE_BOTH = 0;
 const CLOCK_MODE_ELAPSED = 1;

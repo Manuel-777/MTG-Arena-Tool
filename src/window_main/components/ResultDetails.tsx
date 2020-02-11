@@ -1,8 +1,8 @@
 import React from "react";
-import { ExtendedMatchData } from "../../window_background/data";
+import { InternalMatch } from "../../types/match";
 
 interface ResultDetailsProps {
-  match: ExtendedMatchData;
+  match: InternalMatch;
 }
 
 export default function ResultDetails(props: ResultDetailsProps): JSX.Element {
