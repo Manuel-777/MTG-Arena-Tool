@@ -1,13 +1,13 @@
 import React from "react";
 import { getCardArtCrop } from "../../../shared/util";
 
-interface ListItemnProps extends JSX.ElementChildrenAttribute {
+interface ListItemProps extends JSX.ElementChildrenAttribute {
   click: VoidFunction;
   mouseEnter: VoidFunction;
   mouseLeave: VoidFunction;
 }
 
-export function ListItem(props: ListItemnProps): JSX.Element {
+export function ListItem(props: ListItemProps): JSX.Element {
   const { click, mouseEnter, mouseLeave } = props;
   return (
     <div
