@@ -156,12 +156,14 @@ export function ListItemDeck({
           <WildcardsCost deck={deck} />
         )}
       </Column>
-      <ArchiveButton
-        archiveCallback={toggleArchived}
-        dataId={deck.id || ""}
-        hover={hover}
-        isArchived={deck.archived || false}
-      />
+      {!!deck.custom && (
+        <ArchiveButton
+          archiveCallback={toggleArchived}
+          dataId={deck.id || ""}
+          hover={hover}
+          isArchived={deck.archived || false}
+        />
+      )}
     </ListItem>
   );
 }
