@@ -3,7 +3,7 @@ import React from "react";
 interface ButtonProps {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   text: string;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
 }
 
 export default function Button(props: ButtonProps): JSX.Element {

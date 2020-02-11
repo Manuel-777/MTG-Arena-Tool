@@ -4,7 +4,7 @@ export interface ReactSelectProps {
   optionFormatter?: (option: string) => string | JSX.Element;
   current: string;
   callback: (option: string) => void;
-  options: string[];
+  options: any[];
   style?: React.CSSProperties;
 }
 

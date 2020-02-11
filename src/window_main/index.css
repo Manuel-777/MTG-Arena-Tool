@@ -2169,44 +2169,62 @@ a:hover {
     overflow: unset;
     width: calc(100% - 128px);
     margin: 0 64px;
+    display: flex;
+    flex-direction: column;
 }
-
+  
 .slider {
+    margin: 0;
     overflow: unset;
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
     border-radius: 16px;
-    height: 12px;
+    height: 4px;
     background: var(--color-mid-50);
     outline: none;
     opacity: 1;
     transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1.0);
 }
-
+  
 .slider:hover {
     background: var(--color-mid-66);
 }
-
+  
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 12px;
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
     background: var(--color-mid);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1.0);
 }
-
+  
 .slider::-webkit-slider-thumb:hover {
     background: var(--color-light);
-    box-shadow: 0 0 0px 4px var(--color-light-20);
+    box-shadow: 0 0 0px 8px var(--color-light-20);
 }
-
+  
 .slider::-webkit-slider-thumb:active {
     background: var(--color-light);
-    box-shadow: 0 0 0px 10px var(--color-light-40);
+    box-shadow: 0 0 0px 12px var(--color-light-40);
+}
+
+.slider_marks_container_hor {
+    width: calc(100% - 14px);
+    margin: 2px 7px 0 7px;
+    height: 4px;
+    z-index: -1;
+    display: flex;
+    justify-content: space-between;
+}
+
+.slider_mark_hor {
+    width: 1px;
+    height: -webkit-fill-available;
+    background-color: var(--color-light-50);
 }
 
 .draft_nav_container {

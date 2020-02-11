@@ -22,6 +22,7 @@ import {
 import mountReactComponent from "./mountReactComponent";
 import SectionBehaviour from "./components/settings/SectionBehaviour";
 import SectionData from "./components/settings/SectionData";
+import SectionOverlay from "./components/settings/SectionOverlay";
 
 interface SettingsNavProps {
   component: () => JSX.Element;
@@ -48,9 +49,6 @@ function SettingsNav(props: SettingsNavProps): JSX.Element {
   );
 }
 
-function SectionOverlay(): JSX.Element {
-  return <></>;
-}
 
 function SectionVisual(): JSX.Element {
   return <></>;
@@ -111,7 +109,7 @@ function Settings(props: SettingsProps): JSX.Element {
     ...defaultTab,
     id: SETTINGS_OVERLAY,
     component: SectionOverlay,
-    title: "Overlay"
+    title: "Overlays"
   };
   tabs[SETTINGS_VISUAL] = {
     ...defaultTab,
