@@ -1,27 +1,25 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define */
-import fs from "fs";
-import path from "path";
-import { app, ipcRenderer as ipc, remote, shell } from "electron";
-const { dialog } = remote;
-import _ from "lodash";
-import format from "date-fns/format";
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define, @typescript-eslint/camelcase */
 import anime from "animejs";
+import { app, ipcRenderer as ipc, remote, shell } from "electron";
+import fs from "fs";
+import _ from "lodash";
+import path from "path";
+import Pikaday from "pikaday";
+import ReactDOM from "react-dom";
 import striptags from "striptags";
 import Picker from "vanilla-picker";
-import Pikaday from "pikaday";
+import { addCardHover } from "../shared/cardHover";
+import { cardType } from "../shared/cardTypes";
+import ConicGradient from "../shared/conic-gradient";
 import {
-  CARD_RARITIES,
   COLORS_ALL,
-  MANA,
-  MANA_COLORS,
-  IPC_MAIN,
-  IPC_BACKGROUND,
   EASING_DEFAULT,
+  IPC_BACKGROUND,
+  IPC_MAIN,
+  MANA_COLORS,
   SETTINGS_PRIVACY
 } from "../shared/constants";
 import db from "../shared/database";
-import pd from "../shared/player-data";
-import ConicGradient from "../shared/conic-gradient";
 import {
   createDiv,
   createImg,
@@ -30,26 +28,17 @@ import {
   createSpan,
   queryElements as $$
 } from "../shared/dom-fns";
-import * as deckDrawer from "./DeckDrawer";
-import { cardType } from "../shared/cardTypes";
-import { addCardHover } from "../shared/cardHover";
+import pd from "../shared/player-data";
 import {
   deckTypesStats,
-  formatRank,
-  getBoosterCountEstimate,
   getCardArtCrop,
-  get_deck_missing,
-  get_rank_index_16,
   getCardImage,
-  getReadableEvent,
-  makeId,
-  toMMSS,
-  openScryfallCard
+  makeId
 } from "../shared/util";
-import ReactDOM from "react-dom";
-import createShareButton from "./createShareButton";
+import * as deckDrawer from "./DeckDrawer";
 import { forceOpenSettings } from "./tabControl";
 
+const { dialog } = remote;
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 const byId = id => document.getElementById(id);
@@ -846,81 +835,6 @@ function localTimeSince(date) {
   return `<relative-time datetime="${date.toISOString()}">
     ${date.toString()}
   </relative-time>`;
-}
-
-function createDraftSetDiv(draft) {
-  return createDiv(["list_deck_name"], draft.set + " draft");
-}
-
-export function createRoundCard(card, rarityOverlay = false) {
-  const roundCard = createDiv([
-    "round_card",
-    card.rarity,
-    `rarity-overlay${rarityOverlay ? "" : "-none"}`
-  ]);
-
-  roundCard.title = card.name;
-  roundCard.style.backgroundImage = `url("${getCardImage(card, "art_crop")}")`;
-
-  addCardHover(roundCard, card);
-
-  roundCard.addEventListener("click", () => {
-    if (card.dfc == "SplitHalf") {
-      card = db.card(card.dfcId);
-    }
-    openScryfallCard(card);
-  });
-
-  return roundCard;
-}
-
-export function createDraftRares(draft) {
-  const draftRares = createDiv(["flex_item"]);
-  draftRares.style.margin = "auto";
-  if (!draft.pickedCards) return draftRares;
-
-  draft.pickedCards
-    .map(cardId => db.card(cardId))
-    .filter(card => card.rarity == "rare" || card.rarity == "mythic")
-    .map(card => createRoundCard(card, true))
-    .forEach(inventoryCard => draftRares.appendChild(inventoryCard));
-
-  return draftRares;
-}
-
-function createDraftTimeDiv(draft) {
-  return createDiv(
-    ["list_match_time"],
-    draft.date ? localTimeSince(new Date(draft.date)) : "Unknown"
-  );
-}
-
-function createReplayDiv() {
-  return createDiv(["list_match_replay"], "See replay");
-}
-
-function createReplayShareButton(draft) {
-  const replayShareButton = createShareButton(
-    ["list_draft_share", draft.id + "dr"],
-    shareExpire => draftShareLink(draft.id, draft, shareExpire)
-  );
-  replayShareButton.title = "share draft replay";
-  return replayShareButton;
-}
-
-export function attachDraftData(listItem, draft) {
-  // console.log("Draft: ", draft);
-  const draftSetDiv = createDraftSetDiv(draft);
-  const draftRares = createDraftRares(draft);
-  const draftTimeDiv = createDraftTimeDiv(draft);
-  const replayDiv = createReplayDiv(draft);
-  const replayShareButton = createReplayShareButton(draft);
-
-  listItem.leftTop.appendChild(draftSetDiv);
-  listItem.center.appendChild(draftRares);
-  listItem.rightBottom.appendChild(draftTimeDiv);
-  listItem.rightTop.appendChild(replayDiv);
-  listItem.right.after(replayShareButton);
 }
 
 export function draftShareLink(id, draft, shareExpire) {
