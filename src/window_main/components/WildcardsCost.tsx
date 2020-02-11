@@ -1,12 +1,15 @@
 import React from "react";
 import pd from "../../shared/player-data";
-import { get_deck_missing, getBoosterCountEstimate } from "../../shared/util";
+import {
+  get_deck_missing as getDeckMissing,
+  getBoosterCountEstimate
+} from "../../shared/util";
 import { CARD_RARITIES } from "../../shared/constants";
 import _ from "lodash";
+import { SerializedDeck } from "../../shared/types/Deck";
 
 interface WildcardsCostProps {
-  // Should be one of our deck types, not sure which
-  deck: any;
+  deck: SerializedDeck;
 }
 
 interface WildcardsList {
@@ -23,7 +26,7 @@ export default function WildcardsCost(props: WildcardsCostProps): JSX.Element {
     mythic: pd.economy.wcMythic
   };
 
-  const missingWildcards: WildcardsList = get_deck_missing(deck);
+  const missingWildcards: WildcardsList = getDeckMissing(deck);
   let drawCost = false;
   CARD_RARITIES.filter(rarity => rarity !== "land").map(
     (cardRarity: string) => {
@@ -40,6 +43,7 @@ export default function WildcardsCost(props: WildcardsCostProps): JSX.Element {
           if (missingWildcards[cardRarity]) {
             return (
               <div
+                key={cardRarity}
                 className={"wc_explore_cost wc_" + cardRarity}
                 title={_.capitalize(cardRarity) + " wildcards needed."}
               >
@@ -51,12 +55,10 @@ export default function WildcardsCost(props: WildcardsCostProps): JSX.Element {
           }
         }
       )}
-      {drawCost ? (
+      {drawCost && (
         <div title="Boosters needed (estimated)" className="bo_explore_cost">
           {Math.round(getBoosterCountEstimate(missingWildcards))}
         </div>
-      ) : (
-        <></>
       )}
     </div>
   );
