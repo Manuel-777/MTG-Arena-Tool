@@ -1,5 +1,5 @@
 import Deck from "../shared/deck";
-import { CardObject } from "../shared/types/Deck";
+import { CardObject } from "../types/Deck";
 
 interface DeckChanges {
   added: number[];
