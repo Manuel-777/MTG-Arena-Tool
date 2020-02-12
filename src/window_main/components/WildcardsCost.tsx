@@ -37,13 +37,13 @@ export default function WildcardsCost(props: {
 
   return (
     <div style={{ display: "flex", flexDirection: "row", marginRight: "16px" }}>
-      {drawCost &&
-        CARD_RARITIES.filter(rarity => rarity !== "land").map(
-          (cardRarity: string) => {
-            const key = getRarityKey(cardRarity);
-            if (key) {
-              const owned = ownedWildcards[key];
-              const missing = missingWildcards[key];
+      {CARD_RARITIES.filter(rarity => rarity !== "land").map(
+        (cardRarity: string) => {
+          const key = getRarityKey(cardRarity);
+          if (key) {
+            const owned = ownedWildcards[key];
+            const missing = missingWildcards[key];
+            if (missing) {
               return (
                 <div
                   className={"wc_explore_cost wc_" + cardRarity}
@@ -54,7 +54,8 @@ export default function WildcardsCost(props: {
               );
             }
           }
-        )}
+        }
+      )}
       {drawCost && (
         <div title="Boosters needed (estimated)" className="bo_explore_cost">
           {Math.round(getBoosterCountEstimate(missingWildcards))}
