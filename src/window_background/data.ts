@@ -10,6 +10,9 @@ import { InternalMatch } from "../types/match";
 import getOpponentDeck from "./getOpponentDeck";
 import globals from "./globals";
 
+// Generate objects using default templates.
+// Nothing in here should call IPC functions
+
 export interface MatchCreatedEvent {
   controllerFabricUri: string;
   matchEndpointHost: string;
@@ -33,8 +36,31 @@ export interface MatchCreatedEvent {
   commanderGrpIds: number[];
 }
 
-// Generate objects using default templates.
-// Nothing in here should call IPC functions
+// Draft Creation
+
+const currentDraftDefault = {
+  eventId: "",
+  draftId: "",
+  set: "",
+  owner: "",
+  pickedCards: [],
+  packNumber: 0,
+  pickNumber: 0,
+  currentPack: [],
+  date: undefined
+};
+
+export function createDraft(id: string) {
+  const data = {
+    ..._.cloneDeep(currentDraftDefault),
+    id,
+    draftId: id,
+    owner: playerData.name
+  };
+  return data;
+}
+
+// Match Creation
 export function createMatch(
   json: MatchCreatedEvent,
   matchBeginTime: Date
