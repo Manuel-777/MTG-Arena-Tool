@@ -67,7 +67,7 @@ function getExportString(cardIds: string[]): string {
       const code = db.sets[card.set]?.code ?? "???";
       add = add
         .replace("$Name", '"' + name + '"')
-        .replace("$Count", count)
+        .replace("$Count", count + "")
         .replace("$SetName", card.set)
         .replace("$SetCode", code)
         .replace("$Collector", card.cid)

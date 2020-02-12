@@ -37,7 +37,7 @@ function openDeckDetails(
   id: string | number,
   filters: AggregatorFilters
 ): void {
-  const deck = pd.deck(id);
+  const deck = pd.deck(id + "");
   if (!deck) return;
   openDeck(deck, { ...filters, deckId: id });
   anime({
@@ -106,6 +106,7 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
   return pd.deckList.map(
     (deck: SerializedDeck): DecksData => {
       const id = deck.id ?? "";
+      const name = (deck.name ?? "").replace("?=?Loc/Decks/Precon/", "");
       const archivedSortVal = deck.archived ? 1 : deck.custom ? 0.5 : 0;
       const colorSortVal = deck.colors?.join("") ?? "";
       // compute winrate metrics
@@ -123,6 +124,7 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
       const lastTouched = dateMaxValid(lastUpdated, lastPlayed);
       return {
         ...deck,
+        name,
         format: getReadableFormat(deck.format),
         ...deckStats,
         winrate100,

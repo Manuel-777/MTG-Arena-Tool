@@ -1,6 +1,11 @@
 import React from "react";
 import { Cell } from "react-table";
-import { BinarySymbol, FlexLeftContainer, RankSymbol } from "../display";
+import {
+  BinarySymbol,
+  BriefText,
+  FlexLeftContainer,
+  RankSymbol
+} from "../display";
 import { TagsCell } from "../tables/cells";
 import { TagCounts } from "../tables/types";
 import { MatchTableData } from "./types";
@@ -38,7 +43,10 @@ export function RankCell({
   return (
     <FlexLeftContainer>
       <RankSymbol rank={cell.value} />
-      {cell.value}
+      <BriefText
+        value={cell.value}
+        style={{ fontFamily: "var(--main-font-name-it)", opacity: 0.5 }}
+      />
     </FlexLeftContainer>
   );
 }

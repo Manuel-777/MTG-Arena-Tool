@@ -11,6 +11,7 @@ import { MediumTextButton, SmallTextButton } from "../display";
 import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
+import { defaultRarity } from "./filters";
 import { CollectionTableControlsProps } from "./types";
 
 const standardSetsFilter: FilterValue = {};
@@ -22,7 +23,8 @@ const ownedFilters = (): FilterValue[] => [
   { id: "owned", value: [1, undefined] }
 ];
 const wantedFilters = (): FilterValue[] => [
-  { id: "wanted", value: [1, undefined] }
+  { id: "wanted", value: [1, undefined] },
+  { id: "rarity", value: { ...defaultRarity, land: false } }
 ];
 
 const legacyModes = [COLLECTION_CHART_MODE, COLLECTION_SETS_MODE];
@@ -100,6 +102,7 @@ export default function CollectionTableControls(
             setAllFilters(wantedFilters);
             setFiltersVisible({
               ...initialFiltersVisible,
+              rarity: true,
               wanted: true
             });
             toggleSortBy("grpId", true, false);

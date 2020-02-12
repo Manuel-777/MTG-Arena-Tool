@@ -17,7 +17,7 @@ export default function createShareButton(
   return button;
 }
 
-function createShareDialog(callback: (option: string) => void) {
+export function createShareDialog(callback: (option: string) => void) {
   const cont = createDiv(["dialog_content"]);
   cont.style.width = "500px";
 

@@ -1,8 +1,7 @@
-import anime from "animejs";
 import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
-import { DATE_SEASON, EASING_DEFAULT, RANKS } from "../shared/constants";
+import { DATE_SEASON, RANKS } from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
@@ -33,17 +32,11 @@ const tagPrompt = "Set archetype";
 
 function openMatchDetails(id: string | number): void {
   openMatch(id);
-  anime({
-    targets: ".moving_ux",
-    left: "-100%",
-    easing: EASING_DEFAULT,
-    duration: 350
-  });
 }
 
 function addTag(matchid: string, tag: string): void {
   const match = pd.match(matchid);
-  if ([tagPrompt, NO_ARCH, DEFAULT_ARCH].includes(tag)) return;
+  if (!match || [tagPrompt, NO_ARCH].includes(tag)) return;
   if (match.tags?.includes(tag)) return;
   ipcSend("add_matches_tag", { matchid, tag });
 }
@@ -54,7 +47,7 @@ function editTag(tag: string, color: string): void {
 
 function deleteTag(matchid: string, tag: string): void {
   const match = pd.match(matchid);
-  if (!match.tags?.includes(tag)) return;
+  if (!match || !match.tags?.includes(tag)) return;
   ipcSend("delete_matches_tag", { matchid, tag });
 }
 
@@ -228,6 +221,8 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
         const timestamp = new Date(match.date ?? NaN);
         const colors = match.playerDeck.colors ?? [];
         const oppColors = match.oppDeck.colors ?? [];
+        const oppArenaId = match.opponent.name ?? "-#000000";
+        const oppName = oppArenaId.slice(0, -6);
         return {
           ...match,
           archivedSortVal: match.archived ? 1 : 0,
@@ -246,7 +241,8 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
           oppColors,
           oppColorSortVal: oppColors.join(""),
           oppLeaderboardPlace: match.opponent.leaderboardPlace,
-          oppName: match.opponent.name ?? "",
+          oppArenaId,
+          oppName,
           oppPercentile: match.opponent.percentile
             ? match.opponent.percentile / 100
             : undefined,

@@ -61,6 +61,7 @@ export default class Aggregator {
   // Event-related filter values
   public static ALL_EVENT_TRACKS = "All Event Tracks";
   public static ALL_DRAFTS = "All Drafts";
+  public static PLAY_BRAWL = "Play Brawl";
   // Archetype filter values
   public static NO_ARCH = "No Archetype";
 
@@ -205,6 +206,8 @@ export default class Aggregator {
         db.standard_ranked_events.includes(eventId)) ||
       (filterValue === Aggregator.RANKED_DRAFT &&
         db.limited_ranked_events.includes(eventId)) ||
+      (filterValue === Aggregator.PLAY_BRAWL &&
+        getReadableEvent(eventId) === Aggregator.PLAY_BRAWL) ||
       filterValue === eventId
     );
   }
@@ -448,23 +451,24 @@ export default class Aggregator {
   }
 
   get events(): string[] {
+    const brawlEvents = new Set(db.playBrawlEvents);
     return [
       Aggregator.DEFAULT_EVENT,
       Aggregator.ALL_DRAFTS,
       Aggregator.RANKED_CONST,
       Aggregator.RANKED_DRAFT,
-      ...this._eventIds
+      Aggregator.PLAY_BRAWL,
+      ...this._eventIds.filter(eventId => !brawlEvents.has(eventId))
     ];
   }
 
   get trackEvents(): string[] {
+    const bo1Events = new Set(db.single_match_events);
     return [
       Aggregator.ALL_EVENT_TRACKS,
       Aggregator.ALL_DRAFTS,
       Aggregator.RANKED_DRAFT,
-      ...this._eventIds.filter(
-        eventId => !db.single_match_events.includes(eventId)
-      )
+      ...this._eventIds.filter(eventId => !bo1Events.has(eventId))
     ];
   }
 

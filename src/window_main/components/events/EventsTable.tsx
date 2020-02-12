@@ -10,6 +10,7 @@ import {
   MetricCell,
   RelativeTimeCell,
   ShortTextCell,
+  SubTextCell,
   TextCell
 } from "../tables/cells";
 import {
@@ -23,7 +24,7 @@ import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
-import EventsListViewRow from "./EventsListViewRow";
+import { ListItemEvent } from "../list-item/ListItemEvent";
 import EventsTableControls from "./EventsTableControls";
 import { eventSearchFilterFn } from "./filters";
 import {
@@ -49,8 +50,8 @@ const columns: Column<EventTableData>[] = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
+    Cell: SubTextCell,
+    gridWidth: "210px",
     mayToggle: true
   },
   {
@@ -60,7 +61,7 @@ const columns: Column<EventTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -82,8 +83,8 @@ const columns: Column<EventTableData>[] = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
+    Cell: SubTextCell,
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -253,7 +254,7 @@ export default function EventsTable({
               );
             }
             return (
-              <EventsListViewRow
+              <ListItemEvent
                 row={row}
                 index={index}
                 key={row.index}

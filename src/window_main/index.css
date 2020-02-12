@@ -604,18 +604,46 @@ span.top_nav_item_text {
     color: rgba(183, 200, 158, 1);
 }
 
+.ontheplaytext {
+    color: var(--color-g);
+    font-size: 16px;
+    margin: auto auto 2px auto;
+    font-family: var(--sub-font-name-bold);
+}
+
 .ontheplay {
     width: 16px;
     height: 16px;
-    margin: auto 6px auto 6px;
+    margin: 2px 4px auto 4px;
     background: url(../images/ontheplay.png);
+}
+
+.onthedrawtext {
+    color: var(--color-r);
+    font-size: 16px;
+    margin: auto auto 2px auto;
+    font-family: var(--sub-font-name-bold);
 }
 
 .onthedraw {
     width: 16px;
     height: 16px;
-    margin: auto 6px auto 6px;
+    margin: 2px 4px auto 4px;
     background: url(../images/onthedraw.png);
+}
+
+.notplayedtext {
+    color: var(--color-b);
+    font-size: 16px;
+    margin: auto auto 2px auto;
+    font-family: var(--sub-font-name-bold);
+}
+
+.notplayed {
+    width: 16px;
+    height: 16px;
+    margin: 2px 4px auto 4px;
+    background: url(../images/notplayed.png);
 }
 
 .list_draft_share {
@@ -939,7 +967,7 @@ a:hover {
     white-space: nowrap;
     margin-left: 8px;
     margin-right: 16px;
-    margin-top: 2px;
+    /*margin-top: 2px;*/
     color: var(--color-light);
     line-height: 32px;
     text-align: -webkit-left;
@@ -959,6 +987,17 @@ a:hover {
     color: var(--color-light);
     font-family:  var(--main-font-name-it);
     opacity: 0.5;
+}
+
+.list_deck_last {
+    -webkit-user-select: none;
+    margin-left: 14px;
+    margin-right: 18px;
+    line-height: 32px;
+    font-family: var(--sub-font-name);
+    color: var(--color-light);
+    font-weight: 300;
+    text-align: right;
 }
 
 .list_deck_winrate {

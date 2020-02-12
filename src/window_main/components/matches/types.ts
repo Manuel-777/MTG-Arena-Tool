@@ -27,6 +27,7 @@ export interface MatchTableData extends SerializedMatch, TableData {
   isOnPlay: boolean;
   leaderboardPlace?: number;
   losses: number;
+  oppArenaId: string;
   oppArchetype: string;
   oppColors: number[];
   oppColorSortVal: string;
@@ -47,7 +48,7 @@ export interface MatchesTableProps {
   addTagCallback: (id: string, tag: string) => void;
   aggFilters: AggregatorFilters;
   archiveCallback: (id: string | number) => void;
-  cachedState: TableState<MatchTableData>;
+  cachedState?: TableState<MatchTableData>;
   cachedTableMode: string;
   data: MatchTableData[];
   deleteTagCallback: (id: string, tag: string) => void;
@@ -68,12 +69,11 @@ export interface MatchesTableControlsProps
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
 }
 
-export interface MatchesTableRowProps
-  extends TableViewRowProps<MatchTableData> {
+export interface ListItemMatchProps {
   tags: TagCounts;
+  match: SerializedMatch;
   openMatchCallback: (matchId: string | number) => void;
-  archiveCallback: (id: string | number) => void;
-  addTagCallback: (id: string, tag: string) => void;
-  editTagCallback: (tag: string, color: string) => void;
-  deleteTagCallback: (id: string, tag: string) => void;
+  addTagCallback?: (id: string, tag: string) => void;
+  editTagCallback?: (tag: string, color: string) => void;
+  deleteTagCallback?: (id: string, tag: string) => void;
 }

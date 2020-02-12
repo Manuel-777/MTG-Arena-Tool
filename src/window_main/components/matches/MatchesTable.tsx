@@ -10,7 +10,8 @@ import {
   MetricCell,
   PercentCell,
   RelativeTimeCell,
-  ShortTextCell
+  ShortTextCell,
+  SubTextCell
 } from "../tables/cells";
 import {
   ArchiveColumnFilter,
@@ -31,7 +32,7 @@ import {
   RankColumnFilter,
   rankFilterFn
 } from "./filters";
-import MatchesListViewRow from "./MatchesListViewRow";
+import ListItemMatch from "../list-item/ListItemMatch";
 import MatchesTableControls from "./MatchesTableControls";
 import {
   MatchesTableControlsProps,
@@ -68,8 +69,8 @@ const columns: Column<MatchTableData>[] = [
     disableFilters: false,
     filter: "fuzzyText",
     Filter: TextBoxFilter,
-    Cell: ShortTextCell,
-    gridWidth: "200px",
+    Cell: SubTextCell,
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -141,7 +142,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -165,9 +166,19 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     Filter: TextBoxFilter,
     Cell: ShortTextCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
+  },
+  {
+    Header: "Op. ID",
+    accessor: "oppArenaId",
+    disableFilters: false,
+    filter: "fuzzyText",
+    Filter: TextBoxFilter,
+    Cell: SubTextCell,
+    gridWidth: "210px",
+    mayToggle: true
   },
   {
     Header: "Op. Rank",
@@ -226,7 +237,7 @@ const columns: Column<MatchTableData>[] = [
     filter: "fuzzyText",
     disableSortBy: true,
     Cell: ArchetypeCell,
-    gridWidth: "200px",
+    gridWidth: "210px",
     mayToggle: true,
     defaultVisible: true
   },
@@ -371,11 +382,9 @@ export default function MatchesTable({
               );
             }
             return (
-              <MatchesListViewRow
-                row={row}
-                index={index}
+              <ListItemMatch
+                match={row.original}
                 key={row.index}
-                gridTemplateColumns={gridTemplateColumns}
                 openMatchCallback={openMatchCallback}
                 {...customProps}
               />

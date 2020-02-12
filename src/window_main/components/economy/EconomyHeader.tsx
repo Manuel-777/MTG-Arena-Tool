@@ -23,7 +23,7 @@ export function EconomyHeader(): JSX.Element {
       <EconomyValueRecord
         title={"Boosters"}
         iconClassName={"economy_wc_med wc_booster economyIconMargin"}
-        deltaContent={total}
+        deltaContent={formatNumber(total)}
       />
       <EconomyValueRecord
         title={"Vault"}
@@ -68,7 +68,7 @@ export function EconomyHeader(): JSX.Element {
       <EconomyValueRecord
         title={"Experience"}
         iconClassName={"economy_exp economyIconMargin"}
-        deltaContent={pd.economy.currentExp || 0}
+        deltaContent={formatNumber(pd.economy.currentExp || 0)}
       />
     </>
   );

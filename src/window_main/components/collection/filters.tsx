@@ -43,7 +43,7 @@ export type RarityFilterKeys =
 
 export type RarityFilterValue = { [key in RarityFilterKeys]: boolean };
 
-const defaultRarity: RarityFilterValue = {
+export const defaultRarity: RarityFilterValue = {
   common: true,
   uncommon: true,
   rare: true,
