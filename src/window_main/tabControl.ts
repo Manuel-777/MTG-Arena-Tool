@@ -143,6 +143,10 @@ export function forceOpenSettings(section = -1): void {
     easing: EASING_DEFAULT,
     duration: 350
   });
+  ipcSend("save_user_settings", {
+    last_open_tab: MAIN_SETTINGS,
+    skipRefresh: true
+  });
   openSettingsTab(section, 0);
   updateTopBar();
 }
