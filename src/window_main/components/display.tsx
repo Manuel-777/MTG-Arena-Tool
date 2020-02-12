@@ -2,9 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { MANA } from "../../shared/constants";
 import db from "../../shared/database";
-import { createDiv } from "../../shared/dom-fns";
 import { get_rank_index_16 as getRankIndex16 } from "../../shared/util";
-import mountReactComponent from "../mountReactComponent";
 import { getTagColor, showColorpicker } from "../renderer-util";
 import AutosuggestInput from "./tables/AutosuggestInput";
 import { TagCounts } from "./tables/types";
@@ -251,17 +249,6 @@ export function TagBubble({
   );
 }
 
-export function renderTagBubble(
-  parent: Element,
-  props: TagBubbleProps
-): HTMLDivElement {
-  const container = createDiv([]);
-  container.style.alignSelf = "center";
-  mountReactComponent(<TagBubble {...props} />, container);
-  parent.appendChild(container);
-  return container;
-}
-
 interface NewTagProps {
   parentId: string;
   addTagCallback: (id: string, tag: string) => void;
@@ -293,17 +280,6 @@ export function NewTag({
       />
     </TagBubbleDiv>
   );
-}
-
-export function renderNewTag(
-  parent: Element,
-  props: NewTagProps
-): HTMLDivElement {
-  const container = createDiv([]);
-  container.style.alignSelf = "center";
-  mountReactComponent(<NewTag {...props} />, container);
-  parent.appendChild(container);
-  return container;
 }
 
 const ManaSymbolBase = styled.div.attrs<ManaSymbolProps>(props => ({

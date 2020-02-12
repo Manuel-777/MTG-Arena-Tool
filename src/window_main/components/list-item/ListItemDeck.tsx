@@ -5,11 +5,10 @@ import ManaCost from "../ManaCost";
 import {
   formatPercent,
   formatWinrateInterval,
-  getWinrateClass,
-  toggleArchived
+  getWinrateClass
 } from "../../renderer-util";
 import format from "date-fns/format";
-import { TagBubble } from "../display";
+import { NewTag, TagBubble } from "../display";
 import WildcardsCost from "../WildcardsCost";
 import {
   ListItem,
@@ -22,7 +21,10 @@ import {
 
 export function ListItemDeck({
   row,
+  tags,
+  archiveCallback,
   openDeckCallback,
+  addTagCallback,
   editTagCallback,
   deleteTagCallback
 }: DecksTableRowProps): JSX.Element {
@@ -72,6 +74,20 @@ export function ListItemDeck({
       )} winrate since ${format(new Date(deck.lastUpdated || 0), "Pp")}`;
     }
   }
+  const formatProps = {
+    parentId,
+    tag: deck.format ?? "unknown",
+    editTagCallback,
+    fontStyle: "italic",
+    hideCloseButton: true
+  };
+  const newTagProps = {
+    parentId,
+    addTagCallback,
+    tagPrompt: "Add",
+    tags,
+    title: "Add custom deck tag"
+  };
 
   return (
     <ListItem
@@ -89,20 +105,17 @@ export function ListItemDeck({
 
       <Column class="list_item_center">
         <FlexTop innerClass="deck_tags_container">
-          {[...(deck.tags ? deck.tags : []), deck.format || ""].map(
-            (tag: string) => {
-              return (
-                <TagBubble
-                  hideCloseButton
-                  key={tag}
-                  tag={tag}
-                  parentId={deck.id || ""}
-                  editTagCallback={editTagCallback}
-                  deleteTagCallback={deleteTagCallback}
-                ></TagBubble>
-              );
-            }
-          )}
+          <TagBubble {...formatProps} />
+          {deck.tags?.map((tag: string) => {
+            const tagProps = {
+              parentId,
+              tag,
+              editTagCallback,
+              deleteTagCallback
+            };
+            return <TagBubble key={tag} {...tagProps} />;
+          })}
+          <NewTag {...newTagProps} />
         </FlexTop>
         <FlexBottom innerClass="list_deck_last">
           updated/played:{" "}
@@ -143,12 +156,14 @@ export function ListItemDeck({
           <WildcardsCost deck={deck} />
         )}
       </Column>
-      <ArchiveButton
-        archiveCallback={toggleArchived}
-        dataId={deck.id || ""}
-        hover={hover}
-        isArchived={deck.archived || false}
-      />
+      {!!deck.custom && (
+        <ArchiveButton
+          archiveCallback={archiveCallback}
+          dataId={deck.id || ""}
+          hover={hover}
+          isArchived={deck.archived || false}
+        />
+      )}
     </ListItem>
   );
 }
