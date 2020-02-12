@@ -5,8 +5,7 @@ import ManaCost from "../ManaCost";
 import {
   formatPercent,
   formatWinrateInterval,
-  getWinrateClass,
-  toggleArchived
+  getWinrateClass
 } from "../../renderer-util";
 import format from "date-fns/format";
 import { NewTag, TagBubble } from "../display";
@@ -23,6 +22,7 @@ import {
 export function ListItemDeck({
   row,
   tags,
+  archiveCallback,
   openDeckCallback,
   addTagCallback,
   editTagCallback,
@@ -158,7 +158,7 @@ export function ListItemDeck({
       </Column>
       {!!deck.custom && (
         <ArchiveButton
-          archiveCallback={toggleArchived}
+          archiveCallback={archiveCallback}
           dataId={deck.id || ""}
           hover={hover}
           isArchived={deck.archived || false}
