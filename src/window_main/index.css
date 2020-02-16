@@ -3698,7 +3698,8 @@ a:hover {
     font-size: 16px;
     color: var(--color-light);
     line-height: 32px;
-    max-width: calc(100% - 64px);
+    margin-left: 16px;
+    max-width: calc(100% - 80px);
 }
 
 .shortcuts_line {

@@ -24,6 +24,7 @@ import SectionBehaviour from "./components/settings/SectionBehaviour";
 import SectionData from "./components/settings/SectionData";
 import SectionOverlay from "./components/settings/SectionOverlay";
 import SectionVisual from "./components/settings/SectionVisual";
+import SectionShortcuts from "./components/settings/SectionShortcuts";
 
 interface SettingsNavProps {
   component: () => JSX.Element;
@@ -48,10 +49,6 @@ function SettingsNav(props: SettingsNavProps): JSX.Element {
       {props.title}
     </div>
   );
-}
-
-function SectionShortcuts(): JSX.Element {
-  return <></>;
 }
 
 function SectionPrivacy(): JSX.Element {
