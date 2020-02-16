@@ -137,17 +137,10 @@ modeHelp[OVERLAY_LOG] =
 modeHelp[OVERLAY_DRAFT_BREW] =
   "Shows your partially complete draft brew (all previous picks). Usually only shown during a draft.";
 
-function alphaFromTransparency(transparency: number): number {
-  return 1 - transparency / 100;
-}
-
-function transparencyFromAlpha(alpha: number): number {
-  return Math.round((1 - alpha) * 100);
-}
-
 interface SectionProps {
   current: number;
   settings: any;
+  show: boolean;
 }
 
 function saveOverlaySettings(current: number, value: any, key: string): void {
@@ -166,12 +159,12 @@ function setOverlayMode(current: number, filter: string): void {
 }
 
 function OverlaySettingsSection(props: SectionProps): JSX.Element {
-  const { settings, current } = props;
+  const { settings, current, show } = props;
   const [overlayAlpha, setOverlayAlpha] = React.useState(0);
 
   const overlayAlphaDebouce = React.useCallback(
     _.debounce((value: number) => {
-      saveOverlaySettings(current, alphaFromTransparency(value), "alpha");
+      saveOverlaySettings(current, value, "alpha");
     }, 1000),
     []
   );
@@ -185,8 +178,15 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
     setOverlayAlpha(settings ? settings.alpha : 0);
   }, [settings]);
 
-  return settings ? (
+  return show ? (
     <>
+      <Checkbox
+        text={"Enable overlay " + (current + 1)}
+        value={settings.show}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "show")
+        }
+      />
       <label className="but_container_label">
         Mode: ({modeOptions[settings.mode]})
         <ReactSelect
@@ -313,14 +313,14 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
       />
       <div className="slidecontainer_settings">
         <label style={{ width: "400px" }} className="card_size_container">
-          {`Elements transparency: ${transparencyFromAlpha(overlayAlpha)}%`}
+          {`Elements transparency: ${Math.round(overlayAlpha * 100)}%`}
         </label>
         <Slider
           key={current + "-o-slider"}
           min={0}
-          max={100}
-          step={5}
-          value={transparencyFromAlpha(overlayAlpha)}
+          max={1}
+          step={0.05}
+          value={overlayAlpha}
           onChange={overlayAlphaHandler}
         />
       </div>
@@ -458,10 +458,16 @@ export default function SectionOverlay(): JSX.Element {
 
       <OverlaysTopNav current={currentOverlay} setCurrent={setCurrentOverlay} />
       <div className="overlay_section">
-        <OverlaySettingsSection
-          current={currentOverlay}
-          settings={currentOverlaySettings}
-        />
+        {pd.settings.overlays.map((settings: any, index: number) => {
+          return (
+            <OverlaySettingsSection
+              show={index == currentOverlay}
+              key={"overlay-settings-section-" + index}
+              current={index}
+              settings={settings}
+            />
+          );
+        })}
       </div>
     </>
   );

@@ -49,7 +49,6 @@ function SettingsNav(props: SettingsNavProps): JSX.Element {
   );
 }
 
-
 function SectionVisual(): JSX.Element {
   return <></>;
 }

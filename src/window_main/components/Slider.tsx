@@ -15,7 +15,7 @@ export default function Slider(props: SliderProps): JSX.Element {
   const min = props.min || 0;
   const max = props.max || 10;
   const step = props.step || 1;
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(props.value);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const val = parseFloat(e.currentTarget.value);
@@ -36,9 +36,7 @@ export default function Slider(props: SliderProps): JSX.Element {
   const stepsNumber = (max - min) / step;
 
   React.useEffect(() => {
-    if (props.value) {
-      setValue(props.value);
-    }
+    setValue(props.value);
   }, [props.value]);
 
   return (
@@ -57,7 +55,7 @@ export default function Slider(props: SliderProps): JSX.Element {
         {" "
           .repeat(stepsNumber + 1)
           .split("")
-          // just a hack to get an array of length N to amp as marks
+          // just a hack to get an array of length N to map as marks
           .map((c: string, i: number) => {
             return <div key={i} className="slider_mark_hor" />;
           })}
