@@ -146,27 +146,32 @@ function transparencyFromAlpha(alpha: number): number {
 }
 
 interface SectionProps {
-  settings: any;
   current: number;
+  settings: any;
+}
+
+function saveOverlaySettings(current: number, value: any, key: string): void {
+  const send: any = {
+    index: current
+  };
+  send[key] = value;
+  ipcSend("save_overlay_settings", send);
+}
+
+function setOverlayMode(current: number, filter: string): void {
+  ipcSend("save_overlay_settings", {
+    index: current,
+    mode: modeOptions.indexOf(filter)
+  });
 }
 
 function OverlaySettingsSection(props: SectionProps): JSX.Element {
-  const { current, settings } = props;
-
-  const [overlayAlpha, setOverlayAlpha] = React.useState(
-    settings ? settings.alpha : 0
-  );
+  const { settings, current } = props;
+  const [overlayAlpha, setOverlayAlpha] = React.useState(0);
 
   const overlayAlphaDebouce = React.useCallback(
     _.debounce((value: number) => {
-      const { Howl, Howler } = require("howler");
-      const sound = new Howl({ src: ["../sounds/blip.mp3"] });
-      Howler.volume(value);
-      sound.play();
-
-      ipcSend("save_user_settings", {
-        sound_priority_volume: value
-      });
+      saveOverlaySettings(current, alphaFromTransparency(value), "alpha");
     }, 1000),
     []
   );
@@ -176,99 +181,19 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
     overlayAlphaDebouce(value);
   };
 
-  function setOverlayMode(filter: string): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      mode: modeOptions.indexOf(filter)
-    });
-  }
-
-  function overlayShowAlways(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      show_always: val
-    });
-  }
-
-  function overlayShowTop(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      top: val
-    });
-  }
-
-  function overlayShowTitle(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      title: val
-    });
-  }
-
-  function overlayShowDeck(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      deck: val
-    });
-  }
-
-  function overlayShowSideboard(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      sideboard: val
-    });
-  }
-
-  function overlayShowLands(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      lands: val
-    });
-  }
-
-  function overlayShowClock(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      clock: val
-    });
-  }
-
-  function overlayShowOdds(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      draw_odds: val
-    });
-  }
-
-  function overlayShowHoverCards(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      cards_overlay: val
-    });
-  }
-
-  function overlayShowTypeCounts(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      type_counts: val
-    });
-  }
-
-  function overlayShowManaCurve(val: boolean): void {
-    ipcSend("save_overlay_settings", {
-      current,
-      mana_curve: val
-    });
-  }
+  React.useEffect(() => {
+    setOverlayAlpha(settings ? settings.alpha : 0);
+  }, [settings]);
 
   return settings ? (
     <>
       <label className="but_container_label">
-        Mode:
+        Mode: ({modeOptions[settings.mode]})
         <ReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={modeOptions}
           current={modeOptions[settings.mode]}
-          callback={setOverlayMode}
+          callback={(filter: string): void => setOverlayMode(current, filter)}
         />
       </label>
       <div className="settings_note">
@@ -279,7 +204,9 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
       <Checkbox
         text={"Always show overlay"}
         value={settings.show_always}
-        callback={overlayShowAlways}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "show_always")
+        }
       />
       <div className="settings_note" style={{ paddingLeft: "35px" }}>
         <p>
@@ -294,24 +221,32 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
       <Checkbox
         text={"Show top bar"}
         value={settings.top}
-        callback={overlayShowTop}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "top")
+        }
       />
       <Checkbox
         text={"Show title"}
         value={settings.title}
-        callback={overlayShowTitle}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "title")
+        }
         disabled={settings.mode === OVERLAY_DRAFT}
       />
       <Checkbox
         text={"Show deck/lists"}
         value={settings.deck}
-        callback={overlayShowDeck}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "deck")
+        }
         disabled={settings.mode === OVERLAY_DRAFT}
       />
       <Checkbox
         text={"Show sideboard"}
         value={settings.sideboard}
-        callback={overlayShowSideboard}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "sideboard")
+        }
         disabled={
           ![OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_ODDS, OVERLAY_MIXED].includes(
             settings.mode
@@ -321,7 +256,9 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
       <Checkbox
         text={"Compact lands"}
         value={settings.lands}
-        callback={overlayShowLands}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "lands")
+        }
         disabled={
           ![OVERLAY_FULL, OVERLAY_LEFT, OVERLAY_ODDS, OVERLAY_MIXED].includes(
             settings.mode
@@ -331,13 +268,17 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
       <Checkbox
         text={"Show clock"}
         value={settings.clock}
-        callback={overlayShowClock}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "clock")
+        }
         disabled={OVERLAY_DRAFT_MODES.includes(settings.mode)}
       />
       <Checkbox
         text={"Show odds"}
         value={settings.draw_odds}
-        callback={overlayShowOdds}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "draw_odds")
+        }
         disabled={[
           OVERLAY_FULL,
           OVERLAY_LEFT,
@@ -350,30 +291,37 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
       <Checkbox
         text={"Show hover cards"}
         value={settings.cards_overlay}
-        callback={overlayShowHoverCards}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "cards_overlay")
+        }
       />
       <Checkbox
         text={"Show type counts"}
         value={settings.type_counts}
-        callback={overlayShowTypeCounts}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "type_counts")
+        }
         disabled={[OVERLAY_LOG, OVERLAY_DRAFT].includes(settings.mode)}
       />
       <Checkbox
         text={"Show mana curve"}
         value={settings.mana_curve}
-        callback={overlayShowManaCurve}
+        callback={(val: boolean): void =>
+          saveOverlaySettings(current, val, "mana_curve")
+        }
         disabled={[OVERLAY_LOG, OVERLAY_DRAFT].includes(settings.mode)}
       />
       <div className="slidecontainer_settings">
         <label style={{ width: "400px" }} className="card_size_container">
-          {`Elements transparency: ${alphaFromTransparency(overlayAlpha)}%`}
+          {`Elements transparency: ${transparencyFromAlpha(overlayAlpha)}%`}
         </label>
         <Slider
+          key={current + "-o-slider"}
           min={0}
           max={100}
           step={5}
-          value={alphaFromTransparency(settings.alpha)}
-          onInput={overlayAlphaHandler}
+          value={transparencyFromAlpha(overlayAlpha)}
+          onChange={overlayAlphaHandler}
         />
       </div>
     </>
@@ -382,8 +330,15 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
   );
 }
 
+function getOverlaySettings(index: number): any {
+  return pd.settings.overlays.filter((s: any, i: number) => i == index)[0];
+}
+
 export default function SectionOverlay(): JSX.Element {
   const [currentOverlay, setCurrentOverlay] = React.useState(0);
+  const [currentOverlaySettings, setCurrentOverlaySettings] = React.useState(
+    null
+  );
   const [overlayScale, setOverlayScale] = React.useState(
     pd.settings.overlay_scale
   );
@@ -433,6 +388,12 @@ export default function SectionOverlay(): JSX.Element {
     overlayVolumeDebouce(value);
   };
 
+  React.useEffect(() => {
+    setCurrentOverlaySettings(getOverlaySettings(currentOverlay));
+  }, [currentOverlay]);
+
+  React.useEffect(() => {}, [currentOverlaySettings]);
+
   return (
     <>
       <Button onClick={toggleEditMode} text="Edit Overlay Positions" />
@@ -446,7 +407,7 @@ export default function SectionOverlay(): JSX.Element {
           max={200}
           step={10}
           value={pd.settings.overlay_scale}
-          onInput={overlayScaleHandler}
+          onChange={overlayScaleHandler}
         />
       </div>
 
@@ -486,7 +447,7 @@ export default function SectionOverlay(): JSX.Element {
           max={1}
           step={0.05}
           value={pd.settings.sound_priority_volume}
-          onInput={overlayVolumeHandler}
+          onChange={overlayVolumeHandler}
         />
       </div>
 
@@ -497,17 +458,10 @@ export default function SectionOverlay(): JSX.Element {
 
       <OverlaysTopNav current={currentOverlay} setCurrent={setCurrentOverlay} />
       <div className="overlay_section">
-        {pd.settings.overlays.map((settings: any, index: number) => {
-          if (index == currentOverlay) {
-            return (
-              <OverlaySettingsSection
-                key={index}
-                settings={settings}
-                current={currentOverlay}
-              />
-            );
-          }
-        })}
+        <OverlaySettingsSection
+          current={currentOverlay}
+          settings={currentOverlaySettings}
+        />
       </div>
     </>
   );

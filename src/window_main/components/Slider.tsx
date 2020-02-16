@@ -6,7 +6,7 @@ interface SliderProps {
   max?: number;
   step?: number;
   value?: number;
-  onChange?: (value: number) => void;
+  onChange: (value: number) => void;
   onInput?: (value: number) => void;
 }
 
@@ -15,7 +15,7 @@ export default function Slider(props: SliderProps): JSX.Element {
   const min = props.min || 0;
   const max = props.max || 10;
   const step = props.step || 1;
-  const [value, setValue] = useState(props.value);
+  const [value, setValue] = useState(0);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const val = parseFloat(e.currentTarget.value);
@@ -34,6 +34,12 @@ export default function Slider(props: SliderProps): JSX.Element {
   };
 
   const stepsNumber = (max - min) / step;
+
+  React.useEffect(() => {
+    if (props.value) {
+      setValue(props.value);
+    }
+  }, [props.value]);
 
   return (
     <div className="slidecontainer">
