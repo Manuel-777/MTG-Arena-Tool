@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import Button from "../Button";
-import { ipcSend, showColorpicker } from "../../renderer-util";
+import { ipcSend } from "../../renderer-util";
 import pd from "../../../shared/player-data";
 import Checkbox from "../Checkbox";
 import Slider from "../Slider";
@@ -19,6 +19,7 @@ import {
   OVERLAY_DRAFT_MODES
 } from "../../../shared/constants";
 import { ReactSelect } from "../../../shared/ReactSelect";
+import useColorpicker from "../../hooks/useColorPicker";
 
 function toggleEditMode(): void {
   ipcSend("toggle_edit_mode");
@@ -26,38 +27,6 @@ function toggleEditMode(): void {
 
 function backgroundColorPicker(color: string): void {
   ipcSend("save_user_settings", { overlay_back_color: color });
-}
-
-// taken from Display.ts
-// the difference is this one does not use tag as a
-// prop and has a reusable callback.
-// Should probably add ../../hooks directory for these?
-function useColorpicker(
-  containerRef: React.MutableRefObject<HTMLElement | null>,
-  backgroundColor: string,
-  editCallback: (color: string) => void,
-  pickerOptions?: any
-): (e: React.MouseEvent) => void {
-  return (e): void => {
-    e.stopPropagation();
-    showColorpicker(
-      backgroundColor,
-      (color: { rgbString: string }) => {
-        const container = containerRef.current;
-        if (container) {
-          container.style.backgroundColor = color.rgbString;
-        }
-      },
-      (color: { rgbString: string }) => editCallback(color.rgbString),
-      () => {
-        const container = containerRef.current;
-        if (container) {
-          container.style.backgroundColor = backgroundColor;
-        }
-      },
-      pickerOptions || {}
-    );
-  };
 }
 
 function setAlwaysOnTop(checked: boolean): void {

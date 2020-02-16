@@ -23,6 +23,7 @@ import mountReactComponent from "./mountReactComponent";
 import SectionBehaviour from "./components/settings/SectionBehaviour";
 import SectionData from "./components/settings/SectionData";
 import SectionOverlay from "./components/settings/SectionOverlay";
+import SectionVisual from "./components/settings/SectionVisual";
 
 interface SettingsNavProps {
   component: () => JSX.Element;
@@ -47,10 +48,6 @@ function SettingsNav(props: SettingsNavProps): JSX.Element {
       {props.title}
     </div>
   );
-}
-
-function SectionVisual(): JSX.Element {
-  return <></>;
 }
 
 function SectionShortcuts(): JSX.Element {
