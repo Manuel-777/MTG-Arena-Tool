@@ -17,6 +17,8 @@ function setCardStyle(style: string): void {
   ipcSend("save_user_settings", { card_tile_style: style });
 }
 
+const card = db.card(67518);
+
 export default function SectionVisual(): JSX.Element {
   return (
     <>
@@ -30,15 +32,19 @@ export default function SectionVisual(): JSX.Element {
           callback={setCardStyle}
         />
         <div style={{ width: "auto" }}>
-          <CardTile
-            card={db.card(67518)}
-            indent="a"
-            isHighlighted={false}
-            isSideboard={false}
-            quantity={4}
-            showWildcards={false}
-            style={pd.settings.card_tile_style}
-          />
+          {card ? (
+            <CardTile
+              card={card}
+              indent="a"
+              isHighlighted={false}
+              isSideboard={false}
+              quantity={4}
+              showWildcards={false}
+              style={pd.settings.card_tile_style}
+            />
+          ) : (
+            <></>
+          )}
         </div>
       </label>
     </>
