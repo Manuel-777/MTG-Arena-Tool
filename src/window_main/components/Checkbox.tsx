@@ -1,7 +1,7 @@
 import React from "react";
 
 interface CheckboxProps {
-  text: string;
+  text: string | JSX.Element;
   value: boolean;
   callback: (value: boolean) => void;
   disabled?: boolean;
