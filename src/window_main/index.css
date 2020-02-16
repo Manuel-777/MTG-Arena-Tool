@@ -134,26 +134,33 @@ time, local-time, relative-time {
 }
 
 .donate_link {
+    background-image: url('../images/button_paypal.png');
     background-color: white;
     padding: 12px;
-    border-radius: 4px;
+    border-radius: 2px;
     cursor: pointer;
     width: 100px;
     height: 26px;
     margin: auto 12px auto auto;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .patreon_link {
+    background-image: url('../images/button_patreon.png');
     cursor: pointer;
     width: 217px;
     height: 51px;
+    border-radius: 2px;
     margin: auto auto auto 12px;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .twitter_link {
     cursor: pointer;
     align-self: center;
-    margin: auto 32px;
+    margin: auto 16px;
     width: 32px;
     height: 32px;
     background: url(../images/twitter_logo.png) no-repeat center;
@@ -163,7 +170,7 @@ time, local-time, relative-time {
 .discord_link {
     cursor: pointer;
     align-self: center;
-    margin: auto 32px;
+    margin: auto 16px;
     width: 32px;
     height: 32px;
     background: url(../images/discord_logo.png) no-repeat center;
@@ -173,7 +180,7 @@ time, local-time, relative-time {
 .git_link {
     cursor: pointer;
     align-self: center;
-    margin: auto 32px;
+    margin: auto 16px;
     width: 32px;
     height: 32px;
     background: url(../images/github_logo.png) no-repeat center;
@@ -801,7 +808,6 @@ font-family:  var(--main-font-name);
 
 .about {
     width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;

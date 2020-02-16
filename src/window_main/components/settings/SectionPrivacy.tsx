@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import Checkbox from "../Checkbox";
-import Input from "../Input";
 import pd from "../../../shared/player-data";
 import { ipcSend } from "../../renderer-util";
 import Button from "../Button";
