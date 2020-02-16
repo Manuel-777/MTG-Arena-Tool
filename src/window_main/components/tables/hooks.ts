@@ -82,6 +82,24 @@ export function useLegacyRenderer(
   return containerRef;
 }
 
+export function useBlurOnEnter(): [
+  React.RefObject<HTMLInputElement>,
+  (e: React.KeyboardEvent<HTMLInputElement>) => void
+] {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const onKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>): void => {
+      if (inputRef?.current) {
+        if (e.keyCode === 13) {
+          inputRef.current.blur();
+        }
+      }
+    },
+    [inputRef]
+  );
+  return [inputRef, onKeyDown];
+}
+
 export function useLastScrollTop(): [
   React.RefObject<HTMLDivElement>,
   () => void

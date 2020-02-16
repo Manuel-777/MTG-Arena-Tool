@@ -18,7 +18,6 @@ export interface CollectionTableProps {
   contextMenuCallback: (cardDiv: HTMLElement, card: DbCardData) => void;
   data: CardsData[];
   exportCallback: (cardIds: string[]) => void;
-  filterDataCallback: (data: CardsData[]) => void;
   openCardCallback: (cardObj: DbCardData) => void;
   tableModeCallback: (tableMode: string) => void;
   tableStateCallback: (state: TableState<CardsData>) => void;
