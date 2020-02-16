@@ -85,6 +85,9 @@ function OverlaysTopNav(props: OverlaysTopNavProps): JSX.Element {
         return (
           <div
             onClick={(): void => {
+              ipcSend("save_app_settings_nosync", {
+                last_settings_overlay_section: id
+              });
               props.setCurrent(id);
             }}
             key={id}
@@ -161,7 +164,9 @@ function setOverlayMode(current: number, filter: string): void {
 function OverlaySettingsSection(props: SectionProps): JSX.Element {
   const { settings, current, show } = props;
   const [overlayAlpha, setOverlayAlpha] = React.useState(0);
+  const [overlayAlphaBack, setOverlayAlphaBack] = React.useState(0);
 
+  // Alpha
   const overlayAlphaDebouce = React.useCallback(
     _.debounce((value: number) => {
       saveOverlaySettings(current, value, "alpha");
@@ -174,8 +179,22 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
     overlayAlphaDebouce(value);
   };
 
+  // Alpha Background
+  const overlayAlphaBackDebouce = React.useCallback(
+    _.debounce((value: number) => {
+      saveOverlaySettings(current, value, "alpha_back");
+    }, 1000),
+    []
+  );
+
+  const overlayAlphaBackHandler = (value: number): void => {
+    setOverlayAlphaBack(value);
+    overlayAlphaBackDebouce(value);
+  };
+
   React.useEffect(() => {
     setOverlayAlpha(settings ? settings.alpha : 0);
+    setOverlayAlphaBack(settings ? settings.alpha_back : 0);
   }, [settings]);
 
   return show ? (
@@ -188,7 +207,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         }
       />
       <label className="but_container_label">
-        Mode: ({modeOptions[settings.mode]})
+        Mode:
         <ReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={modeOptions}
@@ -316,7 +335,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           {`Elements transparency: ${Math.round(overlayAlpha * 100)}%`}
         </label>
         <Slider
-          key={current + "-o-slider"}
+          key={current + "-overlay-alpha-slider"}
           min={0}
           max={1}
           step={0.05}
@@ -324,6 +343,31 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           onChange={overlayAlphaHandler}
         />
       </div>
+      <div className="slidecontainer_settings">
+        <label style={{ width: "400px" }} className="card_size_container">
+          {`background transparency: ${Math.round(overlayAlphaBack * 100)}%`}
+        </label>
+        <Slider
+          key={current + "-overlay-alpha-back-slider"}
+          min={0}
+          max={1}
+          step={0.05}
+          value={overlayAlphaBack}
+          onChange={overlayAlphaBackHandler}
+        />
+      </div>
+      <Button
+        text="Reset Position"
+        onClick={(): void =>
+          saveOverlaySettings(
+            current,
+            {
+              ...pd.defaultCfg.settings.overlays[0].bounds
+            },
+            "bounds"
+          )
+        }
+      />
     </>
   ) : (
     <></>
@@ -335,7 +379,9 @@ function getOverlaySettings(index: number): any {
 }
 
 export default function SectionOverlay(): JSX.Element {
-  const [currentOverlay, setCurrentOverlay] = React.useState(0);
+  const [currentOverlay, setCurrentOverlay] = React.useState(
+    pd.settings.last_settings_overlay_section
+  );
   const [currentOverlaySettings, setCurrentOverlaySettings] = React.useState(
     null
   );

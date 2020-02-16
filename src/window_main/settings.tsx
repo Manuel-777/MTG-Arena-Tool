@@ -176,3 +176,9 @@ export function openSettingsTab(
   mainDiv.classList.add("flex_item");
   mountReactComponent(<Settings openSection={openSection} />, mainDiv);
 }
+
+export function setCurrentOverlaySettings(current: number): void {
+  ipcSend("save_app_settings_nosync", {
+    last_settings_overlay_section: current
+  });
+}

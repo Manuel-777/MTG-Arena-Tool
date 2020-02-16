@@ -67,6 +67,7 @@ const defaultCfg = {
   cardsNew: {},
   settings: {
     last_settings_section: 1,
+    last_settings_overlay_section: 0,
     sound_priority: false,
     sound_priority_volume: 1,
     cards_quality: "small",
@@ -296,6 +297,8 @@ class PlayerData {
     this.handleSetData = this.handleSetData.bind(this);
     if (ipc) ipc.on("set_player_data", this.handleSetData);
 
+    // This is to make TS happy, not sure if it breaks the defaultCfg assignment?
+    this.defaultCfg = defaultCfg;
     this.appDbPath = "";
     this.playerDbPath = "";
     this.last_log_timestamp = null;
