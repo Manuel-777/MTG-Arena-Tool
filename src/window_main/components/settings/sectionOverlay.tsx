@@ -80,7 +80,7 @@ interface OverlaysTopNavProps {
 function OverlaysTopNav(props: OverlaysTopNavProps): JSX.Element {
   const overlays = [0, 1, 2, 3, 4];
   return (
-    <div className="top_nav_icons">
+    <div className="overlay_section_selector_cont top_nav_icons">
       {overlays.map((id: number) => {
         return (
           <div
@@ -215,7 +215,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           callback={(filter: string): void => setOverlayMode(current, filter)}
         />
       </label>
-      <div className="settings_note">
+      <div className="settings_note" style={{ paddingLeft: "35px" }}>
         <p>
           <i>{modeHelp[settings.mode]}</i>
         </p>
