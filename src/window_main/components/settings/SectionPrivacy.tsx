@@ -17,7 +17,7 @@ function clickSendData(value: boolean): void {
   });
 }
 
-function eraseData() {
+function eraseData(): void {
   if (
     confirm(
       "This will erase all of your decks and events shared online, are you sure?"
@@ -29,7 +29,7 @@ function eraseData() {
   }
 }
 
-export default function SectionBehaviour(): JSX.Element {
+export default function SectionPrivacy(): JSX.Element {
   return (
     <>
       <Checkbox

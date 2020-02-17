@@ -11,7 +11,7 @@ ipc.on("set_update_state", (event: string, arg: string): void => {
   updateState = arg;
 });
 
-export default function SectionBehaviour(): JSX.Element {
+export default function SectionAbout(): JSX.Element {
   return (
     <div className="about">
       <div
