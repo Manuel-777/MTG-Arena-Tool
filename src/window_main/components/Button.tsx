@@ -4,7 +4,7 @@ interface ButtonProps {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   text: string;
   style?: React.CSSProperties;
-  class?: string
+  className?: string;
 }
 
 export default function Button(props: ButtonProps): JSX.Element {
@@ -12,7 +12,7 @@ export default function Button(props: ButtonProps): JSX.Element {
     <div
       style={props.style || {}}
       onClick={props.onClick}
-      className={props.class || "button_simple centered"}
+      className={props.className ?? "button_simple centered"}
     >
       {props.text}
     </div>
