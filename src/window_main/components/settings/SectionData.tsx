@@ -51,12 +51,15 @@ function getLanguageName(lang: string): string {
 }
 
 function setCardsLanguage(filter: string): void {
-  ipcSend("save_app_settings", { metadata_lang: filter.toLowerCase() });
+  ipcSend("save_app_settings_norefresh", {
+    metadata_lang: filter.toLowerCase()
+  });
 }
 
 function firstPassCallback(checked: boolean): void {
   ipcSend("save_user_settings", {
-    skip_firstpass: checked
+    skip_firstpass: checked,
+    skipRefresh: true
   });
 }
 
@@ -93,7 +96,7 @@ function arenaLogCallback(value: string): void {
 
 function localeCallback(value: string): void {
   if (value !== pd.settings.log_locale_format) {
-    ipcSend("save_app_settings", {
+    ipcSend("save_app_settings_norefresh", {
       log_locale_format: value
     });
   }
@@ -179,7 +182,7 @@ export default function SectionData(): JSX.Element {
         <Input
           ref={arenaLogRef}
           contStyle={{ width: "70%" }}
-          callbackEnter={arenaLogCallback}
+          callback={arenaLogCallback}
           placeholder={pd.settings.logUri}
           value={pd.settings.logUri}
         />
@@ -208,7 +211,7 @@ export default function SectionData(): JSX.Element {
       <label className="but_container_label">
         Log Timestamp Format:
         <Input
-          callbackEnter={localeCallback}
+          callback={localeCallback}
           placeholder={"default (auto)"}
           value={pd.settings.log_locale_format}
         />

@@ -75,7 +75,7 @@ ipc.on("save_app_settings", function(event, arg) {
 });
 
 //
-ipc.on("save_app_settings_nosync", function(event, arg) {
+ipc.on("save_app_settings_norefresh", function(event, arg) {
   appDb.find("", "settings").then(appSettings => {
     appSettings.toolVersion = globals.toolVersion;
     const updated = { ...appSettings, ...arg };

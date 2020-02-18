@@ -6,43 +6,43 @@ import pd from "../../../shared/player-data";
 import { ipcSend } from "../../renderer-util";
 
 function clickBetaChannel(value: boolean): void {
-  ipcSend("save_app_settings", {
+  ipcSend("save_app_settings_norefresh", {
     beta_channel: value
   });
 }
 
 function clickAutoLogin(value: boolean): void {
-  ipcSend("save_app_settings", {
+  ipcSend("save_app_settings_norefresh", {
     auto_login: value
   });
 }
 
 function clickLaunchToTray(value: boolean): void {
-  ipcSend("save_app_settings", {
+  ipcSend("save_app_settings_norefresh", {
     launch_to_tray: value
   });
 }
 
 function clickStartup(value: boolean): void {
-  ipcSend("save_app_settings", {
+  ipcSend("save_app_settings_norefresh", {
     startup: value
   });
 }
 
 function clickCloseOnMatch(value: boolean): void {
-  ipcSend("save_app_settings", {
+  ipcSend("save_app_settings_norefresh", {
     close_on_match: value
   });
 }
 
 function clickCloseToTray(value: boolean): void {
-  ipcSend("save_app_settings", {
+  ipcSend("save_app_settings_norefresh", {
     close_to_tray: value
   });
 }
 
 function changeExportFormat(value: string): void {
-  ipcSend("save_user_settings", {
+  ipcSend("save_app_settings_norefresh", {
     export_format: value
   });
 }
