@@ -118,19 +118,15 @@ export default function SectionVisual(): JSX.Element {
           callback={setCardStyle}
         />
         <div style={{ width: "50%" }}>
-          {card ? (
-            <CardTile
-              card={card}
-              indent="a"
-              isHighlighted={false}
-              isSideboard={false}
-              quantity={4}
-              showWildcards={false}
-              style={pd.settings.card_tile_style}
-            />
-          ) : (
-            <></>
-          )}
+          <CardTile
+            card={card}
+            indent="a"
+            isHighlighted={false}
+            isSideboard={false}
+            quantity={4}
+            showWildcards={false}
+            style={parseInt(pd.settings.card_tile_style)}
+          />
         </div>
       </label>
 
