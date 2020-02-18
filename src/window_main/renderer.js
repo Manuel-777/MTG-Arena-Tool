@@ -199,8 +199,7 @@ ipc.on("settings_updated", function() {
   }
   $$(".main_wrapper")[0].style.backgroundColor = pd.settings.back_color;
   if (pd.settings.last_open_tab === MAIN_SETTINGS) {
-    const ls = getLocalState();
-    openSettingsTab(-1, ls.lastScrollTop);
+    openSettingsTab(-1);
   }
   lastSettings = { ...pd.settings };
 });

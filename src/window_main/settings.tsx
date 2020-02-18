@@ -28,6 +28,7 @@ import SectionShortcuts from "./components/settings/SectionShortcuts";
 import SectionPrivacy from "./components/settings/SectionPrivacy";
 import SectionAbout from "./components/settings/SectionAbout";
 import SectionLogin from "./components/settings/SectionLogin";
+import { useLastScrollTop } from "./components/tables/hooks";
 
 interface SettingsNavProps {
   component: () => JSX.Element;
@@ -64,6 +65,7 @@ interface SettingsProps {
  */
 function Settings(props: SettingsProps): JSX.Element {
   const [currentTab, setCurrentTab] = React.useState(props.openSection);
+  const [containerRef, onScroll] = useLastScrollTop();
 
   const defaultTab = {
     currentTab: currentTab,
@@ -140,7 +142,11 @@ function Settings(props: SettingsProps): JSX.Element {
         <SettingsNav {...tabs[SETTINGS_ABOUT]} />
         <SettingsNav {...tabs[SETTINGS_LOGIN]} />
       </div>
-      <div className="wrapper_column settings_page">
+      <div
+        className="wrapper_column settings_page"
+        ref={containerRef}
+        onScroll={onScroll}
+      >
         <div className="settings_title">{tabs[currentTab].title}</div>
         <CurrentSettings />
       </div>
@@ -149,8 +155,7 @@ function Settings(props: SettingsProps): JSX.Element {
 }
 
 export function openSettingsTab(
-  openSection = pd.settings.last_settings_section,
-  scrollTop = 0
+  openSection = pd.settings.last_settings_section
 ): void {
   if (openSection == -1) {
     openSection = pd.settings.last_settings_section;
