@@ -10,7 +10,10 @@ interface InputProps {
   callbackEnter?: (value: string) => void;
 }
 
-export default function Input(props: InputProps): JSX.Element {
+function InputBase(
+  props: InputProps,
+  ref: React.Ref<HTMLInputElement>
+): JSX.Element {
   const {
     label,
     value,
@@ -37,6 +40,7 @@ export default function Input(props: InputProps): JSX.Element {
     return (
       <div style={contStyle || {}} className="input_container">
         <input
+          ref={ref}
           type="text"
           onKeyUp={keyUpHandler}
           onChange={callbackHandler}
@@ -61,3 +65,7 @@ export default function Input(props: InputProps): JSX.Element {
     </>
   );
 }
+
+// https://reactjs.org/docs/forwarding-refs.html
+const Input = React.forwardRef(InputBase);
+export default Input;

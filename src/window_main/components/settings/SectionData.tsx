@@ -60,11 +60,8 @@ function firstPassCallback(checked: boolean): void {
   });
 }
 
-function arenaLogClick(logUriInput: any): void {
-  // This is hackish, what we want to do is obtain the ref to the input
-  // but the input is a React function component, so we cant do a ref to it.
-  // So we get the parent ref and then DOM to it.
-  logUriInput = logUriInput.getElementsByTagName("INPUT")[0];
+function arenaLogClick(logUriInput: HTMLInputElement): void {
+  // ignore clicks inside actual input field
   if (document.activeElement === logUriInput) return;
   const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
     title: "Arena Log Location",
@@ -124,7 +121,7 @@ function backportClick(): void {
 }
 
 export default function SectionData(): JSX.Element {
-  const arenaLogRef = React.useRef(null);
+  const arenaLogRef = React.useRef<HTMLInputElement>(null);
 
   const arenaLogClickHandle = (): void => {
     if (arenaLogRef.current) {
@@ -176,14 +173,11 @@ export default function SectionData(): JSX.Element {
           <p>Card names when exporting will also be changed.</p>
         </i>
       </div>
-      <label
-        ref={arenaLogRef}
-        className="but_container_label"
-        onClick={arenaLogClickHandle}
-      >
+      <label className="but_container_label" onClick={arenaLogClickHandle}>
         Arena Log:
         <div className="open_button" />
         <Input
+          ref={arenaLogRef}
           contStyle={{ width: "70%" }}
           callbackEnter={arenaLogCallback}
           placeholder={pd.settings.logUri}
