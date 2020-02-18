@@ -6,7 +6,7 @@ import Checkbox from "../Checkbox";
 import Input from "../Input";
 import pd from "../../../shared/player-data";
 import { ipcSend } from "../../renderer-util";
-import { ReactSelect } from "../../../shared/ReactSelect";
+import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
 import Button from "../Button";
 
@@ -159,7 +159,7 @@ export default function SectionData(): JSX.Element {
     <>
       <label className="but_container_label">
         Arena Data
-        <ReactSelect
+        <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={LANGUAGES}
           current={pd.settings.metadata_lang}

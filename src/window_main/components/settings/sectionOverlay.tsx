@@ -18,7 +18,7 @@ import {
   OVERLAY_FULL,
   OVERLAY_DRAFT_MODES
 } from "../../../shared/constants";
-import { ReactSelect } from "../../../shared/ReactSelect";
+import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import useColorpicker from "../../hooks/useColorPicker";
 
 function toggleEditMode(): void {
@@ -182,7 +182,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
       />
       <label className="but_container_label">
         Mode:
-        <ReactSelect
+        <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={modeOptions}
           current={modeOptions[settings.mode]}

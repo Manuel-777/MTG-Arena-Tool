@@ -5,7 +5,6 @@ export interface ReactSelectProps {
   current: string;
   callback: (option: string) => void;
   options: any[];
-  style?: React.CSSProperties;
 }
 
 export function ReactSelect(props: ReactSelectProps): JSX.Element {
@@ -34,7 +33,7 @@ export function ReactSelect(props: ReactSelectProps): JSX.Element {
     "button_reset select_button" + (optionsOpen ? " active" : "");
 
   return (
-    <div className="select_container" style={props.style || {}}>
+    <>
       <button
         key={currentOption}
         className={buttonClassNames}
@@ -60,12 +59,13 @@ export function ReactSelect(props: ReactSelectProps): JSX.Element {
             })}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
 export interface WrappedReactSelectProps extends ReactSelectProps {
-  className: string;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 // This is essentially what createSelect does, but reacty.
@@ -73,9 +73,9 @@ export interface WrappedReactSelectProps extends ReactSelectProps {
 export function WrappedReactSelect(
   props: WrappedReactSelectProps
 ): JSX.Element {
-  const { className, ...other } = props;
+  const { className, style, ...other } = props;
   return (
-    <div className={className}>
+    <div className={"select_container " + className} style={style}>
       <ReactSelect {...other} />
     </div>
   );

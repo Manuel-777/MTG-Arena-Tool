@@ -3,7 +3,7 @@ import React from "react";
 import { ipcSend } from "../../renderer-util";
 import pd from "../../../shared/player-data";
 import _ from "lodash";
-import { ReactSelect } from "../../../shared/ReactSelect";
+import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { CARD_TILE_ARENA, CARD_TILE_FLAT } from "../../../shared/constants";
 import CardTile from "../../../shared/CardTile";
 import db from "../../../shared/database";
@@ -110,7 +110,7 @@ export default function SectionVisual(): JSX.Element {
 
       <label className="but_container_label">
         List style:
-        <ReactSelect
+        <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={[CARD_TILE_ARENA, CARD_TILE_FLAT]}
           current={pd.settings.card_tile_style}
@@ -134,7 +134,7 @@ export default function SectionVisual(): JSX.Element {
 
       <label className="but_container_label">
         Image quality:
-        <ReactSelect
+        <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={["small", "normal", "large"]}
           current={pd.settings.cards_quality}
