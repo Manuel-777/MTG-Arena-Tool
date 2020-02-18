@@ -58,7 +58,8 @@ import {
 import { openHomeTab } from "./home";
 import { tournamentOpen } from "./tournaments";
 import { openDeck } from "./deck-details";
-import { openSettingsTab, setCurrentOverlaySettings } from "./settings";
+import { openSettingsTab } from "./settings";
+import { setCurrentOverlaySettings } from "./components/settings/sectionOverlay";
 import { showOfflineSplash } from "./renderer-util";
 import { setExploreDecks } from "./explore";
 

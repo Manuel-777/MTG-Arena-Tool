@@ -41,6 +41,13 @@ function setSoundPriority(checked: boolean): void {
   });
 }
 
+export function setCurrentOverlaySettings(current: number): void {
+  ipcSend("save_user_settings", {
+    last_settings_overlay_section: current,
+    skipRefresh: true
+  });
+}
+
 interface OverlaysTopNavProps {
   current: number;
   setCurrent: React.Dispatch<React.SetStateAction<number>>;
@@ -54,9 +61,7 @@ function OverlaysTopNav(props: OverlaysTopNavProps): JSX.Element {
         return (
           <div
             onClick={(): void => {
-              ipcSend("save_app_settings_nosync", {
-                last_settings_overlay_section: id
-              });
+              setCurrentOverlaySettings(id);
               props.setCurrent(id);
             }}
             key={id}

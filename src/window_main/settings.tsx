@@ -71,8 +71,9 @@ function Settings(props: SettingsProps): JSX.Element {
   };
 
   React.useEffect(() => {
-    ipcSend("save_app_settings_nosync", {
-      last_settings_section: currentTab
+    ipcSend("save_user_settings", {
+      last_settings_section: currentTab,
+      skipRefresh: true
     });
   }, [currentTab]);
 
@@ -160,10 +161,4 @@ export function openSettingsTab(
   const mainDiv = resetMainContainer() as HTMLElement;
   mainDiv.classList.add("flex_item");
   mountReactComponent(<Settings openSection={openSection} />, mainDiv);
-}
-
-export function setCurrentOverlaySettings(current: number): void {
-  ipcSend("save_app_settings_nosync", {
-    last_settings_overlay_section: current
-  });
 }
