@@ -9,10 +9,12 @@ interface CheckboxProps {
 
 export default function Checkbox(props: CheckboxProps): JSX.Element {
   const { disabled, value, callback } = props;
+  const [currentValue, setCurrentValue] = React.useState(value);
 
   const click = (): void => {
     if (!disabled) {
-      callback(!value);
+      callback(!currentValue);
+      setCurrentValue(!currentValue);
     }
   };
 
@@ -28,7 +30,7 @@ export default function Checkbox(props: CheckboxProps): JSX.Element {
       className={"check_container" + (disabled ? "" : " hover_label")}
     >
       {props.text}
-      <input type="checkbox" checked={value} disabled />
+      <input type="checkbox" checked={currentValue} disabled />
       <span className="checkmark" />
     </label>
   );
