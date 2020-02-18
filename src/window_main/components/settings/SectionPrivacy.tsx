@@ -6,15 +6,11 @@ import { ipcSend } from "../../renderer-util";
 import Button from "../Button";
 
 function clickAnonExplore(value: boolean): void {
-  ipcSend("save_app_settings", {
-    anon_explore: value
-  });
+  ipcSend("save_user_settings", { anon_explore: value });
 }
 
 function clickSendData(value: boolean): void {
-  ipcSend("save_app_settings", {
-    send_data: value
-  });
+  ipcSend("save_user_settings", { send_data: value });
 }
 
 function eraseData(): void {

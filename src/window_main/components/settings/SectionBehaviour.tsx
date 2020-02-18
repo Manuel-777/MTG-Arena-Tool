@@ -24,15 +24,11 @@ function clickLaunchToTray(value: boolean): void {
 }
 
 function clickStartup(value: boolean): void {
-  ipcSend("save_app_settings_norefresh", {
-    startup: value
-  });
+  ipcSend("save_user_settings", { startup: value, skipRefresh: true });
 }
 
 function clickCloseOnMatch(value: boolean): void {
-  ipcSend("save_app_settings", {
-    close_on_match: value
-  });
+  ipcSend("save_user_settings", { close_on_match: value });
 }
 
 function clickCloseToTray(value: boolean): void {
@@ -42,9 +38,7 @@ function clickCloseToTray(value: boolean): void {
 }
 
 function changeExportFormat(value: string): void {
-  ipcSend("save_app_settings_norefresh", {
-    export_format: value
-  });
+  ipcSend("save_user_settings", { export_format: value, skipRefresh: true });
 }
 
 export default function SectionBehaviour(): JSX.Element {
