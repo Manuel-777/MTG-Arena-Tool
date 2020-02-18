@@ -18,7 +18,7 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import { useBaseReactTable } from "../tables/hooks";
+import { useBaseReactTable, useLastScrollTop } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { BaseTableProps } from "../tables/types";
@@ -335,8 +335,9 @@ export default function EconomyTable({
     ...tableControlsProps
   };
   const isTableMode = tableMode === EVENTS_TABLE_MODE;
+  const [containerRef, onScroll] = useLastScrollTop();
   return (
-    <div className="react_table_wrap">
+    <div className="react_table_wrap" ref={containerRef} onScroll={onScroll}>
       <EconomyTableControls {...economyTableControlsProps} />
       <div
         className="med_scroll"

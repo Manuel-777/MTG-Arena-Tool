@@ -2,9 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { MANA } from "../../shared/constants";
 import db from "../../shared/database";
-import { createDiv } from "../../shared/dom-fns";
 import { get_rank_index_16 as getRankIndex16 } from "../../shared/util";
-import mountReactComponent from "../mountReactComponent";
 import { getTagColor, showColorpicker } from "../renderer-util";
 import AutosuggestInput from "./tables/AutosuggestInput";
 import { TagCounts } from "./tables/types";
@@ -55,21 +53,46 @@ export const ArtTile = styled(ArtTileHeader)`
   }
 `;
 
-export const FlexLeftContainer = styled.div`
+export const FlexContainer = styled.div`
   display: flex;
-  justify-content: left;
+  align-items: center;
   div {
+    margin: auto 4px;
+  }
+`;
+
+export const FlexLeftContainer = styled(FlexContainer)`
+  justify-content: flex-start;
+  margin-right: auto;
+  div {
+    :first-child:not(.deck_tag_close) {
+      margin-left: 0;
+    }
     :last-child:not(.deck_tag_close) {
       margin-right: auto;
     }
   }
 `;
 
-export const FlexRightContainer = styled.div`
-  display: flex;
-  justify-content: right;
+export const FlexCenterContainer = styled(FlexContainer)`
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
   div {
-    :first-child {
+    :first-child:not(.deck_tag_close) {
+      margin-left: auto;
+    }
+    :last-child:not(.deck_tag_close) {
+      margin-right: auto;
+    }
+  }
+`;
+
+export const FlexRightContainer = styled(FlexContainer)`
+  justify-content: flex-end;
+  margin-left: auto;
+  div {
+    :first-child:not(.deck_tag_close) {
       margin-left: auto;
     }
   }
@@ -79,21 +102,29 @@ export const LabelText = styled.div`
   display: inline-block;
   text-align: left;
   white-space: nowrap;
+  color: var(--color-light);
 `;
+
+export interface BriefTextProps extends React.HTMLAttributes<HTMLDivElement> {
+  value?: string;
+  maxLength?: number;
+}
 
 export function BriefText({
   value,
-  maxLength
-}: {
-  value?: string;
-  maxLength?: number;
-}): JSX.Element {
+  maxLength,
+  ...otherProps
+}: BriefTextProps): JSX.Element {
   let displayName = value ?? "";
   const cutoff = maxLength ?? 25;
   if (displayName.length > cutoff) {
     displayName = displayName.slice(0, cutoff - 3) + "...";
   }
-  return <LabelText title={value}>{displayName}</LabelText>;
+  return (
+    <LabelText title={value} {...otherProps}>
+      {displayName}
+    </LabelText>
+  );
 }
 
 export const MetricText = styled.div`
@@ -117,7 +148,6 @@ export const TagBubbleDiv = styled.div<TagBubbleDivProps>`
   white-space: nowrap;
   opacity: 0.8;
   margin-right: 12px;
-  margin-bottom: 4px;
   height: 20px;
   line-height: 20px;
   text-indent: 8px;
@@ -219,17 +249,6 @@ export function TagBubble({
   );
 }
 
-export function renderTagBubble(
-  parent: Element,
-  props: TagBubbleProps
-): HTMLDivElement {
-  const container = createDiv([]);
-  container.style.alignSelf = "center";
-  mountReactComponent(<TagBubble {...props} />, container);
-  parent.appendChild(container);
-  return container;
-}
-
 interface NewTagProps {
   parentId: string;
   addTagCallback: (id: string, tag: string) => void;
@@ -261,17 +280,6 @@ export function NewTag({
       />
     </TagBubbleDiv>
   );
-}
-
-export function renderNewTag(
-  parent: Element,
-  props: NewTagProps
-): HTMLDivElement {
-  const container = createDiv([]);
-  container.style.alignSelf = "center";
-  mountReactComponent(<NewTag {...props} />, container);
-  parent.appendChild(container);
-  return container;
 }
 
 const ManaSymbolBase = styled.div.attrs<ManaSymbolProps>(props => ({

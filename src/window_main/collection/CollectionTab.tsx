@@ -1,6 +1,6 @@
 import { remote } from "electron";
 import React from "react";
-import { TableState } from "react-table";
+import { TableState, Filters } from "react-table";
 import { addCardHover } from "../../shared/cardHover";
 import Colors from "../../shared/colors";
 import { DRAFT_RANKS } from "../../shared/constants";
@@ -20,7 +20,8 @@ import {
   hideLoadingBars,
   ipcSend,
   makeResizable,
-  resetMainContainer
+  resetMainContainer,
+  setLocalState
 } from "../renderer-util";
 import {
   CollectionStats,
@@ -67,7 +68,7 @@ function getExportString(cardIds: string[]): string {
       const code = db.sets[card.set]?.code ?? "???";
       add = add
         .replace("$Name", '"' + name + '"')
-        .replace("$Count", count)
+        .replace("$Count", count + "")
         .replace("$SetName", card.set)
         .replace("$SetCode", code)
         .replace("$Collector", card.cid)
@@ -85,12 +86,33 @@ function exportCards(cardIds: string[]): void {
   ipcSend("export_csvtxt", { str: exportString, name: "cards" });
 }
 
+function isBoosterMathValid(filters: Filters<CardsData>): boolean {
+  let hasCorrectBoosterFilter = false;
+  let hasCorrectRarityFilter = true;
+  for (const filter of filters) {
+    if (filter.id === "booster") {
+      hasCorrectBoosterFilter = filter.value?.true && !filter.value?.false;
+    } else if (filter.id === "rarity") {
+      hasCorrectRarityFilter = filter.value?.mythic && filter.value?.rare;
+    } else if (filter.id === "set") {
+      continue; // this is fine
+    } else {
+      return false; // no other filters allowed
+    }
+  }
+  return hasCorrectBoosterFilter && hasCorrectRarityFilter;
+}
+
 function saveTableState(collectionTableState: TableState<CardsData>): void {
+  setLocalState({
+    isBoosterMathValid: isBoosterMathValid(collectionTableState.filters)
+  });
   ipcSend("save_user_settings", { collectionTableState, skipRefresh: true });
 }
 
 function saveTableMode(collectionTableMode: string): void {
   ipcSend("save_user_settings", { collectionTableMode, skipRefresh: true });
+  setLocalState({ collectionTableMode });
 }
 
 function getCollectionData(): CardsData[] {
@@ -146,6 +168,9 @@ export function CollectionTab(): JSX.Element {
     right_panel_width: panelWidth
   } = pd.settings;
   const data = React.useMemo(() => getCollectionData(), []);
+  setLocalState({
+    isBoosterMathValid: isBoosterMathValid(collectionTableState.filters)
+  });
 
   const sidePanelWidth = panelWidth + "px";
   const rightPanelRef = React.useRef<HTMLDivElement>(null);

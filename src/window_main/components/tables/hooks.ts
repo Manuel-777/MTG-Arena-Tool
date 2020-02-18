@@ -1,16 +1,20 @@
 import _ from "lodash";
 import React from "react";
 import {
+  Row,
+  SortByFn,
   TableInstance,
   TableState,
   useFilters,
   useGlobalFilter,
   usePagination,
   useSortBy,
-  useTable
+  useTable,
+  IdType
 } from "react-table";
 import pd from "../../../shared/player-data";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
+import { getLocalState, setLocalState } from "../../renderer-util";
 import {
   archivedFilterFn,
   colorsFilterFn,
@@ -50,6 +54,20 @@ export function useMultiSelectFilter<D>(
   return [filterValue, onClickMultiFilter];
 }
 
+export function useEnumSort<D extends TableData>(
+  enums: readonly string[]
+): SortByFn<D> {
+  return React.useCallback(
+    (rowA: Row<D>, rowB: Row<D>, columnId: IdType<D>): 0 | 1 | -1 => {
+      const indexDiff =
+        enums.indexOf(rowA.values[columnId]) -
+        enums.indexOf(rowB.values[columnId]);
+      return indexDiff < 0 ? -1 : indexDiff > 0 ? 1 : 0;
+    },
+    [enums]
+  );
+}
+
 export function useLegacyRenderer(
   renderEventRow: (container: HTMLDivElement, ...rendererArgs: any[]) => any,
   ...rendererArgs: any[]
@@ -62,6 +80,27 @@ export function useLegacyRenderer(
     }
   }, [containerRef, renderEventRow, rendererArgs]);
   return containerRef;
+}
+
+export function useLastScrollTop(): [
+  React.RefObject<HTMLDivElement>,
+  () => void
+] {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (containerRef?.current) {
+      const { lastScrollTop } = getLocalState();
+      if (lastScrollTop) {
+        containerRef.current.scrollTop = lastScrollTop;
+      }
+    }
+  }, [containerRef]);
+  const onScroll = React.useCallback(() => {
+    if (containerRef?.current) {
+      setLocalState({ lastScrollTop: containerRef.current.scrollTop });
+    }
+  }, []);
+  return [containerRef, onScroll];
 }
 
 export function useAggregatorAndSidePanel<D extends TableData>({
@@ -170,8 +209,12 @@ export function useBaseReactTable<D extends TableData>({
     const hiddenColumns = columns
       .filter(column => !column.defaultVisible)
       .map(column => column.id ?? column.accessor);
-    const state =
-      cachedState ?? _.defaults(defaultState, { pageSize: 25, hiddenColumns });
+    const mergedDefault = _.defaults(defaultState, {
+      pageSize: 25,
+      hiddenColumns
+    }) as TableState<D>;
+    const state = cachedState ?? mergedDefault;
+
     // ensure data-only columns are all invisible
     const hiddenSet = new Set(state.hiddenColumns ?? []);
     for (const column of columns) {

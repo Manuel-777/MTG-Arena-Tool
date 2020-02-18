@@ -1,27 +1,25 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define */
-import fs from "fs";
-import path from "path";
-import { app, ipcRenderer as ipc, remote, shell } from "electron";
-const { dialog } = remote;
-import _ from "lodash";
-import format from "date-fns/format";
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define, @typescript-eslint/camelcase */
 import anime from "animejs";
+import { app, ipcRenderer as ipc, remote, shell } from "electron";
+import fs from "fs";
+import _ from "lodash";
+import path from "path";
+import Pikaday from "pikaday";
+import ReactDOM from "react-dom";
 import striptags from "striptags";
 import Picker from "vanilla-picker";
-import Pikaday from "pikaday";
+import { addCardHover } from "../shared/cardHover";
+import { cardType } from "../shared/cardTypes";
+import ConicGradient from "../shared/conic-gradient";
 import {
-  CARD_RARITIES,
   COLORS_ALL,
-  MANA,
-  MANA_COLORS,
-  IPC_MAIN,
-  IPC_BACKGROUND,
   EASING_DEFAULT,
+  IPC_BACKGROUND,
+  IPC_MAIN,
+  MANA_COLORS,
   SETTINGS_PRIVACY
 } from "../shared/constants";
 import db from "../shared/database";
-import pd from "../shared/player-data";
-import ConicGradient from "../shared/conic-gradient";
 import {
   createDiv,
   createImg,
@@ -30,26 +28,17 @@ import {
   createSpan,
   queryElements as $$
 } from "../shared/dom-fns";
-import * as deckDrawer from "./DeckDrawer";
-import { cardType } from "../shared/cardTypes";
-import { addCardHover } from "../shared/cardHover";
+import pd from "../shared/player-data";
 import {
   deckTypesStats,
-  formatRank,
-  getBoosterCountEstimate,
   getCardArtCrop,
-  get_deck_missing,
-  get_rank_index_16,
   getCardImage,
-  getReadableEvent,
-  makeId,
-  toMMSS,
-  openScryfallCard
+  makeId
 } from "../shared/util";
-import ReactDOM from "react-dom";
-import createShareButton from "./createShareButton";
+import * as deckDrawer from "./DeckDrawer";
 import { forceOpenSettings } from "./tabControl";
 
+const { dialog } = remote;
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 const byId = id => document.getElementById(id);
@@ -60,7 +49,9 @@ let unmountPoints = [];
 // (for state shared across processes, use database or player-data)
 const localState = {
   authToken: "",
+  collectionTableMode: pd.settings.collectionTableMode,
   discordTag: null,
+  isBoosterMathValid: true,
   lastDataIndex: 0,
   lastScrollHandler: null,
   lastScrollTop: 0,
@@ -210,7 +201,7 @@ function drawDeck(div, deck, showWildcards = false) {
   // draw maindeck grouped by cardType
   const cardsByGroup = _(deck.mainDeck)
     .map(card => ({ data: db.card(card.id), ...card }))
-    .filter(card => card.data.type)
+    .filter(card => card.data && card.data.type)
     .groupBy(card => {
       const type = cardType(card.data);
       switch (type) {
@@ -278,6 +269,7 @@ function drawDeck(div, deck, showWildcards = false) {
     _(deck.sideboard)
       .filter(card => card.quantity > 0)
       .map(card => ({ data: db.card(card.id), ...card }))
+      .filter(card => card.data)
       .orderBy(["data.cmc", "data.name"])
       .forEach(card => {
         const tile = deckDrawer.cardTile(
@@ -847,262 +839,7 @@ function localTimeSince(date) {
   </relative-time>`;
 }
 
-function attachMatchData(listItem, match) {
-  // Deck name
-  const deckNameDiv = createDiv(["list_deck_name"], match.playerDeck.name);
-  listItem.leftTop.appendChild(deckNameDiv);
-
-  // Event name
-  const eventNameDiv = createDiv(
-    ["list_deck_name_it"],
-    getReadableEvent(match.eventId)
-  );
-  listItem.leftTop.appendChild(eventNameDiv);
-
-  match.playerDeck.colors.forEach(color => {
-    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    listItem.leftBottom.appendChild(m);
-  });
-
-  // Opp name
-  if (match.opponent.name == null) match.opponent.name = "-#000000";
-  const oppNameDiv = createDiv(
-    ["list_match_title"],
-    "vs " + match.opponent.name.slice(0, -6)
-  );
-  listItem.rightTop.appendChild(oppNameDiv);
-
-  // Opp rank
-  const oppRank = createDiv(["ranks_16"]);
-  oppRank.style.marginRight = "0px";
-  oppRank.style.backgroundPosition =
-    get_rank_index_16(match.opponent.rank) * -16 + "px 0px";
-  oppRank.title = formatRank(match.opponent);
-  listItem.rightTop.appendChild(oppRank);
-
-  const date = !match.date
-    ? "Unknown date - "
-    : localTimeSince(new Date(match.date));
-  // Match time
-  const matchTime = createDiv(
-    ["list_match_time"],
-    date + " " + toMMSS(match.duration) + " long"
-  );
-  listItem.rightBottom.appendChild(matchTime);
-
-  // Opp colors
-  match.oppDeck.colors.forEach(color => {
-    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    listItem.rightBottom.appendChild(m);
-  });
-
-  const tagsDiv = createDiv(["matches_tags"], "", {
-    id: "matches_tags_" + match.id
-  });
-  listItem.rightBottom.appendChild(tagsDiv);
-
-  // Result
-  const resultDiv = createDiv(
-    [
-      "list_match_result",
-      match.player.win > match.opponent.win ? "green" : "red"
-    ],
-    `${match.player.win}:${match.opponent.win}`
-  );
-  listItem.right.after(resultDiv);
-
-  // On the play/draw
-  if (match.onThePlay) {
-    let onThePlay = false;
-    if (match.player.seat == match.onThePlay) {
-      onThePlay = true;
-    }
-    const div = createDiv([onThePlay ? "ontheplay" : "onthedraw"]);
-    div.title = onThePlay ? "On the play" : "On the draw";
-    listItem.right.after(div);
-  }
-}
-
-function createDraftSetDiv(draft) {
-  return createDiv(["list_deck_name"], draft.set + " draft");
-}
-
-export function createRoundCard(card, rarityOverlay = false) {
-  const roundCard = createDiv([
-    "round_card",
-    card.rarity,
-    `rarity-overlay${rarityOverlay ? "" : "-none"}`
-  ]);
-
-  roundCard.title = card.name;
-  roundCard.style.backgroundImage = `url("${getCardImage(card, "art_crop")}")`;
-
-  addCardHover(roundCard, card);
-
-  roundCard.addEventListener("click", () => {
-    if (card.dfc == "SplitHalf") {
-      card = db.card(card.dfcId);
-    }
-    openScryfallCard(card);
-  });
-
-  return roundCard;
-}
-
-export function createDraftRares(draft) {
-  const draftRares = createDiv(["flex_item"]);
-  draftRares.style.margin = "auto";
-  if (!draft.pickedCards) return draftRares;
-
-  draft.pickedCards
-    .map(cardId => db.card(cardId))
-    .filter(card => card.rarity == "rare" || card.rarity == "mythic")
-    .map(card => createRoundCard(card, true))
-    .forEach(inventoryCard => draftRares.appendChild(inventoryCard));
-
-  return draftRares;
-}
-
-function createDraftTimeDiv(draft) {
-  return createDiv(
-    ["list_match_time"],
-    draft.date ? localTimeSince(new Date(draft.date)) : "Unknown"
-  );
-}
-
-function createReplayDiv() {
-  return createDiv(["list_match_replay"], "See replay");
-}
-
-function createReplayShareButton(draft) {
-  const replayShareButton = createShareButton(
-    ["list_draft_share", draft.id + "dr"],
-    shareExpire => draftShareLink(draft.id, draft, shareExpire)
-  );
-  replayShareButton.title = "share draft replay";
-  return replayShareButton;
-}
-
-export function attachDeckData(listItem, deck) {
-  // Deck name
-  if (deck.name.indexOf("?=?Loc/Decks/Precon/") != -1) {
-    deck.name = deck.name.replace("?=?Loc/Decks/Precon/", "");
-  }
-  const deckNameDiv = createDiv(["list_deck_name"], deck.name);
-  listItem.leftTop.appendChild(deckNameDiv);
-
-  // Deck colors
-  deck.colors.forEach(function(color) {
-    const m = createDiv(["mana_s20", "mana_" + MANA[color]]);
-    listItem.leftBottom.appendChild(m);
-  });
-
-  // Last touched
-  const lastTouch = new Date(deck.timeTouched);
-  const deckLastTouchedDiv = createDiv(
-    ["list_deck_winrate"],
-    `<i style="opacity:0.6">updated/played:</i> ${localTimeSince(lastTouch)}`
-  );
-  deckLastTouchedDiv.style.marginLeft = "18px";
-  deckLastTouchedDiv.style.marginRight = "auto";
-  deckLastTouchedDiv.style.lineHeight = "18px";
-  listItem.centerBottom.appendChild(deckLastTouchedDiv);
-
-  // Deck winrates
-  if (deck.total > 0) {
-    const deckWinrateDiv = createDiv(["list_deck_winrate"]);
-    let interval, tooltip;
-    if (deck.total >= 20) {
-      // sample Size is large enough to use Wald Interval
-      interval = formatPercent(deck.interval);
-      tooltip = formatWinrateInterval(
-        formatPercent(deck.winrateLow),
-        formatPercent(deck.winrateHigh)
-      );
-    } else {
-      // sample size is too small (garbage results)
-      interval = "???";
-      tooltip = "play at least 20 matches to estimate actual winrate";
-    }
-    let colClass = getWinrateClass(deck.winrate);
-    deckWinrateDiv.innerHTML = `${deck.wins}:${
-      deck.losses
-    } (<span class="${colClass}_bright">${formatPercent(
-      deck.winrate
-    )}</span> <i style="opacity:0.6;">&plusmn; ${interval}</i>)`;
-    deckWinrateDiv.title = tooltip;
-    listItem.rightTop.appendChild(deckWinrateDiv);
-
-    const deckWinrateLastDiv = createDiv(
-      ["list_deck_winrate"],
-      "Since last edit: "
-    );
-    deckWinrateLastDiv.style.opacity = 0.6;
-
-    if (deck.lastEditTotal > 0) {
-      colClass = getWinrateClass(deck.lastEditWinrate);
-      deckWinrateLastDiv.innerHTML += `<span class="${colClass}_bright">${formatPercent(
-        deck.lastEditWinrate
-      )}</span>`;
-      deckWinrateLastDiv.title = `${formatPercent(
-        deck.lastEditWinrate
-      )} winrate since ${format(new Date(deck.lastUpdated), "Pp")}`;
-    } else {
-      deckWinrateLastDiv.innerHTML += "<span>--</span>";
-      deckWinrateLastDiv.title = "no data yet";
-    }
-    listItem.rightBottom.appendChild(deckWinrateLastDiv);
-  }
-
-  // Deck crafting cost
-  const ownedWildcards = {
-    common: pd.economy.wcCommon,
-    uncommon: pd.economy.wcUncommon,
-    rare: pd.economy.wcRare,
-    mythic: pd.economy.wcMythic
-  };
-  const missingWildcards = get_deck_missing(deck);
-  let wc;
-  let n = 0;
-  const boosterCost = getBoosterCountEstimate(missingWildcards);
-  CARD_RARITIES.filter(rarity => rarity !== "land").forEach(cardRarity => {
-    cardRarity = cardRarity.toLowerCase();
-    if (missingWildcards[cardRarity]) {
-      n++;
-      wc = createDiv(["wc_explore_cost", "wc_" + cardRarity]);
-      wc.title = _.capitalize(cardRarity) + " wildcards needed.";
-      wc.innerHTML =
-        (ownedWildcards[cardRarity] > 0
-          ? ownedWildcards[cardRarity] + "/"
-          : "") + missingWildcards[cardRarity];
-      listItem.right.appendChild(wc);
-      listItem.right.style.flexDirection = "row";
-      listItem.right.style.marginRight = "16px";
-    }
-  });
-  if (n !== 0) {
-    const bo = createDiv(["bo_explore_cost"], Math.round(boosterCost));
-    bo.title = "Boosters needed (estimated)";
-    listItem.right.appendChild(bo);
-  }
-}
-
-export function attachDraftData(listItem, draft) {
-  // console.log("Draft: ", draft);
-  const draftSetDiv = createDraftSetDiv(draft);
-  const draftRares = createDraftRares(draft);
-  const draftTimeDiv = createDraftTimeDiv(draft);
-  const replayDiv = createReplayDiv(draft);
-  const replayShareButton = createReplayShareButton(draft);
-
-  listItem.leftTop.appendChild(draftSetDiv);
-  listItem.center.appendChild(draftRares);
-  listItem.rightBottom.appendChild(draftTimeDiv);
-  listItem.rightTop.appendChild(replayDiv);
-  listItem.right.after(replayShareButton);
-}
-
-function draftShareLink(id, draft, shareExpire) {
+export function draftShareLink(id, draft, shareExpire) {
   const draftData = JSON.stringify(draft);
   let expire = 0;
   switch (shareExpire) {
@@ -1124,6 +861,56 @@ function draftShareLink(id, draft, shareExpire) {
   }
   showLoadingBars();
   ipcSend("request_draft_link", { expire, id, draftData });
+}
+
+export function deckShareLink(deck, shareExpire) {
+  const deckString = JSON.stringify(deck);
+  let expire = 0;
+  switch (shareExpire) {
+    case "One day":
+      expire = 0;
+      break;
+    case "One week":
+      expire = 1;
+      break;
+    case "One month":
+      expire = 2;
+      break;
+    case "Never":
+      expire = -1;
+      break;
+    default:
+      expire = 0;
+      break;
+  }
+  showLoadingBars();
+  ipcSend("request_deck_link", { expire, deckString });
+}
+
+export function logShareLink(id, shareExpire) {
+  const actionLogFile = path.join(actionLogDir, id + ".txt");
+  const log = fs.readFileSync(actionLogFile).toString("base64");
+
+  let expire = 0;
+  switch (shareExpire) {
+    case "One day":
+      expire = 0;
+      break;
+    case "One week":
+      expire = 1;
+      break;
+    case "One month":
+      expire = 2;
+      break;
+    case "Never":
+      expire = -1;
+      break;
+    default:
+      expire = 0;
+      break;
+  }
+  showLoadingBars();
+  ipcSend("request_log_link", { expire, log, id });
 }
 
 function showOfflineSplash() {
@@ -1186,6 +973,5 @@ export {
   compareWinrates,
   compareColorWinrates,
   localTimeSince,
-  attachMatchData,
   showOfflineSplash
 };

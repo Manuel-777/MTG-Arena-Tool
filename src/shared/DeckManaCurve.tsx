@@ -1,17 +1,21 @@
 import * as React from "react";
-
+import Deck from "../shared/deck";
 import { MANA_COLORS } from "./constants";
 import db from "./database";
-import Deck from "../shared/deck";
-import { CardData } from "../overlay/overlayUtil";
 import { CardObject } from "./types/Deck";
+
+const MAX_CMC = 7; // cap at 7+ cmc bucket
 
 function add(a: number, b: number): number {
   return a + b;
 }
 
-function getDeckCurve(deck: Deck): any[] {
-  const curve: any[] = [];
+function getDeckCurve(deck: Deck): number[][] {
+  const curve: number[][] = [];
+  for (let i = 0; i < MAX_CMC + 1; i++) {
+    curve[i] = [0, 0, 0, 0, 0, 0];
+  }
+
   if (!deck.getMainboard()) return curve;
 
   deck
@@ -21,9 +25,7 @@ function getDeckCurve(deck: Deck): any[] {
       const cardObj = db.card(card.id);
       if (!cardObj) return;
 
-      const cmc = cardObj.cmc;
-      if (!curve[cmc]) curve[cmc] = [0, 0, 0, 0, 0, 0];
-
+      const cmc = Math.min(MAX_CMC, cardObj.cmc);
       if (!cardObj.type.includes("Land")) {
         cardObj.cost.forEach((c: string): void => {
           if (c.includes("w")) curve[cmc][1] += card.quantity;
@@ -32,23 +34,9 @@ function getDeckCurve(deck: Deck): any[] {
           if (c.includes("r")) curve[cmc][4] += card.quantity;
           if (c.includes("g")) curve[cmc][5] += card.quantity;
         });
-
         curve[cmc][0] += card.quantity;
       }
     });
-  /*
-  // Do not account sideboard?
-  deck.sideboard.forEach(function(card) {
-    var grpid = card.id;
-    var cmc = db.card(grpid).cmc;
-    if (curve[cmc] == undefined)  curve[cmc] = 0;
-    curve[cmc] += card.quantity
-
-    if (db.card(grpid).rarity !== 'land') {
-      curve[cmc] += card.quantity
-    }
-  });
-  */
   //console.log(curve);
   return curve;
 }
@@ -56,14 +44,7 @@ function getDeckCurve(deck: Deck): any[] {
 export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
   const manaCounts = getDeckCurve(deck);
-  const curveMax = Math.max(
-    ...manaCounts
-      .filter(v => {
-        if (v == undefined) return false;
-        return true;
-      })
-      .map(v => v[0] || 0)
-  );
+  const curveMax = Math.max(...manaCounts.map(v => v[0]));
   // console.log("deckManaCurve", manaCounts, curveMax);
 
   return (
@@ -113,7 +94,11 @@ export default function DeckManaCurve(props: { deck: Deck }): JSX.Element {
                 <div
                   className={"mana_s16 mana_" + i}
                   style={{ margin: "auto" }}
-                />
+                >
+                  {i === MAX_CMC && (
+                    <span style={{ paddingLeft: "20px" }}>+</span>
+                  )}
+                </div>
               </div>
             );
           })}

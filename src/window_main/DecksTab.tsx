@@ -19,7 +19,10 @@ import Aggregator, {
 import DecksTable from "./components/decks/DecksTable";
 import { DecksData } from "./components/decks/types";
 import { isHidingArchived } from "./components/tables/filters";
-import { useAggregatorAndSidePanel } from "./components/tables/hooks";
+import {
+  useAggregatorAndSidePanel,
+  useLastScrollTop
+} from "./components/tables/hooks";
 import { openDeck } from "./deck-details";
 import mountReactComponent from "./mountReactComponent";
 import {
@@ -34,7 +37,7 @@ function openDeckDetails(
   id: string | number,
   filters: AggregatorFilters
 ): void {
-  const deck = pd.deck(id);
+  const deck = pd.deck(id + "");
   if (!deck) return;
   openDeck(deck, { ...filters, deckId: id });
   anime({
@@ -103,6 +106,7 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
   return pd.deckList.map(
     (deck: SerializedDeck): DecksData => {
       const id = deck.id ?? "";
+      const name = (deck.name ?? "").replace("?=?Loc/Decks/Precon/", "");
       const archivedSortVal = deck.archived ? 1 : deck.custom ? 0.5 : 0;
       const colorSortVal = deck.colors?.join("") ?? "";
       // compute winrate metrics
@@ -120,6 +124,7 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
       const lastTouched = dateMaxValid(lastUpdated, lastPlayed);
       return {
         ...deck,
+        name,
         format: getReadableFormat(deck.format),
         ...deckStats,
         winrate100,
@@ -174,10 +179,11 @@ export function DecksTab({
     [aggFilters]
   );
   const events = React.useMemo(getTotalAggEvents, []);
+  const [containerRef, onScroll] = useLastScrollTop();
 
   return (
     <>
-      <div className={"wrapper_column"}>
+      <div className={"wrapper_column"} ref={containerRef} onScroll={onScroll}>
         <DecksTable
           data={data}
           aggFilters={aggFilters}

@@ -27,7 +27,7 @@ export interface MultiSelectFilterProps<D> {
 }
 
 export interface BaseTableProps<D extends TableData> {
-  cachedState: TableState<D>;
+  cachedState?: TableState<D>;
   columns: Column<D>[];
   customDefaultColumn?: Partial<Column<D>>;
   customFilterTypes?: { [key: string]: any };

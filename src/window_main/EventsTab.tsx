@@ -15,7 +15,10 @@ import {
   SerializedEvent
 } from "./components/events/types";
 import { isHidingArchived } from "./components/tables/filters";
-import { useAggregatorAndSidePanel } from "./components/tables/hooks";
+import {
+  useAggregatorAndSidePanel,
+  useLastScrollTop
+} from "./components/tables/hooks";
 import mountReactComponent from "./mountReactComponent";
 import {
   hideLoadingBars,
@@ -206,10 +209,11 @@ export function EventsTab({
     updateSidebarCallback: updateStatsPanel
   });
   const events = React.useMemo(getTotalAggEvents, []);
+  const [containerRef, onScroll] = useLastScrollTop();
 
   return (
     <>
-      <div className={"wrapper_column"}>
+      <div className={"wrapper_column"} ref={containerRef} onScroll={onScroll}>
         <EventsTable
           data={data}
           aggFilters={aggFilters}
