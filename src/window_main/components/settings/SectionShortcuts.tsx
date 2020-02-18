@@ -10,7 +10,8 @@ import { createDiv, queryElements as $$ } from "../../../shared/dom-fns";
 
 function setKeyboardShortcuts(checked: boolean): void {
   ipcSend("save_user_settings", {
-    enable_keyboard_shortcuts: checked
+    enable_keyboard_shortcuts: checked,
+    skipRefesh: true
   });
 }
 
@@ -50,16 +51,54 @@ function openKeyCombinationDialog(name: string): void {
       ...pd.settings
     });
 
-    document.removeEventListener("keydown", reportKeyEvent);
+    document.removeEventListener("keydown", reportKeyEvent as any);
     closeDialog();
   });
 
-  document.addEventListener("keydown", reportKeyEvent);
+  document.addEventListener("keydown", reportKeyEvent as any);
   cont.appendChild(desc);
   cont.appendChild(okButton);
   openDialog(cont, () => {
-    document.removeEventListener("keydown", reportKeyEvent);
+    document.removeEventListener("keydown", reportKeyEvent as any);
   });
+}
+
+function ShortcutsRow({
+  code,
+  index
+}: {
+  code: string;
+  index: number;
+}): JSX.Element {
+  const ld = index % 2 ? "line_dark" : "line_light";
+  return (
+    <>
+      <div
+        className={ld + " shortcuts_line"}
+        style={{ gridArea: `${index + 2} / 1 / auto / 2` }}
+      >
+        {SHORTCUT_NAMES[code]}
+      </div>
+      <div
+        className={ld + " shortcuts_line"}
+        style={{ gridArea: `${index + 2} / 2 / auto / 3` }}
+      >
+        {pd.settings[code]}
+      </div>
+      <div
+        className={ld + " shortcuts_line"}
+        style={{ gridArea: `${index + 2} / 3 / auto / 4` }}
+      >
+        <Button
+          text="Edit"
+          className={"button_simple button_edit"}
+          onClick={(): void => {
+            openKeyCombinationDialog(code);
+          }}
+        />
+      </div>
+    </>
+  );
 }
 
 export default function SectionShortcuts(): JSX.Element {
@@ -86,38 +125,9 @@ export default function SectionShortcuts(): JSX.Element {
         >
           Shortcut
         </div>
-        {Object.keys(SHORTCUT_NAMES).map((key: string, index: number) => {
-          const ld = index % 2 ? "line_dark" : "line_light";
-
-          return (
-            <>
-              <div
-                className={ld + " shortcuts_line"}
-                style={{ gridArea: `${index + 2} / 1 / auto / 2` }}
-              >
-                {SHORTCUT_NAMES[key]}
-              </div>
-              <div
-                className={ld + " shortcuts_line"}
-                style={{ gridArea: `${index + 2} / 2 / auto / 3` }}
-              >
-                {pd.settings[key]}
-              </div>
-              <div
-                className={ld + " shortcuts_line"}
-                style={{ gridArea: `${index + 2} / 3 / auto / 4` }}
-              >
-                <Button
-                  text="Edit"
-                  class="button_simple button_edit"
-                  onClick={(): void => {
-                    openKeyCombinationDialog(key);
-                  }}
-                />
-              </div>
-            </>
-          );
-        })}
+        {Object.keys(SHORTCUT_NAMES).map((key: string, index: number) => (
+          <ShortcutsRow key={key} code={key} index={index} />
+        ))}
       </div>
     </>
   );
