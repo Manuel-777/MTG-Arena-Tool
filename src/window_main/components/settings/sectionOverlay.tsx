@@ -205,7 +205,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         <p>
           <i>
             Displays the overlay regardless of Arena match or draft status
-            (&quotEnable Overlay&quot must also be checked). To adjust overlay
+            (&quot;Enable Overlay&quot; must also be checked). To adjust overlay
             position, click on its colored icon in the top left to toggle edit
             mode.
           </i>
