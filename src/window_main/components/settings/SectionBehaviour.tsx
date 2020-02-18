@@ -30,7 +30,7 @@ function clickStartup(value: boolean): void {
 }
 
 function clickCloseOnMatch(value: boolean): void {
-  ipcSend("save_app_settings_norefresh", {
+  ipcSend("save_app_settings", {
     close_on_match: value
   });
 }

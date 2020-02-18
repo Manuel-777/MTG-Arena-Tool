@@ -6,13 +6,13 @@ import { ipcSend } from "../../renderer-util";
 import Button from "../Button";
 
 function clickAnonExplore(value: boolean): void {
-  ipcSend("save_app_settings_norefresh", {
+  ipcSend("save_app_settings", {
     anon_explore: value
   });
 }
 
 function clickSendData(value: boolean): void {
-  ipcSend("save_app_settings_norefresh", {
+  ipcSend("save_app_settings", {
     send_data: value
   });
 }
