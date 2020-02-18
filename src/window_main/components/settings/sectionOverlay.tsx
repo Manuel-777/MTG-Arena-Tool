@@ -442,7 +442,7 @@ export default function SectionOverlay(): JSX.Element {
           className="color_picker"
           id="flat"
           type="text"
-          value=""
+          defaultValue=""
         ></input>
       </label>
 
