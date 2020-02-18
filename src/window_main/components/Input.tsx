@@ -7,34 +7,32 @@ interface InputProps {
   placeholder: string;
   autocomplete?: string;
   callback?: (value: string) => void;
-  callbackEnter?: (value: string) => void;
 }
 
 function InputBase(
   props: InputProps,
   ref: React.Ref<HTMLInputElement>
 ): JSX.Element {
-  const {
-    label,
-    value,
-    contStyle,
-    callback,
-    callbackEnter,
-    placeholder
-  } = props;
+  const { label, value, contStyle, callback, placeholder } = props;
+  const [currentValue, setCurrentValue] = React.useState(value);
   const autocomplete = props.autocomplete || "off";
 
-  const callbackHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const onChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      setCurrentValue(e.target.value);
+    },
+    []
+  );
+  const onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.keyCode === 13) {
+      (e.target as HTMLInputElement).blur();
+    }
+  };
+  const onBlur = React.useCallback(() => {
     if (callback) {
-      callback(e.target.value);
+      callback(currentValue);
     }
-  };
-
-  const keyUpHandler = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (e.keyCode == 13 && callbackEnter) {
-      callbackEnter(e.currentTarget.value);
-    }
-  };
+  }, [callback, currentValue]);
 
   const inputInner = (): JSX.Element => {
     return (
@@ -42,11 +40,12 @@ function InputBase(
         <input
           ref={ref}
           type="text"
-          onKeyUp={keyUpHandler}
-          onChange={callbackHandler}
+          onKeyUp={onKeyUp}
+          onBlur={onBlur}
+          onChange={onChange}
           autoComplete={autocomplete}
           placeholder={placeholder}
-          value={value}
+          value={currentValue}
         />
       </div>
     );
