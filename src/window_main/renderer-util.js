@@ -193,7 +193,9 @@ function drawDeck(div, deck, showWildcards = false) {
           deck,
           false
         );
-        div.appendChild(tile);
+        if (tile) {
+          div.appendChild(tile);
+        }
       }
     });
   }
