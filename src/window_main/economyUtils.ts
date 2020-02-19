@@ -87,7 +87,7 @@ function getReadableTrack(trackCode: string): string {
 
 // quick and dirty generic pretty formatting
 // "WhyDoesWotc.KeepChanging.Codes" => "Why Does Wotc: Keep Changing: Codes"
-function getReadableCode(code: string): string {
+export function getReadableCode(code: string): string {
   let result = "";
   code.split(".").forEach(group => {
     result += ": " + _.startCase(group);

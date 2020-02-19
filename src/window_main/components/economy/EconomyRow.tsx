@@ -21,7 +21,8 @@ import {
 import {
   getCollationSet,
   getPrettyContext,
-  vaultPercentFormat
+  vaultPercentFormat,
+  getReadableCode
 } from "../../economyUtils";
 
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
@@ -360,6 +361,7 @@ function FlexRight(props: FlexRightProps): JSX.Element {
         db.cardFromArt(obj.artId)
       )
     : undefined;
+  const vanityCodes: string[] | undefined = change.delta.vanityItemsAdded;
 
   const xpGainedNumber = change.xpGained && parseInt(change.xpGained);
   return (
@@ -423,6 +425,16 @@ function FlexRight(props: FlexRightProps): JSX.Element {
             title={card.name + " Skin"}
             className={"economy_skin_art"}
             url={`url("${getCardArtCrop(card)}")`}
+          />
+        ))}
+      {vanityCodes &&
+        vanityCodes.map(code => (
+          <EconomyValueRecord
+            key={economyId + "_" + code}
+            iconClassName={""}
+            title={code}
+            smallLabel
+            deltaContent={getReadableCode(code)}
           />
         ))}
     </div>
