@@ -6,7 +6,7 @@ import {
   FULL_SETS,
   SetStats,
   SINGLETONS
-} from "../../collection/CollectionStats";
+} from "../../collection/collectionStats";
 
 export default function CompletionProgressBar({
   countMode,

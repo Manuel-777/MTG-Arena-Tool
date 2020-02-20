@@ -8,7 +8,7 @@ import {
   CollectionStats,
   FULL_SETS,
   SINGLETONS
-} from "../../collection/CollectionStats";
+} from "../../collection/collectionStats";
 import { formatNumber } from "../../renderer-util";
 import { useBlurOnEnter } from "../tables/hooks";
 import CompletionProgressBar, {

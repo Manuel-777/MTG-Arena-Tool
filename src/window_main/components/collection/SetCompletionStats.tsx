@@ -5,7 +5,7 @@ import {
   estimateBoosterMythics,
   estimateBoosterRares,
   SetStats
-} from "../../collection/CollectionStats";
+} from "../../collection/collectionStats";
 
 export function SetCompletionStats({
   setStats,
