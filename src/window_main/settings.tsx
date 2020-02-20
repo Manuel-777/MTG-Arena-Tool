@@ -22,8 +22,8 @@ import {
 import mountReactComponent from "./mountReactComponent";
 import SectionBehaviour from "./components/settings/SectionBehaviour";
 import SectionData from "./components/settings/SectionData";
-import SectionOverlay from "./components/settings/SectionOverlay";
-import SectionVisual from "./components/settings/SectionVisual";
+import SectionOverlay from "./components/settings/sectionOverlay";
+import SectionVisual from "./components/settings/sectionVisual";
 import SectionShortcuts from "./components/settings/SectionShortcuts";
 import SectionPrivacy from "./components/settings/SectionPrivacy";
 import SectionAbout from "./components/settings/SectionAbout";
