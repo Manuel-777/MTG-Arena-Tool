@@ -1870,6 +1870,16 @@ a:hover {
     background-size: contain;
 }
 
+.economy_vanity {
+    background-repeat: no-repeat;
+    margin: auto 4px;
+    width: 28px;
+    height: 28px;
+    background-image: url(../images/cup.png);
+    background-position: center;
+    background-size: contain;
+}
+
 .economy_orb {
     background-repeat: no-repeat;
     margin: auto 4px auto 16px;

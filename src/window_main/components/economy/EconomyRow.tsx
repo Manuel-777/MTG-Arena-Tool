@@ -431,7 +431,7 @@ function FlexRight(props: FlexRightProps): JSX.Element {
         vanityCodes.map(code => (
           <EconomyValueRecord
             key={economyId + "_" + code}
-            iconClassName={""}
+            iconClassName={"economy_vanity"}
             title={code}
             smallLabel
             deltaContent={getReadableCode(code)}
