@@ -1,5 +1,5 @@
 import React from "react";
-import { Column, Filters } from "react-table";
+import { Column, Filters, FilterValue } from "react-table";
 import {
   COLLECTION_CHART_MODE,
   COLLECTION_SETS_MODE,
@@ -299,6 +299,7 @@ export default function CollectionTable({
     page,
     prepareRow,
     rows,
+    setAllFilters,
     setFilter,
     toggleHideColumn
   } = table;
@@ -383,6 +384,12 @@ export default function CollectionTable({
       makeResizable(draggerRef.current);
     }
   }, [draggerRef]);
+  const clickCompletionCallback = React.useCallback((): void => {
+    setTableMode(COLLECTION_SETS_MODE);
+    setAllFilters((): FilterValue[] => [
+      { id: "booster", value: { true: true, false: false } }
+    ]);
+  }, [setAllFilters]);
   return (
     <>
       <div className={"wrapper_column"}>
@@ -428,6 +435,7 @@ export default function CollectionTable({
           setMythicDraftFactor={setMythicDraftFactor}
           setBoosterWinFactor={setBoosterWinFactor}
           setFutureBoosters={setFutureBoosters}
+          clickCompletionCallback={clickCompletionCallback}
         />
       </div>
     </>

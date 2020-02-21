@@ -10,11 +10,16 @@ import {
   SINGLETONS
 } from "../../collection/collectionStats";
 import { formatNumber } from "../../renderer-util";
+import {
+  BoosterSymbol,
+  CalendarSymbol,
+  MediumTextButton,
+  RaritySymbol
+} from "../display";
 import { useBlurOnEnter } from "../tables/hooks";
 import CompletionProgressBar, {
   SetCompletionBar
 } from "./CompletionProgressBar";
-import { CalendarSymbol, RaritySymbol, BoosterSymbol } from "../display";
 
 const getRarityKey = (
   rarity: string
@@ -38,7 +43,8 @@ export function CollectionStatsPanel({
   setRareDraftFactor,
   setMythicDraftFactor,
   setBoosterWinFactor,
-  setFutureBoosters
+  setFutureBoosters,
+  clickCompletionCallback
 }: {
   stats?: CollectionStats;
   countMode: string;
@@ -52,6 +58,7 @@ export function CollectionStatsPanel({
   setMythicDraftFactor: (factor: number) => void;
   setBoosterWinFactor: (factor: number) => void;
   setFutureBoosters: (factor: number) => void;
+  clickCompletionCallback: () => void;
 }): JSX.Element {
   const [rareDraftInputRef, rareDraftOnKey] = useBlurOnEnter();
   const [mythicDraftInputRef, mythicDraftOnKey] = useBlurOnEnter();
@@ -144,7 +151,7 @@ export function CollectionStatsPanel({
               );
             }
           })}
-          {boosterMath && (
+          {boosterMath ? (
             <>
               <div
                 className={"deck_name"}
@@ -271,6 +278,10 @@ export function CollectionStatsPanel({
                 </i>
               </div>
             </>
+          ) : (
+            <MediumTextButton onClick={clickCompletionCallback}>
+              Completion Stats
+            </MediumTextButton>
           )}
         </div>
       </div>
