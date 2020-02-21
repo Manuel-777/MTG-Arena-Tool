@@ -34,7 +34,7 @@ export function SetsView({
   });
   return (
     <div className={"main_stats"}>
-      {collectibleSets.map(set => (
+      {collectibleSets.map((set, index) => (
         <div
           key={set}
           className={"set_stats"}
@@ -52,7 +52,7 @@ export function SetsView({
             rareDraftFactor={rareDraftFactor}
             mythicDraftFactor={mythicDraftFactor}
             boosterWinFactor={boosterWinFactor}
-            futureBoosters={futureBoosters}
+            futureBoosters={index === 0 ? futureBoosters : 0}
           />
         </div>
       ))}
