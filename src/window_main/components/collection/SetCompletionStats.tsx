@@ -4,8 +4,17 @@ import {
   chanceBoosterHasRare,
   estimateBoosterMythics,
   estimateBoosterRares,
-  SetStats
+  SetStats,
+  chanceNotWildCard
 } from "../../collection/collectionStats";
+import {
+  BoosterSymbol,
+  MetricText,
+  RaritySymbol,
+  TicketSymbol,
+  CalendarSymbol
+} from "../display";
+import { OwnershipSymbol } from "../../../shared/OwnershipStars";
 
 export function SetCompletionStats({
   setStats,
@@ -51,120 +60,132 @@ export function SetCompletionStats({
     (chanceBoosterHasMythic * unownedUniqueMythics * 3) /
     setStats["mythic"].unique
   ).toFixed(2);
-  const wantedText = (
-    <abbr title="missing copy of a card in a current deck">wanted</abbr>
-  );
   // chance that the next draft pool (P1P1, P2P1, P3P1) contains a wanted card
-  const chanceDraftRareWanted = (
+  const nextDraftRareWanted = (
     (chanceBoosterHasRare * setStats["rare"].uniqueWanted) /
     unownedUniqueRares
-  ).toLocaleString([], {
-    style: "percent",
-    maximumSignificantDigits: 2
-  });
-  const chanceDraftMythicWanted = (
+  ).toFixed(2);
+  const nextDraftMythicWanted = (
     (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted) /
     unownedUniqueMythics
-  ).toLocaleString([], {
-    style: "percent",
-    maximumSignificantDigits: 2
-  });
+  ).toFixed(2);
   // chance that the next booster opened contains a wanted card
-  const chanceBoosterRareWanted = (
+  const nextBoosterRareWanted = (
     (chanceBoosterHasRare * setStats["rare"].uniqueWanted * 3) /
     setStats["rare"].unique
-  ).toLocaleString([], {
-    style: "percent",
-    maximumSignificantDigits: 2
-  });
-  const chanceBoosterMythicWanted = (
+  ).toFixed(2);
+  const nextBoosterMythicWanted = (
     (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted * 3) /
     setStats["mythic"].unique
-  ).toLocaleString([], {
-    style: "percent",
-    maximumSignificantDigits: 2
-  });
+  ).toFixed(2);
   // estimate remaining drafts to collect entire set
   // https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2
   // D = (T - P*7/8*11/12 - R)/(N+W*7/8*11/12)
   const remainingRares =
     setStats["rare"].total - setStats["rare"].owned - setStats.boosterRares;
-  const rareEstimate = Math.ceil(
+  const completionDraftRare = Math.ceil(
     remainingRares / (rareDraftFactor + estimateBoosterRares(boosterWinFactor))
+  );
+  const completionBoosterRare = Math.ceil(
+    remainingRares / (chanceBoosterHasRare * chanceNotWildCard)
   );
   const remainingMythics =
     setStats["mythic"].total -
     setStats["mythic"].owned -
     setStats.boosterMythics;
-  const mythicEstimate = Math.ceil(
+  const completionDraftMythic = Math.ceil(
     remainingMythics /
       (mythicDraftFactor + estimateBoosterMythics(boosterWinFactor))
   );
+  const completionBoosterMythic = Math.ceil(
+    remainingMythics / (chanceBoosterHasMythic * chanceNotWildCard)
+  );
+  const symbolStyle = {
+    height: "20px",
+    width: "20px",
+    backgroundSize: "contain",
+    margin: "auto 2px",
+    verticalAlign: "middle"
+  };
+  const newSymbol = (
+    <OwnershipSymbol
+      color={"orange"}
+      title={"new copies"}
+      style={symbolStyle}
+    />
+  );
+  const wantedSymbol = (
+    <OwnershipSymbol
+      color={"blue"}
+      title={"wanted copies (missing in a current deck)"}
+      style={symbolStyle}
+    />
+  );
   return (
-    <>
-      <div className={"stats_set_completion"}>
-        <div
-          className={"stats_set_icon bo_explore_cost"}
-          style={{ height: "30px" }}
-        >
-          <span style={{ fontSize: "13px" }}>
-            <i>
-              {setStats.boosters} current boosters: ~
-              {setStats.boosterRares.toFixed(2)} new rares, ~
-              {setStats.boosterMythics.toFixed(2)} new mythics
-            </i>
-          </span>
-        </div>
+    <div className={"stats_set_completion"}>
+      <div className={"stats_set_completion_row"}>
+        <MetricText />
+        <MetricText>
+          <RaritySymbol rarity={"rare"} /> rares
+        </MetricText>
+        <MetricText>
+          <RaritySymbol rarity={"mythic"} /> mythics
+        </MetricText>
       </div>
-      <div className={"stats_set_completion"}>
-        <div
-          className={"stats_set_icon economy_ticket"}
-          style={{ height: "30px" }}
-        >
-          <span style={{ fontSize: "13px" }}>
-            <i>
-              next draft pool: ~{nextDraftRares} new rares, ~{nextDraftMythics}{" "}
-              new mythics
-            </i>
-          </span>
+      {setStats.boosterRares > 0 && (
+        <div className={"stats_set_completion_row"}>
+          <MetricText>
+            Inventory
+            <BoosterSymbol />
+            {setStats.boosters}:
+          </MetricText>
+          <MetricText>
+            {newSymbol}~{setStats.boosterRares.toFixed(2)}
+          </MetricText>
+          <MetricText>
+            {newSymbol}~{setStats.boosterMythics.toFixed(2)}
+          </MetricText>
         </div>
+      )}
+      <div className={"stats_set_completion_row"}>
+        <MetricText>
+          Next booster
+          <BoosterSymbol />:
+        </MetricText>
+        <MetricText>
+          {newSymbol}~{chanceBoosterHasRare.toFixed(2)}, {wantedSymbol}~
+          {nextBoosterRareWanted}
+        </MetricText>
+        <MetricText>
+          {newSymbol}~{chanceBoosterHasMythic.toFixed(2)}, {wantedSymbol}~
+          {nextBoosterMythicWanted}
+        </MetricText>
       </div>
-      <div className={"stats_set_completion"}>
-        <div
-          className={"stats_set_icon bo_explore_cost"}
-          style={{ height: "30px" }}
-        >
-          <span style={{ fontSize: "13px" }}>
-            <i>
-              next booster: ~{chanceDraftRareWanted} {wantedText} rares, ~
-              {chanceDraftMythicWanted} {wantedText} mythics
-            </i>
-          </span>
-        </div>
+      <div className={"stats_set_completion_row"}>
+        <MetricText>
+          Next draft pool
+          <TicketSymbol />:
+        </MetricText>
+        <MetricText>
+          {newSymbol}~{nextDraftRares}, {wantedSymbol}~{nextDraftRareWanted}
+        </MetricText>
+        <MetricText>
+          {newSymbol}~{nextDraftMythics}, {wantedSymbol}~{nextDraftMythicWanted}
+        </MetricText>
       </div>
-      <div className={"stats_set_completion"}>
-        <div
-          className={"stats_set_icon economy_ticket"}
-          style={{ height: "30px" }}
-        >
-          <span style={{ fontSize: "13px" }}>
-            <i>
-              next draft pool: ~{chanceBoosterRareWanted} {wantedText} rares, ~
-              {chanceBoosterMythicWanted} {wantedText} mythics
-            </i>
-          </span>
-        </div>
+      <div className={"stats_set_completion_row"}>
+        <MetricText>
+          Completion* <CalendarSymbol />:
+        </MetricText>
+        <MetricText>
+          <BoosterSymbol />~{completionBoosterRare} or <TicketSymbol />~
+          {completionDraftRare}
+        </MetricText>
+        <MetricText>
+          <BoosterSymbol />~{completionBoosterMythic} or <TicketSymbol />~
+          {completionDraftMythic}
+        </MetricText>
       </div>
-      <div className={"stats_set_completion"}>
-        <div className={"stats_set_icon icon_2"} style={{ height: "30px" }}>
-          <span style={{ fontSize: "13px" }}>
-            <i>
-              drafts to complete set*: ~{rareEstimate} for rares, ~
-              {mythicEstimate} for mythics
-            </i>
-          </span>
-        </div>
-      </div>
-    </>
+    </div>
   );
 }
