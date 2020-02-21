@@ -118,84 +118,104 @@ export function SetCompletionStats({
     margin: "auto 2px",
     verticalAlign: "middle"
   };
-  const newSymbol = (
-    <OwnershipSymbol
-      color={"orange"}
-      title={"new copies"}
-      style={symbolStyle}
-    />
-  );
-  const wantedSymbol = (
-    <OwnershipSymbol
-      color={"blue"}
-      title={"wanted copies (missing in a current deck)"}
-      style={symbolStyle}
-    />
-  );
+  const newSymbol = <OwnershipSymbol color={"orange"} style={symbolStyle} />;
+  const wantedSymbol = <OwnershipSymbol color={"blue"} style={symbolStyle} />;
   return (
     <div className={"stats_set_completion"}>
       <div className={"stats_set_completion_row"}>
         <MetricText />
         <MetricText>
-          <RaritySymbol rarity={"rare"} /> rares
+          <RaritySymbol rarity={"rare"} /> Rares
         </MetricText>
         <MetricText>
-          <RaritySymbol rarity={"mythic"} /> mythics
+          <RaritySymbol rarity={"mythic"} /> Mythics
         </MetricText>
       </div>
       {!!(setStats.boosterRares > 0 || futureBoosters > 0) && (
         <div className={"stats_set_completion_row"}>
-          <MetricText>
+          <MetricText title={"boosters in inventory, current (+future)"}>
             Inventory
             <BoosterSymbol />
             {setStats.boosters} (+{futureBoosters}):
           </MetricText>
-          <MetricText>
+          <MetricText title={"new copies, current (+future)"}>
             {newSymbol}~{boosterRares.toFixed(2)} (+{futureRares.toFixed(2)})
           </MetricText>
-          <MetricText>
-            {newSymbol}~{boosterMythics.toFixed(2)} (+{futureMythics.toFixed(2)}
-            )
+          <MetricText title={"new copies, current (+future)"}>
+            {newSymbol}~{boosterMythics.toFixed(2)} (+
+            {futureMythics.toFixed(2)})
           </MetricText>
         </div>
       )}
       <div className={"stats_set_completion_row"}>
-        <MetricText>
+        <MetricText title={"Arena booster w duplicate protection"}>
           Next booster
           <BoosterSymbol />:
         </MetricText>
         <MetricText>
-          {newSymbol}~{chanceBoosterHasRare.toFixed(2)}, {wantedSymbol}~
-          {nextBoosterRareWanted}
+          <span title={"new copies"}>
+            {newSymbol}~{chanceBoosterHasRare.toFixed(2)}
+          </span>
+          ,{" "}
+          <span title={"wanted copies (missing in a current deck)"}>
+            {wantedSymbol}~{nextBoosterRareWanted}
+          </span>
         </MetricText>
         <MetricText>
-          {newSymbol}~{chanceBoosterHasMythic.toFixed(2)}, {wantedSymbol}~
-          {nextBoosterMythicWanted}
+          <span title={"new copies"}>
+            {newSymbol}~{chanceBoosterHasMythic.toFixed(2)}
+          </span>
+          ,{" "}
+          <span title={"wanted copies (missing in a current deck)"}>
+            {wantedSymbol}~{nextBoosterMythicWanted}
+          </span>
         </MetricText>
       </div>
       <div className={"stats_set_completion_row"}>
-        <MetricText>
+        <MetricText title={"draft pool first picks (P1P1+P2P1+P3P1)"}>
           Next draft pool
           <TicketSymbol />:
         </MetricText>
         <MetricText>
-          {newSymbol}~{nextDraftRares}, {wantedSymbol}~{nextDraftRareWanted}
+          <span title={"new copies"}>
+            {newSymbol}~{nextDraftRares}
+          </span>
+          ,{" "}
+          <span title={"wanted copies (missing in a current deck)"}>
+            {wantedSymbol}~{nextDraftRareWanted}
+          </span>
         </MetricText>
         <MetricText>
-          {newSymbol}~{nextDraftMythics}, {wantedSymbol}~{nextDraftMythicWanted}
+          <span title={"new copies"}>
+            {newSymbol}~{nextDraftMythics}
+          </span>
+          ,{" "}
+          <span title={"wanted copies (missing in a current deck)"}>
+            {wantedSymbol}~{nextDraftMythicWanted}
+          </span>
         </MetricText>
       </div>
       <div className={"stats_set_completion_row"}>
-        <MetricText>
+        <MetricText title={"see estimation inputs on right"}>
           Completion* <CalendarSymbol />:
         </MetricText>
         <MetricText>
-          <BoosterSymbol />~{completionBoosterRare} or <TicketSymbol />~
-          {completionDraftRare}
+          <span title={"additional Arena boosters to complete"}>
+            <BoosterSymbol />~{completionBoosterRare}
+          </span>{" "}
+          or{" "}
+          <span title={"additional drafts to complete"}>
+            <TicketSymbol />~{completionDraftRare}
+          </span>
         </MetricText>
         <MetricText>
-          <BoosterSymbol />~{completionBoosterMythic} or <TicketSymbol />~
-          {completionDraftMythic}
+          <span title={"additional Arena boosters to complete"}>
+            <BoosterSymbol />~{completionBoosterMythic}
+          </span>{" "}
+          or{" "}
+          <span title={"additional drafts to complete"}>
+            <TicketSymbol />~{completionDraftMythic}
+          </span>
         </MetricText>
       </div>
     </div>

@@ -14,6 +14,7 @@ import { useBlurOnEnter } from "../tables/hooks";
 import CompletionProgressBar, {
   SetCompletionBar
 } from "./CompletionProgressBar";
+import { CalendarSymbol, RaritySymbol, BoosterSymbol } from "../display";
 
 const getRarityKey = (
   rarity: string
@@ -74,6 +75,7 @@ export function CollectionStatsPanel({
       missing[key] = countStats.total - countStats.owned;
     }
   });
+  const inputStyle = { width: "60px" };
 
   return (
     <>
@@ -144,12 +146,19 @@ export function CollectionStatsPanel({
           })}
           {boosterMath && (
             <>
-              <div className={"deck_name"} style={{ width: "100%" }}>
-                Draft Estimator*:
+              <div
+                className={"deck_name"}
+                style={{ width: "100%" }}
+                title={"set completion estimator"}
+              >
+                Completion* <CalendarSymbol />:
               </div>
-              <label className={"but_container_label"}>
-                rares/draft:
-                <div className={"input_container"}>
+              <label
+                className={"but_container_label"}
+                title={"rare picks per draft"}
+              >
+                <RaritySymbol rarity={"rare"} /> rares/draft:
+                <div className={"input_container"} style={inputStyle}>
                   <input
                     ref={rareDraftInputRef}
                     type={"text"}
@@ -170,9 +179,12 @@ export function CollectionStatsPanel({
                   />
                 </div>
               </label>
-              <label className={"but_container_label"}>
-                mythics/draft:
-                <div className={"input_container"}>
+              <label
+                className={"but_container_label"}
+                title={"mythic picks per draft"}
+              >
+                <RaritySymbol rarity={"mythic"} /> mythics/draft:
+                <div className={"input_container"} style={inputStyle}>
                   <input
                     ref={mythicDraftInputRef}
                     type={"text"}
@@ -193,9 +205,12 @@ export function CollectionStatsPanel({
                   />
                 </div>
               </label>
-              <label className={"but_container_label"}>
-                boosters/draft:
-                <div className={"input_container"}>
+              <label
+                className={"but_container_label"}
+                title={"prize boosters awarded per draft"}
+              >
+                <BoosterSymbol /> boosters/draft:
+                <div className={"input_container"} style={inputStyle}>
                   <input
                     ref={boosterWinInputRef}
                     type={"text"}
@@ -216,9 +231,12 @@ export function CollectionStatsPanel({
                   />
                 </div>
               </label>
-              <label className={"but_container_label"}>
-                future boosters:
-                <div className={"input_container"}>
+              <label
+                className={"but_container_label"}
+                title={"expected other boosters, e.g. rewards track"}
+              >
+                <BoosterSymbol /> future boosters:
+                <div className={"input_container"} style={inputStyle}>
                   <input
                     ref={futureBoostersInputRef}
                     type={"text"}
