@@ -76,13 +76,23 @@ export function SetCompletionStats({
     setStats["mythic"].unique
   ).toFixed(2);
   // chance that the next draft pool (P1P1, P2P1, P3P1) contains a wanted card
-  const nextDraftRareWanted = (
-    (chanceBoosterHasRare * setStats["rare"].uniqueWanted) /
-    unownedUniqueRares
+  const nextDraftRareWanted = (unownedUniqueRares > 0
+    ? (chanceBoosterHasRare * setStats["rare"].uniqueWanted) /
+      unownedUniqueRares
+    : 0
   ).toFixed(2);
-  const nextDraftMythicWanted = (
-    (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted) /
-    unownedUniqueMythics
+  const nextDraftMythicWanted = (unownedUniqueMythics > 0
+    ? (chanceBoosterHasMythic * setStats["mythic"].uniqueWanted) /
+      unownedUniqueMythics
+    : 0
+  ).toFixed(2);
+  // chance that the next booster opened contains an unowned card
+  const nextBoosterRare = Math.min(chanceBoosterHasRare, unownedRares).toFixed(
+    2
+  );
+  const nextBoosterMythic = Math.min(
+    chanceBoosterHasMythic,
+    unownedMythics
   ).toFixed(2);
   // chance that the next booster opened contains a wanted card
   const nextBoosterRareWanted = (
@@ -97,17 +107,24 @@ export function SetCompletionStats({
   // https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2
   // D = (T - P*7/8*11/12 - R)/(N+W*7/8*11/12)
   const remainingRares = unownedRares - boosterRares - futureRares;
-  const completionDraftRare = Math.ceil(
-    remainingRares / (rareDraftFactor + estimateBoosterRares(boosterWinFactor))
-  );
+  const completionDraftRare =
+    remainingRares > 0
+      ? Math.ceil(
+          remainingRares /
+            (rareDraftFactor + estimateBoosterRares(boosterWinFactor))
+        )
+      : 0;
   const completionBoosterRare = Math.ceil(
     remainingRares / (chanceBoosterHasRare * chanceNotWildCard)
   );
   const remainingMythics = unownedMythics - boosterMythics - futureMythics;
-  const completionDraftMythic = Math.ceil(
-    remainingMythics /
-      (mythicDraftFactor + estimateBoosterMythics(boosterWinFactor))
-  );
+  const completionDraftMythic =
+    remainingMythics > 0
+      ? Math.ceil(
+          remainingMythics /
+            (mythicDraftFactor + estimateBoosterMythics(boosterWinFactor))
+        )
+      : 0;
   const completionBoosterMythic = Math.ceil(
     remainingMythics / (chanceBoosterHasMythic * chanceNotWildCard)
   );
@@ -154,7 +171,7 @@ export function SetCompletionStats({
         </MetricText>
         <MetricText>
           <span title={"new copies"}>
-            {newSymbol}~{chanceBoosterHasRare.toFixed(2)}
+            {newSymbol}~{nextBoosterRare}
           </span>
           ,{" "}
           <span title={"wanted copies (missing in a current deck)"}>
@@ -163,7 +180,7 @@ export function SetCompletionStats({
         </MetricText>
         <MetricText>
           <span title={"new copies"}>
-            {newSymbol}~{chanceBoosterHasMythic.toFixed(2)}
+            {newSymbol}~{nextBoosterMythic}
           </span>
           ,{" "}
           <span title={"wanted copies (missing in a current deck)"}>

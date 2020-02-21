@@ -240,7 +240,7 @@ export function CollectionStatsPanel({
               </label>
               <label
                 className={"but_container_label"}
-                title={"expected other boosters, e.g. rewards track"}
+                title={"expected additional boosters, e.g. seasonal rewards"}
               >
                 <BoosterSymbol /> future boosters:
                 <div className={"input_container"} style={inputStyle}>
