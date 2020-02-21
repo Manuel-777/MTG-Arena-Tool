@@ -21,13 +21,15 @@ export function SetCompletionStats({
   boosterMath,
   rareDraftFactor,
   mythicDraftFactor,
-  boosterWinFactor
+  boosterWinFactor,
+  futureBoosters
 }: {
   setStats: SetStats;
   boosterMath: boolean;
   rareDraftFactor: number;
   mythicDraftFactor: number;
   boosterWinFactor: number;
+  futureBoosters: number;
 }): JSX.Element {
   const unownedUniqueRares =
     setStats["rare"].unique - setStats["rare"].complete;
@@ -51,6 +53,19 @@ export function SetCompletionStats({
   if (!(unownedUniqueRares || unownedUniqueMythics)) {
     return <></>; // all set rares and mythics completed
   }
+  const unownedRares = setStats["rare"].total - setStats["rare"].owned;
+  const unownedMythics = setStats["mythic"].total - setStats["mythic"].owned;
+  // estimate future rares and mythics (e.g. from seasonal rewards track)
+  const boosterRares = Math.min(setStats.boosterRares, unownedRares);
+  const boosterMythics = Math.min(setStats.boosterMythics, unownedMythics);
+  const futureRares = Math.min(
+    estimateBoosterRares(futureBoosters),
+    unownedRares - boosterRares
+  );
+  const futureMythics = Math.min(
+    estimateBoosterMythics(futureBoosters),
+    unownedMythics - boosterMythics
+  );
   // estimate unowned rares and mythics in next draft pool (P1P1, P2P1, P3P1)
   const nextDraftRares = (
     (chanceBoosterHasRare * unownedUniqueRares * 3) /
@@ -81,18 +96,14 @@ export function SetCompletionStats({
   // estimate remaining drafts to collect entire set
   // https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2
   // D = (T - P*7/8*11/12 - R)/(N+W*7/8*11/12)
-  const remainingRares =
-    setStats["rare"].total - setStats["rare"].owned - setStats.boosterRares;
+  const remainingRares = unownedRares - boosterRares - futureRares;
   const completionDraftRare = Math.ceil(
     remainingRares / (rareDraftFactor + estimateBoosterRares(boosterWinFactor))
   );
   const completionBoosterRare = Math.ceil(
     remainingRares / (chanceBoosterHasRare * chanceNotWildCard)
   );
-  const remainingMythics =
-    setStats["mythic"].total -
-    setStats["mythic"].owned -
-    setStats.boosterMythics;
+  const remainingMythics = unownedMythics - boosterMythics - futureMythics;
   const completionDraftMythic = Math.ceil(
     remainingMythics /
       (mythicDraftFactor + estimateBoosterMythics(boosterWinFactor))
@@ -132,18 +143,19 @@ export function SetCompletionStats({
           <RaritySymbol rarity={"mythic"} /> mythics
         </MetricText>
       </div>
-      {setStats.boosterRares > 0 && (
+      {!!(setStats.boosterRares > 0 || futureBoosters > 0) && (
         <div className={"stats_set_completion_row"}>
           <MetricText>
             Inventory
             <BoosterSymbol />
-            {setStats.boosters}:
+            {setStats.boosters} (+{futureBoosters}):
           </MetricText>
           <MetricText>
-            {newSymbol}~{setStats.boosterRares.toFixed(2)}
+            {newSymbol}~{boosterRares.toFixed(2)} (+{futureRares.toFixed(2)})
           </MetricText>
           <MetricText>
-            {newSymbol}~{setStats.boosterMythics.toFixed(2)}
+            {newSymbol}~{boosterMythics.toFixed(2)} (+{futureMythics.toFixed(2)}
+            )
           </MetricText>
         </div>
       )}

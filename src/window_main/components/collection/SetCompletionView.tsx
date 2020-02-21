@@ -11,7 +11,8 @@ export function SetsView({
   boosterMath,
   rareDraftFactor,
   mythicDraftFactor,
-  boosterWinFactor
+  boosterWinFactor,
+  futureBoosters
 }: {
   stats: CollectionStats;
   setClickCallback: (set: string) => void;
@@ -20,6 +21,7 @@ export function SetsView({
   rareDraftFactor: number;
   mythicDraftFactor: number;
   boosterWinFactor: number;
+  futureBoosters: number;
 }): JSX.Element {
   const collectibleSets = db.sortedSetCodes.filter(set => {
     // ensure metadata populated
@@ -50,6 +52,7 @@ export function SetsView({
             rareDraftFactor={rareDraftFactor}
             mythicDraftFactor={mythicDraftFactor}
             boosterWinFactor={boosterWinFactor}
+            futureBoosters={futureBoosters}
           />
         </div>
       ))}

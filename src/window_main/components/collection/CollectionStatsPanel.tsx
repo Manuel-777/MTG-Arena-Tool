@@ -32,10 +32,12 @@ export function CollectionStatsPanel({
   rareDraftFactor,
   mythicDraftFactor,
   boosterWinFactor,
+  futureBoosters,
   setCountMode,
   setRareDraftFactor,
   setMythicDraftFactor,
-  setBoosterWinFactor
+  setBoosterWinFactor,
+  setFutureBoosters
 }: {
   stats?: CollectionStats;
   countMode: string;
@@ -43,14 +45,17 @@ export function CollectionStatsPanel({
   rareDraftFactor: number;
   mythicDraftFactor: number;
   boosterWinFactor: number;
+  futureBoosters: number;
   setCountMode: (mode: string) => void;
   setRareDraftFactor: (factor: number) => void;
   setMythicDraftFactor: (factor: number) => void;
   setBoosterWinFactor: (factor: number) => void;
+  setFutureBoosters: (factor: number) => void;
 }): JSX.Element {
   const [rareDraftInputRef, rareDraftOnKey] = useBlurOnEnter();
   const [mythicDraftInputRef, mythicDraftOnKey] = useBlurOnEnter();
   const [boosterWinInputRef, boosterWinOnKey] = useBlurOnEnter();
+  const [futureBoostersInputRef, futureBoostersOnKey] = useBlurOnEnter();
   if (!stats) {
     return <></>;
   }
@@ -93,8 +98,8 @@ export function CollectionStatsPanel({
       </div>
       <div className={"flex_item"}>
         <div className={"main_stats"}>
-          <label>count:</label>
-          <div className={"stats_count_div"}>
+          <label>
+            count:
             <div
               className={"select_container stats_count_select"}
               style={{
@@ -110,7 +115,7 @@ export function CollectionStatsPanel({
                 callback={setCountMode}
               />
             </div>
-          </div>
+          </label>
           <SetCompletionBar
             countMode={countMode}
             setStats={setStats}
@@ -205,6 +210,29 @@ export function CollectionStatsPanel({
                         );
                         if (newFactor !== boosterWinFactor) {
                           setBoosterWinFactor(newFactor);
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </label>
+              <label className={"but_container_label"}>
+                future boosters:
+                <div className={"input_container"}>
+                  <input
+                    ref={futureBoostersInputRef}
+                    type={"text"}
+                    autoComplete={"off"}
+                    placeholder={"0"}
+                    defaultValue={futureBoosters}
+                    onKeyUp={futureBoostersOnKey}
+                    onBlur={(): void => {
+                      if (futureBoostersInputRef?.current) {
+                        const newFactor = parseFloat(
+                          futureBoostersInputRef?.current.value
+                        );
+                        if (newFactor !== futureBoosters) {
+                          setFutureBoosters(newFactor);
                         }
                       }
                     }}

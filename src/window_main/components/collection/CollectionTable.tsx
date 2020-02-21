@@ -110,6 +110,7 @@ export default function CollectionTable({
   const [rareDraftFactor, setRareDraftFactor] = React.useState(3);
   const [mythicDraftFactor, setMythicDraftFactor] = React.useState(0.14);
   const [boosterWinFactor, setBoosterWinFactor] = React.useState(1.2);
+  const [futureBoosters, setFutureBoosters] = React.useState(0);
   React.useEffect(() => tableModeCallback(tableMode), [
     tableMode,
     tableModeCallback
@@ -348,6 +349,7 @@ export default function CollectionTable({
         rareDraftFactor={rareDraftFactor}
         mythicDraftFactor={mythicDraftFactor}
         boosterWinFactor={boosterWinFactor}
+        futureBoosters={futureBoosters}
       />
     ) : (
       <div
@@ -420,10 +422,12 @@ export default function CollectionTable({
           rareDraftFactor={rareDraftFactor}
           mythicDraftFactor={mythicDraftFactor}
           boosterWinFactor={boosterWinFactor}
+          futureBoosters={futureBoosters}
           setCountMode={setCountMode}
           setRareDraftFactor={setRareDraftFactor}
           setMythicDraftFactor={setMythicDraftFactor}
           setBoosterWinFactor={setBoosterWinFactor}
+          setFutureBoosters={setFutureBoosters}
         />
       </div>
     </>
