@@ -1,11 +1,11 @@
 import _ from "lodash";
 import React from "react";
 import ReactDOM from "react-dom";
-import { queryElements as $$ } from "../shared/dom-fns";
-import { clickNav } from "./tabControl";
-import pd from "../shared/player-data";
+import { queryElements as $$ } from "../../../shared/dom-fns";
+import { clickNav } from "../../tabControl";
+import pd from "../../../shared/player-data";
 
-import { get_rank_index as getRankIndex, formatRank } from "../shared/util";
+import { get_rank_index as getRankIndex, formatRank } from "../../../shared/util";
 
 import {
   MAIN_HOME,
@@ -17,7 +17,7 @@ import {
   MAIN_COLLECTION,
   MAIN_CONSTRUCTED,
   MAIN_LIMITED
-} from "../shared/constants";
+} from "../../../shared/constants";
 
 interface TopNavItemProps {
   currentTab: number;
@@ -143,7 +143,7 @@ function PatreonBadge(props: PatreonProps): JSX.Element {
   return <div title={title} style={style} className="top_patreon"></div>;
 }
 
-function TopNav(): JSX.Element {
+export function TopNav(): JSX.Element {
   const [compact, setCompact] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState(pd.settings.last_open_tab);
   const topNavIconsRef: any = React.useRef(null);

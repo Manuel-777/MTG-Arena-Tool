@@ -1,5 +1,4 @@
 import { ipcRenderer as ipc, remote, shell } from "electron";
-import sha1 from "js-sha1";
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");
   const unhandled = require("electron-unhandled");
@@ -24,7 +23,6 @@ import "@github/time-elements";
 
 import {
   EASING_DEFAULT,
-  HIDDEN_PW,
   MAIN_LOGIN,
   MAIN_HOME,
   MAIN_EXPLORE,
@@ -64,7 +62,11 @@ import { showOfflineSplash } from "./renderer-util";
 import { setExploreDecks } from "./explore";
 
 import { openTab, forceOpenAbout, forceOpenSettings } from "./tabControl";
-import { updateTopBar } from "./topNav";
+import { updateTopBar } from "./components/main/topNav";
+
+import RenderApp from "./app/App";
+
+RenderApp();
 
 const byId = id => document.getElementById(id);
 let loggedIn = false;
@@ -293,14 +295,6 @@ ipc.on("prefill_auth_form", function(event, arg) {
   byId("signin_pass").value = arg.password;
 });
 
-// Seems this is not used anymore?
-function rememberMe() {
-  const rSettings = {
-    remember_me: byId("rememberme").checked
-  };
-  ipcSend("save_app_settings", rSettings);
-}
-
 //
 ipc.on("initialize", function() {
   showLoadingBars();
@@ -357,17 +351,6 @@ window.addEventListener("resize", () => {
   updateTopBar();
 });
 
-function ready(fn) {
-  if (
-    document.attachEvent
-      ? document.readyState === "complete"
-      : document.readyState !== "loading"
-  ) {
-    fn();
-  } else {
-    document.addEventListener("DOMContentLoaded", fn);
-  }
-}
 
 ipc.on("toggle_login", (event, arg) => {
   loginToggle(arg);
@@ -382,60 +365,6 @@ function loginToggle(toggle) {
     $$(".login_link")[0].classList.add("disabled");
   }
 }
-
-ready(function() {
-  $$(".version_number")[0].innerHTML = `v${remote.app.getVersion()}`;
-
-  $$(".version_number")[0].addEventListener("click", function() {
-    forceOpenSettings(SETTINGS_ABOUT);
-  });
-
-  $$(".signup_link")[0].addEventListener("click", function() {
-    shell.openExternal("https://mtgatool.com/signup/");
-  });
-
-  $$(".offline_link")[0].addEventListener("click", function() {
-    ipcSend("login", { username: "", password: "" });
-  });
-
-  $$(".forgot_link")[0].addEventListener("click", function() {
-    shell.openExternal("https://mtgatool.com/resetpassword/");
-  });
-
-  function submitAuthenticateForm() {
-    if (canLogin) {
-      const user = byId("signin_user").value;
-      let pass = byId("signin_pass").value;
-      if (pass !== HIDDEN_PW) {
-        pass = sha1(pass);
-      }
-      ipcSend("login", { username: user, password: pass });
-      loginToggle(false);
-    }
-  }
-
-  $$("#authenticate_form")[0].addEventListener("submit", e => {
-    e.preventDefault();
-    submitAuthenticateForm();
-  });
-
-  $$(".login_link")[0].addEventListener("click", submitAuthenticateForm);
-
-  //
-  $$(".close")[0].addEventListener("click", function() {
-    ipcSend("renderer_window_close", 1);
-  });
-
-  //
-  $$(".minimize")[0].addEventListener("click", function() {
-    ipcSend("renderer_window_minimize", 1);
-  });
-
-  //
-  $$(".settings")[0].addEventListener("click", function() {
-    forceOpenSettings();
-  });
-});
 
 //
 ipc.on("set_draft_link", function(event, arg) {

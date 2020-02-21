@@ -14,7 +14,7 @@ import {
   SETTINGS_ABOUT
 } from "../shared/constants";
 
-import { updateTopBar } from "./topNav";
+import { updateTopBar } from "./components/main/topNav";
 import pd from "../shared/player-data";
 import Aggregator from "./aggregator";
 import anime from "animejs";

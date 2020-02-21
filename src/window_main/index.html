@@ -8,94 +8,10 @@
         <link rel="stylesheet" href="../shared/shared.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i|Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
-        <script src="renderer.js"></script>
     </head>
     <body>
-        <div class="main_wrapper main_bg_image">
-        </div>
-        <div class="outer_wrapper">
-            <div class="dialog_wrapper">
-                <div class="dialog">
-                </div>
-            </div>
-
-            <div class="top">
-                <div class="flex_item">
-                    <div class="top_logo"></div>
-                    <div class="top_artist">Bedevil by Seb Seb McKinnon</div>
-                </div>
-                <div class="flex_item">
-                    <div class="unlink" title="You are not logged-in."></div>
-                    <div class="notification"></div>
-                    <div class="button minimize"></div>
-                    <div class="button settings"></div>
-                    <div class="button close"></div>
-                </div>
-            </div>
-            <div class="top_nav_container">
-                <!-- Now featuring; React! -->
-            </div>
-
-            <div class="loading_bar_main main_loading" style="display: none"><div class="loading_color loading_w"></div><div class="loading_color loading_u"></div><div class="loading_color loading_b"></div><div class="loading_color loading_r"></div><div class="loading_color loading_g"></div></div>
-
-            <div class="popup"></div>
-            <div class="wrapper">
-                <div class="loading_bar init_loading"><div class="loading_color loading_w"></div><div class="loading_color loading_u"></div><div class="loading_color loading_b"></div><div class="loading_color loading_r"></div><div class="loading_color loading_g"></div></div>
-
-                <div class="overflow_ux hidden">
-                    <div class="moving_ux">
-                        <div class="ux_item" id="ux_0">
-                        </div>
-
-                        <div class="ux_item" id="ux_1">
-                        </div>
-
-                        <div class="ux_item" id="ux_2">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="main_hover_container">
-                    <div class="hover_card_quantity" style="opacity: 0;"></div>
-                    <img class="main_hover" style="opacity: 0;">
-                    <img class="main_hover_dfc" style="opacity: 0;">
-                </div>
-                <div class="main_hover_container">
-                    <img class="loader" src="../images/nocard.png">
-                    <img class="loader_dfc" src="../images/nocard.png">
-                </div>
-
-                <div class="message_center">
-                    <div class="message_big red">Loading</div>
-                    <div class="message_sub white">Just a moment..</div>
-                </div>
-
-                <form id="authenticate_form" class="authenticate">
-                    <div class="message_big green">Welcome!</div>
-                        <label style="display: table">Email</label>
-                    <div class="input_login_container">
-                        <input type="username" id="signin_user" autocomplete="off" />
-                    </div>
-                        <label style="display: table">Password</label>
-                    <div class="input_login_container">
-                        <input type="password" id="signin_pass" autocomplete="off" />
-                    </div>
-                    <div class="button_simple_disabled centered login_link">Login</div>
-                    <input type="submit" style="display:none" />
-
-                    <label class="check_container check_container_centered hover_label">Remember me?
-                        <input type="checkbox" id="rememberme" onclick="rememberMe()" />
-                        <span class="checkmark"></span>
-                    </label>
-
-                    <div class="message_small">Dont have an account? <a class="signup_link">Sign up!</a></div>
-                    <div class="message_small">You can also <a class="offline_link">continue offline</a></div>
-                    --<div class="message_small">Did you <a class="forgot_link">forget your password?</a></div>
-                </form>
-            </div>
-
-            <div class="version_number"></div>
-        </div>
+        <div id="appcontainer"></div>
     </body>
+    <script src="renderer.js"></script>
 </html>
 
