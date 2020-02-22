@@ -1,21 +1,38 @@
 import React from "react";
-import { useContext } from "../../app/web-provider";
+import { ipcSend } from "../../renderer-util";
+import { forceOpenSettings } from "../../tabControl";
 
-export default function TopBar(): JSX.Element {
-  const appContext = useContext();
+interface TopBarProps {
+  artist: string;
+  offline: boolean;
+}
 
+function clickMinimize(): void {
+  ipcSend("renderer_window_minimize", 1);
+}
+
+function clickSettings(): void {
+  forceOpenSettings();
+}
+
+function clickClose(): void {
+  ipcSend("renderer_window_close", 1);
+}
+
+export default function TopBar(props: TopBarProps): JSX.Element {
   return (
     <div className="top">
       <div className="flex_item">
         <div className="top_logo"></div>
-        <div className="top_artist">{appContext.TopArtist}</div>
+        <div className="top_artist">{props.artist}</div>
       </div>
       <div className="flex_item">
-        <div className="unlink" title="You are not logged-in."></div>
-        <div className="notification"></div>
-        <div className="button minimize"></div>
-        <div className="button settings"></div>
-        <div className="button close"></div>
+        {props.offline ?? (
+          <div className="unlink" title="You are not logged-in."></div>
+        )}
+        <div onClick={clickMinimize} className="button minimize"></div>
+        <div onClick={clickSettings} className="button settings"></div>
+        <div onClick={clickClose} className="button close"></div>
       </div>
     </div>
   );

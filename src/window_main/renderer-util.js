@@ -84,12 +84,12 @@ function pop(str, timeout) {
 }
 
 function showLoadingBars() {
-  $$(".main_loading")[0].style.display = "block";
+  //$$(".main_loading")[0].style.display = "block";
   document.body.style.cursor = "progress";
 }
 
 function hideLoadingBars() {
-  $$(".main_loading")[0].style.display = "none";
+  //$$(".main_loading")[0].style.display = "none";
   document.body.style.cursor = "auto";
 }
 

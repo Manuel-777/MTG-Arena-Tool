@@ -1,35 +1,25 @@
 import React from "react";
+import ContextReducer from "./ContextReducer";
 
 const StateContext = React.createContext(null);
 const DispatchContext = React.createContext(null);
 
-function contextReducer(state: any, action: any): any {
-  switch (action.type) {
-    case "setBackgroundImage": {
-      return { ...state, BackgroundImage: action.BackgroundImage };
-    }
-    case "setTopArtist": {
-      return { ...state, TopArtist: action.TopArtist };
-    }
-    case "setHoverCard": {
-      return { ...state, HoverGrpId: action.HoverGrpId };
-    }
-    default: {
-      throw new Error(`Unhandled action type: ${action.type}`);
-    }
-  }
-}
-
-interface AppContext {
+export interface AppContext {
   HoverGrpId: number;
   TopArtist: string;
   BackgroundImage: string;
+  Offline: boolean;
+  Loading: boolean;
+  TopNav: number;
 }
 
 const defaultState: AppContext = {
   HoverGrpId: 1,
   TopArtist: "Bedevil by Seb Seb McKinnon",
-  BackgroundImage: "default"
+  BackgroundImage: "default",
+  Offline: false,
+  Loading: false,
+  TopNav: 0
 };
 
 interface WebProviderProps {
@@ -37,7 +27,7 @@ interface WebProviderProps {
 }
 
 function ContextProvider({ children }: WebProviderProps): JSX.Element {
-  const [state, dispatch] = React.useReducer(contextReducer, defaultState);
+  const [state, dispatch] = React.useReducer(ContextReducer, defaultState);
   return (
     <StateContext.Provider value={state}>
       <DispatchContext.Provider value={dispatch}>
@@ -51,7 +41,7 @@ const useContext = (): AppContext => {
   const context = React.useContext(StateContext);
   if (!context) {
     throw new Error(
-      "useWebContext must be used in a component within a WebProvider."
+      "useContext must be used in a component within a ContextProvider."
     );
   }
   return context;

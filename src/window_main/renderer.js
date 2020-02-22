@@ -1,6 +1,6 @@
-import { ipcRenderer as ipc, remote, shell } from "electron";
+import {ipcRenderer as ipc, remote, shell} from "electron";
 if (!remote.app.isPackaged) {
-  const { openNewGitHubIssue, debugInfo } = require("electron-util");
+  const {openNewGitHubIssue, debugInfo} = require("electron-util");
   const unhandled = require("electron-unhandled");
   unhandled({
     showDialog: true,
@@ -8,13 +8,13 @@ if (!remote.app.isPackaged) {
       openNewGitHubIssue({
         user: "Manuel-777",
         repo: "MTG-Arena-Tool",
-        body: `\`\`\`\n${error.stack}\n\`\`\`\n\n---\n\n${debugInfo()}`
+        body: `\`\`\`\n${error.stack}\n\`\`\`\n\n---\n\n${debugInfo()}`,
       });
-    }
+    },
   });
   const Sentry = require("@sentry/electron");
   Sentry.init({
-    dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
+    dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171",
   });
 }
 
@@ -29,17 +29,13 @@ import {
   MAIN_SETTINGS,
   MAIN_UPDATE,
   SETTINGS_ABOUT,
-  SETTINGS_OVERLAY
+  SETTINGS_OVERLAY,
 } from "../shared/constants";
 
 import pd from "../shared/player-data";
-import { createDiv, queryElements as $$ } from "../shared/dom-fns";
+import {createDiv, queryElements as $$} from "../shared/dom-fns";
 
-import {
-  compare_cards,
-  get_deck_colors,
-  removeDuplicates
-} from "../shared/util";
+import {compare_cards, get_deck_colors, removeDuplicates} from "../shared/util";
 
 import {
   changeBackground,
@@ -50,19 +46,18 @@ import {
   pop,
   renderLogInput,
   setLocalState,
-  showLoadingBars
+  showLoadingBars,
 } from "./renderer-util";
 
-import { openHomeTab } from "./home";
-import { tournamentOpen } from "./tournaments";
-import { openDeck } from "./deck-details";
-import { openSettingsTab } from "./settings";
-import { setCurrentOverlaySettings } from "./components/settings/sectionOverlay";
-import { showOfflineSplash } from "./renderer-util";
-import { setExploreDecks } from "./explore";
+import {openHomeTab} from "./home";
+import {tournamentOpen} from "./tournaments";
+import {openDeck} from "./deck-details";
+import {openSettingsTab} from "./settings";
+import {setCurrentOverlaySettings} from "./components/settings/sectionOverlay";
+import {showOfflineSplash} from "./renderer-util";
+import {setExploreDecks} from "./explore";
 
-import { openTab, forceOpenAbout, forceOpenSettings } from "./tabControl";
-import { updateTopBar } from "./components/main/topNav";
+import {openTab, forceOpenAbout, forceOpenSettings} from "./tabControl";
 
 import RenderApp from "./app/App";
 
@@ -80,7 +75,7 @@ ipc.on("clear_pwd", function() {
 
 //
 ipc.on("auth", function(event, arg) {
-  setLocalState({ authToken: arg.token });
+  setLocalState({authToken: arg.token});
   if (arg.ok) {
     $$(".message_center")[0].style.display = "flex";
     $$(".authenticate")[0].style.display = "none";
@@ -94,7 +89,7 @@ ipc.on("auth", function(event, arg) {
 
 //
 ipc.on("set_discord_tag", (event, arg) => {
-  setLocalState({ discordTag: arg });
+  setLocalState({discordTag: arg});
   if (pd.settings.last_open_tab === MAIN_HOME) {
     openHomeTab(null, true);
   }
@@ -159,7 +154,7 @@ ipc.on("open_course_deck", function(event, arg) {
     targets: ".moving_ux",
     left: "-100%",
     easing: EASING_DEFAULT,
-    duration: 350
+    duration: 350,
   });
   arg = arg.CourseDeck;
   arg.colors = get_deck_colors(arg);
@@ -203,7 +198,7 @@ ipc.on("settings_updated", function() {
   if (pd.settings.last_open_tab === MAIN_SETTINGS) {
     openSettingsTab(-1);
   }
-  lastSettings = { ...pd.settings };
+  lastSettings = {...pd.settings};
 });
 
 let lastDataRefresh = null;
@@ -219,7 +214,6 @@ ipc.on("player_data_refresh", () => {
   if (lastRefreshTooRecent) return;
 
   const ls = getLocalState();
-  updateTopBar();
   // Will not be needed when elements are all reactify'ed
   openTab(pd.settings.last_open_tab, {}, ls.lastDataIndex, ls.lastScrollTop);
   lastDataRefresh = ts;
@@ -277,15 +271,14 @@ ipc.on("force_open_tab", function(event, arg) {
     targets: ".moving_ux",
     left: 0,
     easing: EASING_DEFAULT,
-    duration: 350
+    duration: 350,
   });
 
-  setLocalState({ lastDataIndex: 0, lastScrollTop: 0 });
+  setLocalState({lastDataIndex: 0, lastScrollTop: 0});
   openTab(arg);
   ipcSend("save_user_settings", {
-    skipRefresh: true
+    skipRefresh: true,
   });
-  updateTopBar();
 });
 
 //
@@ -298,7 +291,6 @@ ipc.on("prefill_auth_form", function(event, arg) {
 //
 ipc.on("initialize", function() {
   showLoadingBars();
-  updateTopBar();
 
   openTab(pd.settings.last_open_tab);
 
@@ -348,9 +340,7 @@ ipc.on("popup", function(event, arg, time) {
 
 window.addEventListener("resize", () => {
   hideLoadingBars();
-  updateTopBar();
 });
-
 
 ipc.on("toggle_login", (event, arg) => {
   loginToggle(arg);
@@ -392,6 +382,6 @@ ipc.on("tou_set", function(event, arg) {
     targets: ".moving_ux",
     left: "-100%",
     easing: EASING_DEFAULT,
-    duration: 350
+    duration: 350,
   });
 });

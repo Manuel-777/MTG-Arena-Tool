@@ -14,20 +14,11 @@ import {
   SETTINGS_ABOUT
 } from "../shared/constants";
 
-import { updateTopBar } from "./components/main/topNav";
 import pd from "../shared/player-data";
 import Aggregator from "./aggregator";
 import anime from "animejs";
 
-import {
-  changeBackground,
-  ipcSend,
-  getLocalState,
-  setLocalState,
-  hideLoadingBars,
-  resetMainContainer,
-  showLoadingBars
-} from "./renderer-util";
+import { ipcSend, getLocalState, setLocalState } from "./renderer-util";
 
 import { openDecksTab } from "./DecksTab";
 import { openMatchesTab } from "./MatchesTab";
@@ -40,8 +31,6 @@ import { openSettingsTab } from "./settings";
 import { openHomeTab, requestHome } from "./home";
 
 export function openTab(tab: number, filters = {}): void {
-  showLoadingBars();
-  resetMainContainer();
   switch (tab) {
     case MAIN_DECKS:
       openDecksTab(filters);
@@ -80,14 +69,11 @@ export function openTab(tab: number, filters = {}): void {
       }
       break;
     default:
-      hideLoadingBars();
-      //$$(".init_loading")[0].style.display = "block";
       break;
   }
 }
 
 export function clickNav(id: number): void {
-  changeBackground("default");
   document.body.style.cursor = "auto";
   anime({
     targets: ".moving_ux",
@@ -143,7 +129,6 @@ export function forceOpenAbout(): void {
   });
 
   openSettingsTab(SETTINGS_ABOUT);
-  updateTopBar();
 }
 
 export function forceOpenSettings(section = -1): void {
@@ -159,5 +144,4 @@ export function forceOpenSettings(section = -1): void {
   });
 
   openSettingsTab(section);
-  updateTopBar();
 }

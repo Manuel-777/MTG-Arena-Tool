@@ -1,11 +1,12 @@
 import _ from "lodash";
 import React from "react";
-import ReactDOM from "react-dom";
-import { queryElements as $$ } from "../../../shared/dom-fns";
 import { clickNav } from "../../tabControl";
 import pd from "../../../shared/player-data";
 
-import { get_rank_index as getRankIndex, formatRank } from "../../../shared/util";
+import {
+  get_rank_index as getRankIndex,
+  formatRank
+} from "../../../shared/util";
 
 import {
   MAIN_HOME,
@@ -18,8 +19,16 @@ import {
   MAIN_CONSTRUCTED,
   MAIN_LIMITED
 } from "../../../shared/constants";
+import { useDispatch } from "../../app/ContextProvider";
+import {
+  SET_LOADING,
+  SET_TOP_NAV,
+  dispatchAction,
+  SET_BACKGROUND_IMAGE
+} from "../../app/ContextReducer";
 
 interface TopNavItemProps {
+  dispatcher: unknown;
   currentTab: number;
   compact: boolean;
   id: number;
@@ -32,10 +41,12 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 
   const clickTab = React.useCallback(
     (tabId: number) => (): void => {
+      dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
+      dispatchAction(props.dispatcher, SET_LOADING, true);
       clickNav(tabId);
       callback(tabId);
     },
-    [props.id, props.callback]
+    [props.dispatcher, callback]
   );
 
   return compact ? (
@@ -75,6 +86,7 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 }
 
 interface TopRankProps {
+  dispatcher: unknown;
   currentTab: number;
   id: number;
   rank: any | null;
@@ -86,13 +98,15 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   const { currentTab, id, rank, callback, rankClass } = props;
 
   const selected = currentTab === id;
-
   const clickTab = React.useCallback(
     tabId => (): void => {
+      dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
+      dispatchAction(props.dispatcher, SET_LOADING, true);
+      dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
       clickNav(tabId);
       callback(tabId);
     },
-    [props.id, props.callback]
+    [props.dispatcher, callback]
   );
 
   if (rank == null) {
@@ -147,8 +161,10 @@ export function TopNav(): JSX.Element {
   const [compact, setCompact] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState(pd.settings.last_open_tab);
   const topNavIconsRef: any = React.useRef(null);
+  const dispatcher = useDispatch();
 
   const defaultTab = {
+    dispatcher: dispatcher,
     compact: compact,
     currentTab: currentTab,
     callback: setCurrentTab
@@ -167,6 +183,7 @@ export function TopNav(): JSX.Element {
   };
 
   const contructedNav = {
+    dispatcher: dispatcher,
     callback: setCurrentTab,
     currentTab: currentTab,
     id: MAIN_CONSTRUCTED,
@@ -175,6 +192,7 @@ export function TopNav(): JSX.Element {
   };
 
   const limitedNav = {
+    dispatcher: dispatcher,
     callback: setCurrentTab,
     currentTab: currentTab,
     id: MAIN_LIMITED,
@@ -190,7 +208,7 @@ export function TopNav(): JSX.Element {
     } else if (compact) {
       setCompact(false);
     }
-  });
+  }, [compact]);
 
   const patreon = {
     patreon: pd.patreon,
@@ -226,18 +244,4 @@ export function TopNav(): JSX.Element {
       </div>
     </div>
   );
-}
-
-export default function createTopNav(parent: Element): boolean {
-  ReactDOM.render(<TopNav />, parent);
-  return true;
-}
-
-export function updateTopBar(): void {
-  const topNavDiv = $$(".top_nav_container")[0];
-  createTopNav(topNavDiv);
-
-  if (pd.offline || !pd.settings.send_data) {
-    $$(".unlink")[0].style.display = "block";
-  }
 }
