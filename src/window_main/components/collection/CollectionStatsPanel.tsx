@@ -264,18 +264,15 @@ export function CollectionStatsPanel({
                   />
                 </div>
               </label>
-              <div className={"settings_note"} style={{ opacity: "0.6" }}>
-                <i>
-                  <a
-                    onClick={(): Promise<void> =>
-                      shell.openExternal(
-                        "https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2"
-                      )
-                    }
-                  >
-                    *[original by caliban on mtggoldfish]
-                  </a>
-                </i>
+              <div
+                className={"message_sub_15 white link"}
+                onClick={(): Promise<void> =>
+                  shell.openExternal(
+                    "https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2"
+                  )
+                }
+              >
+                *[original by caliban on mtggoldfish]
               </div>
             </>
           ) : (
