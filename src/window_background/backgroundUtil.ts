@@ -151,6 +151,4 @@ export function setData(
 
   const overlayData = _.pick(cleanData, overlayWhitelist);
   ipc_send("set_player_data", JSON.stringify(overlayData), IPC_OVERLAY);
-
-  if (refresh) ipc_send("player_data_refresh");
 }

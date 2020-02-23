@@ -15,14 +15,7 @@ import {
   useAggregatorAndSidePanel,
   useLastScrollTop
 } from "./components/tables/hooks";
-import mountReactComponent from "./mountReactComponent";
-import {
-  hideLoadingBars,
-  ipcSend,
-  makeResizable,
-  resetMainContainer,
-  toggleArchived
-} from "./renderer-util";
+import { ipcSend, makeResizable, toggleArchived } from "./renderer-util";
 import StatsPanel from "./stats-panel";
 
 function editTag(tag: string, color: string): void {
@@ -236,9 +229,6 @@ export function EventsTab({
   );
 }
 
-export function openEventsTab(aggFilters: AggregatorFilters = {}): void {
-  hideLoadingBars();
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mainDiv.classList.add("flex_item");
-  mountReactComponent(<EventsTab aggFiltersArg={aggFilters} />, mainDiv);
+export function openEventsTab(aggFilters: AggregatorFilters = {}): JSX.Element {
+  return <EventsTab aggFiltersArg={aggFilters} />;
 }

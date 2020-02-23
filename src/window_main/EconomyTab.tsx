@@ -6,13 +6,7 @@ import pd from "../shared/player-data";
 import EconomyTable from "./components/economy/EconomyTable";
 import { TransactionData } from "./components/economy/types";
 import { getPrettyContext } from "./economyUtils";
-import mountReactComponent from "./mountReactComponent";
-import {
-  hideLoadingBars,
-  ipcSend,
-  resetMainContainer,
-  toggleArchived
-} from "./renderer-util";
+import { ipcSend, toggleArchived } from "./renderer-util";
 import { InternalEconomyTransaction } from "../types/inventory";
 
 function saveTableState(economyTableState: TableState<TransactionData>): void {
@@ -100,8 +94,6 @@ export function EconomyTab(): JSX.Element {
   );
 }
 
-export function openEconomyTab(): void {
-  hideLoadingBars();
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mountReactComponent(<EconomyTab />, mainDiv);
+export function openEconomyTab(): JSX.Element {
+  return <EconomyTab />;
 }

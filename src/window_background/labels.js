@@ -161,7 +161,6 @@ function processMatch(json, matchBeginTime) {
   if (match.eventId == "DirectGame" && globals.currentDeck) {
     const str = globals.currentDeck.getSave();
     const httpApi = require("./httpApi");
-    httpApi.httpTournamentCheck(str, match.opponent.name, true);
   }
 
   return match;
@@ -1090,15 +1089,6 @@ export function onLabelOutDirectGameChallenge(entry) {
   let deck = json.params.deck;
   deck = JSON.parse(deck);
   select_deck(convertDeckFromV3(deck));
-
-  const httpApi = require("./httpApi");
-  httpApi.httpTournamentCheck(
-    globals.currentDeck.getSave(),
-    json.params.opponentDisplayName,
-    false,
-    json.params.playFirst,
-    json.params.bo3
-  );
 }
 
 export function onLabelOutEventAIPractice(entry) {

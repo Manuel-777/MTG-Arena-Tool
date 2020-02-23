@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import pd from "../shared/player-data";
-import {
-  changeBackground,
-  hideLoadingBars,
-  resetMainContainer,
-  ipcSend
-} from "./renderer-util";
+import { ipcSend } from "./renderer-util";
 
 import {
   SETTINGS_BEHAVIOUR,
@@ -19,7 +14,6 @@ import {
   SETTINGS_LOGIN
 } from "../shared/constants";
 
-import mountReactComponent from "./mountReactComponent";
 import SectionBehaviour from "./components/settings/SectionBehaviour";
 import SectionData from "./components/settings/SectionData";
 import SectionOverlay from "./components/settings/SectionOverlay";
@@ -156,14 +150,6 @@ function Settings(props: SettingsProps): JSX.Element {
 
 export function openSettingsTab(
   openSection = pd.settings.last_settings_section
-): void {
-  if (openSection == -1) {
-    openSection = pd.settings.last_settings_section;
-  }
-  changeBackground("default");
-  hideLoadingBars();
-
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mainDiv.classList.add("flex_item");
-  mountReactComponent(<Settings openSection={openSection} />, mainDiv);
+): JSX.Element {
+  return <Settings openSection={openSection} />;
 }

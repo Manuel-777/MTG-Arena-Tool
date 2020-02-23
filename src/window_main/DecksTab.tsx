@@ -24,13 +24,7 @@ import {
   useLastScrollTop
 } from "./components/tables/hooks";
 import { openDeck } from "./deck-details";
-import mountReactComponent from "./mountReactComponent";
-import {
-  hideLoadingBars,
-  ipcSend,
-  makeResizable,
-  resetMainContainer
-} from "./renderer-util";
+import { ipcSend, makeResizable } from "./renderer-util";
 import StatsPanel from "./stats-panel";
 
 function openDeckDetails(
@@ -213,9 +207,6 @@ export function DecksTab({
   );
 }
 
-export function openDecksTab(aggFilters: AggregatorFilters = {}): void {
-  hideLoadingBars();
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mainDiv.classList.add("flex_item");
-  mountReactComponent(<DecksTab aggFiltersArg={aggFilters} />, mainDiv);
+export function openDecksTab(aggFilters: AggregatorFilters = {}): JSX.Element {
+  return <DecksTab aggFiltersArg={aggFilters} />;
 }

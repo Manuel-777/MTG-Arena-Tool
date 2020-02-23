@@ -15,14 +15,8 @@ import {
 } from "../../shared/util";
 import CollectionTable from "../components/collection/CollectionTable";
 import { CardsData } from "../components/collection/types";
-import mountReactComponent from "../mountReactComponent";
-import {
-  hideLoadingBars,
-  ipcSend,
-  makeResizable,
-  resetMainContainer,
-  setLocalState
-} from "../renderer-util";
+
+import { ipcSend, makeResizable, setLocalState } from "../renderer-util";
 import {
   CollectionStats,
   createInventoryStats,
@@ -213,9 +207,6 @@ export function CollectionTab(): JSX.Element {
   );
 }
 
-export function openCollectionTab(): void {
-  hideLoadingBars();
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mainDiv.classList.add("flex_item");
-  mountReactComponent(<CollectionTab />, mainDiv);
+export function openCollectionTab(): JSX.Element {
+  return <CollectionTab />;
 }

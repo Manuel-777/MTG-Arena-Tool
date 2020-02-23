@@ -43,6 +43,7 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
     (tabId: number) => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
       dispatchAction(props.dispatcher, SET_LOADING, true);
+      dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
       clickNav(tabId);
       callback(tabId);
     },
@@ -159,7 +160,7 @@ function PatreonBadge(props: PatreonProps): JSX.Element {
 
 export function TopNav(): JSX.Element {
   const [compact, setCompact] = React.useState(false);
-  const [currentTab, setCurrentTab] = React.useState(pd.settings.last_open_tab);
+  const [currentTab, setCurrentTab] = React.useState(MAIN_HOME);
   const topNavIconsRef: any = React.useRef(null);
   const dispatcher = useDispatch();
 

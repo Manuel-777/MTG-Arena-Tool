@@ -529,8 +529,16 @@ span.top_nav_item_text {
     overflow: hidden;
 }
 
+.overflow_ux_main {
+    width: calc(100%);
+    height: calc(100vh - 101px);
+    height: 100%;
+    overflow: hidden;
+}
+
 .ux_item {
     width: calc(100%);
+    display: flex;
     height: 100%;
     overflow-x: hidden;
     overflow-y: visible;
@@ -2923,11 +2931,6 @@ a:hover {
     background-color: #4e5d94;
 }
 
-.tournament_list_cont {
-    max-width: 800px;
-    margin: 16px auto;
-    overflow: auto;
-}
 
 .tourney_pwd_container {
     display: flex;
@@ -3302,14 +3305,6 @@ a:hover {
     justify-content: center;
     display: flex;
     overflow: hidden;
-}
-
-.tournament_title {
-    color: var(--color-light-75);
-    text-align: center;
-    margin-top: 16px;
-    font-family: Beleren;
-    font-size: 18px;
 }
 
 .join_decklist {
@@ -4010,3 +4005,117 @@ a:hover {
 /*    background-color: rgba(0,0,0,0.4);*/
     cursor: pointer;
 }
+
+.form-options {
+    width: 18.9em;
+    margin: 0 auto auto auto;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-container {
+    margin: auto auto 16px auto;
+    flex-grow: 2;
+    display: flex;
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+    flex-direction: column;
+}
+
+.form-icon {
+    background-image: url(../../icons/icon-256.png);
+    background-color: var(--color-light);
+    border-radius: 7em;
+    background-size: contain;
+    width: 7em;
+    height: 7em;
+    position: relative;
+    margin: auto auto -7em auto;
+    top: -7em;
+}
+  
+.form-authenticate {
+    max-width: 18.9em;
+    z-index: 5;
+    width: -webkit-fill-available;
+    margin: auto auto 16px auto;
+    background-color: var(--color-light);
+    padding: 3.5em 2em 2em 2em;
+    border-radius: 3px;
+    box-shadow: 0px 2px 7px 4px rgba(0, 0, 0, 0.3);
+}
+  
+.form-label {
+    font-family: var(--main-font-name);
+    color: var(--color-back);
+    margin: auto 0;
+}
+  
+.form-input-container {
+    display: flex;
+    height: 32px;
+    width: 100%;
+    padding: 4px 0 12px 0;
+}
+  
+.form-input-container input {
+    background-color: var(--color-mid-40);
+    border: 1px solid var(--color-mid-50);
+    display: inline-table;
+    border-radius: 5px;
+    color: var(--color-back);
+    height: 22px;
+    width: 100%;
+    font-size: 15px;
+    padding: 6px;
+    user-select: none;
+    font-family: var(--main-font-name);
+}
+  
+.form-input-container input:focus {
+    border: 1px solid white;
+    outline-style: none;
+}
+  
+.form-button {
+    align-self: center;
+    cursor: pointer;
+    width: -webkit-fill-available;
+    width: -moz-available;
+    height: 36px;
+    border-radius: 3px;
+    color: var(--color-light);
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid var(--color-mid-50);
+    background-color: var(--color-back);
+    -webkit-transition: all .1s ease-in;
+    font-family: var(--main-font-name);
+    display: block;
+    margin: auto;
+}
+  
+.form-button:hover {
+    background-color: var(--color-mid-66);
+    box-shadow: 0px 6px 15px 0px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-mid-50);
+}
+  
+.form-button:active {
+    background-color: var(--color-mid);
+    line-height: 34px;
+    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.6);
+}
+  
+.form-error {
+    text-align: center;
+    line-height: 32px;
+    font-family: var(--main-font-name-bold-it);
+    color: var(--color-r);
+    width: 19em;
+    height: 32px;
+    margin: 0px auto;
+    -webkit-transition: all .3s ease-in;
+}
+  

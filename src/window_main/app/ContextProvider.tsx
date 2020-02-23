@@ -1,25 +1,58 @@
 import React from "react";
-import ContextReducer from "./ContextReducer";
+import ContextReducer, { LOGIN_AUTH } from "./ContextReducer";
+import { WildcardsChange } from "../HomeTab";
 
 const StateContext = React.createContext(null);
 const DispatchContext = React.createContext(null);
 
-export interface AppContext {
-  HoverGrpId: number;
-  TopArtist: string;
-  BackgroundImage: string;
-  Offline: boolean;
-  Loading: boolean;
-  TopNav: number;
+export interface AppState {
+  hoverGrpId: number;
+  topArtist: string;
+  backgroundImage: string;
+  offline: boolean;
+  loading: boolean;
+  topNav: number;
+  login: number;
+  canLogin: boolean;
+  loginForm: {
+    email: string;
+    pass: string;
+    rememberme: boolean;
+  };
+  homeData: {
+    wildcards: WildcardsChange[];
+    filteredSet: string;
+    usersActive: number;
+  };
+  popup: {
+    text: string;
+    time: number;
+  };
 }
 
-const defaultState: AppContext = {
-  HoverGrpId: 1,
-  TopArtist: "Bedevil by Seb Seb McKinnon",
-  BackgroundImage: "default",
-  Offline: false,
-  Loading: false,
-  TopNav: 0
+const defaultState: AppState = {
+  hoverGrpId: 1,
+  topArtist: "Bedevil by Seb Seb McKinnon",
+  backgroundImage: "default",
+  offline: false,
+  loading: false,
+  topNav: 0,
+  login: LOGIN_AUTH,
+  canLogin: true,
+  loginForm: {
+    email: "",
+    pass: "",
+    rememberme: false
+  },
+  homeData: {
+    wildcards: [],
+    filteredSet: "",
+    usersActive: 0
+  },
+  popup: {
+    text: "",
+    time: 0
+  }
 };
 
 interface WebProviderProps {
@@ -37,7 +70,7 @@ function ContextProvider({ children }: WebProviderProps): JSX.Element {
   );
 }
 
-const useContext = (): AppContext => {
+const useContext = (): AppState => {
   const context = React.useContext(StateContext);
   if (!context) {
     throw new Error(

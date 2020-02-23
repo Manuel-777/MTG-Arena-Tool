@@ -191,17 +191,6 @@ function startApp() {
         setSettings(arg);
         break;
 
-      case "player_data_refresh":
-        // HACK WARNING!
-        // during Arena matches and drafts we deliberately let the main window state
-        // "go stale" instead of auto-refreshing. This allows players to use deck
-        // details or collections pages without being constantly "reset" to main tab
-        if (arenaState === ARENA_MODE_IDLE) {
-          mainWindow.webContents.send("player_data_refresh");
-        }
-        overlay.webContents.send("player_data_refresh");
-        break;
-
       case "set_db":
         mainWindow.webContents.send("set_db", arg);
         overlay.webContents.send("set_db", arg);
@@ -355,7 +344,6 @@ function setArenaState(state) {
   if (state === ARENA_MODE_MATCH && settings.close_on_match) {
     mainWindow.hide();
   }
-  mainWindow.webContents.send("player_data_refresh");
   overlay.webContents.send("set_arena_state", state);
   updateOverlayVisibility();
 }

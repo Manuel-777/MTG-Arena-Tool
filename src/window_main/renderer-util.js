@@ -5,7 +5,6 @@ import fs from "fs";
 import _ from "lodash";
 import path from "path";
 import Pikaday from "pikaday";
-import ReactDOM from "react-dom";
 import striptags from "striptags";
 import Picker from "vanilla-picker";
 import { addCardHover } from "../shared/cardHover";
@@ -83,16 +82,6 @@ function pop(str, timeout) {
   }
 }
 
-function showLoadingBars() {
-  //$$(".main_loading")[0].style.display = "block";
-  document.body.style.cursor = "progress";
-}
-
-function hideLoadingBars() {
-  //$$(".main_loading")[0].style.display = "none";
-  document.body.style.cursor = "auto";
-}
-
 function setLocalState(state = {}) {
   Object.assign(localState, state);
 }
@@ -152,22 +141,6 @@ function makeResizable(div, resizeCallback, finalCallback) {
     },
     false
   );
-}
-
-export function resetMainContainer() {
-  const container = byId("ux_0");
-  if (unmountPoints.length > 0) {
-    unmountPoints.forEach(node => ReactDOM.unmountComponentAtNode(node));
-  }
-  unmountPoints = [];
-  container.innerHTML = "";
-  container.classList.remove("flex_item");
-  const { lastScrollHandler } = getLocalState();
-  if (lastScrollHandler) {
-    container.removeEventListener("scroll", lastScrollHandler);
-    setLocalState({ lastScrollHandler: null });
-  }
-  return container;
 }
 
 export function addNodeToUnmountReact(node) {
@@ -859,7 +832,6 @@ export function draftShareLink(id, draft, shareExpire) {
       expire = 0;
       break;
   }
-  showLoadingBars();
   ipcSend("request_draft_link", { expire, id, draftData });
 }
 
@@ -883,7 +855,6 @@ export function deckShareLink(deck, shareExpire) {
       expire = 0;
       break;
   }
-  showLoadingBars();
   ipcSend("request_deck_link", { expire, deckString });
 }
 
@@ -909,12 +880,10 @@ export function logShareLink(id, shareExpire) {
       expire = 0;
       break;
   }
-  showLoadingBars();
   ipcSend("request_log_link", { expire, log, id });
 }
 
 function showOfflineSplash() {
-  hideLoadingBars();
   byId("ux_0").innerHTML = `
   <div class="message_center_offline" style="display: flex; position: fixed;">
     <div class="message_unlink"></div>
@@ -946,8 +915,6 @@ export {
   actionLogDir,
   ipcSend,
   pop,
-  showLoadingBars,
-  hideLoadingBars,
   setLocalState,
   getLocalState,
   toggleArchived,

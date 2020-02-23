@@ -415,7 +415,6 @@ function finishLoading() {
 
     ipc_send("set_settings", JSON.stringify(playerData.settings));
     ipc_send("initialize");
-    ipc_send("player_data_refresh");
 
     ipc_send("popup", {
       text: "Initialized successfully!",

@@ -215,8 +215,10 @@ label {
     overflow: hidden;
     width: calc(100% - 4px);
     height: 4px;
+    /*
     position: absolute;
     top: 99px;
+    */
     animation-name: color;
     animation-duration: 2s;
     animation-iteration-count: infinite;
@@ -438,13 +440,14 @@ label {
     height: -webkit-fill-available;
     z-index: 5;
 }
-/*
-.overlay_wrapper {
-    padding: 2px;
+
+.wrapper_main {
     position: relative;
-    height: calc(100% - 4px);
+    opacity: 1;
+    display: flex;
+    height: -webkit-fill-available;
+    z-index: 5;
 }
-*/
 
 .absolute {
     left: 0;
@@ -456,7 +459,7 @@ label {
 .outer_wrapper {
     padding: 2px;
     overflow: hidden;
-    height: calc(100% - 4px);
+    height: calc(100vh - 4px);
     width: calc(100% - 4px);
     display: flex;
     flex-direction: column;

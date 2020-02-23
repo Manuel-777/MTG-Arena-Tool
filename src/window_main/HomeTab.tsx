@@ -1,10 +1,11 @@
 import React from "react";
 import db from "../shared/database";
-import { resetMainContainer, hideLoadingBars, ipcSend } from "./renderer-util";
-import mountReactComponent from "./mountReactComponent";
+import { ipcSend } from "./renderer-util";
 import { timestamp, toDDHHMMSS } from "../shared/util";
+import { SET_LOADING, dispatchAction } from "./app/ContextReducer";
+import { useDispatch } from "./app/ContextProvider";
 
-interface WildcardsChange {
+export interface WildcardsChange {
   grpId: number;
   rarity: string;
   quantity: number;
@@ -19,6 +20,7 @@ interface HomeTabProps {
 
 function HomeTab(props: HomeTabProps): JSX.Element {
   const [filteredSet, setFilteredSet] = React.useState(props.filteredSet);
+  const [requested, setRequested] = React.useState(false);
   const orderedSets: string[] = Object.keys(db.sets).filter(
     set => db.sets[set].collation > 0
   );
@@ -49,8 +51,16 @@ function HomeTab(props: HomeTabProps): JSX.Element {
   }, []);
 
   const requestHome = (set: string): void => {
+    console.log("request_home: " + set);
     ipcSend("request_home", set);
   };
+
+  React.useEffect(() => {
+    if (!requested && props.usersActive == 0) {
+      requestHome(props.filteredSet);
+      setRequested(true);
+    }
+  }, [props, requested]);
 
   orderedSets.sort((a: string, b: string) => {
     const aSet = db.sets[a];
@@ -61,7 +71,7 @@ function HomeTab(props: HomeTabProps): JSX.Element {
   });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", margin: "auto" }}>
+    <div style={{ margin: "0 auto" }}>
       <div className="list_fill"></div>
       <div className="card_tile_separator">General</div>
       <div
@@ -152,6 +162,7 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
         return card ? (
           <>
             <div
+              key={index + "a"}
               className={ld}
               style={{
                 gridArea: `${index + 2} / 1 / auto / auto`,
@@ -162,6 +173,7 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             </div>
 
             <div
+              key={index + "b"}
               className={ld}
               style={{ gridArea: `${index + 2} / 2 / auto / auto` }}
             >
@@ -177,11 +189,13 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             </div>
 
             <div
+              key={index + "c"}
               className={"top_wildcards_wc_icon wc_" + wc.rarity + " " + ld}
               style={{ gridArea: `${index + 2} / 3 / auto / auto` }}
             ></div>
 
             <div
+              key={index + "d"}
               className={ld}
               style={{
                 gridArea: `${index + 2} / 4 / auto / auto`,
@@ -192,6 +206,7 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             </div>
 
             <div
+              key={index + "e"}
               className={ld}
               style={{
                 gridArea: `${index + 2} / 5 / auto / auto`
@@ -201,6 +216,7 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             </div>
 
             <div
+              key={index + "f"}
               className={
                 ld +
                 " " +
@@ -216,6 +232,7 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             ></div>
 
             <div
+              key={index + "g"}
               className={ld}
               style={{
                 gridArea: `${index + 2} / 7 / auto / auto`
@@ -230,20 +247,16 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
   );
 }
 
-export function openHomeTab(
-  wildcards: WildcardsChange[],
-  filteredSet: "",
-  usersActive: number
-): void {
-  hideLoadingBars();
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mainDiv.classList.add("flex_item");
-  mountReactComponent(
+export function openHomeTab(homeData: {
+  wildcards: WildcardsChange[];
+  filteredSet: string;
+  usersActive: number;
+}): JSX.Element {
+  return (
     <HomeTab
-      wildcards={wildcards}
-      filteredSet={filteredSet}
-      usersActive={usersActive}
-    />,
-    mainDiv
+      wildcards={homeData.wildcards}
+      filteredSet={homeData.filteredSet}
+      usersActive={homeData.usersActive}
+    />
   );
 }

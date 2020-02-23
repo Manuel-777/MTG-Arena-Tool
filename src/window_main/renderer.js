@@ -23,12 +23,8 @@ import "@github/time-elements";
 
 import {
   EASING_DEFAULT,
-  MAIN_LOGIN,
-  MAIN_HOME,
   MAIN_EXPLORE,
   MAIN_SETTINGS,
-  MAIN_UPDATE,
-  SETTINGS_ABOUT,
   SETTINGS_OVERLAY,
 } from "../shared/constants";
 
@@ -39,24 +35,14 @@ import {compare_cards, get_deck_colors, removeDuplicates} from "../shared/util";
 
 import {
   changeBackground,
-  getLocalState,
   hideLoadingBars,
-  ipcSend,
   openDialog,
-  pop,
   renderLogInput,
-  setLocalState,
-  showLoadingBars,
 } from "./renderer-util";
 
-import { openHomeTab } from "./HomeTab";
-import { tournamentOpen } from "./tournaments";
-import { openDeck } from "./deck-details";
-import { openSettingsTab, setCurrentOverlaySettings } from "./settings";
-import { showOfflineSplash } from "./renderer-util";
-import { setExploreDecks } from "./explore";
-
-import {openTab, forceOpenAbout, forceOpenSettings} from "./tabControl";
+import {openDeck} from "./deck-details";
+import {openSettingsTab} from "./settings";
+import {setExploreDecks} from "./explore";
 
 import RenderApp from "./app/App";
 
@@ -64,87 +50,11 @@ RenderApp();
 
 const byId = id => document.getElementById(id);
 let loggedIn = false;
-let canLogin = false;
 let lastSettings = {};
 
 //
-ipc.on("clear_pwd", function() {
-  byId("signin_pass").value = "";
-});
-
-//
-ipc.on("auth", function(event, arg) {
-  setLocalState({authToken: arg.token});
-  if (arg.ok) {
-    $$(".message_center")[0].style.display = "flex";
-    $$(".authenticate")[0].style.display = "none";
-    loggedIn = true;
-  } else {
-    canLogin = true;
-    ipcSend("renderer_show");
-    pop(arg.error, -1);
-  }
-});
-
-//
-ipc.on("set_discord_tag", (event, arg) => {
-  setLocalState({discordTag: arg});
-  if (pd.settings.last_open_tab === MAIN_HOME) {
-    openHomeTab(undefined, 0);
-  }
-});
-
-//
-ipc.on("too_slow", function() {
-  pop(
-    'Loading is taking too long, please read our <a class="trouble_link">troubleshooting guide</a>.',
-    0
-  );
-
-  const popDiv = $$(".popup")[0];
-  popDiv.style.left = "calc(50% - 280px)";
-  popDiv.style.width = "560px";
-  popDiv.style.pointerEvents = "all";
-
-  $$(".trouble_link")[0].addEventListener("click", function() {
-    shell.openExternal(
-      "https://github.com/Manuel-777/MTG-Arena-Tool/blob/master/TROUBLESHOOTING.md"
-    );
-  });
-});
-
-//
-ipc.on("show_login", () => {
-  canLogin = true;
-  showLogin();
-});
-
-//
-function showLogin() {
-  $$(".authenticate")[0].style.display = "block";
-  $$(".message_center")[0].style.display = "none";
-  $$(".init_loading")[0].style.display = "none";
-
-  $$(".button_simple_disabled")[0].classList.add("button_simple");
-  byId("signin_user").focus();
-}
-
-//
-ipc.on("set_home", function(event, arg) {
-  hideLoadingBars();
-
-  if (pd.settings.last_open_tab === MAIN_HOME) {
-    console.log("Home", arg);
-    openHomeTab(arg.wildcards, arg.filtered_set, arg.users_active);
-  }
-});
-
-//
 ipc.on("set_explore_decks", function(event, arg) {
-  hideLoadingBars();
-  if (pd.settings.last_open_tab === MAIN_EXPLORE) {
-    setExploreDecks(arg);
-  }
+  setExploreDecks(arg);
 });
 
 //
@@ -200,106 +110,6 @@ ipc.on("settings_updated", function() {
   lastSettings = {...pd.settings};
 });
 
-let lastDataRefresh = null;
-
-//
-ipc.on("player_data_refresh", () => {
-  // ignore signal before user login
-  if (pd.settings.last_open_tab === MAIN_LOGIN) return;
-
-  // limit refresh to one per second
-  const ts = Date.now();
-  const lastRefreshTooRecent = lastDataRefresh && ts - lastDataRefresh < 1000;
-  if (lastRefreshTooRecent) return;
-
-  const ls = getLocalState();
-  // Will not be needed when elements are all reactify'ed
-  openTab(pd.settings.last_open_tab, {}, ls.lastDataIndex, ls.lastScrollTop);
-  lastDataRefresh = ts;
-});
-
-//
-ipc.on("set_update_state", function(event, arg) {
-  if (pd.settings.last_open_tab === MAIN_UPDATE) {
-    openSettingsTab(SETTINGS_ABOUT);
-  }
-});
-
-//
-ipc.on("show_notification", function(event, arg) {
-  const notification = $$(".notification")[0];
-  notification.style.display = "block";
-  notification.title = arg;
-
-  if (arg === "Update available" || arg === "Update downloaded") {
-    const handler = () => {
-      forceOpenAbout();
-      notification.removeEventListener("click", handler);
-    };
-    notification.addEventListener("click", handler);
-  }
-});
-
-//
-ipc.on("hide_notification", function() {
-  const notification = $$(".notification")[0];
-  notification.style.display = "none";
-  notification.title = "";
-});
-
-//
-ipc.on("force_open_settings", function() {
-  forceOpenSettings();
-});
-
-//
-ipc.on("force_open_overlay_settings", function(event, arg) {
-  setCurrentOverlaySettings(arg);
-  forceOpenSettings(SETTINGS_OVERLAY);
-});
-
-//
-ipc.on("force_open_about", function() {
-  forceOpenAbout();
-});
-
-//
-ipc.on("force_open_tab", function(event, arg) {
-  changeBackground("default");
-  anime({
-    targets: ".moving_ux",
-    left: 0,
-    easing: EASING_DEFAULT,
-    duration: 350,
-  });
-
-  setLocalState({lastDataIndex: 0, lastScrollTop: 0});
-  openTab(arg);
-  ipcSend("save_user_settings", {
-    skipRefresh: true,
-  });
-});
-
-//
-ipc.on("prefill_auth_form", function(event, arg) {
-  byId("rememberme").checked = arg.remember_me;
-  byId("signin_user").value = arg.username;
-  byId("signin_pass").value = arg.password;
-});
-
-//
-ipc.on("initialize", function() {
-  showLoadingBars();
-
-  openTab(pd.settings.last_open_tab);
-
-  $$(".top_nav")[0].classList.remove("hidden");
-  $$(".overflow_ux")[0].classList.remove("hidden");
-  $$(".message_center")[0].style.display = "none";
-  $$(".init_loading")[0].style.display = "none";
-});
-
-//
 let logDialogOpen = false;
 ipc.on("no_log", function(event, arg) {
   if (loggedIn) {
@@ -319,41 +129,14 @@ ipc.on("no_log", function(event, arg) {
   }
 });
 
-//
-ipc.on("offline", function() {
-  showOfflineSplash();
-});
-
-//
+/*
 ipc.on("log_read", function() {
   $$(".top_nav")[0].classList.remove("hidden");
   $$(".overflow_ux")[0].classList.remove("hidden");
   $$(".message_center")[0].style.display = "none";
   $$(".init_loading")[0].style.display = "none";
 });
-
-//
-ipc.on("popup", function(event, arg, time) {
-  pop(arg, time);
-});
-
-window.addEventListener("resize", () => {
-  hideLoadingBars();
-});
-
-ipc.on("toggle_login", (event, arg) => {
-  loginToggle(arg);
-});
-
-function loginToggle(toggle) {
-  if (toggle) {
-    canLogin = true;
-    $$(".login_link")[0].classList.remove("disabled");
-  } else {
-    canLogin = false;
-    $$(".login_link")[0].classList.add("disabled");
-  }
-}
+*/
 
 //
 ipc.on("set_draft_link", function(event, arg) {
@@ -371,16 +154,4 @@ ipc.on("set_log_link", function(event, arg) {
 ipc.on("set_deck_link", function(event, arg) {
   hideLoadingBars();
   byId("share_input").value = arg;
-});
-
-//
-ipc.on("tou_set", function(event, arg) {
-  document.body.style.cursor = "auto";
-  tournamentOpen(arg);
-  anime({
-    targets: ".moving_ux",
-    left: "-100%",
-    easing: EASING_DEFAULT,
-    duration: 350,
-  });
 });

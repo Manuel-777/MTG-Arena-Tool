@@ -17,13 +17,11 @@ import {
 } from "./components/tables/hooks";
 import { TagCounts } from "./components/tables/types";
 import { openMatch } from "./match-details";
-import mountReactComponent from "./mountReactComponent";
+
 import {
   formatPercent,
-  hideLoadingBars,
   ipcSend,
   makeResizable,
-  resetMainContainer,
   toggleArchived
 } from "./renderer-util";
 import StatsPanel from "./stats-panel";
@@ -339,9 +337,8 @@ export function MatchesTab({
   );
 }
 
-export function openMatchesTab(aggFilters: AggregatorFilters = {}): void {
-  hideLoadingBars();
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mainDiv.classList.add("flex_item");
-  mountReactComponent(<MatchesTab aggFiltersArg={aggFilters} />, mainDiv);
+export function openMatchesTab(
+  aggFilters: AggregatorFilters = {}
+): JSX.Element {
+  return <MatchesTab aggFiltersArg={aggFilters} />;
 }

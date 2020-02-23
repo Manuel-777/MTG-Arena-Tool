@@ -84,7 +84,6 @@ const defaultCfg = {
     back_url: "",
     right_panel_width: 400,
     last_date_filter: DATE_LAST_30,
-    last_open_tab: -1,
     economyTableState: undefined,
     economyTableMode: ECONOMY_LIST_MODE,
     eventsTableState: undefined,

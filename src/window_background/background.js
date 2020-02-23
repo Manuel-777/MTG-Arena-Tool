@@ -157,14 +157,6 @@ ipc.on("start_background", async function() {
   httpApi.initHttpQueue();
   httpApi.httpGetDatabaseVersion(settings.metadata_lang);
   ipc_send("ipc_log", `Downloading metadata ${settings.metadata_lang}`);
-
-  // Check if it is the first time we open this version
-  if (
-    settings.toolVersion == undefined ||
-    globals.toolVersion > settings.toolVersion
-  ) {
-    ipc_send("show_whats_new");
-  }
 });
 
 function offlineLogin() {
@@ -183,11 +175,6 @@ ipc.on("login", function(event, arg) {
     syncSettings({ token: "" }, false);
     httpApi.httpAuth(arg.username, arg.password);
   }
-});
-
-//
-ipc.on("unlink_discord", function(event, obj) {
-  httpApi.httpDiscordUnlink();
 });
 
 //
@@ -276,7 +263,6 @@ ipc.on("import_custom_deck", function(event, arg) {
     ...data
   };
   addCustomDeck(deckData);
-  ipc_send("force_open_tab", MAIN_DECKS);
   ipc_send("hide_loading");
 });
 
@@ -326,18 +312,6 @@ ipc.on("request_home", (event, set) => {
   } else {
     httpApi.httpHomeGet(set);
   }
-});
-
-ipc.on("tou_get", function(event, arg) {
-  httpApi.httpTournamentGet(arg);
-});
-
-ipc.on("tou_join", function(event, arg) {
-  httpApi.httpTournamentJoin(arg.id, arg.deck, sha1(arg.pass));
-});
-
-ipc.on("tou_drop", function(event, arg) {
-  httpApi.httpTournamentDrop(arg);
 });
 
 ipc.on("edit_tag", (event, arg) => {
