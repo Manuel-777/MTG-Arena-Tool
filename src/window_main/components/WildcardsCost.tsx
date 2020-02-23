@@ -6,52 +6,53 @@ import {
 } from "../../shared/util";
 import { CARD_RARITIES } from "../../shared/constants";
 import _ from "lodash";
-import { SerializedDeck } from "../../shared/types/Deck";
+import { MissingWildcards } from "./decks/types";
+import { InternalDeck } from "../../types/Deck";
 
-interface WildcardsCostProps {
-  deck: SerializedDeck;
-}
+const getRarityKey = (
+  rarity: string
+): "rare" | "common" | "uncommon" | "mythic" | undefined => {
+  if (["rare", "common", "uncommon", "mythic"].includes(rarity))
+    return rarity as any;
+  return undefined;
+};
 
-interface WildcardsList {
-  [key: string]: number;
-}
-
-export default function WildcardsCost(props: WildcardsCostProps): JSX.Element {
+export default function WildcardsCost(props: {
+  deck: InternalDeck;
+}): JSX.Element {
   const { deck } = props;
-
-  const ownedWildcards: WildcardsList = {
+  const missingWildcards = getDeckMissing(deck);
+  const totalMissing =
+    missingWildcards.common +
+    missingWildcards.uncommon +
+    missingWildcards.rare +
+    missingWildcards.mythic;
+  const drawCost = totalMissing > 0;
+  const ownedWildcards: MissingWildcards = {
     common: pd.economy.wcCommon,
     uncommon: pd.economy.wcUncommon,
     rare: pd.economy.wcRare,
     mythic: pd.economy.wcMythic
   };
 
-  const missingWildcards: WildcardsList = getDeckMissing(deck);
-  let drawCost = false;
-  CARD_RARITIES.filter(rarity => rarity !== "land").map(
-    (cardRarity: string) => {
-      if (missingWildcards[cardRarity]) {
-        drawCost = true;
-      }
-    }
-  );
-
   return (
     <div style={{ display: "flex", flexDirection: "row", marginRight: "16px" }}>
       {CARD_RARITIES.filter(rarity => rarity !== "land").map(
         (cardRarity: string) => {
-          if (missingWildcards[cardRarity]) {
-            return (
-              <div
-                key={cardRarity}
-                className={"wc_explore_cost wc_" + cardRarity}
-                title={_.capitalize(cardRarity) + " wildcards needed."}
-              >
-                {(ownedWildcards[cardRarity] > 0
-                  ? ownedWildcards[cardRarity] + "/"
-                  : "") + missingWildcards[cardRarity]}
-              </div>
-            );
+          const key = getRarityKey(cardRarity);
+          if (key) {
+            const owned = ownedWildcards[key];
+            const missing = missingWildcards[key];
+            if (missing) {
+              return (
+                <div
+                  className={"wc_explore_cost wc_" + cardRarity}
+                  title={_.capitalize(cardRarity) + " wildcards needed."}
+                >
+                  {(owned > 0 ? owned + "/" : "") + missing}
+                </div>
+              );
+            }
           }
         }
       )}

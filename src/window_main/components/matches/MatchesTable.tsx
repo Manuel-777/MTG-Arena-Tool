@@ -369,7 +369,7 @@ export default function MatchesTable({
             prepareRow(row);
             const data = row.original;
             if (isTableMode) {
-              const onClick = (): void => openMatchCallback(data.id ?? "");
+              const onClick = (): void => openMatchCallback(data.id);
               return (
                 <TableViewRow
                   onClick={onClick}

@@ -3,7 +3,7 @@ import matchSorter from "match-sorter";
 import React from "react";
 import { ColumnInstance, FilterValue, Row, TableState } from "react-table";
 import { COLORS_ALL, COLORS_BRIEF } from "../../../shared/constants";
-import { SerializedDeck } from "../../../shared/types/Deck";
+import { InternalDeck } from "../../../types/Deck";
 import ManaFilter, { ColorFilter, ManaFilterKeys } from "../../ManaFilter";
 import {
   BinarySymbol,
@@ -198,7 +198,7 @@ export function getDefaultColorFilter(): ColorFilter {
 }
 
 export function filterDeckByColors(
-  deck: SerializedDeck | null,
+  deck: Partial<InternalDeck> | null,
   _colors: ColorFilter
 ): boolean {
   if (!deck) return true;

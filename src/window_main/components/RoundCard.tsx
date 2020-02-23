@@ -1,5 +1,5 @@
 import React from "react";
-import { DbCardData } from "../../shared/types/Metadata";
+import { DbCardData } from "../../types/Metadata";
 import { getCardImage } from "../../shared/util";
 
 interface RoundCardProps {

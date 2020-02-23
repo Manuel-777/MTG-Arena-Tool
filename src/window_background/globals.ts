@@ -1,7 +1,11 @@
 /* eslint-disable prefer-const */
 import Deck from "../shared/deck";
-import { ZoneData } from "./types/greInterpreter";
-import { MatchData, matchDataDefault } from "./types/currentMatch";
+import { ZoneData } from "../types/greInterpreter";
+import {
+  MatchData,
+  matchDataDefault,
+  MatchGameStats
+} from "../types/currentMatch";
 
 // Hey! If you're here, you might be thinking of adding stuff to this file.
 // Don't. This is a shadowy place. You must never go here.
@@ -30,19 +34,19 @@ let initialLibraryInstanceIds: number[] = [];
 
 let instanceToCardIdMap: any = {};
 
-let logReadStart: any = null;
+let logReadStart: Date = new Date();
 
 let logTime = new Date();
 
 let matchCompletedOnGameNumber = 0;
 
-let matchGameStats: any[] = [];
+let matchGameStats: MatchGameStats[] = [];
 
 let originalDeck: Deck = new Deck();
 
 let odds_sample_size = 1;
 
-let toolVersion: any = null;
+let toolVersion = 0;
 
 let watchingLog = false;
 

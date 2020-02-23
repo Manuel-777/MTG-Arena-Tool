@@ -59,7 +59,8 @@ import {
 import { openHomeTab } from "./home";
 import { tournamentOpen } from "./tournaments";
 import { openDeck } from "./deck-details";
-import { openSettingsTab, setCurrentOverlaySettings } from "./settings";
+import { openSettingsTab } from "./settings";
+import { setCurrentOverlaySettings } from "./components/settings/sectionOverlay";
 import { setExploreDecks } from "./explore";
 
 import { openTab, forceOpenAbout, forceOpenSettings } from "./tabControl";
@@ -198,8 +199,7 @@ ipc.on("settings_updated", function() {
   }
   $$(".main_wrapper")[0].style.backgroundColor = pd.settings.back_color;
   if (pd.settings.last_open_tab === MAIN_SETTINGS) {
-    const ls = getLocalState();
-    openSettingsTab(-1, ls.lastScrollTop);
+    openSettingsTab(-1);
   }
   lastSettings = { ...pd.settings };
 });

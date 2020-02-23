@@ -6,14 +6,10 @@ import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
 import { getReadableEvent } from "../shared/util";
+import { EventInstanceData, InternalEvent } from "../types/event";
 import Aggregator, { AggregatorFilters } from "./aggregator";
 import EventsTable from "./components/events/EventsTable";
-import {
-  EventInstanceData,
-  EventStats,
-  EventTableData,
-  SerializedEvent
-} from "./components/events/types";
+import { EventStats, EventTableData } from "./components/events/types";
 import { isHidingArchived } from "./components/tables/filters";
 import {
   useAggregatorAndSidePanel,
@@ -80,7 +76,7 @@ function getValidMatchId(rawMatchId?: string): string | undefined {
   return undefined;
 }
 
-function getEventStats(event: SerializedEvent): EventStats {
+function getEventStats(event: InternalEvent): EventStats {
   const eventData: EventInstanceData = {
     CurrentWins: 0,
     CurrentLosses: 0,
@@ -148,7 +144,7 @@ function getEventStats(event: SerializedEvent): EventStats {
 
 function getEventsData(aggregator: Aggregator): EventTableData[] {
   return pd.eventList
-    .filter((event: SerializedEvent) => {
+    .filter((event: InternalEvent) => {
       // legacy filter logic
       if (event === undefined || event.CourseDeck === undefined) {
         return false;
@@ -157,7 +153,7 @@ function getEventsData(aggregator: Aggregator): EventTableData[] {
       return aggregator.filterEvent(event.InternalEventName);
     })
     .map(
-      (event: SerializedEvent): EventTableData => {
+      (event: InternalEvent): EventTableData => {
         const timestamp = new Date(event.date ?? NaN);
         const colors = event.CourseDeck.colors ?? [];
         const stats = getEventStats(event);
@@ -168,7 +164,7 @@ function getEventsData(aggregator: Aggregator): EventTableData[] {
           custom: true,
           colors,
           colorSortVal: colors.join(""),
-          deckId: event.CourseDeck.id ?? "",
+          deckId: event.CourseDeck.id,
           deckName: event.CourseDeck.name ?? "",
           format: db.events_format[event.InternalEventName] ?? "unknown",
           stats,

@@ -134,26 +134,33 @@ time, local-time, relative-time {
 }
 
 .donate_link {
+    background-image: url('../images/button_paypal.png');
     background-color: white;
     padding: 12px;
-    border-radius: 4px;
+    border-radius: 2px;
     cursor: pointer;
     width: 100px;
     height: 26px;
     margin: auto 12px auto auto;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .patreon_link {
+    background-image: url('../images/button_patreon.png');
     cursor: pointer;
     width: 217px;
     height: 51px;
+    border-radius: 2px;
     margin: auto auto auto 12px;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .twitter_link {
     cursor: pointer;
     align-self: center;
-    margin: auto 32px;
+    margin: auto 16px;
     width: 32px;
     height: 32px;
     background: url(../images/twitter_logo.png) no-repeat center;
@@ -163,7 +170,7 @@ time, local-time, relative-time {
 .discord_link {
     cursor: pointer;
     align-self: center;
-    margin: auto 32px;
+    margin: auto 16px;
     width: 32px;
     height: 32px;
     background: url(../images/discord_logo.png) no-repeat center;
@@ -173,7 +180,7 @@ time, local-time, relative-time {
 .git_link {
     cursor: pointer;
     align-self: center;
-    margin: auto 32px;
+    margin: auto 16px;
     width: 32px;
     height: 32px;
     background: url(../images/github_logo.png) no-repeat center;
@@ -829,7 +836,6 @@ font-family:  var(--main-font-name);
 
 .about {
     width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1961,10 +1967,12 @@ a:hover {
 }
 
 .input_container {
+    /*
     display: flex;
     height: 24px;
-    width: 50%;
     margin: 8px 16px;
+    */
+    width: 50%;
 }
 
 .input_container input, .input_container_explore input {
@@ -2020,7 +2028,6 @@ a:hover {
 
 .settings_page {
     height: calc(100% - 64px);
-    margin: 32px 16px 32px 16px;
 }
 
 .settings_title {
@@ -2200,6 +2207,9 @@ a:hover {
 .slidecontainer_settings {
     overflow: unset;
     display: flex;
+    height: 28px;
+    align-items: center;
+    line-height: 28px;
     margin: 10px 48px 10px 16px;
 }
 
@@ -2207,44 +2217,62 @@ a:hover {
     overflow: unset;
     width: calc(100% - 128px);
     margin: 0 64px;
+    display: flex;
+    flex-direction: column;
 }
-
+  
 .slider {
+    margin: 0;
     overflow: unset;
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
     border-radius: 16px;
-    height: 12px;
+    height: 4px;
     background: var(--color-mid-50);
     outline: none;
     opacity: 1;
     transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1.0);
 }
-
+  
 .slider:hover {
     background: var(--color-mid-66);
 }
-
+  
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 12px;
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
     background: var(--color-mid);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.35, 0.12, 0.5, 1.0);
 }
-
+  
 .slider::-webkit-slider-thumb:hover {
     background: var(--color-light);
-    box-shadow: 0 0 0px 4px var(--color-light-20);
+    box-shadow: 0 0 0px 8px var(--color-light-20);
 }
-
+  
 .slider::-webkit-slider-thumb:active {
     background: var(--color-light);
-    box-shadow: 0 0 0px 10px var(--color-light-40);
+    box-shadow: 0 0 0px 12px var(--color-light-40);
+}
+
+.slider_marks_container_hor {
+    width: calc(100% - 14px);
+    margin: 2px 7px 0 7px;
+    height: 4px;
+    z-index: -1;
+    display: flex;
+    justify-content: space-between;
+}
+
+.slider_mark_hor {
+    width: 1px;
+    height: -webkit-fill-available;
+    background-color: var(--color-light-50);
 }
 
 .draft_nav_container {
@@ -2311,6 +2339,8 @@ a:hover {
 }
 
 .sidebar_column_r {
+    margin-top: 16px;
+    height: calc(100% - 16px);
     width: 30% !important;
     max-width: 220px;
     border-width: 2px;
@@ -3546,7 +3576,7 @@ a:hover {
     height: 64px;
     justify-content: space-around;
     border-bottom: solid var(--color-light-20) 2px;
-    margin: 24px 64px 14px 12px;
+    margin: 4px 64px 12px 12px;
 }
 
 .overlay_prev {
@@ -3713,7 +3743,8 @@ a:hover {
     font-size: 16px;
     color: var(--color-light);
     line-height: 32px;
-    max-width: calc(100% - 64px);
+    margin-left: 16px;
+    max-width: calc(100% - 80px);
 }
 
 .shortcuts_line {
@@ -3976,6 +4007,6 @@ a:hover {
 }
 
 .hover_label:hover {
-    background-color: rgba(0,0,0,0.4);
+/*    background-color: rgba(0,0,0,0.4);*/
     cursor: pointer;
 }

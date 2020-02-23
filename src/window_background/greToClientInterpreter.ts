@@ -21,7 +21,7 @@ import {
   TurnInfo,
   GameObject,
   GameObjectTypeAbility
-} from "./types/greInterpreter";
+} from "../types/greInterpreter";
 
 const actionType = [];
 actionType[0] = "ActionType_None";
@@ -707,7 +707,7 @@ GREMessages.GREMessageType_QueuedGameStateMessage = function(
 
 GREMessages.GREMessageType_ConnectResp = function(msg: GreMessage): void {
   if (
-    msg.connectResp.deckMessage.deckCards &&
+    msg.connectResp?.deckMessage.deckCards &&
     globals.currentMatch.player.originalDeck == null
   ) {
     const deck = new Deck({}, msg.connectResp.deckMessage.deckCards);

@@ -1,39 +1,8 @@
-import { CellProps, TableState, Row } from "react-table";
+import { CellProps, Row, TableState } from "react-table";
+import { InternalEconomyTransaction } from "../../../types/inventory";
 import { TableControlsProps, TableViewRowProps } from "../tables/types";
 
-export interface SerializedTransaction {
-  id: string;
-  date: string;
-  originalContext: string;
-  trackDiff: {
-    currentLevel: number;
-    oldLevel: number;
-  };
-  orbCountDiff: {
-    currentOrbCount: number;
-    oldOrbCount: number;
-  };
-  delta: {
-    artSkinsAdded?: { artId: string }[];
-    boosterDelta?: { collationId: number; count: number }[];
-    cardsAdded?: { grpId: string }[];
-    draftTokensDelta?: number;
-    gemsDelta?: number;
-    goldDelta?: number;
-    sealedTokensDelta?: number;
-    vanityItemsAdded?: string[];
-    vaultProgressDelta?: number;
-    wcCommonDelta?: number;
-    wcUncommonDelta?: number;
-    wcRareDelta?: number;
-    wcMythicDelta?: number;
-  };
-  aetherizedCards: { grpId: string }[];
-  xpGained: string;
-  archived: boolean;
-}
-
-export interface TransactionData extends SerializedTransaction {
+export interface TransactionData extends InternalEconomyTransaction {
   aetherizedCardsCount: number;
   archivedSortVal: number;
   artSkinsAddedCount: number;

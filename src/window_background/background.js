@@ -74,6 +74,20 @@ ipc.on("save_app_settings", function(event, arg) {
   });
 });
 
+//
+ipc.on("save_app_settings_norefresh", function(event, arg) {
+  appDb.find("", "settings").then(appSettings => {
+    appSettings.toolVersion = globals.toolVersion;
+    const updated = { ...appSettings, ...arg };
+    if (!updated.remember_me) {
+      appDb.upsert("", "email", "");
+      appDb.upsert("", "token", "");
+    }
+    appDb.upsert("", "settings", updated);
+    syncSettings(updated, false);
+  });
+});
+
 function fixBadSettingsData() {
   appDb.find("", "settings").then(appSettings => {
     // First introduced in 2.8.4 (2019-07-25)

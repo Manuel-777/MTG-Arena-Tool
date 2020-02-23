@@ -330,7 +330,7 @@ export default function DecksTable({
             prepareRow(row);
             const data = row.original;
             if (isTableMode) {
-              const onClick = (): void => openDeckCallback(data.id ?? "");
+              const onClick = (): void => openDeckCallback(data.id);
               return (
                 <TableViewRow
                   onClick={onClick}

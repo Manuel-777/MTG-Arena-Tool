@@ -66,6 +66,8 @@ const defaultCfg = {
   cards: { cards_time: 0, cards_before: {}, cards: {} },
   cardsNew: {},
   settings: {
+    last_settings_section: 1,
+    last_settings_overlay_section: 0,
     sound_priority: false,
     sound_priority_volume: 1,
     cards_quality: "small",
@@ -295,12 +297,18 @@ class PlayerData {
     this.handleSetData = this.handleSetData.bind(this);
     if (ipc) ipc.on("set_player_data", this.handleSetData);
 
+    // This is to make TS happy, not sure if it breaks the defaultCfg assignment?
+    this.defaultCfg = defaultCfg;
+    this.appDbPath = "";
+    this.playerDbPath = "";
+    this.last_log_timestamp = null;
     this.transaction = this.transaction.bind(this);
     this.deck = this.deck.bind(this);
     this.arenaVersion = undefined;
     this.userName = undefined;
     this.cards = undefined;
     this.cardsNew = undefined;
+    this.deck_changes = undefined;
     this.decks = undefined;
     this.name = undefined;
     this.arenaId = undefined;
@@ -308,6 +316,7 @@ class PlayerData {
     this.economy = undefined;
     this.seasonal = undefined;
     this.courses_index = [];
+    this.deck_changes_index = [];
     this.matches_index = [];
     this.economy_index = [];
     this.draft_index = [];
