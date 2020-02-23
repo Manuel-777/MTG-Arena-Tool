@@ -107,7 +107,7 @@ export default function Auth(props: AuthProps): JSX.Element {
         <Checkbox
           style={{ width: "max-content", margin: "auto auto 12px auto" }}
           text="Remember me?"
-          value={formData.rememberme}
+          value={props.authForm.rememberme}
           callback={clickRememberMe}
         />
         <div className="message_small">

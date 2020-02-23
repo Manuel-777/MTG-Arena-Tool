@@ -28,7 +28,7 @@ function App(): JSX.Element {
 
   return (
     <>
-      <BackgroundImage />
+      <BackgroundImage appContext={appContext} />
       <div className="outer_wrapper">
         <TopBar artist={appContext.topArtist} offline={appContext.offline} />
         <Popup text={appContext.popup.text} time={appContext.popup.time} />

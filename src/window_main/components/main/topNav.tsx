@@ -19,7 +19,7 @@ import {
   MAIN_CONSTRUCTED,
   MAIN_LIMITED
 } from "../../../shared/constants";
-import { useDispatch } from "../../app/ContextProvider";
+import { useDispatch, useContext } from "../../app/ContextProvider";
 import {
   SET_LOADING,
   SET_TOP_NAV,
@@ -160,7 +160,8 @@ function PatreonBadge(props: PatreonProps): JSX.Element {
 
 export function TopNav(): JSX.Element {
   const [compact, setCompact] = React.useState(false);
-  const [currentTab, setCurrentTab] = React.useState(MAIN_HOME);
+  const appContext = useContext();
+  const [currentTab, setCurrentTab] = React.useState(appContext.topNav);
   const topNavIconsRef: any = React.useRef(null);
   const dispatcher = useDispatch();
 
