@@ -1,5 +1,5 @@
 import { CellProps, Row, TableState } from "react-table";
-import { DbCardData } from "../../../shared/types/Metadata";
+import { DbCardData } from "../../../types/Metadata";
 import { TableControlsProps, TableViewRowProps } from "../tables/types";
 
 export interface CardsData extends DbCardData {

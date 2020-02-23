@@ -1,31 +1,29 @@
 import React from "react";
-
+import CardTile from "../shared/CardTile";
+import Colors from "../shared/colors";
 import {
   DRAFT_RANKS,
+  OVERLAY_DRAFT,
   OVERLAY_FULL,
   OVERLAY_LEFT,
-  OVERLAY_ODDS,
   OVERLAY_MIXED,
-  OVERLAY_DRAFT
+  OVERLAY_ODDS
 } from "../shared/constants";
 import db from "../shared/database";
+import Deck from "../shared/deck";
+import DeckManaCurve from "../shared/DeckManaCurve";
+import DeckTypesStats from "../shared/DeckTypesStats";
+import OwnershipStars from "../shared/OwnershipStars";
 import {
   compare_cards as compareCards,
   get_card_type_sort as getCardTypeSort,
   objectClone
 } from "../shared/util";
-import CardTile from "../shared/CardTile";
-import Colors from "../shared/colors";
-import Deck from "../shared/deck";
-import DeckManaCurve from "../shared/DeckManaCurve";
-import DeckTypesStats from "../shared/DeckTypesStats";
-import OwnershipStars from "../shared/OwnershipStars";
-
-import { CardObject } from "../shared/types/Deck";
-import { OverlaySettingsData } from "./overlayUtil";
+import { Chances } from "../types/Chances";
+import { CardObject } from "../types/Deck";
+import { DbCardData } from "../types/Metadata";
+import { OverlaySettingsData } from "../types/settings";
 import SampleSizePanel from "./SampleSizePanel";
-import { DbCardData } from "../shared/types/Metadata";
-import { Chances } from "../window_background/types/decks";
 
 const landsCard = {
   id: 100,

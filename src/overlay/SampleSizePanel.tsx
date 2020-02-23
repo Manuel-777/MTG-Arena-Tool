@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 
 import { CARD_TYPES } from "../shared/constants";
-import { Chances } from "../window_background/types/decks";
+import { Chances } from "../types/Chances";
 
 export interface SampleSizePanelProps {
   cardOdds: Chances;

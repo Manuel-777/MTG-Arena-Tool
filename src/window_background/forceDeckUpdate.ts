@@ -1,7 +1,7 @@
 import globals from "./globals";
 import { hypergeometricRange } from "../shared/statsFns";
-import { CardObject } from "../shared/types/Deck";
-import { Chances } from "./types/decks";
+import { CardObject } from "../types/Deck";
+import { Chances } from "../types/Chances";
 
 function chanceType(
   quantity: number,

@@ -238,6 +238,12 @@ export interface Action {
   };
 }
 
+export interface Stop {
+  stopType: string;
+  appliesTo: string;
+  status: string;
+}
+
 export interface Team {
   id: number;
   playerIds: number[];
@@ -247,7 +253,7 @@ export interface Result {
   scope: string;
   result: string;
   winningTeamId: number;
-  reason: string;
+  reason?: string;
 }
 
 export interface ZoneType {
@@ -294,10 +300,11 @@ export interface GreMessage {
   type: string;
   msgId: number;
   gameStateMessage: GameStateMessage;
-  dieRollResultsResp: {
+  gameStateId?: number;
+  dieRollResultsResp?: {
     playerDieRolls: { systemSeatId: number; rollValue?: number }[];
   };
-  connectResp: {
+  connectResp?: {
     status: string;
     majorVer: string;
     minorVer: string;
@@ -310,6 +317,19 @@ export interface GreMessage {
       deckCards: number[];
       sideboardCards: number[];
       commanderCards: number[];
+    };
+  };
+  setSettingsResp?: {
+    settings: {
+      stops: Stop[];
+      autoPassOption: string;
+      graveyardOrder: string;
+      manaSelectionType: string;
+      defaultAutoPassOption: string;
+      smartStopsSetting: string;
+      autoTapStopsSetting: string;
+      autoOptionalPaymentCancellationSetting: string;
+      transientStops: Stop[];
     };
   };
 }

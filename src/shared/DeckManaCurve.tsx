@@ -2,7 +2,6 @@ import * as React from "react";
 import Deck from "../shared/deck";
 import { MANA_COLORS } from "./constants";
 import db from "./database";
-import { CardObject } from "./types/Deck";
 
 const MAX_CMC = 7; // cap at 7+ cmc bucket
 
@@ -21,7 +20,7 @@ function getDeckCurve(deck: Deck): number[][] {
   deck
     .getMainboard()
     .get()
-    .forEach((card: CardObject) => {
+    .forEach(card => {
       const cardObj = db.card(card.id);
       if (!cardObj) return;
 

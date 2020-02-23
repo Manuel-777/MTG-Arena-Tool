@@ -1,17 +1,40 @@
-import _ from "lodash";
-import database from "../shared/database";
 import electron from "electron";
+import _ from "lodash";
+import { DEFAULT_TILE } from "../shared/constants";
+import database from "../shared/database";
+import Deck from "../shared/deck";
+import playerData from "../shared/player-data";
+import { objectClone } from "../shared/util";
+import { MatchData, matchDataDefault } from "../types/currentMatch";
+import { InternalMatch } from "../types/match";
 import getOpponentDeck from "./getOpponentDeck";
 import globals from "./globals";
-import playerData from "../shared/player-data";
-import { DEFAULT_TILE } from "../shared/constants";
-import { MatchCreatedEvent } from "../shared/types/MatchCreatedEvent";
-import { objectClone } from "../shared/util";
-import Deck from "../shared/deck";
-import { SerializedDeck } from "../shared/types/Deck";
-import { MatchData, matchDataDefault } from "./types/currentMatch";
+
 // Generate objects using default templates.
 // Nothing in here should call IPC functions
+
+export interface MatchCreatedEvent {
+  controllerFabricUri: string;
+  matchEndpointHost: string;
+  matchEndpointPort: number;
+  opponentScreenName: string;
+  opponentIsWotc: boolean;
+  matchId: string;
+  opponentRankingClass: string;
+  opponentRankingTier: number;
+  opponentMythicPercentile: number;
+  opponentMythicLeaderboardPlace: number;
+  eventId: string;
+  opponentAvatarSelection: string;
+  opponentCardBackSelection: string;
+  opponentPetSelection: { name: string; variant: string };
+  avatarSelection: string;
+  cardbackSelection: string;
+  petSelection: { name: string; variant: string };
+  battlefield: string;
+  opponentCommanderGrpIds: number[];
+  commanderGrpIds: number[];
+}
 
 // Draft Creation
 
@@ -38,53 +61,6 @@ export function createDraft(id: string) {
 }
 
 // Match Creation
-export interface PlayerMatchData {
-  seat: number;
-  deck: Deck;
-  life: number;
-  turn: number;
-  name: string;
-  id: string;
-  rank: string;
-  tier: number;
-  originalDeck?: Deck;
-  percentile?: number;
-  leaderboardPlace?: number;
-  cards?: any[];
-  commanderGrpIds: number[];
-}
-
-export interface ExtendedPlayerMatchData {
-  userid: string;
-  win: number;
-  step?: number;
-  seat: number;
-  tier: number;
-  name: string;
-  rank: string;
-  percentile?: number;
-  leaderboardPlace?: number;
-  commanderGrpIds: any;
-}
-
-export interface ExtendedMatchData {
-  draws: number;
-  playerDeck: SerializedDeck;
-  oppDeck: SerializedDeck;
-  tags: any;
-  date: number;
-  onThePlay: number;
-  eventId: string;
-  bestOf: number;
-  gameStats: any[];
-  toolVersion: null;
-  toolRunFromSource: boolean;
-  id: string;
-  duration: number;
-  player: ExtendedPlayerMatchData;
-  opponent: ExtendedPlayerMatchData;
-}
-
 export function createMatch(
   json: MatchCreatedEvent,
   matchBeginTime: Date
@@ -166,10 +142,10 @@ function matchIsLimited(match: MatchData): boolean {
 // Given match data calculates derived data for storage.
 // This is called when a match is complete.
 export function completeMatch(
-  match: ExtendedMatchData,
+  match: InternalMatch,
   matchData: MatchData,
   matchEndTime: number
-): ExtendedMatchData | undefined {
+): InternalMatch | undefined {
   if (matchData.eventId === "AIBotMatch") return;
 
   const mode = matchIsLimited(matchData) ? "limited" : "constructed";

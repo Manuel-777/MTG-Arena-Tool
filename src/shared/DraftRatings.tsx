@@ -1,7 +1,7 @@
 import * as React from "react";
 import { DRAFT_RANKS } from "./constants";
 import { getRankColorClass } from "./util";
-import { DbCardData } from "./types/Metadata";
+import { DbCardData } from "../types/Metadata";
 
 interface DraftRankValueProps {
   index: number;

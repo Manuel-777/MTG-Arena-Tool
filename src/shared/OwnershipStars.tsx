@@ -2,7 +2,7 @@ import * as React from "react";
 
 import playerData from "./player-data";
 import { cardHasType } from "./cardTypes";
-import { DbCardData } from "./types/Metadata";
+import { DbCardData } from "../types/Metadata";
 import styled from "styled-components";
 
 function OwnershipInfinity(props: OwnershipProps): JSX.Element {

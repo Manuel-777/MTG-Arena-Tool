@@ -1,20 +1,9 @@
 import { TableState } from "react-table";
-import { ExtendedMatchData } from "../../../window_background/data";
+import { InternalMatch } from "../../../types/match";
 import { AggregatorFilters } from "../../aggregator";
-import {
-  TableControlsProps,
-  TableData,
-  TableViewRowProps,
-  TagCounts
-} from "../tables/types";
+import { TableControlsProps, TableData, TagCounts } from "../tables/types";
 
-export interface SerializedMatch extends ExtendedMatchData {
-  archived?: boolean;
-  set: string;
-  type: "match";
-}
-
-export interface MatchTableData extends SerializedMatch, TableData {
+export interface MatchTableData extends InternalMatch, TableData {
   archivedSortVal: number;
   custom: boolean;
   colors: number[];
@@ -71,7 +60,7 @@ export interface MatchesTableControlsProps
 
 export interface ListItemMatchProps {
   tags: TagCounts;
-  match: SerializedMatch;
+  match: InternalMatch;
   openMatchCallback: (matchId: string | number) => void;
   addTagCallback?: (id: string, tag: string) => void;
   editTagCallback?: (tag: string, color: string) => void;

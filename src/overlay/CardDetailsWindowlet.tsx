@@ -1,17 +1,12 @@
 import React, { useRef } from "react";
 import { CSSTransition } from "react-transition-group";
-
 import { ARENA_MODE_DRAFT } from "../shared/constants";
-import { getCardImage } from "../shared/util";
 import DraftRatings from "../shared/DraftRatings";
-
-import {
-  getEditModeClass,
-  useEditModeOnRef,
-  SettingsData
-} from "./overlayUtil";
-import { DbCardData } from "../shared/types/Metadata";
-import { Chances } from "../window_background/types/decks";
+import { getCardImage } from "../shared/util";
+import { Chances } from "../types/Chances";
+import { DbCardData } from "../types/Metadata";
+import { SettingsData } from "../types/settings";
+import { getEditModeClass, useEditModeOnRef } from "./overlayUtil";
 
 const NO_IMG_URL = "./images/nocard.png";
 
@@ -83,7 +78,7 @@ export default function CardDetailsWindowlet(
   const imgProps = {
     alt: name,
     className: "main_hover",
-    src: images ? getCardImage(card) : NO_IMG_URL,
+    src: images && card ? getCardImage(card) : NO_IMG_URL,
     style: {
       width: cardsSizeHoverCard + "px",
       height: cardsSizeHoverCard / SCALAR + "px"
