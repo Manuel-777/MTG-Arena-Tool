@@ -37,7 +37,7 @@ import { openExploreTab } from "./explore";
 import { openCollectionTab } from "./collection/CollectionTab";
 import { showOfflineSplash } from "./renderer-util";
 import { openSettingsTab } from "./settings";
-import { openHomeTab, requestHome } from "./home";
+import { openHomeTab } from "./HomeTab";
 
 export function openTab(
   tab: number,
@@ -78,9 +78,9 @@ export function openTab(
         showOfflineSplash();
       } else {
         if (getLocalState().discordTag === null) {
-          openHomeTab(null, true);
+          openHomeTab([], "", 0);
         } else {
-          requestHome();
+          ipcSend("request_home", "");
         }
       }
       break;

@@ -55,7 +55,7 @@ import {
   showLoadingBars
 } from "./renderer-util";
 
-import { openHomeTab } from "./home";
+import { openHomeTab } from "./HomeTab";
 import { tournamentOpen } from "./tournaments";
 import { openDeck } from "./deck-details";
 import { openSettingsTab, setCurrentOverlaySettings } from "./settings";
@@ -93,7 +93,7 @@ ipc.on("auth", function(event, arg) {
 ipc.on("set_discord_tag", (event, arg) => {
   setLocalState({ discordTag: arg });
   if (pd.settings.last_open_tab === MAIN_HOME) {
-    openHomeTab(null, true);
+    openHomeTab(undefined, 0);
   }
 });
 
@@ -138,7 +138,7 @@ ipc.on("set_home", function(event, arg) {
 
   if (pd.settings.last_open_tab === MAIN_HOME) {
     console.log("Home", arg);
-    openHomeTab(arg);
+    openHomeTab(arg.wildcards, arg.filtered_set, arg.users_active);
   }
 });
 
