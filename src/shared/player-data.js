@@ -308,6 +308,7 @@ class PlayerData {
     this.userName = undefined;
     this.cards = undefined;
     this.cardsNew = undefined;
+    this.deck_changes = undefined;
     this.decks = undefined;
     this.name = undefined;
     this.arenaId = undefined;
@@ -315,6 +316,7 @@ class PlayerData {
     this.economy = undefined;
     this.seasonal = undefined;
     this.courses_index = [];
+    this.deck_changes_index = [];
     this.matches_index = [];
     this.economy_index = [];
     this.draft_index = [];

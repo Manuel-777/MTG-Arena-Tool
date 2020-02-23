@@ -7,7 +7,7 @@ import { DRAFT_RANKS } from "../../shared/constants";
 import db from "../../shared/database";
 import { createDiv } from "../../shared/dom-fns";
 import pd from "../../shared/player-data";
-import { DbCardData } from "../../shared/types/Metadata";
+import { DbCardData } from "../../types/Metadata";
 import {
   getMissingCardCounts,
   openScryfallCard,
@@ -28,6 +28,7 @@ import {
   createInventoryStats,
   getCollectionStats
 } from "./collectionStats";
+import { CardCounts } from "../components/decks/types";
 
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
@@ -116,7 +117,7 @@ function saveTableMode(collectionTableMode: string): void {
 }
 
 function getCollectionData(): CardsData[] {
-  const wantedCards: { [key: string]: number } = {};
+  const wantedCards: CardCounts = {};
   pd.deckList
     .filter(deck => deck && !deck.archived)
     .forEach(deck => {

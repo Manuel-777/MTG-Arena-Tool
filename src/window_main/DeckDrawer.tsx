@@ -5,7 +5,7 @@ import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import CardTile, { CardTileProps } from "../shared/CardTile";
 import Deck from "../shared/deck";
-import { DbCardData } from "../shared/types/Metadata";
+import { DbCardData } from "../types/Metadata";
 
 export const cardSeparator = function(str: string) {
   return createDiv(["card_tile_separator"], str);

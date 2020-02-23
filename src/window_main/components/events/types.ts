@@ -1,39 +1,7 @@
 import { TableState } from "react-table";
+import { InternalEvent } from "../../../types/event";
 import { AggregatorFilters } from "../../aggregator";
 import { TableControlsProps, TableData } from "../tables/types";
-
-export interface SerializedEvent {
-  archived?: boolean;
-  CourseDeck: {
-    id: string;
-    name: string;
-    colors: number[];
-    deckTileId: number;
-  };
-  CurrentEventState: string | number;
-  custom: boolean;
-  date: string;
-  id: string;
-  InternalEventName: string;
-  ModuleInstanceData: {
-    WinLossGate?: {
-      CurrentWins: number;
-      CurrentLosses: number;
-      ProcessedMatchIds: string[];
-    };
-    WinNoGate?: {
-      CurrentWins: number;
-      ProcessedMatchIds: string[];
-    };
-  };
-  type: "Event";
-}
-
-export interface EventInstanceData {
-  CurrentWins: number;
-  CurrentLosses?: number;
-  ProcessedMatchIds?: string[];
-}
 
 export interface EventStats {
   displayName: string;
@@ -47,7 +15,7 @@ export interface EventStats {
   wins: number;
 }
 
-export interface EventTableData extends TableData, SerializedEvent, EventStats {
+export interface EventTableData extends TableData, InternalEvent, EventStats {
   archivedSortVal: number;
   colors: number[];
   colorSortVal: string;

@@ -13,7 +13,7 @@ import ShareButton from "../ShareButton";
 import db from "../../../shared/database";
 
 import { DEFAULT_TILE } from "../../../shared/constants";
-import { DbCardData } from "../../../shared/types/Metadata";
+import { DbCardData } from "../../../types/Metadata";
 import RoundCard from "../RoundCard";
 import { toggleArchived } from "../../renderer-util";
 import { getReadableEvent } from "../../../shared/util";

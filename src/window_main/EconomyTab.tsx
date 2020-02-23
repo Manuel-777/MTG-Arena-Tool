@@ -4,10 +4,7 @@ import React from "react";
 import { TableState } from "react-table";
 import pd from "../shared/player-data";
 import EconomyTable from "./components/economy/EconomyTable";
-import {
-  SerializedTransaction,
-  TransactionData
-} from "./components/economy/types";
+import { TransactionData } from "./components/economy/types";
 import { getPrettyContext } from "./economyUtils";
 import mountReactComponent from "./mountReactComponent";
 import {
@@ -16,6 +13,7 @@ import {
   resetMainContainer,
   toggleArchived
 } from "./renderer-util";
+import { InternalEconomyTransaction } from "../types/inventory";
 
 function saveTableState(economyTableState: TableState<TransactionData>): void {
   ipcSend("save_user_settings", { economyTableState, skipRefresh: true });
@@ -35,45 +33,31 @@ const sumBoosterCount = (boosters: { count: number }[]): number =>
 function getTxnData(): TransactionData[] {
   const today = new Date();
   return pd.transactionList.map(
-    (txn: SerializedTransaction): TransactionData => {
+    (txn: InternalEconomyTransaction): TransactionData => {
       const ts = new Date(txn.date ?? NaN);
       const archivedSortVal = txn.archived ? 1 : 0;
       const currentTrackLevel = txn.trackDiff?.currentLevel ?? 0;
       const oldTrackLevel = txn.trackDiff?.oldLevel ?? 0;
       const currentOrbCount = txn.orbCountDiff?.currentOrbCount ?? 0;
       const oldOrbCount = txn.orbCountDiff?.oldOrbCount ?? 0;
-      let {
-        artSkinsAdded,
-        boosterDelta,
-        cardsAdded,
-        draftTokensDelta,
-        gemsDelta,
-        goldDelta,
-        sealedTokensDelta,
-        vanityItemsAdded,
-        vaultProgressDelta,
-        wcCommonDelta,
-        wcUncommonDelta,
-        wcRareDelta,
-        wcMythicDelta
-      } = txn.delta;
-      artSkinsAdded = artSkinsAdded ?? [];
-      boosterDelta = boosterDelta ?? [];
-      cardsAdded = cardsAdded ?? [];
-      draftTokensDelta = draftTokensDelta ?? 0;
-      gemsDelta = gemsDelta ?? 0;
-      goldDelta = goldDelta ?? 0;
-      sealedTokensDelta = sealedTokensDelta ?? 0;
-      vanityItemsAdded = vanityItemsAdded ?? [];
-      vaultProgressDelta = vaultProgressDelta ?? 0;
-      wcCommonDelta = wcCommonDelta ?? 0;
-      wcUncommonDelta = wcUncommonDelta ?? 0;
-      wcRareDelta = wcRareDelta ?? 0;
-      wcMythicDelta = wcMythicDelta ?? 0;
+      const originalContext = txn.originalContext ?? "";
+      const artSkinsAdded = txn.delta?.artSkinsAdded ?? [];
+      const boosterDelta = txn.delta?.boosterDelta ?? [];
+      const cardsAdded = txn.delta?.cardsAdded ?? [];
+      const draftTokensDelta = txn.delta?.draftTokensDelta ?? 0;
+      const gemsDelta = txn.delta?.gemsDelta ?? 0;
+      const goldDelta = txn.delta?.goldDelta ?? 0;
+      const sealedTokensDelta = txn.delta?.sealedTokensDelta ?? 0;
+      const vanityItemsAdded = txn.delta?.vanityItemsAdded ?? [];
+      const vaultProgressDelta = txn.delta?.vaultProgressDelta ?? 0;
+      const wcCommonDelta = txn.delta?.wcCommonDelta ?? 0;
+      const wcUncommonDelta = txn.delta?.wcUncommonDelta ?? 0;
+      const wcRareDelta = txn.delta?.wcRareDelta ?? 0;
+      const wcMythicDelta = txn.delta?.wcMythicDelta ?? 0;
       return {
         ...txn,
-        prettyContext: getPrettyContext(txn.originalContext, false),
-        fullContext: getPrettyContext(txn.originalContext, true),
+        prettyContext: getPrettyContext(originalContext, false),
+        fullContext: getPrettyContext(originalContext, true),
         archivedSortVal,
         custom: true, // all txns may be archived
         trackLevelDelta: currentTrackLevel - oldTrackLevel,
@@ -89,13 +73,13 @@ function getTxnData(): TransactionData[] {
         wcRareDelta,
         wcMythicDelta,
         sealedTokensDelta,
-        boosterDeltaCount: sumBoosterCount(boosterDelta ?? []),
+        boosterDeltaCount: sumBoosterCount(boosterDelta),
         vanityAddedCount: vanityItemsAdded.length ?? 0,
         vaultProgressDelta: vaultProgressDelta / 100,
         aetherizedCardsCount: txn.aetherizedCards?.length ?? 0,
         timestamp: isValid(ts) ? ts.getTime() : NaN,
         daysAgo: differenceInCalendarDays(today, ts),
-        xpGainedNumber: parseInt(txn.xpGained ?? "0")
+        xpGainedNumber: txn.xpGained ?? 0
       };
     }
   );

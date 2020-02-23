@@ -6,7 +6,7 @@ import { queryElements as $$ } from "./dom-fns";
 import { getCardImage } from "./util";
 import { FACE_DFC_BACK, FACE_DFC_FRONT } from "./constants";
 import OwnershipStars from "./OwnershipStars";
-import { DbCardData } from "./types/Metadata";
+import { DbCardData } from "../types/Metadata";
 
 // controls when to auto-hide hover display
 // workaround for edge case bugs that cause hover to "get stuck"
@@ -54,7 +54,7 @@ export function addCardHover(element: HTMLElement, card?: DbCardData): void {
       });
 
       const dfcCard = db.card(dbCard.dfcId);
-      const dfcCardImage = getCardImage(dfcCard);
+      const dfcCardImage = dfcCard ? getCardImage(dfcCard) : "";
 
       const dfcImageElement = $$(".main_hover_dfc")[0];
       dfcImageElement.src = dfcCardImage;

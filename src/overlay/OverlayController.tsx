@@ -1,27 +1,22 @@
 import { ipcRenderer as ipc, webFrame } from "electron";
-import React, { useEffect, useCallback, useState } from "react";
 import { Howl, Howler } from "howler";
+import React, { useCallback, useEffect, useState } from "react";
 import striptags from "striptags";
-
-import playerData from "../shared/player-data";
-import Deck from "../shared/deck";
 import {
   ARENA_MODE_IDLE,
   IPC_BACKGROUND,
   IPC_MAIN,
   IPC_OVERLAY
 } from "../shared/constants";
-
-import {
-  DraftData,
-  LogData,
-  OverlaySettingsData,
-  SettingsData
-} from "./overlayUtil";
-import { MatchData } from "../window_background/types/currentMatch";
+import Deck from "../shared/deck";
+import playerData from "../shared/player-data";
+import { MatchData } from "../types/currentMatch";
+import { DraftData } from "../types/draft";
+import { InternalActionLog } from "../types/log";
+import { DbCardData } from "../types/Metadata";
+import { OverlaySettingsData, SettingsData } from "../types/settings";
 import CardDetailsWindowlet from "./CardDetailsWindowlet";
 import OverlayWindowlet from "./OverlayWindowlet";
-import { DbCardData } from "../shared/types/Metadata";
 
 const sound = new Howl({ src: ["../sounds/blip.mp3"] });
 
@@ -34,7 +29,10 @@ function ipcSend(method: string, arg?: unknown, to = IPC_BACKGROUND): void {
 const forceInt = (val: string | null): number =>
   Math.round(parseFloat(val || ""));
 
-function compareLogEntries(a: LogData, b: LogData): -1 | 0 | 1 {
+function compareLogEntries(
+  a: InternalActionLog,
+  b: InternalActionLog
+): -1 | 0 | 1 {
   if (a.time < b.time) return -1;
   if (a.time > b.time) return 1;
   return 0;
@@ -63,7 +61,7 @@ function setOddsCallback(sampleSize: number): void {
  *       - Clock
  */
 export default function OverlayController(): JSX.Element {
-  const [actionLog, setActionLog] = useState([] as LogData[]);
+  const [actionLog, setActionLog] = useState([] as InternalActionLog[]);
   const [arenaState, setArenaState] = useState(ARENA_MODE_IDLE);
   const [editMode, setEditMode] = useState(false);
   const [match, setMatch] = useState(undefined as undefined | MatchData);
@@ -107,7 +105,7 @@ export default function OverlayController(): JSX.Element {
   );
 
   // Note: no useCallback because of dependency on deep overlays state
-  const handleSetEditMode = (event: unknown, _editMode: boolean) => {
+  const handleSetEditMode = (event: unknown, _editMode: boolean): void => {
     // Save current windowlet dimensions before we leave edit mode
     if (editMode && !_editMode) {
       // Compute current dimensions of overlay windowlets in DOM
@@ -148,7 +146,7 @@ export default function OverlayController(): JSX.Element {
   };
 
   const handleActionLog = useCallback(
-    (event: unknown, arg: LogData): void => {
+    (event: unknown, arg: InternalActionLog): void => {
       let newLog = [...actionLog];
       arg.str = striptags(arg.str, ["log-card", "log-ability"]);
       newLog.push(arg);

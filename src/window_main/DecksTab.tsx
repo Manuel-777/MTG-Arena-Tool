@@ -5,7 +5,7 @@ import { TableState } from "react-table";
 import { EASING_DEFAULT } from "../shared/constants";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
-import { SerializedDeck } from "../shared/types/Deck";
+import { InternalDeck } from "../types/Deck";
 import {
   getBoosterCountEstimate,
   getReadableFormat,
@@ -104,7 +104,7 @@ function updateStatsPanel(
 
 function getDecksData(aggregator: Aggregator): DecksData[] {
   return pd.deckList.map(
-    (deck: SerializedDeck): DecksData => {
+    (deck: InternalDeck): DecksData => {
       const id = deck.id ?? "";
       const name = (deck.name ?? "").replace("?=?Loc/Decks/Precon/", "");
       const archivedSortVal = deck.archived ? 1 : deck.custom ? 0.5 : 0;

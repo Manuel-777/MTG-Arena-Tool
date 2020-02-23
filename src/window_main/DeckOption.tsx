@@ -14,12 +14,14 @@ export interface DeckOptionProps {
   deck: DeckOptionDeck;
 }
 
-export default function DeckOption(props: DeckOptionProps) {
+export default function DeckOption(props: DeckOptionProps): JSX.Element {
   const { deckId, deck } = props;
 
   const deckExists = pd.deckExists(deckId);
 
-  let deckName: string = deckExists ? getRecentDeckName(deckId) : deck.name;
+  const deckName: string = deckExists
+    ? getRecentDeckName(deckId)
+    : deck.name || "";
   let maxChars = 10;
   if (deckExists && deck.colors) {
     maxChars = 16 - 2 * deck.colors.length;

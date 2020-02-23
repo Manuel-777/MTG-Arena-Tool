@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { DbCardData } from "./types/Metadata";
+import { DbCardData } from "../types/Metadata";
 
 //
 // this order matters because things like Artifact Creatures exist

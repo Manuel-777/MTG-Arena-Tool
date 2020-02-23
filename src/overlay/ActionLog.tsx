@@ -1,15 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
 import format from "date-fns/format";
-import { FACE_SPLIT_FULL, FACE_ADVENTURE_MAIN } from "../shared/constants";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { FACE_ADVENTURE_MAIN, FACE_SPLIT_FULL } from "../shared/constants";
 import db from "../shared/database";
 import { openScryfallCard } from "../shared/util";
-
-import { LogData } from "./overlayUtil";
-import { DbCardData } from "../shared/types/Metadata";
+import { InternalActionLog } from "../types/log";
+import { DbCardData } from "../types/Metadata";
 
 interface LogEntryProps {
   initialTime: Date;
-  log: LogData;
+  log: InternalActionLog;
   setHoverCardCallback: (card?: DbCardData) => void;
 }
 
@@ -37,18 +36,15 @@ function LogEntry(props: LogEntryProps): JSX.Element {
     ) {
       _card = dfcCard || fullCard;
     }
-    openScryfallCard(_card);
+    if (_card) {
+      openScryfallCard(_card);
+    }
   }, [fullCard, dfcCard]);
   const displayLog = { ...log };
+  displayLog.str = log.str.replace(/<log-card/gi, '<log-card class="click-on"');
   displayLog.str = log.str.replace(
-    "<log-card",
-    '<log-card class="click-on"',
-    "gi"
-  );
-  displayLog.str = log.str.replace(
-    "<log-ability",
-    '<log-ability class="click-on"',
-    "gi"
+    /<log-ability/gi,
+    '<log-ability class="click-on"'
   );
   const date = new Date(log.time);
   const secondsPast = Math.round(
@@ -78,7 +74,7 @@ function LogEntry(props: LogEntryProps): JSX.Element {
 }
 
 export default function ActionLog(props: {
-  actionLog: LogData[];
+  actionLog: InternalActionLog[];
   setHoverCardCallback: (card?: DbCardData) => void;
 }): JSX.Element {
   const { actionLog, setHoverCardCallback } = props;
@@ -97,7 +93,7 @@ export default function ActionLog(props: {
   const logProps = { initialTime, setHoverCardCallback };
   return (
     <div className="overlay_decklist click-on" ref={containerRef}>
-      {actionLog.map((log: LogData, index: number) => (
+      {actionLog.map((log, index) => (
         <LogEntry log={log} key={"log_" + index} {...logProps} />
       ))}
     </div>

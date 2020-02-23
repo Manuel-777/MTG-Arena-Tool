@@ -1,16 +1,15 @@
-import db from "./database";
+import { anyCardsList, InternalDeck } from "../types/Deck";
+import { DbCardData } from "../types/Metadata";
 import CardsList from "./cardsList";
 import Colors from "./colors";
+import { DEFAULT_TILE } from "./constants";
+import db from "./database";
 import {
   compare_cards,
   get_set_code,
   get_wc_missing,
   objectClone
 } from "./util";
-import { DEFAULT_TILE } from "./constants";
-
-import { anyCardsList, SerializedDeck } from "./types/Deck";
-import { DbCardData } from "./types/Metadata";
 
 class Deck {
   private mainboard: CardsList;
@@ -24,32 +23,29 @@ class Deck {
   public tags: string[];
   public custom: boolean;
   public archetype: string;
+  public format: string;
+  public description: string;
 
   constructor(
-    mtgaDeck: SerializedDeck = {},
+    mtgaDeck: Partial<InternalDeck> = {},
     main: anyCardsList = [],
     side: anyCardsList = []
   ) {
     if (!mtgaDeck.mainDeck) mtgaDeck.mainDeck = [];
     if (!mtgaDeck.sideboard) mtgaDeck.sideboard = [];
-    if (main.length > 0) mtgaDeck.mainDeck = main;
-    if (side.length > 0) mtgaDeck.sideboard = side;
-
-    this.mainboard = new CardsList(mtgaDeck.mainDeck);
-    this.sideboard = new CardsList(mtgaDeck.sideboard);
-    this.commandZoneGRPIds = mtgaDeck.commandZoneGRPIds || [];
-    this.name = mtgaDeck.name || "";
-    this.id = mtgaDeck.id || "";
-    this.lastUpdated = mtgaDeck.lastUpdated || "";
+    this.mainboard = new CardsList(main.length > 0 ? main : mtgaDeck.mainDeck);
+    this.sideboard = new CardsList(side.length > 0 ? side : mtgaDeck.sideboard);
+    this.commandZoneGRPIds = mtgaDeck.commandZoneGRPIds ?? [];
+    this.name = mtgaDeck.name ?? "";
+    this.id = mtgaDeck.id ?? "";
+    this.lastUpdated = mtgaDeck.lastUpdated ?? "";
     this.tile = mtgaDeck.deckTileId ? mtgaDeck.deckTileId : DEFAULT_TILE;
     this._colors = this.getColors();
-    this.tags = mtgaDeck.tags || [mtgaDeck.format as string];
-    this.custom = mtgaDeck.custom || false;
-    this.archetype = mtgaDeck.archetype || "";
-
-    //this.sortMainboard(compare_cards);
-    //this.sortSideboard(compare_cards);
-
+    this.tags = mtgaDeck.tags ?? [mtgaDeck.format as string];
+    this.custom = mtgaDeck.custom ?? false;
+    this.archetype = mtgaDeck.archetype ?? "";
+    this.format = mtgaDeck.format ?? "";
+    this.description = mtgaDeck.description ?? "";
     return this;
   }
 
@@ -163,7 +159,7 @@ class Deck {
    * @param countSideboard weter or not to count the sideboard cards.
    */
   getMissingWildcards(countMainboard = true, countSideboard = true) {
-    let missing = {
+    const missing: Record<string, number> = {
       rare: 0,
       common: 0,
       uncommon: 0,
@@ -278,14 +274,14 @@ class Deck {
   /**
    * Returns a copy of this deck as an object.
    */
-  getSave(): SerializedDeck {
+  getSave(): InternalDeck {
     return objectClone(this.getSaveRaw());
   }
 
   /**
    * Returns a copy of this deck as an object, but maintains variables references.
    */
-  getSaveRaw(): SerializedDeck {
+  getSaveRaw(): InternalDeck {
     return {
       mainDeck: this.mainboard.get(),
       sideboard: this.sideboard.get(),
@@ -296,7 +292,10 @@ class Deck {
       colors: this.colors.get(),
       tags: this.tags || [],
       custom: this.custom,
-      commandZoneGRPIds: this.commandZoneGRPIds
+      commandZoneGRPIds: this.commandZoneGRPIds,
+      format: this.format,
+      type: "InternalDeck",
+      description: this.description
     };
   }
 

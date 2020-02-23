@@ -11,7 +11,7 @@ import {
 } from "../../../shared/util";
 import { addCardHover } from "../../../shared/cardHover";
 import LocalTime from "../../../shared/time-components/LocalTime";
-import { DbCardData } from "../../../shared/types/Metadata";
+import { DbCardData } from "../../../types/Metadata";
 
 import {
   formatNumber,

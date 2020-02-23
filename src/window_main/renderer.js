@@ -49,13 +49,12 @@ import {
   showLoadingBars,
 } from "./renderer-util";
 
-import {openHomeTab} from "./home";
-import {tournamentOpen} from "./tournaments";
-import {openDeck} from "./deck-details";
-import {openSettingsTab} from "./settings";
-import {setCurrentOverlaySettings} from "./components/settings/sectionOverlay";
-import {showOfflineSplash} from "./renderer-util";
-import {setExploreDecks} from "./explore";
+import { openHomeTab } from "./HomeTab";
+import { tournamentOpen } from "./tournaments";
+import { openDeck } from "./deck-details";
+import { openSettingsTab, setCurrentOverlaySettings } from "./settings";
+import { showOfflineSplash } from "./renderer-util";
+import { setExploreDecks } from "./explore";
 
 import {openTab, forceOpenAbout, forceOpenSettings} from "./tabControl";
 
@@ -91,7 +90,7 @@ ipc.on("auth", function(event, arg) {
 ipc.on("set_discord_tag", (event, arg) => {
   setLocalState({discordTag: arg});
   if (pd.settings.last_open_tab === MAIN_HOME) {
-    openHomeTab(null, true);
+    openHomeTab(undefined, 0);
   }
 });
 
@@ -136,7 +135,7 @@ ipc.on("set_home", function(event, arg) {
 
   if (pd.settings.last_open_tab === MAIN_HOME) {
     console.log("Home", arg);
-    openHomeTab(arg);
+    openHomeTab(arg.wildcards, arg.filtered_set, arg.users_active);
   }
 });
 
