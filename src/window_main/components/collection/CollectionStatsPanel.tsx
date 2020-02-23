@@ -16,7 +16,7 @@ import {
   MediumTextButton,
   RaritySymbol
 } from "../display";
-import { useBlurOnEnter } from "../tables/hooks";
+import Input from "../Input";
 import CompletionProgressBar, {
   SetCompletionBar
 } from "./CompletionProgressBar";
@@ -60,10 +60,6 @@ export function CollectionStatsPanel({
   setFutureBoosters: (factor: number) => void;
   clickCompletionCallback: () => void;
 }): JSX.Element {
-  const [rareDraftInputRef, rareDraftOnKey] = useBlurOnEnter();
-  const [mythicDraftInputRef, mythicDraftOnKey] = useBlurOnEnter();
-  const [boosterWinInputRef, boosterWinOnKey] = useBlurOnEnter();
-  const [futureBoostersInputRef, futureBoostersOnKey] = useBlurOnEnter();
   if (!stats) {
     return <></>;
   }
@@ -160,110 +156,62 @@ export function CollectionStatsPanel({
               >
                 Completion* <CalendarSymbol />:
               </div>
-              <label
-                className={"but_container_label"}
+              <Input
+                label={
+                  <>
+                    <RaritySymbol rarity={"rare"} /> rares/draft:
+                  </>
+                }
+                value={rareDraftFactor}
+                placeholder={"3"}
                 title={"rare picks per draft"}
-              >
-                <RaritySymbol rarity={"rare"} /> rares/draft:
-                <div className={"input_container"} style={inputStyle}>
-                  <input
-                    ref={rareDraftInputRef}
-                    type={"text"}
-                    autoComplete={"off"}
-                    placeholder={"3"}
-                    defaultValue={rareDraftFactor}
-                    onKeyUp={rareDraftOnKey}
-                    onBlur={(): void => {
-                      if (rareDraftInputRef?.current) {
-                        const newFactor = parseFloat(
-                          rareDraftInputRef?.current.value
-                        );
-                        if (newFactor !== rareDraftFactor) {
-                          setRareDraftFactor(newFactor);
-                        }
-                      }
-                    }}
-                  />
-                </div>
-              </label>
-              <label
-                className={"but_container_label"}
+                contStyle={inputStyle}
+                callback={(value: string): void =>
+                  setRareDraftFactor(parseFloat(value))
+                }
+              />
+              <Input
+                label={
+                  <>
+                    <RaritySymbol rarity={"mythic"} /> mythics/draft:
+                  </>
+                }
+                value={mythicDraftFactor}
+                placeholder={"0.14"}
                 title={"mythic picks per draft"}
-              >
-                <RaritySymbol rarity={"mythic"} /> mythics/draft:
-                <div className={"input_container"} style={inputStyle}>
-                  <input
-                    ref={mythicDraftInputRef}
-                    type={"text"}
-                    autoComplete={"off"}
-                    placeholder={"0.14"}
-                    defaultValue={mythicDraftFactor}
-                    onKeyUp={mythicDraftOnKey}
-                    onBlur={(): void => {
-                      if (mythicDraftInputRef?.current) {
-                        const newFactor = parseFloat(
-                          mythicDraftInputRef?.current.value
-                        );
-                        if (newFactor !== mythicDraftFactor) {
-                          setMythicDraftFactor(newFactor);
-                        }
-                      }
-                    }}
-                  />
-                </div>
-              </label>
-              <label
-                className={"but_container_label"}
+                contStyle={inputStyle}
+                callback={(value: string): void =>
+                  setMythicDraftFactor(parseFloat(value))
+                }
+              />
+              <Input
+                label={
+                  <>
+                    <BoosterSymbol /> boosters/draft:
+                  </>
+                }
+                value={boosterWinFactor}
+                placeholder={"1.2"}
                 title={"prize boosters awarded per draft"}
-              >
-                <BoosterSymbol /> boosters/draft:
-                <div className={"input_container"} style={inputStyle}>
-                  <input
-                    ref={boosterWinInputRef}
-                    type={"text"}
-                    autoComplete={"off"}
-                    placeholder={"1.2"}
-                    defaultValue={boosterWinFactor}
-                    onKeyUp={boosterWinOnKey}
-                    onBlur={(): void => {
-                      if (boosterWinInputRef?.current) {
-                        const newFactor = parseFloat(
-                          boosterWinInputRef?.current.value
-                        );
-                        if (newFactor !== boosterWinFactor) {
-                          setBoosterWinFactor(newFactor);
-                        }
-                      }
-                    }}
-                  />
-                </div>
-              </label>
-              <label
-                className={"but_container_label"}
+                contStyle={inputStyle}
+                callback={(value: string): void =>
+                  setBoosterWinFactor(parseFloat(value))
+                }
+              />
+              <Input
+                label={
+                  <>
+                    <BoosterSymbol /> future boosters:
+                  </>
+                }
+                value={futureBoosters}
+                placeholder={"0"}
                 title={"expected additional boosters, e.g. seasonal rewards"}
-              >
-                <BoosterSymbol /> future boosters:
-                <div className={"input_container"} style={inputStyle}>
-                  <input
-                    ref={futureBoostersInputRef}
-                    type={"text"}
-                    autoComplete={"off"}
-                    placeholder={"0"}
-                    defaultValue={futureBoosters}
-                    onKeyUp={futureBoostersOnKey}
-                    onBlur={(): void => {
-                      if (futureBoostersInputRef?.current) {
-                        const newFactor = parseFloat(
-                          futureBoostersInputRef?.current.value
-                        );
-                        if (newFactor !== futureBoosters) {
-                          setFutureBoosters(newFactor);
-                        }
-                      }
-                    }}
-                  />
-                </div>
-              </label>
+                contStyle={inputStyle}
+                callback={(value: string): void =>
+                  setFutureBoosters(parseFloat(value))
+                }
+              />
               <div
                 className={"message_sub_15 white link"}
                 onClick={(): Promise<void> =>
