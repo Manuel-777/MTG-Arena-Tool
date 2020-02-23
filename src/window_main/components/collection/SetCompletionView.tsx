@@ -4,6 +4,10 @@ import { CollectionStats } from "../../collection/collectionStats";
 import { SetCompletionBar } from "./CompletionProgressBar";
 import { SetCompletionStats } from "./SetCompletionStats";
 
+// threshold to separate "complete" collectible sets from "one-offs"
+// based on card count (e.g. "Ixalan" vs "Gatecrash")
+const STATS_CUTOFF = 100;
+
 export function SetsView({
   stats,
   setClickCallback,
@@ -26,8 +30,7 @@ export function SetsView({
   const collectibleSets = db.sortedSetCodes.filter(set => {
     // ensure metadata populated
     const setStats = stats[set];
-    const cardData = setStats.cards;
-    const hasData = cardData.length > 0;
+    const hasData = setStats.all.total > 0;
     // ensure set has collationId, meaning boosters for it exist
     const isCollectible = !!db.sets[set]?.collation;
     return hasData && isCollectible;
@@ -46,14 +49,16 @@ export function SetsView({
             setIconCode={set}
             setName={set}
           />
-          <SetCompletionStats
-            setStats={stats[set]}
-            boosterMath={boosterMath}
-            rareDraftFactor={rareDraftFactor}
-            mythicDraftFactor={mythicDraftFactor}
-            boosterWinFactor={boosterWinFactor}
-            futureBoosters={index === 0 ? futureBoosters : 0}
-          />
+          {stats[set].all.total > STATS_CUTOFF && (
+            <SetCompletionStats
+              setStats={stats[set]}
+              boosterMath={boosterMath}
+              rareDraftFactor={rareDraftFactor}
+              mythicDraftFactor={mythicDraftFactor}
+              boosterWinFactor={boosterWinFactor}
+              futureBoosters={index === 0 ? futureBoosters : 0}
+            />
+          )}
         </div>
       ))}
     </div>
