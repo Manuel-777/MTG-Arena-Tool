@@ -39,12 +39,7 @@ import { showOfflineSplash } from "./renderer-util";
 import { openSettingsTab } from "./settings";
 import { openHomeTab, requestHome } from "./home";
 
-export function openTab(
-  tab: number,
-  filters = {},
-  dataIndex = 0,
-  scrollTop = 0
-): void {
+export function openTab(tab: number, filters = {}): void {
   showLoadingBars();
   resetMainContainer();
   switch (tab) {
@@ -71,7 +66,7 @@ export function openTab(
       openCollectionTab();
       break;
     case MAIN_SETTINGS:
-      openSettingsTab(-1, scrollTop);
+      openSettingsTab(-1);
       break;
     case MAIN_HOME:
       if (pd.offline) {
@@ -147,7 +142,7 @@ export function forceOpenAbout(): void {
     last_open_tab: MAIN_SETTINGS
   });
 
-  openSettingsTab(SETTINGS_ABOUT, 0);
+  openSettingsTab(SETTINGS_ABOUT);
   updateTopBar();
 }
 
@@ -163,6 +158,6 @@ export function forceOpenSettings(section = -1): void {
     last_open_tab: MAIN_SETTINGS
   });
 
-  openSettingsTab(section, 0);
+  openSettingsTab(section);
   updateTopBar();
 }
