@@ -2,7 +2,7 @@ import React from "react";
 import db from "../shared/database";
 import { ipcSend } from "./renderer-util";
 import { timestamp, toDDHHMMSS } from "../shared/util";
-import { SET_LOADING, dispatchAction } from "./app/ContextReducer";
+import { dispatchAction, SET_HOVER_CARD } from "./app/ContextReducer";
 import { useDispatch } from "./app/ContextProvider";
 
 export interface WildcardsChange {
@@ -141,6 +141,11 @@ interface TopWildcardsProps {
 
 function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
   const lineDark = "line_dark line_bottom_border";
+  const dispatcher = useDispatch();
+
+  const hoverCard = (id: number, opacity: number): void => {
+    dispatchAction(dispatcher, SET_HOVER_CARD, { grpId: id, opacity: opacity });
+  };
 
   return (
     <div className="top_wildcards_cont">
@@ -197,6 +202,12 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             <div
               key={index + "d"}
               className={ld}
+              onMouseEnter={(): void => {
+                hoverCard(card.id, 1);
+              }}
+              onMouseLeave={(): void => {
+                hoverCard(card.id, 0);
+              }}
               style={{
                 gridArea: `${index + 2} / 4 / auto / auto`,
                 textDecoration: "underline dotted"
