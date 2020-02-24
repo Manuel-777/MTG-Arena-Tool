@@ -96,7 +96,6 @@ function isBoosterMathValid(filters: Filters<CardsData>): boolean {
 
 export default function CollectionTable({
   data,
-  cardHoverCallback,
   contextMenuCallback,
   tableModeCallback,
   tableStateCallback,
@@ -367,7 +366,6 @@ export default function CollectionTable({
               key={row.index}
               row={row}
               index={index}
-              cardHoverCallback={cardHoverCallback}
               contextMenuCallback={contextMenuCallback}
               openCardCallback={openCardCallback}
               gridTemplateColumns={gridTemplateColumns}

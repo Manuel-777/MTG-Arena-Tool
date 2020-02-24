@@ -4,10 +4,10 @@ import pd from "../../../shared/player-data";
 import { getCardImage } from "../../../shared/util";
 import { TableViewRow } from "../tables/TableViewRow";
 import { CollectionTableRowProps } from "./types";
+import useHoverCard from "../../hooks/useHoverCard";
 
 export function CardTableViewRow({
   row,
-  cardHoverCallback,
   contextMenuCallback,
   openCardCallback,
   ...otherProps
@@ -20,15 +20,19 @@ export function CardTableViewRow({
   React.useEffect(() => {
     const containerDiv = containerEl.current;
     if (containerDiv) {
-      cardHoverCallback(containerDiv, card);
       contextMenuCallback(containerDiv, card);
     }
-  }, [card, containerEl, cardHoverCallback, contextMenuCallback]);
+  }, [card, containerEl, contextMenuCallback]);
+
+  const [hoverIn, hoverOut] = useHoverCard(card.id);
+
   return (
     <span ref={containerEl}>
       <TableViewRow
         row={row}
         title={`open ${card.name} in Scryfall (browser)`}
+        onMouseEnter={hoverIn}
+        onMouseLeave={hoverOut}
         onClick={onClick}
         {...otherProps}
       />
@@ -38,7 +42,6 @@ export function CardTableViewRow({
 
 export function CardTileRow({
   row,
-  cardHoverCallback,
   contextMenuCallback,
   openCardCallback
 }: CollectionTableRowProps): JSX.Element {
@@ -51,9 +54,11 @@ export function CardTileRow({
     const containerDiv = containerEl.current;
     if (containerDiv) {
       contextMenuCallback(containerDiv, card);
-      cardHoverCallback(containerDiv, card);
     }
-  }, [card, cardHoverCallback, contextMenuCallback]);
+  }, [card, contextMenuCallback]);
+
+  const [hoverIn, hoverOut] = useHoverCard(card.id);
+
   return (
     <div
       ref={containerEl}
@@ -62,7 +67,12 @@ export function CardTileRow({
       style={{ display: "inline-block" }}
     >
       <OwnershipStars card={card} wanted={card.wanted} />
-      <div className={"inventory_card"} style={{ width: pd.cardsSize + "px" }}>
+      <div
+        className={"inventory_card"}
+        onMouseEnter={hoverIn}
+        onMouseLeave={hoverOut}
+        style={{ width: pd.cardsSize + "px" }}
+      >
         <img
           className={"inventory_card_img"}
           style={{ width: pd.cardsSize + "px" }}

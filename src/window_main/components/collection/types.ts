@@ -30,7 +30,6 @@ export interface CollectionTableControlsProps
 }
 
 export interface CollectionTableRowProps extends TableViewRowProps<CardsData> {
-  cardHoverCallback: (cardDiv: HTMLElement, card: DbCardData) => void;
   contextMenuCallback: (cardDiv: HTMLElement, card: DbCardData) => void;
   openCardCallback: (cardObj: DbCardData) => void;
 }
