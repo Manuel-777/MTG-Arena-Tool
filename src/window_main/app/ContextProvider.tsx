@@ -14,6 +14,10 @@ export interface AppState {
   topNav: number;
   login: number;
   canLogin: boolean;
+  patreon: {
+    patreon: boolean;
+    patreonTier: number;
+  };
   loginForm: {
     email: string;
     pass: string;
@@ -39,6 +43,10 @@ const defaultState: AppState = {
   topNav: 0,
   login: LOGIN_AUTH,
   canLogin: true,
+  patreon: {
+    patreon: false,
+    patreonTier: -1
+  },
   loginForm: {
     email: "",
     pass: "",

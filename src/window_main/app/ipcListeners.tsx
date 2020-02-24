@@ -18,7 +18,8 @@ import {
   SET_TOP_NAV,
   SET_BACKGROUND_IMAGE,
   SET_TOP_ARTIST,
-  SET_ANY
+  SET_ANY,
+  SET_PATREON
 } from "./ContextReducer";
 import { timestamp, getCardArtCrop } from "../../shared/util";
 import { MAIN_SETTINGS, SETTINGS_OVERLAY } from "../../shared/constants";
@@ -53,6 +54,12 @@ export default function ipcListeners(dispatcher: unknown): void {
     dispatchAction(dispatcher, SET_LOADING, true);
     if (arg.ok) {
       dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
+      if (arg.patreon) {
+        dispatchAction(dispatcher, SET_PATREON, {
+          patreon: arg.patreon,
+          patreonTier: arg.patreon_tier
+        });
+      }
     } else {
       dispatchAction(dispatcher, SET_LOADING, false);
       dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED);

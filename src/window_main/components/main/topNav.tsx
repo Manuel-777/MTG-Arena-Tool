@@ -212,11 +212,6 @@ export function TopNav(): JSX.Element {
     }
   }, [compact]);
 
-  const patreon = {
-    patreon: pd.patreon,
-    patreonTier: pd.patreon_tier
-  };
-
   const userName = pd.name.slice(0, -6);
   const userNumerical = pd.name.slice(-6);
 
@@ -235,7 +230,7 @@ export function TopNav(): JSX.Element {
         <div className="top_userdata_container">
           <TopRankIcon {...contructedNav} />
           <TopRankIcon {...limitedNav} />
-          {pd.patreon ? <PatreonBadge {...patreon} /> : null}
+          {pd.patreon ? <PatreonBadge {...appContext.patreon} /> : null}
           <div className="top_username" title={"Arena username"}>
             {userName}
           </div>

@@ -12,6 +12,7 @@ export const SET_LOGIN_PASS = 8;
 export const SET_CAN_LOGIN = 9;
 export const SET_HOME_DATA = 10;
 export const SET_POPUP = 11;
+export const SET_PATREON = 12;
 export const SET_ANY = 99;
 
 export const LOGIN_AUTH = 0;
@@ -59,6 +60,9 @@ export default function contextReducer(state: AppState, action: any): AppState {
     }
     case SET_POPUP: {
       return { ...state, popup: action.value };
+    }
+    case SET_PATREON: {
+      return { ...state, patreon: action.value };
     }
     case SET_ANY: {
       // This one defeats the purpose of the dispatcher,
