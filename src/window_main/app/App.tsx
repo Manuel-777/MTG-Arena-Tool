@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { ContextProvider, useContext, useDispatch } from "./ContextProvider";
 import { TopNav } from "../components/main/topNav";
-import { getOpenNav } from "../tabControl";
+import { getOpenNav, getOpenSub } from "../tabControl";
 import BackgroundImage from "../components/main/BackgroundImage";
 import TopBar from "../components/main/TopBar";
 import LoadingBar from "../components/main/LoadingBar";
@@ -47,7 +47,7 @@ function App(): JSX.Element {
             <div className="overflow_ux_main">
               <div className="moving_ux">
                 <div className="ux_item">{getOpenNav(appContext)}</div>
-                <div className="ux_item"></div>
+                <div className="ux_item">{getOpenSub(appContext)}</div>
                 <div className="ux_item"></div>
               </div>
             </div>

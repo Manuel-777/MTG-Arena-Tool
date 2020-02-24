@@ -14,6 +14,10 @@ export interface AppState {
   offline: boolean;
   loading: boolean;
   topNav: number;
+  subNav: {
+    type: number;
+    id: string;
+  };
   login: number;
   canLogin: boolean;
   patreon: {
@@ -45,6 +49,10 @@ const defaultState: AppState = {
   offline: false,
   loading: false,
   topNav: 0,
+  subNav: {
+    type: -1,
+    id: ""
+  },
   login: LOGIN_AUTH,
   canLogin: true,
   patreon: {

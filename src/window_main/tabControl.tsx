@@ -13,11 +13,13 @@ import {
   MAIN_SETTINGS,
   MAIN_CONSTRUCTED,
   MAIN_LIMITED,
-  SETTINGS_BEHAVIOUR
+  SUB_DECK,
+  SUB_MATCH,
+  SUB_DRAFT
 } from "../shared/constants";
 
 import pd from "../shared/player-data";
-import Aggregator, { AggregatorFilters } from "./aggregator";
+import Aggregator from "./aggregator";
 import anime from "animejs";
 
 import { ipcSend } from "./renderer-util";
@@ -32,6 +34,7 @@ import { openSettingsTab } from "./settings";
 import { openHomeTab } from "./HomeTab";
 import { AppState } from "./app/ContextProvider";
 import OfflineSplash from "./OfflineSplash";
+import openDeckSub from "./components/deck-view/DeckVIew";
 
 function getFilters(id: number): any {
   let filters = {
@@ -88,6 +91,24 @@ export function getOpenNav(appState: AppState): JSX.Element {
     default:
       break;
   }
+  return <></>;
+}
+
+export function getOpenSub(appState: AppState): JSX.Element {
+  const subNav = appState.subNav.type;
+  switch (subNav) {
+    case SUB_DECK:
+      return openDeckSub(appState.subNav.id);
+    /*
+    case SUB_MATCH:
+      return openMatchSub(appState.subNav.id);
+    case SUB_DRAFT:
+      return openDraftSub(appState.subNav.id);
+    */
+    default:
+      break;
+  }
+
   return <></>;
 }
 

@@ -785,6 +785,10 @@ export const MAIN_UPDATE = 9;
 export const MAIN_CONSTRUCTED = 10;
 export const MAIN_LIMITED = 11;
 
+export const SUB_DECK = 1;
+export const SUB_MATCH = 2;
+export const SUB_DRAFT = 3;
+
 export const SHORTCUT_NAMES: Record<string, string> = {
   shortcut_overlay_1: "Toggle Overlay 1",
   shortcut_overlay_2: "Toggle Overlay 2",

@@ -14,9 +14,9 @@ import {
   getRankColorClass,
   openScryfallCard
 } from "./util";
-import { addCardHover } from "./cardHover";
 import { DbCardData, Rarity } from "../types/Metadata";
 import useHoverCard from "../window_main/hooks/useHoverCard";
+import pd from "./player-data";
 
 export interface CardTileProps {
   card: DbCardData;
@@ -27,7 +27,6 @@ export interface CardTileProps {
   isSideboard: boolean;
   quantity: { quantity: string; odds: number } | number | string; // TODO clean this up?
   showWildcards: boolean;
-  style: number;
 }
 
 function isNumber(n: number | string): boolean {
@@ -386,7 +385,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
   if (!card || quantity === 0) {
     return <></>;
   }
-  if (props.style === CARD_TILE_FLAT) {
+  if (parseInt(pd.settings.card_tile_style) === CARD_TILE_FLAT) {
     return FlatCardTile(props);
   }
   return ArenaCardTile(props);

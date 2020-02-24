@@ -2,7 +2,7 @@ import anime from "animejs";
 import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
-import { EASING_DEFAULT } from "../shared/constants";
+import { EASING_DEFAULT, SUB_DECK } from "../shared/constants";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
 import { InternalDeck } from "../types/Deck";
@@ -23,24 +23,10 @@ import {
   useAggregatorAndSidePanel,
   useLastScrollTop
 } from "./components/tables/hooks";
-import { openDeck } from "./deck-details";
 import { ipcSend, makeResizable } from "./renderer-util";
 import StatsPanel from "./stats-panel";
-
-function openDeckDetails(
-  id: string | number,
-  filters: AggregatorFilters
-): void {
-  const deck = pd.deck(id + "");
-  if (!deck) return;
-  openDeck(deck, { ...filters, deckId: id });
-  anime({
-    targets: ".moving_ux",
-    left: "-100%",
-    easing: EASING_DEFAULT,
-    duration: 350
-  });
-}
+import { useDispatch } from "./app/ContextProvider";
+import { dispatchAction, SET_SUB_NAV } from "./app/ContextReducer";
 
 function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);
@@ -148,6 +134,7 @@ export function DecksTab({
 }: {
   aggFiltersArg: AggregatorFilters;
 }): JSX.Element {
+  const dispatcher = useDispatch();
   const { decksTableMode, decksTableState } = pd.settings;
   const showArchived = !isHidingArchived(decksTableState);
   const getDataAggFilters = (data: DecksData[]): AggregatorFilters => {
@@ -169,8 +156,16 @@ export function DecksTab({
     updateSidebarCallback: updateStatsPanel
   });
   const openDeckCallback = React.useCallback(
-    (id: string | number): void => openDeckDetails(id, aggFilters),
-    [aggFilters]
+    (id: string | number): void => {
+      anime({
+        targets: ".moving_ux",
+        left: "-100%",
+        easing: EASING_DEFAULT,
+        duration: 350
+      });
+      dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_DECK, id: id });
+    },
+    [dispatcher]
   );
   const events = React.useMemo(getTotalAggEvents, []);
   const [containerRef, onScroll] = useLastScrollTop();

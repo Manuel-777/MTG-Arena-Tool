@@ -6,13 +6,14 @@ export const SET_HOVER_CARD = 2;
 export const SET_OFFLINE = 3;
 export const SET_LOADING = 4;
 export const SET_TOP_NAV = 5;
-export const SET_LOGIN_STATE = 6;
-export const SET_LOGIN_FORM = 7;
-export const SET_LOGIN_PASS = 8;
-export const SET_CAN_LOGIN = 9;
-export const SET_HOME_DATA = 10;
-export const SET_POPUP = 11;
-export const SET_PATREON = 12;
+export const SET_SUB_NAV = 6;
+export const SET_LOGIN_STATE = 7;
+export const SET_LOGIN_FORM = 8;
+export const SET_LOGIN_PASS = 9;
+export const SET_CAN_LOGIN = 10;
+export const SET_HOME_DATA = 11;
+export const SET_POPUP = 12;
+export const SET_PATREON = 13;
 export const SET_ANY = 99;
 
 export const LOGIN_AUTH = 0;
@@ -43,6 +44,9 @@ export default function contextReducer(state: AppState, action: any): AppState {
     }
     case SET_TOP_NAV: {
       return { ...state, topNav: action.value };
+    }
+    case SET_SUB_NAV: {
+      return { ...state, subNav: action.value };
     }
     case SET_LOGIN_STATE: {
       return { ...state, login: action.value };
