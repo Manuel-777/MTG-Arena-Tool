@@ -58,6 +58,7 @@ export interface SettingsData {
   eventsTableState?: TableState<EventTableData>;
   export_format: string;
   last_date_filter: string;
+  last_open_tab: number;
   matchesTableMode: string;
   matchesTableState?: TableState<MatchTableData>;
   metadata_lang: string;

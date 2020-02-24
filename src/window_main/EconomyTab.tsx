@@ -7,6 +7,7 @@ import EconomyTable from "./components/economy/EconomyTable";
 import { TransactionData } from "./components/economy/types";
 import { getPrettyContext } from "./economyUtils";
 import { ipcSend, toggleArchived } from "./renderer-util";
+
 import { InternalEconomyTransaction } from "../types/inventory";
 
 function saveTableState(economyTableState: TableState<TransactionData>): void {

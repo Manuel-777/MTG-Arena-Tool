@@ -53,7 +53,7 @@ function BoosterDelta(props: BoosterDeltaProps): JSX.Element {
     <EconomyValueRecord
       iconClassName={"set_logo_med"}
       iconUrl={imagePath}
-      title={set}
+      title={set + " Boosters"}
       deltaContent={"x" + Math.abs(booster.count)}
     />
   );
@@ -400,6 +400,22 @@ function FlexRight(props: FlexRightProps): JSX.Element {
           iconClassName={"economy_exp"}
           title={"Experience"}
           deltaContent={formatNumber(xpGainedNumber)}
+        />
+      )}
+      {Math.abs(change.delta.draftTokensDelta) > 0 && (
+        <EconomyValueRecord
+          iconClassName={"economy_ticket_med"}
+          title={"Traditional Draft Entry Tokens"}
+          smallLabel
+          deltaContent={formatNumber(change.delta.draftTokensDelta)}
+        />
+      )}
+      {Math.abs(change.delta.sealedTokensDelta) > 0 && (
+        <EconomyValueRecord
+          iconClassName={"economy_ticket_med"}
+          title={"Sealed Entry Tokens"}
+          smallLabel
+          deltaContent={formatNumber(change.delta.sealedTokensDelta)}
         />
       )}
       {checkBoosterAdded &&

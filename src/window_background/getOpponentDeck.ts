@@ -34,10 +34,11 @@ function getBestArchetype(deck: Deck): string {
       .getMainboard()
       .get()
       .forEach(card => {
+        const cardData = db.card(card.id);
+        if (!cardData) return;
         //let q = card.quantity;
-        const name = (db.card(card.id) as DbCardData).name;
+        const name = cardData.name;
         const archMain = arch.average.mainDeck;
-
         const deviation = 1 - (archMain[name] ? 1 : 0); // archMain[name] ? archMain[name] : 0 // for full data
         mainDeviations.push(deviation * deviation);
         //console.log(name, deviation, archMain[name]);

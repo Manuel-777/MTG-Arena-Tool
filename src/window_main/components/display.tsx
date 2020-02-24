@@ -396,6 +396,14 @@ export const BoosterSymbol = styled(SymbolBase).attrs(props => ({
   className: `bo_explore_cost ${props.className ?? ""}`
 }))``;
 
+export const TicketSymbol = styled(SymbolBase).attrs(props => ({
+  className: `economy_ticket ${props.className ?? ""}`
+}))``;
+
+export const CalendarSymbol = styled(SymbolBase).attrs(props => ({
+  className: `icon_2 ${props.className ?? ""}`
+}))``;
+
 export const ArchiveSymbol = styled.div`
   border-radius: 50%;
   cursor: pointer;

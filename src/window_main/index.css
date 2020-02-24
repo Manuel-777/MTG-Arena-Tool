@@ -1594,10 +1594,17 @@ a:hover {
 }
 
 .stats_set_completion {
-    max-width: 400px;
+    max-width: 600px;
     margin: 24px auto;
     display: flex;
     flex-direction: column;
+}
+
+.stats_set_completion_row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    height: 32px;
+    color: var(--color-light);
 }
 
 .stats_set_completion.stats_sidebar {
@@ -1668,7 +1675,7 @@ a:hover {
 .stats_set_bar:after {
     content: '';
     left: 0;
-    width: 400px;
+    width: 600px;
     background-color: rgb(99, 79, 53);
     height: 2px;
     position: absolute;

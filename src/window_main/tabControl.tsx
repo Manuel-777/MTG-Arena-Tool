@@ -17,7 +17,7 @@ import {
 } from "../shared/constants";
 
 import pd from "../shared/player-data";
-import Aggregator from "./aggregator";
+import Aggregator, { AggregatorFilters } from "./aggregator";
 import anime from "animejs";
 
 import { ipcSend } from "./renderer-util";
@@ -35,8 +35,7 @@ import { AppState } from "./app/ContextProvider";
 function getFilters(id: number): any {
   let filters = {
     date: pd.settings.last_date_filter,
-    eventId: "All Events",
-    rankedMode: false
+    eventId: "All Events"
   };
   let sidebarActive = id;
 
@@ -45,8 +44,7 @@ function getFilters(id: number): any {
     filters = {
       ...Aggregator.getDefaultFilters(),
       date: DATE_SEASON,
-      eventId: Aggregator.RANKED_CONST,
-      rankedMode: true
+      eventId: Aggregator.RANKED_CONST
     };
   }
   if (id === MAIN_LIMITED) {
@@ -54,8 +52,7 @@ function getFilters(id: number): any {
     filters = {
       ...Aggregator.getDefaultFilters(),
       date: DATE_SEASON,
-      eventId: Aggregator.RANKED_DRAFT,
-      rankedMode: true
+      eventId: Aggregator.RANKED_DRAFT
     };
   }
 

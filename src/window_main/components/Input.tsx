@@ -1,10 +1,11 @@
 import React from "react";
 
 interface InputProps {
-  label?: string;
+  label?: React.ReactNode;
   contStyle?: React.CSSProperties;
-  value: string;
+  value: string | number;
   placeholder: string;
+  title?: string;
   autocomplete?: string;
   callback?: (value: string) => void;
 }
@@ -13,8 +14,8 @@ function InputBase(
   props: InputProps,
   ref: React.Ref<HTMLInputElement>
 ): JSX.Element {
-  const { label, value, contStyle, callback, placeholder } = props;
-  const [currentValue, setCurrentValue] = React.useState(value);
+  const { label, value, contStyle, callback, title, placeholder } = props;
+  const [currentValue, setCurrentValue] = React.useState(value + "");
   const autocomplete = props.autocomplete || "off";
 
   const onChange = React.useCallback(
@@ -54,7 +55,7 @@ function InputBase(
   return (
     <>
       {label ? (
-        <label className="but_container_label">
+        <label className="but_container_label" title={title}>
           {label}
           {inputInner()}
         </label>

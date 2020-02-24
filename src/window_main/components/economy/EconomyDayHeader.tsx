@@ -73,10 +73,16 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
         containerDiv
         iconClassName={"economy_vault"}
         className={"gridVault"}
-        deltaUpContent={formatPercent(
-          vaultProgressDelta,
-          vaultPercentFormat as any
-        )}
+        deltaUpContent={
+          vaultProgressDelta >= 0
+            ? formatPercent(vaultProgressDelta, vaultPercentFormat as any)
+            : undefined
+        }
+        deltaDownContent={
+          vaultProgressDelta < 0
+            ? formatPercent(vaultProgressDelta, vaultPercentFormat as any)
+            : undefined
+        }
         title={"Vault"}
       />
       <EconomyValueRecord
