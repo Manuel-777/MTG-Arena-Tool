@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 import db from "../../../shared/database";
+import pd from "../../../shared/player-data";
 const NotFound = "../../../images/notfound.png";
 import { useContext, AppState } from "../../app/ContextProvider";
 import { FACE_DFC_FRONT, FACE_DFC_BACK } from "../../../shared/constants";
@@ -13,7 +14,8 @@ export default function CardHover(): JSX.Element {
 
     let newImg;
     try {
-      newImg = `url(https://img.scryfall.com/cards${cardObj.images.normal}`;
+      const quality = pd.settings.cards_quality;
+      newImg = `url(https://img.scryfall.com/cards${cardObj.images[quality]}`;
     } catch (e) {
       newImg = `url(${NotFound})`;
     }
@@ -37,7 +39,8 @@ export default function CardHover(): JSX.Element {
     ) {
       cardObj = db.card(cardObj.dfcId);
       try {
-        newImg = `url(https://img.scryfall.com/cards${cardObj.images.normal}`;
+        const quality = pd.settings.cards_quality;
+        newImg = `url(https://img.scryfall.com/cards${cardObj.images[quality]}`;
       } catch (e) {
         newImg = `url(${NotFound})`;
       }
