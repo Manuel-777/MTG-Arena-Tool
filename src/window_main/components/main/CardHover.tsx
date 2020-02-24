@@ -18,6 +18,9 @@ export default function CardHover(): JSX.Element {
       newImg = `url(${NotFound})`;
     }
     return {
+      width: ctx.hoverSize + "px",
+      height: ctx.hoverSize / 0.71808510638 + "px",
+      top: `calc(100% - ${ctx.hoverSize / 0.71808510638 + 32}px)`,
       opacity: ctx.hoverOpacity,
       backgroundImage: newImg
     };
@@ -43,6 +46,10 @@ export default function CardHover(): JSX.Element {
     }
 
     return {
+      width: ctx.hoverSize + "px",
+      right: ctx.hoverSize + 48 + "px",
+      height: ctx.hoverSize / 0.71808510638 + "px",
+      top: `calc(100% - ${ctx.hoverSize / 0.71808510638 + 32}px)`,
       opacity: opacity,
       backgroundImage: newImg
     };
