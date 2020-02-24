@@ -37,7 +37,7 @@ import { openEconomyTab } from "./EconomyTab";
 import { openExploreTab } from "./explore";
 import { openCollectionTab } from "./collection/CollectionTab";
 import { openSettingsTab } from "./settings";
-import { openHomeTab, requestHome } from "./home";
+import { openHomeTab } from "./HomeTab";
 import { openOfflineSplash } from "./OfflineSplash";
 
 export function openTab(tab: number, filters = {}): void {
