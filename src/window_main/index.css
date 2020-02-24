@@ -189,7 +189,6 @@ time, local-time, relative-time {
 
 .unlink {
     -webkit-app-region: no-drag;
-    display: none;
     background: url(../images/unlink.png) no-repeat center;
     width: 24px;
     height: 24px;

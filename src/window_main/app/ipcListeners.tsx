@@ -54,6 +54,9 @@ export default function ipcListeners(dispatcher: unknown): void {
     dispatchAction(dispatcher, SET_LOADING, true);
     if (arg.ok) {
       dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
+      if (arg.user == -1) {
+        dispatchAction(dispatcher, SET_OFFLINE, true);
+      }
       if (arg.patreon) {
         dispatchAction(dispatcher, SET_PATREON, {
           patreon: arg.patreon,

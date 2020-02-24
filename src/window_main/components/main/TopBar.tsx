@@ -27,8 +27,10 @@ export default function TopBar(props: TopBarProps): JSX.Element {
         <div className="top_artist">{props.artist}</div>
       </div>
       <div className="flex_item">
-        {props.offline ?? (
+        {props.offline ? (
           <div className="unlink" title="You are not logged-in."></div>
+        ) : (
+          <></>
         )}
         <div onClick={clickMinimize} className="button minimize"></div>
         <div onClick={clickSettings} className="button settings"></div>

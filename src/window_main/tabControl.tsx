@@ -31,6 +31,7 @@ import { openCollectionTab } from "./collection/CollectionTab";
 import { openSettingsTab } from "./settings";
 import { openHomeTab } from "./HomeTab";
 import { AppState } from "./app/ContextProvider";
+import OfflineSplash from "./OfflineSplash";
 
 function getFilters(id: number): any {
   let filters = {
@@ -63,6 +64,10 @@ export function getOpenNav(appState: AppState): JSX.Element {
   const tab = appState.topNav;
   const { filters } = getFilters(tab);
 
+  if (appState.offline == true && (tab == MAIN_HOME || tab == MAIN_EXPLORE)) {
+    return <OfflineSplash />;
+  }
+
   switch (tab) {
     case MAIN_DECKS:
       return openDecksTab(filters);
@@ -78,9 +83,8 @@ export function getOpenNav(appState: AppState): JSX.Element {
       return openCollectionTab();
     case MAIN_SETTINGS:
       return openSettingsTab();
-    case MAIN_HOME: {
+    case MAIN_HOME:
       return openHomeTab(appState.homeData);
-    }
     default:
       break;
   }
