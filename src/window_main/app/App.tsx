@@ -37,9 +37,7 @@ function App(): JSX.Element {
         {appContext.login == LOGIN_OK ? <TopNav /> : <></>}
         {appContext.loading ? (
           <LoadingBar
-            style={
-              appContext.login == LOGIN_OK ? { top: "99px" } : { top: "35px" }
-            }
+            style={appContext.login == LOGIN_OK ? { top: "99px" } : {}}
           />
         ) : (
           <></>
