@@ -213,12 +213,10 @@ label {
 .loading_bar_main {
     background-color: var(--color-g);
     overflow: hidden;
+    position: absolute;
+    top: 35px;
     width: calc(100% - 4px);
     height: 4px;
-    /*
-    position: absolute;
-    top: 99px;
-    */
     animation-name: color;
     animation-duration: 2s;
     animation-iteration-count: infinite;

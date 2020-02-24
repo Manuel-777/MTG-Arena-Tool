@@ -35,7 +35,15 @@ function App(): JSX.Element {
         <Popup text={appContext.popup.text} time={appContext.popup.time} />
         <CardHover />
         {appContext.login == LOGIN_OK ? <TopNav /> : <></>}
-        {appContext.loading ? <LoadingBar /> : <></>}
+        {appContext.loading ? (
+          <LoadingBar
+            style={
+              appContext.login == LOGIN_OK ? { top: "99px" } : { top: "35px" }
+            }
+          />
+        ) : (
+          <></>
+        )}
         {appContext.login == LOGIN_OK ? (
           <div className="wrapper">
             <div className="overflow_ux_main">

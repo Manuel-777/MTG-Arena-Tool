@@ -173,32 +173,5 @@ export default function ipcListeners(dispatcher: unknown): void {
       topArtist: artist,
       hoverSize: pd.cardsSizeHoverCard
     });
-    /*
-    let cardQuantityWidth = Math.min(pd.cardsSizeHoverCard - 24, 180);
-  
-    $$(".hover_card_quantity")[0].style.left = cardQuantityWidth + (pd.cardsSizeHoverCard - cardQuantityWidth) / 2 + "px";
-    $$(".hover_card_quantity")[0].style.width = cardQuantityWidth + "px";
-  
-    $$(".main_hover")[0].style.width = pd.cardsSizeHoverCard + "px";
-    $$(".main_hover")[0].style.height = pd.cardsSizeHoverCard / 0.71808510638 + "px";
-  
-    $$(".main_hover_dfc")[0].style.width = pd.cardsSizeHoverCard + "px";
-    $$(".main_hover_dfc")[0].style.height = pd.cardsSizeHoverCard / 0.71808510638 + "px";
-  
-    $$(".loader")[0].style.width = pd.cardsSizeHoverCard + "px";
-    $$(".loader")[0].style.height = pd.cardsSizeHoverCard / 0.71808510638 + "px";
-  
-    $$(".loader_dfc")[0].style.width = pd.cardsSizeHoverCard + "px";
-    $$(".loader_dfc")[0].style.height = pd.cardsSizeHoverCard / 0.71808510638 + "px";
-  
-    if (lastSettings.back_url !== pd.settings.back_url) {
-      changeBackground();
-    }
-    $$(".main_wrapper")[0].style.backgroundColor = pd.settings.back_color;
-    if (pd.settings.last_open_tab === MAIN_SETTINGS) {
-      openSettingsTab(-1);
-    }
-    lastSettings = {...pd.settings};
-    */
   });
 }
