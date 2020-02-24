@@ -12,7 +12,8 @@ import {
   MAIN_COLLECTION,
   MAIN_SETTINGS,
   MAIN_CONSTRUCTED,
-  MAIN_LIMITED
+  MAIN_LIMITED,
+  SETTINGS_BEHAVIOUR
 } from "../shared/constants";
 
 import pd from "../shared/player-data";
@@ -114,8 +115,14 @@ export function forceOpenAbout(): void {
 }
 
 export function forceOpenSettings(section = -1): void {
-  ipcSend("save_user_settings", {
-    last_open_tab: MAIN_SETTINGS,
-    last_settings_section: section
-  });
+  if (section == -1) {
+    ipcSend("save_user_settings", {
+      last_open_tab: MAIN_SETTINGS
+    });
+  } else {
+    ipcSend("save_user_settings", {
+      last_open_tab: MAIN_SETTINGS,
+      last_settings_section: section
+    });
+  }
 }

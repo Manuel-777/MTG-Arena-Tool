@@ -151,5 +151,9 @@ function Settings(props: SettingsProps): JSX.Element {
 export function openSettingsTab(
   openSection = pd.settings.last_settings_section
 ): JSX.Element {
-  return <Settings openSection={openSection} />;
+  return (
+    <Settings
+      openSection={openSection == -1 ? SETTINGS_BEHAVIOUR : openSection}
+    />
+  );
 }
