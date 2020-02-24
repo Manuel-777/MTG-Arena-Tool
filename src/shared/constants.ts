@@ -771,6 +771,7 @@ export const CARD_TILE_ARENA = 0;
 export const CARD_TILE_FLAT = 1;
 export const EASING_DEFAULT = "cubicBezier(0.570, 0.165, 0.210, 0.990)";
 
+export const MAIN_OFFLINE = -3;
 export const MAIN_LOGIN = -2;
 export const MAIN_HOME = -1;
 export const MAIN_DECKS = 0;

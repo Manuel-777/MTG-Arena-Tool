@@ -25,6 +25,7 @@ import "@github/time-elements";
 import {
   EASING_DEFAULT,
   HIDDEN_PW,
+  MAIN_OFFLINE,
   MAIN_LOGIN,
   MAIN_HOME,
   MAIN_EXPLORE,
@@ -58,8 +59,8 @@ import {
 import { openHomeTab } from "./HomeTab";
 import { tournamentOpen } from "./tournaments";
 import { openDeck } from "./deck-details";
-import { openSettingsTab, setCurrentOverlaySettings } from "./settings";
-import { showOfflineSplash } from "./renderer-util";
+import { openSettingsTab } from "./settings";
+import { setCurrentOverlaySettings } from "./components/settings/sectionOverlay";
 import { setExploreDecks } from "./explore";
 
 import { openTab, forceOpenAbout, forceOpenSettings } from "./tabControl";
@@ -198,8 +199,7 @@ ipc.on("settings_updated", function() {
   }
   $$(".main_wrapper")[0].style.backgroundColor = pd.settings.back_color;
   if (pd.settings.last_open_tab === MAIN_SETTINGS) {
-    const ls = getLocalState();
-    openSettingsTab(-1, ls.lastScrollTop);
+    openSettingsTab(-1);
   }
   lastSettings = { ...pd.settings };
 });
@@ -336,7 +336,7 @@ ipc.on("no_log", function(event, arg) {
 
 //
 ipc.on("offline", function() {
-  showOfflineSplash();
+  openTab(MAIN_OFFLINE);
 });
 
 //

@@ -148,7 +148,7 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
   const handleMouseEnter = useCallback((): void => {
     setMouseHovering(true);
     setHoverCardCallback && setHoverCardCallback(card);
-  }, [setHoverCardCallback]);
+  }, [card, setHoverCardCallback]);
   const handleMouseLeave = useCallback((): void => {
     setMouseHovering(false);
     setHoverCardCallback && setHoverCardCallback();
@@ -159,7 +159,7 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
       _card = dfcCard || card;
     }
     openScryfallCard(_card);
-  }, [card]);
+  }, [card, dfcCard]);
 
   const containerEl = useRef(null);
   useEffect(() => {
@@ -183,9 +183,7 @@ function ArenaCardTile(props: CardTileProps): JSX.Element {
       data-quantity={quantity}
       ref={containerEl}
       style={{
-        backgroundColor: isHighlighted
-          ? "rgba(250, 229, 210, 0.66)"
-          : "rgba(0, 0, 0, 0.75)"
+        backgroundColor: isHighlighted ? "rgba(250, 229, 210, 0.66)" : ""
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -283,7 +281,7 @@ function MissingCardSprite(props: MissingCardsProps): JSX.Element {
   const xoff = CARD_RARITIES.indexOf(cardRarity) * -24;
   const yoff = missing * -24;
 
-  var className = "not_owned_sprite";
+  let className = "not_owned_sprite";
   if (listStyle === "flat") {
     className += "_flat";
   }
@@ -316,7 +314,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
   const handleMouseEnter = useCallback((): void => {
     setMouseHovering(true);
     setHoverCardCallback && setHoverCardCallback(card);
-  }, [setHoverCardCallback]);
+  }, [card, setHoverCardCallback]);
   const handleMouseLeave = useCallback((): void => {
     setMouseHovering(false);
     setHoverCardCallback && setHoverCardCallback();
@@ -327,7 +325,7 @@ function FlatCardTile(props: CardTileProps): JSX.Element {
       _card = dfcCard || card;
     }
     openScryfallCard(_card);
-  }, [card]);
+  }, [card, dfcCard]);
 
   const containerEl = useRef(null);
   useEffect(() => {

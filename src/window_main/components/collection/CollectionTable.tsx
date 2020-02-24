@@ -1,5 +1,5 @@
 import React from "react";
-import { Column } from "react-table";
+import { Column, Filters, FilterValue } from "react-table";
 import {
   COLLECTION_CHART_MODE,
   COLLECTION_SETS_MODE,
@@ -8,13 +8,14 @@ import {
 } from "../../../shared/constants";
 import db from "../../../shared/database";
 import { createDiv } from "../../../shared/dom-fns";
+import pd from "../../../shared/player-data";
 import {
+  ALL_CARDS,
   CollectionStats,
-  createWantedStats,
-  getCollectionStats,
-  renderSetStats
+  getCollectionStats
 } from "../../collection/collectionStats";
 import createHeatMap from "../../collection/completionHeatMap";
+import { makeResizable } from "../../renderer-util";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {
   ColorColumnFilter,
@@ -32,6 +33,7 @@ import {
   SetCell,
   TypeCell
 } from "./cells";
+import { CollectionStatsPanel } from "./CollectionStatsPanel";
 import CollectionTableControls from "./CollectionTableControls";
 import {
   cardSearchFilterFn,
@@ -43,6 +45,7 @@ import {
   setFilterFn
 } from "./filters";
 import { CardTableViewRow, CardTileRow } from "./rows";
+import { SetsView } from "./SetCompletionView";
 import {
   CardsData,
   CollectionTableControlsProps,
@@ -50,31 +53,6 @@ import {
 } from "./types";
 
 const legacyModes = [COLLECTION_CHART_MODE, COLLECTION_SETS_MODE];
-
-function renderSetView(
-  container: HTMLElement,
-  stats: CollectionStats,
-  setClickCallback: (set: string) => void
-): void {
-  const setsContainer = createDiv(["main_stats"]);
-  db.sortedSetCodes.forEach(set => {
-    // If the set has a collationId, it means boosters for it exists
-    if (!db.sets[set]?.collation) {
-      return; // skip non-booster sets
-    }
-    const setStats = stats[set];
-    const cardData = setStats.cards;
-    if (cardData.length > 0) {
-      const setContainer = createDiv(["set_stats"]);
-      setContainer.addEventListener("click", () => setClickCallback(set));
-      const rs = renderSetStats(setStats, set, set);
-      setContainer.appendChild(rs);
-      createWantedStats(setContainer, setStats);
-      setsContainer.appendChild(setContainer);
-    }
-  });
-  container.appendChild(setsContainer);
-}
 
 function renderHeatMaps(container: HTMLElement, stats: CollectionStats): void {
   const chartContainer = createDiv(["main_stats"]);
@@ -90,22 +68,30 @@ function renderHeatMaps(container: HTMLElement, stats: CollectionStats): void {
 function updateLegacyViews(
   container: HTMLElement,
   stats: CollectionStats,
-  displayMode: string,
-  setClickCallback: (set: string) => void
+  displayMode: string
 ): void {
-  if (!legacyModes.includes(displayMode)) {
+  if (displayMode !== COLLECTION_CHART_MODE) {
     return;
   }
   container.innerHTML = "";
-  switch (displayMode) {
-    default:
-    case COLLECTION_CHART_MODE:
-      renderHeatMaps(container, stats);
-      break;
-    case COLLECTION_SETS_MODE:
-      renderSetView(container, stats, setClickCallback);
-      break;
+  renderHeatMaps(container, stats);
+}
+
+function isBoosterMathValid(filters: Filters<CardsData>): boolean {
+  let hasCorrectBoosterFilter = false;
+  let hasCorrectRarityFilter = true;
+  for (const filter of filters) {
+    if (filter.id === "booster") {
+      hasCorrectBoosterFilter = filter.value?.true && !filter.value?.false;
+    } else if (filter.id === "rarity") {
+      hasCorrectRarityFilter = filter.value?.mythic && filter.value?.rare;
+    } else if (filter.id === "set") {
+      continue; // this is fine
+    } else {
+      return false; // no other filters allowed
+    }
   }
+  return hasCorrectBoosterFilter && hasCorrectRarityFilter;
 }
 
 export default function CollectionTable({
@@ -116,11 +102,15 @@ export default function CollectionTable({
   tableStateCallback,
   cachedState,
   cachedTableMode,
-  filterDataCallback,
   exportCallback,
   openCardCallback
 }: CollectionTableProps): JSX.Element {
   const [tableMode, setTableMode] = React.useState(cachedTableMode);
+  const [countMode, setCountMode] = React.useState(ALL_CARDS);
+  const [rareDraftFactor, setRareDraftFactor] = React.useState(3);
+  const [mythicDraftFactor, setMythicDraftFactor] = React.useState(0.14);
+  const [boosterWinFactor, setBoosterWinFactor] = React.useState(1.2);
+  const [futureBoosters, setFutureBoosters] = React.useState(0);
   React.useEffect(() => tableModeCallback(tableMode), [
     tableMode,
     tableModeCallback
@@ -292,7 +282,6 @@ export default function CollectionTable({
       ],
       sortBy: [{ id: "grpId", desc: true }]
     },
-    filterDataCallback,
     globalFilter: cardSearchFilterFn,
     setTableMode,
     tableMode,
@@ -310,6 +299,7 @@ export default function CollectionTable({
     page,
     prepareRow,
     rows,
+    setAllFilters,
     setFilter,
     toggleHideColumn
   } = table;
@@ -323,18 +313,17 @@ export default function CollectionTable({
     },
     [setFilter, toggleHideColumn]
   );
+  const cardIds = rows.map(row => row.values.id);
+  const stats = getCollectionStats(cardIds);
   React.useEffect(() => {
-    const cardIds = rows.map(row => row.values.id);
     if (legacyContainerRef?.current) {
-      const stats = getCollectionStats(cardIds);
-      updateLegacyViews(
-        legacyContainerRef.current,
-        stats,
-        tableMode,
-        setClickCallback
-      );
+      updateLegacyViews(legacyContainerRef.current, stats, tableMode);
     }
-  }, [tableMode, rows, legacyContainerRef, setClickCallback]);
+  }, [tableMode, stats, legacyContainerRef]);
+
+  const boosterMath =
+    isBoosterMathValid(table.state.filters) &&
+    tableMode === COLLECTION_SETS_MODE;
 
   const collectionTableControlsProps: CollectionTableControlsProps = {
     exportCallback,
@@ -342,57 +331,113 @@ export default function CollectionTable({
     ...tableControlsProps
   };
   const isTableMode = tableMode === COLLECTION_TABLE_MODE;
-  const tableBody = legacyModes.includes(tableMode) ? (
-    <div
-      className={
-        isTableMode ? "react_table_body" : "react_table_body_no_adjust"
-      }
-      {...getTableBodyProps()}
-    >
-      <div ref={legacyContainerRef} />
-    </div>
-  ) : (
-    <div
-      className={
-        isTableMode ? "react_table_body" : "react_table_body_no_adjust"
-      }
-      {...getTableBodyProps()}
-    >
-      {page.map((row, index) => {
-        prepareRow(row);
-        const RowRenderer = isTableMode ? CardTableViewRow : CardTileRow;
-        return (
-          <RowRenderer
-            key={row.index}
-            row={row}
-            index={index}
-            cardHoverCallback={cardHoverCallback}
-            contextMenuCallback={contextMenuCallback}
-            openCardCallback={openCardCallback}
-            gridTemplateColumns={gridTemplateColumns}
-          />
-        );
-      })}
-    </div>
-  );
-  return (
-    <div className="react_table_wrap">
-      <CollectionTableControls {...collectionTableControlsProps} />
+  const tableBody =
+    tableMode === COLLECTION_CHART_MODE ? (
       <div
-        className="med_scroll"
-        style={isTableMode ? { overflowX: "auto" } : undefined}
+        className={
+          isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+        }
+        {...getTableBodyProps()}
       >
-        <TableHeaders
-          {...headersProps}
-          style={
-            isTableMode
-              ? { width: "fit-content" }
-              : { overflowX: "auto", overflowY: "hidden" }
-          }
-        />
-        {tableBody}
+        <div ref={legacyContainerRef} />
       </div>
-      {!legacyModes.includes(tableMode) && <PagingControls {...pagingProps} />}
-    </div>
+    ) : tableMode === COLLECTION_SETS_MODE ? (
+      <SetsView
+        stats={stats}
+        setClickCallback={setClickCallback}
+        countMode={countMode}
+        boosterMath={boosterMath}
+        rareDraftFactor={rareDraftFactor}
+        mythicDraftFactor={mythicDraftFactor}
+        boosterWinFactor={boosterWinFactor}
+        futureBoosters={futureBoosters}
+      />
+    ) : (
+      <div
+        className={
+          isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+        }
+        {...getTableBodyProps()}
+      >
+        {page.map((row, index) => {
+          prepareRow(row);
+          const RowRenderer = isTableMode ? CardTableViewRow : CardTileRow;
+          return (
+            <RowRenderer
+              key={row.index}
+              row={row}
+              index={index}
+              cardHoverCallback={cardHoverCallback}
+              contextMenuCallback={contextMenuCallback}
+              openCardCallback={openCardCallback}
+              gridTemplateColumns={gridTemplateColumns}
+            />
+          );
+        })}
+      </div>
+    );
+  const { right_panel_width: panelWidth } = pd.settings;
+  const sidePanelWidth = panelWidth + "px";
+  const draggerRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (draggerRef?.current) {
+      makeResizable(draggerRef.current);
+    }
+  }, [draggerRef]);
+  const clickCompletionCallback = React.useCallback((): void => {
+    setTableMode(COLLECTION_SETS_MODE);
+    setAllFilters((): FilterValue[] => [
+      { id: "booster", value: { true: true, false: false } }
+    ]);
+  }, [setAllFilters]);
+  return (
+    <>
+      <div className={"wrapper_column"}>
+        <div className="react_table_wrap">
+          <CollectionTableControls {...collectionTableControlsProps} />
+          <div
+            className="med_scroll"
+            style={isTableMode ? { overflowX: "auto" } : undefined}
+          >
+            <TableHeaders
+              {...headersProps}
+              style={
+                isTableMode
+                  ? { width: "fit-content" }
+                  : { overflowX: "auto", overflowY: "hidden" }
+              }
+            />
+            {tableBody}
+          </div>
+          {!legacyModes.includes(tableMode) && (
+            <PagingControls {...pagingProps} />
+          )}
+        </div>
+      </div>
+      <div
+        className={"wrapper_column sidebar_column_l"}
+        style={{
+          width: sidePanelWidth,
+          flex: `0 0 ${sidePanelWidth}`
+        }}
+      >
+        <div ref={draggerRef} className={"dragger"}></div>
+        <CollectionStatsPanel
+          stats={stats}
+          countMode={countMode}
+          boosterMath={boosterMath}
+          rareDraftFactor={rareDraftFactor}
+          mythicDraftFactor={mythicDraftFactor}
+          boosterWinFactor={boosterWinFactor}
+          futureBoosters={futureBoosters}
+          setCountMode={setCountMode}
+          setRareDraftFactor={setRareDraftFactor}
+          setMythicDraftFactor={setMythicDraftFactor}
+          setBoosterWinFactor={setBoosterWinFactor}
+          setFutureBoosters={setFutureBoosters}
+          clickCompletionCallback={clickCompletionCallback}
+        />
+      </div>
+    </>
   );
 }

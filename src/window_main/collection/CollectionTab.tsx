@@ -1,11 +1,10 @@
 import { remote } from "electron";
 import React from "react";
-import { TableState, Filters } from "react-table";
+import { TableState } from "react-table";
 import { addCardHover } from "../../shared/cardHover";
 import Colors from "../../shared/colors";
 import { DRAFT_RANKS } from "../../shared/constants";
 import db from "../../shared/database";
-import { createDiv } from "../../shared/dom-fns";
 import pd from "../../shared/player-data";
 import { DbCardData } from "../../types/Metadata";
 import {
@@ -16,18 +15,7 @@ import {
 import CollectionTable from "../components/collection/CollectionTable";
 import { CardsData } from "../components/collection/types";
 import mountReactComponent from "../mountReactComponent";
-import {
-  hideLoadingBars,
-  ipcSend,
-  makeResizable,
-  resetMainContainer,
-  setLocalState
-} from "../renderer-util";
-import {
-  CollectionStats,
-  createInventoryStats,
-  getCollectionStats
-} from "./collectionStats";
+import { hideLoadingBars, ipcSend, resetMainContainer } from "../renderer-util";
 import { CardCounts } from "../components/decks/types";
 
 const Menu = remote.Menu;
@@ -87,33 +75,12 @@ function exportCards(cardIds: string[]): void {
   ipcSend("export_csvtxt", { str: exportString, name: "cards" });
 }
 
-function isBoosterMathValid(filters: Filters<CardsData>): boolean {
-  let hasCorrectBoosterFilter = false;
-  let hasCorrectRarityFilter = true;
-  for (const filter of filters) {
-    if (filter.id === "booster") {
-      hasCorrectBoosterFilter = filter.value?.true && !filter.value?.false;
-    } else if (filter.id === "rarity") {
-      hasCorrectRarityFilter = filter.value?.mythic && filter.value?.rare;
-    } else if (filter.id === "set") {
-      continue; // this is fine
-    } else {
-      return false; // no other filters allowed
-    }
-  }
-  return hasCorrectBoosterFilter && hasCorrectRarityFilter;
-}
-
 function saveTableState(collectionTableState: TableState<CardsData>): void {
-  setLocalState({
-    isBoosterMathValid: isBoosterMathValid(collectionTableState.filters)
-  });
   ipcSend("save_user_settings", { collectionTableState, skipRefresh: true });
 }
 
 function saveTableMode(collectionTableMode: string): void {
   ipcSend("save_user_settings", { collectionTableMode, skipRefresh: true });
-  setLocalState({ collectionTableMode });
 }
 
 function getCollectionData(): CardsData[] {
@@ -151,65 +118,21 @@ function getCollectionData(): CardsData[] {
     );
 }
 
-function updateStatsPanel(
-  container: HTMLElement,
-  stats: CollectionStats
-): void {
-  container.innerHTML = "";
-  const drag = createDiv(["dragger"]);
-  container.appendChild(drag);
-  makeResizable(drag);
-  createInventoryStats(container, stats.complete, openCollectionTab);
-}
-
 export function CollectionTab(): JSX.Element {
-  const {
-    collectionTableMode,
-    collectionTableState,
-    right_panel_width: panelWidth
-  } = pd.settings;
+  const { collectionTableMode, collectionTableState } = pd.settings;
   const data = React.useMemo(() => getCollectionData(), []);
-  setLocalState({
-    isBoosterMathValid: isBoosterMathValid(collectionTableState.filters)
-  });
-
-  const sidePanelWidth = panelWidth + "px";
-  const rightPanelRef = React.useRef<HTMLDivElement>(null);
-  const filterDataCallback = React.useCallback(
-    (data: CardsData[]): void => {
-      if (rightPanelRef?.current) {
-        const cardIds = data.map(card => card.id);
-        const stats = getCollectionStats(cardIds);
-        updateStatsPanel(rightPanelRef.current, stats);
-      }
-    },
-    [rightPanelRef]
-  );
   return (
-    <>
-      <div className={"wrapper_column"}>
-        <CollectionTable
-          cachedState={collectionTableState}
-          cachedTableMode={collectionTableMode}
-          cardHoverCallback={addCardHover}
-          contextMenuCallback={addCardMenu}
-          data={data}
-          exportCallback={exportCards}
-          filterDataCallback={filterDataCallback}
-          openCardCallback={openScryfallCard}
-          tableModeCallback={saveTableMode}
-          tableStateCallback={saveTableState}
-        />
-      </div>
-      <div
-        ref={rightPanelRef}
-        className={"wrapper_column sidebar_column_l"}
-        style={{
-          width: sidePanelWidth,
-          flex: `0 0 ${sidePanelWidth}`
-        }}
-      ></div>
-    </>
+    <CollectionTable
+      cachedState={collectionTableState}
+      cachedTableMode={collectionTableMode}
+      cardHoverCallback={addCardHover}
+      contextMenuCallback={addCardMenu}
+      data={data}
+      exportCallback={exportCards}
+      openCardCallback={openScryfallCard}
+      tableModeCallback={saveTableMode}
+      tableStateCallback={saveTableState}
+    />
   );
 }
 

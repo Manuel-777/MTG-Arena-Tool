@@ -3,6 +3,7 @@ import * as React from "react";
 import playerData from "./player-data";
 import { cardHasType } from "./cardTypes";
 import { DbCardData } from "../types/Metadata";
+import styled from "styled-components";
 
 function OwnershipInfinity(props: OwnershipProps): JSX.Element {
   const { owned, acquired, wanted } = props;
@@ -23,6 +24,10 @@ interface OwnershipProps {
   wanted: number;
 }
 
+export const OwnershipSymbol = styled("div").attrs(props => ({
+  className: `inventory_card_quantity_${props.color} ${props.className ?? ""}`
+}))``;
+
 interface OwnershipStarProps extends OwnershipProps {
   copyIndex: number;
   title: string;
@@ -40,7 +45,7 @@ function OwnershipStar(props: OwnershipStarProps): JSX.Element {
   if (copyIndex >= owned && copyIndex < owned + wanted) {
     color = "blue"; // not owned and wanted copy
   }
-  return <div className={`inventory_card_quantity_${color}`} title={title} />;
+  return <OwnershipSymbol color={color} title={title} />;
 }
 
 function MultiCardOwnership(props: OwnershipProps): JSX.Element {
