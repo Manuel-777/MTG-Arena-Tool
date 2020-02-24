@@ -24,7 +24,8 @@ import {
   SET_LOADING,
   SET_TOP_NAV,
   dispatchAction,
-  SET_BACKGROUND_IMAGE
+  SET_BACKGROUND_IMAGE,
+  SET_ANY
 } from "../../app/ContextReducer";
 
 interface TopNavItemProps {
@@ -41,9 +42,11 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 
   const clickTab = React.useCallback(
     (tabId: number) => (): void => {
-      dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
-      dispatchAction(props.dispatcher, SET_LOADING, true);
-      dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
+      dispatchAction(props.dispatcher, SET_ANY, {
+        topNav: tabId,
+        loading: true,
+        backgroundImage: "default"
+      });
       clickNav(tabId);
       callback(tabId);
     },
@@ -101,9 +104,11 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   const selected = currentTab === id;
   const clickTab = React.useCallback(
     tabId => (): void => {
-      dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
-      dispatchAction(props.dispatcher, SET_LOADING, true);
-      dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
+      dispatchAction(props.dispatcher, SET_ANY, {
+        topNav: tabId,
+        loading: true,
+        backgroundImage: "default"
+      });
       clickNav(tabId);
       callback(tabId);
     },
