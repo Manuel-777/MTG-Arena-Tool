@@ -7,6 +7,7 @@ const DispatchContext = React.createContext(null);
 
 export interface AppState {
   hoverGrpId: number;
+  hoverOpacity: number;
   topArtist: string;
   backgroundImage: string;
   offline: boolean;
@@ -36,6 +37,7 @@ export interface AppState {
 
 const defaultState: AppState = {
   hoverGrpId: 1,
+  hoverOpacity: 0,
   topArtist: "Bedevil by Seb Seb McKinnon",
   backgroundImage: "default",
   offline: false,

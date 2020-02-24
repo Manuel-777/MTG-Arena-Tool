@@ -10,6 +10,7 @@ import Auth from "../Auth";
 import { LOGIN_OK } from "./ContextReducer";
 import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";
+import CardHover from "../components/main/CardHover";
 
 function App(): JSX.Element {
   const appContext = useContext();
@@ -32,6 +33,7 @@ function App(): JSX.Element {
       <div className="outer_wrapper">
         <TopBar artist={appContext.topArtist} offline={appContext.offline} />
         <Popup text={appContext.popup.text} time={appContext.popup.time} />
+        <CardHover />
         {appContext.login == LOGIN_OK ? <TopNav /> : <></>}
         {appContext.loading ? <LoadingBar /> : <></>}
         {appContext.login == LOGIN_OK ? (

@@ -29,7 +29,11 @@ export default function contextReducer(state: AppState, action: any): AppState {
       return { ...state, topArtist: action.value };
     }
     case SET_HOVER_CARD: {
-      return { ...state, hoverGrpId: action.value };
+      return {
+        ...state,
+        hoverGrpId: action.value.grpId,
+        hoverOpacity: action.value.opacity
+      };
     }
     case SET_OFFLINE: {
       return { ...state, offline: action.value };
