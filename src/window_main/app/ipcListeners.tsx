@@ -99,7 +99,7 @@ export default function ipcListeners(dispatcher: unknown): void {
   });
 
   ipc.on("popup", (event: string, text: string, time: number): void => {
-    const newTime = timestamp() + time / 1000;
+    const newTime = timestamp() + time;
     dispatchAction(dispatcher, SET_POPUP, { text: text, time: newTime });
   });
 
