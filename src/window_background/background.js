@@ -60,7 +60,7 @@ const debugArenaID = undefined;
 
 //
 ipc.on("save_app_settings", function(event, arg) {
-  ipc_send("show_loading");
+  //ipc_send("show_loading");
   appDb.find("", "settings").then(appSettings => {
     appSettings.toolVersion = globals.toolVersion;
     const updated = { ...appSettings, ...arg };
@@ -70,7 +70,7 @@ ipc.on("save_app_settings", function(event, arg) {
     }
     appDb.upsert("", "settings", updated);
     syncSettings(updated);
-    ipc_send("hide_loading");
+    //ipc_send("hide_loading");
   });
 });
 
@@ -167,6 +167,7 @@ function offlineLogin() {
 
 //
 ipc.on("login", function(event, arg) {
+  ipc_send("begin_login", {});
   if (arg.password == HIDDEN_PW) {
     httpApi.httpAuth(arg.username, arg.password);
   } else if (arg.username === "" && arg.password === "") {
@@ -215,7 +216,7 @@ ipc.on("overlayBounds", (event, index, bounds) => {
 ipc.on("save_overlay_settings", function(event, settings) {
   // console.log("save_overlay_settings");
   if (settings.index === undefined) return;
-  ipc_send("show_loading");
+  //ipc_send("show_loading");
 
   const { index } = settings;
   const overlays = playerData.settings.overlays.map((overlay, _index) => {
@@ -230,13 +231,13 @@ ipc.on("save_overlay_settings", function(event, settings) {
   const updated = { ...playerData.settings, overlays };
   playerDb.upsert("settings", "overlays", overlays);
   syncSettings(updated);
-  ipc_send("hide_loading");
+  //ipc_send("hide_loading");
 });
 
 //
 ipc.on("save_user_settings", function(event, settings) {
   // console.log("save_user_settings");
-  ipc_send("show_loading");
+  //ipc_send("show_loading");
   let refresh = true;
   if (settings.skipRefresh) {
     delete settings.skipRefresh;
@@ -244,7 +245,7 @@ ipc.on("save_user_settings", function(event, settings) {
   }
   syncSettings(settings, refresh);
   playerDb.upsert("", "settings", playerData.data.settings);
-  ipc_send("hide_loading");
+  //ipc_send("hide_loading");
 });
 
 //
@@ -254,7 +255,7 @@ ipc.on("delete_data", function() {
 
 //
 ipc.on("import_custom_deck", function(event, arg) {
-  ipc_send("show_loading");
+  //ipc_send("show_loading");
   const data = JSON.parse(arg);
   const id = data.id;
   if (!id || playerData.deckExists(id)) return;
@@ -263,12 +264,12 @@ ipc.on("import_custom_deck", function(event, arg) {
     ...data
   };
   addCustomDeck(deckData);
-  ipc_send("hide_loading");
+  //ipc_send("hide_loading");
 });
 
 //
 ipc.on("toggle_deck_archived", function(event, arg) {
-  ipc_send("show_loading");
+  //ipc_send("show_loading");
   const id = arg;
   if (!playerData.deckExists(id)) return;
   const deckData = { ...playerData.deck(id) };
@@ -277,12 +278,12 @@ ipc.on("toggle_deck_archived", function(event, arg) {
 
   setData({ decks });
   playerDb.upsert("decks", id, deckData);
-  ipc_send("hide_loading");
+  //ipc_send("hide_loading");
 });
 
 //
 ipc.on("toggle_archived", function(event, arg) {
-  ipc_send("show_loading");
+  //ipc_send("show_loading");
   const id = arg;
   const item = playerData[id];
   if (!item) return;
@@ -291,7 +292,7 @@ ipc.on("toggle_archived", function(event, arg) {
 
   setData({ [id]: data });
   playerDb.upsert("", id, data);
-  ipc_send("hide_loading");
+  //ipc_send("hide_loading");
 });
 
 ipc.on("request_explore", function(event, arg) {

@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  dispatchAction,
-  SET_LOADING,
-  SET_LOGIN_STATE,
-  LOGIN_WAITING
-} from "./app/reducers";
+import { useSelector } from "react-redux";
 import { AppState } from "./app/appState";
 import { shell } from "electron";
 import Checkbox from "./components/Checkbox";
@@ -29,7 +23,6 @@ export default function Auth(props: AuthProps): JSX.Element {
   const [errorMessage, setErrorMessage] = React.useState("");
   const [authForm, setAuthForm] = React.useState(props.authForm);
   const canLogin = useSelector((state: AppState) => state.canLogin);
-  const { dispatcher } = useDispatch();
 
   const handleEmailChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -59,16 +52,14 @@ export default function Auth(props: AuthProps): JSX.Element {
         username: authForm.email,
         password: pwd
       });
-      dispatchAction(dispatcher, SET_LOADING, true);
-      dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
     }
-  }, [dispatcher, authForm.email, authForm.pass]);
+  }, [authForm.email, authForm.pass]);
 
   return (
     <div className="form-container">
       <div className="form-authenticate">
         <div className="form-icon" />
-        <form onSubmit={onSubmit} id="loginform">
+        <div id="loginform">
           <label className="form-label">Email</label>
           <div className="form-input-container">
             <input
@@ -109,12 +100,13 @@ export default function Auth(props: AuthProps): JSX.Element {
             className="form-button"
             type="submit"
             id="submit"
+            onClick={onSubmit}
             disabled={!canLogin}
           >
             Login
           </button>
           <div className="form-error">{errorMessage}</div>
-        </form>
+        </div>
       </div>
       <div className="form-options">
         <Checkbox

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 
 import { createStore } from "redux";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import appReducer from "./reducers";
+import appReducer, { LOGIN_WAITING } from "./reducers";
 const store = createStore(appReducer);
 
 import { TopNav } from "../components/main/topNav";
@@ -17,7 +17,6 @@ import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";
 import CardHover from "../components/main/CardHover";
 import { AppState } from "./appState";
-import { isEqual } from "lodash";
 
 function App(): JSX.Element {
   const loginState = useSelector((state: AppState) => state.loginState);
@@ -27,7 +26,7 @@ function App(): JSX.Element {
   const topNav = useSelector((state: AppState) => state.topNav);
   const subNavType = useSelector((state: AppState) => state.subNav.type);
   const subNavId = useSelector((state: AppState) => state.subNav.id);
-  const authForm = useSelector((state: AppState) => state.loginForm, isEqual);
+  const authForm = useSelector((state: AppState) => state.loginForm);
   /*
     Set up IPC listeners.
     This should only happen once when the app starts, so no
@@ -40,6 +39,10 @@ function App(): JSX.Element {
     ipcListeners(dispatch);
   }, [dispatch]);
 
+  React.useEffect(() => {
+    console.log("loginState: " + loginState);
+  }, [loginState]);
+
   return (
     <>
       <BackgroundImage />
@@ -48,7 +51,7 @@ function App(): JSX.Element {
         <Popup />
         <CardHover />
         {loginState == LOGIN_OK ? <TopNav /> : <></>}
-        {loading ? (
+        {loading || loginState == LOGIN_WAITING ? (
           <LoadingBar style={loginState == LOGIN_OK ? { top: "99px" } : {}} />
         ) : (
           <></>

@@ -49,6 +49,11 @@ export default function ipcListeners(dispatcher: unknown): void {
     dispatchAction(dispatcher, SET_LOGIN_PASS, "");
   });
 
+  ipc.on("begin_login", (): void => {
+    dispatchAction(dispatcher, SET_LOADING, true);
+    dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
+  });
+
   ipc.on("auth", (event: string, arg: any): void => {
     dispatchAction(dispatcher, SET_LOADING, true);
     if (arg.ok) {

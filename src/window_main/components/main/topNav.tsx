@@ -43,7 +43,6 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
   const clickTab = React.useCallback(
     (tabId: number) => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
-      dispatchAction(props.dispatcher, SET_LOADING, true);
       dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
       clickNav(tabId);
       callback(tabId);
@@ -103,7 +102,6 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   const clickTab = React.useCallback(
     tabId => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
-      dispatchAction(props.dispatcher, SET_LOADING, true);
       dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
       clickNav(tabId);
       callback(tabId);
