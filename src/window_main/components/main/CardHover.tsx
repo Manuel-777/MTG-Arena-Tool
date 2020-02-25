@@ -15,7 +15,7 @@ export default function CardHover(): JSX.Element {
     let newImg;
     try {
       const quality = pd.settings.cards_quality;
-      newImg = `url(https://img.scryfall.com/cards${cardObj.images[quality]}`;
+      newImg = `url(https://img.scryfall.com/cards${cardObj?.images[quality]}`;
     } catch (e) {
       newImg = `url(${NotFound})`;
     }
@@ -40,7 +40,7 @@ export default function CardHover(): JSX.Element {
       cardObj = db.card(cardObj.dfcId);
       try {
         const quality = pd.settings.cards_quality;
-        newImg = `url(https://img.scryfall.com/cards${cardObj.images[quality]}`;
+        newImg = `url(https://img.scryfall.com/cards${cardObj?.images[quality]}`;
       } catch (e) {
         newImg = `url(${NotFound})`;
       }

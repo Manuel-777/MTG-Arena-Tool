@@ -2,8 +2,7 @@
 import { remote, shell } from "electron";
 import React from "react";
 import { SETTINGS_PRIVACY } from "../shared/constants";
-import mountReactComponent from "./mountReactComponent";
-import { hideLoadingBars, ipcSend, resetMainContainer } from "./renderer-util";
+import { ipcSend } from "./renderer-util";
 import { forceOpenSettings } from "./tabControl";
 
 export default function OfflineSplash(): JSX.Element {
@@ -58,11 +57,4 @@ export default function OfflineSplash(): JSX.Element {
       </div>
     </div>
   );
-}
-
-export function openOfflineSplash(): void {
-  hideLoadingBars();
-  const mainDiv = resetMainContainer() as HTMLElement;
-  mainDiv.classList.add("flex_item");
-  mountReactComponent(<OfflineSplash />, mainDiv);
 }

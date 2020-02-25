@@ -126,7 +126,6 @@ export default function SectionVisual(): JSX.Element {
               isSideboard={false}
               quantity={4}
               showWildcards={false}
-              style={parseInt(pd.settings.card_tile_style)}
             />
           )}
         </div>

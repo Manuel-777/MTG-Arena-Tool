@@ -44,8 +44,7 @@ export const cardTile = function(
     isHighlighted,
     isSideboard,
     quantity,
-    showWildcards,
-    style: parseInt(style)
+    showWildcards
   };
   ReactDOM.render(<CardTile {...props} />, wrap);
 

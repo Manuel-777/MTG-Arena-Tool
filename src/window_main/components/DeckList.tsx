@@ -5,6 +5,7 @@ import db from "../../shared/database";
 import { cardType } from "../../shared/cardTypes";
 import CardTile from "../../shared/CardTile";
 import { InternalDeck } from "../../types/Deck";
+import { DbCardData } from "../../types/Metadata";
 
 function Separator(props: React.PropsWithChildren<any>): JSX.Element {
   const { children } = props;
@@ -41,7 +42,7 @@ function getDeckComponents(deck: InternalDeck): JSX.Element[] {
     .map(card => ({ data: db.card(card.id), ...card }))
     .filter(card => card.data !== undefined)
     .groupBy(card => {
-      const type = cardType(card.data);
+      const type = cardType(card.data as DbCardData);
       switch (type) {
         case "Creature":
           return "Creatures";
@@ -91,7 +92,7 @@ function getDeckComponents(deck: InternalDeck): JSX.Element[] {
               isHighlighted={false}
               isSideboard={false}
               showWildcards={false}
-              card={card.data}
+              card={card.data as DbCardData}
               key={"mainboardcardtile" + index + "_" + card.id}
               quantity={card.quantity}
             />
@@ -118,7 +119,7 @@ function getDeckComponents(deck: InternalDeck): JSX.Element[] {
             isHighlighted={false}
             isSideboard={false}
             showWildcards={false}
-            card={card.data}
+            card={card.data as DbCardData}
             key={"sideboardcardtile" + index + "_" + card.id}
             quantity={card.quantity}
           />

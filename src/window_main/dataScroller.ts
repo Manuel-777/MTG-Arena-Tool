@@ -1,9 +1,5 @@
 import { createDiv } from "../shared/dom-fns";
-import {
-  setLocalState,
-  showLoadingBars,
-  hideLoadingBars
-} from "./renderer-util";
+import { setLocalState } from "./renderer-util";
 
 class DataScroller {
   private container: HTMLElement;
@@ -61,13 +57,11 @@ class DataScroller {
   }
 
   renderRows(loadMore: number): void {
-    showLoadingBars();
     const loadEnd = this.loaded + loadMore;
     while (this.loaded < loadEnd && this.dataIndex < this.maxDataIndex) {
       this.loaded += this.renderData(this.container, this.dataIndex);
       this.dataIndex++;
     }
-    hideLoadingBars();
   }
 }
 
