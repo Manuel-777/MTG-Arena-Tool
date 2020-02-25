@@ -32,7 +32,6 @@ import { openEconomyTab } from "./EconomyTab";
 import { openCollectionTab } from "./collection/CollectionTab";
 import { openSettingsTab } from "./settings";
 import { openHomeTab } from "./HomeTab";
-import { AppState } from "./app/ContextProvider";
 import OfflineSplash from "./OfflineSplash";
 import openDeckSub from "./components/deck-view/DeckVIew";
 
@@ -63,11 +62,10 @@ function getFilters(id: number): any {
   return { filters: filters, sidebarActive: sidebarActive };
 }
 
-export function getOpenNav(appState: AppState): JSX.Element {
-  const tab = appState.topNav;
+export function getOpenNav(tab: number, offline: boolean): JSX.Element {
   const { filters } = getFilters(tab);
 
-  if (appState.offline == true && (tab == MAIN_HOME || tab == MAIN_EXPLORE)) {
+  if (offline == true && (tab == MAIN_HOME || tab == MAIN_EXPLORE)) {
     return <OfflineSplash />;
   }
 
@@ -87,23 +85,22 @@ export function getOpenNav(appState: AppState): JSX.Element {
     case MAIN_SETTINGS:
       return openSettingsTab();
     case MAIN_HOME:
-      return openHomeTab(appState.homeData);
+      return openHomeTab();
     default:
       break;
   }
   return <></>;
 }
 
-export function getOpenSub(appState: AppState): JSX.Element {
-  const subNav = appState.subNav.type;
+export function getOpenSub(subNav: number, id: string): JSX.Element {
   switch (subNav) {
     case SUB_DECK:
-      return openDeckSub(appState.subNav.id);
+      return openDeckSub(id);
     /*
     case SUB_MATCH:
-      return openMatchSub(appState.subNav.id);
+      return openMatchSub(id);
     case SUB_DRAFT:
-      return openDraftSub(appState.subNav.id);
+      return openDraftSub(id);
     */
     default:
       break;

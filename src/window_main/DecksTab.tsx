@@ -25,8 +25,8 @@ import {
 } from "./components/tables/hooks";
 import { ipcSend, makeResizable } from "./renderer-util";
 import StatsPanel from "./stats-panel";
-import { useDispatch } from "./app/ContextProvider";
-import { dispatchAction, SET_SUB_NAV } from "./app/ContextReducer";
+import { dispatchAction, SET_SUB_NAV } from "./app/reducers";
+import { useDispatch } from "react-redux";
 
 function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);

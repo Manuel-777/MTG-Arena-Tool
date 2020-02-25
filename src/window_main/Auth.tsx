@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import { shell } from "electron";
-import Checkbox from "./components/Checkbox";
-import { ipcSend } from "./renderer-util";
+import { useDispatch, useSelector } from "react-redux";
 import {
   dispatchAction,
   SET_LOADING,
   SET_LOGIN_STATE,
   LOGIN_WAITING
-} from "./app/ContextReducer";
-import { useDispatch } from "./app/ContextProvider";
-import sha1 from "js-sha1";
+} from "./app/reducers";
+import { AppState } from "./app/appState";
+import { shell } from "electron";
+import Checkbox from "./components/Checkbox";
+import { ipcSend } from "./renderer-util";
 import { HIDDEN_PW } from "../shared/constants";
+const sha1 = require("js-sha1");
 
 function clickRememberMe(value: boolean): void {
   const rSettings = {
@@ -21,56 +22,53 @@ function clickRememberMe(value: boolean): void {
 }
 
 interface AuthProps {
-  canLogin: boolean;
-  authForm: {
-    email: string;
-    pass: string;
-    rememberme: boolean;
-  };
+  authForm: { email: string; pass: string; rememberme: boolean };
 }
 
 export default function Auth(props: AuthProps): JSX.Element {
   const [errorMessage, setErrorMessage] = React.useState("");
-  const [formData, setFormData] = React.useState(props.authForm);
-  const dispatcher = useDispatch();
+  const [authForm, setAuthForm] = React.useState(props.authForm);
+  const canLogin = useSelector((state: AppState) => state.canLogin);
+  const { dispatcher } = useDispatch();
 
-  const handleEmailChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setFormData({ ...formData, email: event.target.value });
-  };
+  const handleEmailChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      setAuthForm({ ...authForm, email: event.target.value });
+    },
+    [authForm]
+  );
 
-  const handlePassChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setFormData({ ...formData, pass: event.target.value });
-  };
+  const handlePassChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      setAuthForm({ ...authForm, pass: event.target.value });
+    },
+    [authForm]
+  );
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
-    if (formData.pass.length < 8) {
+  React.useEffect(() => {
+    setAuthForm(props.authForm);
+  }, [props.authForm]);
+
+  const onSubmit = React.useCallback((): void => {
+    if (authForm.pass.length < 8) {
       setErrorMessage("Passwords must contain at least 8 characters.");
     } else {
       setErrorMessage("");
-      const pwd = formData.pass == HIDDEN_PW ? HIDDEN_PW : sha1(formData.pass);
+      const pwd = authForm.pass == HIDDEN_PW ? HIDDEN_PW : sha1(authForm.pass);
       ipcSend("login", {
-        username: formData.email,
+        username: authForm.email,
         password: pwd
       });
       dispatchAction(dispatcher, SET_LOADING, true);
       dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
     }
-  };
-
-  React.useEffect(() => {
-    setFormData(props.authForm);
-  }, [props]);
+  }, [dispatcher, authForm.email, authForm.pass]);
 
   return (
     <div className="form-container">
       <div className="form-authenticate">
         <div className="form-icon" />
-        <form onSubmit={onSubmit} id="loginform" method="POST">
+        <form onSubmit={onSubmit} id="loginform">
           <label className="form-label">Email</label>
           <div className="form-input-container">
             <input
@@ -78,7 +76,7 @@ export default function Auth(props: AuthProps): JSX.Element {
               type="email"
               id="signin_email"
               autoComplete="off"
-              defaultValue={formData.email}
+              value={authForm.email}
             />
           </div>
           <label className="form-label">Password</label>
@@ -88,15 +86,30 @@ export default function Auth(props: AuthProps): JSX.Element {
               type="password"
               id="signin_pass"
               autoComplete="off"
-              defaultValue={formData.pass}
+              value={authForm.pass}
             />
           </div>
-          <div style={{ marginBottom: "16px" }}></div>
+          <div
+            style={{
+              color: "var(--color-mid-75)",
+              cursor: "pointer",
+              marginBottom: "16px"
+            }}
+          >
+            <a
+              onClick={(): void => {
+                shell.openExternal("https://mtgatool.com/resetpassword/");
+              }}
+              className="forgot_link"
+            >
+              Forgot your password?
+            </a>
+          </div>
           <button
             className="form-button"
             type="submit"
             id="submit"
-            disabled={!props.canLogin}
+            disabled={!canLogin}
           >
             Login
           </button>
@@ -107,7 +120,7 @@ export default function Auth(props: AuthProps): JSX.Element {
         <Checkbox
           style={{ width: "max-content", margin: "auto auto 12px auto" }}
           text="Remember me?"
-          value={props.authForm.rememberme}
+          value={authForm.rememberme}
           callback={clickRememberMe}
         />
         <div className="message_small">
@@ -130,17 +143,6 @@ export default function Auth(props: AuthProps): JSX.Element {
             className="offline_link"
           >
             continue offline
-          </a>
-        </div>
-        <div className="message_small">
-          Did you{" "}
-          <a
-            onClick={(): void => {
-              shell.openExternal("https://mtgatool.com/resetpassword/");
-            }}
-            className="forgot_link"
-          >
-            forget your password?
           </a>
         </div>
       </div>

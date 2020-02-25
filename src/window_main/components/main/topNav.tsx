@@ -19,14 +19,14 @@ import {
   MAIN_CONSTRUCTED,
   MAIN_LIMITED
 } from "../../../shared/constants";
-import { useDispatch, useContext } from "../../app/ContextProvider";
 import {
-  SET_LOADING,
   SET_TOP_NAV,
   dispatchAction,
-  SET_BACKGROUND_IMAGE,
-  SET_ANY
-} from "../../app/ContextReducer";
+  SET_LOADING,
+  SET_BACKGROUND_IMAGE
+} from "../../app/reducers";
+import { useDispatch, useSelector } from "react-redux";
+import { AppState } from "../../app/appState";
 
 interface TopNavItemProps {
   dispatcher: unknown;
@@ -42,11 +42,9 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 
   const clickTab = React.useCallback(
     (tabId: number) => (): void => {
-      dispatchAction(props.dispatcher, SET_ANY, {
-        topNav: tabId,
-        loading: true,
-        backgroundImage: "default"
-      });
+      dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
+      dispatchAction(props.dispatcher, SET_LOADING, true);
+      dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
       clickNav(tabId);
       callback(tabId);
     },
@@ -104,11 +102,9 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   const selected = currentTab === id;
   const clickTab = React.useCallback(
     tabId => (): void => {
-      dispatchAction(props.dispatcher, SET_ANY, {
-        topNav: tabId,
-        loading: true,
-        backgroundImage: "default"
-      });
+      dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
+      dispatchAction(props.dispatcher, SET_LOADING, true);
+      dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
       clickNav(tabId);
       callback(tabId);
     },
@@ -142,13 +138,10 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   );
 }
 
-interface PatreonProps {
-  patreon: boolean;
-  patreonTier: number;
-}
-
-function PatreonBadge(props: PatreonProps): JSX.Element {
-  const { patreonTier } = props;
+function PatreonBadge(): JSX.Element {
+  const patreonTier = useSelector(
+    (state: AppState) => state.patreon.patreonTier
+  );
 
   let title = "Patreon Basic Tier";
   if (patreonTier === 1) title = "Patreon Standard Tier";
@@ -165,10 +158,17 @@ function PatreonBadge(props: PatreonProps): JSX.Element {
 
 export function TopNav(): JSX.Element {
   const [compact, setCompact] = React.useState(false);
-  const appContext = useContext();
-  const [currentTab, setCurrentTab] = React.useState(appContext.topNav);
+  const patreon = useSelector((state: AppState) => state.patreon.patreon);
+  const currentTab = useSelector((state: AppState) => state.topNav);
   const topNavIconsRef: any = React.useRef(null);
   const dispatcher = useDispatch();
+
+  const setCurrentTab = React.useCallback(
+    (tab: number) => {
+      dispatchAction(dispatcher, SET_TOP_NAV, tab);
+    },
+    [dispatcher]
+  );
 
   const defaultTab = {
     dispatcher: dispatcher,
@@ -235,7 +235,7 @@ export function TopNav(): JSX.Element {
         <div className="top_userdata_container">
           <TopRankIcon {...contructedNav} />
           <TopRankIcon {...limitedNav} />
-          {pd.patreon ? <PatreonBadge {...appContext.patreon} /> : null}
+          {patreon ? <PatreonBadge /> : null}
           <div className="top_username" title={"Arena username"}>
             {userName}
           </div>

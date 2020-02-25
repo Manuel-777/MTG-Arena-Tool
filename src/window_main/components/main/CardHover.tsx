@@ -1,16 +1,23 @@
 /* eslint-disable react/prop-types */
 import React from "react";
+import { useSelector } from "react-redux";
 import db from "../../../shared/database";
 import pd from "../../../shared/player-data";
-const NotFound = "../../../images/notfound.png";
-import { useContext, AppState } from "../../app/ContextProvider";
+import { AppState } from "../../app/appState";
 import { FACE_DFC_FRONT, FACE_DFC_BACK } from "../../../shared/constants";
+const NotFound = "../images/notfound.png";
 
 export default function CardHover(): JSX.Element {
-  const webContext = useContext();
+  const grpId = useSelector((state: AppState) => state.hover.grpId);
+  const opacity = useSelector((state: AppState) => state.hover.opacity);
+  const hoverSize = useSelector((state: AppState) => state.hover.size);
 
-  const getStyle = (ctx: AppState): React.CSSProperties => {
-    const cardObj = db.card(ctx.hoverGrpId);
+  const getStyle = (
+    hoverGrpId: number,
+    hoverSize: number,
+    opacity: number
+  ): React.CSSProperties => {
+    const cardObj = db.card(hoverGrpId);
 
     let newImg;
     try {
@@ -20,18 +27,21 @@ export default function CardHover(): JSX.Element {
       newImg = `url(${NotFound})`;
     }
     return {
-      width: ctx.hoverSize + "px",
-      height: ctx.hoverSize / 0.71808510638 + "px",
-      top: `calc(100% - ${ctx.hoverSize / 0.71808510638 + 32}px)`,
-      opacity: ctx.hoverOpacity,
+      width: hoverSize + "px",
+      height: hoverSize / 0.71808510638 + "px",
+      top: `calc(100% - ${hoverSize / 0.71808510638 + 32}px)`,
+      opacity: opacity,
       backgroundImage: newImg
     };
   };
 
-  const getStyleDfc = (ctx: AppState): React.CSSProperties => {
-    let cardObj = db.card(ctx.hoverGrpId);
+  const getStyleDfc = (
+    hoverGrpId: number,
+    hoverSize: number,
+    opacity: number
+  ): React.CSSProperties => {
+    let cardObj = db.card(hoverGrpId);
     let newImg = `url(${NotFound})`;
-    let opacity = ctx.hoverOpacity;
     if (
       cardObj &&
       (cardObj.dfc == FACE_DFC_BACK || cardObj.dfc == FACE_DFC_FRONT) &&
@@ -49,10 +59,10 @@ export default function CardHover(): JSX.Element {
     }
 
     return {
-      width: ctx.hoverSize + "px",
-      right: ctx.hoverSize + 48 + "px",
-      height: ctx.hoverSize / 0.71808510638 + "px",
-      top: `calc(100% - ${ctx.hoverSize / 0.71808510638 + 32}px)`,
+      width: hoverSize + "px",
+      right: hoverSize + 48 + "px",
+      height: hoverSize / 0.71808510638 + "px",
+      top: `calc(100% - ${hoverSize / 0.71808510638 + 32}px)`,
       opacity: opacity,
       backgroundImage: newImg
     };
@@ -60,8 +70,14 @@ export default function CardHover(): JSX.Element {
 
   return (
     <>
-      <div style={getStyleDfc(webContext)} className="card-hover-dfc" />
-      <div style={getStyle(webContext)} className="card-hover-main" />
+      <div
+        style={getStyleDfc(grpId, hoverSize, opacity)}
+        className="card-hover-dfc"
+      />
+      <div
+        style={getStyle(grpId, hoverSize, opacity)}
+        className="card-hover-main"
+      />
     </>
   );
 }

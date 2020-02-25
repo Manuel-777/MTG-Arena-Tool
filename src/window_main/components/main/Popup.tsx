@@ -1,16 +1,15 @@
 import React from "react";
 import { timestamp } from "../../../shared/util";
+import { AppState } from "../../app/appState";
+import { useSelector } from "react-redux";
 
-interface PopupProps {
-  text: string;
-  time: number;
-}
-
-export default function Popup(props: PopupProps): JSX.Element {
+export default function Popup(): JSX.Element {
   const [opacity, setOpacity] = React.useState(0);
+  const time = useSelector((state: AppState) => state.popup.time);
+  const text = useSelector((state: AppState) => state.popup.text);
 
   React.useEffect(() => {
-    const diff = props.time - timestamp();
+    const diff = time - timestamp();
     if (diff > 0) {
       setOpacity(1);
       setTimeout(() => {
@@ -20,11 +19,11 @@ export default function Popup(props: PopupProps): JSX.Element {
     /* else {
       setOpacity(0);
     }*/
-  }, [props]);
+  }, [time]);
 
   return (
     <div style={{ opacity: opacity }} className="popup">
-      {props.text}
+      {text}
     </div>
   );
 }

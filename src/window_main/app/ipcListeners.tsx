@@ -16,11 +16,11 @@ import {
   SET_HOME_DATA,
   SET_POPUP,
   SET_TOP_NAV,
+  SET_PATREON,
   SET_BACKGROUND_IMAGE,
   SET_TOP_ARTIST,
-  SET_ANY,
-  SET_PATREON
-} from "./ContextReducer";
+  SET_HOVER_SIZE
+} from "./reducers";
 import { timestamp, getCardArtCrop } from "../../shared/util";
 import { MAIN_SETTINGS, SETTINGS_OVERLAY } from "../../shared/constants";
 import { ipcSend } from "../renderer-util";
@@ -50,7 +50,6 @@ export default function ipcListeners(dispatcher: unknown): void {
   });
 
   ipc.on("auth", (event: string, arg: any): void => {
-    console.log("IPC auth", arg);
     dispatchAction(dispatcher, SET_LOADING, true);
     if (arg.ok) {
       dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
@@ -167,11 +166,9 @@ export default function ipcListeners(dispatcher: unknown): void {
       xhr.send();
     }
 
-    dispatchAction(dispatcher, SET_ANY, {
-      topNav: pd.settings.last_open_tab,
-      backgroundImage: backgroundImage,
-      topArtist: artist,
-      hoverSize: pd.cardsSizeHoverCard
-    });
+    dispatchAction(dispatcher, SET_TOP_NAV, pd.settings.last_open_tab);
+    dispatchAction(dispatcher, SET_BACKGROUND_IMAGE, backgroundImage);
+    dispatchAction(dispatcher, SET_TOP_ARTIST, artist);
+    dispatchAction(dispatcher, SET_HOVER_SIZE, pd.cardsSizeHoverCard);
   });
 }

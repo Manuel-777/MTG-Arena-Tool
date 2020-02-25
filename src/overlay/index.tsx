@@ -1,6 +1,10 @@
 import { remote } from "electron";
 import React from "react";
 import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+import appReducer from "./reducers";
+const store = createStore(appReducer);
 
 import { createDiv } from "../shared/dom-fns";
 
@@ -42,7 +46,12 @@ function ready(fn: () => void): void {
 
 ready(function() {
   const wrap = createDiv([]);
-  ReactDOM.render(<OverlayController />, wrap);
+  ReactDOM.render(
+    <Provider store={store}>
+      <OverlayController />
+    </Provider>,
+    wrap
+  );
   document.body.appendChild(wrap);
   setTimeout(() => {
     new TransparencyMouseFix({

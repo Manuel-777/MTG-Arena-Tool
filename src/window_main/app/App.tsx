@@ -1,21 +1,33 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { ContextProvider, useContext, useDispatch } from "./ContextProvider";
+
+import { createStore } from "redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import appReducer from "./reducers";
+const store = createStore(appReducer);
+
 import { TopNav } from "../components/main/topNav";
 import { getOpenNav, getOpenSub } from "../tabControl";
 import BackgroundImage from "../components/main/BackgroundImage";
 import TopBar from "../components/main/TopBar";
 import LoadingBar from "../components/main/LoadingBar";
 import Auth from "../Auth";
-import { LOGIN_OK } from "./ContextReducer";
+import { LOGIN_OK } from "./reducers";
 import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";
 import CardHover from "../components/main/CardHover";
+import { AppState } from "./appState";
+import { isEqual } from "lodash";
 
 function App(): JSX.Element {
-  const appContext = useContext();
-  const dispatcher = useDispatch();
-
+  const loginState = useSelector((state: AppState) => state.loginState);
+  const topArtist = useSelector((state: AppState) => state.topArtist);
+  const offline = useSelector((state: AppState) => state.offline);
+  const loading = useSelector((state: AppState) => state.loading);
+  const topNav = useSelector((state: AppState) => state.topNav);
+  const subNavType = useSelector((state: AppState) => state.subNav.type);
+  const subNavId = useSelector((state: AppState) => state.subNav.id);
+  const authForm = useSelector((state: AppState) => state.loginForm, isEqual);
   /*
     Set up IPC listeners.
     This should only happen once when the app starts, so no
@@ -23,40 +35,38 @@ function App(): JSX.Element {
     IPC Listeners should be inside a React component below the
     context provider hierarchy, so they can dispatch actions.
   */
+  const dispatch = useDispatch();
   React.useEffect(() => {
-    ipcListeners(dispatcher);
-  }, [dispatcher]);
+    ipcListeners(dispatch);
+  }, [dispatch]);
 
   return (
     <>
-      <BackgroundImage appContext={appContext} />
+      <BackgroundImage />
       <div className="outer_wrapper">
-        <TopBar artist={appContext.topArtist} offline={appContext.offline} />
-        <Popup text={appContext.popup.text} time={appContext.popup.time} />
+        <TopBar artist={topArtist} offline={offline} />
+        <Popup />
         <CardHover />
-        {appContext.login == LOGIN_OK ? <TopNav /> : <></>}
-        {appContext.loading ? (
-          <LoadingBar
-            style={appContext.login == LOGIN_OK ? { top: "99px" } : {}}
-          />
+        {loginState == LOGIN_OK ? <TopNav /> : <></>}
+        {loading ? (
+          <LoadingBar style={loginState == LOGIN_OK ? { top: "99px" } : {}} />
         ) : (
           <></>
         )}
-        {appContext.login == LOGIN_OK ? (
+        {loginState == LOGIN_OK ? (
           <div className="wrapper">
             <div className="overflow_ux_main">
               <div className="moving_ux">
-                <div className="ux_item">{getOpenNav(appContext)}</div>
-                <div className="ux_item">{getOpenSub(appContext)}</div>
+                <div className="ux_item">{getOpenNav(topNav, offline)}</div>
+                <div className="ux_item">
+                  {getOpenSub(subNavType, subNavId)}
+                </div>
                 <div className="ux_item"></div>
               </div>
             </div>
           </div>
         ) : (
-          <Auth
-            authForm={appContext.loginForm}
-            canLogin={appContext.canLogin}
-          />
+          <Auth authForm={authForm} />
         )}
       </div>
     </>
@@ -65,9 +75,9 @@ function App(): JSX.Element {
 
 export default function RenderApp(): void {
   ReactDOM.render(
-    <ContextProvider>
+    <Provider store={store}>
       <App />
-    </ContextProvider>,
+    </Provider>,
     document.getElementById("appcontainer")
   );
 }

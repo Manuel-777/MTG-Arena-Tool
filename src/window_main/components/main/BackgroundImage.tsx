@@ -1,18 +1,16 @@
 import React from "react";
-import { AppState } from "../../app/ContextProvider";
+import { AppState } from "../../app/appState";
+import { useSelector } from "react-redux";
 
-interface BackgroundImageProps {
-  appContext: AppState;
-}
+export default function BackgroundImage(): JSX.Element {
+  const backgroundImage = useSelector(
+    (state: AppState) => state.backgroundImage
+  );
 
-export default function BackgroundImage(
-  props: BackgroundImageProps
-): JSX.Element {
-  const { appContext } = props;
   return (
     <div
       className="main_wrapper main_bg_image"
-      style={{ backgroundImage: appContext.backgroundImage }}
+      style={{ backgroundImage: backgroundImage }}
     ></div>
   );
 }

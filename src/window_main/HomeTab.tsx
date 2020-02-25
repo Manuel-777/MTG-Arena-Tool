@@ -2,8 +2,9 @@ import React from "react";
 import db from "../shared/database";
 import { ipcSend } from "./renderer-util";
 import { timestamp, toDDHHMMSS } from "../shared/util";
-import { dispatchAction, SET_HOVER_CARD } from "./app/ContextReducer";
-import { useDispatch } from "./app/ContextProvider";
+import { dispatchAction, SET_HOVER_IN, SET_HOVER_OUT } from "./app/reducers";
+import { useSelector, useDispatch } from "react-redux";
+import { AppState } from "./app/appState";
 
 export interface WildcardsChange {
   grpId: number;
@@ -12,14 +13,14 @@ export interface WildcardsChange {
   change: number;
 }
 
-interface HomeTabProps {
-  wildcards: WildcardsChange[] | undefined;
-  filteredSet: string;
-  usersActive: number;
-}
+export function HomeTab(): JSX.Element {
+  const wildcards = useSelector((state: AppState) => state.homeData.wildcards);
+  const fSet = useSelector((state: AppState) => state.homeData.filteredSet);
+  const usersActive = useSelector(
+    (state: AppState) => state.homeData.usersActive
+  );
 
-function HomeTab(props: HomeTabProps): JSX.Element {
-  const [filteredSet, setFilteredSet] = React.useState(props.filteredSet);
+  const [filteredSet, setFilteredSet] = React.useState(fSet);
   const [requested, setRequested] = React.useState(false);
   const orderedSets: string[] = Object.keys(db.sets).filter(
     set => db.sets[set].collation > 0
@@ -56,11 +57,11 @@ function HomeTab(props: HomeTabProps): JSX.Element {
   };
 
   React.useEffect(() => {
-    if (!requested && props.usersActive == 0) {
-      requestHome(props.filteredSet);
+    if (!requested && usersActive == 0) {
+      requestHome(filteredSet);
       setRequested(true);
     }
-  }, [props, requested]);
+  }, [requested, usersActive, filteredSet]);
 
   orderedSets.sort((a: string, b: string) => {
     const aSet = db.sets[a];
@@ -80,7 +81,7 @@ function HomeTab(props: HomeTabProps): JSX.Element {
         tooltip-bottom=""
         style={{ textAlign: "center" }}
       >
-        Users active:{" " + props.usersActive}
+        Users active:{" " + usersActive}
       </div>
       <div
         className="text_centered white daily_left"
@@ -94,7 +95,7 @@ function HomeTab(props: HomeTabProps): JSX.Element {
       >
         {weeklyRewards}
       </div>
-      {props.wildcards ? (
+      {wildcards ? (
         <>
           <div className="list_fill"></div>
           <div
@@ -126,7 +127,7 @@ function HomeTab(props: HomeTabProps): JSX.Element {
               );
             })}
           </div>
-          <TopWildcards wildcards={props.wildcards} />
+          <TopWildcards wildcards={wildcards} />
         </>
       ) : (
         <></>
@@ -143,8 +144,8 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
   const lineDark = "line_dark line_bottom_border";
   const dispatcher = useDispatch();
 
-  const hoverCard = (id: number, opacity: number): void => {
-    dispatchAction(dispatcher, SET_HOVER_CARD, { grpId: id, opacity: opacity });
+  const hoverCard = (id: number, hover: boolean): void => {
+    dispatchAction(dispatcher, hover ? SET_HOVER_IN : SET_HOVER_OUT, id);
   };
 
   return (
@@ -203,10 +204,10 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
               key={index + "d"}
               className={ld}
               onMouseEnter={(): void => {
-                hoverCard(card.id, 1);
+                hoverCard(card.id, true);
               }}
               onMouseLeave={(): void => {
-                hoverCard(card.id, 0);
+                hoverCard(card.id, false);
               }}
               style={{
                 gridArea: `${index + 2} / 4 / auto / auto`,
@@ -258,16 +259,6 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
   );
 }
 
-export function openHomeTab(homeData: {
-  wildcards: WildcardsChange[];
-  filteredSet: string;
-  usersActive: number;
-}): JSX.Element {
-  return (
-    <HomeTab
-      wildcards={homeData.wildcards}
-      filteredSet={homeData.filteredSet}
-      usersActive={homeData.usersActive}
-    />
-  );
+export function openHomeTab(): JSX.Element {
+  return <HomeTab />;
 }
