@@ -25,6 +25,10 @@ export default function Checkbox(props: CheckboxProps): JSX.Element {
     opacity: 0.4
   };
 
+  React.useEffect(() => {
+    setCurrentValue(props.value);
+  }, [props.value]);
+
   return (
     <label
       style={disabled ? disabledLabelStyle : { ...style }}

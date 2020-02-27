@@ -12,6 +12,7 @@ export default function ShareButton({
   type,
   data
 }: ShareButtonProps): JSX.Element {
+  //const offline = useSelector((state: AppState) => state.offline);
   const click = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();

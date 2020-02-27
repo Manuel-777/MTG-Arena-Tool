@@ -110,6 +110,7 @@
     "react-dom": "^16.12.0",
     "react-is": "^16.12.0",
     "react-redux": "^7.2.0",
+    "react-svg-piechart": "^2.4.1",
     "react-table": "7.0.0-rc.15",
     "react-transition-group": "^4.3.0",
     "redux": "^4.0.5",

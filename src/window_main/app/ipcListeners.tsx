@@ -27,7 +27,7 @@ import { ipcSend } from "../renderer-util";
 import { SETTINGS_ABOUT } from "../../shared/constants";
 import pd from "../../shared/player-data";
 import db from "../../shared/database";
-const DEFAULT_BACKGROUND = "../../images/Bedevil-Art.jpg";
+const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 export default function ipcListeners(dispatcher: unknown): void {
   console.log("Set up IPC listeners.");
@@ -143,8 +143,8 @@ export default function ipcListeners(dispatcher: unknown): void {
     let backgroundImage = "";
     let artist = "";
     if (backUrl === "default") {
-      if (pd.settings.back_url && pd.settings.back_url !== "default") {
-        backgroundImage = "url(" + pd.settings.back_url + ")";
+      if (backUrl && backUrl !== "default") {
+        backgroundImage = "url(" + backUrl + ")";
       } else {
         artist = "Bedevil by Seb McKinnon";
         backgroundImage = "url(" + DEFAULT_BACKGROUND + ")";

@@ -4,20 +4,20 @@ import React from "react";
 import db from "../../shared/database";
 import { cardType } from "../../shared/cardTypes";
 import CardTile from "../../shared/CardTile";
-import { InternalDeck } from "../../types/Deck";
 import { DbCardData } from "../../types/Metadata";
+import Deck from "../../shared/deck";
 
 function Separator(props: React.PropsWithChildren<any>): JSX.Element {
   const { children } = props;
   return <div className="card_tile_separator">{children}</div>;
 }
 
-function getDeckComponents(deck: InternalDeck): JSX.Element[] {
+function getDeckComponents(deck: Deck): JSX.Element[] {
   const components = [];
-  if (deck.commandZoneGRPIds && deck.commandZoneGRPIds.length > 0) {
+  if (deck.getCommanders() && deck.getCommanders().length > 0) {
     components.push(<Separator key="sep_commander">Commander</Separator>);
 
-    deck.commandZoneGRPIds.forEach((id, index) => {
+    deck.getCommanders().forEach((id: number, index: number) => {
       if (index % 2 == 0) {
         const card = db.card(id);
         if (card) {
@@ -38,7 +38,7 @@ function getDeckComponents(deck: InternalDeck): JSX.Element[] {
   }
 
   // draw maindeck grouped by cardType
-  const cardsByGroup = _(deck.mainDeck)
+  const cardsByGroup = _(deck.getMainboard().get())
     .map(card => ({ data: db.card(card.id), ...card }))
     .filter(card => card.data !== undefined)
     .groupBy(card => {
@@ -100,7 +100,7 @@ function getDeckComponents(deck: InternalDeck): JSX.Element[] {
         });
     });
 
-  const sideboardSize = _.sumBy(deck.sideboard, "quantity");
+  const sideboardSize = _.sumBy(deck.getSideboard().get(), "quantity");
   if (sideboardSize) {
     // draw a separator for the sideboard
     components.push(
@@ -108,7 +108,7 @@ function getDeckComponents(deck: InternalDeck): JSX.Element[] {
     );
 
     // draw the cards
-    _(deck.sideboard)
+    _(deck.getSideboard().get())
       .map(card => ({ data: db.card(card.id), ...card }))
       .filter(card => card.quantity > 0)
       .orderBy(["data.cmc", "data.name"])
@@ -131,7 +131,7 @@ function getDeckComponents(deck: InternalDeck): JSX.Element[] {
 }
 
 interface DeckListProps {
-  deck: InternalDeck;
+  deck: Deck;
 }
 
 export default function DeckList(props: DeckListProps): JSX.Element {
