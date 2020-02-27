@@ -19,7 +19,7 @@ interface HomeTabProps {
 
 function HomeTab(props: HomeTabProps): JSX.Element {
   const [filteredSet, setFilteredSet] = React.useState(props.filteredSet);
-  const orderedSets: string[] = Object.keys(db.sets).filter(
+  const orderedSets: string[] = db.sortedSetCodes.filter(
     set => db.sets[set].collation > 0
   );
 
@@ -51,14 +51,6 @@ function HomeTab(props: HomeTabProps): JSX.Element {
   const requestHome = (set: string): void => {
     ipcSend("request_home", set);
   };
-
-  orderedSets.sort((a: string, b: string) => {
-    const aSet = db.sets[a];
-    const bSet = db.sets[b];
-    if (aSet.release < bSet.release) return 1;
-    if (aSet.release > bSet.release) return -1;
-    return 0;
-  });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", margin: "auto" }}>
