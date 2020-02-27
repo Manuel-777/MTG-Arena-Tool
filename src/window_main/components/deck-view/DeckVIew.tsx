@@ -10,13 +10,12 @@ import DeckManaCurve from "../../../shared/DeckManaCurve";
 import Deck from "../../../shared/deck";
 import Button from "../Button";
 import { ipcSend } from "../../renderer-util";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { dispatchAction, SET_POPUP } from "../../app/reducers";
-import WildcardsCost from "../WildcardsCost";
 import ReactSvgPieChart from "react-svg-piechart";
 import db from "../../../shared/database";
-import { AppState } from "../../app/appState";
 import ShareButton from "../ShareButton";
+import CraftingCost from "./CraftingCost";
 
 interface DeckViewProps {
   deck: InternalDeck;
@@ -206,7 +205,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
             render. Im not changing it now because
             it will break other parts of the UI
           */}
-          <WildcardsCost deck={deck.getSave()} />
           <div className="pie_container_outer">
             <div className="pie_container">
               <span>Mana Symbols</span>
@@ -217,6 +215,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
               <ReactSvgPieChart strokeWidth={0} data={landsPie} />
             </div>
           </div>
+          <CraftingCost deck={deck} />
         </div>
       </div>
     </div>
