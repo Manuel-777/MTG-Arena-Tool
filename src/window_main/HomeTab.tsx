@@ -166,9 +166,8 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
         const ld = index % 2 ? "line_dark" : "line_light";
 
         return card ? (
-          <>
+          <React.Fragment key={"wcc_" + index}>
             <div
-              key={index + "a"}
               className={ld}
               style={{
                 gridArea: `${index + 2} / 1 / auto / auto`,
@@ -179,7 +178,6 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             </div>
 
             <div
-              key={index + "b"}
               className={ld}
               style={{ gridArea: `${index + 2} / 2 / auto / auto` }}
             >
@@ -195,13 +193,11 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             </div>
 
             <div
-              key={index + "c"}
               className={"top_wildcards_wc_icon wc_" + wc.rarity + " " + ld}
               style={{ gridArea: `${index + 2} / 3 / auto / auto` }}
             ></div>
 
             <div
-              key={index + "d"}
               className={ld}
               onMouseEnter={(): void => {
                 hoverCard(card.id, true);
@@ -218,7 +214,6 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             </div>
 
             <div
-              key={index + "e"}
               className={ld}
               style={{
                 gridArea: `${index + 2} / 5 / auto / auto`
@@ -228,7 +223,6 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             </div>
 
             <div
-              key={index + "f"}
               className={
                 ld +
                 " " +
@@ -244,7 +238,6 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             ></div>
 
             <div
-              key={index + "g"}
               className={ld}
               style={{
                 gridArea: `${index + 2} / 7 / auto / auto`
@@ -252,7 +245,7 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
             >
               {(wc.change > 0 ? "+" : "") + wc.change}
             </div>
-          </>
+          </React.Fragment>
         ) : null;
       })}
     </div>
