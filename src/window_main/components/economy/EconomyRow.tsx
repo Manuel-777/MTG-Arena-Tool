@@ -277,7 +277,7 @@ function InventoryCardList(props: InventoryCardListProps): JSX.Element {
   const uniqueCardList = countDupesArray(cardsList);
   const cardCounts = Object.entries(uniqueCardList);
   cardCounts.sort((a: [string, number], b: [string, number]): number =>
-    collectionSortRarity(a[0], b[0])
+    collectionSortRarity(parseInt(a[0]), parseInt(b[0]))
   );
   return (
     <>
