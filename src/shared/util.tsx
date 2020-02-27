@@ -1,65 +1,73 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import formatDistanceStrict from "date-fns/formatDistanceStrict";
 import { shell } from "electron";
 import React from "react";
 import ReactDOM from "react-dom";
-
-import { FORMATS, BLACK, BLUE, GREEN, RED, WHITE } from "./constants";
+import { MatchPlayer } from "../types/currentMatch";
+import { CardObject, InternalDeck, v2cardsList } from "../types/Deck";
+import { InternalPlayer } from "../types/match";
+import { DbCardData } from "../types/Metadata";
+import { InternalRankData } from "../types/rank";
+import {
+  CardCounts,
+  MissingWildcards
+} from "../window_main/components/decks/types";
+import {
+  BLACK,
+  BLUE,
+  CARD_RARITIES,
+  FACE_DFC_FRONT,
+  FORMATS,
+  GREEN,
+  RED,
+  WHITE
+} from "./constants";
 import db from "./database";
-import pd from "./player-data";
-import { createDiv } from "./dom-fns";
+import Deck from "./deck";
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";
-import Deck from "../shared/deck";
+import { createDiv } from "./dom-fns";
+import pd from "./player-data";
 
-export function getCardArtCrop(cardObj) {
-  if (typeof cardObj !== "object") {
-    cardObj = db.card(cardObj);
+const NO_IMG_URL = "../images/notfound.png";
+
+export function getCardImage(
+  card?: DbCardData | number,
+  quality: string = pd.settings.cards_quality
+): string {
+  if (card === undefined) {
+    return NO_IMG_URL;
   }
-
+  const cardObj = typeof card == "number" ? db.card(card) : card;
   try {
-    return "https://img.scryfall.com/cards" + cardObj.images.art_crop;
+    const url = cardObj?.images[quality];
+    if (url === undefined || url === "") throw "Undefined url";
+    return "https://img.scryfall.com/cards" + cardObj?.images[quality];
   } catch (e) {
-    console.log("Cant find card art crop: ", cardObj);
-    return "../images/notfound.png";
-  }
-}
-
-export function getCardImage(cardObj, quality = undefined) {
-  if (typeof cardObj !== "object") {
-    cardObj = db.card(cardObj);
-  }
-
-  if (quality == undefined) {
-    quality = pd.settings.cards_quality;
-  }
-
-  try {
-    let url = cardObj.images[quality];
-    if (url == undefined || url == "") throw "Undefined url";
-    return "https://img.scryfall.com/cards" + cardObj.images[quality];
-  } catch (e) {
+    // eslint-disable-next-line no-console
     console.log("Cant find card image: ", cardObj);
-    return "../images/notfound.png";
+    return NO_IMG_URL;
   }
 }
 
-export function openScryfallCard(cardObj) {
-  if (typeof cardObj !== "object") {
-    cardObj = db.card(cardObj);
-  }
+export function getCardArtCrop(card?: DbCardData | number): string {
+  return getCardImage(card, "art_crop");
+}
 
-  const { cid, set } = cardObj;
-
-  try {
+export function openScryfallCard(card?: DbCardData | number): void {
+  const cardObj = typeof card == "number" ? db.card(card) : card;
+  if (cardObj) {
+    const { cid, set } = cardObj;
     shell.openExternal(
       "https://scryfall.com/card/" + db.sets[set].scryfall + "/" + cid
     );
-  } catch (e) {
+  } else {
+    // eslint-disable-next-line no-console
     console.log("Cant open scryfall card: ", cardObj);
   }
 }
 
-export function getRankColorClass(rank) {
+export function getRankColorClass(rank: string): string {
   switch (rank) {
     case "A+":
     case "A":
@@ -83,8 +91,8 @@ export function getRankColorClass(rank) {
   }
 }
 
-export function get_rank_index(_rank, _tier) {
-  var ii = 0;
+export function get_rank_index(_rank: string, _tier: number): number {
+  let ii = 0;
   if (_rank == "Unranked") ii = 0;
   if (_rank == "Bronze") ii = 1 + (_tier - 1); //1 2 3 4
   if (_rank == "Silver") ii = 5 + (_tier - 1); //5 6 7 8
@@ -95,8 +103,8 @@ export function get_rank_index(_rank, _tier) {
   return ii;
 }
 
-export function get_rank_index_16(_rank) {
-  var ii = 0;
+export function get_rank_index_16(_rank: string): number {
+  let ii = 0;
   if (_rank == "Unranked") ii = 0;
   if (_rank == "Bronze") ii = 1;
   if (_rank == "Silver") ii = 2;
@@ -107,11 +115,11 @@ export function get_rank_index_16(_rank) {
   return ii;
 }
 
-export function getRecentDeckName(deckId) {
+export function getRecentDeckName(deckId: string): string {
   return pd.deckExists(deckId) ? pd.deck(deckId).name : deckId;
 }
 
-export function getReadableEvent(arg) {
+export function getReadableEvent(arg: string): string {
   if (db.events[arg] != undefined) {
     return db.events[arg];
   }
@@ -119,27 +127,29 @@ export function getReadableEvent(arg) {
   return arg;
 }
 
-export function getReadableFormat(format) {
+export function getReadableFormat(format: string): string {
   if (format in FORMATS) {
     return FORMATS[format];
   }
   return format || "Unknown";
 }
 
-export function removeDuplicates(decklist) {
-  var newList = [];
+// REVIEW
+// All instances using this should use Deck and CardsList classes instead
+export function removeDuplicates(decklist: v2cardsList): v2cardsList {
+  const newList: v2cardsList = [];
   try {
-    decklist.forEach(function(card) {
-      var cname = db.card(card.id).name;
-      var added = false;
+    decklist.forEach(function(card: CardObject) {
+      const cname = db.card(card.id)?.name;
+      let added = false;
       newList.forEach(function(c) {
-        var cn = db.card(c.id).name;
+        const cn = db.card(c.id)?.name;
         if (cn == cname) {
           if (c.quantity !== 9999) {
             c.quantity += card.quantity;
           }
           if (c.chance != undefined) {
-            c.chance += card.chance;
+            c.chance += card.chance || 0;
           }
           added = true;
         }
@@ -155,7 +165,7 @@ export function removeDuplicates(decklist) {
   }
 }
 
-export function get_card_type_sort(a) {
+export function get_card_type_sort(a?: string): number {
   if (a == undefined) return 0;
   if (a.includes("Creature", 0)) return 1;
   if (a.includes("Planeswalker", 0)) return 2;
@@ -168,16 +178,16 @@ export function get_card_type_sort(a) {
   return 0;
 }
 
-export function compare_cards(a, b) {
+export function compare_cards(a: CardObject, b: CardObject): number {
   // Yeah this is lazy.. I know
-  a = db.card(a.id);
-  b = db.card(b.id);
+  const aObj = db.card(a.id);
+  const bObj = db.card(b.id);
 
-  if (!a) return 1;
-  if (!b) return -1;
+  if (!aObj) return 1;
+  if (!bObj) return -1;
 
-  var _as = get_card_type_sort(a.type);
-  var _bs = get_card_type_sort(b.type);
+  const _as = get_card_type_sort(aObj.type);
+  const _bs = get_card_type_sort(bObj.type);
 
   // Order by type?
   if (_as < _bs) {
@@ -188,38 +198,32 @@ export function compare_cards(a, b) {
   }
 
   // by cmc
-  if (a.cmc < b.cmc) {
+  if (aObj.cmc < bObj.cmc) {
     return -1;
   }
-  if (a.cmc > b.cmc) {
+  if (aObj.cmc > bObj.cmc) {
     return 1;
   }
 
   // then by name
-  if (a.name < b.name) {
+  if (aObj.name < bObj.name) {
     return -1;
   }
-  if (a.name > b.name) {
+  if (aObj.name > bObj.name) {
     return 1;
   }
 
   return 0;
 }
 
-export function compare_archetypes(a, b) {
-  if (a.average > b.average) return -1;
-  if (a.average < b.average) return 1;
-  return 0;
-}
-
-export function get_set_code(set) {
+export function get_set_code(set: string): string {
   if (set == undefined) return "";
   let s = db.sets[set].code;
   if (s == undefined) s = set;
   return s;
 }
 
-export function getRaritySortValue(rarity) {
+export function getRaritySortValue(rarity: string): number {
   rarity = rarity.toLowerCase();
   switch (rarity) {
     case "land":
@@ -237,36 +241,42 @@ export function getRaritySortValue(rarity) {
   }
 }
 
-export function collectionSortRarity(a, b) {
-  a = db.card(a);
-  b = db.card(b);
-  if (getRaritySortValue(a.rarity) < getRaritySortValue(b.rarity)) return -1;
-  if (getRaritySortValue(a.rarity) > getRaritySortValue(b.rarity)) return 1;
+export function collectionSortRarity(a: number, b: number): number {
+  const aObj = db.card(a);
+  const bObj = db.card(b);
 
-  if (a.set < b.set) return -1;
-  if (a.set > b.set) return 1;
+  if (!aObj) return 1;
+  if (!bObj) return -1;
 
-  if (parseInt(a.cid) < parseInt(b.cid)) return -1;
-  if (parseInt(a.cid) > parseInt(b.cid)) return 1;
+  if (getRaritySortValue(aObj.rarity) < getRaritySortValue(bObj.rarity))
+    return -1;
+  if (getRaritySortValue(aObj.rarity) > getRaritySortValue(bObj.rarity))
+    return 1;
+
+  if (aObj.set < bObj.set) return -1;
+  if (aObj.set > bObj.set) return 1;
+
+  if (parseInt(aObj.cid) < parseInt(bObj.cid)) return -1;
+  if (parseInt(aObj.cid) > parseInt(bObj.cid)) return 1;
   return 0;
 }
 
-export function get_deck_colors(deck) {
-  var colorIndices = [];
+export function get_deck_colors(deck: InternalDeck): number[] {
+  let colorIndices: number[] = [];
   try {
     deck.mainDeck.forEach(card => {
       if (card.quantity < 1) {
         return;
       }
 
-      let cardData = db.card(card.id);
+      const cardData = db.card(card.id);
 
       if (!cardData) {
         return;
       }
 
-      let isLand = cardData.type.indexOf("Land") !== -1;
-      let frame = cardData.frame;
+      const isLand = cardData.type.indexOf("Land") !== -1;
+      const frame = cardData.frame;
       if (isLand && frame.length < 3) {
         colorIndices = colorIndices.concat(frame);
       }
@@ -293,6 +303,7 @@ export function get_deck_colors(deck) {
   } catch (e) {
     // FIXME: Errors shouldn't be caught silently. If this is an
     //        expected error then there should be a test to catch only that error.
+    console.error(e);
     colorIndices = [];
   }
 
@@ -300,15 +311,19 @@ export function get_deck_colors(deck) {
   return colorIndices;
 }
 
-export function get_wc_missing(deck, grpid, isSideboard) {
+export function get_wc_missing(
+  deck: InternalDeck,
+  grpid: number,
+  isSideboard?: boolean
+): number {
   let mainQuantity = 0;
-  let mainMatches = deck.mainDeck.filter(card => card.id == grpid);
+  const mainMatches = deck.mainDeck.filter(card => card.id == grpid);
   if (mainMatches.length) {
     mainQuantity = mainMatches[0].quantity;
   }
 
   let sideboardQuantity = 0;
-  let sideboardMatches = deck.sideboard.filter(card => card.id == grpid);
+  const sideboardMatches = deck.sideboard.filter(card => card.id == grpid);
   if (sideboardMatches.length) {
     sideboardQuantity = sideboardMatches[0].quantity;
   }
@@ -320,14 +335,14 @@ export function get_wc_missing(deck, grpid, isSideboard) {
   // cap at 4 copies to handle petitioners, rat colony, etc
   needed = Math.min(4, needed);
 
-  let card = db.card(grpid);
-  let arr = card.reprints;
-  if (!arr) arr = [grpid];
+  const card = db.card(grpid);
+  let arr = [];
+  if (!card?.reprints) arr = [grpid];
   else arr.push(grpid);
 
   let have = 0;
   arr.forEach(id => {
-    let n = pd.cards.cards[id];
+    const n = pd.cards.cards[id];
     if (n !== undefined) {
       have += n;
     }
@@ -337,7 +352,7 @@ export function get_wc_missing(deck, grpid, isSideboard) {
   if (isSideboard) {
     copiesLeft = Math.max(0, copiesLeft - mainQuantity);
 
-    let infiniteCards = [67306, 69172]; // petitioners, rat colony, etc
+    const infiniteCards = [67306, 69172]; // petitioners, rat colony, etc
     if (have >= 4 && infiniteCards.indexOf(grpid) >= 0) {
       copiesLeft = 4;
     }
@@ -346,33 +361,38 @@ export function get_wc_missing(deck, grpid, isSideboard) {
   return Math.max(0, needed - copiesLeft);
 }
 
-export function get_deck_missing(deck) {
-  let missing = { rare: 0, common: 0, uncommon: 0, mythic: 0 };
-  let alreadySeenIds = new Set(); // prevents double counting cards across main/sideboard
-  let entireDeck = [...deck.mainDeck, ...deck.sideboard];
+export function getCardsMissingCount(
+  deck: InternalDeck,
+  grpid: number
+): number {
+  const mainMissing = get_wc_missing(deck, grpid, false);
+  const sideboardMissing = get_wc_missing(deck, grpid, true);
+  return mainMissing + sideboardMissing;
+}
+
+export function get_deck_missing(deck: InternalDeck): MissingWildcards {
+  const missing = { rare: 0, common: 0, uncommon: 0, mythic: 0 };
+  const alreadySeenIds = new Set(); // prevents double counting cards across main/sideboard
+  const entireDeck = [...deck.mainDeck, ...deck.sideboard];
 
   entireDeck.forEach(card => {
-    let grpid = card.id;
+    const grpid = card.id;
     // process each card at most once
     if (alreadySeenIds.has(grpid)) {
       return;
     }
-    let rarity = db.card(grpid).rarity;
-    missing[rarity] += getCardsMissingCount(deck, grpid);
-    alreadySeenIds.add(grpid); // remember this card
+    const rarity = db.card(grpid)?.rarity;
+    if (rarity && rarity !== "land") {
+      missing[rarity] += getCardsMissingCount(deck, grpid);
+      alreadySeenIds.add(grpid); // remember this card
+    }
   });
 
   return missing;
 }
 
-export function getCardsMissingCount(deck, grpid) {
-  let mainMissing = get_wc_missing(deck, grpid, false);
-  let sideboardMissing = get_wc_missing(deck, grpid, true);
-  return mainMissing + sideboardMissing;
-}
-
-export function getMissingCardCounts(deck) {
-  const missingCards = {};
+export function getMissingCardCounts(deck: InternalDeck): CardCounts {
+  const missingCards: CardCounts = {};
   const allCardIds = new Set(
     [...deck.mainDeck, ...deck.sideboard].map(card => card.id)
   );
@@ -385,7 +405,9 @@ export function getMissingCardCounts(deck) {
   return missingCards;
 }
 
-export function getBoosterCountEstimate(neededWildcards) {
+export function getBoosterCountEstimate(
+  neededWildcards: MissingWildcards
+): number {
   let boosterCost = 0;
   const boosterEstimates = {
     common: 3.36,
@@ -393,40 +415,46 @@ export function getBoosterCountEstimate(neededWildcards) {
     rare: 5.72,
     mythic: 13.24
   };
+
   const ownedWildcards = {
     common: pd.economy.wcCommon,
     uncommon: pd.economy.wcUncommon,
     rare: pd.economy.wcRare,
     mythic: pd.economy.wcMythic
   };
-  for (let rarity in boosterEstimates) {
-    // accept either short or long form of keys in argument
-    const shortForm = rarity[0]; // grab first letter
-    const needed = neededWildcards[rarity] || neededWildcards[shortForm] || 0;
-    const owned = ownedWildcards[rarity] || ownedWildcards[shortForm] || 0;
-    const missing = Math.max(0, needed - owned);
-    boosterCost = Math.max(boosterCost, boosterEstimates[rarity] * missing);
-  }
+
+  CARD_RARITIES.map(rarity => {
+    if (rarity !== "land") {
+      const needed = neededWildcards[rarity] || 0;
+      const owned = ownedWildcards[rarity] || 0;
+      const missing = Math.max(0, needed - owned);
+      boosterCost = Math.max(boosterCost, boosterEstimates[rarity] * missing);
+    }
+  });
+
   return Math.round(boosterCost);
 }
 
-export function get_deck_export(deck) {
+export function get_deck_export(deck: InternalDeck): string {
   let str = "";
   deck.mainDeck = removeDuplicates(deck.mainDeck);
   deck.mainDeck.forEach(function(card) {
     let grpid = card.id;
     let cardObj = db.card(grpid);
 
-    if (cardObj.set == "Mythic Edition") {
-      grpid = cardObj.reprints[0];
+    if (cardObj?.set == "Mythic Edition") {
+      // This is awful..
+      grpid =
+        cardObj.reprints && cardObj.reprints !== true ? cardObj.reprints[0] : 0;
       cardObj = db.card(grpid);
     }
 
-    if (cardObj.dfc == "DFC_Front") return;
+    if (cardObj == undefined) return;
+    if (cardObj.dfc == FACE_DFC_FRONT) return;
 
-    let card_name = cardObj.name;
+    const card_name = cardObj.name;
     let card_set = cardObj.set;
-    let card_cn = cardObj.cid;
+    const card_cn = cardObj.cid;
     let card_q = card.quantity;
     if (card_q == 9999) card_q = 1;
 
@@ -454,14 +482,18 @@ export function get_deck_export(deck) {
     let grpid = card.id;
     let cardObj = db.card(grpid);
 
-    if (cardObj.set == "Mythic Edition") {
-      grpid = cardObj.reprints[0];
+    if (cardObj?.set == "Mythic Edition") {
+      grpid =
+        cardObj.reprints && cardObj.reprints !== true ? cardObj.reprints[0] : 0;
       cardObj = db.card(grpid);
     }
 
-    let card_name = cardObj.name;
+    if (cardObj == undefined) return;
+    if (cardObj.dfc == FACE_DFC_FRONT) return;
+
+    const card_name = cardObj.name;
     let card_set = cardObj.set;
-    let card_cn = cardObj.cid;
+    const card_cn = cardObj.cid;
     let card_q = card.quantity;
     if (card_q == 9999) card_q = 1;
 
@@ -485,12 +517,12 @@ export function get_deck_export(deck) {
   return str;
 }
 
-export function get_deck_export_txt(deck) {
-  var str = "";
+export function get_deck_export_txt(deck: InternalDeck): string {
+  let str = "";
   deck.mainDeck = removeDuplicates(deck.mainDeck);
   deck.mainDeck.forEach(function(card) {
-    var grpid = card.id;
-    var card_name = db.card(grpid).name;
+    const grpid = card.id;
+    const card_name = db.card(grpid)?.name;
     //var card_set = db.card(grpid).set;
     //var card_cn = db.card(grpid).cid;
 
@@ -502,8 +534,8 @@ export function get_deck_export_txt(deck) {
 
   deck.sideboard = removeDuplicates(deck.sideboard);
   deck.sideboard.forEach(function(card) {
-    var grpid = card.id;
-    var card_name = db.card(grpid).name;
+    const grpid = card.id;
+    const card_name = db.card(grpid)?.name;
     //var card_set = db.card(grpid).set;
     //var card_cn = db.card(grpid).cid;
 
@@ -514,61 +546,70 @@ export function get_deck_export_txt(deck) {
   return str;
 }
 
-export function timeSince(_date, options = { includeSeconds: true }) {
+export function timeSince(
+  _date: number,
+  options: {
+    addSuffix?: boolean;
+    unit?: "second" | "minute" | "hour" | "day" | "month" | "year";
+    roundingMethod?: "floor" | "ceil" | "round";
+    locale?: Locale;
+  } = { unit: "second" }
+): string {
   // https://date-fns.org/v2.2.1/docs/formatDistanceStrict
   return formatDistanceStrict(_date, new Date(), options);
 }
 
-export function replaceAll(str, find, replace) {
+export function replaceAll(str: string, find: string, replace: string): string {
   return str.replace(new RegExp(find, "g"), replace);
 }
 
-export function urlDecode(url) {
+export function urlDecode(url: string): string {
   return decodeURIComponent(url.replace(/\+/g, " "));
 }
 
-export function makeId(length) {
-  var ret = "";
-  var possible =
+export function makeId(length: number): string {
+  let ret = "";
+  const possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (var i = 0; i < length; i++)
+  for (let i = 0; i < length; i++)
     ret += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return ret;
 }
 
-export function timestamp() {
+export function timestamp(): number {
   return Math.floor(Date.now() / 1000);
 }
 
-export function toMMSS(sec_num) {
-  var hours = Math.floor(sec_num / 3600);
-  var minutes = Math.floor((sec_num - hours * 3600) / 60);
-  var seconds = sec_num - hours * 3600 - minutes * 60;
+export function toMMSS(sec_num: number): string {
+  const hours = Math.floor(sec_num / 3600);
+  const minutes = Math.floor((sec_num - hours * 3600) / 60);
+  const seconds = sec_num - hours * 3600 - minutes * 60;
 
+  let minutesStr, secondsStr;
   if (minutes < 10) {
-    minutes = "0" + minutes;
+    minutesStr = "0" + minutes;
   }
   if (seconds < 10) {
-    seconds = "0" + seconds;
+    secondsStr = "0" + seconds;
   }
   if (hours > 0) {
-    return hours + ":" + minutes + ":" + seconds;
+    return hours + ":" + minutesStr + ":" + secondsStr;
   } else {
-    return minutes + ":" + seconds;
+    return minutesStr + ":" + secondsStr;
   }
 }
 
-export function toDDHHMMSS(sec_num) {
-  let dd = Math.floor(sec_num / 86400);
-  let hh = Math.floor((sec_num - dd * 86400) / 3600);
-  let mm = Math.floor((sec_num - dd * 86400 - hh * 3600) / 60);
-  let ss = sec_num - dd * 86400 - hh * 3600 - mm * 60;
+export function toDDHHMMSS(sec_num: number): string {
+  const dd = Math.floor(sec_num / 86400);
+  const hh = Math.floor((sec_num - dd * 86400) / 3600);
+  const mm = Math.floor((sec_num - dd * 86400 - hh * 3600) / 60);
+  const ss = sec_num - dd * 86400 - hh * 3600 - mm * 60;
 
-  let days = dd + (dd > 1 ? " days" : " day");
-  let hours = hh + (hh > 1 ? " hours" : " hour");
-  let minutes = mm + (mm > 1 ? " minutes" : " minute");
-  let seconds = ss + (ss > 1 ? " seconds" : " second");
+  const days = dd + (dd > 1 ? " days" : " day");
+  const hours = hh + (hh > 1 ? " hours" : " hour");
+  const minutes = mm + (mm > 1 ? " minutes" : " minute");
+  const seconds = ss + (ss > 1 ? " seconds" : " second");
 
   return `${dd > 0 ? days + ", " : ""}
 ${hh > 0 ? hours + ", " : ""}
@@ -576,57 +617,63 @@ ${minutes},
 ${seconds}`;
 }
 
-export function toHHMMSS(sec_num) {
-  var hours = Math.floor(sec_num / 3600);
-  var minutes = Math.floor((sec_num - hours * 3600) / 60);
-  var seconds = sec_num - hours * 3600 - minutes * 60;
+export function toHHMMSS(sec_num: number): string {
+  const hours = Math.floor(sec_num / 3600);
+  const minutes = Math.floor((sec_num - hours * 3600) / 60);
+  const seconds = sec_num - hours * 3600 - minutes * 60;
 
+  let hoursStr, minutesStr, secondsStr;
   if (hours < 10) {
-    hours = "0" + hours;
+    hoursStr = "0" + hours;
   }
   if (minutes < 10) {
-    minutes = "0" + minutes;
+    minutesStr = "0" + minutes;
   }
   if (seconds < 10) {
-    seconds = "0" + seconds;
+    secondsStr = "0" + seconds;
   }
-  return hours + ":" + minutes + ":" + seconds;
+  return hoursStr + ":" + minutesStr + ":" + secondsStr;
 }
 
-export function toHHMM(sec_num) {
-  var hours = Math.floor(sec_num / 3600);
-  var minutes = Math.floor((sec_num - hours * 3600) / 60);
+export function toHHMM(sec_num: number): string {
+  const hours = Math.floor(sec_num / 3600);
+  const minutes = Math.floor((sec_num - hours * 3600) / 60);
+
+  let hoursStr, minutesStr;
   if (hours < 10) {
-    hours = "0" + hours;
+    hoursStr = "0" + hours;
   }
   if (minutes < 10) {
-    minutes = "0" + minutes;
+    minutesStr = "0" + minutes;
   }
-  return hours + ":" + minutes;
+  return hoursStr + ":" + minutesStr;
 }
 
-export function add(a, b) {
+export function add(a: number, b: number): number {
   return a + b;
 }
 
-export function objectClone(originalObject) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function objectClone(originalObject: unknown): any {
   return JSON.parse(JSON.stringify(originalObject));
 }
 
-export function deckManaCurve(deck) {
+export function deckManaCurve(deck: InternalDeck): HTMLDivElement {
   const wrap = createDiv([]);
   ReactDOM.render(<DeckManaCurve deck={new Deck(deck)} />, wrap);
   return wrap;
 }
 
-export function deckTypesStats(deck) {
+export function deckTypesStats(deck: InternalDeck): HTMLDivElement {
   const wrap = createDiv([]);
   ReactDOM.render(<DeckTypesStats deck={new Deck(deck)} />, wrap);
   return wrap;
 }
 
 // pass in playerData.constructed / limited / historic objects
-export function formatRank(rank) {
+export function formatRank(
+  rank: InternalRankData | MatchPlayer | InternalPlayer
+): string {
   if (rank.leaderboardPlace) {
     return `Mythic #${rank.leaderboardPlace}`;
   }
@@ -636,6 +683,6 @@ export function formatRank(rank) {
   return `${rank.rank} ${rank.tier}`;
 }
 
-export function roundWinrate(x) {
+export function roundWinrate(x: number): number {
   return Math.round(x * 100) / 100;
 }
