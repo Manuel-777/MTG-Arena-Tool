@@ -142,7 +142,7 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
         const ld = index % 2 ? "line_dark" : "line_light";
 
         return card ? (
-          <>
+          < key={ "wcc_" + index } >
             <div
               className={ld}
               style={{
