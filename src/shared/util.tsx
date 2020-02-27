@@ -548,14 +548,14 @@ export function get_deck_export_txt(deck: InternalDeck): string {
 
 export function timeSince(
   _date: number,
-  options: {
+  options?: {
     addSuffix?: boolean;
     unit?: "second" | "minute" | "hour" | "day" | "month" | "year";
     roundingMethod?: "floor" | "ceil" | "round";
     locale?: Locale;
-  } = { unit: "second" }
+  }
 ): string {
-  // https://date-fns.org/v2.2.1/docs/formatDistanceStrict
+  // https://date-fns.org/v2.8.1/docs/formatDistanceStrict
   return formatDistanceStrict(_date, new Date(), options);
 }
 
@@ -581,22 +581,20 @@ export function timestamp(): number {
   return Math.floor(Date.now() / 1000);
 }
 
+function getTwoDigitString(val: number): string {
+  return (val < 10 ? "0" : "") + val;
+}
+
 export function toMMSS(sec_num: number): string {
   const hours = Math.floor(sec_num / 3600);
   const minutes = Math.floor((sec_num - hours * 3600) / 60);
   const seconds = sec_num - hours * 3600 - minutes * 60;
-
-  let minutesStr, secondsStr;
-  if (minutes < 10) {
-    minutesStr = "0" + minutes;
-  }
-  if (seconds < 10) {
-    secondsStr = "0" + seconds;
-  }
+  const minutesStr = getTwoDigitString(minutes);
+  const secondsStr = getTwoDigitString(seconds);
   if (hours > 0) {
     return hours + ":" + minutesStr + ":" + secondsStr;
   } else {
-    return minutesStr + ":" + secondsStr;
+    return minutes + ":" + secondsStr;
   }
 }
 
@@ -621,31 +619,17 @@ export function toHHMMSS(sec_num: number): string {
   const hours = Math.floor(sec_num / 3600);
   const minutes = Math.floor((sec_num - hours * 3600) / 60);
   const seconds = sec_num - hours * 3600 - minutes * 60;
-
-  let hoursStr, minutesStr, secondsStr;
-  if (hours < 10) {
-    hoursStr = "0" + hours;
-  }
-  if (minutes < 10) {
-    minutesStr = "0" + minutes;
-  }
-  if (seconds < 10) {
-    secondsStr = "0" + seconds;
-  }
+  const hoursStr = getTwoDigitString(hours);
+  const minutesStr = getTwoDigitString(minutes);
+  const secondsStr = getTwoDigitString(seconds);
   return hoursStr + ":" + minutesStr + ":" + secondsStr;
 }
 
 export function toHHMM(sec_num: number): string {
   const hours = Math.floor(sec_num / 3600);
   const minutes = Math.floor((sec_num - hours * 3600) / 60);
-
-  let hoursStr, minutesStr;
-  if (hours < 10) {
-    hoursStr = "0" + hours;
-  }
-  if (minutes < 10) {
-    minutesStr = "0" + minutes;
-  }
+  const hoursStr = getTwoDigitString(hours);
+  const minutesStr = getTwoDigitString(minutes);
   return hoursStr + ":" + minutesStr;
 }
 
