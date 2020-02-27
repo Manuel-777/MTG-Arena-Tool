@@ -4,8 +4,8 @@ import * as ReactDOM from "react-dom";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import CardTile, { CardTileProps } from "../shared/CardTile";
-import Deck from "../shared/deck";
 import { DbCardData } from "../types/Metadata";
+import { InternalDeck } from "../types/Deck";
 
 export const cardSeparator = function(str: string) {
   return createDiv(["card_tile_separator"], str);
@@ -17,7 +17,7 @@ export const cardTile = function(
   indent: string,
   quantity: string | number | { quantity: string; odds: number },
   showWildcards = false,
-  deck?: Deck,
+  deck?: InternalDeck,
   isSideboard = false,
   isHighlighted = false
 ): HTMLDivElement | undefined {

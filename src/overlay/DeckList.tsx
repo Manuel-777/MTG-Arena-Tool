@@ -219,7 +219,6 @@ export default function DeckList(props: DeckListProps): JSX.Element {
         quantity={quantity}
         showWildcards={false}
         setHoverCardCallback={setHoverCardCallback}
-        deck={deck}
         isHighlighted={card.id === highlightCardId}
       />
     );
@@ -254,7 +253,6 @@ export default function DeckList(props: DeckListProps): JSX.Element {
           quantity={quantity}
           showWildcards={false}
           setHoverCardCallback={setHoverCardCallback}
-          deck={deck}
           isHighlighted={false}
         />
       );
