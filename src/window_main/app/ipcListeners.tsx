@@ -104,7 +104,7 @@ export default function ipcListeners(dispatcher: unknown): void {
 
   ipc.on("popup", (event: string, text: string, time: number): void => {
     const newTime = timestamp() + time;
-    dispatchAction(dispatcher, SET_POPUP, { text: text, time: newTime });
+    dispatchAction(dispatcher, SET_POPUP, { text: text, time: newTime, duration: time });
   });
 
   ipc.on("force_open_settings", (): void => {

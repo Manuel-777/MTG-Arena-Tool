@@ -7,19 +7,17 @@ export default function Popup(): JSX.Element {
   const [opacity, setOpacity] = React.useState(0);
   const time = useSelector((state: AppState) => state.popup.time);
   const text = useSelector((state: AppState) => state.popup.text);
+  const duration = useSelector((state: AppState) => state.popup.duration);
 
   React.useEffect(() => {
     const diff = time - timestamp();
-    if (diff > 0) {
-      setOpacity(1);
+    setOpacity(1);
+    if (diff > 0 && duration > 0) {
       setTimeout(() => {
         setOpacity(0);
       }, diff);
     }
-    /* else {
-      setOpacity(0);
-    }*/
-  }, [time]);
+  }, [time, duration]);
 
   return (
     <div style={{ opacity: opacity }} className="popup">

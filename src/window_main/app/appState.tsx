@@ -35,6 +35,7 @@ export interface AppState {
   popup: {
     text: string;
     time: number;
+    duration: number;
   };
 }
 
@@ -71,6 +72,7 @@ export const defaultState: AppState = {
   },
   popup: {
     text: "",
-    time: 0
+    time: 0,
+    duration: 0
   }
 };
