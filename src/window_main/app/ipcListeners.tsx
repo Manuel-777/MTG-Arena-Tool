@@ -22,7 +22,11 @@ import {
   SET_HOVER_SIZE
 } from "./reducers";
 import { timestamp, getCardArtCrop } from "../../shared/util";
-import { MAIN_SETTINGS, SETTINGS_OVERLAY } from "../../shared/constants";
+import {
+  MAIN_SETTINGS,
+  SETTINGS_OVERLAY,
+  MAIN_HOME
+} from "../../shared/constants";
 import { ipcSend } from "../renderer-util";
 import { SETTINGS_ABOUT } from "../../shared/constants";
 import pd from "../../shared/player-data";
@@ -171,7 +175,11 @@ export default function ipcListeners(dispatcher: unknown): void {
       xhr.send();
     }
 
-    dispatchAction(dispatcher, SET_TOP_NAV, pd.settings.last_open_tab);
+    dispatchAction(
+      dispatcher,
+      SET_TOP_NAV,
+      pd.settings.last_open_tab || MAIN_HOME
+    );
     dispatchAction(dispatcher, SET_BACKGROUND_IMAGE, backgroundImage);
     dispatchAction(dispatcher, SET_TOP_ARTIST, artist);
     dispatchAction(dispatcher, SET_HOVER_SIZE, pd.cardsSizeHoverCard);

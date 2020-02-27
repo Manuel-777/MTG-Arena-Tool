@@ -22,11 +22,11 @@ import {
 import {
   SET_TOP_NAV,
   dispatchAction,
-  SET_LOADING,
   SET_BACKGROUND_IMAGE
 } from "../../app/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { AppState } from "../../app/appState";
+import useWindowSize from "../../hooks/useWindowSize";
 
 interface TopNavItemProps {
   dispatcher: unknown;
@@ -160,6 +160,7 @@ export function TopNav(): JSX.Element {
   const currentTab = useSelector((state: AppState) => state.topNav);
   const topNavIconsRef: any = React.useRef(null);
   const dispatcher = useDispatch();
+  const windowSize = useWindowSize();
 
   const setCurrentTab = React.useCallback(
     (tab: number) => {
@@ -213,7 +214,7 @@ export function TopNav(): JSX.Element {
     } else if (compact) {
       setCompact(false);
     }
-  }, [compact]);
+  }, [windowSize, compact]);
 
   const userName = pd.name.slice(0, -6);
   const userNumerical = pd.name.slice(-6);
