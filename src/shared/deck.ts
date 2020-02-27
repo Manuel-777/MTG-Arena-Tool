@@ -175,7 +175,7 @@ class Deck {
         let card = db.card(grpid);
         if (card !== undefined) {
           let rarity = card.rarity;
-          let add = get_wc_missing(grpid, quantity);
+          let add = get_wc_missing(this.getSave(), grpid, false);
           missing[rarity] += add;
         }
       });
@@ -188,7 +188,7 @@ class Deck {
         let card = db.card(grpid);
         if (card !== undefined) {
           let rarity = card.rarity;
-          let add = get_wc_missing(grpid, quantity);
+          let add = get_wc_missing(this.getSave(), grpid, true);
           missing[rarity] += add;
         }
       });
