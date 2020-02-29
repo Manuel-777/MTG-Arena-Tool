@@ -46,6 +46,7 @@ export default function WildcardsCost(props: {
             if (missing) {
               return (
                 <div
+                  key={key}
                   className={"wc_explore_cost wc_" + cardRarity}
                   title={_.capitalize(cardRarity) + " wildcards needed."}
                 >
