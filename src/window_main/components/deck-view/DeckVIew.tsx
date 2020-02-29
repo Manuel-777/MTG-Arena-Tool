@@ -371,6 +371,7 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
               if (cardObj) {
                 return (
                   <div
+                    key={"visual-side-" + _n}
                     style={{
                       width: sz + "px",
                       height: sz * 0.166 + "px",

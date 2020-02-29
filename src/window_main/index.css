@@ -763,20 +763,12 @@ font-family:  var(--main-font-name);
     color: var(--color-light-75);
 }
 
-.list_match_player_left {
-    -webkit-user-select: none;
-    align-self: center;
-    margin-left: 16px;
-    font-family:  var(--main-font-name-it);
-    color: var(--color-light);
-}
-
-.list_match_player_right {
+.match_player_win {
     -webkit-user-select: none;
     align-self: center;
     margin-right: 16px;
     font-family:  var(--main-font-name-it);
-    color: var(--color-light);
+    color: var(--color-g);
 }
 
 .match_player_name {
@@ -3444,11 +3436,19 @@ a:hover {
     margin-right: auto;
 }
 
+.gamestats_subtitle {
+    margin: 4px auto 10px auto;
+    color: var(--color-light);
+    font-size: 16px;
+    font-family: var(--main-font-name-it);
+    text-align: center;
+}
+
 .card_lists_list {
     display: flex;
-    overflow-x: auto;
-    overflow-y: visible;
-    justify-content: center;
+    flex-direction: column;
+    max-width: 570px;
+    margin: auto;
 }
 
 .top_wildcards_cont {
