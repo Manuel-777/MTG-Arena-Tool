@@ -311,11 +311,11 @@ time, local-time, relative-time {
     cursor: default;
 }
 
-.top_constructed_rank {
+.top_constructed_rank, .constructed_rank {
     background: url(../images/ranks_constructed_48.png);
 }
 
-.top_limited_rank {
+.top_limited_rank, .limited_rank {
     background: url(../images/ranks_limited_48.png);
 }
 
@@ -776,6 +776,14 @@ font-family:  var(--main-font-name);
     align-self: center;
     margin-right: 16px;
     font-family:  var(--main-font-name-it);
+    color: var(--color-light);
+}
+
+.match_player_name {
+    -webkit-user-select: none;
+    align-self: center;
+    margin-right: 16px;
+    font-family:  var(--main-font-name);
     color: var(--color-light);
 }
 
