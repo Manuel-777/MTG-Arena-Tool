@@ -116,7 +116,7 @@ export function get_rank_index_16(_rank: string): number {
 }
 
 export function getRecentDeckName(deckId: string): string {
-  return pd.deckExists(deckId) ? pd.deck(deckId).name : deckId;
+  return pd.deck(deckId)?.name ?? deckId;
 }
 
 export function getReadableEvent(arg: string): string {
