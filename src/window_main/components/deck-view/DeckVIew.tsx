@@ -21,7 +21,6 @@ import db from "../../../shared/database";
 import ShareButton from "../ShareButton";
 import CraftingCost from "./CraftingCost";
 import { getCardImage } from "../../../shared/util";
-import { clickNav } from "../../tabControl";
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;

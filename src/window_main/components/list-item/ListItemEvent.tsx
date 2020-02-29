@@ -1,5 +1,5 @@
 import React from "react";
-
+import anime from "animejs";
 import { TableViewRowProps } from "../tables/types";
 import { EventTableData } from "../events/types";
 import ManaCost from "../ManaCost";
@@ -16,19 +16,24 @@ import {
 } from "./ListItem";
 import ListItemMatch from "./ListItemMatch";
 import ListItemDraft from "./ListItemDraft";
-import { DEFAULT_TILE } from "../../../shared/constants";
+import {
+  DEFAULT_TILE,
+  SUB_MATCH,
+  EASING_DEFAULT
+} from "../../../shared/constants";
 import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
 import { DbCardData } from "../../../types/Metadata";
 import RoundCard from "../RoundCard";
 import { compareDesc } from "date-fns";
-import { openMatch } from "../../match-details";
 import { openDraft } from "../../draft-details";
+import { useDispatch } from "react-redux";
+import { dispatchAction, SET_SUB_NAV } from "../../app/reducers";
 
 export function ListItemEvent({
   row
 }: TableViewRowProps<EventTableData>): JSX.Element {
   const event = row.original;
-
+  const dispatcher = useDispatch();
   const [expanded, setExpanded] = React.useState(false);
 
   const onRowClick = (): void => {
@@ -68,6 +73,19 @@ export function ListItemEvent({
   if (pd.draftExists(draftId)) {
     matchRows.unshift(pd.draft(draftId));
   }
+
+  const openMatch = React.useCallback(
+    (id: string | number): void => {
+      anime({
+        targets: ".moving_ux",
+        left: "-100%",
+        easing: EASING_DEFAULT,
+        duration: 350
+      });
+      dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_MATCH, id: id });
+    },
+    [dispatcher]
+  );
 
   return (
     <>

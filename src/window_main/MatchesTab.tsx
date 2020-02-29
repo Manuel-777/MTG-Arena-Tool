@@ -1,7 +1,8 @@
 import isValid from "date-fns/isValid";
+import anime from "animejs";
 import React from "react";
 import { TableState } from "react-table";
-import { DATE_SEASON, RANKS } from "../shared/constants";
+import { DATE_SEASON, RANKS, SUB_MATCH, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/player-data";
@@ -16,7 +17,6 @@ import {
   useLastScrollTop
 } from "./components/tables/hooks";
 import { TagCounts } from "./components/tables/types";
-import { openMatch } from "./match-details";
 
 import {
   formatPercent,
@@ -25,13 +25,11 @@ import {
   toggleArchived
 } from "./renderer-util";
 import StatsPanel from "./stats-panel";
+import { useDispatch } from "react-redux";
+import { dispatchAction, SET_SUB_NAV } from "./app/reducers";
 
 const { DEFAULT_ARCH, NO_ARCH, RANKED_CONST, RANKED_DRAFT } = Aggregator;
 const tagPrompt = "Set archetype";
-
-function openMatchDetails(id: string | number): void {
-  openMatch(id);
-}
 
 function addTag(matchid: string, tag: string): void {
   const match = pd.match(matchid);
@@ -281,6 +279,7 @@ export function MatchesTab({
 }: {
   aggFiltersArg: AggregatorFilters;
 }): JSX.Element {
+  const dispatcher = useDispatch();
   const { matchesTableMode, matchesTableState } = pd.settings;
   const showArchived = !isHidingArchived(matchesTableState);
   const getDataAggFilters = (data: MatchTableData[]): AggregatorFilters => {
@@ -301,6 +300,18 @@ export function MatchesTab({
     showArchived,
     updateSidebarCallback: updateStatsPanel
   });
+  const openMatchDetails = React.useCallback(
+    (id: string | number): void => {
+      anime({
+        targets: ".moving_ux",
+        left: "-100%",
+        easing: EASING_DEFAULT,
+        duration: 350
+      });
+      dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_MATCH, id: id });
+    },
+    [dispatcher]
+  );
   const [events, tags] = React.useMemo(getTotalAggData, []);
   const [containerRef, onScroll] = useLastScrollTop();
 
