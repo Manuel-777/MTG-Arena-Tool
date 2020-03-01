@@ -294,7 +294,7 @@ export function httpGetExplore(query: any): void {
       filter_sort: query.filterSort,
       filter_sortdir: query.filterSortDir,
       filter_mana: query.filteredMana,
-      filter_ranks: query.filteredranks,
+      filter_ranks: query.filteredRanks,
       filter_skip: query.filterSkip,
       collection: JSON.stringify(playerData.cards.cards)
     },

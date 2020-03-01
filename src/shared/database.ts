@@ -296,7 +296,7 @@ class Database {
     return this.metadata.abilities[abid] || undefined;
   }
 
-  event(id: string): string | boolean {
+  event(id: string): string | false {
     return this.events[id] || false;
   }
 

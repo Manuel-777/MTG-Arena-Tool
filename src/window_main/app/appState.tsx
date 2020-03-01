@@ -37,6 +37,7 @@ export interface AppState {
     time: number;
     duration: number;
   };
+  exploreData: any;
 }
 
 export const defaultState: AppState = {
@@ -74,5 +75,6 @@ export const defaultState: AppState = {
     text: "",
     time: 0,
     duration: 0
-  }
+  },
+  exploreData: {}
 };

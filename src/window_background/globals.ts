@@ -18,7 +18,7 @@ let currentDeck = new Deck();
 
 const debugLog = false;
 
-const debugNet = false;
+const debugNet = true;
 
 let duringDraft = false;
 

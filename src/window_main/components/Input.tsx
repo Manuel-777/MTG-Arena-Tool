@@ -1,7 +1,9 @@
 import React from "react";
 
 interface InputProps {
+  containerClassName?: string;
   label?: React.ReactNode;
+  type?: string;
   contStyle?: React.CSSProperties;
   value: string | number;
   placeholder: string;
@@ -14,7 +16,16 @@ function InputBase(
   props: InputProps,
   ref: React.Ref<HTMLInputElement>
 ): JSX.Element {
-  const { label, value, contStyle, callback, title, placeholder } = props;
+  const {
+    containerClassName,
+    label,
+    type,
+    value,
+    contStyle,
+    callback,
+    title,
+    placeholder
+  } = props;
   const [currentValue, setCurrentValue] = React.useState(value + "");
   const autocomplete = props.autocomplete || "off";
 
@@ -37,10 +48,13 @@ function InputBase(
 
   const inputInner = (): JSX.Element => {
     return (
-      <div style={contStyle || {}} className="input_container">
+      <div
+        style={contStyle || {}}
+        className={containerClassName || "input_container"}
+      >
         <input
           ref={ref}
-          type="text"
+          type={type || "text"}
           onKeyUp={onKeyUp}
           onBlur={onBlur}
           onChange={onChange}

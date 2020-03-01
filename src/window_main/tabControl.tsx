@@ -28,7 +28,7 @@ import { openDecksTab } from "./DecksTab";
 import { openMatchesTab } from "./MatchesTab";
 import { openEventsTab } from "./EventsTab";
 import { openEconomyTab } from "./EconomyTab";
-//import { openExploreTab } from "./explore";
+import { openExploreTab } from "./ExploreTab";
 import { openCollectionTab } from "./collection/CollectionTab";
 import { openSettingsTab } from "./settings";
 import { openHomeTab } from "./HomeTab";
@@ -78,7 +78,7 @@ export function getOpenNav(tab: number, offline: boolean): JSX.Element {
     case MAIN_EVENTS:
       return openEventsTab(filters);
     case MAIN_EXPLORE:
-      return <></>; //openExploreTab();
+      return openExploreTab();
     case MAIN_ECONOMY:
       return openEconomyTab();
     case MAIN_COLLECTION:

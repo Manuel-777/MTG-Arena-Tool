@@ -43,10 +43,6 @@ RenderApp();
 const byId = id => document.getElementById(id);
 const loggedIn = false;
 
-ipc.on("set_explore_decks", function(event, arg) {
-  setExploreDecks(arg);
-});
-
 ipc.on("open_course_deck", function(event, arg) {
   anime({
     targets: ".moving_ux",

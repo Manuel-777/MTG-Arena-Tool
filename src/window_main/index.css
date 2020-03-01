@@ -1516,7 +1516,7 @@ a:hover {
 .wc_search_icon {
     width: 24px;
     height: 20px;
-    margin-right: 12px;
+    margin: 12px 0 12px 12px;
     background-position-y: -4px;
     background-repeat: no-repeat;
 }
@@ -1980,6 +1980,10 @@ a:hover {
     white-space: pre;
 }
 
+.explore_wc_input {
+    max-width: 70px;
+}
+
 .input_container {
     /*
     display: flex;
@@ -1998,7 +2002,7 @@ a:hover {
     /* border-style: hidden; */
     color: var(--color-light);
     height: 24px;
-    width: 100%;
+    width: calc(100% - 22px);
     font-size: 14px;
     user-select: none;
     font-family:  var(--main-font-name);
@@ -2545,7 +2549,7 @@ a:hover {
 }
 
 .explore_buttons_container {
-    display: flex;
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -2555,6 +2559,10 @@ a:hover {
     display: flex;
     justify-content: center;
     margin-bottom: 8px;
+}
+
+.explore_buttons_top {
+    margin-top: 24px;
 }
 
 .select_container {

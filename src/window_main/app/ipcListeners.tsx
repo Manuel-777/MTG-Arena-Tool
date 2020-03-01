@@ -19,7 +19,8 @@ import {
   SET_PATREON,
   SET_BACKGROUND_IMAGE,
   SET_TOP_ARTIST,
-  SET_HOVER_SIZE
+  SET_HOVER_SIZE,
+  SET_EXPLORE_DATA
 } from "./reducers";
 import { timestamp, getCardArtCrop } from "../../shared/util";
 import {
@@ -138,6 +139,12 @@ export default function ipcListeners(dispatcher: unknown): void {
       filteredSet: arg.filtered_set,
       usersActive: arg.users_active
     });
+  });
+
+  ipc.on("set_explore_decks", function(event, arg) {
+    console.log("Explore", arg);
+    dispatchAction(dispatcher, SET_LOADING, false);
+    dispatchAction(dispatcher, SET_EXPLORE_DATA, arg);
   });
 
   ipc.on("settings_updated", (): void => {
