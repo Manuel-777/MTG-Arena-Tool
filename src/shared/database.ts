@@ -283,6 +283,19 @@ class Database {
     return this.metadata.cards[numId] || undefined;
   }
 
+  ability(id?: number | string): string | undefined {
+    if (id === undefined) {
+      return undefined;
+    }
+
+    if (!this.metadata?.abilities) {
+      return undefined;
+    }
+
+    const abid = typeof id === "number" ? id : parseInt(id);
+    return this.metadata.abilities[abid] || undefined;
+  }
+
   event(id: string): string | boolean {
     return this.events[id] || false;
   }

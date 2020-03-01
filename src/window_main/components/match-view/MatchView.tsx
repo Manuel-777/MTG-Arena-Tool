@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import fs from "fs";
 import path from "path";
 import anime from "animejs";
@@ -15,21 +15,28 @@ import RankIcon from "../RankIcon";
 import db from "../../../shared/database";
 import CardList from "../CardList";
 import CardsList from "../../../shared/cardsList";
+import ActionLog from "./ActionLog";
 
 interface MatchViewProps {
   match: InternalMatch;
 }
 
+const VIEW_MATCH = 1;
+const VIEW_LOG = 2;
+
 export function MatchView(props: MatchViewProps): JSX.Element {
   const { match } = props;
+  const [view, setView] = useState(VIEW_MATCH);
   const playerDeck = new Deck(match.playerDeck);
   const oppDeck = new Deck(match.oppDeck);
 
   const logExists = fs.existsSync(path.join(actionLogDir, match.id + ".txt"));
-  let actionLogData = "";
+  let actionLogDataB64 = "";
+  let actionLogDataString = "";
   if (logExists) {
     const actionLogFile = path.join(actionLogDir, match.id + ".txt");
-    actionLogData = fs.readFileSync(actionLogFile).toString("base64");
+    actionLogDataB64 = fs.readFileSync(actionLogFile).toString("base64");
+    actionLogDataString = fs.readFileSync(actionLogFile).toString();
   }
 
   const goBack = (): void => {
@@ -42,7 +49,11 @@ export function MatchView(props: MatchViewProps): JSX.Element {
   };
 
   const openActionLog = (): void => {
-    //
+    setView(VIEW_LOG);
+  };
+
+  const openMatch = (): void => {
+    setView(VIEW_MATCH);
   };
   /*
   const mulliganType =
@@ -61,43 +72,63 @@ export function MatchView(props: MatchViewProps): JSX.Element {
             <ManaCost colors={playerDeck.getColors().get()} />
           </div>
         </div>
-        <div className="flex_item">
-          {logExists ? (
-            <>
-              <Button
-                style={{ marginLeft: "auto" }}
-                onClick={openActionLog}
-                className="button_simple openLog"
-                text="Action log"
-              ></Button>
-              <ShareButton type="actionlog" data={actionLogData} />
-            </>
-          ) : (
-            <></>
-          )}
-        </div>
-        <div className="flex_item">
-          <Seat
-            player={match.player}
-            deck={playerDeck}
-            eventId={match.eventId}
-            won={match.player.win > match.opponent.win}
-          />
-          <Seat
-            player={match.opponent}
-            deck={oppDeck}
-            eventId={match.eventId}
-            won={match.opponent.win > match.player.win}
-          />
-        </div>
-        <div>
-          {match.gameStats.map((stats: any, index: number) => {
-            if (stats)
-              return (
-                <GameStats key={"stats-" + index} index={index} game={stats} />
-              );
-          })}
-        </div>
+        {view == VIEW_MATCH ? (
+          <>
+            <div className="flex_item">
+              {logExists ? (
+                <>
+                  <Button
+                    style={{ marginLeft: "auto" }}
+                    onClick={openActionLog}
+                    className="button_simple openLog"
+                    text="Action log"
+                  ></Button>
+                  <ShareButton type="actionlog" data={actionLogDataB64} />
+                </>
+              ) : (
+                <></>
+              )}
+            </div>
+            <div className="flex_item">
+              <Seat
+                player={match.player}
+                deck={playerDeck}
+                eventId={match.eventId}
+                won={match.player.win > match.opponent.win}
+              />
+              <Seat
+                player={match.opponent}
+                deck={oppDeck}
+                eventId={match.eventId}
+                won={match.opponent.win > match.player.win}
+              />
+            </div>
+            <div>
+              {match.gameStats.map((stats: any, index: number) => {
+                if (stats)
+                  return (
+                    <GameStats
+                      key={"stats-" + index}
+                      index={index}
+                      game={stats}
+                    />
+                  );
+              })}
+            </div>
+          </>
+        ) : (
+          <>
+            <Button
+              style={{ margin: "auto" }}
+              onClick={openMatch}
+              className={"button_simple centered"}
+              text="Go back"
+            ></Button>
+            <div className="actionlog-div">
+              <ActionLog logStr={actionLogDataString} />
+            </div>
+          </>
+        )}
       </div>
     </>
   );
