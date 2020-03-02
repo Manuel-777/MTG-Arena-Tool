@@ -9,6 +9,8 @@ export interface AppState {
   loginState: number;
   canLogin: boolean;
   topNav: number;
+  UX0Scroll: boolean;
+  UX1Scroll: boolean;
   subNav: {
     type: number;
     id: string;
@@ -62,6 +64,8 @@ export const defaultState: AppState = {
   loginState: LOGIN_AUTH,
   canLogin: true,
   topNav: 0,
+  UX0Scroll: false,
+  UX1Scroll: false,
   subNav: {
     type: -1,
     id: ""

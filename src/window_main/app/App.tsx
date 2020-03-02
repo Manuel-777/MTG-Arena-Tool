@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useCallback } from "react";
+
 import ReactDOM from "react-dom";
 
 import { createStore } from "redux";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import appReducer, { LOGIN_WAITING } from "./reducers";
+import appReducer, {
+  LOGIN_WAITING,
+  SET_UX0_SCROLL,
+  dispatchAction
+} from "./reducers";
+
 const store = createStore(appReducer);
 
 import { TopNav } from "../components/main/topNav";
@@ -43,6 +49,18 @@ function App(): JSX.Element {
     console.log("loginState: " + loginState);
   }, [loginState]);
 
+  const ux0Scroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>): void => {
+      const scroll =
+        e.currentTarget.scrollHeight -
+          e.currentTarget.scrollTop -
+          e.currentTarget.clientHeight ==
+        0;
+      dispatchAction(dispatch, SET_UX0_SCROLL, scroll);
+    },
+    [dispatch]
+  );
+
   return (
     <>
       <BackgroundImage />
@@ -60,7 +78,9 @@ function App(): JSX.Element {
           <div className="wrapper">
             <div className="overflow_ux_main">
               <div className="moving_ux">
-                <div className="ux_item">{getOpenNav(topNav, offline)}</div>
+                <div className="ux_item" onScroll={ux0Scroll}>
+                  {getOpenNav(topNav, offline)}
+                </div>
                 <div className="ux_item">
                   {getOpenSub(subNavType, subNavId)}
                 </div>

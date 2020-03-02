@@ -22,6 +22,8 @@ export const SET_POPUP = 17;
 export const SET_PATREON = 18;
 export const SET_EXPLORE_DATA = 19;
 export const SET_EXPLORE_FILTERS = 20;
+export const SET_UX0_SCROLL = 21;
+export const SET_UX1_SCROLL = 22;
 export const SET_ANY = 99;
 
 export const LOGIN_AUTH = 1;
@@ -251,7 +253,12 @@ const explore = (
 ): any => {
   switch (action.type) {
     case SET_EXPLORE_DATA:
-      return action.value;
+      if (action.value.skip == 0) return action.value;
+      else
+        return {
+          ...action.value,
+          result: [...state.result, ...action.value.result]
+        };
     default:
       return state;
   }
@@ -263,6 +270,30 @@ const exploreFilters = (
 ): any => {
   switch (action.type) {
     case SET_EXPLORE_FILTERS:
+      return action.value;
+    default:
+      return state;
+  }
+};
+
+const UX0Scroll = (
+  state: boolean = defaultState.UX0Scroll,
+  action: Action
+): boolean => {
+  switch (action.type) {
+    case SET_UX0_SCROLL:
+      return action.value;
+    default:
+      return state;
+  }
+};
+
+const UX1Scroll = (
+  state: boolean = defaultState.UX1Scroll,
+  action: Action
+): boolean => {
+  switch (action.type) {
+    case SET_UX1_SCROLL:
       return action.value;
     default:
       return state;
@@ -284,7 +315,9 @@ export default combineReducers({
   popup: popup,
   patreon: patreon,
   exploreData: explore,
-  exploreFilters: exploreFilters
+  exploreFilters: exploreFilters,
+  UX0Scroll: UX0Scroll,
+  UX1Scroll: UX1Scroll
 });
 
 export function dispatchAction(

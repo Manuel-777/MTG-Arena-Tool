@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ipcSend } from "./renderer-util";
 import { useDispatch, useSelector } from "react-redux";
-import { dispatchAction, SET_LOADING, SET_EXPLORE_FILTERS } from "./app/reducers";
+import {
+  dispatchAction,
+  SET_LOADING,
+  SET_EXPLORE_FILTERS,
+  SET_UX0_SCROLL
+} from "./app/reducers";
 import { WrappedReactSelect } from "../shared/ReactSelect";
 import Button from "./components/Button";
 import db from "../shared/database";
@@ -27,6 +32,7 @@ export interface ExploreQuery {
 }
 
 function queryExplore(query: ExploreQuery): void {
+  console.log("request_explore", query);
   ipcSend("request_explore", query);
 }
 
@@ -34,15 +40,9 @@ export function ExploreTab(): JSX.Element {
   const dispatcher = useDispatch();
   const exploreData = useSelector((state: AppState) => state.exploreData);
   const exploreFilters = useSelector((state: AppState) => state.exploreFilters);
+  const scroll = useSelector((state: AppState) => state.UX0Scroll);
   const [queryFilters, setQueryFilters] = useState(exploreFilters);
-  const [data, setData] = useState();
-  const [append, setAppend] = useState(false);
-
-  const doQuery = useCallback(() => {
-    dispatchAction(dispatcher, SET_LOADING, true);
-    setAppend(false);
-    queryExplore(queryFilters);
-  }, [dispatcher, queryFilters]);
+  const [fetching, setFetching] = useState(false);
 
   const setFilters = useCallback(
     (filters: ExploreQuery) => {
@@ -51,9 +51,21 @@ export function ExploreTab(): JSX.Element {
     [dispatcher]
   );
 
+  const doQuery = useCallback(() => {
+    const newFilters = {
+      ...queryFilters,
+      filterSkip: 0
+    };
+    setFetching(true);
+    setFilters(newFilters);
+    queryExplore(newFilters);
+    dispatchAction(dispatcher, SET_LOADING, true);
+  }, [dispatcher, setFilters, queryFilters]);
+
   useEffect(() => {
     if (!exploreData.result) {
       dispatchAction(dispatcher, SET_LOADING, true);
+      setFetching(true);
       queryExplore(exploreFilters);
     }
   }, [exploreData.result, dispatcher, exploreFilters]);
@@ -67,13 +79,23 @@ export function ExploreTab(): JSX.Element {
   }, [exploreFilters]);
 
   useEffect(() => {
-    if (!exploreData || !exploreData.result) return;
-    if (append) {
-      setData([...(data || []), ...exploreData.result]);
-    } else {
-      setData(exploreData.result);
+    setFetching(false);
+  }, [exploreData]);
+
+  useEffect(() => {
+    console.log("ux0 scroll: ", scroll);
+    if (scroll && !fetching) {
+      const newFilters = {
+        ...queryFilters,
+        filterSkip: queryFilters.filterSkip + 25
+      };
+      setFetching(true);
+      setFilters(newFilters);
+      queryExplore(newFilters);
+      dispatchAction(dispatcher, SET_LOADING, true);
+      dispatchAction(dispatcher, SET_UX0_SCROLL, false);
     }
-  }, [exploreData, data, append]);
+  }, [scroll, fetching, dispatcher, queryFilters, setFilters]);
 
   return (
     <div
@@ -86,12 +108,29 @@ export function ExploreTab(): JSX.Element {
         doSearch={doQuery}
       />
       <div className="explore_list">
-        {data ? (
-          data.map((row: any) => {
-            return (
-              <ListItemExplore key={row._id} row={row} openCallback={openRow} />
-            );
-          })
+        {exploreData.result ? (
+          exploreData.result.length > 0 ? (
+            exploreData.result.map((row: any) => {
+              return (
+                <ListItemExplore
+                  key={row._id}
+                  row={row}
+                  openCallback={openRow}
+                />
+              );
+            })
+          ) : (
+            <div style={{ marginTop: "32px" }} className="message_sub red">
+              Query returned no data.
+            </div>
+          )
+        ) : (
+          <></>
+        )}
+        {exploreData.result && exploreData.result.length > 0 ? (
+          <div style={{ margin: "16px" }} className="message_sub white">
+            Loading..
+          </div>
         ) : (
           <></>
         )}
