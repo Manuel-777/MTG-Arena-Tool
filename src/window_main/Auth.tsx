@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "./app/appState";
 import { shell } from "electron";
 import Checkbox from "./components/Checkbox";
 import { ipcSend } from "./renderer-util";
 import { HIDDEN_PW } from "../shared/constants";
+import { dispatchAction, SET_CAN_LOGIN } from "./app/reducers";
 const sha1 = require("js-sha1");
 
 function clickRememberMe(value: boolean): void {
@@ -23,6 +24,7 @@ export default function Auth(props: AuthProps): JSX.Element {
   const [errorMessage, setErrorMessage] = React.useState("");
   const [authForm, setAuthForm] = React.useState(props.authForm);
   const canLogin = useSelector((state: AppState) => state.canLogin);
+  const dispatcher = useDispatch();
 
   const handleEmailChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -48,12 +50,13 @@ export default function Auth(props: AuthProps): JSX.Element {
     } else {
       setErrorMessage("");
       const pwd = authForm.pass == HIDDEN_PW ? HIDDEN_PW : sha1(authForm.pass);
+      dispatchAction(dispatcher, SET_CAN_LOGIN, false);
       ipcSend("login", {
         username: authForm.email,
         password: pwd
       });
     }
-  }, [authForm.email, authForm.pass]);
+  }, [dispatcher, authForm.email, authForm.pass]);
 
   return (
     <div className="form-container">
@@ -128,14 +131,18 @@ export default function Auth(props: AuthProps): JSX.Element {
         </div>
         <div className="message_small">
           You can also{" "}
-          <a
-            onClick={(): void => {
-              ipcSend("login", { username: "", password: "" });
-            }}
-            className="offline_link"
-          >
-            continue offline
-          </a>
+          {canLogin ? (
+            <a
+              onClick={(): void => {
+                ipcSend("login", { username: "", password: "" });
+              }}
+              className="offline_link"
+            >
+              continue offline
+            </a>
+          ) : (
+            "continue offline"
+          )}
         </div>
       </div>
     </div>
