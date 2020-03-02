@@ -1,15 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ipcSend } from "./renderer-util";
-import { useDispatch } from "react-redux";
-import { dispatchAction, SET_LOADING } from "./app/reducers";
+import { useDispatch, useSelector } from "react-redux";
+import { dispatchAction, SET_LOADING, SET_EXPLORE_FILTERS } from "./app/reducers";
 import { WrappedReactSelect } from "../shared/ReactSelect";
 import Button from "./components/Button";
 import db from "../shared/database";
 import Checkbox from "./components/Checkbox";
 import Input from "./components/Input";
 import { COLORS_LONG, RANKS } from "../shared/constants";
+import { AppState } from "./app/appState";
+import { ListItemExplore } from "./components/list-item/ListItemExplore";
 
-interface ExploreQuery {
+export interface ExploreQuery {
   filterWCC: string;
   filterWCU: string;
   filterWCR: string;
@@ -24,47 +26,76 @@ interface ExploreQuery {
   filterSkip: number;
 }
 
-const defaultQuery: ExploreQuery = {
-  filterEvent: null,
-  filterType: "Events",
-  filterSort: "By Wins",
-  filterSortDir: -1,
-  filterSkip: 0,
-  filterWCC: "",
-  filterWCU: "",
-  filterWCR: "",
-  filterWCM: "",
-  filteredMana: [],
-  filteredRanks: [],
-  onlyOwned: false
-};
-
 function queryExplore(query: ExploreQuery): void {
   ipcSend("request_explore", query);
 }
 
 export function ExploreTab(): JSX.Element {
   const dispatcher = useDispatch();
-  const [queryFilters, setQueryFilters] = React.useState(defaultQuery);
+  const exploreData = useSelector((state: AppState) => state.exploreData);
+  const exploreFilters = useSelector((state: AppState) => state.exploreFilters);
+  const [queryFilters, setQueryFilters] = useState(exploreFilters);
+  const [data, setData] = useState();
+  const [append, setAppend] = useState(false);
 
   const doQuery = useCallback(() => {
     dispatchAction(dispatcher, SET_LOADING, true);
+    setAppend(false);
     queryExplore(queryFilters);
   }, [dispatcher, queryFilters]);
 
+  const setFilters = useCallback(
+    (filters: ExploreQuery) => {
+      dispatchAction(dispatcher, SET_EXPLORE_FILTERS, filters);
+    },
+    [dispatcher]
+  );
+
   useEffect(() => {
-    dispatchAction(dispatcher, SET_LOADING, true);
-    queryExplore(defaultQuery);
-  }, [dispatcher]);
+    if (!exploreData.result) {
+      dispatchAction(dispatcher, SET_LOADING, true);
+      queryExplore(exploreFilters);
+    }
+  }, [exploreData.result, dispatcher, exploreFilters]);
+
+  const openRow = (id: string): void => {
+    //
+  };
+
+  useEffect(() => {
+    setQueryFilters(exploreFilters);
+  }, [exploreFilters]);
+
+  useEffect(() => {
+    if (!exploreData || !exploreData.result) return;
+    if (append) {
+      setData([...(data || []), ...exploreData.result]);
+    } else {
+      setData(exploreData.result);
+    }
+  }, [exploreData, data, append]);
 
   return (
-    <div style={{ width: "100%" }} className="flex_item">
+    <div
+      style={{ width: "100%", flexDirection: "column" }}
+      className="flex_item"
+    >
       <ExploreFilters
         filters={queryFilters}
-        updateFilters={setQueryFilters}
+        updateFilters={setFilters}
         doSearch={doQuery}
       />
-      <div className="explore_list"></div>
+      <div className="explore_list">
+        {data ? (
+          data.map((row: any) => {
+            return (
+              <ListItemExplore key={row._id} row={row} openCallback={openRow} />
+            );
+          })
+        ) : (
+          <></>
+        )}
+      </div>
     </div>
   );
 }
@@ -82,7 +113,7 @@ interface ExploreFiltersProps {
 function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
   const { updateFilters, doSearch } = props;
   const [filters, setFilters] = useState(props.filters);
-  const [eventFilters, setEventFilters] = useState([""]);
+  const [eventFilters, setEventFilters] = useState(["Ladder"]);
 
   const typeFilter = ["Events", "Ranked Constructed", "Ranked Draft"];
   const sortFilters = ["By Date", "By Wins", "By Winrate", "By Player"];

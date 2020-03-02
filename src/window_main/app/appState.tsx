@@ -38,6 +38,20 @@ export interface AppState {
     duration: number;
   };
   exploreData: any;
+  exploreFilters: {
+    filterWCC: string;
+    filterWCU: string;
+    filterWCR: string;
+    filterWCM: string;
+    onlyOwned: boolean;
+    filterType: string;
+    filterEvent: string | null;
+    filterSort: string;
+    filterSortDir: -1 | 1;
+    filteredMana: number[];
+    filteredRanks: string[];
+    filterSkip: number;
+  };
 }
 
 export const defaultState: AppState = {
@@ -76,5 +90,19 @@ export const defaultState: AppState = {
     time: 0,
     duration: 0
   },
-  exploreData: {}
+  exploreData: {},
+  exploreFilters: {
+    filterEvent: "Ladder",
+    filterType: "Ranked Constructed",
+    filterSort: "By Winrate",
+    filterSortDir: -1,
+    filterSkip: 0,
+    filterWCC: "",
+    filterWCU: "",
+    filterWCR: "",
+    filterWCM: "",
+    filteredMana: [],
+    filteredRanks: [],
+    onlyOwned: false
+  }
 };

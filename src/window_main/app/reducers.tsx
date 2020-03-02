@@ -21,6 +21,7 @@ export const SET_HOME_DATA = 16;
 export const SET_POPUP = 17;
 export const SET_PATREON = 18;
 export const SET_EXPLORE_DATA = 19;
+export const SET_EXPLORE_FILTERS = 20;
 export const SET_ANY = 99;
 
 export const LOGIN_AUTH = 1;
@@ -256,6 +257,18 @@ const explore = (
   }
 };
 
+const exploreFilters = (
+  state: any = defaultState.exploreFilters,
+  action: Action
+): any => {
+  switch (action.type) {
+    case SET_EXPLORE_FILTERS:
+      return action.value;
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   backgroundImage: backgroundImage,
   topArtist: topArtist,
@@ -270,7 +283,8 @@ export default combineReducers({
   homeData: homeData,
   popup: popup,
   patreon: patreon,
-  exploreData: explore
+  exploreData: explore,
+  exploreFilters: exploreFilters
 });
 
 export function dispatchAction(

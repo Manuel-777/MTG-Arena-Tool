@@ -1,0 +1,105 @@
+import React from "react";
+
+import ManaCost from "../ManaCost";
+import { formatPercent, getWinrateClass } from "../../renderer-util";
+import { ListItem, Column, HoverTile, FlexTop, FlexBottom } from "./ListItem";
+import WildcardsCostPreset from "../WildcardsCostPreset";
+import RankSmall from "../RankSmall";
+
+export interface ExploreDeck {
+  _id: string;
+  eventId: string;
+  name: string;
+  mainDeck: any[];
+  sideboard: any[];
+  commander: any[];
+  tile: number;
+  rank: string[];
+  player: string[];
+  colors: number[];
+  date: string;
+  gw: number;
+  gl: number;
+  mw: number;
+  ml: number;
+  mt: number;
+  gt: number;
+  mwrate: number;
+  w: number;
+  l: number;
+  wildcards: {
+    u?: number;
+    r?: number;
+    m?: number;
+    c?: number;
+  };
+}
+
+interface ListItemExploreProps {
+  row: ExploreDeck;
+  openCallback: (id: string) => void;
+}
+
+export function ListItemExplore(props: ListItemExploreProps): JSX.Element {
+  const { row, openCallback } = props;
+  const onRowClick = (): void => {
+    openCallback(row._id);
+  };
+
+  const [hover, setHover] = React.useState(false);
+  const mouseEnter = React.useCallback(() => {
+    setHover(true);
+  }, []);
+  const mouseLeave = React.useCallback(() => {
+    setHover(false);
+  }, []);
+
+  return (
+    <ListItem
+      click={onRowClick}
+      mouseEnter={mouseEnter}
+      mouseLeave={mouseLeave}
+    >
+      <HoverTile hover={hover} grpId={row.tile || 0} />
+      <Column class="list_item_left">
+        <FlexTop>
+          <div className="list_deck_name">{row.name || ""}</div>
+          <div
+            className="list_deck_name_it"
+            style={{
+              textDecoration: row.player.length > 1 ? "underline dotted" : ""
+            }}
+            title={row.player.length > 1 ? row.player.join(", ") : ""}
+          >
+            {row.player.length > 1
+              ? row.player.length + " players"
+              : "by " + row.player[0]}
+          </div>
+        </FlexTop>
+        <FlexBottom>
+          <ManaCost class="mana_s20" colors={row.colors || []} />
+        </FlexBottom>
+      </Column>
+
+      <Column class="list_item_center">
+        <WildcardsCostPreset wildcards={row.wildcards} />
+      </Column>
+      <Column class="list_item_right">
+        <FlexTop innerClass="list_deck_winrate">
+          {row.mw}:{row.ml} (
+          <span className={getWinrateClass(row.mwrate) + "_bright"}>
+            {formatPercent(row.mwrate)}
+          </span>
+          )
+        </FlexTop>
+        <FlexBottom style={{ justifyContent: "flex-end", marginRight: "18px" }}>
+          {row.rank.map((r: string) => {
+            return (
+              <RankSmall key={row._id + "-r-" + r} rankTier={r}></RankSmall>
+            );
+          })}
+        </FlexBottom>
+      </Column>
+    </ListItem>
+  );
+}

@@ -2,25 +2,27 @@ import React from "react";
 import { get_rank_index_16, formatRank } from "../../shared/util";
 
 interface RankSmallProps {
-  rank: any;
+  rank?: any | string;
+  rankTier?: string;
   style?: React.CSSProperties;
 }
 
 export default function RankSmall(props: RankSmallProps): JSX.Element {
-  const { rank, style } = props;
+  const { rank, rankTier, style } = props;
 
   const getRankStyle = (): React.CSSProperties => {
     return {
       ...(style ? style : {}),
       marginRight: "0px",
-      backgroundPosition: get_rank_index_16(rank.rank) * -16 + "px 0px"
+      backgroundPosition:
+        get_rank_index_16(rankTier ? rankTier : rank.rank) * -16 + "px 0px"
     };
   };
 
   return (
     <div
       style={getRankStyle()}
-      title={formatRank(rank)}
+      title={rankTier ? rankTier : formatRank(rank)}
       className="ranks_16"
     ></div>
   );
