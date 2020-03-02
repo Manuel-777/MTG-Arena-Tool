@@ -3,6 +3,7 @@ import { dialog, app, globalShortcut, Menu, Tray, clipboard } from "electron";
 import path from "path";
 import fs from "fs";
 import { autoUpdater } from "electron-updater";
+import installDevTools from "./devtools";
 
 import {
   ARENA_MODE_IDLE,
@@ -14,9 +15,6 @@ import { appDb } from "./shared/db/LocalDatabase";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
-import electronDebug from "electron-debug";
-// Adds debug features like hotkeys for triggering dev tools and reload
-electronDebug({ showDevTools: false });
 console.log(process.platform);
 
 const debugBack = false;
@@ -64,6 +62,7 @@ app.on("ready", () => {
   if (app.isPackaged) {
     startUpdater();
   } else {
+    installDevTools();
     const Sentry = require("@sentry/electron");
     Sentry.init({
       dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"

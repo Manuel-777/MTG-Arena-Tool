@@ -151,7 +151,7 @@
     "dotenv": "^8.2.0",
     "electron": "^5.0.12",
     "electron-builder": "^21.2.0",
-    "electron-react-devtools": "^0.5.3",
+    "electron-devtools-installer": "^2.2.4",
     "eslint": "^6.7.2",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-prettier": "^3.1.1",
