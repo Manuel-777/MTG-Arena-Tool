@@ -1,49 +1,25 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define, @typescript-eslint/camelcase */
 import anime from "animejs";
-import { app, ipcRenderer as ipc, remote, shell } from "electron";
+import { app, ipcRenderer as ipc, remote } from "electron";
 import fs from "fs";
 import _ from "lodash";
 import path from "path";
 import Pikaday from "pikaday";
-import striptags from "striptags";
 import Picker from "vanilla-picker";
-import { addCardHover } from "../shared/cardHover";
-import { cardType } from "../shared/cardTypes";
-import ConicGradient from "../shared/conic-gradient";
-import {
-  COLORS_ALL,
-  EASING_DEFAULT,
-  IPC_BACKGROUND,
-  IPC_MAIN,
-  MANA_COLORS,
-  SETTINGS_PRIVACY
-} from "../shared/constants";
-import db from "../shared/database";
+import { EASING_DEFAULT, IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
 import {
   createDiv,
-  createImg,
   createInput,
   createLabel,
-  createSpan,
   queryElements as $$
 } from "../shared/dom-fns";
 import pd from "../shared/player-data";
-import {
-  deckTypesStats,
-  getCardArtCrop,
-  getCardImage,
-  makeId
-} from "../shared/util";
-import * as deckDrawer from "./DeckDrawer";
-import { forceOpenSettings } from "./tabControl";
 
 const { dialog } = remote;
-const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 const byId = id => document.getElementById(id);
-let popTimeout = null;
 let dialogHandler = null;
-let unmountPoints = [];
+const unmountPoints = [];
 // quick and dirty shared state object for main renderer process
 // (for state shared across processes, use database or player-data)
 const localState = {
@@ -64,22 +40,8 @@ function ipcSend(method, arg, to = IPC_BACKGROUND) {
   ipc.send("ipc_switch", method, IPC_MAIN, arg, to);
 }
 
-function pop(str, timeout) {
-  const popup = $$(".popup")[0];
-  popup.style.opacity = 1;
-  popup.innerHTML = str;
-
-  if (popTimeout) clearTimeout(popTimeout);
-
-  if (timeout < 1) {
-    popTimeout = null;
-  } else {
-    popTimeout = setTimeout(function() {
-      popup.style.opacity = 0;
-      popup.innerHTML = "";
-      popTimeout = null;
-    }, timeout);
-  }
+export function addNodeToUnmountReact(node) {
+  unmountPoints.push(node);
 }
 
 function setLocalState(state = {}) {
@@ -143,362 +105,6 @@ function makeResizable(div, resizeCallback, finalCallback) {
   );
 }
 
-export function addNodeToUnmountReact(node) {
-  unmountPoints.push(node);
-}
-
-function drawDeck(div, deck, showWildcards = false) {
-  div.innerHTML = "";
-  const unique = makeId(4);
-
-  if (deck.commandZoneGRPIds && deck.commandZoneGRPIds.length > 0) {
-    const separator = deckDrawer.cardSeparator(`Commander`);
-    div.appendChild(separator);
-
-    deck.commandZoneGRPIds.forEach((id, index) => {
-      if (index % 2 == 0) {
-        const tile = deckDrawer.cardTile(
-          pd.settings.card_tile_style,
-          id,
-          unique + "a",
-          deck.commandZoneGRPIds[index + 1],
-          showWildcards,
-          deck,
-          false
-        );
-        if (tile) {
-          div.appendChild(tile);
-        }
-      }
-    });
-  }
-
-  // draw maindeck grouped by cardType
-  const cardsByGroup = _(deck.mainDeck)
-    .map(card => ({ data: db.card(card.id), ...card }))
-    .filter(card => card.data && card.data.type)
-    .groupBy(card => {
-      const type = cardType(card.data);
-      switch (type) {
-        case "Creature":
-          return "Creatures";
-        case "Planeswalker":
-          return "Planeswalkers";
-        case "Instant":
-        case "Sorcery":
-          return "Spells";
-        case "Enchantment":
-          return "Enchantments";
-        case "Artifact":
-          return "Artifacts";
-        case "Land":
-        case "Basic Land":
-          return "Lands";
-        default:
-          throw new Error(`Unexpected card type: ${type}`);
-      }
-    })
-    .value();
-
-  _([
-    "Creatures",
-    "Planeswalkers",
-    "Spells",
-    "Enchantments",
-    "Artifacts",
-    "Lands"
-  ])
-    .filter(group => !_.isEmpty(cardsByGroup[group]))
-    .forEach(group => {
-      // draw a separator for the group
-      const cards = cardsByGroup[group];
-      const count = _.sumBy(cards, "quantity");
-      const separator = deckDrawer.cardSeparator(`${group} (${count})`);
-      div.appendChild(separator);
-
-      // draw the cards
-      _(cards)
-        .filter(card => card.quantity > 0)
-        .orderBy(["data.cmc", "data.name"])
-        .forEach(card => {
-          const tile = deckDrawer.cardTile(
-            pd.settings.card_tile_style,
-            card.id,
-            unique + "a",
-            card.quantity,
-            showWildcards,
-            deck,
-            false
-          );
-          div.appendChild(tile);
-        });
-    });
-
-  const sideboardSize = _.sumBy(deck.sideboard, "quantity");
-  if (sideboardSize) {
-    // draw a separator for the sideboard
-    const separator = deckDrawer.cardSeparator(`Sideboard (${sideboardSize})`);
-    div.appendChild(separator);
-
-    // draw the cards
-    _(deck.sideboard)
-      .filter(card => card.quantity > 0)
-      .map(card => ({ data: db.card(card.id), ...card }))
-      .filter(card => card.data)
-      .orderBy(["data.cmc", "data.name"])
-      .forEach(card => {
-        const tile = deckDrawer.cardTile(
-          pd.settings.card_tile_style,
-          card.id,
-          unique + "b",
-          card.quantity,
-          showWildcards,
-          deck,
-          true
-        );
-        div.appendChild(tile);
-      });
-  }
-}
-
-function drawCardList(div, cards) {
-  const unique = makeId(4);
-  const counts = {};
-  cards.forEach(cardId => (counts[cardId] = (counts[cardId] || 0) + 1));
-  Object.keys(counts).forEach(cardId => {
-    const tile = deckDrawer.cardTile(
-      pd.settings.card_tile_style,
-      cardId,
-      unique,
-      counts[cardId]
-    );
-    div.appendChild(tile);
-  });
-}
-
-function drawDeckVisual(container, deck, openCallback) {
-  container.innerHTML = "";
-  container.style.flexDirection = "column";
-
-  container.appendChild(deckTypesStats(deck));
-
-  // attempt at sorting visually..
-  const newMainDeck = [];
-
-  for (let cmc = 0; cmc < 21; cmc++) {
-    for (let qq = 4; qq > -1; qq--) {
-      deck.mainDeck.forEach(function(c) {
-        const grpId = c.id;
-        const card = db.card(grpId);
-        let quantity;
-        if (!card.type.includes("Land") && grpId !== 67306) {
-          if (card.cmc === cmc) {
-            quantity = c.quantity;
-
-            if (quantity === qq) {
-              newMainDeck.push(c);
-            }
-          }
-        } else if (cmc === 20) {
-          quantity = c.quantity;
-          if (qq === 0 && quantity > 4) {
-            newMainDeck.push(c);
-          }
-          if (quantity === qq) {
-            newMainDeck.push(c);
-          }
-        }
-      });
-    }
-  }
-
-  const listDiv = createDiv(["decklist"]);
-  listDiv.style.display = "flex";
-  listDiv.style.width = "auto";
-  listDiv.style.margin = "0 auto";
-
-  const sz = pd.cardsSize;
-  const mainDiv = createDiv(["visual_mainboard"]);
-  mainDiv.style.display = "flex";
-  mainDiv.style.flexWrap = "wrap";
-  mainDiv.style.alignContent = "start";
-  mainDiv.style.maxWidth = (sz + 6) * 5 + "px";
-
-  let tileNow;
-  let _n = 0;
-  newMainDeck.forEach(c => {
-    const card = db.card(c.id);
-    if (c.quantity > 0) {
-      let dfc = "";
-      if (card.dfc === "DFC_Back") dfc = "a";
-      if (card.dfc === "DFC_Front") dfc = "b";
-      if (card.dfc === "SplitHalf") dfc = "a";
-      if (dfc !== "b") {
-        for (let i = 0; i < c.quantity; i++) {
-          if (_n % 4 === 0) {
-            tileNow = createDiv(["deck_visual_tile"]);
-            tileNow.style.marginBottom = sz * 0.5 + "px";
-            mainDiv.appendChild(tileNow);
-          }
-
-          const d = createDiv(["deck_visual_card"]);
-          d.style.width = sz + "px";
-          d.style.height = sz * 0.166 + "px";
-          const img = createImg(["deck_visual_card_img"], "", {
-            src: getCardImage(card)
-          });
-          img.style.width = sz + "px";
-          addCardHover(img, card);
-          d.appendChild(img);
-
-          tileNow.appendChild(d);
-          _n++;
-        }
-      }
-    }
-  });
-  listDiv.appendChild(mainDiv);
-
-  const sideDiv = createDiv(["visual_sideboard"]);
-  sideDiv.style.display = "flex";
-  sideDiv.style.flexWrap = "wrap";
-  sideDiv.style.marginLeft = "32px";
-  sideDiv.style.alignContent = "start";
-  sideDiv.style.maxWidth = (sz + 6) * 1.5 + "px";
-
-  if (deck.sideboard && deck.sideboard.length) {
-    tileNow = createDiv(["deck_visual_tile_side"]);
-    tileNow.style.width = (sz + 6) * 5 + "px";
-
-    let _n = 0;
-    deck.sideboard.forEach(c => {
-      const card = db.card(c.id);
-      if (c.quantity > 0) {
-        let dfc = "";
-        if (card.dfc === "DFC_Back") dfc = "a";
-        if (card.dfc === "DFC_Front") dfc = "b";
-        if (card.dfc === "SplitHalf") dfc = "a";
-        if (dfc !== "b") {
-          for (let i = 0; i < c.quantity; i++) {
-            const d = createDiv(["deck_visual_card_side"]);
-            d.style.width = sz + "px";
-            d.style.height = sz * 0.166 + "px";
-            if (_n % 2 === 0) {
-              d.style.marginLeft = "60px";
-            }
-
-            const img = createImg(["deck_visual_card_img"], "", {
-              src: getCardImage(card)
-            });
-            img.style.width = sz + "px";
-            addCardHover(img, card);
-            d.appendChild(img);
-
-            tileNow.appendChild(d);
-            _n++;
-          }
-        }
-      }
-    });
-    sideDiv.appendChild(tileNow);
-  }
-  listDiv.appendChild(sideDiv);
-
-  container.appendChild(listDiv);
-
-  if (openCallback) {
-    const normalButton = createDiv(["button_simple"], "Normal view");
-    normalButton.addEventListener("click", () => openCallback());
-    container.appendChild(normalButton);
-  }
-}
-
-function colorPieChart(colorCounts, title) {
-  /*
-    used for land / card pie charts.
-    colorCounts should be object with values for each of the color codes wubrgc and total.
-    */
-  // console.log("making colorPieChart", colorCounts, title);
-
-  const stops = [];
-  let start = 0;
-  COLORS_ALL.forEach((colorCode, i) => {
-    const currentColor = MANA_COLORS[i];
-    const stop =
-      start + ((colorCounts[colorCode] || 0) / colorCounts.total) * 100;
-    stops.push(`${currentColor} 0 ${stop}%`);
-    // console.log('\t', start, stop, currentColor);
-    start = stop;
-  });
-  const gradient = new ConicGradient({
-    stops: stops.join(", "),
-    size: 400
-  });
-  const chart = createDiv(
-    ["pie_container"],
-    `<span>${title}</span>
-    <svg class="pie">${gradient.svg}</svg>`
-  );
-  return chart;
-}
-
-function openActionLog(actionLogId) {
-  const conatiner = byId("ux_2");
-  conatiner.innerHTML = "";
-
-  const top = createDiv(["decklist_top"]);
-  const backButton = createDiv(["button", "back"]);
-  backButton.addEventListener("click", () => {
-    anime({
-      targets: ".moving_ux",
-      left: "-100%",
-      easing: EASING_DEFAULT,
-      duration: 350
-    });
-  });
-  top.appendChild(backButton);
-  top.appendChild(createDiv(["deck_name"], "Action Log"));
-  top.appendChild(createDiv(["deck_name"]));
-  conatiner.appendChild(top);
-
-  const actionLogContainer = createDiv(["action_log_container"]);
-
-  const actionLogFile = path.join(actionLogDir, actionLogId + ".txt");
-  const str = fs.readFileSync(actionLogFile).toString();
-
-  const actionLog = str.split("\n");
-  for (let line = 1; line < actionLog.length - 1; line += 3) {
-    const seat = ("" + actionLog[line]).trim();
-    const time = actionLog[line + 1];
-    let str = actionLog[line + 2];
-    str = striptags(str, ["log-card", "log-ability"]);
-
-    const boxDiv = createDiv(["actionlog", "log_p" + seat]);
-    boxDiv.appendChild(createDiv(["actionlog_time"], time));
-    boxDiv.appendChild(createDiv(["actionlog_text"], str));
-    actionLogContainer.appendChild(boxDiv);
-  }
-
-  conatiner.appendChild(actionLogContainer);
-
-  $$("log-card").forEach(obj => {
-    const grpId = obj.getAttribute("id");
-    addCardHover(obj, db.card(grpId));
-  });
-
-  $$("log-ability").forEach(obj => {
-    const grpId = obj.getAttribute("id");
-    obj.title = db.abilities[grpId] || "";
-  });
-
-  anime({
-    targets: ".moving_ux",
-    left: "-200%",
-    easing: EASING_DEFAULT,
-    duration: 350
-  });
-}
-
 function toggleVisibility(...ids) {
   ids.forEach(id => {
     const el = byId(id);
@@ -508,69 +114,6 @@ function toggleVisibility(...ids) {
       el.classList.add("hidden");
     }
   });
-}
-
-function addCheckbox(div, label, id, def, func, disabled = false) {
-  const labelEl = createLabel(["check_container", "hover_label"], label);
-  if (disabled) {
-    labelEl.classList.remove("hover_label");
-    labelEl.style.cursor = "default";
-    labelEl.style.opacity = 0.4;
-  }
-
-  const checkbox = createInput([], "", {
-    type: "checkbox",
-    id,
-    checked: def,
-    disabled
-  });
-  if (!disabled) checkbox.addEventListener("click", func);
-  labelEl.appendChild(checkbox);
-  labelEl.appendChild(createSpan(["checkmark"]));
-
-  div.appendChild(labelEl);
-  return labelEl;
-}
-
-function changeBackground(arg = "default", grpId = 0) {
-  let artistLine = "";
-  const _card = db.card(grpId);
-  const topArtist = $$(".top_artist")[0];
-  const mainWrapper = $$(".main_wrapper")[0];
-
-  //console.log(arg, grpId, _card);
-  if (arg === "default") {
-    if (pd.settings.back_url && pd.settings.back_url !== "default") {
-      topArtist.innerHTML = "";
-      mainWrapper.style.backgroundImage = "url(" + pd.settings.back_url + ")";
-    } else {
-      topArtist.innerHTML = "Bedevil by Seb McKinnon";
-      mainWrapper.style.backgroundImage = "url(" + DEFAULT_BACKGROUND + ")";
-    }
-  } else if (_card) {
-    mainWrapper.style.backgroundImage = `url(${getCardArtCrop(_card)})`;
-    try {
-      artistLine = _card.name + " by " + _card.artist;
-      topArtist.innerHTML = artistLine;
-    } catch (e) {
-      console.log(e);
-    }
-  } else if (fs.existsSync(arg)) {
-    topArtist.innerHTML = "";
-    mainWrapper.style.backgroundImage = "url(" + arg + ")";
-  } else {
-    topArtist.innerHTML = "";
-    const xhr = new XMLHttpRequest();
-    xhr.open("HEAD", arg);
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        mainWrapper.style.backgroundImage = "url(" + arg + ")";
-      } else {
-        mainWrapper.style.backgroundImage = "";
-      }
-    };
-    xhr.send();
-  }
 }
 
 function openDialog(content, onClose = () => {}) {
@@ -888,20 +431,12 @@ export function logShareLink(id, shareExpire) {
 export {
   actionLogDir,
   ipcSend,
-  pop,
   setLocalState,
   getLocalState,
   toggleArchived,
   getTagColor,
   makeResizable,
-  drawDeck,
-  drawCardList,
-  drawDeckVisual,
-  colorPieChart,
-  openActionLog,
   toggleVisibility,
-  addCheckbox,
-  changeBackground,
   openDialog,
   closeDialog,
   showColorpicker,

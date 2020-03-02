@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable no-console */
 import { ipcRenderer as ipc } from "electron";
@@ -110,7 +111,11 @@ export default function ipcListeners(dispatcher: unknown): void {
 
   ipc.on("popup", (event: string, text: string, time: number): void => {
     const newTime = timestamp() + time;
-    dispatchAction(dispatcher, SET_POPUP, { text: text, time: newTime, duration: time });
+    dispatchAction(dispatcher, SET_POPUP, {
+      text: text,
+      time: newTime,
+      duration: time
+    });
   });
 
   ipc.on("force_open_settings", (): void => {
@@ -146,7 +151,7 @@ export default function ipcListeners(dispatcher: unknown): void {
     });
   });
 
-  ipc.on("set_explore_decks", function(event, arg) {
+  ipc.on("set_explore_decks", function(event: string, arg: any) {
     console.log("Explore", arg);
     dispatchAction(dispatcher, SET_LOADING, false);
     dispatchAction(dispatcher, SET_EXPLORE_DATA, arg);

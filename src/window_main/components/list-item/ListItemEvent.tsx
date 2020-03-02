@@ -25,7 +25,6 @@ import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
 import { DbCardData } from "../../../types/Metadata";
 import RoundCard from "../RoundCard";
 import { compareDesc } from "date-fns";
-import { openDraft } from "../../draft-details";
 import { useDispatch } from "react-redux";
 import { dispatchAction, SET_SUB_NAV } from "../../app/reducers";
 
