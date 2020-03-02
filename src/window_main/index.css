@@ -868,7 +868,6 @@ a:hover {
 }
 
 .message_center, .message_center_offline {
-    position: absolute;
     top: -48px;
     left: 0;
     width: 100%;

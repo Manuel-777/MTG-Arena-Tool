@@ -7,10 +7,7 @@ import { forceOpenSettings } from "./tabControl";
 
 export default function OfflineSplash(): JSX.Element {
   return (
-    <div
-      className="message_center_offline"
-      style={{ display: "flex", position: "fixed" }}
-    >
+    <div className="message_center_offline" style={{ display: "flex" }}>
       <div className="message_unlink"></div>
       <div className="message_big red">Oops, you are offline!</div>
       <div className="message_sub_16 white">To access online features:</div>
