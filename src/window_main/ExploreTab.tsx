@@ -44,23 +44,20 @@ export function ExploreTab(): JSX.Element {
   const [queryFilters, setQueryFilters] = useState(exploreFilters);
   const [fetching, setFetching] = useState(false);
 
-  const setFilters = useCallback(
-    (filters: ExploreQuery) => {
-      dispatchAction(dispatcher, SET_EXPLORE_FILTERS, filters);
-    },
-    [dispatcher]
-  );
-
   const doQuery = useCallback(() => {
     const newFilters = {
       ...queryFilters,
       filterSkip: 0
     };
     setFetching(true);
-    setFilters(newFilters);
     queryExplore(newFilters);
+    dispatchAction(dispatcher, SET_EXPLORE_FILTERS, newFilters);
     dispatchAction(dispatcher, SET_LOADING, true);
-  }, [dispatcher, setFilters, queryFilters]);
+  }, [dispatcher, queryFilters]);
+
+  const openRow = (id: string): void => {
+    //
+  };
 
   useEffect(() => {
     if (!exploreData.result) {
@@ -69,10 +66,6 @@ export function ExploreTab(): JSX.Element {
       queryExplore(exploreFilters);
     }
   }, [exploreData.result, dispatcher, exploreFilters]);
-
-  const openRow = (id: string): void => {
-    //
-  };
 
   useEffect(() => {
     setQueryFilters(exploreFilters);
@@ -85,47 +78,31 @@ export function ExploreTab(): JSX.Element {
   useEffect(() => {
     console.log("ux0 scroll: ", scroll);
     if (scroll && !fetching) {
-      const newFilters = {
-        ...queryFilters,
-        filterSkip: queryFilters.filterSkip + 25
-      };
       setFetching(true);
-      setFilters(newFilters);
-      queryExplore(newFilters);
+      queryExplore(queryFilters);
       dispatchAction(dispatcher, SET_LOADING, true);
+      dispatchAction(dispatcher, SET_EXPLORE_FILTERS, queryFilters);
       dispatchAction(dispatcher, SET_UX0_SCROLL, false);
     }
-  }, [scroll, fetching, dispatcher, queryFilters, setFilters]);
+  }, [scroll, fetching, dispatcher, queryFilters]);
 
   return (
     <div
       style={{ width: "100%", flexDirection: "column" }}
       className="flex_item"
     >
-      <ExploreFilters
-        filters={queryFilters}
-        updateFilters={setFilters}
-        doSearch={doQuery}
-      />
+      <ExploreFilters doSearch={doQuery} />
       <div className="explore_list">
-        {exploreData.result ? (
-          exploreData.result.length > 0 ? (
-            exploreData.result.map((row: any) => {
-              return (
-                <ListItemExplore
-                  key={row._id}
-                  row={row}
-                  openCallback={openRow}
-                />
-              );
-            })
-          ) : (
-            <div style={{ marginTop: "32px" }} className="message_sub red">
-              Query returned no data.
-            </div>
-          )
+        {exploreData.result && exploreData.result.length > 0 ? (
+          exploreData.result.map((row: any) => {
+            return (
+              <ListItemExplore key={row._id} row={row} openCallback={openRow} />
+            );
+          })
         ) : (
-          <></>
+          <div style={{ marginTop: "32px" }} className="message_sub red">
+            Query returned no data.
+          </div>
         )}
         {exploreData.result && exploreData.result.length > 0 ? (
           <div style={{ margin: "16px" }} className="message_sub white">
@@ -144,33 +121,45 @@ function getEventPrettyName(event: string): string {
 }
 
 interface ExploreFiltersProps {
-  updateFilters: (query: ExploreQuery) => void;
   doSearch: () => void;
-  filters: ExploreQuery;
 }
 
 function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
-  const { updateFilters, doSearch } = props;
-  const [filters, setFilters] = useState(props.filters);
+  const { doSearch } = props;
+  const filters = useSelector((state: AppState) => state.exploreFilters);
   const [eventFilters, setEventFilters] = useState(["Ladder"]);
+  const dispatcher = useDispatch();
 
   const typeFilter = ["Events", "Ranked Constructed", "Ranked Draft"];
   const sortFilters = ["By Date", "By Wins", "By Winrate", "By Player"];
   const sortDirection = ["Descending", "Ascending"];
 
-  const setManaFilter = (value: number[]): void => {
-    updateFilters({
-      ...filters,
-      filteredMana: value
-    });
-  };
+  const updateFilters = useCallback(
+    (filters: ExploreQuery): void => {
+      dispatchAction(dispatcher, SET_EXPLORE_FILTERS, filters);
+    },
+    [dispatcher]
+  );
 
-  const setRanksFilter = (value: string[]): void => {
-    updateFilters({
-      ...filters,
-      filteredRanks: value
-    });
-  };
+  const setManaFilter = useCallback(
+    (value: number[]): void => {
+      updateFilters({
+        ...filters,
+        filteredMana: value
+      });
+    },
+    [filters, updateFilters]
+  );
+
+  const setRanksFilter = useCallback(
+    (value: string[]): void => {
+      updateFilters({
+        ...filters,
+        filteredRanks: value
+      });
+    },
+    [filters, updateFilters]
+  );
 
   const getFilterEvents = useCallback(
     (prevFilters: ExploreQuery = filters): string[] => {
@@ -204,10 +193,6 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
     },
     [filters]
   );
-
-  useEffect(() => {
-    setFilters(props.filters);
-  }, [props.filters]);
 
   return (
     <div className="explore_buttons_container">

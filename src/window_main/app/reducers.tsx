@@ -2,29 +2,30 @@ import { combineReducers } from "redux";
 import { defaultState } from "./appState";
 import { WildcardsChange } from "../HomeTab";
 
-export const SET_BACKGROUND_IMAGE = 1;
-export const SET_TOP_ARTIST = 2;
-export const SET_HOVER_IN = 3;
-export const SET_HOVER_OUT = 4;
-export const SET_HOVER_SIZE = 5;
-export const SET_OFFLINE = 6;
-export const SET_LOADING = 7;
-export const SET_TOP_NAV = 8;
-export const SET_SUB_NAV = 9;
-export const SET_LOGIN_STATE = 10;
-export const SET_LOGIN_FORM = 11;
-export const SET_LOGIN_EMAIL = 12;
-export const SET_LOGIN_REMEMBER = 13;
-export const SET_LOGIN_PASS = 14;
-export const SET_CAN_LOGIN = 15;
-export const SET_HOME_DATA = 16;
-export const SET_POPUP = 17;
-export const SET_PATREON = 18;
-export const SET_EXPLORE_DATA = 19;
-export const SET_EXPLORE_FILTERS = 20;
-export const SET_UX0_SCROLL = 21;
-export const SET_UX1_SCROLL = 22;
-export const SET_ANY = 99;
+export const SET_BACKGROUND_IMAGE = "SET_BACKGROUND_IMAGE";
+export const SET_TOP_ARTIST = "SET_TOP_ARTIST";
+export const SET_HOVER_IN = "SET_HOVER_IN";
+export const SET_HOVER_OUT = "SET_HOVER_OUT";
+export const SET_HOVER_SIZE = "SET_HOVER_SIZE";
+export const SET_OFFLINE = "SET_OFFLINE";
+export const SET_LOADING = "SET_LOADING";
+export const SET_TOP_NAV = "SET_TOP_NAV";
+export const SET_SUB_NAV = "SET_SUB_NAV";
+export const SET_LOGIN_STATE = "SET_LOGIN_STATE";
+export const SET_LOGIN_FORM = "SET_LOGIN_FORM";
+export const SET_LOGIN_EMAIL = "SET_LOGIN_EMAIL";
+export const SET_LOGIN_REMEMBER = "SET_LOGIN_REMEMBER";
+export const SET_LOGIN_PASS = "SET_LOGIN_PASS";
+export const SET_CAN_LOGIN = "SET_CAN_LOGIN";
+export const SET_HOME_DATA = "SET_HOME_DATA";
+export const SET_POPUP = "SET_POPUP";
+export const SET_PATREON = "SET_PATREON";
+export const SET_EXPLORE_DATA = "SET_EXPLORE_DATA";
+export const SET_EXPLORE_FILTERS = "SET_EXPLORE_FILTERS";
+export const SET_EXPLORE_FILTERS_SKIP = "SET_EXPLORE_FILTERS_SKIP";
+export const SET_UX0_SCROLL = "SET_UX0_SCROLL";
+export const SET_UX1_SCROLL = "SET_UX1_SCROLL";
+export const SET_ANY = "SET_ANY";
 
 export const LOGIN_AUTH = 1;
 export const LOGIN_WAITING = 2;
@@ -32,7 +33,7 @@ export const LOGIN_OK = 3;
 export const LOGIN_FAILED = 4;
 
 export interface Action {
-  type: number;
+  type: string;
   value: any;
 }
 
@@ -271,6 +272,8 @@ const exploreFilters = (
   switch (action.type) {
     case SET_EXPLORE_FILTERS:
       return action.value;
+    case SET_EXPLORE_FILTERS_SKIP:
+      return { ...state, filterSkip: action.value };
     default:
       return state;
   }
@@ -322,7 +325,7 @@ export default combineReducers({
 
 export function dispatchAction(
   dispatch: any,
-  action: number,
+  action: string,
   value: any
 ): void {
   dispatch({

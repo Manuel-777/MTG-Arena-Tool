@@ -20,7 +20,8 @@ import {
   SET_BACKGROUND_IMAGE,
   SET_TOP_ARTIST,
   SET_HOVER_SIZE,
-  SET_EXPLORE_DATA
+  SET_EXPLORE_DATA,
+  SET_EXPLORE_FILTERS_SKIP
 } from "./reducers";
 import { timestamp, getCardArtCrop } from "../../shared/util";
 import {
@@ -52,6 +53,10 @@ export default function ipcListeners(dispatcher: unknown): void {
 
   ipc.on("clear_pwd", (): void => {
     dispatchAction(dispatcher, SET_LOGIN_PASS, "");
+  });
+
+  ipc.on("login_failed", (): void => {
+    dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED);
   });
 
   ipc.on("begin_login", (): void => {
@@ -145,6 +150,7 @@ export default function ipcListeners(dispatcher: unknown): void {
     console.log("Explore", arg);
     dispatchAction(dispatcher, SET_LOADING, false);
     dispatchAction(dispatcher, SET_EXPLORE_DATA, arg);
+    dispatchAction(dispatcher, SET_EXPLORE_FILTERS_SKIP, arg.results_number);
   });
 
   ipc.on("settings_updated", (): void => {

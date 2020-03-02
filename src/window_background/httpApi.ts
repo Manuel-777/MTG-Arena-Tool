@@ -200,6 +200,7 @@ function handleAuthResponse(
     appDb.upsert("", "token", "");
     ipcSend("auth", {});
     ipcSend("toggle_login", true);
+    ipcSend("login_failed", true);
     ipcSend("clear_pwd", 1);
     ipcPop({
       text: error?.message,
