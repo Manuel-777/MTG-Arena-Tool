@@ -35,6 +35,7 @@ import { openHomeTab } from "./HomeTab";
 import OfflineSplash from "./OfflineSplash";
 import openDeckSub from "./components/deck-view/DeckVIew";
 import openMatchSub from "./components/match-view/MatchView";
+import openDraftSub from "./components/draft-view/DraftVIew";
 
 function getFilters(id: number): any {
   let filters = {
@@ -103,10 +104,8 @@ export function getOpenSub(
       return openDeckSub(id, data);
     case SUB_MATCH:
       return openMatchSub(id);
-    /*
     case SUB_DRAFT:
       return openDraftSub(id);
-    */
     default:
       break;
   }

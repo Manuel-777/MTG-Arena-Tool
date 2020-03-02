@@ -19,7 +19,8 @@ import ListItemDraft from "./ListItemDraft";
 import {
   DEFAULT_TILE,
   SUB_MATCH,
-  EASING_DEFAULT
+  EASING_DEFAULT,
+  SUB_DRAFT
 } from "../../../shared/constants";
 import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
 import { DbCardData } from "../../../types/Metadata";
@@ -82,6 +83,23 @@ export function ListItemEvent({
         duration: 350
       });
       dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_MATCH, id: id });
+    },
+    [dispatcher]
+  );
+
+  const openDraft = React.useCallback(
+    (id: string | number): void => {
+      anime({
+        targets: ".moving_ux",
+        left: "-100%",
+        easing: EASING_DEFAULT,
+        duration: 350
+      });
+      dispatchAction(dispatcher, SET_SUB_NAV, {
+        type: SUB_DRAFT,
+        id: id,
+        data: null
+      });
     },
     [dispatcher]
   );
