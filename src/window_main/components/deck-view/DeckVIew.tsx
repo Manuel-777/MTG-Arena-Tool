@@ -401,8 +401,11 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
   );
 }
 
-export default function openDeckSub(deckId: string): JSX.Element {
-  const deck = pd.deck(deckId);
-  if (!deck) return <div>{deckId}</div>;
-  return <DeckView deck={deck} />;
+export default function openDeckSub(
+  deckId: string,
+  deck: InternalDeck | null = null
+): JSX.Element {
+  const decklist = deck ?? pd.deck(deckId);
+  if (!decklist) return <div>{deckId}</div>;
+  return <DeckView deck={decklist} />;
 }

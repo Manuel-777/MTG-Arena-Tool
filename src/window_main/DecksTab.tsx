@@ -163,7 +163,11 @@ export function DecksTab({
         easing: EASING_DEFAULT,
         duration: 350
       });
-      dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_DECK, id: id });
+      dispatchAction(dispatcher, SET_SUB_NAV, {
+        type: SUB_DECK,
+        id: id,
+        data: null
+      });
     },
     [dispatcher]
   );

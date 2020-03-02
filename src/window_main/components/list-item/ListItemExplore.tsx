@@ -37,16 +37,17 @@ export interface ExploreDeck {
 
 interface ListItemExploreProps {
   row: ExploreDeck;
-  openCallback: (id: string) => void;
+  openCallback: (row: any) => void;
 }
 
 export function ListItemExplore(props: ListItemExploreProps): JSX.Element {
   const { row, openCallback } = props;
+  const [hover, setHover] = React.useState(false);
+
   const onRowClick = (): void => {
-    openCallback(row._id);
+    openCallback(row);
   };
 
-  const [hover, setHover] = React.useState(false);
   const mouseEnter = React.useCallback(() => {
     setHover(true);
   }, []);

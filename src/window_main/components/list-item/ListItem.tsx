@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { getCardArtCrop } from "../../../shared/util";
 
 interface ListItemProps extends JSX.ElementChildrenAttribute {
@@ -41,15 +41,17 @@ interface HoverTileProps {
 export function HoverTile(props: HoverTileProps): JSX.Element {
   const { hover, grpId } = props;
 
-  return (
-    <div
-      className="list_item_image"
-      style={{
+  const getStyle = useCallback(
+    (hover: boolean) => {
+      return {
         backgroundImage: `url(${getCardArtCrop(grpId)})`,
         ...getHoverStyle(hover)
-      }}
-    ></div>
+      };
+    },
+    [grpId]
   );
+
+  return <div className="list_item_image" style={getStyle(hover)}></div>;
 }
 
 interface ColumnProps extends JSX.ElementChildrenAttribute {

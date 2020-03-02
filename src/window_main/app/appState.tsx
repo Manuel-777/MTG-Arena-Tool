@@ -14,6 +14,7 @@ export interface AppState {
   subNav: {
     type: number;
     id: string;
+    data: any;
   };
   patreon: {
     patreon: boolean;
@@ -68,7 +69,8 @@ export const defaultState: AppState = {
   UX1Scroll: false,
   subNav: {
     type: -1,
-    id: ""
+    id: "",
+    data: null
   },
   patreon: {
     patreon: false,

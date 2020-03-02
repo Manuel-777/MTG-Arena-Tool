@@ -137,6 +137,7 @@ const topNav = (
 export interface SubNavState {
   type: number;
   id: string;
+  data: any;
 }
 
 const subNav = (

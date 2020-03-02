@@ -36,6 +36,7 @@ function App(): JSX.Element {
   const topNav = useSelector((state: AppState) => state.topNav);
   const subNavType = useSelector((state: AppState) => state.subNav.type);
   const subNavId = useSelector((state: AppState) => state.subNav.id);
+  const subNavData = useSelector((state: AppState) => state.subNav.data);
   const authForm = useSelector((state: AppState) => state.loginForm);
   /*
     Set up IPC listeners.
@@ -86,7 +87,7 @@ function App(): JSX.Element {
                   {getOpenNav(topNav, offline)}
                 </div>
                 <div className="ux_item">
-                  {getOpenSub(subNavType, subNavId)}
+                  {getOpenSub(subNavType, subNavId, subNavData)}
                 </div>
                 <div className="ux_item"></div>
               </div>

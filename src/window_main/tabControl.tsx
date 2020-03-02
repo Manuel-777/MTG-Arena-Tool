@@ -93,10 +93,14 @@ export function getOpenNav(tab: number, offline: boolean): JSX.Element {
   return <></>;
 }
 
-export function getOpenSub(subNav: number, id: string): JSX.Element {
+export function getOpenSub(
+  subNav: number,
+  id: string,
+  data?: any
+): JSX.Element {
   switch (subNav) {
     case SUB_DECK:
-      return openDeckSub(id);
+      return openDeckSub(id, data);
     case SUB_MATCH:
       return openMatchSub(id);
     /*

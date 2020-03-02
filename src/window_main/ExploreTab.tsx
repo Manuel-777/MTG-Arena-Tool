@@ -1,3 +1,4 @@
+import anime from "animejs";
 import React, { useCallback, useEffect, useState } from "react";
 import { ipcSend } from "./renderer-util";
 import { useDispatch, useSelector } from "react-redux";
@@ -5,14 +6,20 @@ import {
   dispatchAction,
   SET_LOADING,
   SET_EXPLORE_FILTERS,
-  SET_UX0_SCROLL
+  SET_UX0_SCROLL,
+  SET_SUB_NAV
 } from "./app/reducers";
 import { WrappedReactSelect } from "../shared/ReactSelect";
 import Button from "./components/Button";
 import db from "../shared/database";
 import Checkbox from "./components/Checkbox";
 import Input from "./components/Input";
-import { COLORS_LONG, RANKS } from "../shared/constants";
+import {
+  COLORS_LONG,
+  RANKS,
+  EASING_DEFAULT,
+  SUB_DECK
+} from "../shared/constants";
 import { AppState } from "./app/appState";
 import { ListItemExplore } from "./components/list-item/ListItemExplore";
 
@@ -55,9 +62,29 @@ export function ExploreTab(): JSX.Element {
     dispatchAction(dispatcher, SET_LOADING, true);
   }, [dispatcher, queryFilters]);
 
-  const openRow = (id: string): void => {
-    //
-  };
+  const openRow = useCallback(
+    (row: any): void => {
+      anime({
+        targets: ".moving_ux",
+        left: "-100%",
+        easing: EASING_DEFAULT,
+        duration: 350
+      });
+      const deck = {
+        mainDeck: row.mainDeck,
+        sideboard: row.sideboard,
+        deckTileId: row.tile,
+        name: row.name,
+        id: row._id
+      };
+      dispatchAction(dispatcher, SET_SUB_NAV, {
+        type: SUB_DECK,
+        id: row._id + "_",
+        data: deck
+      });
+    },
+    [dispatcher]
+  );
 
   useEffect(() => {
     if (!exploreData.result) {
