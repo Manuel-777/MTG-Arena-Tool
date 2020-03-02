@@ -10,7 +10,11 @@ import appReducer, {
   dispatchAction
 } from "./reducers";
 
-const store = createStore(appReducer);
+const store = createStore(
+  appReducer,
+  (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
+    (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+);
 
 import { TopNav } from "../components/main/topNav";
 import { getOpenNav, getOpenSub } from "../tabControl";
