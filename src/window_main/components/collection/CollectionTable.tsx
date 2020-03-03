@@ -8,7 +8,7 @@ import {
 } from "../../../shared/constants";
 import db from "../../../shared/database";
 import { createDiv } from "../../../shared/dom-fns";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import {
   ALL_CARDS,
   CollectionStats,

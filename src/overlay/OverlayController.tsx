@@ -9,7 +9,7 @@ import {
   IPC_OVERLAY
 } from "../shared/constants";
 import Deck from "../shared/deck";
-import playerData from "../shared/player-data";
+import playerData from "../shared/PlayerData";
 import { MatchData } from "../types/currentMatch";
 import { DraftData } from "../types/draft";
 import { InternalActionLog } from "../types/log";
@@ -45,7 +45,7 @@ function setOddsCallback(sampleSize: number): void {
 /**
  * This is the React control component at the root of the overlay process.
  * It should handle all of the IPC traffic with other processes and manage all
- * of the data-related state for the overlays (except for player-data, which
+ * of the data-related state for the overlays (except for PlayerData, which
  * still handles "set_player_data").
  *
  * Overlay React hierarchy:

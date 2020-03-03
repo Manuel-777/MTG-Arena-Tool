@@ -18,7 +18,7 @@ import {
   SUB_DRAFT
 } from "../shared/constants";
 
-import pd from "../shared/player-data";
+import pd from "../shared/playerData";
 import Aggregator from "./aggregator";
 import anime from "animejs";
 

@@ -5,7 +5,7 @@ import { TableState } from "react-table";
 import { DATE_SEASON, RANKS, SUB_MATCH, EASING_DEFAULT } from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { getReadableEvent } from "../shared/util";
 import { InternalMatch } from "../types/match";
 import Aggregator, { AggregatorFilters } from "./aggregator";

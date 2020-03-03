@@ -2,7 +2,7 @@
 import React from "react";
 
 import db from "../../../shared/database";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import {
   collectionSortRarity,
   getCardImage,

@@ -2,7 +2,7 @@ import electron from "electron";
 import async from "async";
 
 import { makeId } from "../shared/util";
-import playerData from "../shared/player-data";
+import playerData from "../shared/PlayerData";
 import db from "../shared/database";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 

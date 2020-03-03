@@ -1,6 +1,6 @@
 import React from "react";
 import OwnershipStars from "../../../shared/OwnershipStars";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import { getCardImage } from "../../../shared/util";
 import { TableViewRow } from "../tables/TableViewRow";
 import { CollectionTableRowProps } from "./types";

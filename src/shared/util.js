@@ -5,7 +5,7 @@ import ReactDOM from "react-dom";
 
 import { FORMATS, BLACK, BLUE, GREEN, RED, WHITE } from "./constants";
 import db from "./database";
-import pd from "./player-data";
+import pd from "./PlayerData";
 import { createDiv } from "./dom-fns";
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";

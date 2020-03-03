@@ -57,7 +57,7 @@ export class ElectronStoreDatabase implements LocalDatabase {
         defaults: settingsDefaults
       });
     } else {
-      const playerData = require("../player-data") as any;
+      const playerData = require("../PlayerData") as any;
       this.playerStore = new Store({
         name: dbName,
         defaults: playerData.defaultCfg

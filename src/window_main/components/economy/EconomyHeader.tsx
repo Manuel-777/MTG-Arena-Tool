@@ -1,5 +1,5 @@
 import { formatNumber, formatPercent } from "../../renderer-util";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 
 import { vaultPercentFormat } from "../../economyUtils";
 import EconomyValueRecord from "./EconomyValueRecord";

@@ -2,7 +2,7 @@
 import React, { KeyboardEvent } from "react";
 import { remote } from "electron";
 import { ipcSend, openDialog, closeDialog } from "../../renderer-util";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import { SHORTCUT_NAMES } from "../../../shared/constants";
 import Checkbox from "../Checkbox";
 import Button from "../Button";
@@ -45,7 +45,9 @@ function openKeyCombinationDialog(name: string): void {
   }
 
   okButton.addEventListener("click", function() {
-    pd.settings[name] = $$(".keycomb_desc")[0].innerHTML;
+    ((pd.settings as unknown) as Record<string, string>)[name] = $$(
+      ".keycomb_desc"
+    )[0].innerHTML;
 
     ipcSend("save_user_settings", {
       ...pd.settings
@@ -83,7 +85,7 @@ function ShortcutsRow({
         className={ld + " shortcuts_line"}
         style={{ gridArea: `${index + 2} / 2 / auto / 3` }}
       >
-        {pd.settings[code]}
+        {((pd.settings as unknown) as Record<string, string>)[code]}
       </div>
       <div
         className={ld + " shortcuts_line"}

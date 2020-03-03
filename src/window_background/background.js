@@ -6,7 +6,7 @@ import sha1 from "js-sha1";
 import * as httpApi from "./httpApi";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import { rememberDefaults } from "../shared/db/databaseUtil";
-import playerData from "../shared/player-data";
+import playerData from "../shared/PlayerData";
 import { getReadableFormat } from "../shared/util";
 import { HIDDEN_PW, MAIN_DECKS } from "../shared/constants";
 import { ipc_send, setData, unleakString } from "./backgroundUtil";

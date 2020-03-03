@@ -4,7 +4,7 @@ import { TableViewRowProps } from "../tables/types";
 import { EventTableData } from "../events/types";
 import ManaCost from "../ManaCost";
 import db from "../../../shared/database";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 
 import {
   ListItem,
@@ -65,7 +65,9 @@ export function ListItemEvent({
     ];
   }
 
-  const matchRows = event.stats.matchIds.map(pd.match);
+  const matchRows: InternalMatch[] = event.stats.matchIds
+    .map(pd.match)
+    .filter(match => match !== undefined) as InternalMatch[];
   matchRows.sort((a, b) => {
     if (!a || !b) return 0;
     return compareDesc(new Date(a.date), new Date(b.date));

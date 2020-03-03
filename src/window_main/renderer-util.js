@@ -21,7 +21,7 @@ const byId = id => document.getElementById(id);
 let dialogHandler = null;
 const unmountPoints = [];
 // quick and dirty shared state object for main renderer process
-// (for state shared across processes, use database or player-data)
+// (for state shared across processes, use database or PlayerData)
 const localState = {
   authToken: "",
   collectionTableMode: pd.settings.collectionTableMode,

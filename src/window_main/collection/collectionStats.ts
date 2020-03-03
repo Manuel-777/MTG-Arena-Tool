@@ -1,6 +1,6 @@
 import Colors from "../../shared/colors";
 import db from "../../shared/database";
-import pd from "../../shared/player-data";
+import pd from "../../shared/PlayerData";
 import { getMissingCardCounts } from "../../shared/util";
 
 export const ALL_CARDS = "All cards";
