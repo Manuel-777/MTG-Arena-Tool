@@ -43,20 +43,21 @@ export function ReactSelect(props: ReactSelectProps): JSX.Element {
       </button>
       {optionsOpen && (
         <div className={"select_options_container"}>
-          {props.options
-            .filter(option => option !== currentOption)
-            .map(option => {
-              return (
-                <button
-                  className={"button_reset select_option"}
-                  key={option}
-                  value={option}
-                  onClick={onClickOption}
-                >
-                  {formatterFunc(option)}
-                </button>
-              );
-            })}
+          {props.options.map(option => {
+            return typeof option == "string" && option.startsWith("%%") ? (
+              <div className="select_title">{option.replace("%%", "")}</div>
+            ) : (
+              <button
+                className={"button_reset select_option"}
+                key={option}
+                value={option}
+                disabled={option == currentOption}
+                onClick={onClickOption}
+              >
+                {formatterFunc(option)}
+              </button>
+            );
+          })}
         </div>
       )}
     </>

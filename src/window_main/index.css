@@ -2535,10 +2535,10 @@ a:hover {
     cursor: pointer;
     width: inherit;
     height: 32px;
-    border-radius: 6px;
+    border-radius: 4px;
     background-color: var(--color-mid-20);
     border: 1px solid var(--color-light-50);
-    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    -webkit-transition: all .1s cubic-bezier(0.2, 0.5, 0.35, 1);
     justify-content: space-between;
     align-items: center;
     white-space: nowrap;
@@ -2553,17 +2553,17 @@ a:hover {
     border: 7px solid transparent;
     border-color: var(--color-light) transparent transparent transparent;
     position: absolute;
-    top: 12px;
+    top: 13px;
     right: 8px;
 }
 
-.select_button:hover {
+.select_button:hover:enabled {
     background-color: var(--color-mid-50);
     border: 1px solid var(--color-light);
 }
 
 .select_button:active, .select_button.active {
-    border-radius: 6px 6px 0px 0px;
+    border-radius: 4px 4px 0px 0px;
     border-bottom: 0px;
     background-color: var(--color-mid-50);
 }
@@ -2580,16 +2580,15 @@ a:hover {
     max-height: 384px;
     overflow-y: auto;
     overflow-x: hidden;
-    top: calc(100% + 3px);
+    top: calc(100% + 0px);
     right: 0px;
-    left: 2px;
+    left: 0px;
     z-index: 999;
-    margin: -2px;
-    padding: 0px;
+    border-radius: 0 0 4px 4px;
     background-color: hsla(29, 22%, 30%, 1);
-    border: 1px solid var(--color-light-50);
+    border: 1px solid var(--color-mid);
     border-top: 0px;
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 10px 16px 0px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 6px 8px 4px;
 }
 
 .react-autosuggest__suggestions-list {
@@ -2617,7 +2616,20 @@ a:hover {
     background-color: inherit;
 }
 
+.select_title {
+    white-space: nowrap;
+    background-color: var(--color-back);
+    font-family: var(--main-font-name-bold);
+    opacity: 0.66;
+    height: 33px;
+    font-size: 100%;
+    padding: 0 12px;
+    justify-content: center;
+    line-height: 33px;
+}
+
 .select_option {
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2626,17 +2638,18 @@ a:hover {
     margin: 0;
     height: 33px;
     padding: 0 12px;
-    border-top: 1px solid var(--color-mid-50);
-    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    /*border-top: 1px solid var(--color-mid-50);*/
+    -webkit-transition: all .1s cubic-bezier(0.2, 0.5, 0.35, 1);
     width: 100%;
 }
 
-.select_option:hover, .react-autosuggest__suggestion--highlighted {
-    background: var(--color-light-50);
+.select_option:disabled {
+    background: var(--color-back);
 }
 
-
-
+.select_option:hover:enabled, .react-autosuggest__suggestion--highlighted {
+    background: var(--color-back-40);
+}
 
 .select-hidden {
     display: none;
@@ -2665,7 +2678,7 @@ a:hover {
     background-color: var(--color-mid-20);
     border: 1px solid var(--color-light-50);
     padding: 8px 15px;
-    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    -webkit-transition: all .1s cubic-bezier(0.2, 0.5, 0.35, 1);
 }
 
 .select-styled:after {

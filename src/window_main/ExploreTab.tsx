@@ -191,7 +191,9 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
   const getFilterEvents = useCallback(
     (prevFilters: ExploreQuery = filters): string[] => {
       let newFilters: string[] = [];
+      let sep = true;
       if (prevFilters.filterType === "Events") {
+        sep = false;
         newFilters = db.eventIds
           .concat(db.activeEvents)
           .filter(item => item && !db.single_match_events.includes(item));
@@ -209,12 +211,16 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
       });
 
       const mappedActive = db.activeEvents;
-      newFilters.forEach(item => {
+      newFilters.forEach((item, index: number) => {
         if (mappedActive.includes(item)) {
           newFilters.splice(newFilters.indexOf(item), 1);
           newFilters.unshift(item);
+        } else if (!sep) {
+          sep = true;
+          newFilters.splice(index, 0, "%%Archived");
         }
       });
+      newFilters.splice(0, 0, "%%Active");
       setEventFilters(newFilters);
       return newFilters;
     },
@@ -241,7 +247,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
         <WrappedReactSelect
           options={eventFilters}
           key={filters.filterType}
-          current={eventFilters[0]}
+          current={eventFilters[1]}
           optionFormatter={getEventPrettyName}
           callback={(filter: string): void =>
             updateFilters({ ...filters, filterEvent: filter })

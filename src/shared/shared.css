@@ -37,7 +37,11 @@
   --color-mid-66: rgba(145, 121, 97, 0.66);
   --color-mid-75: rgba(145, 121, 97, 0.75);
 
+  --color-back-100: rgba(51, 40, 30, 1);
   --color-back: rgba(51, 40, 30, 0.75);
+  --color-back-50: rgba(51, 40, 30, 0.5);
+  --color-back-40: rgba(51, 40, 30, 0.4);
+  --color-back-20: rgba(51, 40, 30, 0.2);
 }
 
 html {
@@ -142,18 +146,17 @@ label {
 
 
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #33281E;
-    border-radius: 10px;
-    margin-top: 8px;
+    border-radius: 8px;
+    margin-top: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: #917961;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -166,7 +169,6 @@ label {
 }
 
 .tiny_scroll::-webkit-scrollbar-track {
-    background: #33281E;
     border-radius: 2px;
     margin-left: 2px;
 }
