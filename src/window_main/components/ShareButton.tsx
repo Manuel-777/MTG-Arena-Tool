@@ -1,5 +1,5 @@
 import React from "react";
-import pd from "../../shared/player-data";
+import pd from "../../shared/PlayerData";
 import { createShareDialog } from "../createShareButton";
 import { draftShareLink, deckShareLink, logShareLink } from "../renderer-util";
 

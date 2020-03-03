@@ -2,7 +2,7 @@ import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import EconomyTable from "./components/economy/EconomyTable";
 import { TransactionData } from "./components/economy/types";
 import { getPrettyContext } from "./economyUtils";

@@ -2,7 +2,7 @@
 import React from "react";
 import Checkbox from "../Checkbox";
 import Input from "../Input";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
 
 function clickBetaChannel(value: boolean): void {

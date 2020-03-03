@@ -12,7 +12,7 @@ import {
   useTable,
   IdType
 } from "react-table";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { getLocalState, setLocalState } from "../../renderer-util";
 import {

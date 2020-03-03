@@ -4,7 +4,7 @@ import React from "react";
 import { TableState } from "react-table";
 import { EASING_DEFAULT } from "../shared/constants";
 import { createDiv } from "../shared/dom-fns";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { InternalDeck } from "../types/Deck";
 import {
   getBoosterCountEstimate,

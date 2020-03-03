@@ -2,7 +2,7 @@
 import React from "react";
 import Button from "../Button";
 import { ipcSend } from "../../renderer-util";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import Checkbox from "../Checkbox";
 import Slider from "../Slider";
 import _ from "lodash";

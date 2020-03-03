@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import { remote } from "electron";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
 import Button from "../Button";
 

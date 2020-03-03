@@ -35,7 +35,7 @@ import {
   SETTINGS_OVERLAY
 } from "../shared/constants";
 
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { createDiv, queryElements as $$ } from "../shared/dom-fns";
 
 import {

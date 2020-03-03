@@ -1,5 +1,5 @@
 import React from "react";
-import pd from "../../shared/player-data";
+import pd from "../../shared/PlayerData";
 import {
   get_deck_missing as getDeckMissing,
   getBoosterCountEstimate
@@ -46,6 +46,7 @@ export default function WildcardsCost(props: {
             if (missing) {
               return (
                 <div
+                  key={key}
                   className={"wc_explore_cost wc_" + cardRarity}
                   title={_.capitalize(cardRarity) + " wildcards needed."}
                 >

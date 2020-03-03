@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { queryElements as $$ } from "../shared/dom-fns";
 import { clickNav } from "./tabControl";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 
 import { get_rank_index as getRankIndex, formatRank } from "../shared/util";
 

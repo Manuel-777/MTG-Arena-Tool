@@ -4,7 +4,7 @@ import { remote, shell } from "electron";
 const { dialog } = remote;
 import Checkbox from "../Checkbox";
 import Input from "../Input";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
@@ -237,7 +237,7 @@ export default function SectionData(): JSX.Element {
           Last log timestamp: <b>{pd.last_log_timestamp}</b>
         </p>
         <p>
-          Last format used: <b>{pd.settings.last_log_format}</b>
+          Last format used: <b>{pd.last_log_format}</b>
         </p>
       </div>
       <div className="settings_title">Local Data</div>

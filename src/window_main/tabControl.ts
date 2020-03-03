@@ -16,7 +16,7 @@ import {
 } from "../shared/constants";
 
 import { updateTopBar } from "./topNav";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "./aggregator";
 import anime from "animejs";
 

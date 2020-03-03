@@ -4,7 +4,7 @@ import { TableViewRowProps } from "../tables/types";
 import { EventTableData } from "../events/types";
 import ManaCost from "../ManaCost";
 import db from "../../../shared/database";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 
 import {
   ListItem,
@@ -23,6 +23,7 @@ import RoundCard from "../RoundCard";
 import { compareDesc } from "date-fns";
 import { openMatch } from "../../match-details";
 import { openDraft } from "../../draft-details";
+import { InternalMatch } from "../../../types/match";
 
 export function ListItemEvent({
   row
@@ -60,7 +61,9 @@ export function ListItemEvent({
     ];
   }
 
-  const matchRows = event.stats.matchIds.map(pd.match);
+  const matchRows: InternalMatch[] = event.stats.matchIds
+    .map(pd.match)
+    .filter(match => match !== undefined) as InternalMatch[];
   matchRows.sort((a, b) => {
     if (!a || !b) return 0;
     return compareDesc(new Date(a.date), new Date(b.date));

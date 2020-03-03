@@ -2,7 +2,7 @@ import format from "date-fns/format";
 import _ from "lodash";
 import React from "react";
 import { HeaderProps } from "react-table";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/PlayerData";
 import {
   formatPercent,
   formatWinrateInterval,
@@ -80,7 +80,10 @@ export function BoosterNeededHeader(): JSX.Element {
 export function WildcardCell({ cell }: DecksTableCellProps): JSX.Element {
   const rarity = cell.column.id;
   const value = cell.value;
-  const owned = pd.economy["wc" + _.capitalize(rarity)] ?? 0;
+  const owned =
+    ((pd.economy as unknown) as Record<string, number>)[
+      "wc" + _.capitalize(rarity)
+    ] ?? 0;
   return (
     <MetricText title={_.capitalize(rarity) + " wildcards (owned/needed)"}>
       <RaritySymbol rarity={rarity} /> {owned + "/" + value}

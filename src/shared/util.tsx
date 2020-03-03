@@ -27,7 +27,7 @@ import Deck from "./deck";
 import DeckManaCurve from "./DeckManaCurve";
 import DeckTypesStats from "./DeckTypesStats";
 import { createDiv } from "./dom-fns";
-import pd from "./player-data";
+import pd from "./PlayerData";
 
 const NO_IMG_URL = "../images/notfound.png";
 

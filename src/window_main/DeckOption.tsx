@@ -1,6 +1,6 @@
 import React from "react";
 import { getRecentDeckName } from "../shared/util";
-import pd from "../shared/player-data";
+import pd from "../shared/PlayerData";
 import { COLORS_ALL } from "../shared/constants";
 
 export interface DeckOptionDeck {
