@@ -1,7 +1,6 @@
 import { CARD_RARITIES } from "../../shared/constants";
 import db from "../../shared/database";
 import { createDiv } from "../../shared/dom-fns";
-import { addCardHover } from "../../shared/cardHover";
 import {
   MULTI,
   COLORLESS,
@@ -13,11 +12,13 @@ import {
 } from "../../shared/constants";
 
 import { CardStats } from "./collectionStats";
+import { dispatchAction, SET_HOVER_IN, SET_HOVER_OUT } from "../app/reducers";
 
 export default function createHeatMap(
   container: HTMLElement,
   cardData: { [key: string]: CardStats[] }[],
-  setName: string
+  setName: string,
+  dispatcher: any
 ): void {
   const label = document.createElement("label");
   const iconSvg = db.sets[setName]?.svg ?? db.defaultSet?.svg;
@@ -79,7 +80,6 @@ export default function createHeatMap(
         const cardsArray = cardData[color + 1][rarity];
         if (cardsArray) {
           cardsArray.forEach((card, index) => {
-            const dbCard = db.card(card.id);
             const classes = ["completion_table_card", "n" + card.owned];
             if (card.wanted > 0) classes.push("wanted");
             const cell = createDiv(classes, String(card.owned));
@@ -88,7 +88,12 @@ export default function createHeatMap(
               rarityIndex} / auto / ${color * 5 + 1 + rarityIndex}`;
             table.appendChild(cell);
 
-            addCardHover(cell, dbCard);
+            cell.addEventListener("mouseover", () => {
+              dispatchAction(dispatcher, SET_HOVER_IN, card.id);
+            });
+            cell.addEventListener("mouseleave", () => {
+              dispatchAction(dispatcher, SET_HOVER_OUT, card.id);
+            });
           });
         }
       }

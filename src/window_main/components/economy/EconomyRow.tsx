@@ -9,7 +9,6 @@ import {
   openScryfallCard,
   getCardArtCrop
 } from "../../../shared/util";
-import { addCardHover } from "../../../shared/cardHover";
 import LocalTime from "../../../shared/time-components/LocalTime";
 import { DbCardData } from "../../../types/Metadata";
 
@@ -25,6 +24,7 @@ import {
 } from "../../economyUtils";
 
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
+import useHoverCard from "../../hooks/useHoverCard";
 
 function EconomyRowDate(date: Date): JSX.Element {
   return (
@@ -453,25 +453,21 @@ interface InventoryCardProps {
 
 function InventoryCard(props: InventoryCardProps): JSX.Element {
   const { card, isAetherized, quantity } = props;
-  const inventoryCardRef = React.useRef<HTMLDivElement>(null);
   const onCardClick = React.useCallback(() => {
     const lookupCard = db.card(card?.dfcId) ?? card;
     openScryfallCard(lookupCard);
   }, [card]);
   // inventoryCard.style.width = "39px";
 
-  React.useEffect(() => {
-    if (inventoryCardRef) {
-      addCardHover(inventoryCardRef.current as HTMLElement, card);
-    }
-  });
+  const [hoverIn, hoverOut] = useHoverCard(card?.id || 0);
 
   const tooltip = isAetherized
     ? computeAetherizedTooltip(card, quantity)
     : card?.name ?? "";
   return (
     <div
-      ref={inventoryCardRef}
+      onMouseEnter={hoverIn}
+      onMouseLeave={hoverOut}
       className={"inventory_card small"}
       onClick={onCardClick}
     >

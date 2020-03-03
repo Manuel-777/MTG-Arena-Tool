@@ -51,15 +51,20 @@ import {
   CollectionTableControlsProps,
   CollectionTableProps
 } from "./types";
+import { useDispatch } from "react-redux";
 
 const legacyModes = [COLLECTION_CHART_MODE, COLLECTION_SETS_MODE];
 
-function renderHeatMaps(container: HTMLElement, stats: CollectionStats): void {
+function renderHeatMaps(
+  container: HTMLElement,
+  stats: CollectionStats,
+  dispatcher: any
+): void {
   const chartContainer = createDiv(["main_stats"]);
   db.sortedSetCodes.forEach(set => {
     const cardData = stats[set].cards;
     if (cardData.length > 0) {
-      createHeatMap(chartContainer, cardData, set);
+      createHeatMap(chartContainer, cardData, set, dispatcher);
     }
   });
   container.appendChild(chartContainer);
@@ -68,13 +73,14 @@ function renderHeatMaps(container: HTMLElement, stats: CollectionStats): void {
 function updateLegacyViews(
   container: HTMLElement,
   stats: CollectionStats,
-  displayMode: string
+  displayMode: string,
+  dispatcher: any
 ): void {
   if (displayMode !== COLLECTION_CHART_MODE) {
     return;
   }
   container.innerHTML = "";
-  renderHeatMaps(container, stats);
+  renderHeatMaps(container, stats, dispatcher);
 }
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
@@ -302,7 +308,7 @@ export default function CollectionTable({
     setFilter,
     toggleHideColumn
   } = table;
-
+  const dispatcher = useDispatch();
   const legacyContainerRef = React.useRef<HTMLDivElement>(null);
   const setClickCallback = React.useCallback(
     (set: string) => {
@@ -316,9 +322,14 @@ export default function CollectionTable({
   const stats = getCollectionStats(cardIds);
   React.useEffect(() => {
     if (legacyContainerRef?.current) {
-      updateLegacyViews(legacyContainerRef.current, stats, tableMode);
+      updateLegacyViews(
+        legacyContainerRef.current,
+        stats,
+        tableMode,
+        dispatcher
+      );
     }
-  }, [tableMode, stats, legacyContainerRef]);
+  }, [tableMode, stats, legacyContainerRef, dispatcher]);
 
   const boosterMath =
     isBoosterMathValid(table.state.filters) &&

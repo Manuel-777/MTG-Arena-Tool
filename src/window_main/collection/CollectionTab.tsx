@@ -1,7 +1,6 @@
 import { remote } from "electron";
 import React from "react";
 import { TableState } from "react-table";
-import { addCardHover } from "../../shared/cardHover";
 import Colors from "../../shared/colors";
 import { DRAFT_RANKS } from "../../shared/constants";
 import db from "../../shared/database";
@@ -125,7 +124,6 @@ export function CollectionTab(): JSX.Element {
     <CollectionTable
       cachedState={collectionTableState}
       cachedTableMode={collectionTableMode}
-      cardHoverCallback={addCardHover}
       contextMenuCallback={addCardMenu}
       data={data}
       exportCallback={exportCards}
