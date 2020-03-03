@@ -13,6 +13,7 @@ main.sublime-project
 /.vs
 /.pnp
 .pnp.js
+/.idea/
 
 # testing
 /coverage
