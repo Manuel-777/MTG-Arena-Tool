@@ -26,7 +26,8 @@ import {
   OVERLAY_LOG,
   OVERLAY_SEEN,
   RED,
-  WHITE
+  WHITE,
+  MAIN_HOME
 } from "./constants";
 import db from "./database";
 import { MergedSettings } from "../types/settings";
@@ -85,6 +86,7 @@ const defaultCfg = {
   cards: { cards_time: 0, cards_before: {}, cards: {} },
   cardsNew: {},
   settings: {
+    last_open_tab: MAIN_HOME,
     last_settings_section: 1,
     last_settings_overlay_section: 0,
     sound_priority: false,

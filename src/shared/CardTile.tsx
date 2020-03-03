@@ -385,7 +385,7 @@ export default function CardTile(props: CardTileProps): JSX.Element {
   if (!card || quantity === 0) {
     return <></>;
   }
-  if (parseInt(pd.settings.card_tile_style) === CARD_TILE_FLAT) {
+  if (parseInt(pd.settings.card_tile_style + "") === CARD_TILE_FLAT) {
     return FlatCardTile(props);
   }
   return ArenaCardTile(props);

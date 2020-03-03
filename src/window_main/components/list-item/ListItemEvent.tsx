@@ -28,6 +28,7 @@ import RoundCard from "../RoundCard";
 import { compareDesc } from "date-fns";
 import { useDispatch } from "react-redux";
 import { dispatchAction, SET_SUB_NAV } from "../../app/reducers";
+import { InternalMatch } from "../../../types/match";
 
 export function ListItemEvent({
   row
