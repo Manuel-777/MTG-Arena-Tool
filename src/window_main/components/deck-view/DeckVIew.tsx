@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import anime from "animejs";
 import { InternalDeck, CardObject } from "../../../types/Deck";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/playerData";
 import ManaCost from "../ManaCost";
 import { EASING_DEFAULT, MANA_COLORS } from "../../../shared/constants";
 import DeckList from "../DeckList";

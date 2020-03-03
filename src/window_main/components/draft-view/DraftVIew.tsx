@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import anime from "animejs";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/playerData";
 import Slider from "../Slider";
 import DeckList from "../DeckList";
 import Deck from "../../../shared/deck";

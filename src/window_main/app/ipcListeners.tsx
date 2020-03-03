@@ -32,7 +32,7 @@ import {
 } from "../../shared/constants";
 import { ipcSend } from "../renderer-util";
 import { SETTINGS_ABOUT } from "../../shared/constants";
-import pd from "../../shared/player-data";
+import pd from "../../shared/playerData";
 import db from "../../shared/database";
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 

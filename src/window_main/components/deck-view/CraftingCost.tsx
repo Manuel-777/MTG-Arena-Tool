@@ -5,7 +5,7 @@ import {
   get_deck_missing,
   getBoosterCountEstimate
 } from "../../../shared/util";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/playerData";
 
 interface CraftingCostProps {
   deck: Deck;

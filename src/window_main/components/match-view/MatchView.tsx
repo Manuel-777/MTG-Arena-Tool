@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import anime from "animejs";
 import { InternalMatch, InternalPlayer } from "../../../types/match";
-import pd from "../../../shared/player-data";
+import pd from "../../../shared/playerData";
 import { EASING_DEFAULT } from "../../../shared/constants";
 import ShareButton from "../ShareButton";
 import ManaCost from "../ManaCost";
