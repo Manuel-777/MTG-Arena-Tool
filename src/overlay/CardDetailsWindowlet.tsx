@@ -8,8 +8,6 @@ import { DbCardData } from "../types/Metadata";
 import { SettingsData } from "../types/settings";
 import { getEditModeClass, useEditModeOnRef } from "./overlayUtil";
 
-const NO_IMG_URL = "./images/nocard.png";
-
 function GroupedLandsDetails(props: { odds: Chances }): JSX.Element {
   const { landW, landU, landB, landR, landG } = props.odds;
   const manaChanceDiv = function(value: number, color: string): JSX.Element {
@@ -69,16 +67,10 @@ export default function CardDetailsWindowlet(
   // TODO remove group lands hack
   const isCardGroupedLands = card?.id === 100 && odds;
   // TODO support split cards
-  let name = "";
-  let images = {};
-  if (card !== undefined) {
-    name = card.name;
-    images = card.images;
-  }
   const imgProps = {
-    alt: name,
+    alt: card?.name ?? "",
     className: "main_hover",
-    src: images && card ? getCardImage(card) : NO_IMG_URL,
+    src: getCardImage(card),
     style: {
       width: cardsSizeHoverCard + "px",
       height: cardsSizeHoverCard / SCALAR + "px"
