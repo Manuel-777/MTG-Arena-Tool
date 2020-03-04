@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import fs from "fs";
 import path from "path";
-import anime from "animejs";
 import { InternalMatch, InternalPlayer } from "../../../types/match";
 import pd from "../../../shared/playerData";
-import { EASING_DEFAULT } from "../../../shared/constants";
 import ShareButton from "../ShareButton";
 import ManaCost from "../ManaCost";
 import Deck from "../../../shared/deck";
@@ -16,6 +14,7 @@ import db from "../../../shared/database";
 import CardList from "../CardList";
 import CardsList from "../../../shared/cardsList";
 import ActionLog from "./ActionLog";
+import uxMove from "../../uxMove";
 
 interface MatchViewProps {
   match: InternalMatch;
@@ -40,12 +39,7 @@ export function MatchView(props: MatchViewProps): JSX.Element {
   }
 
   const goBack = (): void => {
-    anime({
-      targets: ".moving_ux",
-      left: 0,
-      easing: EASING_DEFAULT,
-      duration: 350
-    });
+    uxMove(0);
   };
 
   const openActionLog = (): void => {

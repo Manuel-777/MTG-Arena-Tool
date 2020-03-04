@@ -1,4 +1,3 @@
-import anime from "animejs";
 import React, { useCallback, useEffect, useState } from "react";
 import { ipcSend } from "./renderer-util";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,11 +16,11 @@ import Input from "./components/Input";
 import {
   COLORS_LONG,
   RANKS,
-  EASING_DEFAULT,
   SUB_DECK
 } from "../shared/constants";
 import { AppState } from "./app/appState";
 import { ListItemExplore } from "./components/list-item/ListItemExplore";
+import uxMove from "./uxMove";
 
 export interface ExploreQuery {
   filterWCC: string;
@@ -64,12 +63,7 @@ export function ExploreTab(): JSX.Element {
 
   const openRow = useCallback(
     (row: any): void => {
-      anime({
-        targets: ".moving_ux",
-        left: "-100%",
-        easing: EASING_DEFAULT,
-        duration: 350
-      });
+      uxMove(-100);
       const deck = {
         mainDeck: row.mainDeck,
         sideboard: row.sideboard,

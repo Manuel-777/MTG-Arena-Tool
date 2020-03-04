@@ -1,5 +1,4 @@
 import React from "react";
-import anime from "animejs";
 import { TableViewRowProps } from "../tables/types";
 import { EventTableData } from "../events/types";
 import ManaCost from "../ManaCost";
@@ -19,7 +18,6 @@ import ListItemDraft from "./ListItemDraft";
 import {
   DEFAULT_TILE,
   SUB_MATCH,
-  EASING_DEFAULT,
   SUB_DRAFT
 } from "../../../shared/constants";
 import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
@@ -29,6 +27,7 @@ import { compareDesc } from "date-fns";
 import { useDispatch } from "react-redux";
 import { dispatchAction, SET_SUB_NAV } from "../../app/reducers";
 import { InternalMatch } from "../../../types/match";
+import uxMove from "../../uxMove";
 
 export function ListItemEvent({
   row
@@ -79,12 +78,7 @@ export function ListItemEvent({
 
   const openMatch = React.useCallback(
     (id: string | number): void => {
-      anime({
-        targets: ".moving_ux",
-        left: "-100%",
-        easing: EASING_DEFAULT,
-        duration: 350
-      });
+      uxMove(-100);
       dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_MATCH, id: id });
     },
     [dispatcher]
@@ -92,12 +86,7 @@ export function ListItemEvent({
 
   const openDraft = React.useCallback(
     (id: string | number): void => {
-      anime({
-        targets: ".moving_ux",
-        left: "-100%",
-        easing: EASING_DEFAULT,
-        duration: 350
-      });
+      uxMove(-100);
       dispatchAction(dispatcher, SET_SUB_NAV, {
         type: SUB_DRAFT,
         id: id,

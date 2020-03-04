@@ -1,12 +1,10 @@
 import isValid from "date-fns/isValid";
-import anime from "animejs";
 import React from "react";
 import { TableState } from "react-table";
 import {
   DATE_SEASON,
   RANKS,
-  SUB_MATCH,
-  EASING_DEFAULT
+  SUB_MATCH
 } from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
@@ -32,6 +30,7 @@ import {
 import StatsPanel from "./stats-panel";
 import { useDispatch } from "react-redux";
 import { dispatchAction, SET_SUB_NAV } from "./app/reducers";
+import uxMove from "./uxMove";
 
 const { DEFAULT_ARCH, NO_ARCH, RANKED_CONST, RANKED_DRAFT } = Aggregator;
 const tagPrompt = "Set archetype";
@@ -307,12 +306,7 @@ export function MatchesTab({
   });
   const openMatchDetails = React.useCallback(
     (id: string | number): void => {
-      anime({
-        targets: ".moving_ux",
-        left: "-100%",
-        easing: EASING_DEFAULT,
-        duration: 350
-      });
+      uxMove(-100);
       dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_MATCH, id: id });
     },
     [dispatcher]

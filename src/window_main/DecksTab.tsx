@@ -1,8 +1,7 @@
-import anime from "animejs";
 import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
-import { EASING_DEFAULT, SUB_DECK } from "../shared/constants";
+import { SUB_DECK } from "../shared/constants";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/PlayerData";
 import { InternalDeck } from "../types/Deck";
@@ -28,6 +27,7 @@ import StatsPanel from "./stats-panel";
 import { dispatchAction, SET_SUB_NAV } from "./app/reducers";
 import { useDispatch } from "react-redux";
 import Deck from "../shared/deck";
+import uxMove from "./uxMove";
 
 function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);
@@ -158,12 +158,7 @@ export function DecksTab({
   });
   const openDeckCallback = React.useCallback(
     (id: string | number): void => {
-      anime({
-        targets: ".moving_ux",
-        left: "-100%",
-        easing: EASING_DEFAULT,
-        duration: 350
-      });
+      uxMove(-100);
       dispatchAction(dispatcher, SET_SUB_NAV, {
         type: SUB_DECK,
         id: id,

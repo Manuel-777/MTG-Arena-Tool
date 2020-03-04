@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define, @typescript-eslint/camelcase */
-import anime from "animejs";
 import { app, ipcRenderer as ipc, remote } from "electron";
 import fs from "fs";
 import _ from "lodash";
 import path from "path";
 import Pikaday from "pikaday";
 import Picker from "vanilla-picker";
-import { EASING_DEFAULT, IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
+import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
 import {
   createDiv,
   createInput,
@@ -124,13 +123,6 @@ function openDialog(content, onClose = () => {}) {
   };
   wrapper.style.pointerEvents = "all";
   wrapper.addEventListener("mousedown", dialogHandler);
-  anime({
-    targets: ".dialog_wrapper",
-    opacity: 1,
-    display: "block",
-    easing: EASING_DEFAULT,
-    duration: 150
-  });
 
   const dialog = $$(".dialog")[0];
   dialog.innerHTML = "";
@@ -140,34 +132,15 @@ function openDialog(content, onClose = () => {}) {
   dialog.style.width = content.offsetWidth + 32 + "px";
   // dialog.style.height = content.offsetHeight + 32 + "px";
   dialog.style.top = `calc(50% - ${halfHeight}px)`;
-  anime({
-    targets: ".dialog",
-    opacity: 1,
-    easing: EASING_DEFAULT,
-    duration: 250
-  });
 }
 
 function closeDialog() {
   const wrapper = $$(".dialog_wrapper")[0];
-  anime({
-    targets: ".dialog_wrapper",
-    opacity: 0,
-    display: "hidden",
-    easing: EASING_DEFAULT,
-    duration: 150
-  });
   wrapper.style.pointerEvents = "none";
   wrapper.removeEventListener("mousedown", dialogHandler);
   dialogHandler = null;
 
   const dialog = $$(".dialog")[0];
-  anime({
-    targets: ".dialog",
-    opacity: 0,
-    easing: EASING_DEFAULT,
-    duration: 250
-  });
   setTimeout(() => (dialog.innerHTML = ""), 250);
 }
 

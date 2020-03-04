@@ -1,13 +1,13 @@
 import React, { useCallback } from "react";
-import anime from "animejs";
 import pd from "../../../shared/playerData";
 import Slider from "../Slider";
 import DeckList from "../DeckList";
 import Deck from "../../../shared/deck";
 import { getCardImage } from "../../../shared/util";
-import { EASING_DEFAULT, PACK_SIZES } from "../../../shared/constants";
+import { PACK_SIZES } from "../../../shared/constants";
 import useHoverCard from "../../hooks/useHoverCard";
 import { DraftData } from "../../../types/draft";
+import uxMove from "../../uxMove";
 
 interface PickPack {
   pack: number;
@@ -64,12 +64,7 @@ export function DraftView(props: DraftViewProps): JSX.Element {
   const [pickpack, setPickPack] = React.useState({ pick: 0, pack: 0 });
 
   const goBack = (): void => {
-    anime({
-      targets: ".moving_ux",
-      left: 0,
-      easing: EASING_DEFAULT,
-      duration: 350
-    });
+    uxMove(0);
   };
 
   const onSliderChange = useCallback(

@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import anime from "animejs";
 import { InternalDeck, CardObject } from "../../../types/Deck";
 import pd from "../../../shared/playerData";
 import ManaCost from "../ManaCost";
-import { EASING_DEFAULT, MANA_COLORS } from "../../../shared/constants";
+import { MANA_COLORS } from "../../../shared/constants";
 import DeckList from "../DeckList";
 import DeckTypesStats from "../../../shared/DeckTypesStats";
 import DeckManaCurve from "../../../shared/DeckManaCurve";
@@ -21,6 +20,7 @@ import db from "../../../shared/database";
 import ShareButton from "../ShareButton";
 import CraftingCost from "./CraftingCost";
 import { getCardImage } from "../../../shared/util";
+import uxMove from "../../uxMove";
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;
@@ -135,12 +135,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const dispatcher = useDispatch();
 
   const goBack = (): void => {
-    anime({
-      targets: ".moving_ux",
-      left: 0,
-      easing: EASING_DEFAULT,
-      duration: 350
-    });
+    uxMove(0);
   };
 
   const visualView = (): void => {

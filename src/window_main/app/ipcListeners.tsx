@@ -34,6 +34,7 @@ import { ipcSend } from "../renderer-util";
 import { SETTINGS_ABOUT } from "../../shared/constants";
 import pd from "../../shared/playerData";
 import db from "../../shared/database";
+import uxMove from "../uxMove";
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 export default function ipcListeners(dispatcher: unknown): void {
@@ -119,6 +120,7 @@ export default function ipcListeners(dispatcher: unknown): void {
   });
 
   ipc.on("force_open_settings", (): void => {
+    uxMove(0);
     dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
     ipcSend("save_user_settings", {
       last_open_tab: MAIN_SETTINGS
@@ -126,6 +128,7 @@ export default function ipcListeners(dispatcher: unknown): void {
   });
 
   ipc.on("force_open_overlay_settings", (event: string, arg: number): void => {
+    uxMove(0);
     dispatchAction(dispatcher, SET_TOP_NAV, SETTINGS_OVERLAY);
     ipcSend("save_user_settings", {
       last_open_tab: SETTINGS_OVERLAY,
@@ -134,6 +137,7 @@ export default function ipcListeners(dispatcher: unknown): void {
   });
 
   ipc.on("force_open_about", (): void => {
+    uxMove(0);
     dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
     ipcSend("save_user_settings", {
       last_open_tab: MAIN_SETTINGS,

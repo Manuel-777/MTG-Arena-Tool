@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import {
-  EASING_DEFAULT,
   DATE_SEASON,
   MAIN_HOME,
   MAIN_DECKS,
@@ -20,7 +19,6 @@ import {
 
 import pd from "../shared/playerData";
 import Aggregator from "./aggregator";
-import anime from "animejs";
 
 import { ipcSend } from "./renderer-util";
 
@@ -36,6 +34,7 @@ import OfflineSplash from "./OfflineSplash";
 import openDeckSub from "./components/deck-view/DeckVIew";
 import openMatchSub from "./components/match-view/MatchView";
 import openDraftSub from "./components/draft-view/DraftVIew";
+import uxMove from "./uxMove";
 
 function getFilters(id: number): any {
   let filters = {
@@ -115,13 +114,7 @@ export function getOpenSub(
 
 export function clickNav(id: number): void {
   document.body.style.cursor = "auto";
-  anime({
-    targets: ".moving_ux",
-    left: 0,
-    easing: EASING_DEFAULT,
-    duration: 350
-  });
-
+  uxMove(0);
   const { sidebarActive, filters } = getFilters(id);
 
   ipcSend("save_user_settings", {
@@ -132,12 +125,14 @@ export function clickNav(id: number): void {
 }
 
 export function forceOpenAbout(): void {
+  uxMove(0);
   ipcSend("save_user_settings", {
     last_open_tab: MAIN_SETTINGS
   });
 }
 
 export function forceOpenSettings(section = -1): void {
+  uxMove(0);
   if (section == -1) {
     ipcSend("save_user_settings", {
       last_open_tab: MAIN_SETTINGS
