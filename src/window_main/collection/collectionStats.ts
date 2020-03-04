@@ -2,6 +2,7 @@ import Colors from "../../shared/colors";
 import db from "../../shared/database";
 import pd from "../../shared/PlayerData";
 import { getMissingCardCounts } from "../../shared/util";
+import Deck from "../../shared/deck";
 
 export const ALL_CARDS = "All cards";
 export const SINGLETONS = "Singletons (at least one)";
@@ -114,7 +115,7 @@ export function getCollectionStats(
   pd.deckList
     .filter(deck => deck && !deck.archived)
     .forEach(deck => {
-      const missing = getMissingCardCounts(deck);
+      const missing = getMissingCardCounts(new Deck(deck));
       Object.entries(missing).forEach(([grpid, count]) => {
         wantedCards[grpid] = Math.max(wantedCards[grpid] ?? 0, count);
       });

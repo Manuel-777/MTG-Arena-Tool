@@ -18,6 +18,7 @@ import {
   FlexBottom,
   ArchiveButton
 } from "./ListItem";
+import Deck from "../../../shared/deck";
 
 export function ListItemDeck({
   row,
@@ -29,6 +30,7 @@ export function ListItemDeck({
   deleteTagCallback
 }: DecksTableRowProps): JSX.Element {
   const deck = row.original;
+  const deckObj = new Deck(deck);
   const parentId = deck.id ?? "";
 
   const onRowClick = (): void => {
@@ -153,7 +155,7 @@ export function ListItemDeck({
             </FlexBottom>
           </>
         ) : (
-          <WildcardsCost deck={deck} />
+          <WildcardsCost deck={deckObj} />
         )}
       </Column>
       {!!deck.custom && (

@@ -645,4 +645,3 @@ export function httpSyncRequest(data: SyncRequestData): void {
     })
   );
 }
-

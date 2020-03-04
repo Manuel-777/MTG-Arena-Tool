@@ -171,11 +171,10 @@ class Deck {
     if (countMainboard) {
       this.mainboard.get().forEach(cardObj => {
         let grpid = cardObj.id;
-        let quantity = cardObj.quantity;
         let card = db.card(grpid);
         if (card !== undefined) {
           let rarity = card.rarity;
-          let add = get_wc_missing(this.getSave(), grpid, false);
+          let add = get_wc_missing(this, grpid, false);
           missing[rarity] += add;
         }
       });
@@ -184,11 +183,10 @@ class Deck {
     if (countSideboard) {
       this.sideboard.get().forEach(cardObj => {
         let grpid = cardObj.id;
-        let quantity = cardObj.quantity;
         let card = db.card(grpid);
         if (card !== undefined) {
           let rarity = card.rarity;
-          let add = get_wc_missing(this.getSave(), grpid, true);
+          let add = get_wc_missing(this, grpid, false);
           missing[rarity] += add;
         }
       });

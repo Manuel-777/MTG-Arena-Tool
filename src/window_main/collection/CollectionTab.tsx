@@ -16,6 +16,7 @@ import { CardsData } from "../components/collection/types";
 
 import { ipcSend } from "../renderer-util";
 import { CardCounts } from "../components/decks/types";
+import Deck from "../../shared/deck";
 
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
@@ -87,7 +88,7 @@ function getCollectionData(): CardsData[] {
   pd.deckList
     .filter(deck => deck && !deck.archived)
     .forEach(deck => {
-      const missing = getMissingCardCounts(deck);
+      const missing = getMissingCardCounts(new Deck(deck));
       Object.entries(missing).forEach(([grpid, count]) => {
         wantedCards[grpid] = Math.max(wantedCards[grpid] ?? 0, count);
       });

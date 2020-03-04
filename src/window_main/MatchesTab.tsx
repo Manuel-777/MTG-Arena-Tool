@@ -2,7 +2,12 @@ import isValid from "date-fns/isValid";
 import anime from "animejs";
 import React from "react";
 import { TableState } from "react-table";
-import { DATE_SEASON, RANKS, SUB_MATCH, EASING_DEFAULT } from "../shared/constants";
+import {
+  DATE_SEASON,
+  RANKS,
+  SUB_MATCH,
+  EASING_DEFAULT
+} from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/PlayerData";

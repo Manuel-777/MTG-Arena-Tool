@@ -23,7 +23,7 @@ export default function CraftingCost(props: CraftingCostProps): JSX.Element {
     mythic: pd.economy.wcMythic
   };
   // Another deck.getSave() conversion here..
-  const missingWildcards: IndexableObject = get_deck_missing(deck.getSave());
+  const missingWildcards: any = get_deck_missing(deck);
   const boosterCost = getBoosterCountEstimate(missingWildcards);
 
   return (

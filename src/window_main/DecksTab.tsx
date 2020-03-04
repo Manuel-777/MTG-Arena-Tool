@@ -27,6 +27,7 @@ import { ipcSend, makeResizable } from "./renderer-util";
 import StatsPanel from "./stats-panel";
 import { dispatchAction, SET_SUB_NAV } from "./app/reducers";
 import { useDispatch } from "react-redux";
+import Deck from "../shared/deck";
 
 function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);
@@ -96,7 +97,7 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
         aggregator.deckRecentStats[id] ?? Aggregator.getDefaultStats();
       const winrate100 = Math.round(deckStats.winrate * 100);
       // compute missing card metrics
-      const missingWildcards = getDeckMissing(deck);
+      const missingWildcards = getDeckMissing(new Deck(deck));
       const boosterCost = getBoosterCountEstimate(missingWildcards);
       // compute last touch metrics
       const lastUpdated = new Date(deck.lastUpdated ?? NaN);
