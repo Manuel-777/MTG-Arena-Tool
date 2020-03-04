@@ -426,6 +426,8 @@ label {
     background-blend-mode: darken;
     background-size: cover;
     background-position: center;
+    left: 2px;
+    top: 2px;
     opacity: 1;
     z-index: 5;
     height: calc(100% - 4px);
