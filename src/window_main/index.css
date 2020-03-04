@@ -654,6 +654,7 @@ span.top_nav_item_text {
 }
 
 .notplayed {
+    opacity: 0.5;
     width: 16px;
     height: 16px;
     margin: 2px 4px auto 4px;
@@ -2750,21 +2751,20 @@ a:hover {
 
 .popup {
     pointer-events: none;
+    align-self: center;
+    bottom: 18px;
     opacity: 0;
     line-height: 24px;
     font-family: var(--sub-font-name);
     font-size: 15px;
-    left: calc(50% - 200px);
-    top: calc(100% - 100px);
     position: absolute;
     background: rgba(0, 0, 0, 0.7);
     color: var(--color-light);
     text-align: center;
-    padding: 2px 8px;
-    width: 400px;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    padding: 4px 4px;
+    width: 392px;
     margin-top: auto;
+    border-radius: 2px;
     z-index: 100;
     box-shadow: 0 4px 13px 0px rgba(0, 0, 0, 0.3);
     -webkit-transition: all 0.3s cubic-bezier(0.2, 0.5, 0.35, 1);
