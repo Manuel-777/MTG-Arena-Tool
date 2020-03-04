@@ -199,25 +199,35 @@ function GameStats(props: GameStatsProps): JSX.Element {
   );
 
   return (
-    <div style={{ marginTop: "24px" }}>
+    <div
+      style={{
+        marginTop: "24px",
+        marginBottom: "24px",
+        justifyContent: "center"
+      }}
+    >
       {game.sideboardChanges ? (
         <>
           <div className="card_tile_separator">
             Game {index + 1} Sideboard Changes
           </div>
-          <div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
             {game.sideboardChanges.added.length == 0 &&
             game.sideboardChanges.removed.length == 0 ? (
               <div className="gamestats_subtitle red">No Changes</div>
             ) : (
               <>
-                <div className="gamestats_subtitle">Sideboarded In</div>
-                <div className="card_lists_list">
-                  <CardList list={addedCards} />
+                <div className="gamestats_side">
+                  <div className="gamestats_subtitle green">Sideboarded In</div>
+                  <div className="card_lists_list">
+                    <CardList list={addedCards} />
+                  </div>
                 </div>
-                <div className="gamestats_subtitle">Sideboarded Out</div>
-                <div className="card_lists_list">
-                  <CardList list={removedCards} />
+                <div className="gamestats_side">
+                  <div className="gamestats_subtitle red">Sideboarded Out</div>
+                  <div className="card_lists_list">
+                    <CardList list={removedCards} />
+                  </div>
                 </div>
               </>
             )}

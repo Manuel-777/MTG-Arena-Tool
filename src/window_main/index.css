@@ -3400,11 +3400,17 @@ a:hover {
     margin-right: auto;
 }
 
+.gamestats_side {
+    margin: 0 16px 16px 16px;
+    max-width: 360px;
+    width: -webkit-fill-available;
+}
+
 .gamestats_subtitle {
     margin: 4px auto 10px auto;
     color: var(--color-light);
     font-size: 16px;
-    font-family: var(--main-font-name-it);
+    font-family: var(--main-font-name-bold-it);
     text-align: center;
 }
 
