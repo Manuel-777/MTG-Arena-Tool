@@ -25,6 +25,7 @@ export const SET_EXPLORE_FILTERS = "SET_EXPLORE_FILTERS";
 export const SET_EXPLORE_FILTERS_SKIP = "SET_EXPLORE_FILTERS_SKIP";
 export const SET_UX0_SCROLL = "SET_UX0_SCROLL";
 export const SET_UX1_SCROLL = "SET_UX1_SCROLL";
+export const SET_UPDATE_STATE = "SET_UPDATE_STATE";
 export const SET_ANY = "SET_ANY";
 
 export const LOGIN_AUTH = 1;
@@ -304,6 +305,18 @@ const UX1Scroll = (
   }
 };
 
+const updateState = (
+  state: string = defaultState.updateState,
+  action: Action
+): string => {
+  switch (action.type) {
+    case SET_UPDATE_STATE:
+      return action.value;
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   backgroundImage: backgroundImage,
   topArtist: topArtist,
@@ -321,7 +334,8 @@ export default combineReducers({
   exploreData: explore,
   exploreFilters: exploreFilters,
   UX0Scroll: UX0Scroll,
-  UX1Scroll: UX1Scroll
+  UX1Scroll: UX1Scroll,
+  updateState: updateState
 });
 
 export function dispatchAction(

@@ -22,7 +22,8 @@ import {
   SET_TOP_ARTIST,
   SET_HOVER_SIZE,
   SET_EXPLORE_DATA,
-  SET_EXPLORE_FILTERS_SKIP
+  SET_EXPLORE_FILTERS_SKIP,
+  SET_UPDATE_STATE
 } from "./reducers";
 import { timestamp, getCardArtCrop } from "../../shared/util";
 import {
@@ -155,11 +156,15 @@ export default function ipcListeners(dispatcher: unknown): void {
     });
   });
 
-  ipc.on("set_explore_decks", function(event: string, arg: any) {
+  ipc.on("set_explore_decks", (event: string, arg: any): void => {
     console.log("Explore", arg);
     dispatchAction(dispatcher, SET_LOADING, false);
     dispatchAction(dispatcher, SET_EXPLORE_DATA, arg);
     dispatchAction(dispatcher, SET_EXPLORE_FILTERS_SKIP, arg.results_number);
+  });
+
+  ipc.on("set_update_state", (event: string, arg: any): void => {
+    dispatchAction(dispatcher, SET_UPDATE_STATE, arg);
   });
 
   ipc.on("settings_updated", (): void => {

@@ -5,13 +5,11 @@ import { ipcRenderer as ipc, remote, shell } from "electron";
 import db from "../../../shared/database";
 import { format, fromUnixTime } from "date-fns";
 import Button from "../Button";
-
-let updateState = "";
-ipc.on("set_update_state", (event: string, arg: string): void => {
-  updateState = arg;
-});
+import { useSelector } from "react-redux";
+import { AppState } from "../../app/appState";
 
 export default function SectionAbout(): JSX.Element {
+  const updateState = useSelector((state: AppState) => state.updateState);
   return (
     <div className="about">
       <div
@@ -39,7 +37,7 @@ export default function SectionAbout(): JSX.Element {
       ) : (
         <></>
       )}
-      <div className="message_updates green">{updateState}.</div>
+      <div className="message_updates green">{updateState || "-"}</div>
       <Button
         text="Check for Updates"
         onClick={(): void => {

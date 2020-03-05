@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/camelcase */
 import electron from "electron";
 import async from "async";
 
@@ -497,17 +499,29 @@ export function httpGetDatabaseVersion(lang: string): void {
         parsedResult.lang.toLowerCase() !== db.metadata.language.toLowerCase()
       ) {
         // compare language
+        ipcSend("popup", {
+          text: `Downloading latest Database (v${parsedResult.latest})`,
+          time: 5000
+        });
         ipcLog(
           `Downloading database (had lang ${db.metadata.language}, needed ${parsedResult.lang})`
         );
         httpGetDatabase(lang);
       } else if (parsedResult.latest > db.version) {
         // Compare parsedResult.version with stored version
+        ipcSend("popup", {
+          text: `Downloading latest Database (v${parsedResult.latest})`,
+          time: 5000
+        });
         ipcLog(
           `Downloading latest database (had v${db.version}, found v${parsedResult.latest})`
         );
         httpGetDatabase(lang);
       } else {
+        ipcSend("popup", {
+          text: `Database up to date (v${db.version})`,
+          time: 5000
+        });
         ipcLog(`Database up to date (${db.version}), skipping download.`);
       }
     })

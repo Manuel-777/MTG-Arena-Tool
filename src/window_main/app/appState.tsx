@@ -11,6 +11,7 @@ export interface AppState {
   topNav: number;
   UX0Scroll: boolean;
   UX1Scroll: boolean;
+  updateState: string;
   subNav: {
     type: number;
     id: string;
@@ -67,6 +68,7 @@ export const defaultState: AppState = {
   topNav: 0,
   UX0Scroll: false,
   UX1Scroll: false,
+  updateState: "",
   subNav: {
     type: -1,
     id: "",

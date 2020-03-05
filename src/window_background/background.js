@@ -108,17 +108,11 @@ function fixBadSettingsData() {
   });
 }
 
-function downloadMetadata() {
+ipc.on("download_metadata", () => {
   appDb.find("", "settings").then(appSettings => {
-    httpApi.httpGetDatabase(appSettings.metadata_lang);
-    ipc_send("popup", {
-      text: `Downloading metadata ${appSettings.metadata_lang}`,
-      time: 0
-    });
+    httpApi.httpGetDatabaseVersion(appSettings.metadata_lang);
   });
-}
-
-ipc.on("download_metadata", downloadMetadata);
+});
 
 ipc.on("backport_all_data", backportNeDbToElectronStore);
 
