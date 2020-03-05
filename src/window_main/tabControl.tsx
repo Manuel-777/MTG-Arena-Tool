@@ -17,7 +17,7 @@ import {
   SUB_DRAFT
 } from "../shared/constants";
 
-import pd from "../shared/playerData";
+import pd from "../shared/PlayerData";
 import Aggregator from "./aggregator";
 
 import { ipcSend } from "./renderer-util";

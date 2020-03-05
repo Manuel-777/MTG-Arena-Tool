@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import db from "../../../shared/database";
-import pd from "../../../shared/playerData";
+import pd from "../../../shared/PlayerData";
 import { AppState } from "../../app/appState";
 import { FACE_DFC_FRONT, FACE_DFC_BACK } from "../../../shared/constants";
 const NotFound = "../images/notfound.png";

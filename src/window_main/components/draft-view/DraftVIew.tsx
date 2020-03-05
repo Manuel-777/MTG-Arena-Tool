@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import pd from "../../../shared/playerData";
+import pd from "../../../shared/PlayerData";
 import Slider from "../Slider";
 import DeckList from "../DeckList";
 import Deck from "../../../shared/deck";

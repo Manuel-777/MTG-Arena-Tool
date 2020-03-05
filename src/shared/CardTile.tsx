@@ -16,7 +16,7 @@ import {
 } from "./util";
 import { DbCardData, Rarity } from "../types/Metadata";
 import useHoverCard from "../window_main/hooks/useHoverCard";
-import pd from "./playerData";
+import pd from "./PlayerData";
 
 export interface CardTileProps {
   card: DbCardData;

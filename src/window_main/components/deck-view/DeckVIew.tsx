@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { InternalDeck, CardObject } from "../../../types/Deck";
-import pd from "../../../shared/playerData";
+import pd from "../../../shared/PlayerData";
 import ManaCost from "../ManaCost";
 import { MANA_COLORS } from "../../../shared/constants";
 import DeckList from "../DeckList";

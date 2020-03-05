@@ -12,7 +12,7 @@ import {
   createLabel,
   queryElements as $$
 } from "../shared/dom-fns";
-import pd from "../shared/playerData";
+import pd from "../shared/PlayerData";
 
 const { dialog } = remote;
 

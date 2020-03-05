@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import fs from "fs";
 import path from "path";
 import { InternalMatch, InternalPlayer } from "../../../types/match";
-import pd from "../../../shared/playerData";
+import pd from "../../../shared/PlayerData";
 import ShareButton from "../ShareButton";
 import ManaCost from "../ManaCost";
 import Deck from "../../../shared/deck";
