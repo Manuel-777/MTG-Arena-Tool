@@ -3,11 +3,12 @@ import pd from "../../../shared/playerData";
 import Slider from "../Slider";
 import DeckList from "../DeckList";
 import Deck from "../../../shared/deck";
-import { getCardImage } from "../../../shared/util";
-import { PACK_SIZES } from "../../../shared/constants";
+import { getCardImage, getRankColorClass } from "../../../shared/util";
+import { PACK_SIZES, DRAFT_RANKS } from "../../../shared/constants";
 import useHoverCard from "../../hooks/useHoverCard";
 import { DraftData } from "../../../types/draft";
 import uxMove from "../../uxMove";
+import db from "../../../shared/database";
 
 interface PickPack {
   pack: number;
@@ -36,6 +37,7 @@ interface DraftCardProps {
 function DraftCard(props: DraftCardProps): JSX.Element {
   const { grpId, pick } = props;
   const [hoverIn, hoverOut] = useHoverCard(grpId);
+  const card = db.card(grpId);
 
   const makeStyle = useCallback(() => {
     return {
@@ -46,12 +48,22 @@ function DraftCard(props: DraftCardProps): JSX.Element {
   }, [grpId]);
 
   return (
-    <div
-      style={makeStyle()}
-      onMouseEnter={hoverIn}
-      onMouseLeave={hoverOut}
-      className={"draft-card" + (pick ? " " + "draft-card-picked" : "")}
-    />
+    <div className="draft-card-cont">
+      <div
+        style={makeStyle()}
+        onMouseEnter={hoverIn}
+        onMouseLeave={hoverOut}
+        className={"draft-card" + (pick ? " " + "draft-card-picked" : "")}
+      />
+      <div
+        className={
+          "draft-card-rank " +
+          getRankColorClass(DRAFT_RANKS[card ? card.rank : 0])
+        }
+      >
+        {card ? DRAFT_RANKS[card.rank] : "-"}
+      </div>
+    </div>
   );
 }
 

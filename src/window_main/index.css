@@ -4129,49 +4129,65 @@ a:hover {
     font-family: var(--sub-font-name-it);
   }
   
-  .draft-container {
+.draft-container {
     flex-direction: column;
     display: flex;
     margin: 8px 48px;
     flex-grow: 2;
-  }
+}
   
-  @media screen and (min-width: 900px) {
+@media screen and (min-width: 900px) {
     .draft-container{
         flex-direction: row;
     }
     .draft-deck-view {
       max-width: 350px;
     }
-  }
+}
   
-  .draft-view {
+.draft-view {
     display: flex;
     height: fit-content;
     justify-content: center;
     flex-wrap: wrap;
     flex-grow: 2;
-  }
+}
   
-  .draft-deck-view {
+.draft-deck-view {
     width: -webkit-fill-available;
-  }
+}
   
-  .draft-card {
+.draft-card {
     border-radius: 9px;
     margin: 8px;
     background-size: contain;
     cursor: pointer;
     -webkit-transition: all .15s ease-in-out;
     transition: all 0.15s ease-in-out;
-  }
+}
   
-  .draft-card-picked {
+.draft-card-picked {
     border: 2px solid var(--color-r);
     margin: 6px;
-  }
+}
   
-  .draft-card:hover {
+.draft-card:hover {
     box-shadow: 0px 5px 10px 4px rgba(0, 0, 0, 0.4);
     filter: brightness(1.1);
-  }
+}
+
+.draft-card-cont {
+    display: block;
+}
+
+.draft-card-rank {
+    margin: auto;
+    position: relative;
+    width: 24px;
+    height: 24px;
+    background-color: var(--color-back);
+    text-align: center;
+    line-height: 24px;
+    border: 1px solid var(--color-mid-20);
+    border-radius: 2px;
+}
