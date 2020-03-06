@@ -3,9 +3,10 @@ import styled from "styled-components";
 import { MANA } from "../../shared/constants";
 import db from "../../shared/database";
 import { get_rank_index_16 as getRankIndex16 } from "../../shared/util";
-import { getTagColor, showColorpicker } from "../renderer-util";
+import { getTagColor } from "../renderer-util";
 import AutosuggestInput from "./tables/AutosuggestInput";
 import { TagCounts } from "./tables/types";
+import useColorPicker from "../hooks/useColorPicker";
 
 export const ArtTileHeader = styled.div`
   width: 200px;
@@ -170,33 +171,6 @@ const TagBubbleWithCloseDiv = styled(TagBubbleDiv)`
   padding-right: 0;
 `;
 
-export function useColorpicker(
-  containerRef: React.MutableRefObject<HTMLElement | null>,
-  tag: string,
-  backgroundColor: string,
-  editTagCallback: (tag: string, color: string) => void
-): (e: React.MouseEvent) => void {
-  return (e): void => {
-    e.stopPropagation();
-    showColorpicker(
-      backgroundColor,
-      (color: { rgbString: string }) => {
-        const container = containerRef.current;
-        if (container) {
-          container.style.backgroundColor = color.rgbString;
-        }
-      },
-      (color: { rgbString: string }) => editTagCallback(tag, color.rgbString),
-      () => {
-        const container = containerRef.current;
-        if (container) {
-          container.style.backgroundColor = backgroundColor;
-        }
-      }
-    );
-  };
-}
-
 interface TagBubbleProps {
   parentId: string;
   fontStyle?: string;
@@ -220,32 +194,43 @@ export function TagBubble({
   const containerRef: React.MutableRefObject<HTMLDivElement | null> = React.useRef(
     null
   );
+
+  const editTag = (color: string): void => {
+    editTagCallback(tag, color);
+  };
+
+  const [pickerColor, pickerDoShow, pickerElement] = useColorPicker(
+    backgroundColor,
+    editTag
+  );
+
   const Renderer = hideCloseButton ? TagBubbleDiv : TagBubbleWithCloseDiv;
   return (
-    <Renderer
-      backgroundColor={backgroundColor}
-      fontStyle={fontStyle ?? "normal"}
-      ref={containerRef}
-      title={title ?? "change tag color"}
-      onClick={useColorpicker(
-        containerRef,
-        tag,
-        backgroundColor,
-        editTagCallback
-      )}
-    >
-      {tag}
-      {deleteTagCallback && !hideCloseButton && (
-        <div
-          className={"deck_tag_close"}
-          title={"delete tag"}
-          onClick={(e): void => {
-            e.stopPropagation();
-            deleteTagCallback(parentId, tag);
-          }}
-        />
-      )}
-    </Renderer>
+    <>
+      <Renderer
+        backgroundColor={pickerColor}
+        fontStyle={fontStyle ?? "normal"}
+        ref={containerRef}
+        title={title ?? "change tag color"}
+        onClick={(e): void => {
+          e.stopPropagation();
+          pickerDoShow();
+        }}
+      >
+        {tag}
+        {deleteTagCallback && !hideCloseButton && (
+          <div
+            className={"deck_tag_close"}
+            title={"delete tag"}
+            onClick={(e): void => {
+              e.stopPropagation();
+              deleteTagCallback(parentId, tag);
+            }}
+          />
+        )}
+      </Renderer>
+      {pickerElement}
+    </>
   );
 }
 

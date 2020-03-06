@@ -80,6 +80,7 @@
   },
   "dependencies": {
     "@github/time-elements": "^3.0.10",
+    "@types/react-color": "^3.0.1",
     "@types/react-redux": "^7.1.7",
     "animejs": "^3.1.0",
     "async": "^3.1.0",
@@ -108,6 +109,7 @@
     "queue": "^6.0.1",
     "react": "^16.12.0",
     "react-autosuggest": "^9.4.3",
+    "react-color": "^2.18.0",
     "react-dom": "^16.12.0",
     "react-is": "^16.12.0",
     "react-redux": "^7.2.0",
@@ -118,8 +120,7 @@
     "sanitize-filename": "^1.6.3",
     "striptags": "^3.1.1",
     "styled-components": "^5.0.0-rc.2",
-    "stylis": "^3.5.4",
-    "vanilla-picker": "^2.10.0"
+    "stylis": "^3.5.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.5",

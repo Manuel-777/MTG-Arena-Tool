@@ -4,7 +4,6 @@ import fs from "fs";
 import _ from "lodash";
 import path from "path";
 import Pikaday from "pikaday";
-import Picker from "vanilla-picker";
 import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
 import {
   createDiv,
@@ -142,34 +141,6 @@ function closeDialog() {
 
   const dialog = $$(".dialog")[0];
   setTimeout(() => (dialog.innerHTML = ""), 250);
-}
-
-function showColorpicker(
-  color,
-  onChange = color => {},
-  onDone = color => {},
-  onCancel = () => {},
-  pickerOptions = {}
-) {
-  const cont = createDiv(["dialog_content"]);
-  cont.style.width = "250px";
-  // https://vanilla-picker.js.org/gen/Picker.html
-  new Picker({
-    alpha: false,
-    color,
-    parent: cont,
-    popup: false,
-    onChange,
-    onDone: function(color) {
-      onDone(color);
-      closeDialog();
-    },
-    ...pickerOptions
-  });
-  openDialog(cont, () => onCancel(color));
-  const pickerWrapper = $$(".picker_wrapper")[0];
-  pickerWrapper.style.backgroundColor = "rgb(0,0,0,0)";
-  pickerWrapper.style.boxShadow = "none";
 }
 
 function showDatepicker(
@@ -412,7 +383,6 @@ export {
   toggleVisibility,
   openDialog,
   closeDialog,
-  showColorpicker,
   showDatepicker,
   renderLogInput,
   formatPercent,

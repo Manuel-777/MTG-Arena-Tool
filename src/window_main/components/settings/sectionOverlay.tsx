@@ -19,7 +19,7 @@ import {
   OVERLAY_DRAFT_MODES
 } from "../../../shared/constants";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
-import useColorpicker from "../../hooks/useColorPicker";
+import useColorPicker from "../../hooks/useColorPicker";
 
 function toggleEditMode(): void {
   ipcSend("toggle_edit_mode");
@@ -368,11 +368,11 @@ export default function SectionOverlay(): JSX.Element {
   const containerRef: React.MutableRefObject<HTMLInputElement | null> = React.useRef(
     null
   );
-  const colorPicker = useColorpicker(
-    containerRef,
+
+  const [pickerColor, pickerDoShow, pickerElement] = useColorPicker(
     pd.settings.overlay_back_color,
-    backgroundColorPicker,
-    { alpha: true }
+    undefined,
+    backgroundColorPicker
   );
 
   const overlayScaleDebouce = React.useCallback(
@@ -436,15 +436,16 @@ export default function SectionOverlay(): JSX.Element {
           Background color <i>(0,0,0,0 to use default background)</i>:
         </span>
         <input
-          onClick={colorPicker}
+          onClick={pickerDoShow}
           ref={containerRef}
-          style={{ backgroundColor: pd.settings.overlay_back_color }}
+          style={{ backgroundColor: pickerColor }}
           className="color_picker"
           id="flat"
           type="text"
           defaultValue=""
         ></input>
       </label>
+      {pickerElement}
 
       <Checkbox
         text="Always on top when shown"

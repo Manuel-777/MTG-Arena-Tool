@@ -8,7 +8,7 @@ import { CARD_TILE_ARENA, CARD_TILE_FLAT } from "../../../shared/constants";
 import CardTile from "../../../shared/CardTile";
 import db from "../../../shared/database";
 import Input from "../Input";
-import useColorpicker from "../../hooks/useColorPicker";
+import useColorPicker from "../../hooks/useColorPicker";
 import Slider from "../Slider";
 import { getCardImage } from "../../../shared/util";
 
@@ -41,11 +41,11 @@ export default function SectionVisual(): JSX.Element {
   const containerRef: React.MutableRefObject<HTMLInputElement | null> = React.useRef(
     null
   );
-  const colorPicker = useColorpicker(
-    containerRef,
+
+  const [pickerColor, pickerDoShow, pickerElement] = useColorPicker(
     pd.settings.back_color,
-    backColorPicker,
-    { alpha: true }
+    undefined,
+    backColorPicker
   );
 
   // Hover card size slider
@@ -98,15 +98,16 @@ export default function SectionVisual(): JSX.Element {
       <label className="but_container_label">
         <span style={{ marginRight: "32px" }}>Background shade:</span>
         <input
-          onClick={colorPicker}
+          onClick={pickerDoShow}
           ref={containerRef}
-          style={{ backgroundColor: pd.settings.back_color }}
+          style={{ backgroundColor: pickerColor }}
           className="color_picker"
           id="flat"
           type="text"
           defaultValue=""
         ></input>
       </label>
+      {pickerElement}
 
       <label className="but_container_label">
         List style:
