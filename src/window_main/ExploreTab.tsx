@@ -6,18 +6,15 @@ import {
   SET_LOADING,
   SET_EXPLORE_FILTERS,
   SET_UX0_SCROLL,
-  SET_SUB_NAV
+  SET_SUB_NAV,
+  SET_BACKGROUND_GRPID
 } from "./app/reducers";
 import { WrappedReactSelect } from "../shared/ReactSelect";
 import Button from "./components/Button";
 import db from "../shared/database";
 import Checkbox from "./components/Checkbox";
 import Input from "./components/Input";
-import {
-  COLORS_LONG,
-  RANKS,
-  SUB_DECK
-} from "../shared/constants";
+import { COLORS_LONG, RANKS, SUB_DECK } from "../shared/constants";
 import { AppState } from "./app/appState";
 import { ListItemExplore } from "./components/list-item/ListItemExplore";
 import uxMove from "./uxMove";
@@ -71,6 +68,7 @@ export function ExploreTab(): JSX.Element {
         name: row.name,
         id: row._id
       };
+      dispatchAction(dispatcher, SET_BACKGROUND_GRPID, row.tile);
       dispatchAction(dispatcher, SET_SUB_NAV, {
         type: SUB_DECK,
         id: row._id + "_",

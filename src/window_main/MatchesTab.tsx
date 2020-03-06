@@ -1,11 +1,7 @@
 import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
-import {
-  DATE_SEASON,
-  RANKS,
-  SUB_MATCH
-} from "../shared/constants";
+import { DATE_SEASON, RANKS, SUB_MATCH } from "../shared/constants";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/PlayerData";
@@ -29,7 +25,11 @@ import {
 } from "./renderer-util";
 import StatsPanel from "./stats-panel";
 import { useDispatch } from "react-redux";
-import { dispatchAction, SET_SUB_NAV } from "./app/reducers";
+import {
+  dispatchAction,
+  SET_SUB_NAV,
+  SET_BACKGROUND_GRPID
+} from "./app/reducers";
 import uxMove from "./uxMove";
 
 const { DEFAULT_ARCH, NO_ARCH, RANKED_CONST, RANKED_DRAFT } = Aggregator;
@@ -305,9 +305,17 @@ export function MatchesTab({
     updateSidebarCallback: updateStatsPanel
   });
   const openMatchDetails = React.useCallback(
-    (id: string | number): void => {
+    (match: any): void => {
       uxMove(-100);
-      dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_MATCH, id: id });
+      dispatchAction(
+        dispatcher,
+        SET_BACKGROUND_GRPID,
+        match.playerDeck.deckTileId
+      );
+      dispatchAction(dispatcher, SET_SUB_NAV, {
+        type: SUB_MATCH,
+        id: match.id
+      });
     },
     [dispatcher]
   );

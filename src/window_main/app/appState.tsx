@@ -4,6 +4,7 @@ import { WildcardsChange } from "../HomeTab";
 export interface AppState {
   topArtist: string;
   backgroundImage: string;
+  backgroundGrpId: number;
   offline: boolean;
   loading: boolean;
   loginState: number;
@@ -61,6 +62,7 @@ export interface AppState {
 export const defaultState: AppState = {
   topArtist: "Bedevil by Seb Seb McKinnon",
   backgroundImage: "default",
+  backgroundGrpId: 0,
   offline: false,
   loading: false,
   loginState: LOGIN_AUTH,

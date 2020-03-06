@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable no-console */
 import { ipcRenderer as ipc } from "electron";
-import fs from "fs";
 import {
   dispatchAction,
   SET_LOGIN_FORM,
@@ -19,13 +18,12 @@ import {
   SET_TOP_NAV,
   SET_PATREON,
   SET_BACKGROUND_IMAGE,
-  SET_TOP_ARTIST,
   SET_HOVER_SIZE,
   SET_EXPLORE_DATA,
   SET_EXPLORE_FILTERS_SKIP,
   SET_UPDATE_STATE
 } from "./reducers";
-import { timestamp, getCardArtCrop } from "../../shared/util";
+import { timestamp } from "../../shared/util";
 import {
   MAIN_SETTINGS,
   SETTINGS_OVERLAY,
@@ -34,9 +32,7 @@ import {
 import { ipcSend } from "../renderer-util";
 import { SETTINGS_ABOUT } from "../../shared/constants";
 import pd from "../../shared/PlayerData";
-import db from "../../shared/database";
 import uxMove from "../uxMove";
-const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 export default function ipcListeners(dispatcher: unknown): void {
   console.log("Set up IPC listeners.");
@@ -168,47 +164,12 @@ export default function ipcListeners(dispatcher: unknown): void {
   });
 
   ipc.on("settings_updated", (): void => {
-    // Compute new artist and background image
-    const backUrl = pd.settings.back_url;
-    const card = db.card(backUrl);
-    let backgroundImage = "";
-    let artist = "";
-    if (backUrl === "default") {
-      if (backUrl && backUrl !== "default") {
-        backgroundImage = "url(" + backUrl + ")";
-      } else {
-        artist = "Bedevil by Seb McKinnon";
-        backgroundImage = "url(" + DEFAULT_BACKGROUND + ")";
-      }
-    } else if (card) {
-      backgroundImage = `url(${getCardArtCrop(card)})`;
-      try {
-        artist = card.name + " by " + card.artist;
-      } catch (e) {
-        console.log(e);
-      }
-    } else if (fs.existsSync(backUrl)) {
-      backgroundImage = "url(" + backUrl + ")";
-    } else {
-      const xhr = new XMLHttpRequest();
-      xhr.open("HEAD", backUrl);
-      xhr.onload = (): void => {
-        if (xhr.status === 200) {
-          backgroundImage = "url(" + backUrl + ")";
-        } else {
-          backgroundImage = "";
-        }
-      };
-      xhr.send();
-    }
-
     dispatchAction(
       dispatcher,
       SET_TOP_NAV,
       pd.settings.last_open_tab || MAIN_HOME
     );
-    dispatchAction(dispatcher, SET_BACKGROUND_IMAGE, backgroundImage);
-    dispatchAction(dispatcher, SET_TOP_ARTIST, artist);
+    dispatchAction(dispatcher, SET_BACKGROUND_IMAGE, pd.settings.back_url);
     dispatchAction(dispatcher, SET_HOVER_SIZE, pd.cardsSizeHoverCard);
   });
 }

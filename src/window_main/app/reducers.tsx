@@ -3,6 +3,7 @@ import { defaultState } from "./appState";
 import { WildcardsChange } from "../HomeTab";
 
 export const SET_BACKGROUND_IMAGE = "SET_BACKGROUND_IMAGE";
+export const SET_BACKGROUND_GRPID = "SET_BACKGROUND_GRPID";
 export const SET_TOP_ARTIST = "SET_TOP_ARTIST";
 export const SET_HOVER_IN = "SET_HOVER_IN";
 export const SET_HOVER_OUT = "SET_HOVER_OUT";
@@ -44,6 +45,18 @@ const backgroundImage = (
 ): string => {
   switch (action.type) {
     case SET_BACKGROUND_IMAGE:
+      return action.value;
+    default:
+      return state;
+  }
+};
+
+const backgroundGrpId = (
+  state: number = defaultState.backgroundGrpId,
+  action: Action
+): number => {
+  switch (action.type) {
+    case SET_BACKGROUND_GRPID:
       return action.value;
     default:
       return state;
@@ -319,6 +332,7 @@ const updateState = (
 
 export default combineReducers({
   backgroundImage: backgroundImage,
+  backgroundGrpId: backgroundGrpId,
   topArtist: topArtist,
   hover: hover,
   offline: offline,

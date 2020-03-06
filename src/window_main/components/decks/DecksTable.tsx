@@ -296,7 +296,9 @@ export default function DecksTable({
     pagingProps,
     tableControlsProps
   } = useBaseReactTable(tableProps);
+
   useAggregatorArchiveFilter(table, aggFilters, setAggFiltersCallback);
+
   const { getTableBodyProps, page, prepareRow } = table;
   const decksTableControlsProps: DecksTableControlsProps = {
     aggFilters,
@@ -304,7 +306,9 @@ export default function DecksTable({
     setAggFiltersCallback,
     ...tableControlsProps
   };
+
   const isTableMode = tableMode === DECKS_TABLE_MODE;
+
   return (
     <div className="react_table_wrap">
       <DecksTableControls {...decksTableControlsProps} />
@@ -330,7 +334,7 @@ export default function DecksTable({
             prepareRow(row);
             const data = row.original;
             if (isTableMode) {
-              const onClick = (): void => openDeckCallback(data.id);
+              const onClick = (): void => openDeckCallback(data);
               return (
                 <TableViewRow
                   onClick={onClick}

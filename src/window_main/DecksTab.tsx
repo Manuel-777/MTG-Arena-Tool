@@ -24,7 +24,11 @@ import {
 } from "./components/tables/hooks";
 import { ipcSend, makeResizable } from "./renderer-util";
 import StatsPanel from "./stats-panel";
-import { dispatchAction, SET_SUB_NAV } from "./app/reducers";
+import {
+  dispatchAction,
+  SET_SUB_NAV,
+  SET_BACKGROUND_GRPID
+} from "./app/reducers";
 import { useDispatch } from "react-redux";
 import Deck from "../shared/deck";
 import uxMove from "./uxMove";
@@ -157,11 +161,12 @@ export function DecksTab({
     updateSidebarCallback: updateStatsPanel
   });
   const openDeckCallback = React.useCallback(
-    (id: string | number): void => {
+    (deck: InternalDeck): void => {
       uxMove(-100);
+      dispatchAction(dispatcher, SET_BACKGROUND_GRPID, deck.deckTileId);
       dispatchAction(dispatcher, SET_SUB_NAV, {
         type: SUB_DECK,
-        id: id,
+        id: deck.id,
         data: null
       });
     },

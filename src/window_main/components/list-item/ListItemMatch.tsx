@@ -25,10 +25,8 @@ export default function ListItemMatch({
   deleteTagCallback,
   tags
 }: ListItemMatchProps): JSX.Element {
-  const parentId = match.id ?? "";
-
   const onRowClick = (): void => {
-    openMatchCallback(parentId);
+    openMatchCallback(match);
   };
 
   const [hover, setHover] = React.useState(false);

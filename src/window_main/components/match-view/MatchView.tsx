@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import fs from "fs";
 import path from "path";
 import { InternalMatch, InternalPlayer } from "../../../types/match";
@@ -15,6 +15,8 @@ import CardList from "../CardList";
 import CardsList from "../../../shared/cardsList";
 import ActionLog from "./ActionLog";
 import uxMove from "../../uxMove";
+import { dispatchAction, SET_BACKGROUND_GRPID } from "../../app/reducers";
+import { useDispatch } from "react-redux";
 
 interface MatchViewProps {
   match: InternalMatch;
@@ -25,6 +27,7 @@ const VIEW_LOG = 2;
 
 export function MatchView(props: MatchViewProps): JSX.Element {
   const { match } = props;
+  const dispatcher = useDispatch();
   const [view, setView] = useState(VIEW_MATCH);
   const playerDeck = new Deck(match.playerDeck);
   const oppDeck = new Deck(match.oppDeck);
@@ -39,6 +42,7 @@ export function MatchView(props: MatchViewProps): JSX.Element {
   }
 
   const goBack = (): void => {
+    dispatchAction(dispatcher, SET_BACKGROUND_GRPID, 0);
     uxMove(0);
   };
 

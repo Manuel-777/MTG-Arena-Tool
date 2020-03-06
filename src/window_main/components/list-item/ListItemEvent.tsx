@@ -15,17 +15,17 @@ import {
 } from "./ListItem";
 import ListItemMatch from "./ListItemMatch";
 import ListItemDraft from "./ListItemDraft";
-import {
-  DEFAULT_TILE,
-  SUB_MATCH,
-  SUB_DRAFT
-} from "../../../shared/constants";
+import { DEFAULT_TILE, SUB_MATCH, SUB_DRAFT } from "../../../shared/constants";
 import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
 import { DbCardData } from "../../../types/Metadata";
 import RoundCard from "../RoundCard";
 import { compareDesc } from "date-fns";
 import { useDispatch } from "react-redux";
-import { dispatchAction, SET_SUB_NAV } from "../../app/reducers";
+import {
+  dispatchAction,
+  SET_SUB_NAV,
+  SET_BACKGROUND_GRPID
+} from "../../app/reducers";
 import { InternalMatch } from "../../../types/match";
 import uxMove from "../../uxMove";
 
@@ -77,9 +77,17 @@ export function ListItemEvent({
   }
 
   const openMatch = React.useCallback(
-    (id: string | number): void => {
+    (match: any): void => {
       uxMove(-100);
-      dispatchAction(dispatcher, SET_SUB_NAV, { type: SUB_MATCH, id: id });
+      dispatchAction(
+        dispatcher,
+        SET_BACKGROUND_GRPID,
+        match.playerDeck.deckTileId
+      );
+      dispatchAction(dispatcher, SET_SUB_NAV, {
+        type: SUB_MATCH,
+        id: match.id
+      });
     },
     [dispatcher]
   );

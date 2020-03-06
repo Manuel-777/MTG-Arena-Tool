@@ -45,9 +45,8 @@ export default function DecksArtViewRow({
   openDeckCallback
 }: DecksTableRowProps): JSX.Element {
   const deck = row.original;
-  const parentId = deck.id;
   const onRowClick = (): void => {
-    openDeckCallback(parentId);
+    openDeckCallback(deck);
   };
   const [hover, setHover] = React.useState(false);
   const mouseEnter = React.useCallback(() => {

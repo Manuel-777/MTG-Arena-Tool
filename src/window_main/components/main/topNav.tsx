@@ -22,7 +22,7 @@ import {
 import {
   SET_TOP_NAV,
   dispatchAction,
-  SET_BACKGROUND_IMAGE
+  SET_BACKGROUND_GRPID
 } from "../../app/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { AppState } from "../../app/appState";
@@ -43,7 +43,7 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
   const clickTab = React.useCallback(
     (tabId: number) => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
-      dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
+      dispatchAction(props.dispatcher, SET_BACKGROUND_GRPID, 0);
       clickNav(tabId);
       callback(tabId);
     },
@@ -102,7 +102,7 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   const clickTab = React.useCallback(
     tabId => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
-      dispatchAction(props.dispatcher, SET_BACKGROUND_IMAGE, "default");
+      dispatchAction(props.dispatcher, SET_BACKGROUND_GRPID, 0);
       clickNav(tabId);
       callback(tabId);
     },

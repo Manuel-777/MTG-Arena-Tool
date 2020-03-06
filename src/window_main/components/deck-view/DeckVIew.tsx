@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InternalDeck, CardObject } from "../../../types/Deck";
 import pd from "../../../shared/PlayerData";
 import ManaCost from "../ManaCost";
@@ -14,7 +14,8 @@ import {
   dispatchAction,
   SET_POPUP,
   SET_HOVER_IN,
-  SET_HOVER_OUT
+  SET_HOVER_OUT,
+  SET_BACKGROUND_GRPID
 } from "../../app/reducers";
 import db from "../../../shared/database";
 import ShareButton from "../ShareButton";
@@ -135,6 +136,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const dispatcher = useDispatch();
 
   const goBack = (): void => {
+    dispatchAction(dispatcher, SET_BACKGROUND_GRPID, 0);
     uxMove(0);
   };
 

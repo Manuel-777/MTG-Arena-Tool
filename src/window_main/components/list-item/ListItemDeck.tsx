@@ -34,7 +34,7 @@ export function ListItemDeck({
   const parentId = deck.id ?? "";
 
   const onRowClick = (): void => {
-    openDeckCallback(parentId);
+    openDeckCallback(deck);
   };
 
   const [hover, setHover] = React.useState(false);

@@ -49,7 +49,7 @@ export interface DecksTableProps {
   deleteTagCallback: (deckid: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
   filterDataCallback: (data: DecksData[]) => void;
-  openDeckCallback: (id: string | number) => void;
+  openDeckCallback: (deck: any) => void;
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
   tableModeCallback: (tableMode: string) => void;
   tableStateCallback: (state: TableState<DecksData>) => void;
@@ -63,7 +63,7 @@ export interface DecksTableControlsProps extends TableControlsProps<DecksData> {
 
 export interface DecksTableRowProps extends TableViewRowProps<DecksData> {
   tags: TagCounts;
-  openDeckCallback: (id: string | number) => void;
+  openDeckCallback: (deck: any) => void;
   archiveCallback: (id: string | number) => void;
   addTagCallback: (id: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
