@@ -7,7 +7,8 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import appReducer, {
   LOGIN_WAITING,
   SET_UX0_SCROLL,
-  dispatchAction
+  dispatchAction,
+  SET_NO_LOG
 } from "./reducers";
 
 const store = createStore(
@@ -27,6 +28,8 @@ import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";
 import CardHover from "../components/main/CardHover";
 import { AppState } from "./appState";
+import OutputLogInput from "../components/popups/OutputLogInput";
+import { ipcSend } from "../renderer-util";
 
 function App(): JSX.Element {
   const loginState = useSelector((state: AppState) => state.loginState);
@@ -38,6 +41,7 @@ function App(): JSX.Element {
   const subNavId = useSelector((state: AppState) => state.subNav.id);
   const subNavData = useSelector((state: AppState) => state.subNav.data);
   const authForm = useSelector((state: AppState) => state.loginForm);
+  const noLog = useSelector((state: AppState) => state.noLog);
   /*
     Set up IPC listeners.
     This should only happen once when the app starts, so no
@@ -53,6 +57,16 @@ function App(): JSX.Element {
   React.useEffect(() => {
     console.log("loginState: " + loginState);
   }, [loginState]);
+
+  const closeNoLog = React.useCallback(
+    (log: string) => {
+      setTimeout(() => {
+        ipcSend("set_log", log);
+        dispatchAction(dispatch, SET_NO_LOG, false);
+      }, 1000);
+    },
+    [dispatch]
+  );
 
   const ux0Scroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>): void => {
@@ -72,6 +86,7 @@ function App(): JSX.Element {
       <div className="outer_wrapper">
         <TopBar artist={topArtist} offline={offline} />
         <Popup />
+        {noLog ? <OutputLogInput closeCallback={closeNoLog} /> : <></>}
         <CardHover />
         {loginState == LOGIN_OK ? <TopNav /> : <></>}
         {loading || loginState == LOGIN_WAITING ? (

@@ -21,7 +21,8 @@ import {
   SET_HOVER_SIZE,
   SET_EXPLORE_DATA,
   SET_EXPLORE_FILTERS_SKIP,
-  SET_UPDATE_STATE
+  SET_UPDATE_STATE,
+  SET_NO_LOG
 } from "./reducers";
 import { timestamp } from "../../shared/util";
 import {
@@ -171,5 +172,9 @@ export default function ipcListeners(dispatcher: unknown): void {
     );
     dispatchAction(dispatcher, SET_BACKGROUND_IMAGE, pd.settings.back_url);
     dispatchAction(dispatcher, SET_HOVER_SIZE, pd.cardsSizeHoverCard);
+  });
+
+  ipc.on("no_log", (): void => {
+    dispatchAction(dispatcher, SET_NO_LOG, true);
   });
 }

@@ -20,23 +20,10 @@ if (!remote.app.isPackaged) {
 import "@github/time-elements";
 
 import RenderApp from "./app/App";
-import { openDialog, renderLogInput } from "./renderer-util";
-import { createDiv } from "../shared/dom-fns";
 
 RenderApp();
 
 const byId = id => document.getElementById(id);
-
-let logDialogOpen = false;
-ipc.on("no_log", function(event, arg) {
-  if (!logDialogOpen) {
-    logDialogOpen = true;
-    const cont = createDiv(["dialog_content"]);
-    cont.style.width = "650px";
-    renderLogInput(cont);
-    openDialog(cont, () => (logDialogOpen = false));
-  }
-});
 
 ipc.on("set_draft_link", function(event, arg) {
   byId("share_input").value = arg;
