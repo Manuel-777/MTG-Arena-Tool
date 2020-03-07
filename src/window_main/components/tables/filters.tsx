@@ -139,10 +139,19 @@ export interface BinaryFilterProps
   extends MultiSelectFilterProps<BinaryFilterValue> {
   trueLabel: string;
   falseLabel: string;
+  trueSymbol?: string;
+  falseSymbol?: string;
 }
 
 export function BinaryFilter(props: BinaryFilterProps): JSX.Element {
   const [filterValue, onClickMultiFilter] = useMultiSelectFilter(props);
+  const { trueLabel, falseLabel, trueSymbol, falseSymbol } = props;
+  const symbolStyle = {
+    height: "20px",
+    width: "20px",
+    margin: "auto 2px",
+    verticalAlign: "middle"
+  };
   return (
     <div
       className={"matches_table_query_binary"}
@@ -151,18 +160,44 @@ export function BinaryFilter(props: BinaryFilterProps): JSX.Element {
         height: "32px"
       }}
     >
-      <BinarySymbol
-        isOn={true}
-        onClick={onClickMultiFilter("true")}
-        className={filterValue["true"] ? "" : " rarity_filter_on"}
-        title={props.trueLabel}
-      />
-      <BinarySymbol
-        isOn={false}
-        onClick={onClickMultiFilter("false")}
-        className={filterValue["false"] ? "" : " rarity_filter_on"}
-        title={props.falseLabel}
-      />
+      {trueSymbol ? (
+        <div
+          className={
+            "ontheplaytext" + (filterValue["true"] ? "" : " rarity_filter_on")
+          }
+          style={symbolStyle}
+          onClick={onClickMultiFilter("true")}
+          title={trueLabel}
+        >
+          {trueSymbol[0].toUpperCase()}
+        </div>
+      ) : (
+        <BinarySymbol
+          isOn={true}
+          onClick={onClickMultiFilter("true")}
+          className={filterValue["true"] ? "" : " rarity_filter_on"}
+          title={trueLabel}
+        />
+      )}
+      {falseSymbol ? (
+        <div
+          className={
+            "onthedrawtext" + (filterValue["false"] ? "" : " rarity_filter_on")
+          }
+          style={symbolStyle}
+          onClick={onClickMultiFilter("false")}
+          title={falseLabel}
+        >
+          {falseSymbol[0].toUpperCase()}
+        </div>
+      ) : (
+        <BinarySymbol
+          isOn={false}
+          onClick={onClickMultiFilter("false")}
+          className={filterValue["false"] ? "" : " rarity_filter_on"}
+          title={falseLabel}
+        />
+      )}
     </div>
   );
 }
@@ -172,6 +207,8 @@ export function BinaryColumnFilter<D extends TableData>({
   ...filterProps
 }: {
   column: ColumnInstance<D>;
+  trueSymbol?: string;
+  falseSymbol?: string;
   trueLabel: string;
   falseLabel: string;
 }): JSX.Element {

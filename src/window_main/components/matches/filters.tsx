@@ -15,7 +15,9 @@ export function OnPlayColumnFilter(props: {
   return (
     <BinaryColumnFilter
       {...props}
+      trueSymbol={"P"}
       trueLabel={"On the play"}
+      falseSymbol={"D"}
       falseLabel={"On the draw"}
     />
   );

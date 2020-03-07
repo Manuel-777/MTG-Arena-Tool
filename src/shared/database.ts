@@ -296,8 +296,8 @@ class Database {
     return this.metadata.abilities[abid] || undefined;
   }
 
-  event(id: string): string | false {
-    return this.events[id] || false;
+  event(id: string): string | undefined {
+    return this.events[id];
   }
 
   //possibly unused?
