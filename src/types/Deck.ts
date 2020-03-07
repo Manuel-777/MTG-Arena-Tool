@@ -14,6 +14,8 @@ export interface ArenaV3Deck extends BasicDeck {
 export interface InternalDeck extends BasicDeck {
   mainDeck: v2cardsList;
   sideboard: v2cardsList;
+  arenaMain?: Readonly<v2cardsList>;
+  arenaSide?: Readonly<v2cardsList>;
   custom?: boolean;
   tags?: string[];
   colors?: number[];
@@ -57,8 +59,8 @@ export type v2cardsList = Array<CardObject>;
 export type v3cardsList = Array<number>;
 
 export function isV2CardsList(
-  list: v2cardsList | v3cardsList
-): list is v2cardsList {
+  list: Readonly<anyCardsList>
+): list is Readonly<v2cardsList> {
   const first = (list as v2cardsList)[0];
   return first && first.quantity !== undefined;
 }

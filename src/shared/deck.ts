@@ -1,4 +1,10 @@
-import { anyCardsList, InternalDeck } from "../types/Deck";
+import {
+  anyCardsList,
+  CardObject,
+  InternalDeck,
+  isV2CardsList,
+  v2cardsList
+} from "../types/Deck";
 import { DbCardData } from "../types/Metadata";
 import CardsList from "./cardsList";
 import Colors from "./colors";
@@ -14,6 +20,8 @@ import {
 class Deck {
   private mainboard: CardsList;
   private sideboard: CardsList;
+  private readonly arenaMain: Readonly<v2cardsList>;
+  private readonly arenaSide: Readonly<v2cardsList>;
   private commandZoneGRPIds: number[];
   private name: string;
   public id: string;
@@ -28,13 +36,21 @@ class Deck {
 
   constructor(
     mtgaDeck: Partial<InternalDeck> = {},
-    main: anyCardsList = [],
-    side: anyCardsList = []
+    main?: anyCardsList,
+    side?: anyCardsList,
+    arenaMain?: Readonly<anyCardsList>,
+    arenaSide?: Readonly<anyCardsList>
   ) {
-    if (!mtgaDeck.mainDeck) mtgaDeck.mainDeck = [];
-    if (!mtgaDeck.sideboard) mtgaDeck.sideboard = [];
-    this.mainboard = new CardsList(main.length > 0 ? main : mtgaDeck.mainDeck);
-    this.sideboard = new CardsList(side.length > 0 ? side : mtgaDeck.sideboard);
+    // Putting these as default argument values works in tests, but throws an
+    // undefined reference error in production.
+    main = main ?? mtgaDeck.mainDeck ?? [];
+    side = side ?? mtgaDeck.sideboard ?? [];
+    arenaMain = arenaMain ?? main;
+    arenaSide = arenaSide ?? side;
+    this.mainboard = new CardsList(main);
+    this.sideboard = new CardsList(side);
+    this.arenaMain = Deck.toLoggedList(arenaMain);
+    this.arenaSide = Deck.toLoggedList(arenaSide);
     this.commandZoneGRPIds = mtgaDeck.commandZoneGRPIds ?? [];
     this.name = mtgaDeck.name ?? "";
     this.id = mtgaDeck.id ?? "";
@@ -47,6 +63,35 @@ class Deck {
     this.format = mtgaDeck.format ?? "";
     this.description = mtgaDeck.description ?? "";
     return this;
+  }
+
+  private static toLoggedList(
+    list: Readonly<anyCardsList>
+  ): Readonly<v2cardsList> {
+    if (isV2CardsList(list)) {
+      return Object.freeze(
+        list.map(({ id, quantity }: CardObject) =>
+          Object.freeze({
+            id,
+            quantity
+          })
+        )
+      );
+    } else {
+      const loggedList = [];
+      let lastObj: CardObject | undefined = undefined;
+      for (let id of list) {
+        if (lastObj === undefined || lastObj.id !== id) {
+          Object.freeze(lastObj);
+          lastObj = { id: id, quantity: 1 };
+          loggedList.push(lastObj);
+        } else {
+          lastObj.quantity++;
+        }
+      }
+      Object.freeze(lastObj);
+      return Object.freeze(loggedList);
+    }
   }
 
   /**
@@ -124,9 +169,13 @@ class Deck {
       commandZoneGRPIds: this.commandZoneGRPIds
     };
 
-    let ret = new Deck(objectClone(obj), main, side);
-
-    return ret;
+    return new Deck(
+      objectClone(obj),
+      main,
+      side,
+      this.arenaMain,
+      this.arenaSide
+    );
   }
 
   /**
@@ -272,17 +321,21 @@ class Deck {
   /**
    * Returns a copy of this deck as an object.
    */
-  getSave(): InternalDeck {
-    return objectClone(this.getSaveRaw());
+  getSave(includeAsLogged = false): InternalDeck {
+    return objectClone(this.getSaveRaw(includeAsLogged));
   }
 
   /**
    * Returns a copy of this deck as an object, but maintains variables references.
    */
-  getSaveRaw(): InternalDeck {
+  getSaveRaw(includeAsLogged = false): InternalDeck {
     return {
       mainDeck: this.mainboard.get(),
       sideboard: this.sideboard.get(),
+      ...(includeAsLogged && {
+        arenaMain: this.arenaMain,
+        arenaSide: this.arenaSide
+      }),
       name: this.name,
       id: this.id,
       lastUpdated: this.lastUpdated,
@@ -299,7 +352,7 @@ class Deck {
 
   /**
    * Returns a unique string for this deck. (not hashed)
-   * @param checkSide weter or not to use the sideboard (default: true)
+   * @param checkSide whether or not to use the sideboard (default: true)
    */
   getUniqueString(checkSide = true) {
     this.sortMainboard(compare_cards);

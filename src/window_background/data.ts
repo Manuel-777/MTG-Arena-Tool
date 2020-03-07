@@ -183,7 +183,7 @@ export function completeMatch(
 
   match.eventId = matchData.eventId;
   if (matchData.player.originalDeck) {
-    match.playerDeck = matchData.player.originalDeck.getSave();
+    match.playerDeck = matchData.player.originalDeck.getSave(true);
   }
   match.oppDeck = getOpponentDeck();
   match.oppDeck.commandZoneGRPIds = matchData.opponent.commanderGrpIds;
