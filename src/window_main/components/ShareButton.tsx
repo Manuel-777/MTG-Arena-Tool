@@ -40,7 +40,8 @@ export default function ShareButton({
       });
     } else if (type == "actionlog") {
       dispatchAction(dispatcher, SET_SHARE_DIALOG, {
-        data: data,
+        data: data.log,
+        id: data.id,
         type
       });
     }

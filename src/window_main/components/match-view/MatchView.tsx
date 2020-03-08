@@ -81,7 +81,10 @@ export function MatchView(props: MatchViewProps): JSX.Element {
                     className="button_simple openLog"
                     text="Action log"
                   ></Button>
-                  <ShareButton type="actionlog" data={actionLogDataB64} />
+                  <ShareButton
+                    type="actionlog"
+                    data={{ log: actionLogDataB64, id: match.id }}
+                  />
                 </>
               ) : (
                 <></>

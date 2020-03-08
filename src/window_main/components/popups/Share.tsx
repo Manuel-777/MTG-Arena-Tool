@@ -62,7 +62,7 @@ export default function Share(props: ShareProps): JSX.Element {
             deckString: data
           });
           break;
-        case "log":
+        case "actionlog":
           ipcSend("request_log_link", {
             expire: shareTypeId(option),
             log: data,
