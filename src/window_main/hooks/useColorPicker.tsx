@@ -1,8 +1,12 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { SketchPicker } from "react-color";
+import { ChromePicker } from "react-color";
 
-const decimalToHex = (alpha: number) =>
-  alpha === 0 ? "00" : Math.round(255 * alpha).toString(16);
+const decimalToHex = (alpha: number): string =>
+  alpha === 0
+    ? ""
+    : Math.round(255 * alpha)
+        .toString(16)
+        .padStart(2, "0");
 
 export default function useColorPicker(
   backgroundColor: string,
@@ -50,7 +54,7 @@ export default function useColorPicker(
             e.stopPropagation();
           }}
         >
-          <SketchPicker color={color} onChange={handleOnChange} />
+          <ChromePicker color={color} onChange={handleOnChange} />
         </div>
       </div>
     ) : (
