@@ -30,7 +30,7 @@ export default function Share(props: ShareProps): JSX.Element {
   const { closeCallback } = props;
   const dispatcher = useDispatch();
   const [stateUrl, setUrl] = useState("");
-  const [open, setOpen] = useState(1);
+  const [open, setOpen] = useState(0);
   const { data, id, url, type } = useSelector(
     (state: AppState) => state.shareDialog
   );
@@ -87,15 +87,26 @@ export default function Share(props: ShareProps): JSX.Element {
     setUrl(url);
   }, [url]);
 
+  useEffect(() => {
+    // React doesnt give css time to know there was a change
+    // in the properties, adding a timeout solves that.
+    setTimeout(() => {
+      setOpen(1);
+    }, 1);
+  }, []);
+
   return (
     <div
       className="popup-background"
-      style={{ opacity: open, backgroundColor: `rgba(0, 0, 0, ${0.5 * open})` }}
+      style={{
+        opacity: open * 2,
+        backgroundColor: `rgba(0, 0, 0, ${0.5 * open})`
+      }}
       onClick={handleClose}
     >
       <div
         className="popup-div"
-        style={{ height: `${open * 200}px`, width: "400px" }}
+        style={{ height: `${open * 200}px`, width: `${open * 400}px` }}
         onClick={(e): void => {
           e.stopPropagation();
         }}

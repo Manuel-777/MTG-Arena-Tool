@@ -66,7 +66,7 @@ function App(): JSX.Element {
       setTimeout(() => {
         ipcSend("set_log", log);
         dispatchAction(dispatch, SET_NO_LOG, false);
-      }, 1000);
+      }, 350);
     },
     [dispatch]
   );
@@ -74,7 +74,7 @@ function App(): JSX.Element {
   const closeShare = React.useCallback(() => {
     setTimeout(() => {
       dispatchAction(dispatch, SET_SHARE_DIALOG_OPEN, false);
-    }, 1000);
+    }, 350);
   }, [dispatch]);
 
   const ux0Scroll = useCallback(

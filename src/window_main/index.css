@@ -2532,8 +2532,7 @@ a:hover {
     display: flex;
     color: var(--color-light);
     overflow: hidden;
-    line-height: 32px;
-    text-indent: 16px;
+    text-indent: 10px;
     cursor: pointer;
     width: inherit;
     height: 32px;
@@ -2556,6 +2555,7 @@ a:hover {
 
 .light .select_options_container {
     background-color: var(--color-light);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 6px 8px 4px;
 }
 
 .light .select_option {
@@ -4243,6 +4243,7 @@ a:hover {
 }
 
 .popup-div {
+    overflow: hidden;
     max-width: 600px;
     height: 160px;
     width: -webkit-fill-available;
@@ -4251,5 +4252,5 @@ a:hover {
     padding: 32px;
     border-radius: 3px;
     box-shadow: 0px 2px 7px 4px rgba(0, 0, 0, 0.3);
-    -webkit-transition: all .25s ease-in-out;
+    -webkit-transition: all .25s cubic-bezier(0.48, 0, 0.48, 1.2);
 }
