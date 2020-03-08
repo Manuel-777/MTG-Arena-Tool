@@ -8,7 +8,8 @@ import appReducer, {
   LOGIN_WAITING,
   SET_UX0_SCROLL,
   dispatchAction,
-  SET_NO_LOG
+  SET_NO_LOG,
+  SET_SHARE_DIALOG_OPEN
 } from "./reducers";
 
 const store = createStore(
@@ -30,6 +31,7 @@ import CardHover from "../components/main/CardHover";
 import { AppState } from "./appState";
 import OutputLogInput from "../components/popups/OutputLogInput";
 import { ipcSend } from "../renderer-util";
+import Share from "../components/popups/Share";
 
 function App(): JSX.Element {
   const loginState = useSelector((state: AppState) => state.loginState);
@@ -42,6 +44,7 @@ function App(): JSX.Element {
   const subNavData = useSelector((state: AppState) => state.subNav.data);
   const authForm = useSelector((state: AppState) => state.loginForm);
   const noLog = useSelector((state: AppState) => state.noLog);
+  const share = useSelector((state: AppState) => state.shareDialog);
   /*
     Set up IPC listeners.
     This should only happen once when the app starts, so no
@@ -68,6 +71,12 @@ function App(): JSX.Element {
     [dispatch]
   );
 
+  const closeShare = React.useCallback(() => {
+    setTimeout(() => {
+      dispatchAction(dispatch, SET_SHARE_DIALOG_OPEN, false);
+    }, 1000);
+  }, [dispatch]);
+
   const ux0Scroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>): void => {
       const scroll =
@@ -87,6 +96,7 @@ function App(): JSX.Element {
         <TopBar artist={topArtist} offline={offline} />
         <Popup />
         {noLog ? <OutputLogInput closeCallback={closeNoLog} /> : <></>}
+        {share.open ? <Share closeCallback={closeShare} /> : <></>}
         <CardHover />
         {loginState == LOGIN_OK ? <TopNav /> : <></>}
         {loading || loginState == LOGIN_WAITING ? (

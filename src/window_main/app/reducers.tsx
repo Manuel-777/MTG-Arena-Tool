@@ -28,6 +28,9 @@ export const SET_UX0_SCROLL = "SET_UX0_SCROLL";
 export const SET_UX1_SCROLL = "SET_UX1_SCROLL";
 export const SET_UPDATE_STATE = "SET_UPDATE_STATE";
 export const SET_NO_LOG = "SET_NO_LOG";
+export const SET_SHARE_DIALOG = "SET_SHARE_DIALOG";
+export const SET_SHARE_DIALOG_URL = "SET_SHARE_DIALOG_URL";
+export const SET_SHARE_DIALOG_OPEN = "SET_SHARE_DIALOG_OPEN";
 export const SET_ANY = "SET_ANY";
 
 export const LOGIN_AUTH = 1;
@@ -343,6 +346,29 @@ const noLog = (
   }
 };
 
+interface ShareDialogState {
+  open: boolean;
+  url: string;
+  data: any;
+  id: string;
+}
+
+const shareDialog = (
+  state: ShareDialogState = defaultState.shareDialog,
+  action: Action
+): ShareDialogState => {
+  switch (action.type) {
+    case SET_SHARE_DIALOG:
+      return { ...state, open: true, ...action.value };
+    case SET_SHARE_DIALOG_URL:
+      return { ...state, url: action.value };
+    case SET_SHARE_DIALOG_OPEN:
+      return { ...state, open: action.value };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   backgroundImage: backgroundImage,
   backgroundGrpId: backgroundGrpId,
@@ -363,7 +389,8 @@ export default combineReducers({
   UX0Scroll: UX0Scroll,
   UX1Scroll: UX1Scroll,
   updateState: updateState,
-  noLog: noLog
+  noLog: noLog,
+  shareDialog: shareDialog
 });
 
 export function dispatchAction(

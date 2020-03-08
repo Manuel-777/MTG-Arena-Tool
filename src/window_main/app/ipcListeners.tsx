@@ -22,7 +22,8 @@ import {
   SET_EXPLORE_DATA,
   SET_EXPLORE_FILTERS_SKIP,
   SET_UPDATE_STATE,
-  SET_NO_LOG
+  SET_NO_LOG,
+  SET_SHARE_DIALOG_URL
 } from "./reducers";
 import { timestamp } from "../../shared/util";
 import {
@@ -176,5 +177,20 @@ export default function ipcListeners(dispatcher: unknown): void {
 
   ipc.on("no_log", (): void => {
     dispatchAction(dispatcher, SET_NO_LOG, true);
+  });
+
+  ipc.on("set_draft_link", function(event: string, arg: string) {
+    dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
+    dispatchAction(dispatcher, SET_LOADING, false);
+  });
+
+  ipc.on("set_log_link", function(event: string, arg: string) {
+    dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
+    dispatchAction(dispatcher, SET_LOADING, false);
+  });
+
+  ipc.on("set_deck_link", function(event: string, arg: string) {
+    dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
+    dispatchAction(dispatcher, SET_LOADING, false);
   });
 }

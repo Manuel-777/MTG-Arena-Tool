@@ -14,6 +14,13 @@ export interface AppState {
   UX1Scroll: boolean;
   updateState: string;
   noLog: boolean;
+  shareDialog: {
+    open: boolean;
+    url: string;
+    type: string;
+    data: any;
+    id: string;
+  };
   subNav: {
     type: number;
     id: string;
@@ -73,6 +80,13 @@ export const defaultState: AppState = {
   UX1Scroll: false,
   updateState: "",
   noLog: false,
+  shareDialog: {
+    open: false,
+    url: "",
+    type: "",
+    data: {},
+    id: ""
+  },
   subNav: {
     type: -1,
     id: "",

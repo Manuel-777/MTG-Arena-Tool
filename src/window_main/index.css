@@ -2527,6 +2527,7 @@ a:hover {
     margin: 0;
 }
 
+
 .select_button {
     display: flex;
     color: var(--color-light);
@@ -2545,6 +2546,33 @@ a:hover {
     white-space: nowrap;
     margin: 0;
     padding: 0;
+}
+
+.light .select_button {
+    color: var(--color-back);
+    background-color: var(--color-mid-40);
+    border: 1px solid var(--color-mid-50);
+}
+
+.light .select_options_container {
+    background-color: var(--color-light);
+}
+
+.light .select_option {
+    color: var(--color-light);
+    background-color: var(--color-mid-66);
+}
+
+.light .select_option:hover {
+    background-color: var(--color-mid-75);
+}
+
+.light .select_option:hover:enabled {
+    background-color: var(--color-mid-75);
+}
+
+.light .select_option:disabled {
+    background: var(--color-mid-75);
 }
 
 .select_button:after {
@@ -2765,7 +2793,7 @@ a:hover {
     width: 392px;
     margin-top: auto;
     border-radius: 2px;
-    z-index: 1000;
+    z-index: 900;
     box-shadow: 0 4px 13px 0px rgba(0, 0, 0, 0.3);
     -webkit-transition: all 0.3s cubic-bezier(0.2, 0.5, 0.35, 1);
 }

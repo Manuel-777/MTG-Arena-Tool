@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React, { KeyboardEvent } from "react";
 import { remote } from "electron";
-import { ipcSend, openDialog, closeDialog } from "../../renderer-util";
+import { ipcSend } from "../../renderer-util";
 import pd from "../../../shared/PlayerData";
 import { SHORTCUT_NAMES } from "../../../shared/constants";
 import Checkbox from "../Checkbox";
@@ -54,15 +54,11 @@ function openKeyCombinationDialog(name: string): void {
     });
 
     document.removeEventListener("keydown", reportKeyEvent as any);
-    closeDialog();
   });
 
   document.addEventListener("keydown", reportKeyEvent as any);
   cont.appendChild(desc);
   cont.appendChild(okButton);
-  openDialog(cont, () => {
-    document.removeEventListener("keydown", reportKeyEvent as any);
-  });
 }
 
 function ShortcutsRow({

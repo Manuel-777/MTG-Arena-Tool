@@ -1,4 +1,4 @@
-import { ipcRenderer as ipc, remote } from "electron";
+import { remote } from "electron";
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");
   const unhandled = require("electron-unhandled");
@@ -22,17 +22,3 @@ import "@github/time-elements";
 import RenderApp from "./app/App";
 
 RenderApp();
-
-const byId = id => document.getElementById(id);
-
-ipc.on("set_draft_link", function(event, arg) {
-  byId("share_input").value = arg;
-});
-
-ipc.on("set_log_link", function(event, arg) {
-  byId("share_input").value = arg;
-});
-
-ipc.on("set_deck_link", function(event, arg) {
-  byId("share_input").value = arg;
-});

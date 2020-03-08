@@ -209,7 +209,7 @@ label {
     animation-name: color;
     animation-duration: 2s;
     animation-iteration-count: infinite;
-    z-index: 50;
+    z-index: 950;
 }
 
 .loading_bar_main {
