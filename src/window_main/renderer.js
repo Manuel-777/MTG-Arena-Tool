@@ -18,7 +18,6 @@ if (!remote.app.isPackaged) {
   });
 }
 import "@github/time-elements";
-
 import RenderApp from "./app/App";
 
 RenderApp();

@@ -1,21 +1,12 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define, @typescript-eslint/camelcase */
 import { app, ipcRenderer as ipc, remote } from "electron";
-import _ from "lodash";
 import path from "path";
 import Pikaday from "pikaday";
 import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
-import {
-  createDiv,
-  createInput,
-  createLabel,
-  queryElements as $$
-} from "../shared/dom-fns";
+import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/PlayerData";
 
-const { dialog } = remote;
-
 const byId = id => document.getElementById(id);
-let dialogHandler = null;
 const unmountPoints = [];
 // quick and dirty shared state object for main renderer process
 // (for state shared across processes, use database or PlayerData)

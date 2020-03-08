@@ -1,5 +1,4 @@
-import React, { useState, useCallback, ChangeEvent, useEffect } from "react";
-import pd from "../../../shared/PlayerData";
+import React, { useState, useCallback, useEffect } from "react";
 import { ReactSelect } from "../../../shared/ReactSelect";
 import { ipcSend } from "../../renderer-util";
 import { useSelector, useDispatch } from "react-redux";
