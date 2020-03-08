@@ -1,64 +1,18 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import React, { KeyboardEvent } from "react";
+import React, { useState, useCallback } from "react";
 import { remote } from "electron";
 import { ipcSend } from "../../renderer-util";
 import pd from "../../../shared/PlayerData";
 import { SHORTCUT_NAMES } from "../../../shared/constants";
 import Checkbox from "../Checkbox";
 import Button from "../Button";
-import { createDiv, queryElements as $$ } from "../../../shared/dom-fns";
+import EditKey from "../popups/EditKey";
 
 function setKeyboardShortcuts(checked: boolean): void {
   ipcSend("save_user_settings", {
     enable_keyboard_shortcuts: checked,
     skipRefesh: true
   });
-}
-
-function openKeyCombinationDialog(name: string): void {
-  const cont = createDiv(["dialog_content"]);
-  cont.style.width = "320px";
-  cont.style.height = "120px";
-
-  remote.globalShortcut.unregisterAll();
-
-  const desc = createDiv(["keycomb_desc"], "Press any key");
-  const okButton = createDiv(["button_simple"], "Ok");
-
-  function reportKeyEvent(zEvent: KeyboardEvent): void {
-    const keyDesc = $$(".keycomb_desc")[0];
-    const keys = [];
-
-    if (zEvent.ctrlKey) keys.push("Control");
-    if (zEvent.shiftKey) keys.push("Shift");
-    if (zEvent.altKey) keys.push("Alt");
-    if (zEvent.metaKey) keys.push("Meta");
-
-    if (!["Control", "Shift", "Alt", "Meta"].includes(zEvent.key))
-      keys.push(zEvent.key);
-
-    const reportStr = keys.join("+");
-    keyDesc.innerHTML = reportStr;
-
-    zEvent.stopPropagation();
-    zEvent.preventDefault();
-  }
-
-  okButton.addEventListener("click", function() {
-    ((pd.settings as unknown) as Record<string, string>)[name] = $$(
-      ".keycomb_desc"
-    )[0].innerHTML;
-
-    ipcSend("save_user_settings", {
-      ...pd.settings
-    });
-
-    document.removeEventListener("keydown", reportKeyEvent as any);
-  });
-
-  document.addEventListener("keydown", reportKeyEvent as any);
-  cont.appendChild(desc);
-  cont.appendChild(okButton);
 }
 
 function ShortcutsRow({
@@ -68,7 +22,25 @@ function ShortcutsRow({
   code: string;
   index: number;
 }): JSX.Element {
+  const [openDialog, setOpenDialog] = useState(false);
   const ld = index % 2 ? "line_dark" : "line_light";
+
+  function openKeyCombinationDialog(): void {
+    remote.globalShortcut.unregisterAll();
+    setOpenDialog(true);
+  }
+
+  const closeKeyCombDialog = useCallback(
+    (key: string): void => {
+      setOpenDialog(false);
+      ((pd.settings as unknown) as Record<string, string>)[code] = key;
+      ipcSend("save_user_settings", {
+        ...pd.settings
+      });
+    },
+    [code]
+  );
+
   return (
     <>
       <div
@@ -90,11 +62,10 @@ function ShortcutsRow({
         <Button
           text="Edit"
           className={"button_simple button_edit"}
-          onClick={(): void => {
-            openKeyCombinationDialog(code);
-          }}
+          onClick={openKeyCombinationDialog}
         />
       </div>
+      {openDialog ? <EditKey closeCallback={closeKeyCombDialog} /> : <></>}
     </>
   );
 }

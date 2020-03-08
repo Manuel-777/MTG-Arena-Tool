@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ChangeEvent } from "react";
+import React, { useState, useCallback, ChangeEvent, useEffect } from "react";
 import { remote } from "electron";
 const { dialog } = remote;
 import pd from "../../../shared/PlayerData";
@@ -12,7 +12,7 @@ export default function OutputLogInput(
 ): JSX.Element {
   const { closeCallback } = props;
   const [log, setLog] = useState(pd.settings.logUri);
-  const [open, setOpen] = useState(1);
+  const [open, setOpen] = useState(0);
   const handleClose = useCallback(
     e => {
       setOpen(0);
@@ -42,6 +42,14 @@ export default function OutputLogInput(
     if (paths && paths.length && paths[0]) {
       setLog(paths[0]);
     }
+  }, []);
+
+  useEffect(() => {
+    // React doesnt give css time to know there was a change
+    // in the properties, adding a timeout solves that.
+    setTimeout(() => {
+      setOpen(1);
+    }, 1);
   }, []);
 
   return (
