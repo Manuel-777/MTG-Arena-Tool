@@ -51,7 +51,7 @@ function RarityColumn({
 }): JSX.Element {
   const rarityIndex = CARD_RARITIES.indexOf(rarityCode as any);
   const rarity = rarityCode.toLowerCase();
-  const cardsArray = colorData[rarity] ?? [];
+  const cardsArray = colorData && colorData[rarity] ? colorData[rarity] : [];
   return (
     <>
       <div
