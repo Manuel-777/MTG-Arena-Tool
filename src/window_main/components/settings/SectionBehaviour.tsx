@@ -4,6 +4,8 @@ import Checkbox from "../Checkbox";
 import Input from "../Input";
 import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
+import { useSelector } from "react-redux";
+import { AppState } from "../../app/appState";
 
 function clickBetaChannel(value: boolean): void {
   ipcSend("save_app_settings_norefresh", {
@@ -42,41 +44,42 @@ function changeExportFormat(value: string): void {
 }
 
 export default function SectionBehaviour(): JSX.Element {
+  const settings = useSelector((state: AppState) => state.settings);
   return (
     <>
       <Checkbox
         text={"Beta updates channel"}
-        value={pd.settings.beta_channel}
+        value={settings.beta_channel}
         callback={clickBetaChannel}
       />
       <Checkbox
         text={"Login/offline mode automatically"}
-        value={pd.settings.auto_login}
+        value={settings.auto_login}
         callback={clickAutoLogin}
       />
       <Checkbox
         text={"Launch to tray"}
-        value={pd.settings.launch_to_tray}
+        value={settings.launch_to_tray}
         callback={clickLaunchToTray}
       />
       <Checkbox
         text={"Launch on startup"}
-        value={pd.settings.startup}
+        value={settings.startup}
         callback={clickStartup}
       />
       <Checkbox
         text={"Close main window on match found"}
-        value={pd.settings.close_on_match}
+        value={settings.close_on_match}
         callback={clickCloseOnMatch}
       />
       <Checkbox
         text={"Close to tray"}
-        value={pd.settings.close_to_tray}
+        value={settings.close_to_tray}
         callback={clickCloseToTray}
       />
       <Input
         label="Export Format:"
-        value={pd.settings.export_format}
+        value={settings.export_format}
         placeholder="$Name,$Count,$SetName,$SetCode,$Rarity,$Type"
         callback={changeExportFormat}
       />

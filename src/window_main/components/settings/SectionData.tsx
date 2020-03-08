@@ -9,6 +9,8 @@ import { ipcSend } from "../../renderer-util";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
 import Button from "../Button";
+import { useSelector } from "react-redux";
+import { AppState } from "../../app/appState";
 
 const LANGUAGES = [
   "en",
@@ -125,6 +127,7 @@ function backportClick(): void {
 
 export default function SectionData(): JSX.Element {
   const arenaLogRef = React.useRef<HTMLInputElement>(null);
+  const settings = useSelector((state: AppState) => state.settings);
 
   const arenaLogClickHandle = (): void => {
     if (arenaLogRef.current) {
@@ -133,10 +136,10 @@ export default function SectionData(): JSX.Element {
   };
 
   let parsedOutput = <>auto-detection</>;
-  if (pd.settings.log_locale_format) {
+  if (settings.log_locale_format) {
     const testDate = parse(
       pd.last_log_timestamp,
-      pd.settings.log_locale_format,
+      settings.log_locale_format,
       new Date()
     );
     if (isValid(testDate) && !isNaN(testDate.getTime())) {
@@ -162,7 +165,7 @@ export default function SectionData(): JSX.Element {
         <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={LANGUAGES}
-          current={pd.settings.metadata_lang}
+          current={settings.metadata_lang}
           optionFormatter={getLanguageName}
           callback={setCardsLanguage}
         />
@@ -183,13 +186,13 @@ export default function SectionData(): JSX.Element {
           ref={arenaLogRef}
           contStyle={{ width: "70%" }}
           callback={arenaLogCallback}
-          placeholder={pd.settings.logUri}
-          value={pd.settings.logUri}
+          placeholder={settings.logUri}
+          value={settings.logUri}
         />
       </label>
       <Checkbox
         text="Read entire Arena log during launch"
-        value={!pd.settings.skip_firstpass}
+        value={!settings.skip_firstpass}
         callback={firstPassCallback}
       />
       <div style={{ paddingLeft: "35px" }} className="settings_note">
@@ -213,7 +216,7 @@ export default function SectionData(): JSX.Element {
         <Input
           callback={localeCallback}
           placeholder={"default (auto)"}
-          value={pd.settings.log_locale_format}
+          value={settings.log_locale_format}
         />
       </label>
       <div className="settings_note">

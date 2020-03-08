@@ -10,13 +10,13 @@ const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 export default function BackgroundImage(): JSX.Element {
   const dispatcher = useDispatch();
   const backgroundImage = useSelector(
-    (state: AppState) => state.backgroundImage
+    (state: AppState) => state.settings.back_url
   );
   const backgroundGrpId = useSelector(
     (state: AppState) => state.backgroundGrpId
   );
   const backgroundColor = useSelector(
-    (state: AppState) => state.backgroundColor
+    (state: AppState) => state.settings.back_color
   );
 
   const getImage = useCallback(() => {

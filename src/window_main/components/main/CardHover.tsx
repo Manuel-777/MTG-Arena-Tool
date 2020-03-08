@@ -9,11 +9,10 @@ import OwnershipStars from "../../../shared/OwnershipStars";
 const NotFound = "../images/notfound.png";
 const NoCard = "../images/nocard.png";
 
-function getFrontUrl(hoverGrpId: number): string {
+function getFrontUrl(hoverGrpId: number, quality: string): string {
   const cardObj = db.card(hoverGrpId);
   let newImg;
   try {
-    const quality = pd.settings.cards_quality;
     newImg = `https://img.scryfall.com/cards${cardObj?.images[quality]}`;
   } catch (e) {
     newImg = NotFound;
@@ -21,7 +20,7 @@ function getFrontUrl(hoverGrpId: number): string {
   return newImg;
 }
 
-function getBackUrl(hoverGrpId: number): string {
+function getBackUrl(hoverGrpId: number, quality: string): string {
   let cardObj = db.card(hoverGrpId);
   let newImg;
   if (
@@ -31,7 +30,6 @@ function getBackUrl(hoverGrpId: number): string {
   ) {
     cardObj = db.card(cardObj.dfcId);
     try {
-      const quality = pd.settings.cards_quality;
       newImg = `https://img.scryfall.com/cards${cardObj?.images[quality]}`;
     } catch (e) {
       newImg = NotFound;
@@ -41,6 +39,9 @@ function getBackUrl(hoverGrpId: number): string {
 }
 
 export default function CardHover(): JSX.Element {
+  const quality = useSelector(
+    (state: AppState) => state.settings.cards_quality
+  );
   const grpId = useSelector((state: AppState) => state.hover.grpId);
   const opacity = useSelector((state: AppState) => state.hover.opacity);
   const hoverSize = useSelector((state: AppState) => state.hover.size);
@@ -99,8 +100,8 @@ export default function CardHover(): JSX.Element {
 
   useEffect(() => {
     // Reset the image, begin new loading and clear state
-    const front = getFrontUrl(grpId);
-    const back = getBackUrl(grpId);
+    const front = getFrontUrl(grpId, quality);
+    const back = getBackUrl(grpId, quality);
     setFrontLoaded(false);
     setBackLoaded(false);
     setFrontUrl("");
@@ -121,7 +122,7 @@ export default function CardHover(): JSX.Element {
       img.onload = (): void => {};
       imgb.onload = (): void => {};
     };
-  }, [grpId]);
+  }, [grpId, quality]);
 
   return (
     <>

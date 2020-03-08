@@ -1,5 +1,7 @@
 import { LOGIN_AUTH } from "./reducers";
 import { WildcardsChange } from "../HomeTab";
+import { MergedSettings } from "../../types/settings";
+import { playerDataDefault, defaultCfg } from "../../shared/PlayerData";
 
 export interface AppState {
   topArtist: string;
@@ -15,6 +17,7 @@ export interface AppState {
   UX1Scroll: boolean;
   updateState: string;
   noLog: boolean;
+  settings: MergedSettings;
   shareDialog: {
     open: boolean;
     url: string;
@@ -82,6 +85,10 @@ export const defaultState: AppState = {
   UX1Scroll: false,
   updateState: "",
   noLog: false,
+  settings: {
+    ...playerDataDefault.settings,
+    ...defaultCfg.settings
+  },
   shareDialog: {
     open: false,
     url: "",

@@ -19,6 +19,7 @@ import {
   SET_PATREON,
   SET_BACKGROUND_IMAGE,
   SET_BACKGROUND_COLOR,
+  SET_SETTINGS,
   SET_HOVER_SIZE,
   SET_EXPLORE_DATA,
   SET_EXPLORE_FILTERS_SKIP,
@@ -155,9 +156,8 @@ export default function ipcListeners(dispatcher: unknown): void {
       SET_TOP_NAV,
       pd.settings.last_open_tab || MAIN_HOME
     );
-    dispatchAction(dispatcher, SET_BACKGROUND_IMAGE, pd.settings.back_url);
-    dispatchAction(dispatcher, SET_BACKGROUND_COLOR, pd.settings.back_color);
     dispatchAction(dispatcher, SET_HOVER_SIZE, pd.cardsSizeHoverCard);
+    dispatchAction(dispatcher, SET_SETTINGS, pd.settings);
   });
 
   ipc.on("no_log", (): void => {

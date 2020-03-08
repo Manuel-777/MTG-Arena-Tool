@@ -20,6 +20,8 @@ import {
 } from "../../../shared/constants";
 import { WrappedReactSelect } from "../../../shared/ReactSelect";
 import useColorPicker from "../../hooks/useColorPicker";
+import { useSelector } from "react-redux";
+import { AppState } from "../../app/appState";
 
 function toggleEditMode(): void {
   ipcSend("toggle_edit_mode");
@@ -348,29 +350,26 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
   );
 }
 
-function getOverlaySettings(index: number): any {
-  return pd.settings.overlays.filter((s: any, i: number) => i == index)[0];
-}
-
 export default function SectionOverlay(): JSX.Element {
+  const settings = useSelector((state: AppState) => state.settings);
   const [currentOverlay, setCurrentOverlay] = React.useState(
-    pd.settings.last_settings_overlay_section
+    settings.last_settings_overlay_section
   );
   const [currentOverlaySettings, setCurrentOverlaySettings] = React.useState(
-    null
+    settings.overlays[currentOverlay]
   );
   const [overlayScale, setOverlayScale] = React.useState(
-    pd.settings.overlay_scale
+    settings.overlay_scale
   );
   const [overlayVolume, setOverlayVolume] = React.useState(
-    pd.settings.sound_priority_volume
+    settings.sound_priority_volume
   );
   const containerRef: React.MutableRefObject<HTMLInputElement | null> = React.useRef(
     null
   );
 
   const [pickerColor, pickerDoShow, pickerElement] = useColorPicker(
-    pd.settings.overlay_back_color,
+    settings.overlay_back_color,
     undefined,
     backgroundColorPicker
   );
@@ -409,8 +408,11 @@ export default function SectionOverlay(): JSX.Element {
   };
 
   React.useEffect(() => {
-    setCurrentOverlaySettings(getOverlaySettings(currentOverlay));
-  }, [currentOverlay]);
+    const oSettings = settings.overlays.filter(
+      (s: any, i: number) => i == currentOverlay
+    )[0];
+    setCurrentOverlaySettings(oSettings);
+  }, [currentOverlay, settings.overlays]);
 
   React.useEffect(() => {}, [currentOverlaySettings]);
 
@@ -426,7 +428,7 @@ export default function SectionOverlay(): JSX.Element {
           min={10}
           max={200}
           step={10}
-          value={pd.settings.overlay_scale}
+          value={settings.overlay_scale}
           onChange={overlayScaleHandler}
         />
       </div>
@@ -449,13 +451,13 @@ export default function SectionOverlay(): JSX.Element {
 
       <Checkbox
         text="Always on top when shown"
-        value={pd.settings.overlay_ontop}
+        value={settings.overlay_ontop}
         callback={setAlwaysOnTop}
       />
 
       <Checkbox
         text="Sound when priority changes"
-        value={pd.settings.sound_priority}
+        value={settings.sound_priority}
         callback={setSoundPriority}
       />
 
@@ -467,7 +469,7 @@ export default function SectionOverlay(): JSX.Element {
           min={0}
           max={1}
           step={0.05}
-          value={pd.settings.sound_priority_volume}
+          value={settings.sound_priority_volume}
           onChange={overlayVolumeHandler}
         />
       </div>
@@ -479,7 +481,7 @@ export default function SectionOverlay(): JSX.Element {
 
       <OverlaysTopNav current={currentOverlay} setCurrent={setCurrentOverlay} />
       <div className="overlay_section">
-        {pd.settings.overlays.map((settings: any, index: number) => {
+        {settings.overlays.map((settings: any, index: number) => {
           return (
             <OverlaySettingsSection
               show={index == currentOverlay}

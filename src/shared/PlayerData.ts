@@ -32,7 +32,7 @@ import {
 import db from "./database";
 import { MergedSettings } from "../types/settings";
 
-const playerDataDefault = {
+export const playerDataDefault = {
   name: "",
   userName: "",
   arenaId: "",
@@ -83,7 +83,7 @@ const primaryBounds: Electron.Rectangle = remote
   ? remote.screen.getPrimaryDisplay().bounds
   : { width: 800, height: 600, x: 0, y: 0 };
 
-const defaultCfg = {
+export const defaultCfg = {
   windowBounds: { width: 800, height: 600, x: 0, y: 0 },
   cards: { cards_time: 0, cards_before: {}, cards: {} },
   cardsNew: {},

@@ -11,6 +11,8 @@ import Input from "../Input";
 import useColorPicker from "../../hooks/useColorPicker";
 import Slider from "../Slider";
 import { getCardImage } from "../../../shared/util";
+import { AppState } from "../../app/appState";
+import { useSelector } from "react-redux";
 
 function getCardStyleName(style: any): string {
   if (style == CARD_TILE_FLAT) return "Flat";
@@ -38,19 +40,20 @@ function setCardQuality(filter: string): void {
 const card = db.card(70344);
 
 export default function SectionVisual(): JSX.Element {
+  const settings = useSelector((state: AppState) => state.settings);
   const containerRef: React.MutableRefObject<HTMLInputElement | null> = React.useRef(
     null
   );
 
   const [pickerColor, pickerDoShow, pickerElement] = useColorPicker(
-    pd.settings.back_color,
+    settings.back_color,
     undefined,
     backColorPicker
   );
 
   // Hover card size slider
   const [hoverCardSize, setHoverCardSize] = React.useState(
-    pd.settings.cards_size_hover_card
+    settings.cards_size_hover_card
   );
 
   const hoverCardSizeDebouce = React.useCallback(
@@ -69,7 +72,7 @@ export default function SectionVisual(): JSX.Element {
 
   // Collection card size slider
   const [collectionCardSize, setCollectionCardSize] = React.useState(
-    pd.settings.cards_size
+    settings.cards_size
   );
 
   const collectionCardSizeDebouce = React.useCallback(
@@ -90,7 +93,7 @@ export default function SectionVisual(): JSX.Element {
     <>
       <Input
         label="Background URL:"
-        value={pd.settings.back_url !== "default" ? pd.settings.back_url : ""}
+        value={settings.back_url !== "default" ? settings.back_url : ""}
         placeholder="https://example.com/photo.png"
         callback={changeBackgroundImage}
       />
@@ -114,7 +117,7 @@ export default function SectionVisual(): JSX.Element {
         <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={[CARD_TILE_ARENA, CARD_TILE_FLAT]}
-          current={pd.settings.card_tile_style + ""}
+          current={settings.card_tile_style + ""}
           optionFormatter={getCardStyleName}
           callback={setCardStyle}
         />
@@ -137,7 +140,7 @@ export default function SectionVisual(): JSX.Element {
         <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={["small", "normal", "large"]}
-          current={pd.settings.cards_quality}
+          current={settings.cards_quality}
           callback={setCardQuality}
         />
       </label>
@@ -150,7 +153,7 @@ export default function SectionVisual(): JSX.Element {
           min={0}
           max={20}
           step={1}
-          value={pd.settings.cards_size_hover_card}
+          value={settings.cards_size_hover_card}
           onChange={hoverCardSizeHandler}
         />
       </div>
@@ -164,7 +167,7 @@ export default function SectionVisual(): JSX.Element {
           min={0}
           max={20}
           step={1}
-          value={pd.settings.cards_size}
+          value={settings.cards_size}
           onChange={collectionCardSizeHandler}
         />
       </div>

@@ -7,6 +7,8 @@ import { SHORTCUT_NAMES } from "../../../shared/constants";
 import Checkbox from "../Checkbox";
 import Button from "../Button";
 import EditKey from "../popups/EditKey";
+import { useSelector } from "react-redux";
+import { AppState } from "../../app/appState";
 
 function setKeyboardShortcuts(checked: boolean): void {
   ipcSend("save_user_settings", {
@@ -22,6 +24,7 @@ function ShortcutsRow({
   code: string;
   index: number;
 }): JSX.Element {
+  const settings = useSelector((state: AppState) => state.settings);
   const [openDialog, setOpenDialog] = useState(false);
   const ld = index % 2 ? "line_dark" : "line_light";
 
@@ -33,12 +36,12 @@ function ShortcutsRow({
   const closeKeyCombDialog = useCallback(
     (key: string): void => {
       setOpenDialog(false);
-      ((pd.settings as unknown) as Record<string, string>)[code] = key;
+      ((settings as unknown) as Record<string, string>)[code] = key;
       ipcSend("save_user_settings", {
-        ...pd.settings
+        ...settings
       });
     },
-    [code]
+    [code, settings]
   );
 
   return (
@@ -53,7 +56,7 @@ function ShortcutsRow({
         className={ld + " shortcuts_line"}
         style={{ gridArea: `${index + 2} / 2 / auto / 3` }}
       >
-        {((pd.settings as unknown) as Record<string, string>)[code]}
+        {((settings as unknown) as Record<string, string>)[code]}
       </div>
       <div
         className={ld + " shortcuts_line"}
@@ -71,11 +74,14 @@ function ShortcutsRow({
 }
 
 export default function SectionShortcuts(): JSX.Element {
+  const enableKeyboardShortcuts = useSelector(
+    (state: AppState) => state.settings.enable_keyboard_shortcuts
+  );
   return (
     <>
       <Checkbox
         text="Enable keyboard shortcuts"
-        value={pd.settings.enable_keyboard_shortcuts}
+        value={enableKeyboardShortcuts}
         callback={setKeyboardShortcuts}
       />
       <div className="settings_note" style={{ margin: "24px 16px 16px" }}>

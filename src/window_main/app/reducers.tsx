@@ -1,10 +1,12 @@
 import { combineReducers } from "redux";
 import { defaultState } from "./appState";
 import { WildcardsChange } from "../HomeTab";
+import { MergedSettings } from "../../types/settings";
 
 export const SET_BACKGROUND_IMAGE = "SET_BACKGROUND_IMAGE";
 export const SET_BACKGROUND_GRPID = "SET_BACKGROUND_GRPID";
 export const SET_BACKGROUND_COLOR = "SET_BACKGROUND_COLOR";
+export const SET_SETTINGS = "SET_SETTINGS";
 export const SET_TOP_ARTIST = "SET_TOP_ARTIST";
 export const SET_HOVER_IN = "SET_HOVER_IN";
 export const SET_HOVER_OUT = "SET_HOVER_OUT";
@@ -44,30 +46,6 @@ export interface Action {
   value: any;
 }
 
-const backgroundImage = (
-  state: string = defaultState.backgroundImage,
-  action: Action
-): string => {
-  switch (action.type) {
-    case SET_BACKGROUND_IMAGE:
-      return action.value;
-    default:
-      return state;
-  }
-};
-
-const backgroundColor = (
-  state: string = defaultState.backgroundColor,
-  action: Action
-): string => {
-  switch (action.type) {
-    case SET_BACKGROUND_COLOR:
-      return action.value;
-    default:
-      return state;
-  }
-};
-
 const backgroundGrpId = (
   state: number = defaultState.backgroundGrpId,
   action: Action
@@ -75,6 +53,22 @@ const backgroundGrpId = (
   switch (action.type) {
     case SET_BACKGROUND_GRPID:
       return action.value;
+    default:
+      return state;
+  }
+};
+
+const settings = (
+  state: MergedSettings = defaultState.settings,
+  action: Action
+): MergedSettings => {
+  switch (action.type) {
+    case SET_SETTINGS:
+      return action.value;
+    case SET_BACKGROUND_IMAGE:
+      return { ...state, back_url: action.value };
+    case SET_BACKGROUND_COLOR:
+      return { ...state, back_color: action.value };
     default:
       return state;
   }
@@ -383,9 +377,8 @@ const shareDialog = (
 };
 
 export default combineReducers({
-  backgroundImage: backgroundImage,
   backgroundGrpId: backgroundGrpId,
-  backgroundColor: backgroundColor,
+  settings: settings,
   topArtist: topArtist,
   hover: hover,
   offline: offline,

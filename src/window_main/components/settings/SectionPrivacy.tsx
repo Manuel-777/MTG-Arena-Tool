@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import Checkbox from "../Checkbox";
-import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
 import Button from "../Button";
+import { useSelector } from "react-redux";
+import { AppState } from "../../app/appState";
 
 function clickAnonExplore(value: boolean): void {
   ipcSend("save_user_settings", { anon_explore: value });
@@ -26,6 +27,7 @@ function eraseData(): void {
 }
 
 export default function SectionPrivacy(): JSX.Element {
+  const settings = useSelector((state: AppState) => state.settings);
   return (
     <>
       <Checkbox
@@ -34,7 +36,7 @@ export default function SectionPrivacy(): JSX.Element {
             Anonymous sharing <i>(makes your username anonymous on Explore)</i>
           </>
         }
-        value={pd.settings.anon_explore}
+        value={settings.anon_explore}
         callback={clickAnonExplore}
       />
       <Checkbox
@@ -47,7 +49,7 @@ export default function SectionPrivacy(): JSX.Element {
             </i>
           </>
         }
-        value={pd.settings.send_data}
+        value={settings.send_data}
         callback={clickSendData}
       />
       <Button text="Erase my shared data" onClick={eraseData} />
