@@ -182,15 +182,15 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           saveOverlaySettings(current, val, "show")
         }
       />
-      <label className="but_container_label">
-        Mode:
+      <div className="settings-select">
+        <label className="but_container_label">Mode:</label>
         <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={modeOptions}
           current={modeOptions[settings.mode]}
           callback={(filter: string): void => setOverlayMode(current, filter)}
         />
-      </label>
+      </div>
       <div className="settings_note" style={{ paddingLeft: "35px" }}>
         <p>
           <i>{modeHelp[settings.mode]}</i>

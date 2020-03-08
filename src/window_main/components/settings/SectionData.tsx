@@ -160,16 +160,16 @@ export default function SectionData(): JSX.Element {
 
   return (
     <>
-      <label className="but_container_label">
-        Arena Data
+      <div className="settings-select">
+        <label className="but_container_label">Arena Data </label>
         <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={LANGUAGES}
           current={settings.metadata_lang}
           optionFormatter={getLanguageName}
           callback={setCardsLanguage}
-        />
-      </label>
+        />{" "}
+      </div>
       <div className="settings_note">
         <i>
           <p>

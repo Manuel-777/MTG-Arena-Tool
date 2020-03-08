@@ -111,9 +111,8 @@ export default function SectionVisual(): JSX.Element {
         ></input>
       </label>
       {pickerElement}
-
-      <label className="but_container_label">
-        List style:
+      <div className="settings-select">
+        <label className="but_container_label">List style:</label>
         <WrappedReactSelect
           style={{ width: "180px", marginLeft: "32px" }}
           options={[CARD_TILE_ARENA, CARD_TILE_FLAT]}
@@ -133,18 +132,15 @@ export default function SectionVisual(): JSX.Element {
             />
           )}
         </div>
-      </label>
-
-      <label className="but_container_label">
-        Image quality:
+      </div>
+      <div className="settings-select">
+        <label className="but_container_label">Image quality:</label>
         <WrappedReactSelect
-          style={{ width: "180px", marginLeft: "32px" }}
           options={["small", "normal", "large"]}
           current={settings.cards_quality}
           callback={setCardQuality}
         />
-      </label>
-
+      </div>
       <div className="slidecontainer_settings">
         <label style={{ width: "400px" }} className="card_size_container">
           {`Hover card size: ${100 + Math.round(hoverCardSize) * 15}px`}
