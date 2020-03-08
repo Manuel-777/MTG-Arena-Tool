@@ -5,6 +5,7 @@ import db from "../../../shared/database";
 import pd from "../../../shared/PlayerData";
 import { AppState } from "../../app/appState";
 import { FACE_DFC_FRONT, FACE_DFC_BACK } from "../../../shared/constants";
+import OwnershipStars from "../../../shared/OwnershipStars";
 const NotFound = "../images/notfound.png";
 const NoCard = "../images/nocard.png";
 
@@ -43,6 +44,7 @@ export default function CardHover(): JSX.Element {
   const grpId = useSelector((state: AppState) => state.hover.grpId);
   const opacity = useSelector((state: AppState) => state.hover.opacity);
   const hoverSize = useSelector((state: AppState) => state.hover.size);
+  const card = db.card(grpId);
   const [frontLoaded, setFrontLoaded] = useState(false);
   const [backLoaded, setBackLoaded] = useState(false);
 
@@ -130,7 +132,15 @@ export default function CardHover(): JSX.Element {
       <div
         style={getStyle(grpId, hoverSize, opacity)}
         className="card-hover-main"
-      />
+      >
+        {card ? (
+          <div className="ownership-stars-container">
+            <OwnershipStars card={card} />
+          </div>
+        ) : (
+          <></>
+        )}
+      </div>
     </>
   );
 }

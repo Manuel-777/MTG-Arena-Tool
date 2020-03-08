@@ -976,6 +976,16 @@ span {
     transition: all 0.15s ease-in-out;
 }
 
+.ownership-stars-container {
+    background-color: var(--color-back-100);
+    width: calc(100% - 32px);
+    margin: -38px auto 0 auto;
+    height: 38px;
+    align-items: center;
+    display: flex;
+    border-radius: 5px 5px 0 0;
+}
+
 .actionlog-div {
     font-family: var(--main-font-name);
     width: calc(50% - 48px);
