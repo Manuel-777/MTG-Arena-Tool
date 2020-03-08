@@ -40,11 +40,6 @@ import uxMove from "../uxMove";
 export default function ipcListeners(dispatcher: unknown): void {
   console.log("Set up IPC listeners.");
 
-  ipc.on("show_login", (): void => {
-    //  canLogin = true;
-    //  showLogin();
-  });
-
   ipc.on("prefill_auth_form", (event: string, arg: any): void => {
     dispatchAction(dispatcher, SET_LOGIN_FORM, {
       email: arg.username,
@@ -92,18 +87,6 @@ export default function ipcListeners(dispatcher: unknown): void {
 
   ipc.on("offline", (): void => {
     dispatchAction(dispatcher, SET_OFFLINE, true);
-  });
-
-  ipc.on("show_loading", (): void => {
-    dispatchAction(dispatcher, SET_LOADING, true);
-  });
-
-  ipc.on("hide_loading", (): void => {
-    dispatchAction(dispatcher, SET_LOADING, false);
-  });
-
-  ipc.on("show_login", (): void => {
-    //showLogin();
   });
 
   ipc.on("toggle_login", (event: string, arg: any): void => {
