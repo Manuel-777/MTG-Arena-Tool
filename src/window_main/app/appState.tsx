@@ -5,6 +5,7 @@ export interface AppState {
   topArtist: string;
   backgroundImage: string;
   backgroundGrpId: number;
+  backgroundColor: string;
   offline: boolean;
   loading: boolean;
   loginState: number;
@@ -71,6 +72,7 @@ export const defaultState: AppState = {
   topArtist: "Bedevil by Seb Seb McKinnon",
   backgroundImage: "default",
   backgroundGrpId: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.25)",
   offline: false,
   loading: false,
   loginState: LOGIN_AUTH,

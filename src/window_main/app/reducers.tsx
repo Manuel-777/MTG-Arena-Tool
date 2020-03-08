@@ -4,6 +4,7 @@ import { WildcardsChange } from "../HomeTab";
 
 export const SET_BACKGROUND_IMAGE = "SET_BACKGROUND_IMAGE";
 export const SET_BACKGROUND_GRPID = "SET_BACKGROUND_GRPID";
+export const SET_BACKGROUND_COLOR = "SET_BACKGROUND_COLOR";
 export const SET_TOP_ARTIST = "SET_TOP_ARTIST";
 export const SET_HOVER_IN = "SET_HOVER_IN";
 export const SET_HOVER_OUT = "SET_HOVER_OUT";
@@ -49,6 +50,18 @@ const backgroundImage = (
 ): string => {
   switch (action.type) {
     case SET_BACKGROUND_IMAGE:
+      return action.value;
+    default:
+      return state;
+  }
+};
+
+const backgroundColor = (
+  state: string = defaultState.backgroundColor,
+  action: Action
+): string => {
+  switch (action.type) {
+    case SET_BACKGROUND_COLOR:
       return action.value;
     default:
       return state;
@@ -372,6 +385,7 @@ const shareDialog = (
 export default combineReducers({
   backgroundImage: backgroundImage,
   backgroundGrpId: backgroundGrpId,
+  backgroundColor: backgroundColor,
   topArtist: topArtist,
   hover: hover,
   offline: offline,

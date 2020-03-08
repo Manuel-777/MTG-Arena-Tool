@@ -15,6 +15,9 @@ export default function BackgroundImage(): JSX.Element {
   const backgroundGrpId = useSelector(
     (state: AppState) => state.backgroundGrpId
   );
+  const backgroundColor = useSelector(
+    (state: AppState) => state.backgroundColor
+  );
 
   const getImage = useCallback(() => {
     let image = backgroundImage;
@@ -57,7 +60,7 @@ export default function BackgroundImage(): JSX.Element {
   return (
     <div
       className="main_wrapper main_bg_image"
-      style={{ backgroundImage: getImage() }}
+      style={{ backgroundImage: getImage(), backgroundColor: backgroundColor }}
     ></div>
   );
 }
