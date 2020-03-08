@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import Checkbox from "../Checkbox";
+import Toggle from "../Toggle";
 import { ipcSend } from "../../renderer-util";
 import Button from "../Button";
 import { useSelector } from "react-redux";
@@ -30,7 +30,7 @@ export default function SectionPrivacy(): JSX.Element {
   const settings = useSelector((state: AppState) => state.settings);
   return (
     <>
-      <Checkbox
+      <Toggle
         text={
           <>
             Anonymous sharing <i>(makes your username anonymous on Explore)</i>
@@ -39,7 +39,7 @@ export default function SectionPrivacy(): JSX.Element {
         value={settings.anon_explore}
         callback={clickAnonExplore}
       />
-      <Checkbox
+      <Toggle
         text={
           <>
             Online sharing

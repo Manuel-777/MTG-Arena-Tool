@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import Checkbox from "../Checkbox";
+import Toggle from "../Toggle";
 import Input from "../Input";
-import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
 import { useSelector } from "react-redux";
 import { AppState } from "../../app/appState";
@@ -47,32 +46,32 @@ export default function SectionBehaviour(): JSX.Element {
   const settings = useSelector((state: AppState) => state.settings);
   return (
     <>
-      <Checkbox
+      <Toggle
         text={"Beta updates channel"}
         value={settings.beta_channel}
         callback={clickBetaChannel}
       />
-      <Checkbox
+      <Toggle
         text={"Login/offline mode automatically"}
         value={settings.auto_login}
         callback={clickAutoLogin}
       />
-      <Checkbox
+      <Toggle
         text={"Launch to tray"}
         value={settings.launch_to_tray}
         callback={clickLaunchToTray}
       />
-      <Checkbox
+      <Toggle
         text={"Launch on startup"}
         value={settings.startup}
         callback={clickStartup}
       />
-      <Checkbox
+      <Toggle
         text={"Close main window on match found"}
         value={settings.close_on_match}
         callback={clickCloseOnMatch}
       />
-      <Checkbox
+      <Toggle
         text={"Close to tray"}
         value={settings.close_to_tray}
         callback={clickCloseToTray}

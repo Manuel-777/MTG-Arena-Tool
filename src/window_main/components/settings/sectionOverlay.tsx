@@ -3,7 +3,7 @@ import React from "react";
 import Button from "../Button";
 import { ipcSend } from "../../renderer-util";
 import pd from "../../../shared/PlayerData";
-import Checkbox from "../Checkbox";
+import Toggle from "../Toggle";
 import Slider from "../Slider";
 import _ from "lodash";
 import {
@@ -175,7 +175,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
 
   return show ? (
     <>
-      <Checkbox
+      <Toggle
         text={"Enable overlay " + (current + 1)}
         value={settings.show}
         callback={(val: boolean): void =>
@@ -196,7 +196,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           <i>{modeHelp[settings.mode]}</i>
         </p>
       </div>
-      <Checkbox
+      <Toggle
         text={"Always show overlay"}
         value={settings.show_always}
         callback={(val: boolean): void =>
@@ -213,14 +213,14 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           </i>
         </p>
       </div>
-      <Checkbox
+      <Toggle
         text={"Show top bar"}
         value={settings.top}
         callback={(val: boolean): void =>
           saveOverlaySettings(current, val, "top")
         }
       />
-      <Checkbox
+      <Toggle
         text={"Show title"}
         value={settings.title}
         callback={(val: boolean): void =>
@@ -228,7 +228,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         }
         disabled={settings.mode === OVERLAY_DRAFT}
       />
-      <Checkbox
+      <Toggle
         text={"Show deck/lists"}
         value={settings.deck}
         callback={(val: boolean): void =>
@@ -236,7 +236,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         }
         disabled={settings.mode === OVERLAY_DRAFT}
       />
-      <Checkbox
+      <Toggle
         text={"Show sideboard"}
         value={settings.sideboard}
         callback={(val: boolean): void =>
@@ -248,7 +248,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           )
         }
       />
-      <Checkbox
+      <Toggle
         text={"Compact lands"}
         value={settings.lands}
         callback={(val: boolean): void =>
@@ -260,7 +260,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           )
         }
       />
-      <Checkbox
+      <Toggle
         text={"Show clock"}
         value={settings.clock}
         callback={(val: boolean): void =>
@@ -268,7 +268,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         }
         disabled={OVERLAY_DRAFT_MODES.includes(settings.mode)}
       />
-      <Checkbox
+      <Toggle
         text={"Show odds"}
         value={settings.draw_odds}
         callback={(val: boolean): void =>
@@ -283,14 +283,14 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           OVERLAY_DRAFT_BREW
         ].includes(settings.mode)}
       />
-      <Checkbox
+      <Toggle
         text={"Show hover cards"}
         value={settings.cards_overlay}
         callback={(val: boolean): void =>
           saveOverlaySettings(current, val, "cards_overlay")
         }
       />
-      <Checkbox
+      <Toggle
         text={"Show type counts"}
         value={settings.type_counts}
         callback={(val: boolean): void =>
@@ -298,7 +298,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         }
         disabled={[OVERLAY_LOG, OVERLAY_DRAFT].includes(settings.mode)}
       />
-      <Checkbox
+      <Toggle
         text={"Show mana curve"}
         value={settings.mana_curve}
         callback={(val: boolean): void =>
@@ -449,13 +449,13 @@ export default function SectionOverlay(): JSX.Element {
       </label>
       {pickerElement}
 
-      <Checkbox
+      <Toggle
         text="Always on top when shown"
         value={settings.overlay_ontop}
         callback={setAlwaysOnTop}
       />
 
-      <Checkbox
+      <Toggle
         text="Sound when priority changes"
         value={settings.sound_priority}
         callback={setSoundPriority}

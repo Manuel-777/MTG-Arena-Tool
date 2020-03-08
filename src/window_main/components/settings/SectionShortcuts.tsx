@@ -2,9 +2,8 @@
 import React, { useState, useCallback } from "react";
 import { remote } from "electron";
 import { ipcSend } from "../../renderer-util";
-import pd from "../../../shared/PlayerData";
 import { SHORTCUT_NAMES } from "../../../shared/constants";
-import Checkbox from "../Checkbox";
+import Toggle from "../Toggle";
 import Button from "../Button";
 import EditKey from "../popups/EditKey";
 import { useSelector } from "react-redux";
@@ -79,7 +78,7 @@ export default function SectionShortcuts(): JSX.Element {
   );
   return (
     <>
-      <Checkbox
+      <Toggle
         text="Enable keyboard shortcuts"
         value={enableKeyboardShortcuts}
         callback={setKeyboardShortcuts}

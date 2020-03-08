@@ -2,7 +2,7 @@
 import React from "react";
 import { remote, shell } from "electron";
 const { dialog } = remote;
-import Checkbox from "../Checkbox";
+import Toggle from "../Toggle";
 import Input from "../Input";
 import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
@@ -190,7 +190,7 @@ export default function SectionData(): JSX.Element {
           value={settings.logUri}
         />
       </label>
-      <Checkbox
+      <Toggle
         text="Read entire Arena log during launch"
         value={!settings.skip_firstpass}
         callback={firstPassCallback}
