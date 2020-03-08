@@ -2,6 +2,7 @@ import React from "react";
 
 interface SwitchProps {
   text: string | JSX.Element;
+  containerClassName?: string;
   value: boolean;
   callback: (value: boolean) => void;
   disabled?: boolean;
@@ -9,7 +10,7 @@ interface SwitchProps {
 }
 
 export default function Switch(props: SwitchProps): JSX.Element {
-  const { disabled, value, callback, style } = props;
+  const { disabled, value, callback, style, containerClassName } = props;
   const [currentValue, setCurrentValue] = React.useState(value);
 
   const click = (
@@ -33,7 +34,10 @@ export default function Switch(props: SwitchProps): JSX.Element {
   }, [props.value]);
 
   return (
-    <div style={{ ...style }} className="switch-container">
+    <div
+      style={{ ...style }}
+      className={containerClassName || "switch-container"}
+    >
       <div
         style={disabled ? disabledStyle : {}}
         className="switch-label"

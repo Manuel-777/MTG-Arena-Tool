@@ -91,14 +91,16 @@ export default function SectionVisual(): JSX.Element {
 
   return (
     <>
-      <Input
-        label="Background URL:"
-        value={settings.back_url !== "default" ? settings.back_url : ""}
-        placeholder="https://example.com/photo.png"
-        callback={changeBackgroundImage}
-      />
+      <div className="centered_setting_container">
+        <label>Background URL:</label>
+        <Input
+          value={settings.back_url !== "default" ? settings.back_url : ""}
+          placeholder="https://example.com/photo.png"
+          callback={changeBackgroundImage}
+        />
+      </div>
 
-      <label className="but_container_label">
+      <label className="centered_setting_container">
         <span style={{ marginRight: "32px" }}>Background shade:</span>
         <input
           onClick={pickerDoShow}
@@ -111,37 +113,36 @@ export default function SectionVisual(): JSX.Element {
         ></input>
       </label>
       {pickerElement}
-      <div className="settings-select">
-        <label className="but_container_label">List style:</label>
+      <div className="centered_setting_container">
+        <label>List style:</label>
         <WrappedReactSelect
-          style={{ width: "180px", marginLeft: "32px" }}
           options={[CARD_TILE_ARENA, CARD_TILE_FLAT]}
           current={settings.card_tile_style + ""}
           optionFormatter={getCardStyleName}
           callback={setCardStyle}
         />
-        <div style={{ width: "50%" }}>
-          {!!card && (
-            <CardTile
-              card={card}
-              indent="a"
-              isHighlighted={false}
-              isSideboard={false}
-              quantity={4}
-              showWildcards={false}
-            />
-          )}
-        </div>
       </div>
-      <div className="settings-select">
-        <label className="but_container_label">Image quality:</label>
+      <div className="centered_setting_container">
+        {!!card && (
+          <CardTile
+            card={card}
+            indent="a"
+            isHighlighted={false}
+            isSideboard={false}
+            quantity={4}
+            showWildcards={false}
+          />
+        )}
+      </div>
+      <div className="centered_setting_container">
+        <label>Image quality:</label>
         <WrappedReactSelect
           options={["small", "normal", "large"]}
           current={settings.cards_quality}
           callback={setCardQuality}
         />
       </div>
-      <div className="slidecontainer_settings">
+      <div className="centered_setting_container">
         <label style={{ width: "400px" }} className="card_size_container">
           {`Hover card size: ${100 + Math.round(hoverCardSize) * 15}px`}
         </label>
@@ -154,7 +155,7 @@ export default function SectionVisual(): JSX.Element {
         />
       </div>
 
-      <div className="slidecontainer_settings">
+      <div className="centered_setting_container">
         <label style={{ width: "400px" }} className="card_size_container">
           {`Collection card size: ${100 +
             Math.round(collectionCardSize) * 15}px`}

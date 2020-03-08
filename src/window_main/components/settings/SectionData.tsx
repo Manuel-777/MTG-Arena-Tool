@@ -160,10 +160,9 @@ export default function SectionData(): JSX.Element {
 
   return (
     <>
-      <div className="settings-select">
-        <label className="but_container_label">Arena Data </label>
+      <div className="centered_setting_container">
+        <label>Arena Data </label>
         <WrappedReactSelect
-          style={{ width: "180px", marginLeft: "32px" }}
           options={LANGUAGES}
           current={settings.metadata_lang}
           optionFormatter={getLanguageName}
@@ -179,17 +178,24 @@ export default function SectionData(): JSX.Element {
           <p>Card names when exporting will also be changed.</p>
         </i>
       </div>
-      <label className="but_container_label" onClick={arenaLogClickHandle}>
-        Arena Log:
-        <div className="open_button" />
-        <Input
-          ref={arenaLogRef}
-          contStyle={{ width: "70%" }}
-          callback={arenaLogCallback}
-          placeholder={settings.logUri}
-          value={settings.logUri}
-        />
-      </label>
+      <div className="centered_setting_container">
+        <label onClick={arenaLogClickHandle}>Arena Log:</label>
+        <div
+          style={{
+            display: "flex",
+            width: "-webkit-fill-available",
+            justifyContent: "flex-end"
+          }}
+        >
+          <div className="open_button" />
+          <Input
+            ref={arenaLogRef}
+            callback={arenaLogCallback}
+            placeholder={settings.logUri}
+            value={settings.logUri}
+          />
+        </div>
+      </div>
       <Toggle
         text="Read entire Arena log during launch"
         value={!settings.skip_firstpass}
@@ -211,14 +217,14 @@ export default function SectionData(): JSX.Element {
           </p>
         </i>
       </div>
-      <label className="but_container_label">
-        Log Timestamp Format:
+      <div className="centered_setting_container">
+        <label>Log Timestamp Format:</label>
         <Input
           callback={localeCallback}
           placeholder={"default (auto)"}
           value={settings.log_locale_format}
         />
-      </label>
+      </div>
       <div className="settings_note">
         <p>Parsed output: {parsedOutput}</p>
         <i>

@@ -182,16 +182,15 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           saveOverlaySettings(current, val, "show")
         }
       />
-      <div className="settings-select">
-        <label className="but_container_label">Mode:</label>
+      <div className="centered_setting_container">
+        <label>Mode:</label>
         <WrappedReactSelect
-          style={{ width: "180px", marginLeft: "32px" }}
           options={modeOptions}
           current={modeOptions[settings.mode]}
           callback={(filter: string): void => setOverlayMode(current, filter)}
         />
       </div>
-      <div className="settings_note" style={{ paddingLeft: "35px" }}>
+      <div className="settings_note" style={{ paddingLeft: "16px" }}>
         <p>
           <i>{modeHelp[settings.mode]}</i>
         </p>
@@ -203,7 +202,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           saveOverlaySettings(current, val, "show_always")
         }
       />
-      <div className="settings_note" style={{ paddingLeft: "35px" }}>
+      <div className="settings_note" style={{ paddingLeft: "16px" }}>
         <p>
           <i>
             Displays the overlay regardless of Arena match or draft status
@@ -306,7 +305,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
         }
         disabled={[OVERLAY_LOG, OVERLAY_DRAFT].includes(settings.mode)}
       />
-      <div className="slidecontainer_settings">
+      <div className="centered_setting_container">
         <label style={{ width: "400px" }} className="card_size_container">
           {`Elements transparency: ${Math.round(overlayAlpha * 100)}%`}
         </label>
@@ -319,7 +318,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           onChange={overlayAlphaHandler}
         />
       </div>
-      <div className="slidecontainer_settings">
+      <div className="centered_setting_container">
         <label style={{ width: "400px" }} className="card_size_container">
           {`background transparency: ${Math.round(overlayAlphaBack * 100)}%`}
         </label>
@@ -420,7 +419,7 @@ export default function SectionOverlay(): JSX.Element {
     <>
       <Button onClick={toggleEditMode} text="Edit Overlay Positions" />
 
-      <div className="slidecontainer_settings">
+      <div className="centered_setting_container">
         <label style={{ width: "400px" }} className="card_size_container">
           {`UI Scale: ${overlayScale}%`}
         </label>
@@ -433,8 +432,8 @@ export default function SectionOverlay(): JSX.Element {
         />
       </div>
 
-      <label className="but_container_label">
-        <span style={{ marginRight: "32px" }}>
+      <label className="centered_setting_container">
+        <span>
           Background color <i>(0,0,0,0 to use default background)</i>:
         </span>
         <input
@@ -461,7 +460,7 @@ export default function SectionOverlay(): JSX.Element {
         callback={setSoundPriority}
       />
 
-      <div className="slidecontainer_settings">
+      <div className="centered_setting_container">
         <label style={{ width: "400px" }} className="card_size_container">
           {`Volume: ${Math.round(overlayVolume * 100)}%`}
         </label>
@@ -474,7 +473,10 @@ export default function SectionOverlay(): JSX.Element {
         />
       </div>
 
-      <div className="settings_note" style={{ margin: "24px 64px 0px 16px" }}>
+      <div
+        className="settings_note"
+        style={{ margin: "24px auto 0px auto", width: "fit-content" }}
+      >
         You can enable up to 5 independent overlay windows. Customize each
         overlay using the settings below.
       </div>

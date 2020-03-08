@@ -1,4 +1,7 @@
 @import '../../node_modules/pikaday/css/pikaday.css';
+p {
+    margin: 0;
+}
 
 .button_reset {
     font-family: inherit; /* 1 */
@@ -2212,6 +2215,7 @@ a:hover {
 }
 
 .switch-container {
+    min-height: 32px;
     width: calc(100% - 76px);
     margin: 12px;
     align-items: center;
@@ -2237,19 +2241,19 @@ a:hover {
     flex-direction: column;
 }
 
-.slidecontainer_settings {
-    overflow: unset;
-    display: flex;
-    height: 28px;
+.centered_setting_container {
+    min-height: 32px;
+    width: calc(100% - 76px);
+    margin: 12px 12px;
     align-items: center;
-    line-height: 28px;
-    margin: 10px 48px 10px 16px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .slidecontainer {
     overflow: unset;
-    width: calc(100% - 128px);
-    margin: 0 64px;
+    width: 100%;
+    margin: 5px 0px 0 0;
     display: flex;
     flex-direction: column;
 }
@@ -2890,9 +2894,9 @@ a:hover {
 }
 
 .settings_note {
-    color: var(--color-light);
+    color: var(--color-light-75);
     font-size: 14px;
-    margin: 0px 64px 20px 16px;
+    margin: 0px 64px 20px 12px;
 }
 
 .settings_row {
