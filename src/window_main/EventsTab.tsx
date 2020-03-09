@@ -1,6 +1,7 @@
 import isValid from "date-fns/isValid";
 import _ from "lodash";
 import React from "react";
+import ReactDOM from "react-dom";
 import { TableState } from "react-table";
 import db from "../shared/database";
 import { createDiv } from "../shared/dom-fns";
@@ -10,13 +11,13 @@ import { EventInstanceData, InternalEvent } from "../types/event";
 import Aggregator, { AggregatorFilters } from "./aggregator";
 import EventsTable from "./components/events/EventsTable";
 import { EventStats, EventTableData } from "./components/events/types";
+import MatchResultsStatsPanel from "./components/MatchResultsStatsPanel";
 import { isHidingArchived } from "./components/tables/filters";
 import {
   useAggregatorAndSidePanel,
   useLastScrollTop
 } from "./components/tables/hooks";
 import { ipcSend, makeResizable, toggleArchived } from "./renderer-util";
-import StatsPanel from "./stats-panel";
 
 function editTag(tag: string, color: string): void {
   ipcSend("edit_tag", { tag, color });
@@ -38,13 +39,14 @@ function updateStatsPanel(
   const div = createDiv(["ranks_history"]);
   div.style.padding = "0 12px";
 
-  const statsPanel = new StatsPanel(
-    "events_top",
+  const statsPanelDiv = createDiv([]);
+  const props = {
+    prefixId: "events_top",
     aggregator,
-    pd.settings.right_panel_width,
-    true
-  );
-  const statsPanelDiv = statsPanel.render();
+    width: pd.settings.right_panel_width,
+    showCharts: true
+  };
+  ReactDOM.render(<MatchResultsStatsPanel {...props} />, statsPanelDiv);
   statsPanelDiv.style.display = "flex";
   statsPanelDiv.style.flexDirection = "column";
   statsPanelDiv.style.marginTop = "16px";
@@ -52,7 +54,7 @@ function updateStatsPanel(
   div.appendChild(statsPanelDiv);
   const drag = createDiv(["dragger"]);
   container.appendChild(drag);
-  makeResizable(drag, statsPanel.handleResize);
+  makeResizable(drag);
   container.appendChild(div);
 }
 

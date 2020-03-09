@@ -1,5 +1,7 @@
 import isValid from "date-fns/isValid";
 import React from "react";
+import ReactDOM from "react-dom";
+import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
 import { DATE_SEASON, RANKS, SUB_MATCH } from "../shared/constants";
 import db from "../shared/database";
@@ -8,28 +10,26 @@ import pd from "../shared/PlayerData";
 import { getReadableEvent } from "../shared/util";
 import { InternalMatch } from "../types/match";
 import Aggregator, { AggregatorFilters } from "./aggregator";
+import {
+  dispatchAction,
+  SET_BACKGROUND_GRPID,
+  SET_SUB_NAV
+} from "./app/reducers";
 import MatchesTable from "./components/matches/MatchesTable";
 import { MatchTableData } from "./components/matches/types";
+import MatchResultsStatsPanel from "./components/MatchResultsStatsPanel";
 import { isHidingArchived } from "./components/tables/filters";
 import {
   useAggregatorAndSidePanel,
   useLastScrollTop
 } from "./components/tables/hooks";
 import { TagCounts } from "./components/tables/types";
-
 import {
   formatPercent,
   ipcSend,
   makeResizable,
   toggleArchived
 } from "./renderer-util";
-import StatsPanel from "./stats-panel";
-import { useDispatch } from "react-redux";
-import {
-  dispatchAction,
-  SET_SUB_NAV,
-  SET_BACKGROUND_GRPID
-} from "./app/reducers";
 import uxMove from "./uxMove";
 
 const { DEFAULT_ARCH, NO_ARCH, RANKED_CONST, RANKED_DRAFT } = Aggregator;
@@ -182,15 +182,16 @@ function updateStatsPanel(
     ? aggregator.limitedStats
     : undefined;
 
-  const statsPanel = new StatsPanel(
-    "matches_top",
+  const statsPanelDiv = createDiv([]);
+  const props = {
+    prefixId: "matches_top",
     aggregator,
-    pd.settings.right_panel_width,
-    true,
+    width: pd.settings.right_panel_width,
+    showCharts: true,
     rankedStats,
     isLimited
-  );
-  const statsPanelDiv = statsPanel.render();
+  };
+  ReactDOM.render(<MatchResultsStatsPanel {...props} />, statsPanelDiv);
   statsPanelDiv.style.display = "flex";
   statsPanelDiv.style.flexDirection = "column";
   statsPanelDiv.style.marginTop = "16px";
@@ -198,7 +199,7 @@ function updateStatsPanel(
   div.appendChild(statsPanelDiv);
   const drag = createDiv(["dragger"]);
   container.appendChild(drag);
-  makeResizable(drag, statsPanel.handleResize);
+  makeResizable(drag);
   container.appendChild(div);
 }
 
