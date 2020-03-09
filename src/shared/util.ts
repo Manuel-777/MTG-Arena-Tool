@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import formatDistanceStrict from "date-fns/formatDistanceStrict";
 import { shell } from "electron";
-import React from "react";
-import ReactDOM from "react-dom";
 import { MatchPlayer } from "../types/currentMatch";
 import { CardObject, InternalDeck, v2cardsList } from "../types/Deck";
 import { InternalPlayer } from "../types/match";
@@ -24,9 +22,6 @@ import {
 } from "./constants";
 import db from "./database";
 import Deck from "./deck";
-import DeckManaCurve from "./DeckManaCurve";
-import DeckTypesStats from "./DeckTypesStats";
-import { createDiv } from "./dom-fns";
 import pd from "./PlayerData";
 
 const NO_IMG_URL = "../images/notfound.png";
@@ -654,18 +649,6 @@ export function add(a: number, b: number): number {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function objectClone(originalObject: unknown): any {
   return JSON.parse(JSON.stringify(originalObject));
-}
-
-export function deckManaCurve(deck: InternalDeck): HTMLDivElement {
-  const wrap = createDiv([]);
-  ReactDOM.render(<DeckManaCurve deck={new Deck(deck)} />, wrap);
-  return wrap;
-}
-
-export function deckTypesStats(deck: InternalDeck): HTMLDivElement {
-  const wrap = createDiv([]);
-  ReactDOM.render(<DeckTypesStats deck={new Deck(deck)} />, wrap);
-  return wrap;
 }
 
 // pass in playerData.constructed / limited / historic objects
