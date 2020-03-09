@@ -6,7 +6,7 @@ import Toggle from "../Toggle";
 import Input from "../Input";
 import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
-import { WrappedReactSelect } from "../../../shared/ReactSelect";
+import ReactSelect from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
 import Button from "../Button";
 import { useSelector } from "react-redux";
@@ -162,7 +162,7 @@ export default function SectionData(): JSX.Element {
     <>
       <div className="centered_setting_container">
         <label>Arena Data </label>
-        <WrappedReactSelect
+        <ReactSelect
           options={LANGUAGES}
           current={settings.metadata_lang}
           optionFormatter={getLanguageName}

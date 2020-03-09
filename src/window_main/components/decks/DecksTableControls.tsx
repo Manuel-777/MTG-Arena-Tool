@@ -1,7 +1,7 @@
 import React from "react";
 import { FilterValue } from "react-table";
 import { DECKS_TABLE_MODES } from "../../../shared/constants";
-import { ReactSelect, WrappedReactSelect } from "../../../shared/ReactSelect";
+import ReactSelect from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
 import DateFilter from "../../DateFilter";
 import { MediumTextButton, SmallTextButton } from "../display";
@@ -66,16 +66,15 @@ export default function DecksTableControls(
             setAggFiltersCallback({ ...aggFilters, date })
           }
         />
-        <div className={"select_container"} style={{ marginBottom: "auto" }}>
-          <ReactSelect
-            options={events}
-            current={aggFilters.eventId ?? ""}
-            callback={(eventId): void =>
-              setAggFiltersCallback({ ...aggFilters, eventId })
-            }
-            optionFormatter={getReadableEvent}
-          />
-        </div>
+        <ReactSelect
+          options={events}
+          current={aggFilters.eventId ?? ""}
+          callback={(eventId): void =>
+            setAggFiltersCallback({ ...aggFilters, eventId })
+          }
+          optionFormatter={getReadableEvent}
+          style={{ marginBottom: "auto" }}
+        />
         <span style={{ paddingBottom: "8px" }}>Presets:</span>
         <SmallTextButton
           onClick={(): void => {
@@ -139,7 +138,7 @@ export default function DecksTableControls(
         togglesVisible={togglesVisible}
       />
       <div className="react_table_search_cont">
-        <WrappedReactSelect
+        <ReactSelect
           current={tableMode}
           options={DECKS_TABLE_MODES}
           callback={setTableMode}

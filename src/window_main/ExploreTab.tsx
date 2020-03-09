@@ -9,7 +9,7 @@ import {
   SET_SUB_NAV,
   SET_BACKGROUND_GRPID
 } from "./app/reducers";
-import { WrappedReactSelect } from "../shared/ReactSelect";
+import ReactSelect from "../shared/ReactSelect";
 import Button from "./components/Button";
 import db from "../shared/database";
 import Checkbox from "./components/Checkbox";
@@ -222,7 +222,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
   return (
     <div className="explore_buttons_container">
       <div className="explore_buttons_row explore_buttons_top">
-        <WrappedReactSelect
+        <ReactSelect
           options={typeFilter}
           current={filters.filterType}
           callback={(filter: string): void =>
@@ -236,7 +236,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
             })
           }
         />
-        <WrappedReactSelect
+        <ReactSelect
           options={eventFilters}
           key={filters.filterType}
           current={eventFilters[1]}
@@ -246,7 +246,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
           }
         />
         <label style={{ marginLeft: "16px" }}>Sort:</label>
-        <WrappedReactSelect
+        <ReactSelect
           style={{ width: "130px" }}
           options={sortFilters}
           current={filters.filterSort}
@@ -254,7 +254,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
             updateFilters({ ...filters, filterSort: filter })
           }
         />
-        <WrappedReactSelect
+        <ReactSelect
           options={sortDirection}
           style={{ width: "130px" }}
           current={

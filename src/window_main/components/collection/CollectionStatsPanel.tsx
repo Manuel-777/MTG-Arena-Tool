@@ -2,7 +2,7 @@ import { shell } from "electron";
 import React from "react";
 import { CARD_RARITIES } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
-import { ReactSelect } from "../../../shared/ReactSelect";
+import ReactSelect from "../../../shared/ReactSelect";
 import {
   ALL_CARDS,
   CollectionStats,
@@ -105,21 +105,18 @@ export function CollectionStatsPanel({
         <div className={"main_stats"}>
           <label>
             count:
-            <div
-              className={"select_container stats_count_select"}
+            <ReactSelect
+              className={"stats_count_select"}
               style={{
                 margin: "12px auto auto 4px",
                 textAlign: "left",
                 width: "180px",
                 display: "inline-flex"
               }}
-            >
-              <ReactSelect
-                options={[ALL_CARDS, SINGLETONS, FULL_SETS]}
-                current={countMode}
-                callback={setCountMode}
-              />
-            </div>
+              options={[ALL_CARDS, SINGLETONS, FULL_SETS]}
+              current={countMode}
+              callback={setCountMode}
+            />
           </label>
           <SetCompletionBar
             countMode={countMode}

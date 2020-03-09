@@ -1,7 +1,7 @@
 import React from "react";
 import { FilterValue } from "react-table";
 import { MATCHES_TABLE_MODES } from "../../../shared/constants";
-import { ReactSelect, WrappedReactSelect } from "../../../shared/ReactSelect";
+import ReactSelect from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
 import DateFilter from "../../DateFilter";
 import { MediumTextButton, SmallTextButton } from "../display";
@@ -52,16 +52,15 @@ export default function MatchesTableControls(
             setAggFiltersCallback({ ...aggFilters, date })
           }
         />
-        <div className={"select_container"} style={{ marginBottom: "auto" }}>
-          <ReactSelect
-            options={events}
-            current={aggFilters.eventId ?? ""}
-            callback={(eventId): void =>
-              setAggFiltersCallback({ ...aggFilters, eventId })
-            }
-            optionFormatter={getReadableEvent}
-          />
-        </div>
+        <ReactSelect
+          options={events}
+          current={aggFilters.eventId ?? ""}
+          callback={(eventId): void =>
+            setAggFiltersCallback({ ...aggFilters, eventId })
+          }
+          optionFormatter={getReadableEvent}
+          style={{ marginBottom: "auto" }}
+        />
         <SmallTextButton
           onClick={(): void => {
             setAllFilters(defaultFilters);
@@ -87,7 +86,7 @@ export default function MatchesTableControls(
         togglesVisible={togglesVisible}
       />
       <div className="react_table_search_cont">
-        <WrappedReactSelect
+        <ReactSelect
           key={tableMode}
           current={tableMode}
           options={MATCHES_TABLE_MODES}

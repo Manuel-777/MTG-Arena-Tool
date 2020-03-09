@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { MANA, RANKS } from "../../shared/constants";
-import { WrappedReactSelect } from "../../shared/ReactSelect";
+import ReactSelect from "../../shared/ReactSelect";
 import {
   get_rank_index as getRankIndex,
   toDDHHMMSS,
@@ -281,7 +281,7 @@ export default function MatchResultsStatsPanel({
           </div>
           <label className={"but_container_label"}>
             Group by:
-            <WrappedReactSelect
+            <ReactSelect
               current={"Archetype"}
               options={["Archetype", "Color"]}
               callback={(filter): void => setShowTags(filter === "Archetype")}

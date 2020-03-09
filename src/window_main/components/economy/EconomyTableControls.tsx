@@ -1,7 +1,7 @@
 import React from "react";
 import { FilterValue } from "react-table";
 import { ECONOMY_TABLE_MODES } from "../../../shared/constants";
-import { WrappedReactSelect } from "../../../shared/ReactSelect";
+import ReactSelect from "../../../shared/ReactSelect";
 import {
   CheckboxContainer,
   MediumTextButton,
@@ -84,7 +84,7 @@ export default function EconomyTableControls(
         togglesVisible={togglesVisible}
       />
       <div className="react_table_search_cont">
-        <WrappedReactSelect
+        <ReactSelect
           current={tableMode}
           options={ECONOMY_TABLE_MODES}
           callback={setTableMode}

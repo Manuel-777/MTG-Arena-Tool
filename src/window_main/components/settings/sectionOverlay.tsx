@@ -18,7 +18,7 @@ import {
   OVERLAY_FULL,
   OVERLAY_DRAFT_MODES
 } from "../../../shared/constants";
-import { WrappedReactSelect } from "../../../shared/ReactSelect";
+import ReactSelect from "../../../shared/ReactSelect";
 import useColorPicker from "../../hooks/useColorPicker";
 import { useSelector } from "react-redux";
 import { AppState } from "../../app/appState";
@@ -184,7 +184,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
       />
       <div className="centered_setting_container">
         <label>Mode:</label>
-        <WrappedReactSelect
+        <ReactSelect
           options={modeOptions}
           current={modeOptions[settings.mode]}
           callback={(filter: string): void => setOverlayMode(current, filter)}

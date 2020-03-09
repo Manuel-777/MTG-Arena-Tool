@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { ReactSelect } from "../../../shared/ReactSelect";
+import ReactSelect from "../../../shared/ReactSelect";
 import { ipcSend } from "../../renderer-util";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../app/appState";
@@ -116,16 +116,13 @@ export default function Share(props: ShareProps): JSX.Element {
         <div style={{ margin: "4px 0" }} className="form-label">
           Expires after:
         </div>
-        <div
+        <ReactSelect
           style={{ width: "-webkit-fill-available", margin: "0 0 16px 0" }}
-          className="select_container light"
-        >
-          <ReactSelect
-            options={expireOptions}
-            current={"Select..."}
-            callback={selectExpire}
-          />
-        </div>
+          className={"light"}
+          options={expireOptions}
+          current={"Select..."}
+          callback={selectExpire}
+        />
         <label className="form-label">URL:</label>
         <div style={{ display: "flex" }}>
           <div className="form-input-container">

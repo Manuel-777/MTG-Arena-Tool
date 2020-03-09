@@ -5,7 +5,7 @@ import {
   DATE_LAST_DAY,
   DATE_SEASON
 } from "../shared/constants";
-import { ReactSelect } from "../shared/ReactSelect";
+import ReactSelect from "../shared/ReactSelect";
 import { ipcSend, showDatepicker } from "./renderer-util";
 
 export interface DateFilterProps {
@@ -64,20 +64,13 @@ export default function DateFilter({
   }
   return (
     <div className={className + " dateCont"}>
-      <div
-        className={
-          "select_container filter_panel_select_margin " +
-          prefixId +
-          "_query_date"
-        }
-      >
-        <ReactSelect
-          current={String(current)}
-          options={options}
-          callback={dateSelectCallback}
-          optionFormatter={customDateFormatter}
-        />
-      </div>
+      <ReactSelect
+        className={"filter_panel_select_margin " + prefixId + "_query_date"}
+        current={String(current)}
+        options={options}
+        callback={dateSelectCallback}
+        optionFormatter={customDateFormatter}
+      />
     </div>
   );
 }

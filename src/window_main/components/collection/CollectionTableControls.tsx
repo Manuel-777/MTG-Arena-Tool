@@ -6,7 +6,7 @@ import {
   COLLECTION_TABLE_MODES
 } from "../../../shared/constants";
 import db from "../../../shared/database";
-import { WrappedReactSelect } from "../../../shared/ReactSelect";
+import ReactSelect from "../../../shared/ReactSelect";
 import { MediumTextButton, SmallTextButton } from "../display";
 import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
@@ -148,7 +148,7 @@ export default function CollectionTableControls(
         togglesVisible={togglesVisible}
       />
       <div className="react_table_search_cont">
-        <WrappedReactSelect
+        <ReactSelect
           key={tableMode}
           current={tableMode}
           options={COLLECTION_TABLE_MODES}
