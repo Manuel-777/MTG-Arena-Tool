@@ -3,7 +3,6 @@ import { app, ipcRenderer as ipc, remote } from "electron";
 import path from "path";
 import Pikaday from "pikaday";
 import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
-import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/PlayerData";
 
 const byId = id => document.getElementById(id);
@@ -109,7 +108,8 @@ function showDatepicker(
   onChange = date => {},
   pickerOptions = {}
 ) {
-  const cont = createDiv(["dialog_content"]);
+  const cont = document.createElement("div");
+  cont.classList.add("dialog_content");
   cont.style.width = "320px";
   cont.style.heigh = "400px";
   // https://github.com/Pikaday/Pikaday

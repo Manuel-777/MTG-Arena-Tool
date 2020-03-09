@@ -6,8 +6,6 @@ import { createStore } from "redux";
 import appReducer from "./reducers";
 const store = createStore(appReducer);
 
-import { createDiv } from "../shared/dom-fns";
-
 import OverlayController from "../overlay/OverlayController";
 
 const TransparencyMouseFix = require("electron-transparency-mouse-fix");
@@ -45,7 +43,7 @@ function ready(fn: () => void): void {
 }
 
 ready(function() {
-  const wrap = createDiv([]);
+  const wrap = document.createElement("div");
   ReactDOM.render(
     <Provider store={store}>
       <OverlayController />
