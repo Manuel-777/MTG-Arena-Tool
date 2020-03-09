@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { MANA, RANKS } from "../../shared/constants";
 import { WrappedReactSelect } from "../../shared/ReactSelect";
 import {
@@ -7,12 +8,15 @@ import {
   toMMSS
 } from "../../shared/util";
 import Aggregator, { AggregatorStats } from "../aggregator";
+import { AppState } from "../app/appState";
 import {
   compareWinrates,
   formatPercent,
   getTagColor,
   getWinrateClass
 } from "../renderer-util";
+
+const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 
 function ColoredWinrate({ stats }: { stats: AggregatorStats }): JSX.Element {
   const colClass = getWinrateClass(stats.winrate);
@@ -166,23 +170,26 @@ function FrequencyChart({
 export default function MatchResultsStatsPanel({
   prefixId,
   aggregator,
-  width,
-  showCharts,
-  rankedStats,
-  isLimited
+  showCharts
 }: {
   prefixId: string;
   aggregator: Aggregator;
-  width: number;
   showCharts: boolean;
-  rankedStats?: {
-    [key: string]: AggregatorStats;
-  };
-  isLimited?: boolean;
 }): JSX.Element {
   const { stats, playStats, drawStats, tagStats, colorStats } = aggregator;
+  const { eventId } = aggregator.filters;
+  const isLimited = eventId === RANKED_DRAFT;
+  const isConstructed = eventId === RANKED_CONST;
+  const rankedStats = isLimited
+    ? aggregator.limitedStats
+    : isConstructed
+    ? aggregator.constructedStats
+    : undefined;
   const [showTags, setShowTags] = React.useState(true);
-  const barsToShow = Math.max(3, Math.round(width / 40));
+  const panelWidth = useSelector(
+    (state: AppState) => state.settings.right_panel_width
+  );
+  const barsToShow = Math.max(3, Math.round(panelWidth / 40));
   // Archetypes
   const tagsWinrates = [...Object.values(tagStats)];
   tagsWinrates.sort(frequencySort);
@@ -192,103 +199,128 @@ export default function MatchResultsStatsPanel({
   colorsWinrates.sort(frequencySort);
   const freqColorStats = colorsWinrates.slice(0, barsToShow);
   return (
-    <div className={prefixId + "_winrate"}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <div className={"list_deck_winrate"} style={{ margin: "0 auto 0 0" }}>
-          Overall:
-        </div>
-        <div className={"list_deck_winrate"} style={{ margin: "0 0 0 auto" }}>
-          {`${stats.wins}:${stats.losses} `}(<ColoredWinrate stats={stats} />)
-        </div>
-      </div>
-      {!!rankedStats &&
-        RANKS.map(rank => {
-          const stats = rankedStats[rank.toLowerCase()];
-          if (!stats || !stats.total) {
-            return <></>;
-          }
-          return (
+    <div className={"flex_item"}>
+      <div className={"main_stats"}>
+        <div className={prefixId + "_winrate"}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             <div
-              key={rank}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
+              className={"list_deck_winrate"}
+              style={{ margin: "0 auto 0 0" }}
+            >
+              Overall:
+            </div>
+            <div
+              className={"list_deck_winrate"}
+              style={{ margin: "0 0 0 auto" }}
+            >
+              {`${stats.wins}:${stats.losses} `}(
+              <ColoredWinrate stats={stats} />)
+            </div>
+          </div>
+          {!!rankedStats &&
+            RANKS.map(rank => {
+              const stats = rankedStats[rank.toLowerCase()];
+              if (!stats || !stats.total) {
+                return <></>;
+              }
+              return (
+                <div
+                  key={rank}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}
+                >
+                  <div
+                    className={
+                      isLimited ? "top_limited_rank" : "top_constructed_rank"
+                    }
+                    style={{
+                      margin: "0 auto 0 0",
+                      backgroundPosition: `${getRankIndex(rank, 1) * -48}px 0px`
+                    }}
+                    title={rank}
+                  ></div>
+                  <div
+                    className={"list_deck_winrate"}
+                    style={{ margin: "0 0 0 auto" }}
+                  >
+                    {`${stats.wins}:${stats.losses} `}(
+                    <ColoredWinrate stats={stats} />)
+                  </div>
+                </div>
+              );
+            })}
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div
+              className={"list_deck_winrate"}
+              style={{ margin: "0 auto 0 0" }}
+            >
+              Play/Draw:
+            </div>
+            <div
+              className={"list_deck_winrate"}
+              style={{ margin: "0 0 0 auto" }}
+            >
+              <ColoredWinrate stats={playStats} />/
+              <ColoredWinrate stats={drawStats} />
+            </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div className={"list_match_time"} style={{ margin: "0 auto 0 0" }}>
+              Duration:
+            </div>
+            <div
+              className={"list_match_time"}
+              style={{ margin: "0 0 0 auto" }}
+              title={toDDHHMMSS(stats.duration)}
+            >
+              {toMMSS(stats.duration)}
+            </div>
+          </div>
+          <label className={"but_container_label"}>
+            Group by:
+            <WrappedReactSelect
+              current={"Archetype"}
+              options={["Archetype", "Color"]}
+              callback={(filter): void => setShowTags(filter === "Archetype")}
+              style={{ width: "120px" }}
+            />
+          </label>
+          {showCharts && (
+            <div
+              className={
+                showTags
+                  ? "stats_panel_arch_charts"
+                  : "stats_panel_color_charts"
+              }
             >
               <div
-                className={
-                  isLimited ? "top_limited_rank" : "top_constructed_rank"
-                }
-                style={{
-                  margin: "0 auto 0 0",
-                  backgroundPosition: `${getRankIndex(rank, 1) * -48}px 0px`
-                }}
-                title={rank}
-              ></div>
-              <div
-                className={"list_deck_winrate"}
-                style={{ margin: "0 0 0 auto" }}
+                className={"ranks_history_title"}
+                style={{ marginTop: "24px" }}
               >
-                {`${stats.wins}:${stats.losses} `}(
-                <ColoredWinrate stats={stats} />)
+                Frequent Matchups
               </div>
+              <FrequencyChart
+                winrates={showTags ? freqTagStats : freqColorStats}
+                total={stats.total}
+                showTags={showTags}
+              />
+              <div
+                className={"ranks_history_title"}
+                style={{ marginTop: "24px" }}
+              >
+                Wins vs Losses
+              </div>
+              <WinrateChart
+                winrates={showTags ? freqTagStats : freqColorStats}
+                showTags={showTags}
+              />
             </div>
-          );
-        })}
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <div className={"list_deck_winrate"} style={{ margin: "0 auto 0 0" }}>
-          Play/Draw:
-        </div>
-        <div className={"list_deck_winrate"} style={{ margin: "0 0 0 auto" }}>
-          <ColoredWinrate stats={playStats} />/
-          <ColoredWinrate stats={drawStats} />
+          )}
         </div>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <div className={"list_match_time"} style={{ margin: "0 auto 0 0" }}>
-          Duration:
-        </div>
-        <div
-          className={"list_match_time"}
-          style={{ margin: "0 0 0 auto" }}
-          title={toDDHHMMSS(stats.duration)}
-        >
-          {toMMSS(stats.duration)}
-        </div>
-      </div>
-      <label className={"but_container_label"}>
-        Group by:
-        <WrappedReactSelect
-          current={"Archetype"}
-          options={["Archetype", "Color"]}
-          callback={(filter): void => setShowTags(filter === "Archetype")}
-          style={{ width: "120px" }}
-        />
-      </label>
-      {showCharts && (
-        <div
-          className={
-            showTags ? "stats_panel_arch_charts" : "stats_panel_color_charts"
-          }
-        >
-          <div className={"ranks_history_title"} style={{ marginTop: "24px" }}>
-            Frequent Matchups
-          </div>
-          <FrequencyChart
-            winrates={showTags ? freqTagStats : freqColorStats}
-            total={stats.total}
-            showTags={showTags}
-          />
-          <div className={"ranks_history_title"} style={{ marginTop: "24px" }}>
-            Wins vs Losses
-          </div>
-          <WinrateChart
-            winrates={showTags ? freqTagStats : freqColorStats}
-            showTags={showTags}
-          />
-        </div>
-      )}
     </div>
   );
 }

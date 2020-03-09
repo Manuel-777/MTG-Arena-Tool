@@ -1,6 +1,11 @@
 import React from "react";
 import { Column } from "react-table";
 import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
+import pd from "../../../shared/PlayerData";
+import Aggregator, { AggregatorFilters } from "../../aggregator";
+import { ListItemDeck } from "../list-item/ListItemDeck";
+import MatchResultsStatsPanel from "../MatchResultsStatsPanel";
+import ResizableDragger from "../ResizableDragger";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -18,7 +23,11 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import { useAggregatorArchiveFilter, useBaseReactTable } from "../tables/hooks";
+import {
+  useAggregatorArchiveFilter,
+  useBaseReactTable,
+  useLastScrollTop
+} from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
@@ -32,7 +41,6 @@ import {
   WinRateCell
 } from "./cells";
 import DecksArtViewRow from "./DecksArtViewRow";
-import { ListItemDeck } from "../list-item/ListItemDeck";
 import DecksTableControls from "./DecksTableControls";
 import { deckSearchFilterFn } from "./filters";
 import { DecksData, DecksTableControlsProps, DecksTableProps } from "./types";
@@ -245,6 +253,11 @@ const columns: Column<DecksData>[] = [
   }
 ];
 
+function getDataAggFilters(data: DecksData[]): AggregatorFilters {
+  const deckId = data.map(deck => deck.id).filter(id => id) as string[];
+  return { deckId };
+}
+
 export default function DecksTable({
   data,
   aggFilters,
@@ -254,7 +267,6 @@ export default function DecksTable({
   tableStateCallback,
   cachedState,
   cachedTableMode,
-  filterDataCallback,
   openDeckCallback,
   ...customProps
 }: DecksTableProps): JSX.Element {
@@ -274,6 +286,13 @@ export default function DecksTable({
       return { tag, q };
     });
   }, [data]);
+  const [subAggFilters, setSubAggFilters] = React.useState(aggFilters);
+  const filterDataCallback = React.useCallback(
+    (data: DecksData[]): void => {
+      setSubAggFilters({ ...aggFilters, ...getDataAggFilters(data) });
+    },
+    [aggFilters]
+  );
   const tableProps: BaseTableProps<DecksData> = {
     cachedState,
     columns,
@@ -308,61 +327,81 @@ export default function DecksTable({
   };
 
   const isTableMode = tableMode === DECKS_TABLE_MODE;
-
+  const { right_panel_width: panelWidth } = pd.settings;
+  const sidePanelWidth = panelWidth + "px";
+  const [containerRef, onScroll] = useLastScrollTop();
   return (
-    <div className="react_table_wrap">
-      <DecksTableControls {...decksTableControlsProps} />
-      <div
-        className="med_scroll"
-        style={isTableMode ? { overflowX: "auto" } : undefined}
-      >
-        <TableHeaders
-          {...headersProps}
-          style={
-            isTableMode
-              ? { width: "fit-content" }
-              : { overflowX: "auto", overflowY: "hidden" }
-          }
-        />
-        <div
-          className={
-            isTableMode ? "react_table_body" : "react_table_body_no_adjust"
-          }
-          {...getTableBodyProps()}
-        >
-          {page.map((row, index) => {
-            prepareRow(row);
-            const data = row.original;
-            if (isTableMode) {
-              const onClick = (): void => openDeckCallback(data);
-              return (
-                <TableViewRow
-                  onClick={onClick}
-                  title={"show deck details"}
-                  row={row}
-                  index={index}
-                  key={row.index}
-                  gridTemplateColumns={gridTemplateColumns}
-                />
-              );
-            }
-            const RowRenderer =
-              tableMode === DECKS_ART_MODE ? DecksArtViewRow : ListItemDeck;
-            return (
-              <RowRenderer
-                row={row}
-                index={index}
-                key={row.index}
-                gridTemplateColumns={gridTemplateColumns}
-                openDeckCallback={openDeckCallback}
-                tags={tags}
-                {...customProps}
-              />
-            );
-          })}
+    <>
+      <div className={"wrapper_column"} ref={containerRef} onScroll={onScroll}>
+        <div className="react_table_wrap">
+          <DecksTableControls {...decksTableControlsProps} />
+          <div
+            className="med_scroll"
+            style={isTableMode ? { overflowX: "auto" } : undefined}
+          >
+            <TableHeaders
+              {...headersProps}
+              style={
+                isTableMode
+                  ? { width: "fit-content" }
+                  : { overflowX: "auto", overflowY: "hidden" }
+              }
+            />
+            <div
+              className={
+                isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+              }
+              {...getTableBodyProps()}
+            >
+              {page.map((row, index) => {
+                prepareRow(row);
+                const data = row.original;
+                if (isTableMode) {
+                  const onClick = (): void => openDeckCallback(data);
+                  return (
+                    <TableViewRow
+                      onClick={onClick}
+                      title={"show deck details"}
+                      row={row}
+                      index={index}
+                      key={row.index}
+                      gridTemplateColumns={gridTemplateColumns}
+                    />
+                  );
+                }
+                const RowRenderer =
+                  tableMode === DECKS_ART_MODE ? DecksArtViewRow : ListItemDeck;
+                return (
+                  <RowRenderer
+                    row={row}
+                    index={index}
+                    key={row.index}
+                    gridTemplateColumns={gridTemplateColumns}
+                    openDeckCallback={openDeckCallback}
+                    tags={tags}
+                    {...customProps}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <PagingControls {...pagingProps} />
         </div>
       </div>
-      <PagingControls {...pagingProps} />
-    </div>
+      <div
+        className={"wrapper_column sidebar_column_l"}
+        style={{
+          width: sidePanelWidth,
+          flex: `0 0 ${sidePanelWidth}`
+        }}
+      >
+        <ResizableDragger />
+        <MatchResultsStatsPanel
+          prefixId={"decks_top"}
+          aggregator={new Aggregator(subAggFilters)}
+          showCharts
+        />
+      </div>
+    </>
   );
 }

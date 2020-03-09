@@ -14,7 +14,11 @@ import {
 } from "react-table";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
-import { getLocalState, setLocalState } from "../../renderer-util";
+import {
+  getLocalState,
+  setLocalState,
+  makeResizable
+} from "../../renderer-util";
 import {
   archivedFilterFn,
   colorsFilterFn,
@@ -121,33 +125,20 @@ export function useLastScrollTop(): [
   return [containerRef, onScroll];
 }
 
-export function useAggregatorAndSidePanel<D extends TableData>({
+export function useAggregatorData<D extends TableData>({
   aggFiltersArg,
   getData,
-  getDataAggFilters,
-  showArchived,
-  updateSidebarCallback
+  showArchived
 }: {
   aggFiltersArg: AggregatorFilters;
   getData: (aggregator: Aggregator) => D[];
-  getDataAggFilters: (data: D[]) => AggregatorFilters;
   showArchived: boolean;
-  updateSidebarCallback: (
-    container: HTMLElement,
-    aggregator: Aggregator
-  ) => void;
 }): {
   aggFilters: AggregatorFilters;
   data: D[];
-  filterDataCallback: (data: D[]) => void;
-  rightPanelRef: React.RefObject<HTMLDivElement>;
   setAggFilters: (aggFilters: AggregatorFilters) => void;
-  sidePanelWidth: string;
 } {
-  const {
-    last_date_filter: dateFilter,
-    right_panel_width: panelWidth
-  } = pd.settings;
+  const { last_date_filter: dateFilter } = pd.settings;
   const defaultAggFilters = {
     ...Aggregator.getDefaultFilters(),
     date: dateFilter,
@@ -161,26 +152,10 @@ export function useAggregatorAndSidePanel<D extends TableData>({
     const aggregator = new Aggregator(aggFilters);
     return getData(aggregator);
   }, [aggFilters, getData]);
-  const sidePanelWidth = panelWidth + "px";
-  const rightPanelRef = React.useRef<HTMLDivElement>(null);
-  const filterDataCallback = React.useCallback(
-    (data: D[]): void => {
-      if (rightPanelRef?.current) {
-        updateSidebarCallback(
-          rightPanelRef.current,
-          new Aggregator({ ...aggFilters, ...getDataAggFilters(data) })
-        );
-      }
-    },
-    [rightPanelRef, aggFilters, getDataAggFilters, updateSidebarCallback]
-  );
   return {
     aggFilters,
     data,
-    filterDataCallback,
-    rightPanelRef,
-    setAggFilters,
-    sidePanelWidth
+    setAggFilters
   };
 }
 

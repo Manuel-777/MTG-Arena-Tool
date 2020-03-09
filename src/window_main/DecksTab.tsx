@@ -1,11 +1,9 @@
 import isValid from "date-fns/isValid";
 import React from "react";
-import ReactDOM from "react-dom";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
 import { SUB_DECK } from "../shared/constants";
 import Deck from "../shared/deck";
-import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/PlayerData";
 import {
   getBoosterCountEstimate,
@@ -25,13 +23,9 @@ import {
 } from "./app/reducers";
 import DecksTable from "./components/decks/DecksTable";
 import { DecksData } from "./components/decks/types";
-import MatchResultsStatsPanel from "./components/MatchResultsStatsPanel";
 import { isHidingArchived } from "./components/tables/filters";
-import {
-  useAggregatorAndSidePanel,
-  useLastScrollTop
-} from "./components/tables/hooks";
-import { ipcSend, makeResizable } from "./renderer-util";
+import { useAggregatorData } from "./components/tables/hooks";
+import { ipcSend } from "./renderer-util";
 import uxMove from "./uxMove";
 
 function addTag(deckid: string, tag: string): void {
@@ -64,29 +58,6 @@ function saveTableState(decksTableState: TableState<DecksData>): void {
 
 function saveTableMode(decksTableMode: string): void {
   ipcSend("save_user_settings", { decksTableMode, skipRefresh: true });
-}
-
-function updateStatsPanel(
-  container: HTMLElement,
-  aggregator: Aggregator
-): void {
-  container.innerHTML = "";
-  const statsPanelDiv = createDiv([]);
-  const props = {
-    prefixId: "decks_top",
-    aggregator,
-    width: pd.settings.right_panel_width,
-    showCharts: true
-  };
-  ReactDOM.render(<MatchResultsStatsPanel {...props} />, statsPanelDiv);
-  statsPanelDiv.style.display = "flex";
-  statsPanelDiv.style.flexDirection = "column";
-  statsPanelDiv.style.marginTop = "16px";
-  statsPanelDiv.style.padding = "12px";
-  const drag = createDiv(["dragger"]);
-  container.appendChild(drag);
-  makeResizable(drag);
-  container.appendChild(statsPanelDiv);
 }
 
 function getDecksData(aggregator: Aggregator): DecksData[] {
@@ -144,23 +115,10 @@ export function DecksTab({
   const dispatcher = useDispatch();
   const { decksTableMode, decksTableState } = pd.settings;
   const showArchived = !isHidingArchived(decksTableState);
-  const getDataAggFilters = (data: DecksData[]): AggregatorFilters => {
-    const deckId = data.map(deck => deck.id).filter(id => id) as string[];
-    return { deckId };
-  };
-  const {
-    aggFilters,
-    data,
-    filterDataCallback,
-    rightPanelRef,
-    setAggFilters,
-    sidePanelWidth
-  } = useAggregatorAndSidePanel({
+  const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,
     getData: getDecksData,
-    getDataAggFilters,
-    showArchived,
-    updateSidebarCallback: updateStatsPanel
+    showArchived
   });
   const openDeckCallback = React.useCallback(
     (deck: InternalDeck): void => {
@@ -175,37 +133,22 @@ export function DecksTab({
     [dispatcher]
   );
   const events = React.useMemo(getTotalAggEvents, []);
-  const [containerRef, onScroll] = useLastScrollTop();
-
   return (
-    <>
-      <div className={"wrapper_column"} ref={containerRef} onScroll={onScroll}>
-        <DecksTable
-          data={data}
-          aggFilters={aggFilters}
-          events={events}
-          cachedState={decksTableState}
-          cachedTableMode={decksTableMode}
-          setAggFiltersCallback={setAggFilters}
-          tableModeCallback={saveTableMode}
-          tableStateCallback={saveTableState}
-          filterDataCallback={filterDataCallback}
-          openDeckCallback={openDeckCallback}
-          archiveCallback={toggleDeckArchived}
-          addTagCallback={addTag}
-          editTagCallback={editTag}
-          deleteTagCallback={deleteTag}
-        />
-      </div>
-      <div
-        ref={rightPanelRef}
-        className={"wrapper_column sidebar_column_l"}
-        style={{
-          width: sidePanelWidth,
-          flex: `0 0 ${sidePanelWidth}`
-        }}
-      ></div>
-    </>
+    <DecksTable
+      data={data}
+      aggFilters={aggFilters}
+      events={events}
+      cachedState={decksTableState}
+      cachedTableMode={decksTableMode}
+      setAggFiltersCallback={setAggFilters}
+      tableModeCallback={saveTableMode}
+      tableStateCallback={saveTableState}
+      openDeckCallback={openDeckCallback}
+      archiveCallback={toggleDeckArchived}
+      addTagCallback={addTag}
+      editTagCallback={editTag}
+      deleteTagCallback={deleteTag}
+    />
   );
 }
 

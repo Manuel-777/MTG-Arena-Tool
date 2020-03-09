@@ -33,7 +33,6 @@ export interface EventsTableProps {
   data: EventTableData[];
   editTagCallback: (tag: string, color: string) => void;
   events: string[];
-  filterDataCallback: (data: EventTableData[]) => void;
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
   tableModeCallback: (tableMode: string) => void;
   tableStateCallback: (state: TableState<EventTableData>) => void;

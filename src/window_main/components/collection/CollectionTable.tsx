@@ -13,7 +13,7 @@ import {
   ALL_CARDS,
   getCollectionStats
 } from "../../collection/collectionStats";
-import { makeResizable } from "../../renderer-util";
+import ResizableDragger from "../ResizableDragger";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {
   ColorColumnFilter,
@@ -335,12 +335,6 @@ export default function CollectionTable({
     );
   const { right_panel_width: panelWidth } = pd.settings;
   const sidePanelWidth = panelWidth + "px";
-  const draggerRef = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (draggerRef?.current) {
-      makeResizable(draggerRef.current);
-    }
-  }, [draggerRef]);
   const clickCompletionCallback = React.useCallback((): void => {
     setTableMode(COLLECTION_SETS_MODE);
     setAllFilters((): FilterValue[] => [
@@ -378,7 +372,7 @@ export default function CollectionTable({
           flex: `0 0 ${sidePanelWidth}`
         }}
       >
-        <div ref={draggerRef} className={"dragger"}></div>
+        <ResizableDragger />
         <CollectionStatsPanel
           stats={stats}
           countMode={countMode}

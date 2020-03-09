@@ -48,7 +48,6 @@ export interface DecksTableProps {
   events: string[];
   deleteTagCallback: (deckid: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
-  filterDataCallback: (data: DecksData[]) => void;
   openDeckCallback: (deck: InternalDeck) => void;
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
   tableModeCallback: (tableMode: string) => void;

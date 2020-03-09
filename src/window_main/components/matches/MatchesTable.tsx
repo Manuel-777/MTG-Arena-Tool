@@ -1,6 +1,11 @@
 import React from "react";
 import { Column } from "react-table";
-import { MATCHES_TABLE_MODE } from "../../../shared/constants";
+import { DATE_SEASON, MATCHES_TABLE_MODE } from "../../../shared/constants";
+import pd from "../../../shared/PlayerData";
+import Aggregator, { AggregatorFilters } from "../../aggregator";
+import ListItemMatch from "../list-item/ListItemMatch";
+import MatchResultsStatsPanel from "../MatchResultsStatsPanel";
+import ResizableDragger from "../ResizableDragger";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -19,7 +24,11 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import { useAggregatorArchiveFilter, useBaseReactTable } from "../tables/hooks";
+import {
+  useAggregatorArchiveFilter,
+  useBaseReactTable,
+  useLastScrollTop
+} from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
@@ -32,13 +41,15 @@ import {
   RankColumnFilter,
   rankFilterFn
 } from "./filters";
-import ListItemMatch from "../list-item/ListItemMatch";
 import MatchesTableControls from "./MatchesTableControls";
+import RankedStats from "./RankedStats";
 import {
   MatchesTableControlsProps,
   MatchesTableProps,
   MatchTableData
 } from "./types";
+
+const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 
 const columns: Column<MatchTableData>[] = [
   { accessor: "id" },
@@ -290,6 +301,45 @@ const columns: Column<MatchTableData>[] = [
   }
 ];
 
+function getDataAggFilters(data: MatchTableData[]): AggregatorFilters {
+  const matchIds = data.map(match => match.id);
+  return { matchIds };
+}
+
+function MatchesSidePanel({
+  subAggFilters,
+  setAggFiltersCallback
+}: {
+  subAggFilters: AggregatorFilters;
+  setAggFiltersCallback: (filters: AggregatorFilters) => void;
+}): JSX.Element {
+  const { date, eventId } = subAggFilters;
+  const subAggregator = new Aggregator(subAggFilters);
+  const isLimited = eventId === RANKED_DRAFT;
+  const isConstructed = eventId === RANKED_CONST;
+  const isCurrentSeason = date === DATE_SEASON;
+  return (
+    <>
+      {isCurrentSeason && (isLimited || isConstructed) && (
+        <div className={"ranks_history"} style={{ padding: "0 12px" }}>
+          <div className={"ranks_stats"} style={{ paddingBottom: "16px" }}>
+            <RankedStats
+              aggregator={subAggregator}
+              isLimited={isLimited}
+              setAggFiltersCallback={setAggFiltersCallback}
+            />
+          </div>
+        </div>
+      )}
+      <MatchResultsStatsPanel
+        prefixId={"matches_top"}
+        aggregator={subAggregator}
+        showCharts
+      />
+    </>
+  );
+}
+
 export default function MatchesTable({
   data,
   aggFilters,
@@ -299,7 +349,6 @@ export default function MatchesTable({
   tableStateCallback,
   cachedState,
   cachedTableMode,
-  filterDataCallback,
   openMatchCallback,
   ...customProps
 }: MatchesTableProps): JSX.Element {
@@ -312,6 +361,13 @@ export default function MatchesTable({
     onPlay: onPlayFilterFn,
     rank: rankFilterFn
   };
+  const [subAggFilters, setSubAggFilters] = React.useState(aggFilters);
+  const filterDataCallback = React.useCallback(
+    (data: MatchTableData[]): void => {
+      setSubAggFilters({ ...aggFilters, ...getDataAggFilters(data) });
+    },
+    [aggFilters]
+  );
   const tableProps: BaseTableProps<MatchTableData> = {
     cachedState,
     columns,
@@ -344,55 +400,75 @@ export default function MatchesTable({
     ...tableControlsProps
   };
   const isTableMode = tableMode === MATCHES_TABLE_MODE;
+  const { right_panel_width: panelWidth } = pd.settings;
+  const sidePanelWidth = panelWidth + "px";
+  const [containerRef, onScroll] = useLastScrollTop();
   return (
-    <div className="react_table_wrap">
-      <MatchesTableControls {...matchesTableControlsProps} />
-      <div
-        className="med_scroll"
-        style={isTableMode ? { overflowX: "auto" } : undefined}
-      >
-        <TableHeaders
-          {...headersProps}
-          style={
-            isTableMode
-              ? { width: "fit-content" }
-              : { overflowX: "auto", overflowY: "hidden" }
-          }
-        />
-        <div
-          className={
-            isTableMode ? "react_table_body" : "react_table_body_no_adjust"
-          }
-          {...getTableBodyProps()}
-        >
-          {page.map((row, index) => {
-            prepareRow(row);
-            const data = row.original;
-            if (isTableMode) {
-              const onClick = (): void => openMatchCallback(data);
-              return (
-                <TableViewRow
-                  onClick={onClick}
-                  title={"show match details"}
-                  row={row}
-                  index={index}
-                  key={row.index}
-                  gridTemplateColumns={gridTemplateColumns}
-                />
-              );
-            }
-            return (
-              <ListItemMatch
-                match={row.original}
-                key={row.index}
-                openMatchCallback={openMatchCallback}
-                {...customProps}
-              />
-            );
-          })}
+    <>
+      <div className={"wrapper_column"} ref={containerRef} onScroll={onScroll}>
+        <div className="react_table_wrap">
+          <MatchesTableControls {...matchesTableControlsProps} />
+          <div
+            className="med_scroll"
+            style={isTableMode ? { overflowX: "auto" } : undefined}
+          >
+            <TableHeaders
+              {...headersProps}
+              style={
+                isTableMode
+                  ? { width: "fit-content" }
+                  : { overflowX: "auto", overflowY: "hidden" }
+              }
+            />
+            <div
+              className={
+                isTableMode ? "react_table_body" : "react_table_body_no_adjust"
+              }
+              {...getTableBodyProps()}
+            >
+              {page.map((row, index) => {
+                prepareRow(row);
+                const data = row.original;
+                if (isTableMode) {
+                  const onClick = (): void => openMatchCallback(data);
+                  return (
+                    <TableViewRow
+                      onClick={onClick}
+                      title={"show match details"}
+                      row={row}
+                      index={index}
+                      key={row.index}
+                      gridTemplateColumns={gridTemplateColumns}
+                    />
+                  );
+                }
+                return (
+                  <ListItemMatch
+                    match={row.original}
+                    key={row.index}
+                    openMatchCallback={openMatchCallback}
+                    {...customProps}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <PagingControls {...pagingProps} />
         </div>
       </div>
-      <PagingControls {...pagingProps} />
-    </div>
+      <div
+        className={"wrapper_column sidebar_column_l"}
+        style={{
+          width: sidePanelWidth,
+          flex: `0 0 ${sidePanelWidth}`
+        }}
+      >
+        <ResizableDragger />
+        <MatchesSidePanel
+          subAggFilters={subAggFilters}
+          setAggFiltersCallback={setAggFiltersCallback}
+        />
+      </div>
+    </>
   );
 }

@@ -1,23 +1,16 @@
 import isValid from "date-fns/isValid";
-import _ from "lodash";
 import React from "react";
-import ReactDOM from "react-dom";
 import { TableState } from "react-table";
 import db from "../shared/database";
-import { createDiv } from "../shared/dom-fns";
 import pd from "../shared/PlayerData";
 import { getReadableEvent } from "../shared/util";
 import { EventInstanceData, InternalEvent } from "../types/event";
 import Aggregator, { AggregatorFilters } from "./aggregator";
 import EventsTable from "./components/events/EventsTable";
 import { EventStats, EventTableData } from "./components/events/types";
-import MatchResultsStatsPanel from "./components/MatchResultsStatsPanel";
 import { isHidingArchived } from "./components/tables/filters";
-import {
-  useAggregatorAndSidePanel,
-  useLastScrollTop
-} from "./components/tables/hooks";
-import { ipcSend, makeResizable, toggleArchived } from "./renderer-util";
+import { useAggregatorData } from "./components/tables/hooks";
+import { ipcSend, toggleArchived } from "./renderer-util";
 
 function editTag(tag: string, color: string): void {
   ipcSend("edit_tag", { tag, color });
@@ -29,33 +22,6 @@ function saveTableState(eventsTableState: TableState<EventTableData>): void {
 
 function saveTableMode(eventsTableMode: string): void {
   ipcSend("save_user_settings", { eventsTableMode, skipRefresh: true });
-}
-
-function updateStatsPanel(
-  container: HTMLElement,
-  aggregator: Aggregator
-): void {
-  container.innerHTML = "";
-  const div = createDiv(["ranks_history"]);
-  div.style.padding = "0 12px";
-
-  const statsPanelDiv = createDiv([]);
-  const props = {
-    prefixId: "events_top",
-    aggregator,
-    width: pd.settings.right_panel_width,
-    showCharts: true
-  };
-  ReactDOM.render(<MatchResultsStatsPanel {...props} />, statsPanelDiv);
-  statsPanelDiv.style.display = "flex";
-  statsPanelDiv.style.flexDirection = "column";
-  statsPanelDiv.style.marginTop = "16px";
-  statsPanelDiv.style.padding = "12px";
-  div.appendChild(statsPanelDiv);
-  const drag = createDiv(["dragger"]);
-  container.appendChild(drag);
-  makeResizable(drag);
-  container.appendChild(div);
 }
 
 function getValidMatchId(rawMatchId?: string): string | undefined {
@@ -181,53 +147,25 @@ export function EventsTab({
 }): JSX.Element {
   const { eventsTableMode, eventsTableState } = pd.settings;
   const showArchived = !isHidingArchived(eventsTableState);
-  const getDataAggFilters = (data: EventTableData[]): AggregatorFilters => {
-    const matchIds = _.flatten(data.map(event => event.stats.matchIds));
-    return { matchIds };
-  };
-  const {
-    aggFilters,
-    data,
-    filterDataCallback,
-    rightPanelRef,
-    setAggFilters,
-    sidePanelWidth
-  } = useAggregatorAndSidePanel({
+  const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,
     getData: getEventsData,
-    getDataAggFilters,
-    showArchived,
-    updateSidebarCallback: updateStatsPanel
+    showArchived
   });
   const events = React.useMemo(getTotalAggEvents, []);
-  const [containerRef, onScroll] = useLastScrollTop();
-
   return (
-    <>
-      <div className={"wrapper_column"} ref={containerRef} onScroll={onScroll}>
-        <EventsTable
-          data={data}
-          aggFilters={aggFilters}
-          events={events}
-          cachedState={eventsTableState}
-          cachedTableMode={eventsTableMode}
-          setAggFiltersCallback={setAggFilters}
-          tableModeCallback={saveTableMode}
-          tableStateCallback={saveTableState}
-          filterDataCallback={filterDataCallback}
-          archiveCallback={toggleArchived}
-          editTagCallback={editTag}
-        />
-      </div>
-      <div
-        ref={rightPanelRef}
-        className={"wrapper_column sidebar_column_l"}
-        style={{
-          width: sidePanelWidth,
-          flex: `0 0 ${sidePanelWidth}`
-        }}
-      ></div>
-    </>
+    <EventsTable
+      data={data}
+      aggFilters={aggFilters}
+      events={events}
+      cachedState={eventsTableState}
+      cachedTableMode={eventsTableMode}
+      setAggFiltersCallback={setAggFilters}
+      tableModeCallback={saveTableMode}
+      tableStateCallback={saveTableState}
+      archiveCallback={toggleArchived}
+      editTagCallback={editTag}
+    />
   );
 }
 

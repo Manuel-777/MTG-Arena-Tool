@@ -43,7 +43,6 @@ export interface MatchesTableProps {
   deleteTagCallback: (id: string, tag: string) => void;
   editTagCallback: (tag: string, color: string) => void;
   events: string[];
-  filterDataCallback: (data: MatchTableData[]) => void;
   openMatchCallback: (match: InternalMatch) => void;
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
   tableModeCallback: (tableMode: string) => void;
