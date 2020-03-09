@@ -72,20 +72,6 @@ export function useEnumSort<D extends TableData>(
   );
 }
 
-export function useLegacyRenderer(
-  renderEventRow: (container: HTMLDivElement, ...rendererArgs: any[]) => any,
-  ...rendererArgs: any[]
-): React.RefObject<HTMLDivElement> {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (containerRef?.current) {
-      containerRef.current.innerHTML = "";
-      renderEventRow(containerRef.current, ...rendererArgs);
-    }
-  }, [containerRef, renderEventRow, rendererArgs]);
-  return containerRef;
-}
-
 export function useBlurOnEnter(): [
   React.RefObject<HTMLInputElement>,
   (e: React.KeyboardEvent<HTMLInputElement>) => void
