@@ -80,7 +80,7 @@ function getTxnData(): TransactionData[] {
   );
 }
 
-export function EconomyTab(): JSX.Element {
+export default function EconomyTab(): JSX.Element {
   const { economyTableMode, economyTableState } = pd.settings;
   const data = React.useMemo(() => getTxnData(), []);
   return (
@@ -93,8 +93,4 @@ export function EconomyTab(): JSX.Element {
       tableStateCallback={saveTableState}
     />
   );
-}
-
-export function openEconomyTab(): JSX.Element {
-  return <EconomyTab />;
 }

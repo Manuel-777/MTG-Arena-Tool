@@ -140,10 +140,10 @@ function getTotalAggEvents(): string[] {
   return totalAgg.trackEvents;
 }
 
-export function EventsTab({
+export default function EventsTab({
   aggFiltersArg
 }: {
-  aggFiltersArg: AggregatorFilters;
+  aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
   const { eventsTableMode, eventsTableState } = pd.settings;
   const showArchived = !isHidingArchived(eventsTableState);
@@ -167,8 +167,4 @@ export function EventsTab({
       editTagCallback={editTag}
     />
   );
-}
-
-export function openEventsTab(aggFilters: AggregatorFilters = {}): JSX.Element {
-  return <EventsTab aggFiltersArg={aggFilters} />;
 }

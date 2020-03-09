@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import pd from "../shared/PlayerData";
 import { ipcSend } from "./renderer-util";
 
 import {
@@ -49,15 +48,18 @@ function SettingsNav(props: SettingsNavProps): JSX.Element {
 }
 
 interface SettingsProps {
-  openSection: number;
+  openSection?: number;
 }
 
 /**
  * Settings
  * @param props openSection: number
  */
-function Settings(props: SettingsProps): JSX.Element {
-  const [currentTab, setCurrentTab] = React.useState(props.openSection);
+export default function SettingsTab(props: SettingsProps): JSX.Element {
+  const openSection =
+    (props.openSection === -1 ? SETTINGS_BEHAVIOUR : props.openSection) ??
+    SETTINGS_BEHAVIOUR;
+  const [currentTab, setCurrentTab] = React.useState(openSection);
 
   const defaultTab = {
     currentTab: currentTab,
@@ -139,15 +141,5 @@ function Settings(props: SettingsProps): JSX.Element {
         <CurrentSettings />
       </div>
     </>
-  );
-}
-
-export function openSettingsTab(
-  openSection = pd.settings.last_settings_section
-): JSX.Element {
-  return (
-    <Settings
-      openSection={openSection == -1 ? SETTINGS_BEHAVIOUR : openSection}
-    />
   );
 }

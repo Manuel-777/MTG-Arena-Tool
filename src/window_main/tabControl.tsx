@@ -2,95 +2,88 @@
 import React from "react";
 import {
   DATE_SEASON,
-  MAIN_HOME,
+  MAIN_COLLECTION,
+  MAIN_CONSTRUCTED,
   MAIN_DECKS,
-  MAIN_MATCHES,
+  MAIN_ECONOMY,
   MAIN_EVENTS,
   MAIN_EXPLORE,
-  MAIN_ECONOMY,
-  MAIN_COLLECTION,
-  MAIN_SETTINGS,
-  MAIN_CONSTRUCTED,
+  MAIN_HOME,
   MAIN_LIMITED,
+  MAIN_MATCHES,
+  MAIN_SETTINGS,
   SUB_DECK,
+  SUB_DRAFT,
   SUB_MATCH,
-  SUB_DRAFT
+  IPC_MAIN
 } from "../shared/constants";
-
-import pd from "../shared/PlayerData";
 import Aggregator from "./aggregator";
-
-import { ipcSend } from "./renderer-util";
-
-import { openDecksTab } from "./DecksTab";
-import { openMatchesTab } from "./MatchesTab";
-import { openEventsTab } from "./EventsTab";
-import { openEconomyTab } from "./EconomyTab";
-import { openExploreTab } from "./ExploreTab";
-import { openCollectionTab } from "./collection/CollectionTab";
-import { openSettingsTab } from "./settings";
-import { openHomeTab } from "./HomeTab";
-import OfflineSplash from "./OfflineSplash";
+import CollectionTab from "./collection/CollectionTab";
 import openDeckSub from "./components/deck-view/DeckVIew";
-import openMatchSub from "./components/match-view/MatchView";
 import openDraftSub from "./components/draft-view/DraftVIew";
+import openMatchSub from "./components/match-view/MatchView";
+import DecksTab from "./DecksTab";
+import EconomyTab from "./EconomyTab";
+import EventsTab from "./EventsTab";
+import ExploreTab from "./ExploreTab";
+import HomeTab from "./HomeTab";
+import MatchesTab from "./MatchesTab";
+import OfflineSplash from "./OfflineSplash";
+import { ipcSend } from "./renderer-util";
+import SettingsTab from "./settings";
 import uxMove from "./uxMove";
 
-function getFilters(id: number): any {
-  let filters = {
-    date: pd.settings.last_date_filter,
-    eventId: "All Events"
-  };
-  let sidebarActive = id;
-
-  if (id === MAIN_CONSTRUCTED) {
-    sidebarActive = MAIN_MATCHES;
-    filters = {
-      ...Aggregator.getDefaultFilters(),
-      date: DATE_SEASON,
-      eventId: Aggregator.RANKED_CONST
-    };
-  }
-  if (id === MAIN_LIMITED) {
-    sidebarActive = MAIN_MATCHES;
-    filters = {
-      ...Aggregator.getDefaultFilters(),
-      date: DATE_SEASON,
-      eventId: Aggregator.RANKED_DRAFT
-    };
-  }
-
-  return { filters: filters, sidebarActive: sidebarActive };
-}
-
 export function getOpenNav(tab: number, offline: boolean): JSX.Element {
-  const { filters } = getFilters(tab);
-
+  uxMove(0);
   if (offline == true && (tab == MAIN_HOME || tab == MAIN_EXPLORE)) {
     return <OfflineSplash />;
   }
-
+  const newSettings: Record<string, any> = {
+    last_open_tab: tab,
+    skipRefresh: true
+  };
+  if ([MAIN_CONSTRUCTED, MAIN_LIMITED].includes(tab)) {
+    newSettings.last_date_filter = DATE_SEASON;
+  }
+  ipcSend("save_user_settings", newSettings);
   switch (tab) {
     case MAIN_DECKS:
-      return openDecksTab(filters);
+      return <DecksTab />;
+    case MAIN_CONSTRUCTED:
+      return (
+        <MatchesTab
+          aggFiltersArg={{
+            date: DATE_SEASON,
+            eventId: Aggregator.RANKED_CONST
+          }}
+        />
+      );
+    case MAIN_LIMITED:
+      return (
+        <MatchesTab
+          aggFiltersArg={{
+            date: DATE_SEASON,
+            eventId: Aggregator.RANKED_DRAFT
+          }}
+        />
+      );
     case MAIN_MATCHES:
-      return openMatchesTab(filters);
+      return <MatchesTab />;
     case MAIN_EVENTS:
-      return openEventsTab(filters);
+      return <EventsTab />;
     case MAIN_EXPLORE:
-      return openExploreTab();
+      return <ExploreTab />;
     case MAIN_ECONOMY:
-      return openEconomyTab();
+      return <EconomyTab />;
     case MAIN_COLLECTION:
-      return openCollectionTab();
+      return <CollectionTab />;
     case MAIN_SETTINGS:
-      return openSettingsTab();
+      return <SettingsTab />;
     case MAIN_HOME:
-      return openHomeTab();
+      return <HomeTab />;
     default:
-      break;
+      return <></>;
   }
-  return <></>;
 }
 
 export function getOpenSub(
@@ -106,41 +99,14 @@ export function getOpenSub(
     case SUB_DRAFT:
       return openDraftSub(id);
     default:
-      break;
+      return <></>;
   }
-
-  return <></>;
-}
-
-export function clickNav(id: number): void {
-  document.body.style.cursor = "auto";
-  uxMove(0);
-  const { sidebarActive, filters } = getFilters(id);
-
-  ipcSend("save_user_settings", {
-    last_open_tab: sidebarActive,
-    last_date_filter: filters.date,
-    skipRefresh: true
-  });
 }
 
 export function forceOpenAbout(): void {
-  uxMove(0);
-  ipcSend("save_user_settings", {
-    last_open_tab: MAIN_SETTINGS
-  });
+  ipcSend("force_open_about", undefined, IPC_MAIN);
 }
 
 export function forceOpenSettings(section = -1): void {
-  uxMove(0);
-  if (section == -1) {
-    ipcSend("save_user_settings", {
-      last_open_tab: MAIN_SETTINGS
-    });
-  } else {
-    ipcSend("save_user_settings", {
-      last_open_tab: MAIN_SETTINGS,
-      last_settings_section: section
-    });
-  }
+  ipcSend("force_open_settings", section, IPC_MAIN);
 }

@@ -90,7 +90,7 @@ export function useAggregatorData<D extends TableData>({
   getData,
   showArchived
 }: {
-  aggFiltersArg: AggregatorFilters;
+  aggFiltersArg?: AggregatorFilters;
   getData: (aggregator: Aggregator) => D[];
   showArchived: boolean;
 }): {
@@ -98,16 +98,17 @@ export function useAggregatorData<D extends TableData>({
   data: D[];
   setAggFilters: (aggFilters: AggregatorFilters) => void;
 } {
-  const { last_date_filter: dateFilter } = pd.settings;
-  const defaultAggFilters = {
-    ...Aggregator.getDefaultFilters(),
-    date: dateFilter,
-    ...aggFiltersArg,
-    showArchived
-  };
-  const [aggFilters, setAggFilters] = React.useState(
-    defaultAggFilters as AggregatorFilters
-  );
+  const [aggFilters, setAggFilters] = React.useState(aggFiltersArg ?? {});
+  React.useEffect(() => {
+    const { last_date_filter: dateFilter } = pd.settings;
+    const defaultAggFilters: AggregatorFilters = {
+      ...Aggregator.getDefaultFilters(),
+      date: dateFilter,
+      ...aggFiltersArg,
+      showArchived
+    };
+    setAggFilters(defaultAggFilters);
+  }, [aggFiltersArg, showArchived]);
   const data = React.useMemo(() => {
     const aggregator = new Aggregator(aggFilters);
     return getData(aggregator);

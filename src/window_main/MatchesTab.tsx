@@ -125,10 +125,10 @@ function getTotalAggData(): [string[], TagCounts] {
   return [totalAgg.events, tags];
 }
 
-export function MatchesTab({
+export default function MatchesTab({
   aggFiltersArg
 }: {
-  aggFiltersArg: AggregatorFilters;
+  aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
   const dispatcher = useDispatch();
   const { matchesTableMode, matchesTableState } = pd.settings;
@@ -172,10 +172,4 @@ export function MatchesTab({
       deleteTagCallback={deleteTag}
     />
   );
-}
-
-export function openMatchesTab(
-  aggFilters: AggregatorFilters = {}
-): JSX.Element {
-  return <MatchesTab aggFiltersArg={aggFilters} />;
 }

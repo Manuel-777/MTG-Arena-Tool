@@ -39,7 +39,7 @@ function queryExplore(query: ExploreQuery): void {
   ipcSend("request_explore", query);
 }
 
-export function ExploreTab(): JSX.Element {
+export default function ExploreTab(): JSX.Element {
   const dispatcher = useDispatch();
   const exploreData = useSelector((state: AppState) => state.exploreData);
   const exploreFilters = useSelector((state: AppState) => state.exploreFilters);
@@ -440,8 +440,4 @@ function RanksFilter(props: RanksFilterProps): JSX.Element {
       })}
     </div>
   );
-}
-
-export function openExploreTab(): JSX.Element {
-  return <ExploreTab />;
 }

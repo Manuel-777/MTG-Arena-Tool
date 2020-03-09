@@ -107,10 +107,10 @@ function getTotalAggEvents(): string[] {
   return totalAgg.events;
 }
 
-export function DecksTab({
+export default function DecksTab({
   aggFiltersArg
 }: {
-  aggFiltersArg: AggregatorFilters;
+  aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
   const dispatcher = useDispatch();
   const { decksTableMode, decksTableState } = pd.settings;
@@ -150,8 +150,4 @@ export function DecksTab({
       deleteTagCallback={deleteTag}
     />
   );
-}
-
-export function openDecksTab(aggFilters: AggregatorFilters = {}): JSX.Element {
-  return <DecksTab aggFiltersArg={aggFilters} />;
 }

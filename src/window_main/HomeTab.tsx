@@ -13,7 +13,7 @@ export interface WildcardsChange {
   change: number;
 }
 
-export function HomeTab(): JSX.Element {
+export default function HomeTab(): JSX.Element {
   const wildcards = useSelector((state: AppState) => state.homeData.wildcards);
   const fSet = useSelector((state: AppState) => state.homeData.filteredSet);
   const usersActive = useSelector(
@@ -250,8 +250,4 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
       })}
     </div>
   );
-}
-
-export function openHomeTab(): JSX.Element {
-  return <HomeTab />;
 }

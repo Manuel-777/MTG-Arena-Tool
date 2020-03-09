@@ -1,6 +1,5 @@
 import _ from "lodash";
 import React from "react";
-import { clickNav } from "../../tabControl";
 import pd from "../../../shared/PlayerData";
 
 import {
@@ -33,21 +32,18 @@ interface TopNavItemProps {
   currentTab: number;
   compact: boolean;
   id: number;
-  callback: (id: number) => void;
   title: string;
 }
 
 function TopNavItem(props: TopNavItemProps): JSX.Element {
-  const { currentTab, compact, id, callback, title } = props;
+  const { currentTab, compact, id, title } = props;
 
   const clickTab = React.useCallback(
     (tabId: number) => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
       dispatchAction(props.dispatcher, SET_BACKGROUND_GRPID, 0);
-      clickNav(tabId);
-      callback(tabId);
     },
-    [props.dispatcher, callback]
+    [props.dispatcher]
   );
 
   return compact ? (
@@ -91,22 +87,19 @@ interface TopRankProps {
   currentTab: number;
   id: number;
   rank: any | null;
-  callback: (id: number) => void;
   rankClass: string;
 }
 
 function TopRankIcon(props: TopRankProps): JSX.Element {
-  const { currentTab, id, rank, callback, rankClass } = props;
+  const { currentTab, id, rank, rankClass } = props;
 
   const selected = currentTab === id;
   const clickTab = React.useCallback(
     tabId => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
       dispatchAction(props.dispatcher, SET_BACKGROUND_GRPID, 0);
-      clickNav(tabId);
-      callback(tabId);
     },
-    [props.dispatcher, callback]
+    [props.dispatcher]
   );
 
   if (rank == null) {
@@ -162,18 +155,10 @@ export function TopNav(): JSX.Element {
   const dispatcher = useDispatch();
   const windowSize = useWindowSize();
 
-  const setCurrentTab = React.useCallback(
-    (tab: number) => {
-      dispatchAction(dispatcher, SET_TOP_NAV, tab);
-    },
-    [dispatcher]
-  );
-
   const defaultTab = {
     dispatcher: dispatcher,
     compact: compact,
-    currentTab: currentTab,
-    callback: setCurrentTab
+    currentTab: currentTab
   };
 
   const homeTab = { ...defaultTab, id: MAIN_HOME, title: "" };
@@ -190,7 +175,6 @@ export function TopNav(): JSX.Element {
 
   const contructedNav = {
     dispatcher: dispatcher,
-    callback: setCurrentTab,
     currentTab: currentTab,
     id: MAIN_CONSTRUCTED,
     rank: pd.rank ? pd.rank.constructed : null,
@@ -199,7 +183,6 @@ export function TopNav(): JSX.Element {
 
   const limitedNav = {
     dispatcher: dispatcher,
-    callback: setCurrentTab,
     currentTab: currentTab,
     id: MAIN_LIMITED,
     rank: pd.rank ? pd.rank.limited : null,

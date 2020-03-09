@@ -118,7 +118,7 @@ function getCollectionData(): CardsData[] {
     );
 }
 
-export function CollectionTab(): JSX.Element {
+export default function CollectionTab(): JSX.Element {
   const { collectionTableMode, collectionTableState } = pd.settings;
   const data = React.useMemo(() => getCollectionData(), []);
   return (
@@ -133,8 +133,4 @@ export function CollectionTab(): JSX.Element {
       tableStateCallback={saveTableState}
     />
   );
-}
-
-export function openCollectionTab(): JSX.Element {
-  return <CollectionTab />;
 }
