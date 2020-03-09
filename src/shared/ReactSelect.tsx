@@ -32,10 +32,10 @@ export default function ReactSelect({
   const onClickOption = React.useCallback(
     event => {
       setCurrentOption(event.currentTarget.value);
-      setOptionsOpen(!optionsOpen);
+      setOptionsOpen(false);
       callback && callback(event.currentTarget.value);
     },
-    [optionsOpen, callback]
+    [callback]
   );
 
   const buttonClassNames =
@@ -54,7 +54,9 @@ export default function ReactSelect({
         <div className={"select_options_container"}>
           {options.map(option => {
             return typeof option == "string" && option.startsWith("%%") ? (
-              <div className="select_title">{option.replace("%%", "")}</div>
+              <div className="select_title" key={option}>
+                {option.replace("%%", "")}
+              </div>
             ) : (
               <button
                 className={"button_reset select_option"}

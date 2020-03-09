@@ -282,7 +282,7 @@ export default function MatchResultsStatsPanel({
           <label className={"but_container_label"}>
             Group by:
             <ReactSelect
-              current={"Archetype"}
+              current={showTags ? "Archetype" : "Color"}
               options={["Archetype", "Color"]}
               callback={(filter): void => setShowTags(filter === "Archetype")}
               style={{ width: "120px" }}
