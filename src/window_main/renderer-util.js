@@ -7,32 +7,12 @@ import pd from "../shared/PlayerData";
 
 const byId = id => document.getElementById(id);
 
-// quick and dirty shared state object for main renderer process
-// (for state shared across processes, use database or PlayerData)
-const localState = {
-  authToken: "",
-  collectionTableMode: pd.settings.collectionTableMode,
-  discordTag: null,
-  isBoosterMathValid: true,
-  lastDataIndex: 0,
-  lastScrollHandler: null,
-  lastScrollTop: 0,
-  exploreData: null
-};
 const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
   "actionlogs"
 );
 function ipcSend(method, arg, to = IPC_BACKGROUND) {
   ipc.send("ipc_switch", method, IPC_MAIN, arg, to);
-}
-
-function setLocalState(state = {}) {
-  Object.assign(localState, state);
-}
-
-function getLocalState() {
-  return localState;
 }
 
 function toggleArchived(id) {
@@ -193,8 +173,6 @@ function localTimeSince(date) {
 export {
   actionLogDir,
   ipcSend,
-  setLocalState,
-  getLocalState,
   toggleArchived,
   getTagColor,
   makeResizable,
