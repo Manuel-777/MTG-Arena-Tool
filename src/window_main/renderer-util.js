@@ -6,7 +6,7 @@ import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
 import pd from "../shared/PlayerData";
 
 const byId = id => document.getElementById(id);
-const unmountPoints = [];
+
 // quick and dirty shared state object for main renderer process
 // (for state shared across processes, use database or PlayerData)
 const localState = {
@@ -25,10 +25,6 @@ const actionLogDir = path.join(
 );
 function ipcSend(method, arg, to = IPC_BACKGROUND) {
   ipc.send("ipc_switch", method, IPC_MAIN, arg, to);
-}
-
-export function addNodeToUnmountReact(node) {
-  unmountPoints.push(node);
 }
 
 function setLocalState(state = {}) {
