@@ -23,11 +23,7 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import {
-  useAggregatorArchiveFilter,
-  useBaseReactTable,
-  useLastScrollTop
-} from "../tables/hooks";
+import { useAggregatorArchiveFilter, useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
@@ -329,10 +325,9 @@ export default function DecksTable({
   const isTableMode = tableMode === DECKS_TABLE_MODE;
   const { right_panel_width: panelWidth } = pd.settings;
   const sidePanelWidth = panelWidth + "px";
-  const [containerRef, onScroll] = useLastScrollTop();
   return (
     <>
-      <div className={"wrapper_column"} ref={containerRef} onScroll={onScroll}>
+      <div className={"wrapper_column"}>
         <div className="react_table_wrap">
           <DecksTableControls {...decksTableControlsProps} />
           <div

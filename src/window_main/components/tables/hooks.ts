@@ -1,6 +1,7 @@
 import _ from "lodash";
 import React from "react";
 import {
+  IdType,
   Row,
   SortByFn,
   TableInstance,
@@ -9,16 +10,10 @@ import {
   useGlobalFilter,
   usePagination,
   useSortBy,
-  useTable,
-  IdType
+  useTable
 } from "react-table";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
-import {
-  getLocalState,
-  setLocalState,
-  makeResizable
-} from "../../renderer-util";
 import {
   archivedFilterFn,
   colorsFilterFn,
@@ -88,27 +83,6 @@ export function useBlurOnEnter(): [
     [inputRef]
   );
   return [inputRef, onKeyDown];
-}
-
-export function useLastScrollTop(): [
-  React.RefObject<HTMLDivElement>,
-  () => void
-] {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (containerRef?.current) {
-      const { lastScrollTop } = getLocalState();
-      if (lastScrollTop) {
-        containerRef.current.scrollTop = lastScrollTop;
-      }
-    }
-  }, [containerRef]);
-  const onScroll = React.useCallback(() => {
-    if (containerRef?.current) {
-      setLocalState({ lastScrollTop: containerRef.current.scrollTop });
-    }
-  }, []);
-  return [containerRef, onScroll];
 }
 
 export function useAggregatorData<D extends TableData>({
