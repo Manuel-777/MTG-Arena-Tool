@@ -16,6 +16,7 @@ export default function Switch(props: SwitchProps): JSX.Element {
   const click = (
     e: React.MouseEvent<HTMLDivElement | HTMLLabelElement>
   ): void => {
+    e.preventDefault();
     e.stopPropagation();
     if (!disabled) {
       callback(!currentValue);
