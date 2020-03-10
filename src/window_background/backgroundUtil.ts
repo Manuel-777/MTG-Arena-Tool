@@ -114,6 +114,20 @@ export function updateLoading(entry: any): void {
   }
 }
 
+export function normaliseFields(object: any): any {
+  if (typeof object == "object") {
+    if (Array.isArray(object)) {
+      return _.transform(object, (result: any, value: any, key: number) => {
+        result[key] = normaliseFields(value);
+      });
+    }
+    return _.transform(object, (result: any, value: any, key: string) => {
+      result[key.replace(/List$/, "").toLowerCase()] = normaliseFields(value);
+    });
+  }
+  return object;
+}
+
 export function unleakString(s: string): string {
   return (" " + s).substr(1);
 }

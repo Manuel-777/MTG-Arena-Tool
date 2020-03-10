@@ -470,22 +470,24 @@ export function onLabelClientToMatchServiceMessageTypeClientToGREMessage(
     const msgType = entry.label.split("_")[1];
     payload = decodePayload(payload, msgType);
   }
+  // The sideboarding log message has changed format multiple times, sometimes
+  // going back to an earlier format. normaliseFields, together with the
+  // conditional decodePayload call, allows the same code to handle each known
+  // format in case Arena changes it again.
+  payload = normaliseFields(payload);
 
   if (payload.submitdeckresp) {
     //console.log("Client To GRE: ", payload);
     // Get sideboard changes
     const deckResp = payload.submitdeckresp.deck;
 
-    const tempMain = new CardsList([]);
-    deckResp.deckcardsList.map(id => tempMain.add(id));
-    const tempSide = new CardsList([]);
-    deckResp.sideboardcardsList.map(id => tempSide.add(id));
+    const currentDeck = globals.currentMatch.player.deck.getSave();
 
-    const newDeck = globals.currentMatch.player.deck.clone();
-    newDeck.mainboard = tempMain;
-    newDeck.sideboard = tempSide;
-
-    globals.currentMatch.player.deck = newDeck;
+    globals.currentMatch.player.deck = new Deck(
+      currentDeck,
+      deckResp.deckcards,
+      deckResp.sideboardcards
+    );
   }
 }
 
