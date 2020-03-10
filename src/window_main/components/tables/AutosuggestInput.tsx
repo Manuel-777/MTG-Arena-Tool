@@ -89,9 +89,10 @@ export default function AutosuggestInput({
     (event, { suggestionValue, method }): void => {
       if (method === "click") {
         submitCallback(suggestionValue);
+        setValue(initialValue ?? "");
       }
     },
-    [submitCallback]
+    [initialValue, submitCallback]
   );
   const onBlur = React.useCallback(
     (
@@ -104,11 +105,12 @@ export default function AutosuggestInput({
         : input.value;
       if (val && val !== placeholder) {
         submitCallback(val);
+        setValue(initialValue ?? "");
       }
       input.value = "";
       setCellWrapperOverflow(input, "");
     },
-    [placeholder, submitCallback]
+    [initialValue, placeholder, submitCallback]
   );
   const inputProps: InputProps<TagCount> = {
     autoComplete: "off",

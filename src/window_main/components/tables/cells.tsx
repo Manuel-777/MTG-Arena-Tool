@@ -1,4 +1,5 @@
 import isValid from "date-fns/isValid";
+import _ from "lodash";
 import React from "react";
 import { Cell, CellProps } from "react-table";
 import LocalTime from "../../../shared/time-components/LocalTime";
@@ -183,22 +184,39 @@ export function TagsCell<D extends TableData>({
   tags?: TagCounts;
   title?: string;
 }): JSX.Element {
-  const parentId = cell.row.original.id;
+  const parent = cell.row.original;
+  const parentId = parent.id;
+  const [tagState, setTagState] = React.useState<Array<string>>(cell.value);
+  React.useEffect(() => setTagState(cell.value), [cell.value]);
+  const deleteTag = React.useCallback(
+    (id: string, tag: string): void => {
+      setTagState(_.without(tagState, tag));
+      deleteTagCallback(id, tag);
+    },
+    [deleteTagCallback, tagState]
+  );
+  const addTag = React.useCallback(
+    (id: string, tag: string): void => {
+      setTagState([...tagState, tag]);
+      addTagCallback(id, tag);
+    },
+    [addTagCallback, tagState]
+  );
   return (
     <FlexLeftContainer style={{ flexWrap: "wrap" }}>
-      {cell.value.map((tag: string) => (
+      {tagState.map((tag: string) => (
         <TagBubble
           key={tag}
           tag={tag}
           parentId={parentId}
           editTagCallback={editTagCallback}
-          deleteTagCallback={deleteTagCallback}
+          deleteTagCallback={deleteTag}
         />
       ))}
-      {(cell.value.length === 0 || !disallowMultiple) && (
+      {(tagState.length === 0 || !disallowMultiple) && (
         <NewTag
           parentId={parentId}
-          addTagCallback={addTagCallback}
+          addTagCallback={addTag}
           tagPrompt={tagPrompt}
           tags={tags}
           title={title}

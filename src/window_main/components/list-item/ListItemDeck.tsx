@@ -1,5 +1,5 @@
 import React from "react";
-
+import _ from "lodash";
 import { DecksTableRowProps } from "../decks/types";
 import ManaCost from "../ManaCost";
 import {
@@ -32,6 +32,25 @@ export function ListItemDeck({
   const deck = row.original;
   const deckObj = new Deck(deck);
   const parentId = deck.id ?? "";
+
+  const [tagState, setTagState] = React.useState<Array<string>>(
+    deck.tags ?? []
+  );
+  React.useEffect(() => setTagState(deck.tags ?? []), [deck.tags]);
+  const deleteTag = React.useCallback(
+    (deckid: string, tag: string): void => {
+      setTagState(_.without(tagState, tag));
+      deleteTagCallback(deckid, tag);
+    },
+    [deleteTagCallback, tagState]
+  );
+  const addTag = React.useCallback(
+    (deckid: string, tag: string): void => {
+      setTagState([...tagState, tag]);
+      addTagCallback(deckid, tag);
+    },
+    [addTagCallback, tagState]
+  );
 
   const onRowClick = (): void => {
     openDeckCallback(deck);
@@ -85,7 +104,7 @@ export function ListItemDeck({
   };
   const newTagProps = {
     parentId,
-    addTagCallback,
+    addTagCallback: addTag,
     tagPrompt: "Add",
     tags,
     title: "Add custom deck tag"
@@ -108,12 +127,12 @@ export function ListItemDeck({
       <Column class="list_item_center">
         <FlexTop innerClass="deck_tags_container">
           <TagBubble {...formatProps} />
-          {deck.tags?.map((tag: string) => {
+          {tagState.map((tag: string) => {
             const tagProps = {
               parentId,
               tag,
               editTagCallback,
-              deleteTagCallback
+              deleteTagCallback: deleteTag
             };
             return <TagBubble key={tag} {...tagProps} />;
           })}
