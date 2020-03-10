@@ -10,46 +10,40 @@ interface SwitchProps {
 }
 
 export default function Switch(props: SwitchProps): JSX.Element {
-  const { disabled, value, callback, style, containerClassName } = props;
+  const { disabled, value, callback, style, containerClassName, text } = props;
   const [currentValue, setCurrentValue] = React.useState(value);
 
-  const click = (
-    e: React.MouseEvent<HTMLDivElement | HTMLLabelElement>
-  ): void => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!disabled) {
-      callback(!currentValue);
-      setCurrentValue(!currentValue);
-    }
-  };
+  const onChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      if (!disabled) {
+        const newValue = event.target.checked;
+        callback(newValue);
+        setCurrentValue(newValue);
+      }
+    },
+    [callback, disabled]
+  );
 
-  const disabledStyle = {
-    ...style,
-    cursor: "default",
-    color: "var(--color-light-50)"
-  };
+  const disabledStyle = disabled
+    ? {
+        cursor: "default",
+        color: "var(--color-light-50)"
+      }
+    : {};
 
   React.useEffect(() => {
-    setCurrentValue(props.value);
-  }, [props.value]);
+    setCurrentValue(value);
+  }, [value]);
 
   return (
-    <div
-      style={{ ...style }}
-      className={containerClassName || "switch-container"}
-    >
-      <div
-        style={disabled ? disabledStyle : {}}
-        className="switch-label"
-        onClick={click}
-      >
-        {props.text}
+    <label style={style} className={containerClassName ?? "switch-container"}>
+      <div style={disabledStyle} className="switch-label">
+        {text}
       </div>
-      <label className="switch" onClick={click}>
-        <input type="checkbox" checked={currentValue} />
-        <span style={disabled ? disabledStyle : {}} className="switchslider" />
-      </label>
-    </div>
+      <div className="switch">
+        <input type="checkbox" checked={currentValue} onChange={onChange} />
+        <span style={disabledStyle} className="switchslider" />
+      </div>
+    </label>
   );
 }
