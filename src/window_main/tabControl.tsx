@@ -31,10 +31,8 @@ import MatchesTab from "./MatchesTab";
 import OfflineSplash from "./OfflineSplash";
 import { ipcSend } from "./renderer-util";
 import SettingsTab from "./settings";
-import uxMove from "./uxMove";
 
 export function getOpenNav(tab: number, offline: boolean): JSX.Element {
-  uxMove(0);
   if (offline == true && (tab == MAIN_HOME || tab == MAIN_EXPLORE)) {
     return <OfflineSplash />;
   }

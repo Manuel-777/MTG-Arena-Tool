@@ -26,6 +26,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppState } from "../../app/appState";
 import useWindowSize from "../../hooks/useWindowSize";
+import uxMove from "../../uxMove";
 
 interface TopNavItemProps {
   dispatcher: unknown;
@@ -42,6 +43,7 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
     (tabId: number) => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
       dispatchAction(props.dispatcher, SET_BACKGROUND_GRPID, 0);
+      uxMove(0);
     },
     [props.dispatcher]
   );
@@ -98,6 +100,7 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
     tabId => (): void => {
       dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
       dispatchAction(props.dispatcher, SET_BACKGROUND_GRPID, 0);
+      uxMove(0);
     },
     [props.dispatcher]
   );
