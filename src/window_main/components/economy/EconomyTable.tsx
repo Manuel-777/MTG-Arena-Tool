@@ -1,6 +1,6 @@
 import startOfDay from "date-fns/startOfDay";
 import React from "react";
-import { Column, useExpanded, useGroupBy } from "react-table";
+import { Column, useExpanded, useGroupBy, useSortBy } from "react-table";
 import { EVENTS_TABLE_MODE } from "../../../shared/constants";
 import { vaultPercentFormat } from "../../economyUtils";
 import {
@@ -303,7 +303,7 @@ export default function EconomyTable({
     cachedState,
     columns,
     customProps: { archiveCallback, countLabel: "transactions" },
-    customHooks: [useGroupBy, useExpanded],
+    customHooks: [useGroupBy, useSortBy, useExpanded],
     data,
     defaultState: {
       filters: [{ id: "archivedCol", value: "hideArchived" }],

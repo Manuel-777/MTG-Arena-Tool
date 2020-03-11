@@ -65,7 +65,7 @@ export interface PagingControlsProps {
 
 export interface TableControlsProps<D extends TableData> {
   filters: Filters<D>;
-  flatColumns: ColumnInstance<D>[];
+  allColumns: ColumnInstance<D>[];
   getTableProps: (propGetter?: TablePropGetter<D>) => TableProps;
   globalFilter: FilterValue;
   pagingProps: PagingControlsProps;

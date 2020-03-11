@@ -1,36 +1,4 @@
-import {
-  UseExpandedHooks,
-  UseExpandedInstanceProps,
-  UseExpandedOptions,
-  UseExpandedRowProps,
-  UseExpandedState,
-  UseFiltersColumnOptions,
-  UseFiltersColumnProps,
-  UseFiltersInstanceProps,
-  UseFiltersOptions,
-  UseFiltersState,
-  UseGlobalFiltersInstanceProps,
-  UseGlobalFiltersOptions,
-  UseGlobalFiltersState,
-  UseGroupByCellProps,
-  UseGroupByColumnOptions,
-  UseGroupByColumnProps,
-  UseGroupByHooks,
-  UseGroupByInstanceProps,
-  UseGroupByOptions,
-  UseGroupByRowProps,
-  UseGroupByState,
-  UsePaginationInstanceProps,
-  UsePaginationOptions,
-  UsePaginationState,
-  UseSortByColumnOptions,
-  UseSortByColumnProps,
-  UseSortByHooks,
-  UseSortByInstanceProps,
-  UseSortByOptions,
-  UseSortByState,
-  UseTableColumnProps
-} from "react-table";
+import "react-table";
 
 declare module "react-table" {
   // take this file as-is, or comment out the sections that don't apply to your plugin configuration
@@ -69,7 +37,8 @@ declare module "react-table" {
       UseSortByState<D> {}
 
   export interface Column<D extends object = {}>
-    extends UseFiltersColumnOptions<D>,
+    extends UseTableColumnOptions<D>,
+      UseFiltersColumnOptions<D>,
       UseGroupByColumnOptions<D>,
       UseSortByColumnOptions<D> {
     // add custom column property options below
@@ -82,17 +51,15 @@ declare module "react-table" {
   }
 
   export interface ColumnInstance<D extends object = {}>
-    extends UseFiltersColumnProps<D>,
+    extends UseTableColumnProps<D>,
+      UseFiltersColumnProps<D>,
       UseGroupByColumnProps<D>,
       UseSortByColumnProps<D>,
-      UseTableColumnProps<D> {
-    // this is a bugfix for a misspelled function type declaration
-    getToggleHiddenProps: (userProps: any) => any;
-  }
+      UseTableColumnProps<D> {}
 
   export interface Cell<D extends object = {}>
-    extends UseGroupByCellProps<D>,
-      UseRowStateCellProps<D> {}
+    extends UseTableCellProps<D>,
+      UseGroupByCellProps<D> {}
 
   export interface Row<D extends object = {}>
     extends UseExpandedRowProps<D>,

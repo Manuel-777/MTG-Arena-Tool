@@ -16,7 +16,7 @@ export default function ColumnToggles<D extends TableData>({
         toggleableColumns.map(column => (
           <CheckboxContainer key={column.id}>
             {column.render("Header")}
-            <input type="checkbox" {...column.getToggleHiddenProps({})} />
+            <input type="checkbox" {...column.getToggleHiddenProps()} />
             <span className={"checkmark"} />
           </CheckboxContainer>
         ))}
