@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
+import { useSelector } from "react-redux";
 import { ipcSend } from "./renderer-util";
 
 import {
@@ -13,6 +14,7 @@ import {
   SETTINGS_LOGIN
 } from "../shared/constants";
 
+import { AppState } from "./app/appState";
 import SectionBehaviour from "./components/settings/SectionBehaviour";
 import SectionData from "./components/settings/SectionData";
 import SectionOverlay from "./components/settings/sectionOverlay";
@@ -56,10 +58,13 @@ interface SettingsProps {
  * @param props openSection: number
  */
 export default function SettingsTab(props: SettingsProps): JSX.Element {
+  const settings = useSelector((state: AppState) => state.settings);
   const openSection =
-    (props.openSection === -1 ? SETTINGS_BEHAVIOUR : props.openSection) ??
-    SETTINGS_BEHAVIOUR;
+    (props.openSection === -1
+      ? settings.last_settings_section
+      : props.openSection) ?? settings.last_settings_section;
   const [currentTab, setCurrentTab] = React.useState(openSection);
+  React.useEffect(() => setCurrentTab(openSection), [openSection]);
 
   const defaultTab = {
     currentTab: currentTab,
