@@ -85,6 +85,19 @@ export function useBlurOnEnter(): [
   return [inputRef, onKeyDown];
 }
 
+function getDefaultAggFilters(
+  showArchived: boolean,
+  aggFiltersArg?: AggregatorFilters
+): AggregatorFilters {
+  const { last_date_filter: dateFilter } = pd.settings;
+  return {
+    ...Aggregator.getDefaultFilters(),
+    date: dateFilter,
+    ...aggFiltersArg,
+    showArchived
+  };
+}
+
 export function useAggregatorData<D extends TableData>({
   aggFiltersArg,
   getData,
@@ -98,15 +111,10 @@ export function useAggregatorData<D extends TableData>({
   data: D[];
   setAggFilters: (aggFilters: AggregatorFilters) => void;
 } {
-  const [aggFilters, setAggFilters] = React.useState(aggFiltersArg ?? {});
+  const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
+  const [aggFilters, setAggFilters] = React.useState(defaultAggFilters);
   React.useEffect(() => {
-    const { last_date_filter: dateFilter } = pd.settings;
-    const defaultAggFilters: AggregatorFilters = {
-      ...Aggregator.getDefaultFilters(),
-      date: dateFilter,
-      ...aggFiltersArg,
-      showArchived
-    };
+    const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
     setAggFilters(defaultAggFilters);
   }, [aggFiltersArg, showArchived]);
   const data = React.useMemo(() => {
