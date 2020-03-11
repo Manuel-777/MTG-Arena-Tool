@@ -6,7 +6,6 @@ import { createStore } from "redux";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import appReducer, {
   LOGIN_WAITING,
-  SET_UX0_SCROLL,
   dispatchAction,
   SET_NO_LOG,
   SET_SHARE_DIALOG_OPEN
@@ -77,18 +76,6 @@ function App(): JSX.Element {
     }, 350);
   }, [dispatch]);
 
-  const ux0Scroll = useCallback(
-    (e: React.UIEvent<HTMLDivElement>): void => {
-      const scroll =
-        e.currentTarget.scrollHeight -
-          e.currentTarget.scrollTop -
-          e.currentTarget.clientHeight ==
-        0;
-      dispatchAction(dispatch, SET_UX0_SCROLL, scroll);
-    },
-    [dispatch]
-  );
-
   return (
     <>
       <BackgroundImage />
@@ -108,9 +95,7 @@ function App(): JSX.Element {
           <div className="wrapper">
             <div className="overflow_ux_main">
               <div className="moving_ux">
-                <div className="ux_item" onScroll={ux0Scroll}>
-                  {getOpenNav(topNav, offline)}
-                </div>
+                {getOpenNav(topNav, offline)}
                 <div className="ux_item">
                   {getOpenSub(subNavType, subNavId, subNavData)}
                 </div>

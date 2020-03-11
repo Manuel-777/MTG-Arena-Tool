@@ -134,20 +134,22 @@ export default function DecksTab({
   );
   const events = React.useMemo(getTotalAggEvents, []);
   return (
-    <DecksTable
-      data={data}
-      aggFilters={aggFilters}
-      events={events}
-      cachedState={decksTableState}
-      cachedTableMode={decksTableMode}
-      setAggFiltersCallback={setAggFilters}
-      tableModeCallback={saveTableMode}
-      tableStateCallback={saveTableState}
-      openDeckCallback={openDeckCallback}
-      archiveCallback={toggleDeckArchived}
-      addTagCallback={addTag}
-      editTagCallback={editTag}
-      deleteTagCallback={deleteTag}
-    />
+    <div className="ux_item">
+      <DecksTable
+        data={data}
+        aggFilters={aggFilters}
+        events={events}
+        cachedState={decksTableState}
+        cachedTableMode={decksTableMode}
+        setAggFiltersCallback={setAggFilters}
+        tableModeCallback={saveTableMode}
+        tableStateCallback={saveTableState}
+        openDeckCallback={openDeckCallback}
+        archiveCallback={toggleDeckArchived}
+        addTagCallback={addTag}
+        editTagCallback={editTag}
+        deleteTagCallback={deleteTag}
+      />
+    </div>
   );
 }

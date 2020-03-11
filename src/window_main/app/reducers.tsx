@@ -27,8 +27,6 @@ export const SET_PATREON = "SET_PATREON";
 export const SET_EXPLORE_DATA = "SET_EXPLORE_DATA";
 export const SET_EXPLORE_FILTERS = "SET_EXPLORE_FILTERS";
 export const SET_EXPLORE_FILTERS_SKIP = "SET_EXPLORE_FILTERS_SKIP";
-export const SET_UX0_SCROLL = "SET_UX0_SCROLL";
-export const SET_UX1_SCROLL = "SET_UX1_SCROLL";
 export const SET_UPDATE_STATE = "SET_UPDATE_STATE";
 export const SET_NO_LOG = "SET_NO_LOG";
 export const SET_SHARE_DIALOG = "SET_SHARE_DIALOG";
@@ -305,30 +303,6 @@ const exploreFilters = (
   }
 };
 
-const UX0Scroll = (
-  state: boolean = defaultState.UX0Scroll,
-  action: Action
-): boolean => {
-  switch (action.type) {
-    case SET_UX0_SCROLL:
-      return action.value;
-    default:
-      return state;
-  }
-};
-
-const UX1Scroll = (
-  state: boolean = defaultState.UX1Scroll,
-  action: Action
-): boolean => {
-  switch (action.type) {
-    case SET_UX1_SCROLL:
-      return action.value;
-    default:
-      return state;
-  }
-};
-
 const updateState = (
   state: string = defaultState.updateState,
   action: Action
@@ -393,8 +367,6 @@ export default combineReducers({
   patreon: patreon,
   exploreData: explore,
   exploreFilters: exploreFilters,
-  UX0Scroll: UX0Scroll,
-  UX1Scroll: UX1Scroll,
   updateState: updateState,
   noLog: noLog,
   shareDialog: shareDialog

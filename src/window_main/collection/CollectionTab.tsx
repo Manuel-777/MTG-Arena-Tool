@@ -122,15 +122,17 @@ export default function CollectionTab(): JSX.Element {
   const { collectionTableMode, collectionTableState } = pd.settings;
   const data = React.useMemo(() => getCollectionData(), []);
   return (
-    <CollectionTable
-      cachedState={collectionTableState}
-      cachedTableMode={collectionTableMode}
-      contextMenuCallback={addCardMenu}
-      data={data}
-      exportCallback={exportCards}
-      openCardCallback={openScryfallCard}
-      tableModeCallback={saveTableMode}
-      tableStateCallback={saveTableState}
-    />
+    <div className="ux_item">
+      <CollectionTable
+        cachedState={collectionTableState}
+        cachedTableMode={collectionTableMode}
+        contextMenuCallback={addCardMenu}
+        data={data}
+        exportCallback={exportCards}
+        openCardCallback={openScryfallCard}
+        tableModeCallback={saveTableMode}
+        tableStateCallback={saveTableState}
+      />
+    </div>
   );
 }

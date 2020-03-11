@@ -155,21 +155,23 @@ export default function MatchesTab({
   );
   const [events, tags] = React.useMemo(getTotalAggData, []);
   return (
-    <MatchesTable
-      data={data}
-      aggFilters={aggFilters}
-      events={events}
-      tags={tags}
-      cachedState={matchesTableState}
-      cachedTableMode={matchesTableMode}
-      setAggFiltersCallback={setAggFilters}
-      tableModeCallback={saveTableMode}
-      tableStateCallback={saveTableState}
-      openMatchCallback={openMatchDetails}
-      archiveCallback={toggleArchived}
-      addTagCallback={addTag}
-      editTagCallback={editTag}
-      deleteTagCallback={deleteTag}
-    />
+    <div className="ux_item">
+      <MatchesTable
+        data={data}
+        aggFilters={aggFilters}
+        events={events}
+        tags={tags}
+        cachedState={matchesTableState}
+        cachedTableMode={matchesTableMode}
+        setAggFiltersCallback={setAggFilters}
+        tableModeCallback={saveTableMode}
+        tableStateCallback={saveTableState}
+        openMatchCallback={openMatchDetails}
+        archiveCallback={toggleArchived}
+        addTagCallback={addTag}
+        editTagCallback={editTag}
+        deleteTagCallback={deleteTag}
+      />
+    </div>
   );
 }

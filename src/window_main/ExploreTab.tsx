@@ -5,7 +5,6 @@ import {
   dispatchAction,
   SET_LOADING,
   SET_EXPLORE_FILTERS,
-  SET_UX0_SCROLL,
   SET_SUB_NAV,
   SET_BACKGROUND_GRPID
 } from "./app/reducers";
@@ -34,29 +33,35 @@ export interface ExploreQuery {
   filterSkip: number;
 }
 
-function queryExplore(query: ExploreQuery): void {
-  console.log("request_explore", query);
-  ipcSend("request_explore", query);
-}
-
 export default function ExploreTab(): JSX.Element {
   const dispatcher = useDispatch();
+  const loading = useSelector((state: AppState) => state.loading);
   const exploreData = useSelector((state: AppState) => state.exploreData);
   const exploreFilters = useSelector((state: AppState) => state.exploreFilters);
-  const scroll = useSelector((state: AppState) => state.UX0Scroll);
-  const [queryFilters, setQueryFilters] = useState(exploreFilters);
-  const [fetching, setFetching] = useState(false);
 
-  const doQuery = useCallback(() => {
+  const [queryFilters, setQueryFilters] = useState(exploreFilters);
+  useEffect(() => setQueryFilters(exploreFilters), [exploreFilters]);
+
+  const queryExplore = useCallback(
+    (filters: ExploreQuery) => {
+      ipcSend("request_explore", filters);
+      dispatchAction(dispatcher, SET_LOADING, true);
+      dispatchAction(dispatcher, SET_EXPLORE_FILTERS, filters);
+    },
+    [dispatcher]
+  );
+
+  const newQuery = useCallback(() => {
     const newFilters = {
       ...queryFilters,
       filterSkip: 0
     };
-    setFetching(true);
     queryExplore(newFilters);
-    dispatchAction(dispatcher, SET_EXPLORE_FILTERS, newFilters);
-    dispatchAction(dispatcher, SET_LOADING, true);
-  }, [dispatcher, queryFilters]);
+  }, [queryExplore, queryFilters]);
+
+  const scrollQuery = useCallback(() => {
+    queryExplore(queryFilters);
+  }, [queryExplore, queryFilters]);
 
   const openRow = useCallback(
     (row: any): void => {
@@ -79,57 +84,57 @@ export default function ExploreTab(): JSX.Element {
   );
 
   useEffect(() => {
-    if (!exploreData.result) {
-      dispatchAction(dispatcher, SET_LOADING, true);
-      setFetching(true);
-      queryExplore(exploreFilters);
+    if (!loading && !exploreData.result) {
+      newQuery(); // no data and no query in flight, autolaunch
     }
-  }, [exploreData.result, dispatcher, exploreFilters]);
+  }, [exploreData, loading, newQuery]);
 
-  useEffect(() => {
-    setQueryFilters(exploreFilters);
-  }, [exploreFilters]);
-
-  useEffect(() => {
-    setFetching(false);
-  }, [exploreData]);
-
-  useEffect(() => {
-    console.log("ux0 scroll: ", scroll);
-    if (scroll && !fetching) {
-      setFetching(true);
-      queryExplore(queryFilters);
-      dispatchAction(dispatcher, SET_LOADING, true);
-      dispatchAction(dispatcher, SET_EXPLORE_FILTERS, queryFilters);
-      dispatchAction(dispatcher, SET_UX0_SCROLL, false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const onScroll = React.useCallback(() => {
+    if (containerRef?.current) {
+      const container = containerRef?.current;
+      const desiredHeight = Math.round(
+        container.scrollTop + container.offsetHeight
+      );
+      if (desiredHeight >= container.scrollHeight && !loading) {
+        scrollQuery();
+      }
     }
-  }, [scroll, fetching, dispatcher, queryFilters]);
+  }, [loading, scrollQuery]);
 
   return (
-    <div
-      style={{ width: "100%", flexDirection: "column" }}
-      className="flex_item"
-    >
-      <ExploreFilters doSearch={doQuery} />
-      <div className="explore_list">
-        {exploreData.result && exploreData.result.length > 0 ? (
-          exploreData.result.map((row: any) => {
-            return (
-              <ListItemExplore key={row._id} row={row} openCallback={openRow} />
-            );
-          })
-        ) : (
-          <div style={{ marginTop: "32px" }} className="message_sub red">
-            Query returned no data.
-          </div>
-        )}
-        {exploreData.result && exploreData.result.length > 0 ? (
-          <div style={{ margin: "16px" }} className="message_sub white">
-            Loading..
-          </div>
-        ) : (
-          <></>
-        )}
+    <div ref={containerRef} onScroll={onScroll} className="ux_item">
+      <div
+        style={{ width: "100%", flexDirection: "column" }}
+        className="flex_item"
+      >
+        <ExploreFilters doSearch={newQuery} />
+        <div className="explore_list">
+          {exploreData?.result?.length > 0 ? (
+            exploreData.result.map((row: any) => {
+              return (
+                <ListItemExplore
+                  key={row._id}
+                  row={row}
+                  openCallback={openRow}
+                />
+              );
+            })
+          ) : !loading ? (
+            <div style={{ marginTop: "32px" }} className="message_sub red">
+              Query returned no data.
+            </div>
+          ) : (
+            <></>
+          )}
+          {loading ? (
+            <div style={{ margin: "16px" }} className="message_sub white">
+              Loading...
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
       </div>
     </div>
   );

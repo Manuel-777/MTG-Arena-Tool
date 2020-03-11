@@ -154,17 +154,19 @@ export default function EventsTab({
   });
   const events = React.useMemo(getTotalAggEvents, []);
   return (
-    <EventsTable
-      data={data}
-      aggFilters={aggFilters}
-      events={events}
-      cachedState={eventsTableState}
-      cachedTableMode={eventsTableMode}
-      setAggFiltersCallback={setAggFilters}
-      tableModeCallback={saveTableMode}
-      tableStateCallback={saveTableState}
-      archiveCallback={toggleArchived}
-      editTagCallback={editTag}
-    />
+    <div className="ux_item">
+      <EventsTable
+        data={data}
+        aggFilters={aggFilters}
+        events={events}
+        cachedState={eventsTableState}
+        cachedTableMode={eventsTableMode}
+        setAggFiltersCallback={setAggFilters}
+        tableModeCallback={saveTableMode}
+        tableStateCallback={saveTableState}
+        archiveCallback={toggleArchived}
+        editTagCallback={editTag}
+      />
+    </div>
   );
 }

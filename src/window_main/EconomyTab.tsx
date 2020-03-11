@@ -84,13 +84,15 @@ export default function EconomyTab(): JSX.Element {
   const { economyTableMode, economyTableState } = pd.settings;
   const data = React.useMemo(() => getTxnData(), []);
   return (
-    <EconomyTable
-      archiveCallback={toggleArchived}
-      cachedState={economyTableState}
-      cachedTableMode={economyTableMode}
-      data={data}
-      tableModeCallback={saveTableMode}
-      tableStateCallback={saveTableState}
-    />
+    <div className="ux_item">
+      <EconomyTable
+        archiveCallback={toggleArchived}
+        cachedState={economyTableState}
+        cachedTableMode={economyTableMode}
+        data={data}
+        tableModeCallback={saveTableMode}
+        tableStateCallback={saveTableState}
+      />
+    </div>
   );
 }

@@ -13,8 +13,6 @@ export interface AppState {
   loginState: number;
   canLogin: boolean;
   topNav: number;
-  UX0Scroll: boolean;
-  UX1Scroll: boolean;
   updateState: string;
   noLog: boolean;
   settings: MergedSettings;
@@ -81,8 +79,6 @@ export const defaultState: AppState = {
   loginState: LOGIN_AUTH,
   canLogin: true,
   topNav: 0,
-  UX0Scroll: false,
-  UX1Scroll: false,
   updateState: "",
   noLog: false,
   settings: {

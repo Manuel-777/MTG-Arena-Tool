@@ -63,66 +63,68 @@ export default function HomeTab(): JSX.Element {
   }, [requested, usersActive, filteredSet]);
 
   return (
-    <div style={{ margin: "0 auto" }}>
-      <div className="list_fill"></div>
-      <div className="card_tile_separator">General</div>
-      <div
-        className="text_centered"
-        tooltip-content="In the last 24 hours"
-        tooltip-bottom=""
-        style={{ textAlign: "center" }}
-      >
-        Users active:{" " + usersActive}
+    <div className="ux_item">
+      <div style={{ margin: "0 auto" }}>
+        <div className="list_fill"></div>
+        <div className="card_tile_separator">General</div>
+        <div
+          className="text_centered"
+          tooltip-content="In the last 24 hours"
+          tooltip-bottom=""
+          style={{ textAlign: "center" }}
+        >
+          Users active:{" " + usersActive}
+        </div>
+        <div
+          className="text_centered white daily_left"
+          style={{ textAlign: "center" }}
+        >
+          {dailyRewards}
+        </div>
+        <div
+          className="text_centered white weekly_left"
+          style={{ textAlign: "center" }}
+        >
+          {weeklyRewards}
+        </div>
+        {wildcards ? (
+          <>
+            <div className="list_fill"></div>
+            <div
+              className="card_tile_separator"
+              tooltip-content="In the last 15 days."
+              tooltip-bottom=""
+            >
+              Top Wildcards redeemed
+            </div>
+            <div className="top_wildcards_sets_cont">
+              {orderedSets.map((set: string) => {
+                const svgData = db.sets[set].svg;
+                const setClass =
+                  "set_filter " + (filteredSet !== set ? "set_filter_on" : "");
+                const requestSet = filteredSet == set ? "" : set;
+                return (
+                  <div
+                    key={set}
+                    style={{
+                      backgroundImage: `url(data:image/svg+xml;base64,${svgData})`
+                    }}
+                    title={set}
+                    className={setClass}
+                    onClick={(): void => {
+                      setFilteredSet(requestSet);
+                      requestHome(requestSet);
+                    }}
+                  ></div>
+                );
+              })}
+            </div>
+            <TopWildcards wildcards={wildcards} />
+          </>
+        ) : (
+          <></>
+        )}
       </div>
-      <div
-        className="text_centered white daily_left"
-        style={{ textAlign: "center" }}
-      >
-        {dailyRewards}
-      </div>
-      <div
-        className="text_centered white weekly_left"
-        style={{ textAlign: "center" }}
-      >
-        {weeklyRewards}
-      </div>
-      {wildcards ? (
-        <>
-          <div className="list_fill"></div>
-          <div
-            className="card_tile_separator"
-            tooltip-content="In the last 15 days."
-            tooltip-bottom=""
-          >
-            Top Wildcards redeemed
-          </div>
-          <div className="top_wildcards_sets_cont">
-            {orderedSets.map((set: string) => {
-              const svgData = db.sets[set].svg;
-              const setClass =
-                "set_filter " + (filteredSet !== set ? "set_filter_on" : "");
-              const requestSet = filteredSet == set ? "" : set;
-              return (
-                <div
-                  key={set}
-                  style={{
-                    backgroundImage: `url(data:image/svg+xml;base64,${svgData})`
-                  }}
-                  title={set}
-                  className={setClass}
-                  onClick={(): void => {
-                    setFilteredSet(requestSet);
-                    requestHome(requestSet);
-                  }}
-                ></div>
-              );
-            })}
-          </div>
-          <TopWildcards wildcards={wildcards} />
-        </>
-      ) : (
-        <></>
-      )}
     </div>
   );
 }

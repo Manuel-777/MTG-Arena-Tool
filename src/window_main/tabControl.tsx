@@ -80,7 +80,7 @@ export function getOpenNav(tab: number, offline: boolean): JSX.Element {
     case MAIN_HOME:
       return <HomeTab />;
     default:
-      return <></>;
+      return <div className="ux_item" />;
   }
 }
 
