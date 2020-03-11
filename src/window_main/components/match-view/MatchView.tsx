@@ -178,7 +178,7 @@ function Seat(props: SeatProps): JSX.Element {
         <Button text="Add to Decks" onClick={clickAdd} />
         <Button text="Export to Arena" onClick={clickArena} />
         <Button text="Export to .txt" onClick={clickTxt} />
-        <DeckList deck={deck} />
+        <DeckList deck={deck} showWildcards={true} />
       </div>
     </>
   );

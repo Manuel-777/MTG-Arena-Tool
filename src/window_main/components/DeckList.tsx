@@ -12,7 +12,7 @@ function Separator(props: React.PropsWithChildren<any>): JSX.Element {
   return <div className="card_tile_separator">{children}</div>;
 }
 
-function getDeckComponents(deck: Deck): JSX.Element[] {
+function getDeckComponents(deck: Deck, showWildcards = false): JSX.Element[] {
   const components = [];
   if (deck.getCommanders() && deck.getCommanders().length > 0) {
     components.push(<Separator key="sep_commander">Commander</Separator>);
@@ -26,7 +26,8 @@ function getDeckComponents(deck: Deck): JSX.Element[] {
               indent="a"
               isHighlighted={false}
               isSideboard={false}
-              showWildcards={false}
+              showWildcards={showWildcards}
+              deck={deck}
               card={card}
               key={"commandercardtile" + index + "_" + id}
               quantity={1}
@@ -91,7 +92,8 @@ function getDeckComponents(deck: Deck): JSX.Element[] {
               indent="b"
               isHighlighted={false}
               isSideboard={false}
-              showWildcards={false}
+              showWildcards={showWildcards}
+              deck={deck}
               card={card.data as DbCardData}
               key={"mainboardcardtile" + index + "_" + card.id}
               quantity={card.quantity}
@@ -117,8 +119,9 @@ function getDeckComponents(deck: Deck): JSX.Element[] {
           <CardTile
             indent="a"
             isHighlighted={false}
-            isSideboard={false}
-            showWildcards={false}
+            isSideboard={true}
+            showWildcards={showWildcards}
+            deck={deck}
             card={card.data as DbCardData}
             key={"sideboardcardtile" + index + "_" + card.id}
             quantity={card.quantity}
@@ -132,10 +135,11 @@ function getDeckComponents(deck: Deck): JSX.Element[] {
 
 interface DeckListProps {
   deck: Deck;
+  showWildcards?: boolean;
 }
 
 export default function DeckList(props: DeckListProps): JSX.Element {
-  const { deck } = props;
+  const { deck, showWildcards } = props;
   if (!deck || db.version == 0) return <></>;
-  return <>{getDeckComponents(deck)}</>;
+  return <>{getDeckComponents(deck, showWildcards)}</>;
 }

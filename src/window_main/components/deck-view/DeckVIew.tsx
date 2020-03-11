@@ -198,7 +198,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
         ) : (
           <>
             <div className="decklist">
-              <DeckList deck={deck} />
+              <DeckList deck={deck} showWildcards={true} />
             </div>
             <div className="stats">
               <Button
