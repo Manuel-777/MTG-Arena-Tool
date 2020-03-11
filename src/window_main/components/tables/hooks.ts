@@ -139,7 +139,6 @@ export function useBaseReactTable<D extends TableData>({
   setTableMode,
   tableMode,
   data,
-  filterDataCallback,
   tableStateCallback,
   cachedState
 }: BaseTableProps<D>): {
@@ -234,9 +233,6 @@ export function useBaseReactTable<D extends TableData>({
   React.useEffect(() => {
     tableStateCallback({ ...state });
   }, [state, tableStateCallback]);
-  React.useEffect(() => {
-    filterDataCallback && filterDataCallback(rows.map(row => row.original));
-  }, [filterDataCallback, rows]);
 
   const pagingProps: PagingControlsProps = {
     canPreviousPage,

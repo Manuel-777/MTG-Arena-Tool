@@ -1,5 +1,5 @@
 import React from "react";
-import { Column } from "react-table";
+import { Column, Row } from "react-table";
 import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
@@ -249,8 +249,8 @@ const columns: Column<DecksData>[] = [
   }
 ];
 
-function getDataAggFilters(data: DecksData[]): AggregatorFilters {
-  const deckId = data.map(deck => deck.id).filter(id => id) as string[];
+function getDataAggFilters(data: Row<DecksData>[]): AggregatorFilters {
+  const deckId = data.map(row => row.original.id).filter(id => id) as string[];
   return { deckId };
 }
 
@@ -282,13 +282,6 @@ export default function DecksTable({
       return { tag, q };
     });
   }, [data]);
-  const [subAggFilters, setSubAggFilters] = React.useState(aggFilters);
-  const filterDataCallback = React.useCallback(
-    (data: DecksData[]): void => {
-      setSubAggFilters({ ...aggFilters, ...getDataAggFilters(data) });
-    },
-    [aggFilters]
-  );
   const tableProps: BaseTableProps<DecksData> = {
     cachedState,
     columns,
@@ -298,7 +291,6 @@ export default function DecksTable({
       filters: [{ id: "archivedCol", value: "hideArchived" }],
       sortBy: [{ id: "timeTouched", desc: true }]
     },
-    filterDataCallback,
     globalFilter: deckSearchFilterFn,
     setTableMode,
     tableMode,
@@ -314,7 +306,7 @@ export default function DecksTable({
 
   useAggregatorArchiveFilter(table, aggFilters, setAggFiltersCallback);
 
-  const { getTableBodyProps, page, prepareRow } = table;
+  const { getTableBodyProps, page, prepareRow, rows } = table;
   const decksTableControlsProps: DecksTableControlsProps = {
     aggFilters,
     events,
@@ -393,7 +385,9 @@ export default function DecksTable({
         <ResizableDragger />
         <MatchResultsStatsPanel
           prefixId={"decks_top"}
-          aggregator={new Aggregator(subAggFilters)}
+          aggregator={
+            new Aggregator({ ...aggFilters, ...getDataAggFilters(rows) })
+          }
           showCharts
         />
       </div>

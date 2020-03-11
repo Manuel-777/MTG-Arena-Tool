@@ -1,6 +1,6 @@
 import _ from "lodash";
 import React from "react";
-import { Column } from "react-table";
+import { Column, Row } from "react-table";
 import { EVENTS_TABLE_MODE } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
@@ -177,8 +177,8 @@ const columns: Column<EventTableData>[] = [
   }
 ];
 
-function getDataAggFilters(data: EventTableData[]): AggregatorFilters {
-  const matchIds = _.flatten(data.map(event => event.stats.matchIds));
+function getDataAggFilters(data: Row<EventTableData>[]): AggregatorFilters {
+  const matchIds = _.flatten(data.map(row => row.original.stats.matchIds));
   return { matchIds };
 }
 
@@ -198,13 +198,6 @@ export default function EventsTable({
     tableMode,
     tableModeCallback
   ]);
-  const [subAggFilters, setSubAggFilters] = React.useState(aggFilters);
-  const filterDataCallback = React.useCallback(
-    (data: EventTableData[]): void => {
-      setSubAggFilters({ ...aggFilters, ...getDataAggFilters(data) });
-    },
-    [aggFilters]
-  );
   const tableProps: BaseTableProps<EventTableData> = {
     cachedState,
     columns,
@@ -214,7 +207,6 @@ export default function EventsTable({
       filters: [{ id: "archivedCol", value: "hideArchived" }],
       sortBy: [{ id: "timestamp", desc: true }]
     },
-    filterDataCallback,
     globalFilter: eventSearchFilterFn,
     setTableMode,
     tableMode,
@@ -228,7 +220,7 @@ export default function EventsTable({
     tableControlsProps
   } = useBaseReactTable(tableProps);
   useAggregatorArchiveFilter(table, aggFilters, setAggFiltersCallback);
-  const { getTableBodyProps, page, prepareRow } = table;
+  const { getTableBodyProps, page, prepareRow, rows } = table;
   const eventsTableControlsProps: EventsTableControlsProps = {
     aggFilters,
     events,
@@ -297,7 +289,9 @@ export default function EventsTable({
         <ResizableDragger />
         <MatchResultsStatsPanel
           prefixId={"events_top"}
-          aggregator={new Aggregator(subAggFilters)}
+          aggregator={
+            new Aggregator({ ...aggFilters, ...getDataAggFilters(rows) })
+          }
           showCharts
         />
       </div>

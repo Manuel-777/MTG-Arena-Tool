@@ -1,5 +1,5 @@
 import React from "react";
-import { Column } from "react-table";
+import { Column, Row } from "react-table";
 import { DATE_SEASON, MATCHES_TABLE_MODE } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
@@ -297,8 +297,8 @@ const columns: Column<MatchTableData>[] = [
   }
 ];
 
-function getDataAggFilters(data: MatchTableData[]): AggregatorFilters {
-  const matchIds = data.map(match => match.id);
+function getDataAggFilters(data: Row<MatchTableData>[]): AggregatorFilters {
+  const matchIds = data.map(row => row.original.id);
   return { matchIds };
 }
 
@@ -357,13 +357,6 @@ export default function MatchesTable({
     onPlay: onPlayFilterFn,
     rank: rankFilterFn
   };
-  const [subAggFilters, setSubAggFilters] = React.useState(aggFilters);
-  const filterDataCallback = React.useCallback(
-    (data: MatchTableData[]): void => {
-      setSubAggFilters({ ...aggFilters, ...getDataAggFilters(data) });
-    },
-    [aggFilters]
-  );
   const tableProps: BaseTableProps<MatchTableData> = {
     cachedState,
     columns,
@@ -374,7 +367,6 @@ export default function MatchesTable({
       filters: [{ id: "archivedCol", value: "hideArchived" }],
       sortBy: [{ id: "timestamp", desc: true }]
     },
-    filterDataCallback,
     globalFilter: matchSearchFilterFn,
     setTableMode,
     tableMode,
@@ -388,7 +380,7 @@ export default function MatchesTable({
     tableControlsProps
   } = useBaseReactTable(tableProps);
   useAggregatorArchiveFilter(table, aggFilters, setAggFiltersCallback);
-  const { getTableBodyProps, page, prepareRow } = table;
+  const { getTableBodyProps, page, prepareRow, rows } = table;
   const matchesTableControlsProps: MatchesTableControlsProps = {
     aggFilters,
     events,
@@ -460,7 +452,7 @@ export default function MatchesTable({
       >
         <ResizableDragger />
         <MatchesSidePanel
-          subAggFilters={subAggFilters}
+          subAggFilters={{ ...aggFilters, ...getDataAggFilters(rows) }}
           setAggFiltersCallback={setAggFiltersCallback}
         />
       </div>

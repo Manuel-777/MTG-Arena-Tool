@@ -35,7 +35,6 @@ export interface BaseTableProps<D extends TableData> {
   customProps?: { [key: string]: any };
   data: D[];
   defaultState?: Partial<TableState<D>>;
-  filterDataCallback?: (data: D[]) => void;
   globalFilter:
     | string
     | ((
