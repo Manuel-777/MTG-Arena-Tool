@@ -1,5 +1,6 @@
 import React from "react";
 
+import { RANKS } from "../../../shared/constants";
 import ManaCost from "../ManaCost";
 import { formatPercent, getWinrateClass } from "../../renderer-util";
 import { ListItem, Column, HoverTile, FlexTop, FlexBottom } from "./ListItem";
@@ -94,10 +95,10 @@ export function ListItemExplore(props: ListItemExploreProps): JSX.Element {
           )
         </FlexTop>
         <FlexBottom style={{ justifyContent: "flex-end", marginRight: "18px" }}>
-          {row.rank.map((r: string) => {
-            return (
-              <RankSmall key={row._id + "-r-" + r} rankTier={r}></RankSmall>
-            );
+          {RANKS.map(r => {
+            if (row.rank.includes(r)) {
+              return <RankSmall key={row._id + "-r-" + r} rankTier={r} />;
+            }
           })}
         </FlexBottom>
       </Column>
