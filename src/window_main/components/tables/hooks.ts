@@ -93,6 +93,7 @@ function getDefaultAggFilters(
   return {
     ...Aggregator.getDefaultFilters(),
     date: dateFilter,
+    eventId: Aggregator.DEFAULT_EVENT,
     ...aggFiltersArg,
     showArchived
   };

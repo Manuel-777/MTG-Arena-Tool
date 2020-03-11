@@ -68,7 +68,9 @@ export function getOpenNav(tab: number, offline: boolean): JSX.Element {
     case MAIN_MATCHES:
       return <MatchesTab />;
     case MAIN_EVENTS:
-      return <EventsTab />;
+      return (
+        <EventsTab aggFiltersArg={{ eventId: Aggregator.ALL_EVENT_TRACKS }} />
+      );
     case MAIN_EXPLORE:
       return <ExploreTab />;
     case MAIN_ECONOMY:
