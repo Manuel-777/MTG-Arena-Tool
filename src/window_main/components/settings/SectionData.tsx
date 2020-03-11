@@ -65,37 +65,6 @@ function firstPassCallback(checked: boolean): void {
   });
 }
 
-function arenaLogClick(logUriInput: HTMLInputElement): void {
-  // ignore clicks inside actual input field
-  if (document.activeElement === logUriInput) return;
-  const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
-    title: "Arena Log Location",
-    defaultPath: pd.settings.logUri,
-    buttonLabel: "Select",
-    filters: [
-      { name: "Text", extensions: ["txt", "text"] },
-      { name: "All Files", extensions: ["*"] }
-    ],
-    properties: ["openFile"]
-  });
-  if (paths && paths.length && paths[0]) {
-    logUriInput.focus();
-    logUriInput.value = paths[0];
-    logUriInput.blur();
-  }
-}
-
-function arenaLogCallback(value: string): void {
-  if (value === pd.settings.logUri) return;
-  if (
-    confirm("Changing the Arena log location requires a restart, are you sure?")
-  ) {
-    ipcSend("set_log", value);
-  } else {
-    value = pd.settings.logUri;
-  }
-}
-
 function localeCallback(value: string): void {
   if (value !== pd.settings.log_locale_format) {
     ipcSend("save_app_settings_norefresh", {
@@ -126,14 +95,37 @@ function backportClick(): void {
 }
 
 export default function SectionData(): JSX.Element {
-  const arenaLogRef = React.useRef<HTMLInputElement>(null);
   const settings = useSelector((state: AppState) => state.settings);
 
-  const arenaLogClickHandle = (): void => {
-    if (arenaLogRef.current) {
-      arenaLogClick(arenaLogRef.current);
+  const arenaLogCallback = React.useCallback(
+    (value: string): void => {
+      if (value === settings.logUri) return;
+      if (
+        confirm(
+          "Changing the Arena log location requires a restart, are you sure?"
+        )
+      ) {
+        ipcSend("set_log", value);
+      }
+    },
+    [settings.logUri]
+  );
+
+  const openPathDialog = React.useCallback(() => {
+    const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
+      title: "Arena Log Location",
+      defaultPath: settings.logUri,
+      buttonLabel: "Select",
+      filters: [
+        { name: "Text", extensions: ["txt", "text"] },
+        { name: "All Files", extensions: ["*"] }
+      ],
+      properties: ["openFile"]
+    });
+    if (paths && paths.length && paths[0]) {
+      arenaLogCallback(paths[0]);
     }
-  };
+  }, [arenaLogCallback, settings.logUri]);
 
   let parsedOutput = <>auto-detection</>;
   if (settings.log_locale_format) {
@@ -179,7 +171,7 @@ export default function SectionData(): JSX.Element {
         </i>
       </div>
       <div className="centered_setting_container">
-        <label onClick={arenaLogClickHandle}>Arena Log:</label>
+        <label>Arena Log:</label>
         <div
           style={{
             display: "flex",
@@ -187,9 +179,8 @@ export default function SectionData(): JSX.Element {
             justifyContent: "flex-end"
           }}
         >
-          <div className="open_button" />
+          <div className="open_button" onClick={openPathDialog} />
           <Input
-            ref={arenaLogRef}
             callback={arenaLogCallback}
             placeholder={settings.logUri}
             value={settings.logUri}
