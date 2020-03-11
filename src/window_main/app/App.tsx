@@ -1,5 +1,5 @@
+import { remote } from "electron";
 import React, { useCallback } from "react";
-
 import ReactDOM from "react-dom";
 
 import { createStore } from "redux";
@@ -19,7 +19,7 @@ const store = createStore(
 );
 
 import { TopNav } from "../components/main/topNav";
-import { getOpenNav, getOpenSub } from "../tabControl";
+import { forceOpenAbout, getOpenNav, getOpenSub } from "../tabControl";
 import BackgroundImage from "../components/main/BackgroundImage";
 import TopBar from "../components/main/TopBar";
 import LoadingBar from "../components/main/LoadingBar";
@@ -121,6 +121,9 @@ function App(): JSX.Element {
         ) : (
           <Auth authForm={authForm} />
         )}
+      </div>
+      <div className={"version_number"} onClick={forceOpenAbout}>
+        v{remote.app.getVersion()}
       </div>
     </>
   );
