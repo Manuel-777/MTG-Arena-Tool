@@ -221,7 +221,7 @@ export default function MatchResultsStatsPanel({
             RANKS.map(rank => {
               const stats = rankedStats[rank.toLowerCase()];
               if (!stats || !stats.total) {
-                return <></>;
+                return <React.Fragment key={rank} />;
               }
               return (
                 <div
