@@ -24,6 +24,7 @@ export default function ReactSelect({
 
   const [currentOption, setCurrentOption] = React.useState(current);
   const [optionsOpen, setOptionsOpen] = React.useState(false);
+  React.useEffect(() => setCurrentOption(current), [current]);
 
   const onClickSelect = React.useCallback(() => {
     setOptionsOpen(!optionsOpen);
