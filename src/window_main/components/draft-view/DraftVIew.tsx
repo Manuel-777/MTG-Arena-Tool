@@ -15,13 +15,15 @@ interface PickPack {
   pick: number;
 }
 
+const DEFAULT_PACK_SIZE = 14;
+
 function positionFromPickPack(pp: PickPack, set: string): number {
-  const packSize = PACK_SIZES[set] || 14;
+  const packSize = PACK_SIZES[set] ?? DEFAULT_PACK_SIZE;
   return pp.pick + pp.pack * packSize;
 }
 
 function pickPackFromPosition(position: number, set: string): PickPack {
-  const packSize = PACK_SIZES[set] || 14;
+  const packSize = PACK_SIZES[set] ?? DEFAULT_PACK_SIZE;
   //const maxValue = packSize * 3;
   const pack = Math.floor(position / packSize);
   const pick = position % packSize;
@@ -74,6 +76,33 @@ interface DraftViewProps {
 export function DraftView(props: DraftViewProps): JSX.Element {
   const { draft } = props;
   const [pickpack, setPickPack] = React.useState({ pick: 0, pack: 0 });
+  const maxPosition = (PACK_SIZES[draft.set] ?? DEFAULT_PACK_SIZE) * 3 - 1;
+
+  const downHandler = React.useCallback(
+    (event: KeyboardEvent): void => {
+      const key = event.key;
+      let position = positionFromPickPack(pickpack, draft.set);
+      if (key === "ArrowLeft") {
+        position -= 1;
+      } else if (key === "ArrowRight") {
+        position += 1;
+      }
+      if (position < 0) {
+        position = maxPosition;
+      } else if (position > maxPosition) {
+        position = 0;
+      }
+      setPickPack(pickPackFromPosition(position, draft.set));
+    },
+    [maxPosition, pickpack, draft.set]
+  );
+
+  React.useEffect(() => {
+    window.addEventListener("keydown", downHandler);
+    return (): void => {
+      window.removeEventListener("keydown", downHandler);
+    };
+  }, [downHandler]);
 
   const goBack = (): void => {
     uxMove(0);
@@ -115,9 +144,9 @@ export function DraftView(props: DraftViewProps): JSX.Element {
           {`Pack ${pickpack.pack + 1}, Pick ${pickpack.pick + 1}`}
         </div>
         <Slider
-          value={0}
+          value={positionFromPickPack(pickpack, draft.set)}
           onChange={onSliderChange}
-          max={(PACK_SIZES[draft.set] || 14) * 3 - 1}
+          max={maxPosition}
         />
         <div className="draft-container">
           <div className="draft-view">
