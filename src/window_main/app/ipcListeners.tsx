@@ -118,10 +118,11 @@ export default function ipcListeners(dispatcher: unknown): void {
 
   ipc.on("force_open_overlay_settings", (event: string, arg: number): void => {
     uxMove(0);
-    dispatchAction(dispatcher, SET_TOP_NAV, SETTINGS_OVERLAY);
+    dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
     ipcSend("save_user_settings", {
-      last_open_tab: SETTINGS_OVERLAY,
-      last_settings_section: arg
+      last_open_tab: MAIN_SETTINGS,
+      last_settings_section: SETTINGS_OVERLAY,
+      last_settings_overlay_section: arg
     });
   });
 
