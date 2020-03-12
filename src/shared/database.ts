@@ -50,20 +50,17 @@ class Database {
   private static instance: Database;
   rewards_daily_ends: Date;
   rewards_weekly_ends: Date;
-  activeEvents: string[];
   preconDecks: { [id: string]: ArenaV3Deck };
   public metadata: Metadata | undefined;
   season: SeasonAndRankDetail | undefined;
 
   private constructor() {
-    this.handleSetActiveEvents = this.handleSetActiveEvents.bind(this);
     this.handleSetDb = this.handleSetDb.bind(this);
     this.handleSetRewardResets = this.handleSetRewardResets.bind(this);
     this.handleSetSeason = this.handleSetSeason.bind(this);
     this.handleSetPreconDecks = this.handleSetPreconDecks.bind(this);
 
     if (ipc) {
-      ipc.on("set_active_events", this.handleSetActiveEvents);
       ipc.on("set_db", this.handleSetDb);
       ipc.on("set_reward_resets", this.handleSetRewardResets);
       ipc.on("set_season", this.handleSetSeason);
@@ -72,7 +69,6 @@ class Database {
 
     this.rewards_daily_ends = new Date();
     this.rewards_weekly_ends = new Date();
-    this.activeEvents = [];
     this.preconDecks = {};
 
     let dbUri = `${__dirname}/../resources/database.json`;
@@ -98,15 +94,6 @@ class Database {
     }
 
     return Database.instance;
-  }
-
-  handleSetActiveEvents(_event: Event, arg: string): void {
-    if (!arg) return;
-    try {
-      this.activeEvents = JSON.parse(arg);
-    } catch (e) {
-      console.log("Error parsing JSON:", arg);
-    }
   }
 
   handleSetDb(_event: Event | null, arg: string): void {

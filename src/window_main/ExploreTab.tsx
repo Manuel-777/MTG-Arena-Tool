@@ -151,6 +151,7 @@ interface ExploreFiltersProps {
 function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
   const { doSearch } = props;
   const filters = useSelector((state: AppState) => state.exploreFilters);
+  const activeEvents = useSelector((state: AppState) => state.activeEvents);
   const [eventFilters, setEventFilters] = useState(["Ladder"]);
   const dispatcher = useDispatch();
 
@@ -187,12 +188,15 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
 
   const getFilterEvents = useCallback(
     (prevFilters: ExploreQuery = filters): string[] => {
+      // activeEvents is not really iterable? probably because
+      // of how its read from the logs initially.
+      const active = Object.values(activeEvents) || activeEvents;
       let newFilters: string[] = [];
       let sep = true;
       if (prevFilters.filterType === "Events") {
         sep = false;
         newFilters = db.eventIds
-          .concat(db.activeEvents)
+          .concat(active)
           .filter(item => item && !db.single_match_events.includes(item));
 
         newFilters = [...new Set(newFilters)];
@@ -206,10 +210,8 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
         if (a > b) return 1;
         return 0;
       });
-
-      const mappedActive = db.activeEvents;
       newFilters.forEach((item, index: number) => {
-        if (mappedActive.includes(item)) {
+        if (active.includes(item)) {
           newFilters.splice(newFilters.indexOf(item), 1);
           newFilters.unshift(item);
         } else if (!sep) {
@@ -221,7 +223,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
       setEventFilters(newFilters);
       return newFilters;
     },
-    [filters]
+    [filters, activeEvents]
   );
 
   return (

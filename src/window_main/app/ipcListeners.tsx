@@ -17,15 +17,14 @@ import {
   SET_POPUP,
   SET_TOP_NAV,
   SET_PATREON,
-  SET_BACKGROUND_IMAGE,
-  SET_BACKGROUND_COLOR,
   SET_SETTINGS,
   SET_HOVER_SIZE,
   SET_EXPLORE_DATA,
   SET_EXPLORE_FILTERS_SKIP,
   SET_UPDATE_STATE,
   SET_NO_LOG,
-  SET_SHARE_DIALOG_URL
+  SET_SHARE_DIALOG_URL,
+  SET_ACTIVE_EVENTS
 } from "./reducers";
 import { timestamp } from "../../shared/util";
 import {
@@ -182,5 +181,15 @@ export default function ipcListeners(dispatcher: unknown): void {
   ipc.on("set_deck_link", function(event: string, arg: string) {
     dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
     dispatchAction(dispatcher, SET_LOADING, false);
+  });
+
+  ipc.on("set_active_events", function(event: string, arg: string) {
+    if (!arg) return;
+    try {
+      const activeEvents = JSON.parse(arg);
+      dispatchAction(dispatcher, SET_ACTIVE_EVENTS, activeEvents);
+    } catch (e) {
+      console.log("(set_active_events) Error parsing JSON:", arg);
+    }
   });
 }

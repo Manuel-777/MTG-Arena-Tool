@@ -32,6 +32,7 @@ export const SET_NO_LOG = "SET_NO_LOG";
 export const SET_SHARE_DIALOG = "SET_SHARE_DIALOG";
 export const SET_SHARE_DIALOG_URL = "SET_SHARE_DIALOG_URL";
 export const SET_SHARE_DIALOG_OPEN = "SET_SHARE_DIALOG_OPEN";
+export const SET_ACTIVE_EVENTS = "SET_ACTIVE_EVENTS";
 export const SET_ANY = "SET_ANY";
 
 export const LOGIN_AUTH = 1;
@@ -350,6 +351,18 @@ const shareDialog = (
   }
 };
 
+const activeEvents = (
+  state: string[] = defaultState.activeEvents,
+  action: Action
+): string[] => {
+  switch (action.type) {
+    case SET_ACTIVE_EVENTS:
+      return { ...state, ...action.value };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   backgroundGrpId: backgroundGrpId,
   settings: settings,
@@ -369,7 +382,8 @@ export default combineReducers({
   exploreFilters: exploreFilters,
   updateState: updateState,
   noLog: noLog,
-  shareDialog: shareDialog
+  shareDialog: shareDialog,
+  activeEvents: activeEvents
 });
 
 export function dispatchAction(

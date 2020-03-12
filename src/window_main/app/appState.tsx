@@ -15,6 +15,7 @@ export interface AppState {
   topNav: number;
   updateState: string;
   noLog: boolean;
+  activeEvents: string[];
   settings: MergedSettings;
   shareDialog: {
     open: boolean;
@@ -81,6 +82,7 @@ export const defaultState: AppState = {
   topNav: 0,
   updateState: "",
   noLog: false,
+  activeEvents: [],
   settings: {
     ...playerDataDefault.settings,
     ...defaultCfg.settings
