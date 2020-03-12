@@ -1,11 +1,13 @@
 import React, { useRef } from "react";
+import { useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
 import { ARENA_MODE_DRAFT } from "../shared/constants";
+import db from "../shared/database";
 import DraftRatings from "../shared/DraftRatings";
 import { getCardImage } from "../shared/util";
 import { Chances } from "../types/Chances";
-import { DbCardData } from "../types/Metadata";
 import { SettingsData } from "../types/settings";
+import { AppState } from "../window_main/app/appState";
 import { getEditModeClass, useEditModeOnRef } from "./overlayUtil";
 
 function GroupedLandsDetails(props: { odds: Chances }): JSX.Element {
@@ -33,8 +35,6 @@ const SCALAR = 0.71808510638; // ???
 
 export interface CardDetailsWindowletProps {
   arenaState: number;
-  card?: DbCardData;
-  cardsSizeHoverCard: number;
   editMode: boolean;
   handleToggleEditMode: () => void;
   odds?: Chances;
@@ -54,8 +54,6 @@ export default function CardDetailsWindowlet(
 ): JSX.Element {
   const {
     arenaState,
-    card,
-    cardsSizeHoverCard,
     handleToggleEditMode,
     editMode,
     odds,
@@ -63,6 +61,10 @@ export default function CardDetailsWindowlet(
     overlayScale,
     settings
   } = props;
+  const grpId = useSelector((state: AppState) => state.hover.grpId);
+  const opacity = useSelector((state: AppState) => state.hover.opacity);
+  const cardsSizeHoverCard = useSelector((state: AppState) => state.hover.size);
+  const card = db.card(grpId);
 
   // TODO remove group lands hack
   const isCardGroupedLands = card?.id === 100 && odds;
@@ -73,7 +75,8 @@ export default function CardDetailsWindowlet(
     src: getCardImage(card),
     style: {
       width: cardsSizeHoverCard + "px",
-      height: cardsSizeHoverCard / SCALAR + "px"
+      height: cardsSizeHoverCard / SCALAR + "px",
+      opacity
     }
   };
   const containerRef = useRef(null);

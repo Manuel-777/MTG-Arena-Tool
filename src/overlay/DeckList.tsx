@@ -100,7 +100,6 @@ export interface DeckListProps {
   settings: OverlaySettingsData;
   tileStyle: number;
   cardOdds?: Chances;
-  setHoverCardCallback: (card?: DbCardData) => void;
   setOddsCallback?: (sampleSize: number) => void;
 }
 
@@ -112,7 +111,6 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     tileStyle,
     highlightCardId,
     cardOdds,
-    setHoverCardCallback,
     setOddsCallback
   } = props;
   if (!deck) return <></>;

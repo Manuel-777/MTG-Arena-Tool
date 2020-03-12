@@ -5,16 +5,17 @@ import db from "../shared/database";
 import { openScryfallCard } from "../shared/util";
 import { InternalActionLog } from "../types/log";
 import { DbCardData } from "../types/Metadata";
+import useHoverCard from "../window_main/hooks/useHoverCard";
 
 interface LogEntryProps {
   initialTime: Date;
   log: InternalActionLog;
-  setHoverCardCallback: (card?: DbCardData) => void;
 }
 
 function LogEntry(props: LogEntryProps): JSX.Element {
-  const { initialTime, log, setHoverCardCallback } = props;
+  const { initialTime, log } = props;
   const [isMouseHovering, setMouseHovering] = useState(false);
+  const [hoverIn, hoverOut] = useHoverCard(log.grpId);
   const fullCard = db.card(log.grpId);
   let dfcCard: DbCardData | undefined;
   if (fullCard?.dfcId !== undefined) {
@@ -22,12 +23,12 @@ function LogEntry(props: LogEntryProps): JSX.Element {
   }
   const handleMouseEnter = useCallback((): void => {
     setMouseHovering(true);
-    fullCard && setHoverCardCallback(fullCard);
-  }, [fullCard, setHoverCardCallback]);
+    hoverIn();
+  }, [hoverIn]);
   const handleMouseLeave = useCallback((): void => {
     setMouseHovering(false);
-    setHoverCardCallback();
-  }, [setHoverCardCallback]);
+    hoverOut();
+  }, [hoverOut]);
   const handleMouseClick = useCallback((): void => {
     let _card = fullCard;
     if (
@@ -73,28 +74,29 @@ function LogEntry(props: LogEntryProps): JSX.Element {
   );
 }
 
-export default function ActionLog(props: {
+export default function ActionLog({
+  actionLog
+}: {
   actionLog: InternalActionLog[];
-  setHoverCardCallback: (card?: DbCardData) => void;
 }): JSX.Element {
-  const { actionLog, setHoverCardCallback } = props;
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const container = containerRef.current as any;
-    const doscroll =
-      Math.round(
-        container.scrollHeight - container.offsetHeight - container.scrollTop
-      ) < 32;
-    if (doscroll) {
-      container.scrollTop = container.scrollHeight;
+    const container = containerRef.current;
+    if (container) {
+      const doscroll =
+        Math.round(
+          container.scrollHeight - container.offsetHeight - container.scrollTop
+        ) < 32;
+      if (doscroll) {
+        container.scrollTop = container.scrollHeight;
+      }
     }
   });
   const initialTime = actionLog[0] ? new Date(actionLog[0].time) : new Date();
-  const logProps = { initialTime, setHoverCardCallback };
   return (
     <div className="overlay_decklist click-on" ref={containerRef}>
       {actionLog.map((log, index) => (
-        <LogEntry log={log} key={"log_" + index} {...logProps} />
+        <LogEntry log={log} key={"log_" + index} initialTime={initialTime} />
       ))}
     </div>
   );

@@ -9,7 +9,6 @@ import {
 import { MatchData } from "../types/currentMatch";
 import { DraftData, DraftState } from "../types/draft";
 import { InternalActionLog } from "../types/log";
-import { DbCardData } from "../types/Metadata";
 import { SettingsData } from "../types/settings";
 import DraftElements from "./DraftElements";
 import MatchElements from "./MatchElements";
@@ -30,12 +29,11 @@ export interface OverlayWindowletProps {
   match?: MatchData;
   settings: SettingsData;
   setDraftStateCallback: (state: DraftState) => void;
-  setHoverCardCallback: (card?: DbCardData) => void;
   setOddsCallback: (sampleSize: number) => void;
   turnPriority: number;
 }
 
-function isOverlayDraftMode(mode: number) {
+function isOverlayDraftMode(mode: number): boolean {
   return OVERLAY_DRAFT_MODES.some(draftMode => draftMode === mode);
 }
 
@@ -60,7 +58,6 @@ export default function OverlayWindowlet(
     index,
     match,
     setDraftStateCallback,
-    setHoverCardCallback,
     setOddsCallback,
     settings,
     turnPriority
@@ -97,7 +94,6 @@ export default function OverlayWindowlet(
   const commonProps = {
     index,
     settings: overlaySettings,
-    setHoverCardCallback,
     tileStyle
   };
   if (draft && isOverlayDraftMode(overlaySettings.mode)) {
@@ -139,7 +135,7 @@ export default function OverlayWindowlet(
 
   const backgroundColor = settings.overlay_back_color;
 
-  const bgStyle: any = {
+  const bgStyle: React.CSSProperties = {
     opacity: overlaySettings.alpha_back.toString()
   };
 
