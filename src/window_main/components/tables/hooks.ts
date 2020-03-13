@@ -10,7 +10,8 @@ import {
   useGlobalFilter,
   usePagination,
   useSortBy,
-  useTable
+  useTable,
+  Column
 } from "react-table";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
@@ -210,7 +211,6 @@ export function useBaseReactTable<D extends TableData>({
   const {
     headers,
     getTableProps,
-    rows,
     toggleSortBy,
     toggleHideColumn,
     setAllFilters,
@@ -252,8 +252,11 @@ export function useBaseReactTable<D extends TableData>({
   const gridTemplateColumns = visibleHeaders
     .map(header => `minmax(${header.gridWidth ?? "140px"}, auto)`)
     .join(" ");
+
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
-    const toggleableColumns = allColumns.filter(column => column.mayToggle);
+    const toggleableColumns = allColumns.filter(
+      (column: Column) => column.mayToggle
+    );
     const initialFiltersVisible: FiltersVisible = {};
     for (const column of allColumns) {
       if (column.canFilter) {
@@ -262,9 +265,11 @@ export function useBaseReactTable<D extends TableData>({
     }
     return [toggleableColumns, initialFiltersVisible];
   }, [allColumns]);
+
   const [filtersVisible, setFiltersVisible] = React.useState(
     initialFiltersVisible
   );
+
   const [togglesVisible, setTogglesVisible] = React.useState(false);
   const headersProps = {
     filtersVisible,
