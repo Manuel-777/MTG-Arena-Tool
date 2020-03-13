@@ -208,7 +208,6 @@ export function useBaseReactTable<D extends TableData>({
     usePagination
   );
   const {
-    allColumns,
     headers,
     getTableProps,
     rows,
@@ -228,6 +227,8 @@ export function useBaseReactTable<D extends TableData>({
     setPageSize,
     state
   } = table;
+  // It seems allComumns can be undefined on some cycles of the table hook
+  const allColumns = table.allColumns || [];
   const { filters, pageIndex, pageSize } = state;
 
   React.useEffect(() => {
