@@ -204,11 +204,12 @@ export function useBaseReactTable<D extends TableData>({
     },
     useFilters,
     useGlobalFilter,
-    ...(customHooks ?? [useSortBy]),
+    ...(customHooks ?? []),
+    useSortBy,
     usePagination
   );
   const {
-    allColumns,
+    flatColumns,
     headers,
     getTableProps,
     rows,
@@ -252,15 +253,15 @@ export function useBaseReactTable<D extends TableData>({
     .map(header => `minmax(${header.gridWidth ?? "140px"}, auto)`)
     .join(" ");
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
-    const toggleableColumns = allColumns.filter(column => column.mayToggle);
+    const toggleableColumns = flatColumns.filter(column => column.mayToggle);
     const initialFiltersVisible: FiltersVisible = {};
-    for (const column of allColumns) {
+    for (const column of flatColumns) {
       if (column.canFilter) {
         initialFiltersVisible[column.id] = !!column.filterValue;
       }
     }
     return [toggleableColumns, initialFiltersVisible];
-  }, [allColumns]);
+  }, [flatColumns]);
   const [filtersVisible, setFiltersVisible] = React.useState(
     initialFiltersVisible
   );
@@ -276,7 +277,7 @@ export function useBaseReactTable<D extends TableData>({
 
   const tableControlsProps: TableControlsProps<D> = {
     filters,
-    allColumns,
+    flatColumns,
     getTableProps,
     globalFilter: state.globalFilter,
     gridTemplateColumns,
