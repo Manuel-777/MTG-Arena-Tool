@@ -1,28 +1,29 @@
 import React from "react";
 import OwnershipStars from "../../../shared/OwnershipStars";
 import pd from "../../../shared/PlayerData";
-import { getCardImage } from "../../../shared/util";
+import { getCardImage, openScryfallCard } from "../../../shared/util";
 import { TableViewRow } from "../tables/TableViewRow";
-import { CollectionTableRowProps } from "./types";
+import { TableViewRowProps } from "../tables/types";
+import { CardsData } from "./types";
+
 import useHoverCard from "../../hooks/useHoverCard";
+import { addCardMenu } from "../../collection/CollectionTab";
 
 export function CardTableViewRow({
   row,
-  contextMenuCallback,
-  openCardCallback,
   ...otherProps
-}: CollectionTableRowProps): JSX.Element {
+}: TableViewRowProps<CardsData>): JSX.Element {
   const card = row.original;
   const onClick = React.useCallback(() => {
-    openCardCallback(card);
-  }, [card, openCardCallback]);
+    openScryfallCard(card);
+  }, [card]);
   const containerEl = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const containerDiv = containerEl.current;
     if (containerDiv) {
-      contextMenuCallback(containerDiv, card);
+      addCardMenu(containerDiv, card);
     }
-  }, [card, containerEl, contextMenuCallback]);
+  }, [card, containerEl]);
 
   const [hoverIn, hoverOut] = useHoverCard(card.id);
 
@@ -41,21 +42,19 @@ export function CardTableViewRow({
 }
 
 export function CardTileRow({
-  row,
-  contextMenuCallback,
-  openCardCallback
-}: CollectionTableRowProps): JSX.Element {
+  row
+}: TableViewRowProps<CardsData>): JSX.Element {
   const card = row.original;
   const onClick = React.useCallback(() => {
-    openCardCallback(card);
-  }, [card, openCardCallback]);
+    openScryfallCard(card);
+  }, [card]);
   const containerEl = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const containerDiv = containerEl.current;
     if (containerDiv) {
-      contextMenuCallback(containerDiv, card);
+      addCardMenu(containerDiv, card);
     }
-  }, [card, contextMenuCallback]);
+  }, [card]);
 
   const [hoverIn, hoverOut] = useHoverCard(card.id);
 

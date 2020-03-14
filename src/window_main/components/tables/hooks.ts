@@ -192,11 +192,11 @@ export function useBaseReactTable<D extends TableData>({
 
   const table = useTable<D>(
     {
-      columns: React.useMemo(() => columns, [columns]),
-      data: React.useMemo(() => data, [data]),
+      columns: columns,
+      data: data,
       defaultColumn,
       filterTypes,
-      globalFilter: React.useMemo(() => globalFilter, [globalFilter]),
+      globalFilter: globalFilter,
       initialState,
       autoResetFilters: false,
       autoResetGlobalFilter: false,
@@ -254,9 +254,7 @@ export function useBaseReactTable<D extends TableData>({
     .join(" ");
 
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
-    const toggleableColumns = allColumns.filter(
-      (column: Column) => column.mayToggle
-    );
+    const toggleableColumns = allColumns.filter(column => column.mayToggle);
     const initialFiltersVisible: FiltersVisible = {};
     for (const column of allColumns) {
       if (column.canFilter) {
