@@ -311,7 +311,7 @@ export function SetSymbol({
   style,
   ...otherProps
 }: SetSymbolProps): JSX.Element {
-  const setSvg = set === "other" ? db.defaultSet?.svg : db.sets[set].svg;
+  const setSvg = set === "other" || db.sets[set] == undefined ? db.defaultSet?.svg : db.sets[set].svg;
   return (
     <SetSymbolBase
       style={{
