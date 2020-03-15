@@ -36,7 +36,6 @@ export default function CollectionTableControls(
   props: CollectionTableControlsProps
 ): JSX.Element {
   const {
-    exportCallback,
     globalFilter,
     initialFiltersVisible,
     pagingProps,
