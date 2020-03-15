@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable no-console */
-import { ipcRenderer as ipc } from "electron";
+import { ipcRenderer as ipc, IpcRendererEvent } from "electron";
 import {
   dispatchAction,
   SET_LOGIN_FORM,
@@ -40,7 +40,7 @@ import uxMove from "../uxMove";
 export default function ipcListeners(dispatcher: unknown): void {
   console.log("Set up IPC listeners.");
 
-  ipc.on("prefill_auth_form", (event: string, arg: any): void => {
+  ipc.on("prefill_auth_form", (event: IpcRendererEvent, arg: any): void => {
     dispatchAction(dispatcher, SET_LOGIN_FORM, {
       email: arg.username,
       pass: arg.password,
@@ -61,7 +61,7 @@ export default function ipcListeners(dispatcher: unknown): void {
     dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
   });
 
-  ipc.on("auth", (event: string, arg: any): void => {
+  ipc.on("auth", (event: IpcRendererEvent, arg: any): void => {
     dispatchAction(dispatcher, SET_LOADING, true);
     if (arg.ok) {
       dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
@@ -89,41 +89,50 @@ export default function ipcListeners(dispatcher: unknown): void {
     dispatchAction(dispatcher, SET_OFFLINE, true);
   });
 
-  ipc.on("toggle_login", (event: string, arg: any): void => {
+  ipc.on("toggle_login", (event: IpcRendererEvent, arg: any): void => {
     dispatchAction(dispatcher, SET_CAN_LOGIN, arg);
   });
 
-  ipc.on("popup", (event: string, text: string, time: number): void => {
-    const newTime = timestamp() + time;
-    dispatchAction(dispatcher, SET_POPUP, {
-      text: text,
-      time: newTime,
-      duration: time
-    });
-  });
-
-  ipc.on("force_open_settings", (event: unknown, arg?: number): void => {
-    uxMove(0);
-    dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
-    if (arg === -1) {
-      ipcSend("save_user_settings", { last_open_tab: MAIN_SETTINGS });
-    } else {
-      ipcSend("save_user_settings", {
-        last_open_tab: MAIN_SETTINGS,
-        last_settings_section: arg
+  ipc.on(
+    "popup",
+    (event: IpcRendererEvent, text: string, time: number): void => {
+      const newTime = timestamp() + time;
+      dispatchAction(dispatcher, SET_POPUP, {
+        text: text,
+        time: newTime,
+        duration: time
       });
     }
-  });
+  );
 
-  ipc.on("force_open_overlay_settings", (event: string, arg: number): void => {
-    uxMove(0);
-    dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
-    ipcSend("save_user_settings", {
-      last_open_tab: MAIN_SETTINGS,
-      last_settings_section: SETTINGS_OVERLAY,
-      last_settings_overlay_section: arg
-    });
-  });
+  ipc.on(
+    "force_open_settings",
+    (event: IpcRendererEvent, arg?: number): void => {
+      uxMove(0);
+      dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
+      if (arg === -1) {
+        ipcSend("save_user_settings", { last_open_tab: MAIN_SETTINGS });
+      } else {
+        ipcSend("save_user_settings", {
+          last_open_tab: MAIN_SETTINGS,
+          last_settings_section: arg
+        });
+      }
+    }
+  );
+
+  ipc.on(
+    "force_open_overlay_settings",
+    (event: IpcRendererEvent, arg: number): void => {
+      uxMove(0);
+      dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
+      ipcSend("save_user_settings", {
+        last_open_tab: MAIN_SETTINGS,
+        last_settings_section: SETTINGS_OVERLAY,
+        last_settings_overlay_section: arg
+      });
+    }
+  );
 
   ipc.on("force_open_about", (): void => {
     uxMove(0);
@@ -134,7 +143,7 @@ export default function ipcListeners(dispatcher: unknown): void {
     });
   });
 
-  ipc.on("set_home", (event: string, arg: any): void => {
+  ipc.on("set_home", (event: IpcRendererEvent, arg: any): void => {
     dispatchAction(dispatcher, SET_LOADING, false);
     console.log("Home", arg);
     dispatchAction(dispatcher, SET_HOME_DATA, {
@@ -144,14 +153,14 @@ export default function ipcListeners(dispatcher: unknown): void {
     });
   });
 
-  ipc.on("set_explore_decks", (event: string, arg: any): void => {
+  ipc.on("set_explore_decks", (event: IpcRendererEvent, arg: any): void => {
     console.log("Explore", arg);
     dispatchAction(dispatcher, SET_LOADING, false);
     dispatchAction(dispatcher, SET_EXPLORE_DATA, arg);
     dispatchAction(dispatcher, SET_EXPLORE_FILTERS_SKIP, arg.results_number);
   });
 
-  ipc.on("set_update_state", (event: string, arg: any): void => {
+  ipc.on("set_update_state", (event: IpcRendererEvent, arg: any): void => {
     dispatchAction(dispatcher, SET_UPDATE_STATE, arg);
   });
 
@@ -169,22 +178,22 @@ export default function ipcListeners(dispatcher: unknown): void {
     dispatchAction(dispatcher, SET_NO_LOG, true);
   });
 
-  ipc.on("set_draft_link", function(event: string, arg: string) {
+  ipc.on("set_draft_link", function(event: IpcRendererEvent, arg: string) {
     dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
     dispatchAction(dispatcher, SET_LOADING, false);
   });
 
-  ipc.on("set_log_link", function(event: string, arg: string) {
+  ipc.on("set_log_link", function(event: IpcRendererEvent, arg: string) {
     dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
     dispatchAction(dispatcher, SET_LOADING, false);
   });
 
-  ipc.on("set_deck_link", function(event: string, arg: string) {
+  ipc.on("set_deck_link", function(event: IpcRendererEvent, arg: string) {
     dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
     dispatchAction(dispatcher, SET_LOADING, false);
   });
 
-  ipc.on("set_active_events", function(event: string, arg: string) {
+  ipc.on("set_active_events", function(event: IpcRendererEvent, arg: string) {
     if (!arg) return;
     try {
       const activeEvents = JSON.parse(arg);
