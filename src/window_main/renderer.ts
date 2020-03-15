@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { remote } from "electron";
 import React from "react";
 
@@ -6,7 +7,8 @@ if (!remote.app.isPackaged) {
   const unhandled = require("electron-unhandled");
   unhandled({
     showDialog: true,
-    reportButton: error => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    reportButton: (error: any) => {
       openNewGitHubIssue({
         user: "Manuel-777",
         repo: "MTG-Arena-Tool",
@@ -19,7 +21,6 @@ if (!remote.app.isPackaged) {
     dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const whyDidYouRender = require("@welldone-software/why-did-you-render");
   whyDidYouRender(React, {
     trackAllPureComponents: true
