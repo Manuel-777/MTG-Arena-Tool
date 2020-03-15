@@ -134,6 +134,7 @@
     "@types/match-sorter": "^4.0.0",
     "@types/mathjs": "^6.0.4",
     "@types/nedb": "^1.8.9",
+    "@types/pikaday": "^1.7.4",
     "@types/qs": "^6.9.1",
     "@types/react": "^16.9.23",
     "@types/react-autosuggest": "^9.3.13",
