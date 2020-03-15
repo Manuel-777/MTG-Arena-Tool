@@ -296,7 +296,7 @@ export default function CollectionTable({
           id: "booster",
           value: {
             true: true,
-            false: false
+            false: true
           }
         }
       ],
