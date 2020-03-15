@@ -77,6 +77,8 @@ export interface SettingsData {
   sound_priority: boolean;
   sound_priority_volume: number;
   shortcut_editmode: string;
+  shortcut_devtools_main: string;
+  shortcut_devtools_overlay: string;
   send_data: boolean;
 }
 

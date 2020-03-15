@@ -1,17 +1,29 @@
-import electron from "electron";
-import { dialog, app, globalShortcut, Menu, Tray, clipboard } from "electron";
-import path from "path";
-import fs from "fs";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/camelcase */
+import electron, {
+  app,
+  BrowserWindow,
+  clipboard,
+  dialog,
+  globalShortcut,
+  Menu,
+  SaveDialogReturnValue,
+  Tray
+} from "electron";
 import { autoUpdater } from "electron-updater";
+import fs from "fs";
+import path from "path";
 import installDevTools from "./devtools";
-
 import {
+  ARENA_MODE_DRAFT,
   ARENA_MODE_IDLE,
   ARENA_MODE_MATCH,
-  ARENA_MODE_DRAFT,
   OVERLAY_DRAFT_MODES
 } from "./shared/constants";
 import { appDb } from "./shared/db/LocalDatabase";
+import { MergedSettings, OverlaySettingsData } from "./types/settings";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
@@ -20,16 +32,16 @@ console.log(process.platform);
 const debugBack = false;
 const debugIPC = false;
 
-var mainWindow = null;
-var updaterWindow = null;
-var background = null;
-var overlay = null;
-var mainTimeout = null;
-let settings = {
+let mainWindow: BrowserWindow | undefined = undefined;
+let updaterWindow: BrowserWindow | undefined = undefined;
+let background: BrowserWindow | undefined = undefined;
+let overlay: BrowserWindow | undefined = undefined;
+let mainTimeout: NodeJS.Timeout | undefined = undefined;
+let settings: Partial<MergedSettings> = {
   close_to_tray: false,
   launch_to_tray: false
 };
-var tray = null;
+let tray = null;
 
 const ipc = electron.ipcMain;
 
@@ -44,7 +56,7 @@ const singleLock = app.requestSingleInstanceLock();
 app.on("second-instance", () => {
   if (updaterWindow) {
     showWindow();
-  } else if (mainWindow.isVisible()) {
+  } else if (mainWindow?.isVisible()) {
     if (mainWindow.isMinimized()) {
       showWindow();
     }
@@ -63,17 +75,19 @@ app.on("ready", () => {
     startUpdater();
   } else {
     installDevTools();
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const Sentry = require("@sentry/electron");
     Sentry.init({
       dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
     });
     startApp();
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const dotenv = require("dotenv");
     dotenv.config();
   }
 });
 
-function startUpdater() {
+function startUpdater(): void {
   if (!app.isPackaged) return;
   appDb.init("application");
   appDb.find("", "settings").then(doc => {
@@ -81,8 +95,8 @@ function startUpdater() {
     updaterWindow = createUpdaterWindow();
 
     updaterWindow.webContents.on("did-finish-load", function() {
-      updaterWindow.show();
-      updaterWindow.moveTop();
+      updaterWindow?.show();
+      updaterWindow?.moveTop();
     });
 
     //autoUpdater.allowDowngrade = true;
@@ -106,20 +120,20 @@ autoUpdater.on("error", err => {
   startApp();
 });
 autoUpdater.on("download-progress", progressObj => {
-  updaterWindow.webContents.send("update_progress", progressObj);
+  updaterWindow?.webContents.send("update_progress", progressObj);
 });
 autoUpdater.on("update-downloaded", info => {
   console.log("Update downloaded: ", info);
   installUpdate();
 });
 
-function installUpdate() {
+function installUpdate(): void {
   autoUpdater.quitAndInstall(true, true);
 }
 
 let appStarted = false;
 
-function startApp() {
+function startApp(): void {
   if (appStarted) {
     if (updaterWindow) {
       updaterWindow.destroy();
@@ -130,9 +144,9 @@ function startApp() {
   mainWindow = createMainWindow();
   background = createBackgroundWindow();
 
-  const startBackgroundWhenReady = () => {
+  const startBackgroundWhenReady = (): void => {
     if (mainLoaded && backLoaded && overlayLoaded) {
-      background.webContents.send("start_background");
+      background?.webContents.send("start_background");
     }
   };
 
@@ -191,16 +205,16 @@ function startApp() {
         break;
 
       case "set_db":
-        mainWindow.webContents.send("set_db", arg);
-        overlay.webContents.send("set_db", arg);
+        mainWindow?.webContents.send("set_db", arg);
+        overlay?.webContents.send("set_db", arg);
         break;
 
       case "popup":
-        mainWindow.webContents.send("popup", arg.text, arg.time);
+        mainWindow?.webContents.send("popup", arg.text, arg.time);
         if (arg.progress) {
           // set progress to <0 to disable
           // set progress to >1 for indeterminate time
-          mainWindow.setProgressBar(arg.progress);
+          mainWindow?.setProgressBar(arg.progress);
         }
         break;
 
@@ -209,7 +223,7 @@ function startApp() {
         break;
 
       case "renderer_window_minimize":
-        mainWindow.minimize();
+        mainWindow?.minimize();
         break;
 
       case "set_arena_state":
@@ -217,11 +231,11 @@ function startApp() {
         break;
 
       case "renderer_set_bounds":
-        mainWindow.setBounds(arg);
+        mainWindow?.setBounds(arg);
         break;
 
       case "show_background":
-        background.show();
+        background?.show();
         break;
 
       case "renderer_show":
@@ -245,159 +259,176 @@ function startApp() {
         break;
 
       case "updates_check":
-        background.webContents.send("download_metadata");
+        background?.webContents.send("download_metadata");
         startUpdater();
         break;
 
       case "export_txt":
-        dialog.showSaveDialog(
-          {
-            filters: [
-              {
-                name: "txt",
-                extensions: ["txt"]
-              }
-            ],
-            defaultPath: "~/" + arg.name + ".txt"
-          },
-          function(file_path) {
-            if (file_path) {
-              fs.writeFile(file_path, arg.str, function(err) {
-                if (err) {
-                  dialog.showErrorBox("Error", err);
-                  return;
+        mainWindow &&
+          dialog
+            .showSaveDialog(mainWindow, {
+              filters: [
+                {
+                  name: "txt",
+                  extensions: ["txt"]
                 }
-              });
-            }
-          }
-        );
+              ],
+              defaultPath: "~/" + arg.name + ".txt"
+            })
+            .then((value: SaveDialogReturnValue): void => {
+              const filePath = value.filePath;
+              if (filePath) {
+                fs.writeFile(
+                  filePath,
+                  arg.str,
+                  (err: NodeJS.ErrnoException | null): void => {
+                    if (err) {
+                      dialog.showErrorBox("Error", err.message);
+                      return;
+                    }
+                  }
+                );
+              }
+            });
         break;
 
       case "export_csvtxt":
-        dialog.showSaveDialog(
-          {
-            filters: [
-              {
-                name: "csv",
-                extensions: ["csv"]
-              },
-              {
-                name: "txt",
-                extensions: ["txt"]
-              }
-            ],
-            defaultPath: "~/" + arg.name + ".csv"
-          },
-          function(file_path) {
-            if (file_path) {
-              fs.writeFile(file_path, arg.str, function(err) {
-                if (err) {
-                  dialog.showErrorBox("Error", err);
-                  return;
+        mainWindow &&
+          dialog
+            .showSaveDialog(mainWindow, {
+              filters: [
+                {
+                  name: "csv",
+                  extensions: ["csv"]
+                },
+                {
+                  name: "txt",
+                  extensions: ["txt"]
                 }
-              });
-            }
-          }
-        );
+              ],
+              defaultPath: "~/" + arg.name + ".csv"
+            })
+            .then((value: SaveDialogReturnValue): void => {
+              const filePath = value.filePath;
+              if (filePath) {
+                fs.writeFile(
+                  filePath,
+                  arg.str,
+                  (err: NodeJS.ErrnoException | null): void => {
+                    if (err) {
+                      dialog.showErrorBox("Error", err.message);
+                      return;
+                    }
+                  }
+                );
+              }
+            });
         break;
 
       default:
-        if (to == 0) background.webContents.send(method, arg);
-        if (to == 1) mainWindow.webContents.send(method, arg);
-        if (to === 2) overlay.webContents.send(method, arg);
+        if (to == 0) background?.webContents.send(method, arg);
+        if (to == 1) mainWindow?.webContents.send(method, arg);
+        if (to === 2) overlay?.webContents.send(method, arg);
         break;
     }
   });
 }
 
-function initialize(_settings) {
+function initialize(settingsArg: MergedSettings): void {
   console.log("MAIN:  Initializing");
-  settings = _settings;
+  settings = settingsArg;
   if (!settings.launch_to_tray) showWindow();
 }
 
-function openDevTools() {
-  if (background.isDevToolsOpened()) {
-    background.closeDevTools();
+function openDevTools(): void {
+  const backgroundDevWin = background as any;
+  if (backgroundDevWin?.isDevToolsOpened()) {
+    backgroundDevWin.closeDevTools();
   } else {
-    background.openDevTools({ mode: "detach" });
+    backgroundDevWin?.openDevTools({ mode: "detach" });
   }
-  if (mainWindow.isDevToolsOpened()) {
-    mainWindow.closeDevTools();
+  const mainDevWin = mainWindow as any;
+  if (mainDevWin?.isDevToolsOpened()) {
+    mainDevWin.closeDevTools();
   } else {
     showWindow();
-    mainWindow.openDevTools();
+    mainDevWin?.openDevTools();
   }
 }
 
-function openOverlayDevTools() {
-  if (overlay.isDevToolsOpened()) {
-    overlay.closeDevTools();
+function openOverlayDevTools(): void {
+  const overlayDevWin = overlay as any;
+  if (overlayDevWin?.isDevToolsOpened()) {
+    overlayDevWin.closeDevTools();
   } else {
-    overlay.openDevTools({ mode: "detach" });
+    overlayDevWin?.openDevTools({ mode: "detach" });
   }
 }
 
-function setArenaState(state) {
+function setArenaState(state: number): void {
   arenaState = state;
   if (state === ARENA_MODE_MATCH && settings.close_on_match) {
-    mainWindow.hide();
+    mainWindow?.hide();
   }
-  overlay.webContents.send("set_arena_state", state);
+  overlay?.webContents.send("set_arena_state", state);
   updateOverlayVisibility();
 }
 
-function toggleEditMode() {
+function toggleEditMode(): void {
   editMode = !editMode;
-  overlay.webContents.send("set_edit_mode", editMode);
+  overlay?.webContents.send("set_edit_mode", editMode);
   updateOverlayVisibility();
 }
 
-function setSettings(_settings) {
+function setSettings(settingsArg: any): void {
   try {
-    settings = JSON.parse(_settings);
+    settings = JSON.parse(settingsArg);
   } catch (e) {
     console.log("MAIN: Error parsing settings");
     console.log(e);
     return;
   }
   console.log("MAIN:  Updating settings");
+  const settingsData = settings as MergedSettings;
 
   // update keyboard shortcuts
   globalShortcut.unregisterAll();
   if (settings.enable_keyboard_shortcuts) {
-    globalShortcut.register(settings.shortcut_devtools_main, openDevTools);
+    globalShortcut.register(settingsData.shortcut_devtools_main, openDevTools);
     globalShortcut.register(
-      settings.shortcut_devtools_overlay,
+      settingsData.shortcut_devtools_overlay,
       openOverlayDevTools
     );
-    globalShortcut.register(settings.shortcut_editmode, () => {
+    globalShortcut.register(settingsData.shortcut_editmode, () => {
       toggleEditMode();
     });
-    settings.overlays.forEach((_settings, index) => {
-      let short = "shortcut_overlay_" + (index + 1);
-      globalShortcut.register(settings[short], () => {
-        overlay.webContents.send("close", { action: -1, index: index });
-      });
+    settings.overlays?.forEach((_settings, index) => {
+      const short = "shortcut_overlay_" + (index + 1);
+      globalShortcut.register(
+        (settings as Record<string, string>)[short],
+        () => {
+          overlay?.webContents.send("close", { action: -1, index: index });
+        }
+      );
     });
   }
 
   app.setLoginItemSettings({
     openAtLogin: settings.startup
   });
-  mainWindow.webContents.send("settings_updated");
+  mainWindow?.webContents.send("settings_updated");
 
   // Send settings update
-  overlay.setAlwaysOnTop(settings.overlay_ontop, "floating");
-  overlay.webContents.send("settings_updated");
+  overlay?.setAlwaysOnTop(settingsData.overlay_ontop, "floating");
+  overlay?.webContents.send("settings_updated");
 
   updateOverlayVisibility();
 }
 
-let overlayHideTimeout = undefined;
+let overlayHideTimeout: NodeJS.Timeout | undefined = undefined;
 
-function updateOverlayVisibility() {
-  const shouldDisplayOverlay = settings.overlays.some(getOverlayVisible);
+function updateOverlayVisibility(): void {
+  const shouldDisplayOverlay = settings.overlays?.some(getOverlayVisible);
   const isOverlayVisible = isEntireOverlayVisible();
 
   //console.log("shouldDisplayOverlay: ", shouldDisplayOverlay, "isOverlayVisible: ", isOverlayVisible);
@@ -405,20 +436,20 @@ function updateOverlayVisibility() {
     // hide entire overlay window
     // Add a 1 second timeout for animations
     overlayHideTimeout = setTimeout(function() {
-      overlay.hide();
+      overlay?.hide();
     }, 1000);
   } else if (shouldDisplayOverlay && !isOverlayVisible) {
     // display entire overlay window
-    clearTimeout(overlayHideTimeout);
+    overlayHideTimeout && clearTimeout(overlayHideTimeout);
     overlayHideTimeout = undefined;
 
     overlaySetBounds();
-    overlay.show();
+    overlay?.show();
   }
 }
 
-function isEntireOverlayVisible() {
-  return overlay.isVisible();
+function isEntireOverlayVisible(): boolean {
+  return overlay?.isVisible() ?? false;
 }
 
 /**
@@ -429,22 +460,22 @@ function isEntireOverlayVisible() {
  *
  * @param OverlaySettingsData settings
  */
-function getOverlayVisible(settings) {
+function getOverlayVisible(settings: OverlaySettingsData): boolean {
   if (!settings) return false;
 
   // Note: ensure this logic matches the logic in OverlayWindowlet
   // TODO: extract a common utility?
   const currentModeApplies =
-    (OVERLAY_DRAFT_MODES.includes(settings.mode) &&
+    (OVERLAY_DRAFT_MODES.includes(settings.mode as any) &&
       arenaState === ARENA_MODE_DRAFT) ||
-    (!OVERLAY_DRAFT_MODES.includes(settings.mode) &&
+    (!OVERLAY_DRAFT_MODES.includes(settings.mode as any) &&
       arenaState === ARENA_MODE_MATCH) ||
     (editMode && arenaState === ARENA_MODE_IDLE);
 
   return settings.show && (currentModeApplies || settings.show_always);
 }
 
-function overlaySetBounds() {
+function overlaySetBounds(): void {
   const newBounds = { x: 0, y: 0, width: 0, height: 0 };
   electron.screen.getAllDisplays().forEach(display => {
     newBounds.x = Math.min(newBounds.x, display.bounds.x);
@@ -469,7 +500,7 @@ function overlaySetBounds() {
     newBounds.height
   );
 
-  overlay.setBounds(newBounds);
+  overlay?.setBounds(newBounds);
 }
 
 // Catch exceptions
@@ -479,24 +510,24 @@ process.on("uncaughtException", function(err) {
   //console.log('Current chunk:',  currentChunk);
 });
 
-function onBackClosed() {
-  background = null;
+function onBackClosed(): void {
+  background = undefined;
   quit();
 }
 
-function onMainClosed(e) {
+function onMainClosed(): void {
   quit();
   //hideWindow();
   //e.preventDefault();
 }
 
-function hideWindow() {
-  if (mainWindow.isVisible()) {
+function hideWindow(): void {
+  if (mainWindow?.isVisible()) {
     mainWindow.hide();
   }
 }
 
-function toggleWindow() {
+function toggleWindow(): void {
   if (mainWindow && mainWindow.isVisible()) {
     if (!mainWindow.isMinimized()) {
       mainWindow.minimize();
@@ -508,7 +539,7 @@ function toggleWindow() {
   }
 }
 
-function showWindow() {
+function showWindow(): void {
   if (mainWindow) {
     if (!mainWindow.isVisible()) mainWindow.show();
     else mainWindow.moveTop();
@@ -519,36 +550,36 @@ function showWindow() {
   }
 }
 
-function quit() {
+function quit(): void {
   app.quit();
 }
 
-function saveWindowPos() {
-  var obj = {};
-  var bounds = mainWindow.getBounds();
-  var pos = mainWindow.getPosition();
-  obj.width = Math.floor(bounds.width);
-  obj.height = Math.floor(bounds.height);
-  obj.x = Math.floor(pos[0]);
-  obj.y = Math.floor(pos[1]);
-  background.webContents.send("windowBounds", obj);
+function saveWindowPos(): void {
+  const obj: Record<string, number> = {};
+  const bounds = mainWindow?.getBounds();
+  const pos = mainWindow?.getPosition();
+  obj.width = Math.floor(bounds?.width ?? 320);
+  obj.height = Math.floor(bounds?.height ?? 240);
+  obj.x = Math.floor(pos?.[0] ?? 0);
+  obj.y = Math.floor(pos?.[1] ?? 0);
+  background?.webContents.send("windowBounds", obj);
 }
 
-function resetWindows() {
+function resetWindows(): void {
   const primary = electron.screen.getPrimaryDisplay();
   const { bounds } = primary;
   // reset overlay
   overlaySetBounds();
 
   // reset main to primary
-  mainWindow.setBounds({ ...bounds, width: 800, height: 600 });
-  mainWindow.show();
-  mainWindow.moveTop();
+  mainWindow?.setBounds({ ...bounds, width: 800, height: 600 });
+  mainWindow?.show();
+  mainWindow?.moveTop();
   saveWindowPos();
 }
 
-function createUpdaterWindow() {
-  const win = new electron.BrowserWindow({
+function createUpdaterWindow(): BrowserWindow {
+  const win = new BrowserWindow({
     frame: false,
     resizable: false,
     maximizable: false,
@@ -568,8 +599,8 @@ function createUpdaterWindow() {
   return win;
 }
 
-function createBackgroundWindow() {
-  const win = new electron.BrowserWindow({
+function createBackgroundWindow(): BrowserWindow {
+  const win = new BrowserWindow({
     frame: false,
     x: 0,
     y: 0,
@@ -588,9 +619,9 @@ function createBackgroundWindow() {
   return win;
 }
 
-function createOverlayWindow() {
-  let bounds = electron.screen.getPrimaryDisplay().bounds;
-  const overlay = new electron.BrowserWindow({
+function createOverlayWindow(): BrowserWindow {
+  const bounds = electron.screen.getPrimaryDisplay().bounds;
+  const overlay = new BrowserWindow({
     transparent: true,
     x: bounds.x,
     y: bounds.y,
@@ -617,8 +648,8 @@ function createOverlayWindow() {
   return overlay;
 }
 
-function createMainWindow() {
-  const win = new electron.BrowserWindow({
+function createMainWindow(): BrowserWindow {
+  const win = new BrowserWindow({
     backgroundColor: "#000",
     frame: false,
     show: false,
@@ -646,23 +677,23 @@ function createMainWindow() {
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Show",
-      click: () => {
+      click: (): void => {
         showWindow();
       }
     },
     {
       label: "Edit Overlay Positions",
-      click: () => {
+      click: (): void => {
         toggleEditMode();
       }
     },
     {
       label: "Reset Windows",
-      click: () => resetWindows()
+      click: (): void => resetWindows()
     },
     {
       label: "Quit",
-      click: () => {
+      click: (): void => {
         quit();
       }
     }
@@ -674,22 +705,22 @@ function createMainWindow() {
   win.on("resize", () => {
     if (mainTimeout) {
       clearTimeout(mainTimeout);
-      mainTimeout = null;
+      mainTimeout = undefined;
     }
     mainTimeout = setTimeout(function() {
       saveWindowPos();
-      mainTimeout = null;
+      mainTimeout = undefined;
     }, 500);
   });
 
   win.on("move", function() {
     if (mainTimeout) {
       clearTimeout(mainTimeout);
-      mainTimeout = null;
+      mainTimeout = undefined;
     }
     mainTimeout = setTimeout(function() {
       saveWindowPos();
-      mainTimeout = null;
+      mainTimeout = undefined;
     }, 500);
   });
 
