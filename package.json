@@ -85,7 +85,6 @@
     "chart.js": "^2.9.3",
     "conic-gradient": "^1.0.0",
     "date-fns": "^2.11.0",
-    "electron-asar-hot-updater": "0.1.2",
     "electron-debug": "^3.0.1",
     "electron-devtools-installer": "^2.2.4",
     "electron-store": "^5.1.1",
