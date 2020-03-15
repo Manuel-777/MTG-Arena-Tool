@@ -29,19 +29,23 @@ export default function OutputLogInput(
   };
 
   const openPathDialog = useCallback(() => {
-    const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
-      title: "Arena Log Location",
-      defaultPath: pd.settings.logUri,
-      buttonLabel: "Select",
-      filters: [
-        { name: "Text", extensions: ["txt", "text"] },
-        { name: "All Files", extensions: ["*"] }
-      ],
-      properties: ["openFile"]
-    });
-    if (paths && paths.length && paths[0]) {
-      setLog(paths[0]);
-    }
+    dialog
+      .showOpenDialog(remote.getCurrentWindow(), {
+        title: "Arena Log Location",
+        defaultPath: pd.settings.logUri,
+        buttonLabel: "Select",
+        filters: [
+          { name: "Text", extensions: ["txt", "text"] },
+          { name: "All Files", extensions: ["*"] }
+        ],
+        properties: ["openFile"]
+      })
+      .then((value: Electron.OpenDialogReturnValue): void => {
+        const paths = value.filePaths;
+        if (paths && paths.length && paths[0]) {
+          setLog(paths[0]);
+        }
+      });
   }, []);
 
   useEffect(() => {

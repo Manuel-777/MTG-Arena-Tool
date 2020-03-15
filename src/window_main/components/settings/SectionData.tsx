@@ -112,19 +112,23 @@ export default function SectionData(): JSX.Element {
   );
 
   const openPathDialog = React.useCallback(() => {
-    const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
-      title: "Arena Log Location",
-      defaultPath: settings.logUri,
-      buttonLabel: "Select",
-      filters: [
-        { name: "Text", extensions: ["txt", "text"] },
-        { name: "All Files", extensions: ["*"] }
-      ],
-      properties: ["openFile"]
-    });
-    if (paths && paths.length && paths[0]) {
-      arenaLogCallback(paths[0]);
-    }
+    dialog
+      .showOpenDialog(remote.getCurrentWindow(), {
+        title: "Arena Log Location",
+        defaultPath: settings.logUri,
+        buttonLabel: "Select",
+        filters: [
+          { name: "Text", extensions: ["txt", "text"] },
+          { name: "All Files", extensions: ["*"] }
+        ],
+        properties: ["openFile"]
+      })
+      .then((value: Electron.OpenDialogReturnValue): void => {
+        const paths = value.filePaths;
+        if (paths && paths.length && paths[0]) {
+          arenaLogCallback(paths[0]);
+        }
+      });
   }, [arenaLogCallback, settings.logUri]);
 
   let parsedOutput = <>auto-detection</>;
