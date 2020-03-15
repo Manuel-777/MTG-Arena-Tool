@@ -22,9 +22,9 @@ import {
   SET_TOP_NAV,
   dispatchAction,
   SET_BACKGROUND_GRPID
-} from "../../app/reducers";
+} from "../../../shared/redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
-import { AppState } from "../../app/appState";
+import { AppState } from "../../../shared/redux/appState";
 import useWindowSize from "../../hooks/useWindowSize";
 import uxMove from "../../uxMove";
 

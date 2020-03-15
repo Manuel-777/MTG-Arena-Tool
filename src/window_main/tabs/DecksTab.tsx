@@ -20,7 +20,7 @@ import {
   dispatchAction,
   SET_BACKGROUND_GRPID,
   SET_SUB_NAV
-} from "../app/reducers";
+} from "../../shared/redux/reducers";
 import DecksTable from "../components/decks/DecksTable";
 import { DecksData } from "../components/decks/types";
 import { isHidingArchived } from "../components/tables/filters";

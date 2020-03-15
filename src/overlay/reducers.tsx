@@ -5,9 +5,9 @@ import {
   SET_HOVER_OUT,
   SET_HOVER_SIZE,
   HoverState
-} from "../window_main/app/reducers";
+} from "../shared/redux/reducers";
 
-import { defaultState } from "../window_main/app/appState";
+import { defaultState } from "../shared/redux/appState";
 
 const hover = (
   state: HoverState = defaultState.hover,

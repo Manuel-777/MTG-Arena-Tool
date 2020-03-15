@@ -1,10 +1,10 @@
 import React, { useCallback } from "react";
 import fs from "fs";
-import { AppState } from "../../app/appState";
+import { AppState } from "../../../shared/redux/appState";
 import { useSelector, useDispatch } from "react-redux";
 import db from "../../../shared/database";
 import { getCardArtCrop } from "../../../shared/util";
-import { dispatchAction, SET_TOP_ARTIST } from "../../app/reducers";
+import { dispatchAction, SET_TOP_ARTIST } from "../../../shared/redux/reducers";
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 export default function BackgroundImage(): JSX.Element {

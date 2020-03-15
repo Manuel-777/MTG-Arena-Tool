@@ -2,8 +2,8 @@ import React, { useState, useCallback, useEffect } from "react";
 import ReactSelect from "../../../shared/ReactSelect";
 import { ipcSend } from "../../renderer-util";
 import { useSelector, useDispatch } from "react-redux";
-import { AppState } from "../../app/appState";
-import { SET_LOADING, dispatchAction } from "../../app/reducers";
+import { AppState } from "../../../shared/redux/appState";
+import { SET_LOADING, dispatchAction } from "../../../shared/redux/reducers";
 
 function shareTypeId(type: string): number {
   switch (type) {

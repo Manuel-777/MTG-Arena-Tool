@@ -2,9 +2,13 @@ import React from "react";
 import db from "../../shared/database";
 import { ipcSend } from "../renderer-util";
 import { timestamp, toDDHHMMSS } from "../../shared/util";
-import { dispatchAction, SET_HOVER_IN, SET_HOVER_OUT } from "../app/reducers";
+import {
+  dispatchAction,
+  SET_HOVER_IN,
+  SET_HOVER_OUT
+} from "../../shared/redux/reducers";
 import { useSelector, useDispatch } from "react-redux";
-import { AppState } from "../app/appState";
+import { AppState } from "../../shared/redux/appState";
 
 export interface WildcardsChange {
   grpId: number;

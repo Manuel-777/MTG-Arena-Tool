@@ -25,7 +25,7 @@ import {
   SET_NO_LOG,
   SET_SHARE_DIALOG_URL,
   SET_ACTIVE_EVENTS
-} from "./reducers";
+} from "../../shared/redux/reducers";
 import { timestamp } from "../../shared/util";
 import {
   MAIN_SETTINGS,

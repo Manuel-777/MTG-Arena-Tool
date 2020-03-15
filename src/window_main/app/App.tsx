@@ -1,5 +1,5 @@
 import { remote } from "electron";
-import React, { useCallback } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 
 import { createStore } from "redux";
@@ -9,7 +9,7 @@ import appReducer, {
   dispatchAction,
   SET_NO_LOG,
   SET_SHARE_DIALOG_OPEN
-} from "./reducers";
+} from "../../shared/redux/reducers";
 
 const store = createStore(
   appReducer,
@@ -23,11 +23,11 @@ import BackgroundImage from "../components/main/BackgroundImage";
 import TopBar from "../components/main/TopBar";
 import LoadingBar from "../components/main/LoadingBar";
 import Auth from "../components/main/Auth";
-import { LOGIN_OK } from "./reducers";
+import { LOGIN_OK } from "../../shared/redux/reducers";
 import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";
 import CardHover from "../components/main/CardHover";
-import { AppState } from "./appState";
+import { AppState } from "../../shared/redux/appState";
 import OutputLogInput from "../components/popups/OutputLogInput";
 import { ipcSend } from "../renderer-util";
 import Share from "../components/popups/Share";

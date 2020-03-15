@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import { ipcSend } from "../../renderer-util";
-import { ipcRenderer as ipc, remote, shell } from "electron";
+import { remote, shell } from "electron";
 import db from "../../../shared/database";
 import { format, fromUnixTime } from "date-fns";
 import Button from "../Button";
 import { useSelector } from "react-redux";
-import { AppState } from "../../app/appState";
+import { AppState } from "../../../shared/redux/appState";
 
 export default function SectionAbout(): JSX.Element {
   const updateState = useSelector((state: AppState) => state.updateState);

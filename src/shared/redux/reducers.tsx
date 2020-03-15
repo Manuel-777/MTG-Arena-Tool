@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import { defaultState } from "./appState";
-import { WildcardsChange } from "../tabs/HomeTab";
+import { WildcardsChange } from "../../window_main/tabs/HomeTab";
 import { MergedSettings } from "../../types/settings";
 
 export const SET_BACKGROUND_IMAGE = "SET_BACKGROUND_IMAGE";

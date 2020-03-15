@@ -17,7 +17,7 @@ import { DbCardData } from "../types/Metadata";
 import { OverlaySettingsData, SettingsData } from "../types/settings";
 import CardDetailsWindowlet from "./CardDetailsWindowlet";
 import OverlayWindowlet from "./OverlayWindowlet";
-import { dispatchAction, SET_HOVER_SIZE } from "../window_main/app/reducers";
+import { dispatchAction, SET_HOVER_SIZE } from "../shared/redux/reducers";
 import { useDispatch } from "react-redux";
 
 const sound = new Howl({ src: ["../sounds/blip.mp3"] });

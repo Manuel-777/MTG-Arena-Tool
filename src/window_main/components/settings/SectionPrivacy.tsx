@@ -4,7 +4,7 @@ import Toggle from "../Toggle";
 import { ipcSend } from "../../renderer-util";
 import Button from "../Button";
 import { useSelector } from "react-redux";
-import { AppState } from "../../app/appState";
+import { AppState } from "../../../shared/redux/appState";
 
 function clickAnonExplore(value: boolean): void {
   ipcSend("save_user_settings", { anon_explore: value });

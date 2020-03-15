@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { InternalDeck, CardObject } from "../../../types/Deck";
 import pd from "../../../shared/PlayerData";
 import ManaCost from "../ManaCost";
@@ -16,7 +16,7 @@ import {
   SET_HOVER_IN,
   SET_HOVER_OUT,
   SET_BACKGROUND_GRPID
-} from "../../app/reducers";
+} from "../../../shared/redux/reducers";
 import db from "../../../shared/database";
 import ShareButton from "../ShareButton";
 import CraftingCost from "./CraftingCost";

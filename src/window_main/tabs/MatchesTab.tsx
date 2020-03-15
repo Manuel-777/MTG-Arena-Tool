@@ -12,7 +12,7 @@ import {
   dispatchAction,
   SET_BACKGROUND_GRPID,
   SET_SUB_NAV
-} from "../app/reducers";
+} from "../../shared/redux/reducers";
 import MatchesTable from "../components/matches/MatchesTable";
 import { MatchTableData } from "../components/matches/types";
 import { isHidingArchived } from "../components/tables/filters";

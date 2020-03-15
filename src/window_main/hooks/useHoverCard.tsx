@@ -1,4 +1,8 @@
-import { SET_HOVER_IN, SET_HOVER_OUT, dispatchAction } from "../app/reducers";
+import {
+  SET_HOVER_IN,
+  SET_HOVER_OUT,
+  dispatchAction
+} from "../../shared/redux/reducers";
 import { useDispatch } from "react-redux";
 
 type HoverCardHook = (() => void)[];

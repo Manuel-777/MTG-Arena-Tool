@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import pd from "../../shared/PlayerData";
-import { dispatchAction, SET_SETTINGS } from "../app/reducers";
+import { dispatchAction, SET_SETTINGS } from "../../shared/redux/reducers";
 import { makeResizable } from "../renderer-util";
 
 export default function ResizableDragger(): JSX.Element {

@@ -25,7 +25,7 @@ import {
   dispatchAction,
   SET_SUB_NAV,
   SET_BACKGROUND_GRPID
-} from "../../app/reducers";
+} from "../../../shared/redux/reducers";
 import { InternalMatch } from "../../../types/match";
 import uxMove from "../../uxMove";
 

@@ -1,7 +1,7 @@
 import { LOGIN_AUTH } from "./reducers";
-import { WildcardsChange } from "../tabs/HomeTab";
+import { WildcardsChange } from "../../window_main/tabs/HomeTab";
 import { MergedSettings } from "../../types/settings";
-import { playerDataDefault, defaultCfg } from "../../shared/PlayerData";
+import { playerDataDefault, defaultCfg } from "../PlayerData";
 
 export interface AppState {
   topArtist: string;

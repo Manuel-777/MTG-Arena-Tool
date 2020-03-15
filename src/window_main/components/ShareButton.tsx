@@ -1,15 +1,7 @@
 import React from "react";
-import fs from "fs";
-import path from "path";
-import { AppState } from "../app/appState";
+import { AppState } from "../../shared/redux/appState";
 import { useSelector, useDispatch } from "react-redux";
-import { dispatchAction, SET_SHARE_DIALOG, SET_LOADING } from "../app/reducers";
-import { app, remote } from "electron";
-
-const actionLogDir = path.join(
-  (app || remote.app).getPath("userData"),
-  "actionlogs"
-);
+import { dispatchAction, SET_SHARE_DIALOG } from "../../shared/redux/reducers";
 
 interface ShareButtonProps {
   type: "draft" | "deck" | "actionlog";

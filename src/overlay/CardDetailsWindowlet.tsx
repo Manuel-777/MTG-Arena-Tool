@@ -7,7 +7,7 @@ import DraftRatings from "../shared/DraftRatings";
 import { getCardImage } from "../shared/util";
 import { Chances } from "../types/Chances";
 import { SettingsData } from "../types/settings";
-import { AppState } from "../window_main/app/appState";
+import { AppState } from "../shared/redux/appState";
 import { getEditModeClass, useEditModeOnRef } from "./overlayUtil";
 
 function GroupedLandsDetails(props: { odds: Chances }): JSX.Element {
