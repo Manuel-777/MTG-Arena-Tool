@@ -30,7 +30,7 @@ import ExploreTab from "./tabs/ExploreTab";
 import HomeTab from "./tabs/HomeTab";
 import MatchesTab from "./tabs/MatchesTab";
 import OfflineSplash from "./components/main/OfflineSplash";
-import { ipcSend } from "./renderer-util";
+import { ipcSend } from "./rendererUtil";
 import SettingsTab from "./tabs/settings";
 
 export function getOpenNav(tab: number, offline: boolean): JSX.Element {

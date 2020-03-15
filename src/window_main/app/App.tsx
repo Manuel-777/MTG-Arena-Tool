@@ -29,7 +29,7 @@ import Popup from "../components/main/Popup";
 import CardHover from "../components/main/CardHover";
 import { AppState } from "../../shared/redux/appState";
 import OutputLogInput from "../components/popups/OutputLogInput";
-import { ipcSend } from "../renderer-util";
+import { ipcSend } from "../rendererUtil";
 import Share from "../components/popups/Share";
 
 function App(): JSX.Element {

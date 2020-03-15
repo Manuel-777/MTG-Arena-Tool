@@ -14,7 +14,7 @@ import {
   formatPercent,
   getTagColor,
   getWinrateClass
-} from "../../renderer-util";
+} from "../../rendererUtil";
 
 const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 

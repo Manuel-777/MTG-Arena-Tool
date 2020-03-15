@@ -5,7 +5,7 @@ const { dialog } = remote;
 import Toggle from "../misc/Toggle";
 import Input from "../misc/Input";
 import pd from "../../../shared/PlayerData";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../rendererUtil";
 import ReactSelect from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
 import Button from "../misc/Button";

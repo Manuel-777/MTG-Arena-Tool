@@ -2,7 +2,7 @@ import React from "react";
 
 import { RANKS } from "../../../shared/constants";
 import ManaCost from "../misc/ManaCost";
-import { formatPercent, getWinrateClass } from "../../renderer-util";
+import { formatPercent, getWinrateClass } from "../../rendererUtil";
 import { ListItem, Column, HoverTile, FlexTop, FlexBottom } from "./ListItem";
 import WildcardsCostPreset from "../misc/WildcardsCostPreset";
 import RankSmall from "../misc/RankSmall";

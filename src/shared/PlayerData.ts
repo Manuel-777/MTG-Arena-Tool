@@ -333,6 +333,7 @@ class PlayerData implements Record<string, any> {
   public deck_changes: Record<string, any> = {};
   public static_decks: string[] = [];
   public static_events: string[] = [];
+  public tags_colors: Record<string, string> = {};
   public decks: Record<string, InternalDeck> = {};
   public decks_tags: Record<string, string[]> = {};
   public name = "";

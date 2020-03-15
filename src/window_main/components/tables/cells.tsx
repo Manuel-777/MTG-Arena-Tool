@@ -5,7 +5,7 @@ import { Cell, CellProps } from "react-table";
 import LocalTime from "../../../shared/time-components/LocalTime";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { toDDHHMMSS, toMMSS } from "../../../shared/util";
-import { formatNumber, formatPercent } from "../../renderer-util";
+import { formatNumber, formatPercent } from "../../rendererUtil";
 import {
   ArchiveSymbol,
   BriefText,

@@ -16,7 +16,7 @@ import {
   formatNumber,
   formatPercent,
   toggleArchived
-} from "../../renderer-util";
+} from "../../rendererUtil";
 import {
   getCollationSet,
   getPrettyContext,

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { MANA } from "../../../shared/constants";
 import db from "../../../shared/database";
 import { get_rank_index_16 as getRankIndex16 } from "../../../shared/util";
-import { getTagColor } from "../../renderer-util";
+import { getTagColor } from "../../rendererUtil";
 import AutosuggestInput from "../tables/AutosuggestInput";
 import { TagCounts } from "../tables/types";
 import useColorPicker from "../../hooks/useColorPicker";

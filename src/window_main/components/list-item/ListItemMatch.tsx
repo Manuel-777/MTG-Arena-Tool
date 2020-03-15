@@ -15,7 +15,7 @@ import { getReadableEvent, toMMSS } from "../../../shared/util";
 import RankSmall from "../misc/RankSmall";
 import ResultDetails from "../misc/ResultDetails";
 import { TagBubble, NewTag } from "../misc/display";
-import { toggleArchived } from "../../renderer-util";
+import { toggleArchived } from "../../rendererUtil";
 
 export default function ListItemMatch({
   match,

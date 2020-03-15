@@ -9,7 +9,7 @@ import {
   FULL_SETS,
   SINGLETONS
 } from "./collectionStats";
-import { formatNumber } from "../../renderer-util";
+import { formatNumber } from "../../rendererUtil";
 import {
   BoosterSymbol,
   CalendarSymbol,

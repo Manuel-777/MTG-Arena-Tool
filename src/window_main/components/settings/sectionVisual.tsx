@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../rendererUtil";
 import pd from "../../../shared/PlayerData";
 import _ from "lodash";
 import ReactSelect from "../../../shared/ReactSelect";

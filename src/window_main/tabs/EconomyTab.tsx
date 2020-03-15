@@ -6,7 +6,7 @@ import pd from "../../shared/PlayerData";
 import EconomyTable from "../components/economy/EconomyTable";
 import { TransactionData } from "../components/economy/types";
 import { getPrettyContext } from "../components/economy/economyUtils";
-import { ipcSend, toggleArchived } from "../renderer-util";
+import { ipcSend, toggleArchived } from "../rendererUtil";
 
 import { InternalEconomyTransaction } from "../../types/inventory";
 

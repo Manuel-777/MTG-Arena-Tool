@@ -18,7 +18,7 @@ import { MatchTableData } from "../components/matches/types";
 import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/hooks";
 import { TagCounts } from "../components/tables/types";
-import { ipcSend, toggleArchived } from "../renderer-util";
+import { ipcSend, toggleArchived } from "../rendererUtil";
 import uxMove from "../uxMove";
 
 const { DEFAULT_ARCH, NO_ARCH } = Aggregator;

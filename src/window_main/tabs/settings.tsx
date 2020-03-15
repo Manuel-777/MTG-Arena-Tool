@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import { useSelector } from "react-redux";
-import { ipcSend } from "../renderer-util";
+import { ipcSend } from "../rendererUtil";
 
 import {
   SETTINGS_BEHAVIOUR,

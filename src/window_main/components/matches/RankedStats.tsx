@@ -2,7 +2,7 @@ import React from "react";
 import { DATE_SEASON, RANKS } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
-import { formatPercent } from "../../renderer-util";
+import { formatPercent } from "../../rendererUtil";
 
 const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 

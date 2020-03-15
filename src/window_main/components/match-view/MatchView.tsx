@@ -6,7 +6,7 @@ import pd from "../../../shared/PlayerData";
 import ShareButton from "../misc/ShareButton";
 import ManaCost from "../misc/ManaCost";
 import Deck from "../../../shared/deck";
-import { actionLogDir, ipcSend } from "../../renderer-util";
+import { actionLogDir, ipcSend } from "../../rendererUtil";
 import Button from "../misc/Button";
 import DeckList from "../misc/DeckList";
 import RankIcon from "../misc/RankIcon";

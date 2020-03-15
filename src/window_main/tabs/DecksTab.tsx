@@ -25,7 +25,7 @@ import DecksTable from "../components/decks/DecksTable";
 import { DecksData } from "../components/decks/types";
 import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/hooks";
-import { ipcSend } from "../renderer-util";
+import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
 
 function addTag(deckid: string, tag: string): void {

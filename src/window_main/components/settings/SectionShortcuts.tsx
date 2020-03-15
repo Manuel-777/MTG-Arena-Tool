@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React, { useState, useCallback } from "react";
 import { remote } from "electron";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../rendererUtil";
 import { SHORTCUT_NAMES } from "../../../shared/constants";
 import Toggle from "../misc/Toggle";
 import Button from "../misc/Button";

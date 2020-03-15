@@ -1,6 +1,6 @@
 import React from "react";
 import db from "../../shared/database";
-import { ipcSend } from "../renderer-util";
+import { ipcSend } from "../rendererUtil";
 import { timestamp, toDDHHMMSS } from "../../shared/util";
 import {
   dispatchAction,

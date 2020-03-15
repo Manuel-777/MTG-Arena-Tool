@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../../shared/redux/appState";
 import { shell } from "electron";
 import Checkbox from "../misc/Checkbox";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../rendererUtil";
 import { HIDDEN_PW } from "../../../shared/constants";
 import { dispatchAction, SET_CAN_LOGIN } from "../../../shared/redux/reducers";
 const sha1 = require("js-sha1");

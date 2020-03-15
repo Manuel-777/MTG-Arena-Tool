@@ -2,7 +2,7 @@
 import { remote, shell } from "electron";
 import React from "react";
 import { SETTINGS_PRIVACY } from "../../../shared/constants";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../rendererUtil";
 import { forceOpenSettings } from "../../tabControl";
 
 export default function OfflineSplash(): JSX.Element {

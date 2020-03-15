@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ipcSend } from "../renderer-util";
+import { ipcSend } from "../rendererUtil";
 import { useDispatch, useSelector } from "react-redux";
 import {
   dispatchAction,

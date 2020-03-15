@@ -7,12 +7,18 @@ import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass
-} from "../../renderer-util";
+} from "../../rendererUtil";
 import { BoosterSymbol, MetricText, RaritySymbol } from "../misc/display";
 import { DecksData, DecksTableCellProps } from "./types";
 
 export function WinRateCell({ cell }: DecksTableCellProps): JSX.Element {
-  const { total, interval, winrate, winrateLow, winrateHigh } = cell.row.values;
+  const {
+    total,
+    interval,
+    winrate,
+    winrateLow,
+    winrateHigh
+  } = cell.row.original;
   if (!total) {
     return <MetricText title={"no data yet"}>-</MetricText>;
   }
@@ -20,10 +26,7 @@ export function WinRateCell({ cell }: DecksTableCellProps): JSX.Element {
   if (total >= 20) {
     // sample size is large enough to use Wald Interval
     intervalDisplay = formatPercent(interval);
-    tooltip = formatWinrateInterval(
-      formatPercent(winrateLow),
-      formatPercent(winrateHigh)
-    );
+    tooltip = formatWinrateInterval(winrateLow, winrateHigh);
   } else {
     // sample size is too small (garbage results)
     intervalDisplay = "???";

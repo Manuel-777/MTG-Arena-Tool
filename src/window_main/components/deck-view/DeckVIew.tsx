@@ -8,7 +8,7 @@ import DeckTypesStats from "../../../shared/DeckTypesStats";
 import DeckManaCurve from "../../../shared/DeckManaCurve";
 import Deck from "../../../shared/deck";
 import Button from "../misc/Button";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../rendererUtil";
 import { useDispatch } from "react-redux";
 import {
   dispatchAction,

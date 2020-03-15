@@ -16,7 +16,7 @@ import {
 import ListItemMatch from "./ListItemMatch";
 import ListItemDraft from "./ListItemDraft";
 import { DEFAULT_TILE, SUB_MATCH, SUB_DRAFT } from "../../../shared/constants";
-import { getEventWinLossClass, toggleArchived } from "../../renderer-util";
+import { getEventWinLossClass, toggleArchived } from "../../rendererUtil";
 import { DbCardData } from "../../../types/Metadata";
 import RoundCard from "../misc/RoundCard";
 import { compareDesc } from "date-fns";

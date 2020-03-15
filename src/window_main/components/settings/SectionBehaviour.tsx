@@ -2,7 +2,7 @@
 import React from "react";
 import Toggle from "../misc/Toggle";
 import Input from "../misc/Input";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../rendererUtil";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared/redux/appState";
 

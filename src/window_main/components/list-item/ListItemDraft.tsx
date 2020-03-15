@@ -15,7 +15,7 @@ import db from "../../../shared/database";
 import { DEFAULT_TILE } from "../../../shared/constants";
 import { DbCardData } from "../../../types/Metadata";
 import RoundCard from "../misc/RoundCard";
-import { toggleArchived } from "../../renderer-util";
+import { toggleArchived } from "../../rendererUtil";
 import { getReadableEvent } from "../../../shared/util";
 
 interface ListItemDraftProps {

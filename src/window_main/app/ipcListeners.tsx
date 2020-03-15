@@ -32,7 +32,7 @@ import {
   SETTINGS_OVERLAY,
   MAIN_HOME
 } from "../../shared/constants";
-import { ipcSend } from "../renderer-util";
+import { ipcSend } from "../rendererUtil";
 import { SETTINGS_ABOUT } from "../../shared/constants";
 import pd from "../../shared/PlayerData";
 import uxMove from "../uxMove";

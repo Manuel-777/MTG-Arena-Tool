@@ -6,7 +6,7 @@ import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass
-} from "../../renderer-util";
+} from "../../rendererUtil";
 import format from "date-fns/format";
 import { NewTag, TagBubble } from "../misc/display";
 import WildcardsCost from "../misc/WildcardsCost";
@@ -84,10 +84,7 @@ export function ListItemDeck({
   if (deck.total > 0) {
     if (deck.total >= 20) {
       winrateInterval = formatPercent(deck.interval);
-      winrateTooltip = formatWinrateInterval(
-        formatPercent(deck.winrateLow),
-        formatPercent(deck.winrateHigh)
-      );
+      winrateTooltip = formatWinrateInterval(deck.winrateLow, deck.winrateHigh);
     }
     if (deck.lastEditTotal > 0) {
       winrateEditTooltip = `${formatPercent(

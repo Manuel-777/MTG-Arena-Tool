@@ -10,7 +10,7 @@ import EventsTable from "../components/events/EventsTable";
 import { EventStats, EventTableData } from "../components/events/types";
 import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/hooks";
-import { ipcSend, toggleArchived } from "../renderer-util";
+import { ipcSend, toggleArchived } from "../rendererUtil";
 
 function editTag(tag: string, color: string): void {
   ipcSend("edit_tag", { tag, color });
