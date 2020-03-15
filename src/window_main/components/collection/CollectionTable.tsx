@@ -87,6 +87,7 @@ export default function CollectionTable({
   const [boosterWinFactor, setBoosterWinFactor] = React.useState(1.2);
   const [futureBoosters, setFutureBoosters] = React.useState(0);
   const cardSize = useSelector((state: AppState) => state.settings.cards_size);
+  const sortedSetCodes = useMemo(() => db.sortedSetCodes, []);
   React.useEffect(() => tableModeCallback(tableMode), [
     tableMode,
     tableModeCallback
@@ -106,8 +107,8 @@ export default function CollectionTable({
       columnId: IdType<CardsData>
     ): 0 | 1 | -1 => {
       const indexDiff =
-        db.sortedSetCodes.indexOf(rowA.values[columnId]) -
-        db.sortedSetCodes.indexOf(rowB.values[columnId]);
+        sortedSetCodes.indexOf(rowA.values[columnId]) -
+        sortedSetCodes.indexOf(rowB.values[columnId]);
       return indexDiff < 0 ? -1 : indexDiff > 0 ? 1 : 0;
     },
     []
