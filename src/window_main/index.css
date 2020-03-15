@@ -4112,7 +4112,7 @@ a:hover {
 }
 
 .form-container {
-    margin: 48px auto 16px auto;
+    margin: auto;
     flex-grow: 2;
     display: flex;
     width: -webkit-fill-available;

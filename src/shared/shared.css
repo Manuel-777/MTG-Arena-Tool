@@ -442,7 +442,7 @@ label {
     position: relative;
     opacity: 1;
     display: flex;
-    height: -webkit-fill-available;
+    height: calc(100% - 97px);
     z-index: 5;
 }
 
