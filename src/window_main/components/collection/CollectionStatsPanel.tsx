@@ -103,21 +103,19 @@ export function CollectionStatsPanel({
       </div>
       <div className={"flex_item"}>
         <div className={"main_stats"}>
-          <label>
-            count:
-            <ReactSelect
-              className={"stats_count_select"}
-              style={{
-                margin: "12px auto auto 4px",
-                textAlign: "left",
-                width: "180px",
-                display: "inline-flex"
-              }}
-              options={[ALL_CARDS, SINGLETONS, FULL_SETS]}
-              current={countMode}
-              callback={setCountMode}
-            />
-          </label>
+          <label>count:</label>
+          <ReactSelect
+            className={"stats_count_select"}
+            style={{
+              margin: "12px auto auto 4px",
+              textAlign: "left",
+              width: "180px",
+              display: "inline-flex"
+            }}
+            options={[ALL_CARDS, SINGLETONS, FULL_SETS]}
+            current={countMode}
+            callback={setCountMode}
+          />
           <SetCompletionBar
             countMode={countMode}
             setStats={setStats}
