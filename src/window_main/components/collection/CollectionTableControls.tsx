@@ -13,6 +13,7 @@ import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
 import { defaultRarity } from "./filters";
 import { CollectionTableControlsProps } from "./types";
+import { exportCards } from "../../collection/CollectionTab";
 
 const boostersFilters = (): FilterValue[] => [
   { id: "booster", value: { true: true, false: false } }
@@ -53,8 +54,8 @@ export default function CollectionTableControls(
     togglesVisible
   } = props;
   const exportRows = React.useCallback(() => {
-    exportCallback(rows.map(row => row.values.id));
-  }, [exportCallback, rows]);
+    exportCards(rows.map(row => row.values.id));
+  }, [rows]);
   return (
     <div
       style={{
