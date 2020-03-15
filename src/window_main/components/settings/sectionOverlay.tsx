@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import Button from "../Button";
+import Button from "../misc/Button";
 import { ipcSend } from "../../renderer-util";
 import pd from "../../../shared/PlayerData";
-import Toggle from "../Toggle";
-import Slider from "../Slider";
+import Toggle from "../misc/Toggle";
+import Slider from "../misc/Slider";
 import _ from "lodash";
 import {
   COLORS_ALL,

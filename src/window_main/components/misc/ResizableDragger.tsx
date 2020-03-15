@@ -1,8 +1,8 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import pd from "../../shared/PlayerData";
-import { dispatchAction, SET_SETTINGS } from "../../shared/redux/reducers";
-import { makeResizable } from "../renderer-util";
+import pd from "../../../shared/PlayerData";
+import { dispatchAction, SET_SETTINGS } from "../../../shared/redux/reducers";
+import { makeResizable } from "../../renderer-util";
 
 export default function ResizableDragger(): JSX.Element {
   const draggerRef = React.useRef<HTMLDivElement>(null);

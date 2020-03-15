@@ -3,7 +3,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../../shared/redux/appState";
 import { shell } from "electron";
-import Checkbox from "../Checkbox";
+import Checkbox from "../misc/Checkbox";
 import { ipcSend } from "../../renderer-util";
 import { HIDDEN_PW } from "../../../shared/constants";
 import { dispatchAction, SET_CAN_LOGIN } from "../../../shared/redux/reducers";

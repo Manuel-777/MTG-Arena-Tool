@@ -1,7 +1,7 @@
 import React from "react";
-import { AppState } from "../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/appState";
 import { useSelector, useDispatch } from "react-redux";
-import { dispatchAction, SET_SHARE_DIALOG } from "../../shared/redux/reducers";
+import { dispatchAction, SET_SHARE_DIALOG } from "../../../shared/redux/reducers";
 
 interface ShareButtonProps {
   type: "draft" | "deck" | "actionlog";

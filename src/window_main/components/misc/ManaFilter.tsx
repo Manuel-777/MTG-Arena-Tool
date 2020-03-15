@@ -1,5 +1,5 @@
 import React from "react";
-import { COLORS_BRIEF } from "../../shared/constants";
+import { COLORS_BRIEF } from "../../../shared/constants";
 import { ManaSymbol } from "./display";
 
 export type ManaFilterKeys = "w" | "u" | "b" | "r" | "g" | "multi";

@@ -5,7 +5,7 @@ import {
   BriefText,
   FlexLeftContainer,
   RankSymbol
-} from "../display";
+} from "../misc/display";
 import { TagsCell } from "../tables/cells";
 import { TagCounts } from "../tables/types";
 import { MatchTableData } from "./types";

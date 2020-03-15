@@ -4,8 +4,8 @@ import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { ListItemDeck } from "../list-item/ListItemDeck";
-import MatchResultsStatsPanel from "../MatchResultsStatsPanel";
-import ResizableDragger from "../ResizableDragger";
+import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";
+import ResizableDragger from "../misc/ResizableDragger";
 import {
   ArchivedCell,
   ArchiveHeader,

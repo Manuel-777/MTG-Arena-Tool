@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import Button from "../Button";
+import Button from "../misc/Button";
 
 interface EditKeyProps {
   closeCallback?: (log: string) => void;

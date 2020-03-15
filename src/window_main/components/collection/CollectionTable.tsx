@@ -10,7 +10,7 @@ import {
 import db from "../../../shared/database";
 import pd from "../../../shared/PlayerData";
 import { ALL_CARDS, getCollectionStats } from "./collectionStats";
-import ResizableDragger from "../ResizableDragger";
+import ResizableDragger from "../misc/ResizableDragger";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {
   ColorColumnFilter,

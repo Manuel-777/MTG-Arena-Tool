@@ -1,5 +1,5 @@
 import React from "react";
-import { COLORS_ALL } from "../../shared/constants";
+import { COLORS_ALL } from "../../../shared/constants";
 
 interface ManaCostProps {
   colors: number[];

@@ -1,11 +1,11 @@
 import React from "react";
 
 import { RANKS } from "../../../shared/constants";
-import ManaCost from "../ManaCost";
+import ManaCost from "../misc/ManaCost";
 import { formatPercent, getWinrateClass } from "../../renderer-util";
 import { ListItem, Column, HoverTile, FlexTop, FlexBottom } from "./ListItem";
-import WildcardsCostPreset from "../WildcardsCostPreset";
-import RankSmall from "../RankSmall";
+import WildcardsCostPreset from "../misc/WildcardsCostPreset";
+import RankSmall from "../misc/RankSmall";
 
 export interface ExploreDeck {
   _id: string;

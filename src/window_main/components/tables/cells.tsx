@@ -16,7 +16,7 @@ import {
   MetricText,
   NewTag,
   TagBubble
-} from "../display";
+} from "../misc/display";
 import { TableData, TagCounts } from "./types";
 
 export function ColorsCell<D extends TableData>({

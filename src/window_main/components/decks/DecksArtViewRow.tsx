@@ -2,7 +2,7 @@ import React from "react";
 import { Cell } from "react-table";
 import { CSSTransition } from "react-transition-group";
 import { getCardArtCrop } from "../../../shared/util";
-import { ArtTile, MetricText } from "../display";
+import { ArtTile, MetricText } from "../misc/display";
 import { DecksData, DecksTableRowProps } from "./types";
 
 function DeckArt({ url }: { url: string }): JSX.Element {

@@ -3,7 +3,7 @@ import React from "react";
 import { remote } from "electron";
 import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../renderer-util";
-import Button from "../Button";
+import Button from "../misc/Button";
 
 function click(): void {
   const clearAppSettings = {

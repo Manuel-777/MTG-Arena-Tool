@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { InternalDeck, CardObject } from "../../../types/Deck";
 import pd from "../../../shared/PlayerData";
-import ManaCost from "../ManaCost";
+import ManaCost from "../misc/ManaCost";
 import { MANA_COLORS } from "../../../shared/constants";
-import DeckList from "../DeckList";
+import DeckList from "../misc/DeckList";
 import DeckTypesStats from "../../../shared/DeckTypesStats";
 import DeckManaCurve from "../../../shared/DeckManaCurve";
 import Deck from "../../../shared/deck";
-import Button from "../Button";
+import Button from "../misc/Button";
 import { ipcSend } from "../../renderer-util";
 import { useDispatch } from "react-redux";
 import {
@@ -18,7 +18,7 @@ import {
   SET_BACKGROUND_GRPID
 } from "../../../shared/redux/reducers";
 import db from "../../../shared/database";
-import ShareButton from "../ShareButton";
+import ShareButton from "../misc/ShareButton";
 import CraftingCost from "./CraftingCost";
 import { getCardImage } from "../../../shared/util";
 import uxMove from "../../uxMove";

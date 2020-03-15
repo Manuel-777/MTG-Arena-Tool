@@ -8,7 +8,7 @@ import {
   formatWinrateInterval,
   getWinrateClass
 } from "../../renderer-util";
-import { BoosterSymbol, MetricText, RaritySymbol } from "../display";
+import { BoosterSymbol, MetricText, RaritySymbol } from "../misc/display";
 import { DecksData, DecksTableCellProps } from "./types";
 
 export function WinRateCell({ cell }: DecksTableCellProps): JSX.Element {

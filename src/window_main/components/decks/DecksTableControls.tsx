@@ -4,7 +4,7 @@ import { DECKS_TABLE_MODES } from "../../../shared/constants";
 import ReactSelect from "../../../shared/ReactSelect";
 import { getReadableEvent } from "../../../shared/util";
 import DateFilter from "../../DateFilter";
-import { MediumTextButton, SmallTextButton } from "../display";
+import { MediumTextButton, SmallTextButton } from "../misc/display";
 import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";

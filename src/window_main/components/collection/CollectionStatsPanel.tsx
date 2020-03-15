@@ -15,8 +15,8 @@ import {
   CalendarSymbol,
   MediumTextButton,
   RaritySymbol
-} from "../display";
-import Input from "../Input";
+} from "../misc/display";
+import Input from "../misc/Input";
 import CompletionProgressBar, {
   SetCompletionBar
 } from "./CompletionProgressBar";

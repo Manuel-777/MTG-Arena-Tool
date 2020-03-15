@@ -1,5 +1,5 @@
 import React from "react";
-import { get_rank_index as getRankIndex } from "../../shared/util";
+import { get_rank_index as getRankIndex } from "../../../shared/util";
 
 interface RankIconProps {
   style?: React.CSSProperties;

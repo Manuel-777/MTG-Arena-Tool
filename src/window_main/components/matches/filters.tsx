@@ -3,7 +3,7 @@ import matchSorter from "match-sorter";
 import React from "react";
 import { ColumnInstance, FilterValue, Row } from "react-table";
 import { MANA, RANKS } from "../../../shared/constants";
-import { RankSymbol } from "../display";
+import { RankSymbol } from "../misc/display";
 import { BinaryColumnFilter, BinaryFilterValue } from "../tables/filters";
 import { useMultiSelectFilter } from "../tables/hooks";
 import { MultiSelectFilterProps } from "../tables/types";

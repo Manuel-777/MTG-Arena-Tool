@@ -1,20 +1,20 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { MANA, RANKS } from "../../shared/constants";
-import ReactSelect from "../../shared/ReactSelect";
+import { MANA, RANKS } from "../../../shared/constants";
+import ReactSelect from "../../../shared/ReactSelect";
 import {
   get_rank_index as getRankIndex,
   toDDHHMMSS,
   toMMSS
-} from "../../shared/util";
-import Aggregator, { AggregatorStats } from "../aggregator";
-import { AppState } from "../../shared/redux/appState";
+} from "../../../shared/util";
+import Aggregator, { AggregatorStats } from "../../aggregator";
+import { AppState } from "../../../shared/redux/appState";
 import {
   compareWinrates,
   formatPercent,
   getTagColor,
   getWinrateClass
-} from "../renderer-util";
+} from "../../renderer-util";
 
 const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 

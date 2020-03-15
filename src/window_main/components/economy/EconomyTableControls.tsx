@@ -6,7 +6,7 @@ import {
   CheckboxContainer,
   MediumTextButton,
   SmallTextButton
-} from "../display";
+} from "../misc/display";
 import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";

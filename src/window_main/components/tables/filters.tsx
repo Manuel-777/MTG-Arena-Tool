@@ -4,13 +4,13 @@ import React from "react";
 import { ColumnInstance, FilterValue, Row, TableState } from "react-table";
 import { COLORS_ALL, COLORS_BRIEF } from "../../../shared/constants";
 import { InternalDeck } from "../../../types/Deck";
-import ManaFilter, { ColorFilter, ManaFilterKeys } from "../ManaFilter";
+import ManaFilter, { ColorFilter, ManaFilterKeys } from "../misc/ManaFilter";
 import {
   BinarySymbol,
   CheckboxContainer,
   InputContainer,
   MetricText
-} from "../display";
+} from "../misc/display";
 import { useMultiSelectFilter } from "./hooks";
 import { MultiSelectFilterProps, TableData } from "./types";
 

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import Toggle from "../Toggle";
+import Toggle from "../misc/Toggle";
 import { ipcSend } from "../../renderer-util";
-import Button from "../Button";
+import Button from "../misc/Button";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared/redux/appState";
 

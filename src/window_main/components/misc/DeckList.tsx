@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 import _ from "lodash";
 import React from "react";
-import db from "../../shared/database";
-import { cardType } from "../../shared/cardTypes";
-import CardTile from "../../shared/CardTile";
-import { DbCardData } from "../../types/Metadata";
-import Deck from "../../shared/deck";
+import db from "../../../shared/database";
+import { cardType } from "../../../shared/cardTypes";
+import CardTile from "../../../shared/CardTile";
+import { DbCardData } from "../../../types/Metadata";
+import Deck from "../../../shared/deck";
 
 function Separator(props: React.PropsWithChildren<any>): JSX.Element {
   const { children } = props;

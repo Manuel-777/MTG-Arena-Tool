@@ -10,11 +10,11 @@ import {
 } from "./ListItem";
 import { ListItemMatchProps } from "../matches/types";
 import { DEFAULT_TILE } from "../../../shared/constants";
-import ManaCost from "../ManaCost";
+import ManaCost from "../misc/ManaCost";
 import { getReadableEvent, toMMSS } from "../../../shared/util";
-import RankSmall from "../RankSmall";
-import ResultDetails from "../ResultDetails";
-import { TagBubble, NewTag } from "../display";
+import RankSmall from "../misc/RankSmall";
+import ResultDetails from "../misc/ResultDetails";
+import { TagBubble, NewTag } from "../misc/display";
 import { toggleArchived } from "../../renderer-util";
 
 export default function ListItemMatch({

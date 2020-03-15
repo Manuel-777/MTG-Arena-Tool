@@ -1,5 +1,5 @@
 import React from "react";
-import { InternalMatch } from "../../types/match";
+import { InternalMatch } from "../../../types/match";
 
 interface ResultDetailsProps {
   match: InternalMatch;

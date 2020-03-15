@@ -4,7 +4,7 @@ import { ipcSend } from "../../renderer-util";
 import { remote, shell } from "electron";
 import db from "../../../shared/database";
 import { format, fromUnixTime } from "date-fns";
-import Button from "../Button";
+import Button from "../misc/Button";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared/redux/appState";
 

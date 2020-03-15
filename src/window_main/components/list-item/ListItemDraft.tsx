@@ -9,12 +9,12 @@ import {
   ArchiveButton
 } from "./ListItem";
 
-import ShareButton from "../ShareButton";
+import ShareButton from "../misc/ShareButton";
 import db from "../../../shared/database";
 
 import { DEFAULT_TILE } from "../../../shared/constants";
 import { DbCardData } from "../../../types/Metadata";
-import RoundCard from "../RoundCard";
+import RoundCard from "../misc/RoundCard";
 import { toggleArchived } from "../../renderer-util";
 import { getReadableEvent } from "../../../shared/util";
 

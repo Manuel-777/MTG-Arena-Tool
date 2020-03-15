@@ -9,10 +9,10 @@ import {
   SET_BACKGROUND_GRPID
 } from "../../shared/redux/reducers";
 import ReactSelect from "../../shared/ReactSelect";
-import Button from "../components/Button";
+import Button from "../components/misc/Button";
 import db from "../../shared/database";
-import Checkbox from "../components/Checkbox";
-import Input from "../components/Input";
+import Checkbox from "../components/misc/Checkbox";
+import Input from "../components/misc/Input";
 import { COLORS_LONG, RANKS, SUB_DECK } from "../../shared/constants";
 import { AppState } from "../../shared/redux/appState";
 import { ListItemExplore } from "../components/list-item/ListItemExplore";

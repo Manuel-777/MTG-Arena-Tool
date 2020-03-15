@@ -1,15 +1,15 @@
 import React from "react";
 import _ from "lodash";
 import { DecksTableRowProps } from "../decks/types";
-import ManaCost from "../ManaCost";
+import ManaCost from "../misc/ManaCost";
 import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass
 } from "../../renderer-util";
 import format from "date-fns/format";
-import { NewTag, TagBubble } from "../display";
-import WildcardsCost from "../WildcardsCost";
+import { NewTag, TagBubble } from "../misc/display";
+import WildcardsCost from "../misc/WildcardsCost";
 import {
   ListItem,
   Column,

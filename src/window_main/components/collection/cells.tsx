@@ -8,7 +8,7 @@ import {
   SetSymbol,
   TypeSymbol,
   BriefText
-} from "../display";
+} from "../misc/display";
 import { CollectionTableCellProps } from "./types";
 
 export function RarityCell({ cell }: CollectionTableCellProps): JSX.Element {

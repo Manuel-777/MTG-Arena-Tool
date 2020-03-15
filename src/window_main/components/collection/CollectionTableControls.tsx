@@ -7,7 +7,7 @@ import {
 } from "../../../shared/constants";
 import db from "../../../shared/database";
 import ReactSelect from "../../../shared/ReactSelect";
-import { MediumTextButton, SmallTextButton } from "../display";
+import { MediumTextButton, SmallTextButton } from "../misc/display";
 import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";

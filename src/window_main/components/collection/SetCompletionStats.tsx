@@ -13,7 +13,7 @@ import {
   RaritySymbol,
   TicketSymbol,
   CalendarSymbol
-} from "../display";
+} from "../misc/display";
 import { OwnershipSymbol } from "../../../shared/OwnershipStars";
 
 export function SetCompletionStats({

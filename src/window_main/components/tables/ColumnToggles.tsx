@@ -1,6 +1,6 @@
 import React from "react";
 import { ColumnInstance } from "react-table";
-import { CheckboxContainer } from "../display";
+import { CheckboxContainer } from "../misc/display";
 import { TableData } from "./types";
 
 export default function ColumnToggles<D extends TableData>({

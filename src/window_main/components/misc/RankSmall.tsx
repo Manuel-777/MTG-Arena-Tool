@@ -1,5 +1,5 @@
 import React from "react";
-import { get_rank_index_16, formatRank } from "../../shared/util";
+import { get_rank_index_16, formatRank } from "../../../shared/util";
 
 interface RankSmallProps {
   rank?: any | string;

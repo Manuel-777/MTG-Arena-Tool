@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import pd from "../../../shared/PlayerData";
-import Slider from "../Slider";
-import DeckList from "../DeckList";
+import Slider from "../misc/Slider";
+import DeckList from "../misc/DeckList";
 import Deck from "../../../shared/deck";
 import { getCardImage, getRankColorClass } from "../../../shared/util";
 import { PACK_SIZES, DRAFT_RANKS } from "../../../shared/constants";
