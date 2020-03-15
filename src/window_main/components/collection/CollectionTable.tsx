@@ -55,6 +55,8 @@ import {
   getCollectionData
 } from "../../collection/CollectionTab";
 import db from "../../../shared/database";
+import { useSelector } from "react-redux";
+import { AppState } from "../../app/appState";
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   let hasCorrectBoosterFilter = false;
@@ -85,6 +87,7 @@ export default function CollectionTable({
   const [futureBoosters, setFutureBoosters] = React.useState(0);
   const data = useMemo(() => getCollectionData(), []);
   const sortedSetCodes = useMemo(() => db.sortedSetCodes, []);
+  const cardSize = useSelector((state: AppState) => state.settings.cards_size);
 
   React.useEffect(() => saveTableMode(tableMode), [tableMode]);
 
@@ -358,6 +361,16 @@ export default function CollectionTable({
       />
     ) : (
       <div
+        style={
+          isTableMode
+            ? {}
+            : {
+                display: "grid",
+                gridTemplateColumns: `repeat(auto-fit, minmax(${100 +
+                  cardSize * 15 +
+                  12}px, 1fr))`
+              }
+        }
         className={
           isTableMode ? "react_table_body" : "react_table_body_no_adjust"
         }
