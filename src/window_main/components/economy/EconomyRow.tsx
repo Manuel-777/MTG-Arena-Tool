@@ -22,7 +22,7 @@ import {
   getPrettyContext,
   vaultPercentFormat,
   getReadableCode
-} from "../../economyUtils";
+} from "./economyUtils";
 
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
 import useHoverCard from "../../hooks/useHoverCard";

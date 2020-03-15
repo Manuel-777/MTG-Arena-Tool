@@ -1,7 +1,7 @@
 import _ from "lodash";
 
-import db from "../shared/database";
-import { getReadableEvent } from "../shared/util";
+import db from "../../../shared/database";
+import { getReadableEvent } from "../../../shared/util";
 
 const questMap = {
   "a4a06519-fd8a-422a-b20f-8fc7a175feef": "Quests/Quest_Azorius_Justiciar",

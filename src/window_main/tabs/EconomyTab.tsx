@@ -2,13 +2,13 @@ import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
-import pd from "../shared/PlayerData";
-import EconomyTable from "./components/economy/EconomyTable";
-import { TransactionData } from "./components/economy/types";
-import { getPrettyContext } from "./economyUtils";
-import { ipcSend, toggleArchived } from "./renderer-util";
+import pd from "../../shared/PlayerData";
+import EconomyTable from "../components/economy/EconomyTable";
+import { TransactionData } from "../components/economy/types";
+import { getPrettyContext } from "../components/economy/economyUtils";
+import { ipcSend, toggleArchived } from "../renderer-util";
 
-import { InternalEconomyTransaction } from "../types/inventory";
+import { InternalEconomyTransaction } from "../../types/inventory";
 
 function saveTableState(economyTableState: TableState<TransactionData>): void {
   ipcSend("save_user_settings", { economyTableState, skipRefresh: true });

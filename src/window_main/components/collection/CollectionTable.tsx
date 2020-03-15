@@ -12,7 +12,7 @@ import pd from "../../../shared/PlayerData";
 import {
   ALL_CARDS,
   getCollectionStats
-} from "../../collection/collectionStats";
+} from "./collectionStats";
 import ResizableDragger from "../ResizableDragger";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {

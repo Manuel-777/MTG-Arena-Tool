@@ -22,7 +22,7 @@ import { forceOpenAbout, getOpenNav, getOpenSub } from "../tabControl";
 import BackgroundImage from "../components/main/BackgroundImage";
 import TopBar from "../components/main/TopBar";
 import LoadingBar from "../components/main/LoadingBar";
-import Auth from "../Auth";
+import Auth from "../components/main/Auth";
 import { LOGIN_OK } from "./reducers";
 import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";

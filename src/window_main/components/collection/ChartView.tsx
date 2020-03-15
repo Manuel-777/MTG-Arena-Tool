@@ -1,6 +1,6 @@
 import React from "react";
 import db from "../../../shared/database";
-import { CollectionStats } from "../../collection/collectionStats";
+import { CollectionStats } from "./collectionStats";
 import CompletionHeatMap from "./CompletionHeatMap";
 
 export default function ChartView({

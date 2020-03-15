@@ -2,24 +2,24 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
-import { SUB_MATCH } from "../shared/constants";
-import db from "../shared/database";
-import pd from "../shared/PlayerData";
-import { getReadableEvent } from "../shared/util";
-import { InternalMatch } from "../types/match";
-import Aggregator, { AggregatorFilters } from "./aggregator";
+import { SUB_MATCH } from "../../shared/constants";
+import db from "../../shared/database";
+import pd from "../../shared/PlayerData";
+import { getReadableEvent } from "../../shared/util";
+import { InternalMatch } from "../../types/match";
+import Aggregator, { AggregatorFilters } from "../aggregator";
 import {
   dispatchAction,
   SET_BACKGROUND_GRPID,
   SET_SUB_NAV
-} from "./app/reducers";
-import MatchesTable from "./components/matches/MatchesTable";
-import { MatchTableData } from "./components/matches/types";
-import { isHidingArchived } from "./components/tables/filters";
-import { useAggregatorData } from "./components/tables/hooks";
-import { TagCounts } from "./components/tables/types";
-import { ipcSend, toggleArchived } from "./renderer-util";
-import uxMove from "./uxMove";
+} from "../app/reducers";
+import MatchesTable from "../components/matches/MatchesTable";
+import { MatchTableData } from "../components/matches/types";
+import { isHidingArchived } from "../components/tables/filters";
+import { useAggregatorData } from "../components/tables/hooks";
+import { TagCounts } from "../components/tables/types";
+import { ipcSend, toggleArchived } from "../renderer-util";
+import uxMove from "../uxMove";
 
 const { DEFAULT_ARCH, NO_ARCH } = Aggregator;
 const tagPrompt = "Set archetype";

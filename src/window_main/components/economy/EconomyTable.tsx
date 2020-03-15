@@ -2,7 +2,7 @@ import startOfDay from "date-fns/startOfDay";
 import React from "react";
 import { Column, useExpanded, useGroupBy, useSortBy } from "react-table";
 import { EVENTS_TABLE_MODE } from "../../../shared/constants";
-import { vaultPercentFormat } from "../../economyUtils";
+import { vaultPercentFormat } from "./economyUtils";
 import {
   AggregatedContextCell,
   ArchivedCell,

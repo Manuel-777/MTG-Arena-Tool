@@ -2,31 +2,31 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
-import { SUB_DECK } from "../shared/constants";
-import Deck from "../shared/deck";
-import pd from "../shared/PlayerData";
+import { SUB_DECK } from "../../shared/constants";
+import Deck from "../../shared/deck";
+import pd from "../../shared/PlayerData";
 import {
   getBoosterCountEstimate,
   getReadableFormat,
   get_deck_missing as getDeckMissing
-} from "../shared/util";
-import { InternalDeck } from "../types/Deck";
+} from "../../shared/util";
+import { InternalDeck } from "../../types/Deck";
 import Aggregator, {
   AggregatorFilters,
   AggregatorStats,
   dateMaxValid
-} from "./aggregator";
+} from "../aggregator";
 import {
   dispatchAction,
   SET_BACKGROUND_GRPID,
   SET_SUB_NAV
-} from "./app/reducers";
-import DecksTable from "./components/decks/DecksTable";
-import { DecksData } from "./components/decks/types";
-import { isHidingArchived } from "./components/tables/filters";
-import { useAggregatorData } from "./components/tables/hooks";
-import { ipcSend } from "./renderer-util";
-import uxMove from "./uxMove";
+} from "../app/reducers";
+import DecksTable from "../components/decks/DecksTable";
+import { DecksData } from "../components/decks/types";
+import { isHidingArchived } from "../components/tables/filters";
+import { useAggregatorData } from "../components/tables/hooks";
+import { ipcSend } from "../renderer-util";
+import uxMove from "../uxMove";
 
 function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);

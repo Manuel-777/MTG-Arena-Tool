@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import { useSelector } from "react-redux";
-import { ipcSend } from "./renderer-util";
+import { ipcSend } from "../renderer-util";
 
 import {
   SETTINGS_BEHAVIOUR,
@@ -12,17 +12,17 @@ import {
   SETTINGS_PRIVACY,
   SETTINGS_ABOUT,
   SETTINGS_LOGIN
-} from "../shared/constants";
+} from "../../shared/constants";
 
-import { AppState } from "./app/appState";
-import SectionBehaviour from "./components/settings/SectionBehaviour";
-import SectionData from "./components/settings/SectionData";
-import SectionOverlay from "./components/settings/sectionOverlay";
-import SectionVisual from "./components/settings/sectionVisual";
-import SectionShortcuts from "./components/settings/SectionShortcuts";
-import SectionPrivacy from "./components/settings/SectionPrivacy";
-import SectionAbout from "./components/settings/SectionAbout";
-import SectionLogin from "./components/settings/SectionLogin";
+import { AppState } from "../app/appState";
+import SectionBehaviour from "../components/settings/SectionBehaviour";
+import SectionData from "../components/settings/SectionData";
+import SectionOverlay from "../components/settings/sectionOverlay";
+import SectionVisual from "../components/settings/sectionVisual";
+import SectionShortcuts from "../components/settings/SectionShortcuts";
+import SectionPrivacy from "../components/settings/SectionPrivacy";
+import SectionAbout from "../components/settings/SectionAbout";
+import SectionLogin from "../components/settings/SectionLogin";
 
 interface SettingsNavProps {
   component: () => JSX.Element;

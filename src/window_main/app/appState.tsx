@@ -1,5 +1,5 @@
 import { LOGIN_AUTH } from "./reducers";
-import { WildcardsChange } from "../HomeTab";
+import { WildcardsChange } from "../tabs/HomeTab";
 import { MergedSettings } from "../../types/settings";
 import { playerDataDefault, defaultCfg } from "../../shared/PlayerData";
 

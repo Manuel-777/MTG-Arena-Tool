@@ -18,19 +18,20 @@ import {
   IPC_MAIN
 } from "../shared/constants";
 import Aggregator from "./aggregator";
-import CollectionTab from "./collection/CollectionTab";
 import openDeckSub from "./components/deck-view/DeckVIew";
 import openDraftSub from "./components/draft-view/DraftVIew";
 import openMatchSub from "./components/match-view/MatchView";
-import DecksTab from "./DecksTab";
-import EconomyTab from "./EconomyTab";
-import EventsTab from "./EventsTab";
-import ExploreTab from "./ExploreTab";
-import HomeTab from "./HomeTab";
-import MatchesTab from "./MatchesTab";
-import OfflineSplash from "./OfflineSplash";
+
+import CollectionTab from "./tabs/CollectionTab";
+import DecksTab from "./tabs/DecksTab";
+import EconomyTab from "./tabs/EconomyTab";
+import EventsTab from "./tabs/EventsTab";
+import ExploreTab from "./tabs/ExploreTab";
+import HomeTab from "./tabs/HomeTab";
+import MatchesTab from "./tabs/MatchesTab";
+import OfflineSplash from "./components/main/OfflineSplash";
 import { ipcSend } from "./renderer-util";
-import SettingsTab from "./settings";
+import SettingsTab from "./tabs/settings";
 
 export function getOpenNav(tab: number, offline: boolean): JSX.Element {
   if (offline == true && (tab == MAIN_HOME || tab == MAIN_EXPLORE)) {

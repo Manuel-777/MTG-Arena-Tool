@@ -1,3 +1,6 @@
+/*
+  Not used / deprecated?
+*/
 import React from "react";
 import { getRecentDeckName } from "../shared/util";
 import pd from "../shared/PlayerData";

@@ -1,16 +1,16 @@
 import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
-import db from "../shared/database";
-import pd from "../shared/PlayerData";
-import { getReadableEvent } from "../shared/util";
-import { EventInstanceData, InternalEvent } from "../types/event";
-import Aggregator, { AggregatorFilters } from "./aggregator";
-import EventsTable from "./components/events/EventsTable";
-import { EventStats, EventTableData } from "./components/events/types";
-import { isHidingArchived } from "./components/tables/filters";
-import { useAggregatorData } from "./components/tables/hooks";
-import { ipcSend, toggleArchived } from "./renderer-util";
+import db from "../../shared/database";
+import pd from "../../shared/PlayerData";
+import { getReadableEvent } from "../../shared/util";
+import { EventInstanceData, InternalEvent } from "../../types/event";
+import Aggregator, { AggregatorFilters } from "../aggregator";
+import EventsTable from "../components/events/EventsTable";
+import { EventStats, EventTableData } from "../components/events/types";
+import { isHidingArchived } from "../components/tables/filters";
+import { useAggregatorData } from "../components/tables/hooks";
+import { ipcSend, toggleArchived } from "../renderer-util";
 
 function editTag(tag: string, color: string): void {
   ipcSend("edit_tag", { tag, color });

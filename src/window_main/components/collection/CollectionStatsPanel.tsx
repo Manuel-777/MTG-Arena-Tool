@@ -8,7 +8,7 @@ import {
   CollectionStats,
   FULL_SETS,
   SINGLETONS
-} from "../../collection/collectionStats";
+} from "./collectionStats";
 import { formatNumber } from "../../renderer-util";
 import {
   BoosterSymbol,

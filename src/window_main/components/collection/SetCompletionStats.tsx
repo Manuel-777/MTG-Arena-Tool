@@ -6,7 +6,7 @@ import {
   estimateBoosterRares,
   SetStats,
   chanceNotWildCard
-} from "../../collection/collectionStats";
+} from "./collectionStats";
 import {
   BoosterSymbol,
   MetricText,

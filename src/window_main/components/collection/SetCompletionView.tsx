@@ -1,6 +1,6 @@
 import React from "react";
 import db from "../../../shared/database";
-import { CollectionStats } from "../../collection/collectionStats";
+import { CollectionStats } from "./collectionStats";
 import { SetCompletionBar } from "./CompletionProgressBar";
 import { SetCompletionStats } from "./SetCompletionStats";
 
