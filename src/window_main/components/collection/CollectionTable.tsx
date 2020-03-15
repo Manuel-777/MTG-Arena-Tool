@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
-import { Column, Filters, FilterValue } from "react-table";
+import { Row, IdType, Column, Filters, FilterValue } from "react-table";
 import {
   COLLECTION_CARD_MODE,
   COLLECTION_CHART_MODE,
   COLLECTION_SETS_MODE,
-  COLLECTION_TABLE_MODE
+  COLLECTION_TABLE_MODE,
+  DRAFT_RANKS
 } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import {
@@ -53,6 +54,7 @@ import {
   saveTableState,
   getCollectionData
 } from "../../collection/CollectionTab";
+import db from "../../../shared/database";
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   let hasCorrectBoosterFilter = false;
@@ -82,6 +84,7 @@ export default function CollectionTable({
   const [boosterWinFactor, setBoosterWinFactor] = React.useState(1.2);
   const [futureBoosters, setFutureBoosters] = React.useState(0);
   const data = useMemo(() => getCollectionData(), []);
+  const sortedSetCodes = useMemo(() => db.sortedSetCodes, []);
 
   React.useEffect(() => saveTableMode(tableMode), [tableMode]);
 
@@ -93,17 +96,49 @@ export default function CollectionTable({
     };
   }, []);
 
-  /*
-  const setSortType = useEnumSort<CardsData>(db.sortedSetCodes);
-  const raritySortType = useEnumSort<CardsData>([
-    "land", // needs custom order, does not use constants.CARD_RARITIES
-    "common",
-    "uncommon",
-    "rare",
-    "mythic"
-  ]);
-  const rankSortType = useEnumSort<CardsData>(DRAFT_RANKS);
-  */
+  // Memoize the sort functions only once
+  const setSortType = React.useCallback(
+    (
+      rowA: Row<CardsData>,
+      rowB: Row<CardsData>,
+      columnId: IdType<CardsData>
+    ): 0 | 1 | -1 => {
+      const indexDiff =
+        sortedSetCodes.indexOf(rowA.values[columnId]) -
+        sortedSetCodes.indexOf(rowB.values[columnId]);
+      return indexDiff < 0 ? -1 : indexDiff > 0 ? 1 : 0;
+    },
+    [sortedSetCodes]
+  );
+
+  const rankSortType = React.useCallback(
+    (
+      rowA: Row<CardsData>,
+      rowB: Row<CardsData>,
+      columnId: IdType<CardsData>
+    ): 0 | 1 | -1 => {
+      const indexDiff =
+        DRAFT_RANKS.indexOf(rowA.values[columnId]) -
+        DRAFT_RANKS.indexOf(rowB.values[columnId]);
+      return indexDiff < 0 ? -1 : indexDiff > 0 ? 1 : 0;
+    },
+    []
+  );
+
+  const raritySortType = React.useCallback(
+    (
+      rowA: Row<CardsData>,
+      rowB: Row<CardsData>,
+      columnId: IdType<CardsData>
+    ): 0 | 1 | -1 => {
+      const orderedRarity = ["land", "common", "uncommon", "rare", "mythic"];
+      const indexDiff =
+        orderedRarity.indexOf(rowA.values[columnId]) -
+        orderedRarity.indexOf(rowB.values[columnId]);
+      return indexDiff < 0 ? -1 : indexDiff > 0 ? 1 : 0;
+    },
+    []
+  );
 
   const columns: Column<CardsData>[] = useMemo(
     () => [
@@ -159,6 +194,7 @@ export default function CollectionTable({
         disableFilters: false,
         filter: "set",
         Filter: SetColumnFilter,
+        sortType: setSortType,
         sortInverted: true,
         sortDescFirst: true,
         Cell: SetCell,
@@ -172,6 +208,7 @@ export default function CollectionTable({
         accessor: "rarity",
         Filter: RarityColumnFilter,
         filter: "rarity",
+        sortType: raritySortType,
         sortDescFirst: true,
         Cell: RarityCell,
         mayToggle: true,
@@ -233,6 +270,7 @@ export default function CollectionTable({
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
+        sortType: rankSortType,
         sortDescFirst: true,
         gridWidth: "100px",
         mayToggle: true
@@ -242,7 +280,7 @@ export default function CollectionTable({
       { accessor: "images" },
       { accessor: "reprints" }
     ],
-    []
+    [rankSortType, raritySortType, setSortType]
   );
   const tableProps: BaseTableProps<CardsData> = {
     cachedState,
