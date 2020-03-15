@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Row, IdType, Column, Filters, FilterValue } from "react-table";
+import { Column, Filters, FilterValue, IdType, Row } from "react-table";
 import {
   COLLECTION_CARD_MODE,
   COLLECTION_CHART_MODE,
@@ -7,6 +7,7 @@ import {
   COLLECTION_TABLE_MODE,
   DRAFT_RANKS
 } from "../../../shared/constants";
+import db from "../../../shared/database";
 import pd from "../../../shared/PlayerData";
 import {
   ALL_CARDS,
@@ -49,12 +50,6 @@ import {
   CollectionTableControlsProps,
   CollectionTableProps
 } from "./types";
-import {
-  saveTableMode,
-  saveTableState,
-  getCollectionData
-} from "../../collection/CollectionTab";
-import db from "../../../shared/database";
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   let hasCorrectBoosterFilter = false;
@@ -74,8 +69,14 @@ function isBoosterMathValid(filters: Filters<CardsData>): boolean {
 }
 
 export default function CollectionTable({
+  data,
+  contextMenuCallback,
+  tableModeCallback,
+  tableStateCallback,
   cachedState,
-  cachedTableMode
+  cachedTableMode,
+  exportCallback,
+  openCardCallback
 }: CollectionTableProps): JSX.Element {
   const [tableMode, setTableMode] = React.useState(cachedTableMode);
   const [countMode, setCountMode] = React.useState(ALL_CARDS);
@@ -83,18 +84,16 @@ export default function CollectionTable({
   const [mythicDraftFactor, setMythicDraftFactor] = React.useState(0.14);
   const [boosterWinFactor, setBoosterWinFactor] = React.useState(1.2);
   const [futureBoosters, setFutureBoosters] = React.useState(0);
-  const data = useMemo(() => getCollectionData(), []);
-  const sortedSetCodes = useMemo(() => db.sortedSetCodes, []);
+  React.useEffect(() => tableModeCallback(tableMode), [
+    tableMode,
+    tableModeCallback
+  ]);
 
-  React.useEffect(() => saveTableMode(tableMode), [tableMode]);
-
-  const customFilterTypes = useMemo(() => {
-    return {
-      inBoosters: inBoostersFilterFn,
-      rarity: rarityFilterFn,
-      set: setFilterFn
-    };
-  }, []);
+  const customFilterTypes = {
+    inBoosters: inBoostersFilterFn,
+    rarity: rarityFilterFn,
+    set: setFilterFn
+  };
 
   // Memoize the sort functions only once
   const setSortType = React.useCallback(
@@ -104,11 +103,11 @@ export default function CollectionTable({
       columnId: IdType<CardsData>
     ): 0 | 1 | -1 => {
       const indexDiff =
-        sortedSetCodes.indexOf(rowA.values[columnId]) -
-        sortedSetCodes.indexOf(rowB.values[columnId]);
+        db.sortedSetCodes.indexOf(rowA.values[columnId]) -
+        db.sortedSetCodes.indexOf(rowB.values[columnId]);
       return indexDiff < 0 ? -1 : indexDiff > 0 ? 1 : 0;
     },
-    [sortedSetCodes]
+    []
   );
 
   const rankSortType = React.useCallback(
@@ -302,7 +301,7 @@ export default function CollectionTable({
     globalFilter: cardSearchFilterFn,
     setTableMode,
     tableMode,
-    tableStateCallback: saveTableState
+    tableStateCallback
   };
   const {
     table,
@@ -311,7 +310,6 @@ export default function CollectionTable({
     pagingProps,
     tableControlsProps
   } = useBaseReactTable(tableProps);
-
   const {
     getTableBodyProps,
     page,
@@ -321,7 +319,6 @@ export default function CollectionTable({
     setFilter,
     toggleHideColumn
   } = table;
-
   const setClickCallback = React.useCallback(
     (set: string) => {
       setTableMode(COLLECTION_CHART_MODE);
@@ -337,11 +334,11 @@ export default function CollectionTable({
     tableMode === COLLECTION_SETS_MODE;
 
   const collectionTableControlsProps: CollectionTableControlsProps = {
+    exportCallback,
     rows,
     ...tableControlsProps
   };
   const isTableMode = tableMode === COLLECTION_TABLE_MODE;
-
   const tableBody =
     tableMode === COLLECTION_CHART_MODE ? (
       <ChartView stats={stats} />
@@ -371,6 +368,8 @@ export default function CollectionTable({
               key={row.index}
               row={row}
               index={index}
+              contextMenuCallback={contextMenuCallback}
+              openCardCallback={openCardCallback}
               gridTemplateColumns={gridTemplateColumns}
             />
           );
