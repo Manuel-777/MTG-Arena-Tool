@@ -8,7 +8,6 @@ import pd from "../../shared/PlayerData";
 import { DbCardData } from "../../types/Metadata";
 import { getMissingCardCounts, replaceAll } from "../../shared/util";
 import CollectionTable from "../components/collection/CollectionTable";
-CollectionTable.whyDidYouRender = true;
 
 import { CardsData } from "../components/collection/types";
 
@@ -115,8 +114,7 @@ export function getCollectionData(): CardsData[] {
           rankSortVal
         };
       }
-    )
-    .slice(0, 50);
+    );
 }
 
 export default function CollectionTab(): JSX.Element {

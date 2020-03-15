@@ -10,8 +10,7 @@ import {
   useGlobalFilter,
   usePagination,
   useSortBy,
-  useTable,
-  Column
+  useTable
 } from "react-table";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
@@ -192,8 +191,8 @@ export function useBaseReactTable<D extends TableData>({
 
   const table = useTable<D>(
     {
-      columns: columns,
-      data: data,
+      columns,
+      data,
       defaultColumn,
       filterTypes,
       globalFilter: globalFilter,

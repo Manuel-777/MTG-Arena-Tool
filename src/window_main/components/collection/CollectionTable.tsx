@@ -4,10 +4,8 @@ import {
   COLLECTION_CARD_MODE,
   COLLECTION_CHART_MODE,
   COLLECTION_SETS_MODE,
-  COLLECTION_TABLE_MODE,
-  DRAFT_RANKS
+  COLLECTION_TABLE_MODE
 } from "../../../shared/constants";
-import db from "../../../shared/database";
 import pd from "../../../shared/PlayerData";
 import {
   ALL_CARDS,
@@ -20,7 +18,7 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import { useBaseReactTable, useEnumSort } from "../tables/hooks";
+import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { BaseTableProps } from "../tables/types";
@@ -95,6 +93,7 @@ export default function CollectionTable({
     };
   }, []);
 
+  /*
   const setSortType = useEnumSort<CardsData>(db.sortedSetCodes);
   const raritySortType = useEnumSort<CardsData>([
     "land", // needs custom order, does not use constants.CARD_RARITIES
@@ -104,6 +103,7 @@ export default function CollectionTable({
     "mythic"
   ]);
   const rankSortType = useEnumSort<CardsData>(DRAFT_RANKS);
+  */
 
   const columns: Column<CardsData>[] = useMemo(
     () => [
@@ -159,7 +159,6 @@ export default function CollectionTable({
         disableFilters: false,
         filter: "set",
         Filter: SetColumnFilter,
-        sortType: setSortType,
         sortInverted: true,
         sortDescFirst: true,
         Cell: SetCell,
@@ -173,7 +172,6 @@ export default function CollectionTable({
         accessor: "rarity",
         Filter: RarityColumnFilter,
         filter: "rarity",
-        sortType: raritySortType,
         sortDescFirst: true,
         Cell: RarityCell,
         mayToggle: true,
@@ -235,7 +233,6 @@ export default function CollectionTable({
         disableFilters: false,
         filter: "fuzzyText",
         Filter: TextBoxFilter,
-        sortType: rankSortType,
         sortDescFirst: true,
         gridWidth: "100px",
         mayToggle: true
@@ -245,7 +242,7 @@ export default function CollectionTable({
       { accessor: "images" },
       { accessor: "reprints" }
     ],
-    [setSortType, raritySortType, rankSortType]
+    []
   );
   const tableProps: BaseTableProps<CardsData> = {
     cachedState,
