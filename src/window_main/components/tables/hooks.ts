@@ -1,9 +1,6 @@
 import _ from "lodash";
 import React from "react";
 import {
-  IdType,
-  Row,
-  SortByFn,
   TableInstance,
   TableState,
   useFilters,
@@ -51,20 +48,6 @@ export function useMultiSelectFilter<D>(
     [filterValue, onFilterChanged]
   );
   return [filterValue, onClickMultiFilter];
-}
-
-export function useEnumSort<D extends TableData>(
-  enums: readonly string[]
-): SortByFn<D> {
-  return React.useCallback(
-    (rowA: Row<D>, rowB: Row<D>, columnId: IdType<D>): 0 | 1 | -1 => {
-      const indexDiff =
-        enums.indexOf(rowA.values[columnId]) -
-        enums.indexOf(rowB.values[columnId]);
-      return indexDiff < 0 ? -1 : indexDiff > 0 ? 1 : 0;
-    },
-    [enums]
-  );
 }
 
 export function useBlurOnEnter(): [
@@ -191,11 +174,11 @@ export function useBaseReactTable<D extends TableData>({
 
   const table = useTable<D>(
     {
-      columns,
-      data,
+      columns: React.useMemo(() => columns, [columns]),
+      data: React.useMemo(() => data, [data]),
       defaultColumn,
       filterTypes,
-      globalFilter: globalFilter,
+      globalFilter: React.useMemo(() => globalFilter, [globalFilter]),
       initialState,
       autoResetFilters: false,
       autoResetGlobalFilter: false,
@@ -251,7 +234,6 @@ export function useBaseReactTable<D extends TableData>({
   const gridTemplateColumns = visibleHeaders
     .map(header => `minmax(${header.gridWidth ?? "140px"}, auto)`)
     .join(" ");
-
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
     const toggleableColumns = allColumns.filter(column => column.mayToggle);
     const initialFiltersVisible: FiltersVisible = {};
@@ -262,11 +244,9 @@ export function useBaseReactTable<D extends TableData>({
     }
     return [toggleableColumns, initialFiltersVisible];
   }, [allColumns]);
-
   const [filtersVisible, setFiltersVisible] = React.useState(
     initialFiltersVisible
   );
-
   const [togglesVisible, setTogglesVisible] = React.useState(false);
   const headersProps = {
     filtersVisible,

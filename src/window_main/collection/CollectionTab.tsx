@@ -6,9 +6,12 @@ import { DRAFT_RANKS } from "../../shared/constants";
 import db from "../../shared/database";
 import pd from "../../shared/PlayerData";
 import { DbCardData } from "../../types/Metadata";
-import { getMissingCardCounts, replaceAll } from "../../shared/util";
+import {
+  getMissingCardCounts,
+  openScryfallCard,
+  replaceAll
+} from "../../shared/util";
 import CollectionTable from "../components/collection/CollectionTable";
-
 import { CardsData } from "../components/collection/types";
 
 import { ipcSend } from "../renderer-util";
@@ -18,7 +21,7 @@ import Deck from "../../shared/deck";
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
 
-export function addCardMenu(div: HTMLElement, card: DbCardData): void {
+function addCardMenu(div: HTMLElement, card: DbCardData): void {
   if (!(card.set in db.sets)) return;
   const arenaCode = `1 ${card.name} (${db.sets[card.set].arenacode}) ${
     card.cid
@@ -41,7 +44,7 @@ export function addCardMenu(div: HTMLElement, card: DbCardData): void {
   );
 }
 
-export function getExportString(cardIds: string[]): string {
+function getExportString(cardIds: string[]): string {
   const { export_format: exportFormat } = pd.settings;
   // TODO teach export how to handle all the new optional columns?
   let exportString = "";
@@ -67,22 +70,20 @@ export function getExportString(cardIds: string[]): string {
   return exportString;
 }
 
-export function exportCards(cardIds: string[]): void {
+function exportCards(cardIds: string[]): void {
   const exportString = getExportString(cardIds);
   ipcSend("export_csvtxt", { str: exportString, name: "cards" });
 }
 
-export function saveTableState(
-  collectionTableState: TableState<CardsData>
-): void {
+function saveTableState(collectionTableState: TableState<CardsData>): void {
   ipcSend("save_user_settings", { collectionTableState, skipRefresh: true });
 }
 
-export function saveTableMode(collectionTableMode: string): void {
+function saveTableMode(collectionTableMode: string): void {
   ipcSend("save_user_settings", { collectionTableMode, skipRefresh: true });
 }
 
-export function getCollectionData(): CardsData[] {
+function getCollectionData(): CardsData[] {
   const wantedCards: CardCounts = {};
   pd.deckList
     .filter(deck => deck && !deck.archived)
@@ -125,7 +126,12 @@ export default function CollectionTab(): JSX.Element {
       <CollectionTable
         cachedState={collectionTableState}
         cachedTableMode={collectionTableMode}
+        contextMenuCallback={addCardMenu}
         data={data}
+        exportCallback={exportCards}
+        openCardCallback={openScryfallCard}
+        tableModeCallback={saveTableMode}
+        tableStateCallback={saveTableState}
       />
     </div>
   );
