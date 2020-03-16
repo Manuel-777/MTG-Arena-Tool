@@ -10,7 +10,7 @@ const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
   "actionlogs"
 );
-function ipcSend(method: string, arg: any, to = IPC_BACKGROUND): void {
+function ipcSend(method: string, arg: any = true, to = IPC_BACKGROUND): void {
   ipc.send("ipc_switch", method, IPC_MAIN, arg, to);
 }
 
@@ -25,7 +25,7 @@ function getTagColor(tag: string): string {
 function makeResizable(
   div: HTMLDivElement,
   resizeCallback: (width: number) => void,
-  finalCallback: (width: number) => void
+  finalCallback?: (width: number) => void
 ) {
   let mPos: number;
   let finalWidth: number | null;

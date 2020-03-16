@@ -147,7 +147,7 @@ function FrequencyChart({
               {showTags && (
                 <div
                   className={"mana_curve_tag"}
-                  style={{ backgroundColor: getTagColor(cwr.tag) }}
+                  style={{ backgroundColor: getTagColor(cwr.tag || "") }}
                 >
                   {cwr.tag}
                 </div>
