@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import fs from "fs";
 import { AppState } from "../../../shared/redux/appState";
 import { useSelector, useDispatch } from "react-redux";
@@ -19,7 +19,8 @@ export default function BackgroundImage(): JSX.Element {
     (state: AppState) => state.settings.back_color
   );
 
-  const getImage = useCallback(() => {
+  const [image, setImage] = React.useState(DEFAULT_BACKGROUND);
+  React.useEffect(() => {
     let image = backgroundImage;
     const card = db.card(backgroundGrpId);
     if (card) {
@@ -54,13 +55,10 @@ export default function BackgroundImage(): JSX.Element {
       // We dont know who is the artist..
       dispatchAction(dispatcher, SET_TOP_ARTIST, "");
     }
-    return `url(${image})`;
+    setImage(`url(${image})`);
   }, [backgroundGrpId, backgroundImage, dispatcher]);
 
-  return (
-    <div
-      className="main_wrapper main_bg_image"
-      style={{ backgroundImage: getImage(), backgroundColor: backgroundColor }}
-    ></div>
-  );
+  const style = { backgroundImage: image, backgroundColor };
+
+  return <div className="main_wrapper main_bg_image" style={style} />;
 }
