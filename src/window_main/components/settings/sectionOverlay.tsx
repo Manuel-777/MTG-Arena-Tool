@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import Button from "../misc/Button";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../util";
 import pd from "../../../shared/PlayerData";
 import Toggle from "../misc/Toggle";
 import Slider from "../misc/Slider";

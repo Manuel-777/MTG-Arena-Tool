@@ -6,7 +6,7 @@ import {
   DATE_SEASON
 } from "../shared/constants";
 import ReactSelect from "../shared/ReactSelect";
-import { ipcSend, showDatepicker } from "./renderer-util";
+import { ipcSend, showDatepicker } from "./util";
 
 export interface DateFilterProps {
   prefixId: string;

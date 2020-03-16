@@ -6,6 +6,21 @@ export interface EventInstanceData {
   ProcessedMatchIds?: string[];
 }
 
+export interface WinLossGate {
+  MaxWins: number;
+  MaxLosses: number;
+  MaxGames: number;
+  CurrentWins: number;
+  CurrentLosses: number;
+  CurrentGames: number;
+  ProcessedMatchIds: string[];
+}
+
+export interface WinNoGate {
+  CurrentWins: number;
+  ProcessedMatchIds: string[];
+}
+
 export interface InternalEvent {
   Id?: string;
   _id?: string;
@@ -17,15 +32,8 @@ export interface InternalEvent {
   date: string;
   InternalEventName: string;
   ModuleInstanceData: {
-    WinLossGate?: {
-      CurrentWins: number;
-      CurrentLosses: number;
-      ProcessedMatchIds: string[];
-    };
-    WinNoGate?: {
-      CurrentWins: number;
-      ProcessedMatchIds: string[];
-    };
+    WinLossGate?: WinLossGate;
+    WinNoGate?: WinNoGate;
   };
   type: "Event";
 }

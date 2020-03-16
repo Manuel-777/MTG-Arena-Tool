@@ -6,7 +6,7 @@ import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass
-} from "../../renderer-util";
+} from "../../util";
 import format from "date-fns/format";
 import { NewTag, TagBubble } from "../misc/display";
 import WildcardsCost from "../misc/WildcardsCost";

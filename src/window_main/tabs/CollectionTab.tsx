@@ -14,7 +14,7 @@ import {
 import CollectionTable from "../components/collection/CollectionTable";
 import { CardsData } from "../components/collection/types";
 
-import { ipcSend } from "../renderer-util";
+import { ipcSend } from "../util";
 import { CardCounts } from "../components/decks/types";
 import Deck from "../../shared/deck";
 

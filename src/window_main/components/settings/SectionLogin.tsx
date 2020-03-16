@@ -2,7 +2,7 @@
 import React from "react";
 import { remote } from "electron";
 import pd from "../../../shared/PlayerData";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../util";
 import Button from "../misc/Button";
 
 function click(): void {

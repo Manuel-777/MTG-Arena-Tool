@@ -1,5 +1,5 @@
 import React from "react";
-import { ipcSend } from "../../renderer-util";
+import { ipcSend } from "../../util";
 import { forceOpenSettings } from "../../tabControl";
 
 interface TopBarProps {

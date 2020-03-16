@@ -7,7 +7,7 @@ import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass
-} from "../../renderer-util";
+} from "../../util";
 import { BoosterSymbol, MetricText, RaritySymbol } from "../misc/display";
 import { DecksData, DecksTableCellProps } from "./types";
 

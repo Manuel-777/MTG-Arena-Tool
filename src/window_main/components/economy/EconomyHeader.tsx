@@ -1,4 +1,4 @@
-import { formatNumber, formatPercent } from "../../renderer-util";
+import { formatNumber, formatPercent } from "../../util";
 import pd from "../../../shared/PlayerData";
 
 import { vaultPercentFormat } from "./economyUtils";

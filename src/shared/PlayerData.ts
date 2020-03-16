@@ -346,6 +346,7 @@ class PlayerData implements Record<string, any> {
   public matches_index: string[] = [];
   public economy_index: string[] = [];
   public draft_index: string[] = [];
+  public tags_colors: Record<string, string> = {};
   public offline = false;
   public patreon = false;
   public patreon_tier = -1;

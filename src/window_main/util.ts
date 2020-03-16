@@ -1,44 +1,49 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-use-before-define, @typescript-eslint/camelcase */
 import { app, ipcRenderer as ipc, remote } from "electron";
 import path from "path";
-import Pikaday from "pikaday";
 import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
+import { WinLossGate } from "../types/event";
 import pd from "../shared/PlayerData";
-
-const byId = id => document.getElementById(id);
+const Pikaday = require("pikaday");
 
 const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
   "actionlogs"
 );
-function ipcSend(method, arg, to = IPC_BACKGROUND) {
+function ipcSend(method: string, arg: any, to = IPC_BACKGROUND): void {
   ipc.send("ipc_switch", method, IPC_MAIN, arg, to);
 }
 
-function toggleArchived(id) {
+function toggleArchived(id: string): void {
   ipcSend("toggle_archived", id);
 }
 
-function getTagColor(tag) {
+function getTagColor(tag: string): string {
   return pd.tags_colors[tag] || "#FAE5D2";
 }
 
-function makeResizable(div, resizeCallback, finalCallback) {
-  let mPos;
-  let finalWidth;
+function makeResizable(
+  div: HTMLDivElement,
+  resizeCallback: (width: number) => void,
+  finalCallback: (width: number) => void
+) {
+  let mPos: number;
+  let finalWidth: number | null;
 
-  const resize = function(e) {
-    const parent = div.parentNode;
+  const resize = (e: MouseEvent) => {
+    const parent = div.parentElement;
     const dx = mPos - e.x;
     mPos = e.x;
-    const newWidth = Math.max(10, parseInt(parent.style.width) + dx);
-    parent.style.width = `${newWidth}px`;
-    parent.style.flex = `0 0 ${newWidth}px`;
-    if (resizeCallback instanceof Function) resizeCallback(newWidth);
-    finalWidth = newWidth;
+    if (parent !== null) {
+      const newWidth = Math.max(10, parseInt(parent.style.width) + dx);
+      parent.style.width = `${newWidth}px`;
+      parent.style.flex = `0 0 ${newWidth}px`;
+      if (resizeCallback instanceof Function) resizeCallback(newWidth);
+      finalWidth = newWidth;
+    }
   };
 
-  const saveWidth = function(width) {
+  const saveWidth = function(width: number) {
     ipcSend("save_user_settings", {
       right_panel_width: width,
       skipRefresh: true
@@ -68,26 +73,15 @@ function makeResizable(div, resizeCallback, finalCallback) {
   );
 }
 
-function toggleVisibility(...ids) {
-  ids.forEach(id => {
-    const el = byId(id);
-    if ([...el.classList].includes("hidden")) {
-      el.classList.remove("hidden");
-    } else {
-      el.classList.add("hidden");
-    }
-  });
-}
-
 function showDatepicker(
-  defaultDate,
-  onChange = date => {},
-  pickerOptions = {}
-) {
+  defaultDate: Date,
+  onChange: (date: Date) => void,
+  pickerOptions: any = {}
+): void {
   const cont = document.createElement("div");
   cont.classList.add("dialog_content");
   cont.style.width = "320px";
-  cont.style.heigh = "400px";
+  cont.style.height = "400px";
   // https://github.com/Pikaday/Pikaday
   const now = new Date();
   const picker = new Pikaday({
@@ -100,26 +94,29 @@ function showDatepicker(
   cont.appendChild(picker.el);
 }
 
-function formatPercent(value, config = { maximumSignificantDigits: 2 }) {
+function formatPercent(
+  value: number,
+  config = { maximumSignificantDigits: 2 }
+): string {
   return value.toLocaleString([], {
     style: "percent",
     ...config
   });
 }
 
-export function formatWinrateInterval(lower, upper) {
+export function formatWinrateInterval(lower: number, upper: number): string {
   return `${formatPercent(lower)} to ${formatPercent(upper)} with 95% confidence
 (estimated actual winrate bounds, assuming a normal distribution)`;
 }
 
-function formatNumber(value, config = {}) {
+function formatNumber(value: number, config = {}): string {
   return value.toLocaleString([], {
     style: "decimal",
     ...config
   });
 }
 
-function getWinrateClass(wr) {
+function getWinrateClass(wr: number): string {
   if (wr > 0.65) return "blue";
   if (wr > 0.55) return "green";
   if (wr < 0.45) return "orange";
@@ -127,7 +124,7 @@ function getWinrateClass(wr) {
   return "white";
 }
 
-function getEventWinLossClass(wlGate) {
+function getEventWinLossClass(wlGate: WinLossGate): string {
   if (wlGate === undefined) return "white";
   if (wlGate.MaxWins === wlGate.CurrentWins) return "blue";
   if (wlGate.CurrentWins > wlGate.CurrentLosses) return "green";
@@ -135,7 +132,13 @@ function getEventWinLossClass(wlGate) {
   return "red";
 }
 
-function compareWinrates(a, b) {
+interface Winrate {
+  wins: number;
+  losses: number;
+  colors: number[];
+}
+
+function compareWinrates(a: Winrate, b: Winrate): 1 | 0 | -1 {
   const _a = a.wins / a.losses;
   const _b = b.wins / b.losses;
 
@@ -145,9 +148,9 @@ function compareWinrates(a, b) {
   return compareColorWinrates(a, b);
 }
 
-function compareColorWinrates(a, b) {
-  a = a.colors;
-  b = b.colors;
+function compareColorWinrates(_a: Winrate, _b: Winrate): 1 | 0 | -1 {
+  const a = _a.colors;
+  const b = _b.colors;
 
   if (a.length < b.length) return -1;
   if (a.length > b.length) return 1;
@@ -164,25 +167,17 @@ function compareColorWinrates(a, b) {
   return 0;
 }
 
-function localTimeSince(date) {
-  return `<relative-time datetime="${date.toISOString()}">
-    ${date.toString()}
-  </relative-time>`;
-}
-
 export {
   actionLogDir,
   ipcSend,
   toggleArchived,
   getTagColor,
   makeResizable,
-  toggleVisibility,
   showDatepicker,
   formatPercent,
   formatNumber,
   getWinrateClass,
   getEventWinLossClass,
   compareWinrates,
-  compareColorWinrates,
-  localTimeSince
+  compareColorWinrates
 };
