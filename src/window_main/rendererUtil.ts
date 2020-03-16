@@ -4,6 +4,7 @@ import path from "path";
 import Pikaday from "pikaday";
 import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
 import pd from "../shared/PlayerData";
+import { WinLossGate, WinNoGate } from "../types/event";
 
 export const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
@@ -132,7 +133,7 @@ export function getWinrateClass(wr: number): string {
   return "white";
 }
 
-export function getEventWinLossClass(wlGate: any): string {
+export function getEventWinLossClass(wlGate: WinLossGate): string {
   if (wlGate === undefined) return "white";
   if (wlGate.MaxWins === wlGate.CurrentWins) return "blue";
   if (wlGate.CurrentWins > wlGate.CurrentLosses) return "green";
@@ -140,7 +141,13 @@ export function getEventWinLossClass(wlGate: any): string {
   return "red";
 }
 
-export function compareWinrates(a: any, b: any): -1 | 0 | 1 {
+interface Winrate {
+  wins: number;
+  losses: number;
+  colors: number[];
+}
+
+export function compareWinrates(a: Winrate, b: Winrate): -1 | 0 | 1 {
   const _a = a.wins / a.losses;
   const _b = b.wins / b.losses;
 
@@ -150,9 +157,9 @@ export function compareWinrates(a: any, b: any): -1 | 0 | 1 {
   return compareColorWinrates(a, b);
 }
 
-export function compareColorWinrates(a: any, b: any): -1 | 0 | 1 {
-  a = a.colors;
-  b = b.colors;
+export function compareColorWinrates(winA: Winrate, winB: Winrate): -1 | 0 | 1 {
+  const a = winA.colors;
+  const b = winB.colors;
 
   if (a.length < b.length) return -1;
   if (a.length > b.length) return 1;
@@ -167,10 +174,4 @@ export function compareColorWinrates(a: any, b: any): -1 | 0 | 1 {
   if (sa > sb) return 1;
 
   return 0;
-}
-
-export function localTimeSince(date: Date): string {
-  return `<relative-time datetime="${date.toISOString()}">
-    ${date.toString()}
-  </relative-time>`;
 }
