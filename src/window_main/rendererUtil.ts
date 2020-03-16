@@ -133,18 +133,20 @@ export function getWinrateClass(wr: number): string {
   return "white";
 }
 
-export function getEventWinLossClass(wlGate: WinLossGate): string {
+export function getEventWinLossClass(wlGate: Partial<WinLossGate>): string {
   if (wlGate === undefined) return "white";
   if (wlGate.MaxWins === wlGate.CurrentWins) return "blue";
-  if (wlGate.CurrentWins > wlGate.CurrentLosses) return "green";
-  if (wlGate.CurrentWins * 2 > wlGate.CurrentLosses) return "orange";
+  if (wlGate.CurrentWins && wlGate.CurrentLosses) {
+    if (wlGate.CurrentWins > wlGate.CurrentLosses) return "green";
+    if (wlGate.CurrentWins * 2 > wlGate.CurrentLosses) return "orange";
+  }
   return "red";
 }
 
 interface Winrate {
   wins: number;
   losses: number;
-  colors: number[];
+  colors?: number[] | undefined;
 }
 
 export function compareWinrates(a: Winrate, b: Winrate): -1 | 0 | 1 {
@@ -158,8 +160,8 @@ export function compareWinrates(a: Winrate, b: Winrate): -1 | 0 | 1 {
 }
 
 export function compareColorWinrates(winA: Winrate, winB: Winrate): -1 | 0 | 1 {
-  const a = winA.colors;
-  const b = winB.colors;
+  const a = winA.colors ?? [];
+  const b = winB.colors ?? [];
 
   if (a.length < b.length) return -1;
   if (a.length > b.length) return 1;
