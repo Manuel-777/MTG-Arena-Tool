@@ -75,10 +75,8 @@ export default function Slider(props: SliderProps): JSX.Element {
                 className="slider_mark_hor"
                 style={{ backgroundColor: c.color, opacity: c.hide ? 0 : 1 }}
               />
-              {c.text !== "" ? (
+              {c.text !== "" && (
                 <div className="slider_mark_text">{c.text}</div>
-              ) : (
-                <></>
               )}
             </div>
           );
