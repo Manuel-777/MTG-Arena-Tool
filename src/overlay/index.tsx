@@ -1,12 +1,12 @@
+import { configureStore } from "@reduxjs/toolkit";
 import { remote } from "electron";
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { createStore } from "redux";
-import appReducer from "./reducers";
-const store = createStore(appReducer);
-
 import OverlayController from "../overlay/OverlayController";
+import appReducer from "./reducers";
+
+const store = configureStore({ reducer: appReducer });
 
 const TransparencyMouseFix = require("electron-transparency-mouse-fix");
 

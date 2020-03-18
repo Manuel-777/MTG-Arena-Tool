@@ -1,8 +1,8 @@
 import { remote } from "electron";
 import React from "react";
 import ReactDOM from "react-dom";
+import { configureStore } from "@reduxjs/toolkit";
 
-import { createStore } from "redux";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import appReducer, {
   LOGIN_WAITING,
@@ -11,11 +11,7 @@ import appReducer, {
   SET_SHARE_DIALOG_OPEN
 } from "../../shared/redux/reducers";
 
-const store = createStore(
-  appReducer,
-  (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
-    (window as any).__REDUX_DEVTOOLS_EXTENSION__()
-);
+const store = configureStore({ reducer: appReducer });
 
 import { TopNav } from "../components/main/topNav";
 import { forceOpenAbout, getOpenNav, getOpenSub } from "../tabControl";
