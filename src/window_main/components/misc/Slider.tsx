@@ -56,7 +56,7 @@ export default function Slider(props: SliderProps): JSX.Element {
   }, [props.value]);
 
   return (
-    <div style={{ ...props.containerStyle }} className="slidecontainer">
+    <div style={props.containerStyle} className="slidecontainer">
       <input
         className="slider"
         type="range"
