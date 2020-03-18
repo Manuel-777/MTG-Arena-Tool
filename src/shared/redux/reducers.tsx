@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { createSlice } from "@reduxjs/toolkit";
 import { defaultState } from "./appState";
 import { WildcardsChange } from "../../window_main/tabs/HomeTab";
 import { MergedSettings } from "../../types/settings";
@@ -13,7 +14,6 @@ export const SET_HOVER_OUT = "SET_HOVER_OUT";
 export const SET_HOVER_SIZE = "SET_HOVER_SIZE";
 export const SET_OFFLINE = "SET_OFFLINE";
 export const SET_LOADING = "SET_LOADING";
-export const SET_TOP_NAV = "SET_TOP_NAV";
 export const SET_SUB_NAV = "SET_SUB_NAV";
 export const SET_LOGIN_STATE = "SET_LOGIN_STATE";
 export const SET_LOGIN_FORM = "SET_LOGIN_FORM";
@@ -146,17 +146,13 @@ const loading = (
   }
 };
 
-const topNav = (
-  state: number = defaultState.topNav,
-  action: Action
-): number => {
-  switch (action.type) {
-    case SET_TOP_NAV:
-      return action.value;
-    default:
-      return state;
+export const topNavSlice = createSlice({
+  name: "topNav",
+  initialState: defaultState.topNav,
+  reducers: {
+    setTopNav: (state, action): number => action.payload
   }
-};
+});
 
 export interface SubNavState {
   type: number;
@@ -371,7 +367,7 @@ export default combineReducers({
   offline: offline,
   loading: loading,
   loginState: loginState,
-  topNav: topNav,
+  topNav: topNavSlice.reducer,
   subNav: subNav,
   loginForm: loginForm,
   canLogin: canLogin,

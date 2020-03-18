@@ -15,7 +15,6 @@ import {
   SET_CAN_LOGIN,
   SET_HOME_DATA,
   SET_POPUP,
-  SET_TOP_NAV,
   SET_PATREON,
   SET_SETTINGS,
   SET_HOVER_SIZE,
@@ -24,7 +23,8 @@ import {
   SET_UPDATE_STATE,
   SET_NO_LOG,
   SET_SHARE_DIALOG_URL,
-  SET_ACTIVE_EVENTS
+  SET_ACTIVE_EVENTS,
+  topNavSlice
 } from "../../shared/redux/reducers";
 import { timestamp } from "../../shared/util";
 import {
@@ -37,8 +37,9 @@ import { SETTINGS_ABOUT } from "../../shared/constants";
 import pd from "../../shared/PlayerData";
 import uxMove from "../uxMove";
 
-export default function ipcListeners(dispatcher: unknown): void {
+export default function ipcListeners(dispatcher: any): void {
   console.log("Set up IPC listeners.");
+  const { setTopNav } = topNavSlice.actions;
 
   ipc.on("prefill_auth_form", (event: IpcRendererEvent, arg: any): void => {
     dispatchAction(dispatcher, SET_LOGIN_FORM, {
@@ -109,7 +110,7 @@ export default function ipcListeners(dispatcher: unknown): void {
     "force_open_settings",
     (event: IpcRendererEvent, arg?: number): void => {
       uxMove(0);
-      dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
+      dispatcher(setTopNav(MAIN_SETTINGS));
       if (arg === -1) {
         ipcSend("save_user_settings", { last_open_tab: MAIN_SETTINGS });
       } else {
@@ -125,7 +126,7 @@ export default function ipcListeners(dispatcher: unknown): void {
     "force_open_overlay_settings",
     (event: IpcRendererEvent, arg: number): void => {
       uxMove(0);
-      dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
+      dispatcher(setTopNav(MAIN_SETTINGS));
       ipcSend("save_user_settings", {
         last_open_tab: MAIN_SETTINGS,
         last_settings_section: SETTINGS_OVERLAY,
@@ -136,7 +137,7 @@ export default function ipcListeners(dispatcher: unknown): void {
 
   ipc.on("force_open_about", (): void => {
     uxMove(0);
-    dispatchAction(dispatcher, SET_TOP_NAV, MAIN_SETTINGS);
+    dispatcher(setTopNav(MAIN_SETTINGS));
     ipcSend("save_user_settings", {
       last_open_tab: MAIN_SETTINGS,
       last_settings_section: SETTINGS_ABOUT
@@ -165,11 +166,7 @@ export default function ipcListeners(dispatcher: unknown): void {
   });
 
   ipc.on("settings_updated", (): void => {
-    dispatchAction(
-      dispatcher,
-      SET_TOP_NAV,
-      pd.settings.last_open_tab || MAIN_HOME
-    );
+    dispatcher(setTopNav(pd.settings.last_open_tab ?? MAIN_HOME));
     dispatchAction(dispatcher, SET_HOVER_SIZE, pd.cardsSizeHoverCard);
     dispatchAction(dispatcher, SET_SETTINGS, pd.settings);
   });
