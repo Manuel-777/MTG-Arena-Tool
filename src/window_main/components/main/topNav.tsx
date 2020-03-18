@@ -85,7 +85,7 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 }
 
 interface TopRankProps {
-  dispatcher: unknown;
+  dispatcher: any;
   currentTab: number;
   id: number;
   rank: any | null;
@@ -93,16 +93,16 @@ interface TopRankProps {
 }
 
 function TopRankIcon(props: TopRankProps): JSX.Element {
-  const { currentTab, id, rank, rankClass } = props;
+  const { currentTab, dispatcher, id, rank, rankClass } = props;
 
   const selected = currentTab === id;
   const clickTab = React.useCallback(
     tabId => (): void => {
-      dispatchAction(props.dispatcher, SET_TOP_NAV, tabId);
-      dispatchAction(props.dispatcher, SET_BACKGROUND_GRPID, 0);
+      dispatcher(topNavSlice.actions.setTopNav(tabId));
+      dispatchAction(dispatcher, SET_BACKGROUND_GRPID, 0);
       uxMove(0);
     },
-    [props.dispatcher]
+    [dispatcher]
   );
 
   if (rank == null) {
