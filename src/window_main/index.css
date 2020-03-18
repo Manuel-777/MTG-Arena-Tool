@@ -4289,7 +4289,7 @@ a:hover {
   
 .draft-card {
     border-radius: 9px;
-    margin: 8px;
+    margin: 8px auto;
     background-size: contain;
     cursor: pointer;
     -webkit-transition: all .15s ease-in-out;
@@ -4298,7 +4298,7 @@ a:hover {
   
 .draft-card-picked {
     border: 2px solid var(--color-r);
-    margin: 6px;
+    margin: 6px auto;
 }
   
 .draft-card:hover {
