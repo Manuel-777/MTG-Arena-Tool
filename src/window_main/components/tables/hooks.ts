@@ -158,7 +158,7 @@ export function useBaseReactTable<D extends TableData>({
       pageSize: 25,
       hiddenColumns
     }) as TableState<D>;
-    const state = cachedState ?? mergedDefault;
+    const state = { ...(cachedState ?? mergedDefault) };
 
     // ensure data-only columns are all invisible
     const hiddenSet = new Set(state.hiddenColumns ?? []);
