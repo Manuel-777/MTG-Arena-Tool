@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import pd from "../../../shared/PlayerData";
-import Slider, { sliderPosition } from "../misc/Slider";
+import Slider, { SliderPosition } from "../misc/Slider";
 import DeckList from "../misc/DeckList";
 import Deck from "../../../shared/deck";
 import { getCardImage, getRankColorClass } from "../../../shared/util";
@@ -136,16 +136,16 @@ export function DraftView(props: DraftViewProps): JSX.Element {
     return decklist;
   }, [draft, pickpack]);
 
-  const sliderPositions = Array(maxPosition + 1).fill(sliderPosition());
+  const sliderPositions = Array(maxPosition + 1).fill(new SliderPosition());
   sliderPositions[
     positionFromPickPack({ pick: 0, pack: 0 }, draft.set)
-  ] = sliderPosition("Pack 1");
+  ] = new SliderPosition("Pack 1");
   sliderPositions[
     positionFromPickPack({ pick: 0, pack: 1 }, draft.set)
-  ] = sliderPosition("Pack 2");
+  ] = new SliderPosition("Pack 2");
   sliderPositions[
     positionFromPickPack({ pick: 0, pack: 2 }, draft.set)
-  ] = sliderPosition("Pack 3");
+  ] = new SliderPosition("Pack 3");
 
   return (
     <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>

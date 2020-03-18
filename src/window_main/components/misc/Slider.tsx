@@ -1,22 +1,16 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
 
-interface SliderPosition {
-  text: string;
-  hide: boolean;
-  color: string;
-}
+export class SliderPosition {
+  public text: string;
+  public hide: boolean;
+  public color: string;
 
-export function sliderPosition(
-  text = "",
-  hide = false,
-  color = "var(--color-light-50)"
-): SliderPosition {
-  return {
-    text: text,
-    hide: hide,
-    color: color
-  };
+  constructor(_text = "", _hide = false, _color = "var(--color-light-50)") {
+    this.text = _text;
+    this.hide = _hide;
+    this.color = _color;
+  }
 }
 
 interface SliderProps {
@@ -39,7 +33,7 @@ export default function Slider(props: SliderProps): JSX.Element {
 
   const stepsNumber = (max - min) / step;
   const posArray: SliderPosition[] =
-    props.positions || Array(stepsNumber + 1).fill(sliderPosition());
+    props.positions || Array(stepsNumber + 1).fill(new SliderPosition());
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const val = parseFloat(e.currentTarget.value);
