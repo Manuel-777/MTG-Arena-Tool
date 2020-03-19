@@ -45,8 +45,8 @@ class Deck {
     // undefined reference error in production.
     main = main ?? mtgaDeck.mainDeck ?? [];
     side = side ?? mtgaDeck.sideboard ?? [];
-    arenaMain = arenaMain ?? main;
-    arenaSide = arenaSide ?? side;
+    arenaMain = arenaMain ?? mtgaDeck.arenaMain ?? main;
+    arenaSide = arenaSide ?? mtgaDeck.arenaSide ?? side;
     this.mainboard = new CardsList(main);
     this.sideboard = new CardsList(side);
     this.arenaMain = Deck.toLoggedList(arenaMain);

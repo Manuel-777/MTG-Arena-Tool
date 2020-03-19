@@ -58,7 +58,81 @@ describe("deck", () => {
           [66091, 66089, 66091, 66091, 67224],
           [66091, 66089, 66091, 66091, 67224],
           [66091, 66089, 67224, 66091, 66091]
-        )
+        ),
+        new Deck({
+          mainDeck: [
+            {
+              id: 66091,
+              quantity: 1
+            },
+            {
+              id: 66089,
+              quantity: 1
+            },
+            {
+              id: 67224,
+              quantity: 1
+            },
+            {
+              id: 66091,
+              quantity: 2
+            }
+          ],
+          sideboard: [
+            {
+              id: 66091,
+              quantity: 1
+            },
+            {
+              id: 66089,
+              quantity: 1
+            },
+            {
+              id: 66091,
+              quantity: 2
+            },
+            {
+              id: 67224,
+              quantity: 1
+            }
+          ],
+          arenaMain: [
+            {
+              id: 66091,
+              quantity: 1
+            },
+            {
+              id: 66089,
+              quantity: 1
+            },
+            {
+              id: 66091,
+              quantity: 2
+            },
+            {
+              id: 67224,
+              quantity: 1
+            }
+          ],
+          arenaSide: [
+            {
+              id: 66091,
+              quantity: 1
+            },
+            {
+              id: 66089,
+              quantity: 1
+            },
+            {
+              id: 67224,
+              quantity: 1
+            },
+            {
+              id: 66091,
+              quantity: 2
+            }
+          ]
+        })
       ];
       decks.forEach(deck => {
         const saved = deck.getSave(true);
