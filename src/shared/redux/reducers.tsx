@@ -24,15 +24,11 @@ export const SET_CAN_LOGIN = "SET_CAN_LOGIN";
 export const SET_HOME_DATA = "SET_HOME_DATA";
 export const SET_POPUP = "SET_POPUP";
 export const SET_PATREON = "SET_PATREON";
-export const SET_EXPLORE_DATA = "SET_EXPLORE_DATA";
-export const SET_EXPLORE_FILTERS = "SET_EXPLORE_FILTERS";
-export const SET_EXPLORE_FILTERS_SKIP = "SET_EXPLORE_FILTERS_SKIP";
 export const SET_UPDATE_STATE = "SET_UPDATE_STATE";
 export const SET_NO_LOG = "SET_NO_LOG";
 export const SET_SHARE_DIALOG = "SET_SHARE_DIALOG";
 export const SET_SHARE_DIALOG_URL = "SET_SHARE_DIALOG_URL";
 export const SET_SHARE_DIALOG_OPEN = "SET_SHARE_DIALOG_OPEN";
-export const SET_ACTIVE_EVENTS = "SET_ACTIVE_EVENTS";
 export const SET_ANY = "SET_ANY";
 
 export const LOGIN_AUTH = 1;
@@ -269,36 +265,44 @@ const patreon = (
   }
 };
 
-const explore = (
-  state: any = defaultState.exploreData,
-  action: Action
-): any => {
-  switch (action.type) {
-    case SET_EXPLORE_DATA:
-      if (action.value.skip == 0) return action.value;
-      else
-        return {
-          ...action.value,
-          result: [...state.result, ...action.value.result]
-        };
-    default:
-      return state;
+export const exploreSlice = createSlice({
+  name: "explore",
+  initialState: {
+    data: defaultState.explore.data,
+    filters: defaultState.explore.filters,
+    activeEvents: defaultState.explore.activeEvents
+  },
+  reducers: {
+    setExploreData: (state, action): void => {
+      const isSameResultType =
+        state.data.results_type === action.payload.results_type;
+      const isSubsequentResult = action.payload.skip > state.data.skip;
+      if (isSameResultType && isSubsequentResult) {
+        // when possible, extend prevous data
+        const result = state.data.result.concat(action.payload.result);
+        const resultsNumber =
+          state.data.results_number + action.payload.results_number;
+        action.payload.result = result;
+        action.payload.results_number = resultsNumber;
+        state.data = action.payload;
+      } else if (action.payload.results_number === 0) {
+        // query has no future results
+        state.data.results_number = -1;
+      } else {
+        state.data = action.payload;
+      }
+    },
+    setExploreFilters: (state, action): void => {
+      state.filters = action.payload;
+    },
+    setExploreFiltersSkip: (state, action): void => {
+      state.filters.filterSkip = action.payload;
+    },
+    setActiveEvents: (state, action): void => {
+      state.activeEvents.push(...action.payload);
+    }
   }
-};
-
-const exploreFilters = (
-  state: any = defaultState.exploreFilters,
-  action: Action
-): any => {
-  switch (action.type) {
-    case SET_EXPLORE_FILTERS:
-      return action.value;
-    case SET_EXPLORE_FILTERS_SKIP:
-      return { ...state, filterSkip: action.value };
-    default:
-      return state;
-  }
-};
+});
 
 const updateState = (
   state: string = defaultState.updateState,
@@ -347,18 +351,6 @@ const shareDialog = (
   }
 };
 
-const activeEvents = (
-  state: string[] = defaultState.activeEvents,
-  action: Action
-): string[] => {
-  switch (action.type) {
-    case SET_ACTIVE_EVENTS:
-      return { ...state, ...action.value };
-    default:
-      return state;
-  }
-};
-
 export default combineReducers({
   backgroundGrpId: backgroundGrpId,
   settings: settings,
@@ -374,12 +366,10 @@ export default combineReducers({
   homeData: homeData,
   popup: popup,
   patreon: patreon,
-  exploreData: explore,
-  exploreFilters: exploreFilters,
+  explore: exploreSlice.reducer,
   updateState: updateState,
   noLog: noLog,
-  shareDialog: shareDialog,
-  activeEvents: activeEvents
+  shareDialog: shareDialog
 });
 
 export function dispatchAction(

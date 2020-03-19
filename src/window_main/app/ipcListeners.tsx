@@ -18,12 +18,10 @@ import {
   SET_PATREON,
   SET_SETTINGS,
   SET_HOVER_SIZE,
-  SET_EXPLORE_DATA,
-  SET_EXPLORE_FILTERS_SKIP,
   SET_UPDATE_STATE,
   SET_NO_LOG,
   SET_SHARE_DIALOG_URL,
-  SET_ACTIVE_EVENTS,
+  exploreSlice,
   topNavSlice
 } from "../../shared/redux/reducers";
 import { timestamp } from "../../shared/util";
@@ -40,6 +38,11 @@ import uxMove from "../uxMove";
 export default function ipcListeners(dispatcher: any): void {
   console.log("Set up IPC listeners.");
   const { setTopNav } = topNavSlice.actions;
+  const {
+    setActiveEvents,
+    setExploreData,
+    setExploreFiltersSkip
+  } = exploreSlice.actions;
 
   ipc.on("prefill_auth_form", (event: IpcRendererEvent, arg: any): void => {
     dispatchAction(dispatcher, SET_LOGIN_FORM, {
@@ -157,8 +160,8 @@ export default function ipcListeners(dispatcher: any): void {
   ipc.on("set_explore_decks", (event: IpcRendererEvent, arg: any): void => {
     console.log("Explore", arg);
     dispatchAction(dispatcher, SET_LOADING, false);
-    dispatchAction(dispatcher, SET_EXPLORE_DATA, arg);
-    dispatchAction(dispatcher, SET_EXPLORE_FILTERS_SKIP, arg.results_number);
+    dispatcher(setExploreData(arg));
+    dispatcher(setExploreFiltersSkip(arg.results_number));
   });
 
   ipc.on("set_update_state", (event: IpcRendererEvent, arg: any): void => {
@@ -194,7 +197,7 @@ export default function ipcListeners(dispatcher: any): void {
     if (!arg) return;
     try {
       const activeEvents = JSON.parse(arg);
-      dispatchAction(dispatcher, SET_ACTIVE_EVENTS, activeEvents);
+      dispatcher(setActiveEvents(activeEvents));
     } catch (e) {
       console.log("(set_active_events) Error parsing JSON:", arg);
     }

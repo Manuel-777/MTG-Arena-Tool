@@ -15,7 +15,6 @@ export interface AppState {
   topNav: number;
   updateState: string;
   noLog: boolean;
-  activeEvents: string[];
   settings: MergedSettings;
   shareDialog: {
     open: boolean;
@@ -53,20 +52,28 @@ export interface AppState {
     time: number;
     duration: number;
   };
-  exploreData: any;
-  exploreFilters: {
-    filterWCC: string;
-    filterWCU: string;
-    filterWCR: string;
-    filterWCM: string;
-    onlyOwned: boolean;
-    filterType: string;
-    filterEvent: string | null;
-    filterSort: string;
-    filterSortDir: -1 | 1;
-    filteredMana: number[];
-    filteredRanks: string[];
-    filterSkip: number;
+  explore: {
+    activeEvents: string[];
+    data: {
+      results_type: string;
+      skip: number;
+      results_number: number;
+      result: any[];
+    };
+    filters: {
+      filterWCC: string;
+      filterWCU: string;
+      filterWCR: string;
+      filterWCM: string;
+      onlyOwned: boolean;
+      filterType: string;
+      filterEvent: string;
+      filterSort: string;
+      filterSortDir: -1 | 1;
+      filteredMana: number[];
+      filteredRanks: string[];
+      filterSkip: number;
+    };
   };
 }
 
@@ -82,7 +89,6 @@ export const defaultState: AppState = {
   topNav: 0,
   updateState: "",
   noLog: false,
-  activeEvents: [],
   settings: {
     ...playerDataDefault.settings,
     ...defaultCfg.settings
@@ -123,19 +129,27 @@ export const defaultState: AppState = {
     time: 0,
     duration: 0
   },
-  exploreData: {},
-  exploreFilters: {
-    filterEvent: "Ladder",
-    filterType: "Ranked Constructed",
-    filterSort: "By Winrate",
-    filterSortDir: -1,
-    filterSkip: 0,
-    filterWCC: "",
-    filterWCU: "",
-    filterWCR: "",
-    filterWCM: "",
-    filteredMana: [],
-    filteredRanks: [],
-    onlyOwned: false
+  explore: {
+    activeEvents: [],
+    data: {
+      results_type: "Ranked Constructed",
+      skip: 0,
+      results_number: 0,
+      result: []
+    },
+    filters: {
+      filterEvent: "Ladder",
+      filterType: "Ranked Constructed",
+      filterSort: "By Winrate",
+      filterSortDir: -1,
+      filterSkip: 0,
+      filterWCC: "",
+      filterWCU: "",
+      filterWCR: "",
+      filterWCM: "",
+      filteredMana: [],
+      filteredRanks: [],
+      onlyOwned: false
+    }
   }
 };
