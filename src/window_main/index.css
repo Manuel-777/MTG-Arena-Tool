@@ -2307,9 +2307,27 @@ a:hover {
     box-shadow: 0 0 0px 12px var(--color-light-40);
 }
 
+
+.slider_mark_outer {
+    display: flex;
+    flex-direction: column;
+    width: 4px;
+    height: 6px;
+    align-items: center;
+}
+
+.slider_mark_text {
+    margin-top: 6px;
+    white-space: nowrap;
+    color: var(--color-light);
+    font-size: 14px;
+    opacity: 0.9;
+    font-family: var(--sub-font-name-bold);
+}
+
 .slider_marks_container_hor {
     width: calc(100% - 14px);
-    margin: 2px 7px 0 7px;
+    margin: 4px 7px 0 7px;
     height: 4px;
     z-index: -1;
     display: flex;
@@ -2317,9 +2335,10 @@ a:hover {
 }
 
 .slider_mark_hor {
-    width: 1px;
-    height: -webkit-fill-available;
-    background-color: var(--color-light-50);
+    display: inline-table;
+    width: 2px;
+    height: 6px;
+    border-radius: 2px;
 }
 
 .draft_nav_container {
@@ -4245,7 +4264,6 @@ a:hover {
 .draft-container {
     flex-direction: column;
     display: flex;
-    margin: 8px 48px;
     flex-grow: 2;
 }
   
@@ -4259,10 +4277,9 @@ a:hover {
 }
   
 .draft-view {
-    display: flex;
+    display: grid;
     height: fit-content;
     justify-content: center;
-    flex-wrap: wrap;
     flex-grow: 2;
 }
   
@@ -4272,7 +4289,7 @@ a:hover {
   
 .draft-card {
     border-radius: 9px;
-    margin: 8px;
+    margin: 8px auto;
     background-size: contain;
     cursor: pointer;
     -webkit-transition: all .15s ease-in-out;
@@ -4281,7 +4298,7 @@ a:hover {
   
 .draft-card-picked {
     border: 2px solid var(--color-r);
-    margin: 6px;
+    margin: 6px auto;
 }
   
 .draft-card:hover {

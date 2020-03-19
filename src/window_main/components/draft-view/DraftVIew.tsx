@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import pd from "../../../shared/PlayerData";
-import Slider from "../misc/Slider";
+import Slider, { SliderPosition } from "../misc/Slider";
 import DeckList from "../misc/DeckList";
 import Deck from "../../../shared/deck";
 import { getCardImage, getRankColorClass } from "../../../shared/util";
@@ -9,6 +9,8 @@ import useHoverCard from "../../hooks/useHoverCard";
 import { DraftData } from "../../../types/draft";
 import uxMove from "../../uxMove";
 import db from "../../../shared/database";
+import { useSelector } from "react-redux";
+import { AppState } from "../../../shared/redux/appState";
 
 interface PickPack {
   pack: number;
@@ -76,6 +78,7 @@ interface DraftViewProps {
 export function DraftView(props: DraftViewProps): JSX.Element {
   const { draft } = props;
   const [pickpack, setPickPack] = React.useState({ pick: 0, pack: 0 });
+  const cardSize = useSelector((state: AppState) => state.settings.cards_size);
   const maxPosition = (PACK_SIZES[draft.set] ?? DEFAULT_PACK_SIZE) * 3 - 1;
 
   const downHandler = React.useCallback(
@@ -133,23 +136,46 @@ export function DraftView(props: DraftViewProps): JSX.Element {
     return decklist;
   }, [draft, pickpack]);
 
+  const sliderPositions = Array(maxPosition + 1).fill(new SliderPosition());
+  sliderPositions[
+    positionFromPickPack({ pick: 0, pack: 0 }, draft.set)
+  ] = new SliderPosition("Pack 1");
+  sliderPositions[
+    positionFromPickPack({ pick: 0, pack: 1 }, draft.set)
+  ] = new SliderPosition("Pack 2");
+  sliderPositions[
+    positionFromPickPack({ pick: 0, pack: 2 }, draft.set)
+  ] = new SliderPosition("Pack 3");
+
   return (
     <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
       <div className="decklist_top">
         <div className="button back" onClick={goBack}></div>
         <div className="deck_name">{draft.set + " Draft"}</div>
       </div>
-      <div className="flex_item" style={{ flexDirection: "column" }}>
+      <div
+        className="flex_item"
+        style={{ flexDirection: "column", margin: "0 32px" }}
+      >
         <div className="draft-title">
           {`Pack ${pickpack.pack + 1}, Pick ${pickpack.pick + 1}`}
         </div>
         <Slider
+          containerStyle={{ margin: "8px 0 30px 0" }}
           value={positionFromPickPack(pickpack, draft.set)}
           onChange={onSliderChange}
           max={maxPosition}
+          positions={sliderPositions}
         />
         <div className="draft-container">
-          <div className="draft-view">
+          <div
+            className="draft-view"
+            style={{
+              gridTemplateColumns: `repeat(auto-fit, minmax(${100 +
+                cardSize * 15 +
+                12}px, 1fr))`
+            }}
+          >
             {getCurrentPick().pack.map((grpId: number, index: number) => {
               return (
                 <DraftCard
