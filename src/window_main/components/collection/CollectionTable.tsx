@@ -9,7 +9,7 @@ import {
 } from "../../../shared/constants";
 import db from "../../../shared/database";
 import pd from "../../../shared/PlayerData";
-import { ALL_CARDS, getCollectionStats } from "./collectionStats";
+import { getCollectionStats } from "./collectionStats";
 import ResizableDragger from "../misc/ResizableDragger";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {
@@ -48,7 +48,7 @@ import {
   CollectionTableProps
 } from "./types";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState, collectionSlice } from "../../../shared/redux/reducers";
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   let hasCorrectBoosterFilter = false;
@@ -78,11 +78,6 @@ export default function CollectionTable({
   openCardCallback
 }: CollectionTableProps): JSX.Element {
   const [tableMode, setTableMode] = React.useState(cachedTableMode);
-  const [countMode, setCountMode] = React.useState(ALL_CARDS);
-  const [rareDraftFactor, setRareDraftFactor] = React.useState(3);
-  const [mythicDraftFactor, setMythicDraftFactor] = React.useState(0.14);
-  const [boosterWinFactor, setBoosterWinFactor] = React.useState(1.2);
-  const [futureBoosters, setFutureBoosters] = React.useState(0);
   const cardSize = useSelector((state: AppState) => state.settings.cards_size);
   const sortedSetCodes = useMemo(() => db.sortedSetCodes, []);
   React.useEffect(() => tableModeCallback(tableMode), [
@@ -346,13 +341,8 @@ export default function CollectionTable({
     ) : tableMode === COLLECTION_SETS_MODE ? (
       <SetsView
         stats={stats}
-        setClickCallback={setClickCallback}
-        countMode={countMode}
         boosterMath={boosterMath}
-        rareDraftFactor={rareDraftFactor}
-        mythicDraftFactor={mythicDraftFactor}
-        boosterWinFactor={boosterWinFactor}
-        futureBoosters={futureBoosters}
+        setClickCallback={setClickCallback}
       />
     ) : (
       <div
@@ -429,17 +419,7 @@ export default function CollectionTable({
         <ResizableDragger />
         <CollectionStatsPanel
           stats={stats}
-          countMode={countMode}
           boosterMath={boosterMath}
-          rareDraftFactor={rareDraftFactor}
-          mythicDraftFactor={mythicDraftFactor}
-          boosterWinFactor={boosterWinFactor}
-          futureBoosters={futureBoosters}
-          setCountMode={setCountMode}
-          setRareDraftFactor={setRareDraftFactor}
-          setMythicDraftFactor={setMythicDraftFactor}
-          setBoosterWinFactor={setBoosterWinFactor}
-          setFutureBoosters={setFutureBoosters}
           clickCompletionCallback={clickCompletionCallback}
         />
       </div>

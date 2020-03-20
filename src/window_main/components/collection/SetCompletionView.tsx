@@ -1,5 +1,7 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import db from "../../../shared/database";
+import { AppState } from "../../../shared/redux/reducers";
 import { CollectionStats } from "./collectionStats";
 import { SetCompletionBar } from "./CompletionProgressBar";
 import { SetCompletionStats } from "./SetCompletionStats";
@@ -10,23 +12,20 @@ const STATS_CUTOFF = 100;
 
 export function SetsView({
   stats,
-  setClickCallback,
-  countMode,
   boosterMath,
-  rareDraftFactor,
-  mythicDraftFactor,
-  boosterWinFactor,
-  futureBoosters
+  setClickCallback
 }: {
   stats: CollectionStats;
-  setClickCallback: (set: string) => void;
-  countMode: string;
   boosterMath: boolean;
-  rareDraftFactor: number;
-  mythicDraftFactor: number;
-  boosterWinFactor: number;
-  futureBoosters: number;
+  setClickCallback: (set: string) => void;
 }): JSX.Element {
+  const {
+    countMode,
+    rareDraftFactor,
+    mythicDraftFactor,
+    boosterWinFactor,
+    futureBoosters
+  } = useSelector((state: AppState) => state.collection);
   const collectibleSets = db.sortedSetCodes.filter(set => {
     // ensure metadata populated
     const setStats = stats[set];

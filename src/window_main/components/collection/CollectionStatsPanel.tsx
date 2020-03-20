@@ -1,14 +1,10 @@
 import { shell } from "electron";
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { CARD_RARITIES } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import ReactSelect from "../../../shared/ReactSelect";
-import {
-  ALL_CARDS,
-  CollectionStats,
-  FULL_SETS,
-  SINGLETONS
-} from "./collectionStats";
+import { AppState, collectionSlice } from "../../../shared/redux/reducers";
 import { formatNumber } from "../../rendererUtil";
 import {
   BoosterSymbol,
@@ -17,6 +13,12 @@ import {
   RaritySymbol
 } from "../misc/display";
 import Input from "../misc/Input";
+import {
+  ALL_CARDS,
+  CollectionStats,
+  FULL_SETS,
+  SINGLETONS
+} from "./collectionStats";
 import CompletionProgressBar, {
   SetCompletionBar
 } from "./CompletionProgressBar";
@@ -33,33 +35,28 @@ const getRarityKey = (
 
 export function CollectionStatsPanel({
   stats,
-  countMode,
   boosterMath,
-  rareDraftFactor,
-  mythicDraftFactor,
-  boosterWinFactor,
-  futureBoosters,
-  setCountMode,
-  setRareDraftFactor,
-  setMythicDraftFactor,
-  setBoosterWinFactor,
-  setFutureBoosters,
   clickCompletionCallback
 }: {
   stats?: CollectionStats;
-  countMode: string;
   boosterMath: boolean;
-  rareDraftFactor: number;
-  mythicDraftFactor: number;
-  boosterWinFactor: number;
-  futureBoosters: number;
-  setCountMode: (mode: string) => void;
-  setRareDraftFactor: (factor: number) => void;
-  setMythicDraftFactor: (factor: number) => void;
-  setBoosterWinFactor: (factor: number) => void;
-  setFutureBoosters: (factor: number) => void;
   clickCompletionCallback: () => void;
 }): JSX.Element {
+  const {
+    countMode,
+    rareDraftFactor,
+    mythicDraftFactor,
+    boosterWinFactor,
+    futureBoosters
+  } = useSelector((state: AppState) => state.collection);
+  const dispatch = useDispatch();
+  const {
+    setCountMode,
+    setRareDraftFactor,
+    setMythicDraftFactor,
+    setBoosterWinFactor,
+    setFutureBoosters
+  } = collectionSlice.actions;
   if (!stats) {
     return <></>;
   }
@@ -114,7 +111,9 @@ export function CollectionStatsPanel({
             }}
             options={[ALL_CARDS, SINGLETONS, FULL_SETS]}
             current={countMode}
-            callback={setCountMode}
+            callback={(mode: string): void => {
+              dispatch(setCountMode(mode));
+            }}
           />
           <SetCompletionBar
             countMode={countMode}
@@ -161,9 +160,9 @@ export function CollectionStatsPanel({
                 placeholder={"3"}
                 title={"rare picks per draft"}
                 contStyle={inputStyle}
-                callback={(value: string): void =>
-                  setRareDraftFactor(parseFloat(value))
-                }
+                callback={(value: string): void => {
+                  dispatch(setRareDraftFactor(parseFloat(value)));
+                }}
               />
               <Input
                 label={
@@ -175,9 +174,9 @@ export function CollectionStatsPanel({
                 placeholder={"0.14"}
                 title={"mythic picks per draft"}
                 contStyle={inputStyle}
-                callback={(value: string): void =>
-                  setMythicDraftFactor(parseFloat(value))
-                }
+                callback={(value: string): void => {
+                  dispatch(setMythicDraftFactor(parseFloat(value)));
+                }}
               />
               <Input
                 label={
@@ -189,9 +188,9 @@ export function CollectionStatsPanel({
                 placeholder={"1.2"}
                 title={"prize boosters awarded per draft"}
                 contStyle={inputStyle}
-                callback={(value: string): void =>
-                  setBoosterWinFactor(parseFloat(value))
-                }
+                callback={(value: string): void => {
+                  dispatch(setBoosterWinFactor(parseFloat(value)));
+                }}
               />
               <Input
                 label={
@@ -203,17 +202,17 @@ export function CollectionStatsPanel({
                 placeholder={"0"}
                 title={"expected additional boosters, e.g. seasonal rewards"}
                 contStyle={inputStyle}
-                callback={(value: string): void =>
-                  setFutureBoosters(parseFloat(value))
-                }
+                callback={(value: string): void => {
+                  dispatch(setFutureBoosters(parseFloat(value)));
+                }}
               />
               <div
                 className={"message_sub_15 white link"}
-                onClick={(): Promise<void> =>
+                onClick={(): void => {
                   shell.openExternal(
                     "https://www.mtggoldfish.com/articles/collecting-mtg-arena-part-1-of-2"
-                  )
-                }
+                  );
+                }}
               >
                 *[original by caliban on mtggoldfish]
               </div>
