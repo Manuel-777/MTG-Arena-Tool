@@ -1,6 +1,8 @@
-import { combineReducers } from "redux";
 import { createSlice } from "@reduxjs/toolkit";
-import { defaultState } from "./appState";
+import { combineReducers } from "redux";
+import { MergedSettings } from "../../types/settings";
+import { WildcardsChange } from "../../window_main/tabs/HomeTab";
+import { defaultCfg, playerDataDefault } from "../PlayerData";
 
 export const LOGIN_AUTH = 1;
 export const LOGIN_WAITING = 2;
@@ -9,7 +11,10 @@ export const LOGIN_FAILED = 4;
 
 export const settingsSlice = createSlice({
   name: "settings",
-  initialState: defaultState.settings,
+  initialState: {
+    ...playerDataDefault.settings,
+    ...defaultCfg.settings
+  } as MergedSettings,
   reducers: {
     setSettings: (state, action): void => {
       Object.assign(state, action.payload);
@@ -19,7 +24,11 @@ export const settingsSlice = createSlice({
 
 export const hoverSlice = createSlice({
   name: "hover",
-  initialState: defaultState.hover,
+  initialState: {
+    grpId: 0,
+    opacity: 0,
+    size: 0
+  },
   reducers: {
     setHoverIn: (state, action): void => {
       state.grpId = action.payload;
@@ -36,7 +45,38 @@ export const hoverSlice = createSlice({
 
 export const rendererSlice = createSlice({
   name: "renderer",
-  initialState: defaultState.renderer,
+  initialState: {
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
+    backgroundGrpId: 0,
+    backgroundImage: "default",
+    loading: false,
+    noLog: false,
+    offline: false,
+    patreon: {
+      patreon: false,
+      patreonTier: -1
+    },
+    popup: {
+      text: "",
+      time: 0,
+      duration: 0
+    },
+    shareDialog: {
+      open: false,
+      url: "",
+      type: "",
+      data: {},
+      id: ""
+    },
+    subNav: {
+      type: -1,
+      id: "",
+      data: null
+    },
+    topArtist: "Bedevil by Seb McKinnon",
+    topNav: 0,
+    updateState: ""
+  },
   reducers: {
     setBackgroundColor: (state, action): void => {
       state.backgroundColor = action.payload;
@@ -89,7 +129,15 @@ export const rendererSlice = createSlice({
 
 export const loginSlice = createSlice({
   name: "login",
-  initialState: defaultState.login,
+  initialState: {
+    canLogin: true,
+    loginForm: {
+      email: "",
+      pass: "",
+      rememberme: false
+    },
+    loginState: LOGIN_AUTH
+  },
   reducers: {
     setLoginState: (state, action): void => {
       state.loginState = action.payload;
@@ -114,15 +162,56 @@ export const loginSlice = createSlice({
 
 export const homeSlice = createSlice({
   name: "home",
-  initialState: defaultState.homeData,
+  initialState: {
+    wildcards: [] as WildcardsChange[],
+    filteredSet: "",
+    usersActive: 0
+  },
   reducers: {
     setHomeData: (state, action) => action.payload
   }
 });
 
+export interface ExploreQuery {
+  filterWCC: string;
+  filterWCU: string;
+  filterWCR: string;
+  filterWCM: string;
+  onlyOwned: boolean;
+  filterType: string;
+  filterEvent: string;
+  filterSort: string;
+  filterSortDir: -1 | 1;
+  filteredMana: number[];
+  filteredRanks: string[];
+  filterSkip: number;
+}
+
 export const exploreSlice = createSlice({
   name: "explore",
-  initialState: defaultState.explore,
+  initialState: {
+    activeEvents: [] as string[],
+    data: {
+      results_type: "Ranked Constructed",
+      skip: 0,
+      results_number: 0,
+      result: []
+    },
+    filters: {
+      filterEvent: "Ladder",
+      filterType: "Ranked Constructed",
+      filterSort: "By Winrate",
+      filterSortDir: -1,
+      filterSkip: 0,
+      filterWCC: "",
+      filterWCU: "",
+      filterWCR: "",
+      filterWCM: "",
+      filteredMana: [],
+      filteredRanks: [],
+      onlyOwned: false
+    } as ExploreQuery
+  },
   reducers: {
     setExploreData: (state, action): void => {
       const isSameResultType =
@@ -155,7 +244,7 @@ export const exploreSlice = createSlice({
   }
 });
 
-export default combineReducers({
+const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
   renderer: rendererSlice.reducer,
   hover: hoverSlice.reducer,
@@ -163,3 +252,5 @@ export default combineReducers({
   homeData: homeSlice.reducer,
   explore: exploreSlice.reducer
 });
+export default rootReducer;
+export type AppState = ReturnType<typeof rootReducer>;

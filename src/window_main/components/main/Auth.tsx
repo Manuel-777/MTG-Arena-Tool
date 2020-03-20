@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 import { shell } from "electron";
 import Checkbox from "../misc/Checkbox";
 import { ipcSend } from "../../rendererUtil";

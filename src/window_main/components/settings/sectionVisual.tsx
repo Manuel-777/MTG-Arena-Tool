@@ -11,7 +11,7 @@ import Input from "../misc/Input";
 import useColorPicker from "../../hooks/useColorPicker";
 import Slider from "../misc/Slider";
 import { getCardImage } from "../../../shared/util";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 import { useSelector } from "react-redux";
 
 function getCardStyleName(style: any): string {

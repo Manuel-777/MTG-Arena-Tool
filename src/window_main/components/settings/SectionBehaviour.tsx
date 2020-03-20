@@ -4,7 +4,7 @@ import Toggle from "../misc/Toggle";
 import Input from "../misc/Input";
 import { ipcSend } from "../../rendererUtil";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 
 function clickBetaChannel(value: boolean): void {
   ipcSend("save_app_settings_norefresh", {

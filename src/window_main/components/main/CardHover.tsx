@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import db from "../../../shared/database";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 import { FACE_DFC_FRONT, FACE_DFC_BACK } from "../../../shared/constants";
 import OwnershipStars from "../../../shared/OwnershipStars";
 const NotFound = "../images/notfound.png";

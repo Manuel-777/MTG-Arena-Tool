@@ -2,15 +2,11 @@ import { remote } from "electron";
 import React from "react";
 import ReactDOM from "react-dom";
 import { configureStore } from "@reduxjs/toolkit";
-
 import { Provider, useDispatch, useSelector } from "react-redux";
 import appReducer, {
   LOGIN_WAITING,
   rendererSlice
 } from "../../shared/redux/reducers";
-
-const store = configureStore({ reducer: appReducer });
-
 import { TopNav } from "../components/main/topNav";
 import { forceOpenAbout, getOpenNav, getOpenSub } from "../tabControl";
 import BackgroundImage from "../components/main/BackgroundImage";
@@ -21,10 +17,13 @@ import { LOGIN_OK } from "../../shared/redux/reducers";
 import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";
 import CardHover from "../components/main/CardHover";
-import { AppState } from "../../shared/redux/appState";
+import { AppState } from "../../shared/redux/reducers";
 import OutputLogInput from "../components/popups/OutputLogInput";
 import { ipcSend } from "../rendererUtil";
 import Share from "../components/popups/Share";
+
+const store = configureStore({ reducer: appReducer });
+export type AppDispatch = typeof store.dispatch;
 
 function App(): JSX.Element {
   const loginState = useSelector((state: AppState) => state.login.loginState);

@@ -10,7 +10,7 @@ import { DraftData } from "../../../types/draft";
 import uxMove from "../../uxMove";
 import db from "../../../shared/database";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 
 interface PickPack {
   pack: number;

@@ -21,7 +21,7 @@ import {
 import ReactSelect from "../../../shared/ReactSelect";
 import useColorPicker from "../../hooks/useColorPicker";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 
 function toggleEditMode(): void {
   ipcSend("toggle_edit_mode");

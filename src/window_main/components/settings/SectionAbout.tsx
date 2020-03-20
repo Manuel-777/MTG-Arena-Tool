@@ -6,7 +6,7 @@ import db from "../../../shared/database";
 import { format, fromUnixTime } from "date-fns";
 import Button from "../misc/Button";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 
 export default function SectionAbout(): JSX.Element {
   const updateState = useSelector(

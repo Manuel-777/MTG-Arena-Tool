@@ -14,7 +14,7 @@ import {
   SETTINGS_LOGIN
 } from "../../shared/constants";
 
-import { AppState } from "../../shared/redux/appState";
+import { AppState } from "../../shared/redux/reducers";
 import SectionBehaviour from "../components/settings/SectionBehaviour";
 import SectionData from "../components/settings/SectionData";
 import SectionOverlay from "../components/settings/sectionOverlay";

@@ -1,31 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ipcSend } from "../rendererUtil";
 import { useDispatch, useSelector } from "react-redux";
-import { exploreSlice, rendererSlice } from "../../shared/redux/reducers";
-import ReactSelect from "../../shared/ReactSelect";
-import Button from "../components/misc/Button";
+import { COLORS_LONG, RANKS, SUB_DECK } from "../../shared/constants";
 import db from "../../shared/database";
+import ReactSelect from "../../shared/ReactSelect";
+import {
+  AppState,
+  ExploreQuery,
+  exploreSlice,
+  rendererSlice
+} from "../../shared/redux/reducers";
+import { ListItemExplore } from "../components/list-item/ListItemExplore";
+import Button from "../components/misc/Button";
 import Checkbox from "../components/misc/Checkbox";
 import Input from "../components/misc/Input";
-import { COLORS_LONG, RANKS, SUB_DECK } from "../../shared/constants";
-import { AppState } from "../../shared/redux/appState";
-import { ListItemExplore } from "../components/list-item/ListItemExplore";
+import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
-
-export interface ExploreQuery {
-  filterWCC: string;
-  filterWCU: string;
-  filterWCR: string;
-  filterWCM: string;
-  onlyOwned: boolean;
-  filterType: string;
-  filterEvent: string;
-  filterSort: string;
-  filterSortDir: -1 | 1;
-  filteredMana: number[];
-  filteredRanks: string[];
-  filterSkip: number;
-}
 
 export default function ExploreTab(): JSX.Element {
   const dispatcher = useDispatch();

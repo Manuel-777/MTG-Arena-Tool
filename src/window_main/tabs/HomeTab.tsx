@@ -4,7 +4,7 @@ import { ipcSend } from "../rendererUtil";
 import { timestamp, toDDHHMMSS } from "../../shared/util";
 import { hoverSlice } from "../../shared/redux/reducers";
 import { useSelector, useDispatch } from "react-redux";
-import { AppState } from "../../shared/redux/appState";
+import { AppState } from "../../shared/redux/reducers";
 
 export interface WildcardsChange {
   grpId: number;

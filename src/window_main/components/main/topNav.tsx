@@ -20,7 +20,7 @@ import {
 } from "../../../shared/constants";
 import { rendererSlice } from "../../../shared/redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 import useWindowSize from "../../hooks/useWindowSize";
 import uxMove from "../../uxMove";
 

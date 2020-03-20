@@ -1,6 +1,6 @@
 import React from "react";
 import fs from "fs";
-import { AppState } from "../../../shared/redux/appState";
+import { AppState } from "../../../shared/redux/reducers";
 import { useSelector, useDispatch } from "react-redux";
 import db from "../../../shared/database";
 import { getCardArtCrop } from "../../../shared/util";
