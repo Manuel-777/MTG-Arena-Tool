@@ -12,9 +12,8 @@ import { ipcSend } from "../../rendererUtil";
 import { useDispatch } from "react-redux";
 import {
   dispatchAction,
+  hoverSlice,
   SET_POPUP,
-  SET_HOVER_IN,
-  SET_HOVER_OUT,
   SET_BACKGROUND_GRPID
 } from "../../../shared/redux/reducers";
 import db from "../../../shared/database";
@@ -264,9 +263,10 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
   const { deck, setRegularView } = props;
   const sz = pd.cardsSize;
   const dispatcher = useDispatch();
+  const { setHoverIn, setHoverOut } = hoverSlice.actions;
 
   const hoverCard = (id: number, hover: boolean): void => {
-    dispatchAction(dispatcher, hover ? SET_HOVER_IN : SET_HOVER_OUT, id);
+    dispatcher(hover ? setHoverIn(id) : setHoverOut());
   };
 
   // attempt at sorting visually..

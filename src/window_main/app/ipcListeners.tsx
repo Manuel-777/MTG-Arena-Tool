@@ -16,13 +16,13 @@ import {
   SET_POPUP,
   SET_PATREON,
   SET_SETTINGS,
-  SET_HOVER_SIZE,
   SET_UPDATE_STATE,
   SET_NO_LOG,
   SET_SHARE_DIALOG_URL,
   loadingSlice,
   exploreSlice,
-  topNavSlice
+  topNavSlice,
+  hoverSlice
 } from "../../shared/redux/reducers";
 import { timestamp } from "../../shared/util";
 import {
@@ -45,6 +45,7 @@ export default function ipcListeners(dispatcher: any): void {
     setExploreData,
     setExploreFiltersSkip
   } = exploreSlice.actions;
+  const { setHoverSize } = hoverSlice.actions;
 
   const { setLoading } = loadingSlice.actions;
 
@@ -174,7 +175,7 @@ export default function ipcListeners(dispatcher: any): void {
 
   ipc.on("settings_updated", (): void => {
     dispatcher(setTopNav(pd.settings.last_open_tab ?? MAIN_HOME));
-    dispatchAction(dispatcher, SET_HOVER_SIZE, pd.cardsSizeHoverCard);
+    dispatcher(setHoverSize(pd.cardsSizeHoverCard));
     dispatchAction(dispatcher, SET_SETTINGS, pd.settings);
   });
 

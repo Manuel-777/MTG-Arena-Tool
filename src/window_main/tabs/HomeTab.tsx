@@ -2,11 +2,7 @@ import React from "react";
 import db from "../../shared/database";
 import { ipcSend } from "../rendererUtil";
 import { timestamp, toDDHHMMSS } from "../../shared/util";
-import {
-  dispatchAction,
-  SET_HOVER_IN,
-  SET_HOVER_OUT
-} from "../../shared/redux/reducers";
+import { hoverSlice } from "../../shared/redux/reducers";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../shared/redux/appState";
 
@@ -140,9 +136,10 @@ interface TopWildcardsProps {
 function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
   const lineDark = "line_dark line_bottom_border";
   const dispatcher = useDispatch();
+  const { setHoverIn, setHoverOut } = hoverSlice.actions;
 
   const hoverCard = (id: number, hover: boolean): void => {
-    dispatchAction(dispatcher, hover ? SET_HOVER_IN : SET_HOVER_OUT, id);
+    dispatcher(hover ? setHoverIn(id) : setHoverOut());
   };
 
   return (
