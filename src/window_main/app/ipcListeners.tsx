@@ -35,8 +35,6 @@ import { SETTINGS_ABOUT } from "../../shared/constants";
 import pd from "../../shared/PlayerData";
 import uxMove from "../uxMove";
 
-
-
 export default function ipcListeners(dispatcher: any): void {
   console.log("Set up IPC listeners.");
   const { setTopNav } = topNavSlice.actions;

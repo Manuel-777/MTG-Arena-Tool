@@ -123,7 +123,7 @@ export const loadingSlice = createSlice({
   reducers: {
     setLoading: (state, action): boolean => action.payload
   }
-})
+});
 
 export const topNavSlice = createSlice({
   name: "topNav",
