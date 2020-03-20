@@ -15,10 +15,7 @@ import CardList from "../misc/CardList";
 import CardsList from "../../../shared/cardsList";
 import ActionLog from "./ActionLog";
 import uxMove from "../../uxMove";
-import {
-  dispatchAction,
-  SET_BACKGROUND_GRPID
-} from "../../../shared/redux/reducers";
+import { rendererSlice } from "../../../shared/redux/reducers";
 import { useDispatch } from "react-redux";
 
 interface MatchViewProps {
@@ -45,7 +42,8 @@ export function MatchView(props: MatchViewProps): JSX.Element {
   }
 
   const goBack = (): void => {
-    dispatchAction(dispatcher, SET_BACKGROUND_GRPID, 0);
+    const { setBackgroundGrpId } = rendererSlice.actions;
+    dispatcher(setBackgroundGrpId(0));
     uxMove(0);
   };
 

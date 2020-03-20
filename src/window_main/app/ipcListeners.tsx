@@ -3,26 +3,15 @@
 /* eslint-disable no-console */
 import { ipcRenderer as ipc, IpcRendererEvent } from "electron";
 import {
-  dispatchAction,
-  SET_LOGIN_FORM,
-  SET_LOGIN_PASS,
-  SET_LOGIN_STATE,
   LOGIN_OK,
   LOGIN_FAILED,
   LOGIN_WAITING,
-  SET_OFFLINE,
-  SET_CAN_LOGIN,
-  SET_HOME_DATA,
-  SET_POPUP,
-  SET_PATREON,
-  SET_SETTINGS,
-  SET_UPDATE_STATE,
-  SET_NO_LOG,
-  SET_SHARE_DIALOG_URL,
-  loadingSlice,
   exploreSlice,
-  topNavSlice,
-  hoverSlice
+  homeSlice,
+  hoverSlice,
+  loginSlice,
+  rendererSlice,
+  settingsSlice
 } from "../../shared/redux/reducers";
 import { timestamp } from "../../shared/util";
 import {
@@ -37,78 +26,99 @@ import uxMove from "../uxMove";
 
 export default function ipcListeners(dispatcher: any): void {
   console.log("Set up IPC listeners.");
-  const { setTopNav } = topNavSlice.actions;
+  const { setHomeData } = homeSlice.actions;
   const {
     setActiveEvents,
     setExploreData,
     setExploreFiltersSkip
   } = exploreSlice.actions;
   const { setHoverSize } = hoverSlice.actions;
-
-  const { setLoading } = loadingSlice.actions;
+  const {
+    setCanLogin,
+    setLoginForm,
+    setLoginPassword,
+    setLoginState
+  } = loginSlice.actions;
+  const {
+    setLoading,
+    setOffline,
+    setNoLog,
+    setPatreon,
+    setPopup,
+    setShareDialogUrl,
+    setTopNav,
+    setUpdateState
+  } = rendererSlice.actions;
+  const { setSettings } = settingsSlice.actions;
 
   ipc.on("prefill_auth_form", (event: IpcRendererEvent, arg: any): void => {
-    dispatchAction(dispatcher, SET_LOGIN_FORM, {
-      email: arg.username,
-      pass: arg.password,
-      rememberme: arg.remember_me
-    });
+    dispatcher(
+      setLoginForm({
+        email: arg.username,
+        pass: arg.password,
+        rememberme: arg.remember_me
+      })
+    );
   });
 
   ipc.on("clear_pwd", (): void => {
-    dispatchAction(dispatcher, SET_LOGIN_PASS, "");
+    dispatcher(setLoginPassword(""));
   });
 
   ipc.on("login_failed", (): void => {
-    dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED);
+    dispatcher(setLoginState(LOGIN_FAILED));
   });
 
   ipc.on("begin_login", (): void => {
     dispatcher(setLoading(true));
-    dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
+    dispatcher(setLoginState(LOGIN_WAITING));
   });
 
   ipc.on("auth", (event: IpcRendererEvent, arg: any): void => {
     dispatcher(setLoading(true));
     if (arg.ok) {
-      dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
+      dispatcher(setLoginState(LOGIN_WAITING));
       if (arg.user == -1) {
-        dispatchAction(dispatcher, SET_OFFLINE, true);
+        dispatcher(setOffline(true));
       }
       if (arg.patreon) {
-        dispatchAction(dispatcher, SET_PATREON, {
-          patreon: arg.patreon,
-          patreonTier: arg.patreon_tier
-        });
+        dispatcher(
+          setPatreon({
+            patreon: arg.patreon,
+            patreonTier: arg.patreon_tier
+          })
+        );
       }
     } else {
       dispatcher(setLoading(false));
-      dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED);
+      dispatcher(setLoginState(LOGIN_FAILED));
     }
   });
 
   ipc.on("initialize", (): void => {
     dispatcher(setLoading(false));
-    dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_OK);
+    dispatcher(setLoginState(LOGIN_OK));
   });
 
   ipc.on("offline", (): void => {
-    dispatchAction(dispatcher, SET_OFFLINE, true);
+    dispatcher(setOffline(true));
   });
 
   ipc.on("toggle_login", (event: IpcRendererEvent, arg: any): void => {
-    dispatchAction(dispatcher, SET_CAN_LOGIN, arg);
+    dispatcher(setCanLogin(arg));
   });
 
   ipc.on(
     "popup",
     (event: IpcRendererEvent, text: string, time: number): void => {
       const newTime = timestamp() + time;
-      dispatchAction(dispatcher, SET_POPUP, {
-        text: text,
-        time: newTime,
-        duration: time
-      });
+      dispatcher(
+        setPopup({
+          text: text,
+          time: newTime,
+          duration: time
+        })
+      );
     }
   );
 
@@ -153,11 +163,13 @@ export default function ipcListeners(dispatcher: any): void {
   ipc.on("set_home", (event: IpcRendererEvent, arg: any): void => {
     dispatcher(setLoading(false));
     console.log("Home", arg);
-    dispatchAction(dispatcher, SET_HOME_DATA, {
-      wildcards: arg.wildcards,
-      filteredSet: arg.filtered_set,
-      usersActive: arg.users_active
-    });
+    dispatcher(
+      setHomeData({
+        wildcards: arg.wildcards,
+        filteredSet: arg.filtered_set,
+        usersActive: arg.users_active
+      })
+    );
   });
 
   ipc.on("set_explore_decks", (event: IpcRendererEvent, arg: any): void => {
@@ -168,31 +180,31 @@ export default function ipcListeners(dispatcher: any): void {
   });
 
   ipc.on("set_update_state", (event: IpcRendererEvent, arg: any): void => {
-    dispatchAction(dispatcher, SET_UPDATE_STATE, arg);
+    dispatcher(setUpdateState(arg));
   });
 
   ipc.on("settings_updated", (): void => {
     dispatcher(setTopNav(pd.settings.last_open_tab ?? MAIN_HOME));
     dispatcher(setHoverSize(pd.cardsSizeHoverCard));
-    dispatchAction(dispatcher, SET_SETTINGS, pd.settings);
+    dispatcher(setSettings(pd.settings));
   });
 
   ipc.on("no_log", (): void => {
-    dispatchAction(dispatcher, SET_NO_LOG, true);
+    dispatcher(setNoLog(true));
   });
 
   ipc.on("set_draft_link", function(event: IpcRendererEvent, arg: string) {
-    dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
+    dispatcher(setShareDialogUrl(arg));
     dispatcher(setLoading(false));
   });
 
   ipc.on("set_log_link", function(event: IpcRendererEvent, arg: string) {
-    dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
+    dispatcher(setShareDialogUrl(arg));
     dispatcher(setLoading(false));
   });
 
   ipc.on("set_deck_link", function(event: IpcRendererEvent, arg: string) {
-    dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
+    dispatcher(setShareDialogUrl(arg));
     dispatcher(setLoading(false));
   });
 

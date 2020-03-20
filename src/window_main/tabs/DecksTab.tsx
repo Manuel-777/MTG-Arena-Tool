@@ -5,6 +5,7 @@ import { TableState } from "react-table";
 import { SUB_DECK } from "../../shared/constants";
 import Deck from "../../shared/deck";
 import pd from "../../shared/PlayerData";
+import { rendererSlice } from "../../shared/redux/reducers";
 import {
   getBoosterCountEstimate,
   getReadableFormat,
@@ -16,11 +17,6 @@ import Aggregator, {
   AggregatorStats,
   dateMaxValid
 } from "../aggregator";
-import {
-  dispatchAction,
-  SET_BACKGROUND_GRPID,
-  SET_SUB_NAV
-} from "../../shared/redux/reducers";
 import DecksTable from "../components/decks/DecksTable";
 import { DecksData } from "../components/decks/types";
 import { isHidingArchived } from "../components/tables/filters";
@@ -123,12 +119,14 @@ export default function DecksTab({
   const openDeckCallback = React.useCallback(
     (deck: InternalDeck): void => {
       uxMove(-100);
-      dispatchAction(dispatcher, SET_BACKGROUND_GRPID, deck.deckTileId);
-      dispatchAction(dispatcher, SET_SUB_NAV, {
-        type: SUB_DECK,
-        id: deck.id,
-        data: null
-      });
+      const { setBackgroundGrpId, setSubNav } = rendererSlice.actions;
+      dispatcher(setBackgroundGrpId(deck.deckTileId));
+      dispatcher(
+        setSubNav({
+          type: SUB_DECK,
+          id: deck.id
+        })
+      );
     },
     [dispatcher]
   );

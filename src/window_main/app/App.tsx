@@ -6,9 +6,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import appReducer, {
   LOGIN_WAITING,
-  dispatchAction,
-  SET_NO_LOG,
-  SET_SHARE_DIALOG_OPEN
+  rendererSlice
 } from "../../shared/redux/reducers";
 
 const store = configureStore({ reducer: appReducer });
@@ -29,17 +27,21 @@ import { ipcSend } from "../rendererUtil";
 import Share from "../components/popups/Share";
 
 function App(): JSX.Element {
-  const loginState = useSelector((state: AppState) => state.loginState);
-  const topArtist = useSelector((state: AppState) => state.topArtist);
-  const offline = useSelector((state: AppState) => state.offline);
-  const loading = useSelector((state: AppState) => state.loading);
-  const topNav = useSelector((state: AppState) => state.topNav);
-  const subNavType = useSelector((state: AppState) => state.subNav.type);
-  const subNavId = useSelector((state: AppState) => state.subNav.id);
-  const subNavData = useSelector((state: AppState) => state.subNav.data);
-  const authForm = useSelector((state: AppState) => state.loginForm);
-  const noLog = useSelector((state: AppState) => state.noLog);
-  const share = useSelector((state: AppState) => state.shareDialog);
+  const loginState = useSelector((state: AppState) => state.login.loginState);
+  const topArtist = useSelector((state: AppState) => state.renderer.topArtist);
+  const offline = useSelector((state: AppState) => state.renderer.offline);
+  const loading = useSelector((state: AppState) => state.renderer.loading);
+  const topNav = useSelector((state: AppState) => state.renderer.topNav);
+  const subNavType = useSelector(
+    (state: AppState) => state.renderer.subNav.type
+  );
+  const subNavId = useSelector((state: AppState) => state.renderer.subNav.id);
+  const subNavData = useSelector(
+    (state: AppState) => state.renderer.subNav.data
+  );
+  const authForm = useSelector((state: AppState) => state.login.loginForm);
+  const noLog = useSelector((state: AppState) => state.renderer.noLog);
+  const share = useSelector((state: AppState) => state.renderer.shareDialog);
   /*
     Set up IPC listeners.
     This should only happen once when the app starts, so no
@@ -59,8 +61,9 @@ function App(): JSX.Element {
   const closeNoLog = React.useCallback(
     (log: string) => {
       setTimeout(() => {
+        const { setNoLog } = rendererSlice.actions;
         ipcSend("set_log", log);
-        dispatchAction(dispatch, SET_NO_LOG, false);
+        dispatch(setNoLog(false));
       }, 350);
     },
     [dispatch]
@@ -68,7 +71,8 @@ function App(): JSX.Element {
 
   const closeShare = React.useCallback(() => {
     setTimeout(() => {
-      dispatchAction(dispatch, SET_SHARE_DIALOG_OPEN, false);
+      const { setShareDialogOpen } = rendererSlice.actions;
+      dispatch(setShareDialogOpen(false));
     }, 350);
   }, [dispatch]);
 

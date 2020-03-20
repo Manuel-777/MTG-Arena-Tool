@@ -5,14 +5,10 @@ import { TableState } from "react-table";
 import { SUB_MATCH } from "../../shared/constants";
 import db from "../../shared/database";
 import pd from "../../shared/PlayerData";
+import { rendererSlice } from "../../shared/redux/reducers";
 import { getReadableEvent } from "../../shared/util";
 import { InternalMatch } from "../../types/match";
 import Aggregator, { AggregatorFilters } from "../aggregator";
-import {
-  dispatchAction,
-  SET_BACKGROUND_GRPID,
-  SET_SUB_NAV
-} from "../../shared/redux/reducers";
 import MatchesTable from "../components/matches/MatchesTable";
 import { MatchTableData } from "../components/matches/types";
 import { isHidingArchived } from "../components/tables/filters";
@@ -141,15 +137,14 @@ export default function MatchesTab({
   const openMatchDetails = React.useCallback(
     (match: InternalMatch): void => {
       uxMove(-100);
-      dispatchAction(
-        dispatcher,
-        SET_BACKGROUND_GRPID,
-        match.playerDeck.deckTileId
+      const { setBackgroundGrpId, setSubNav } = rendererSlice.actions;
+      dispatcher(setBackgroundGrpId(match.playerDeck.deckTileId));
+      dispatcher(
+        setSubNav({
+          type: SUB_MATCH,
+          id: match.id
+        })
       );
-      dispatchAction(dispatcher, SET_SUB_NAV, {
-        type: SUB_MATCH,
-        id: match.id
-      });
     },
     [dispatcher]
   );

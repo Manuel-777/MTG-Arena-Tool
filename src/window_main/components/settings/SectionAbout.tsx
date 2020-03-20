@@ -9,7 +9,9 @@ import { useSelector } from "react-redux";
 import { AppState } from "../../../shared/redux/appState";
 
 export default function SectionAbout(): JSX.Element {
-  const updateState = useSelector((state: AppState) => state.updateState);
+  const updateState = useSelector(
+    (state: AppState) => state.renderer.updateState
+  );
   return (
     <div className="about">
       <div

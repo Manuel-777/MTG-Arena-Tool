@@ -10,12 +10,7 @@ import Deck from "../../../shared/deck";
 import Button from "../misc/Button";
 import { ipcSend } from "../../rendererUtil";
 import { useDispatch } from "react-redux";
-import {
-  dispatchAction,
-  hoverSlice,
-  SET_POPUP,
-  SET_BACKGROUND_GRPID
-} from "../../../shared/redux/reducers";
+import { hoverSlice, rendererSlice } from "../../../shared/redux/reducers";
 import db from "../../../shared/database";
 import ShareButton from "../misc/ShareButton";
 import CraftingCost from "./CraftingCost";
@@ -135,7 +130,8 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const dispatcher = useDispatch();
 
   const goBack = (): void => {
-    dispatchAction(dispatcher, SET_BACKGROUND_GRPID, 0);
+    const { setBackgroundGrpId } = rendererSlice.actions;
+    dispatcher(setBackgroundGrpId(0));
     uxMove(0);
   };
 
@@ -150,10 +146,13 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const arenaExport = (): void => {
     const list = deck.getExportArena();
     ipcSend("set_clipboard", list);
-    dispatchAction(dispatcher, SET_POPUP, {
-      text: "Copied to clipboard",
-      time: 2000
-    });
+    const { setPopup } = rendererSlice.actions;
+    dispatcher(
+      setPopup({
+        text: "Copied to clipboard",
+        time: 2000
+      })
+    );
   };
 
   const txtExport = (): void => {

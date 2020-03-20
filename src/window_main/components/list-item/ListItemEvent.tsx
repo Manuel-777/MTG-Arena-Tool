@@ -21,11 +21,7 @@ import { DbCardData } from "../../../types/Metadata";
 import RoundCard from "../misc/RoundCard";
 import { compareDesc } from "date-fns";
 import { useDispatch } from "react-redux";
-import {
-  dispatchAction,
-  SET_SUB_NAV,
-  SET_BACKGROUND_GRPID
-} from "../../../shared/redux/reducers";
+import { rendererSlice } from "../../../shared/redux/reducers";
 import { InternalMatch } from "../../../types/match";
 import uxMove from "../../uxMove";
 
@@ -148,15 +144,14 @@ function EventSubRows({
   const openMatch = React.useCallback(
     (match: InternalMatch): void => {
       uxMove(-100);
-      dispatchAction(
-        dispatcher,
-        SET_BACKGROUND_GRPID,
-        match.playerDeck.deckTileId
+      const { setBackgroundGrpId, setSubNav } = rendererSlice.actions;
+      dispatcher(setBackgroundGrpId(match.playerDeck.deckTileId));
+      dispatcher(
+        setSubNav({
+          type: SUB_MATCH,
+          id: match.id
+        })
       );
-      dispatchAction(dispatcher, SET_SUB_NAV, {
-        type: SUB_MATCH,
-        id: match.id
-      });
     },
     [dispatcher]
   );
@@ -164,11 +159,13 @@ function EventSubRows({
   const openDraft = React.useCallback(
     (id: string | number): void => {
       uxMove(-100);
-      dispatchAction(dispatcher, SET_SUB_NAV, {
-        type: SUB_DRAFT,
-        id: id,
-        data: null
-      });
+      const { setSubNav } = rendererSlice.actions;
+      dispatcher(
+        setSubNav({
+          type: SUB_DRAFT,
+          id: id
+        })
+      );
     },
     [dispatcher]
   );
