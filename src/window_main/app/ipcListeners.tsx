@@ -4,14 +4,10 @@
 import { ipcRenderer as ipc, IpcRendererEvent } from "electron";
 import {
   dispatchAction,
-  SET_LOGIN_FORM,
-  SET_LOGIN_PASS,
-  SET_LOGIN_STATE,
   LOGIN_OK,
   LOGIN_FAILED,
   LOGIN_WAITING,
   SET_OFFLINE,
-  SET_CAN_LOGIN,
   SET_HOME_DATA,
   SET_POPUP,
   SET_PATREON,
@@ -20,6 +16,7 @@ import {
   SET_NO_LOG,
   SET_SHARE_DIALOG_URL,
   loadingSlice,
+  loginSlice,
   exploreSlice,
   topNavSlice,
   hoverSlice
@@ -44,34 +41,41 @@ export default function ipcListeners(dispatcher: any): void {
     setExploreFiltersSkip
   } = exploreSlice.actions;
   const { setHoverSize } = hoverSlice.actions;
-
+  const {
+    setCanLogin,
+    setLoginForm,
+    setLoginPassword,
+    setLoginState
+  } = loginSlice.actions;
   const { setLoading } = loadingSlice.actions;
 
   ipc.on("prefill_auth_form", (event: IpcRendererEvent, arg: any): void => {
-    dispatchAction(dispatcher, SET_LOGIN_FORM, {
-      email: arg.username,
-      pass: arg.password,
-      rememberme: arg.remember_me
-    });
+    dispatcher(
+      setLoginForm({
+        email: arg.username,
+        pass: arg.password,
+        rememberme: arg.remember_me
+      })
+    );
   });
 
   ipc.on("clear_pwd", (): void => {
-    dispatchAction(dispatcher, SET_LOGIN_PASS, "");
+    dispatcher(setLoginPassword(""));
   });
 
   ipc.on("login_failed", (): void => {
-    dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED);
+    dispatcher(setLoginState(LOGIN_FAILED));
   });
 
   ipc.on("begin_login", (): void => {
     dispatcher(setLoading(true));
-    dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
+    dispatcher(setLoginState(LOGIN_WAITING));
   });
 
   ipc.on("auth", (event: IpcRendererEvent, arg: any): void => {
     dispatcher(setLoading(true));
     if (arg.ok) {
-      dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
+      dispatcher(setLoginState(LOGIN_WAITING));
       if (arg.user == -1) {
         dispatchAction(dispatcher, SET_OFFLINE, true);
       }
@@ -83,13 +87,13 @@ export default function ipcListeners(dispatcher: any): void {
       }
     } else {
       dispatcher(setLoading(false));
-      dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED);
+      dispatcher(setLoginState(LOGIN_FAILED));
     }
   });
 
   ipc.on("initialize", (): void => {
     dispatcher(setLoading(false));
-    dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_OK);
+    dispatcher(setLoginState(LOGIN_OK));
   });
 
   ipc.on("offline", (): void => {
@@ -97,7 +101,7 @@ export default function ipcListeners(dispatcher: any): void {
   });
 
   ipc.on("toggle_login", (event: IpcRendererEvent, arg: any): void => {
-    dispatchAction(dispatcher, SET_CAN_LOGIN, arg);
+    dispatcher(setCanLogin(arg));
   });
 
   ipc.on(

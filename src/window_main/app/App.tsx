@@ -29,7 +29,7 @@ import { ipcSend } from "../rendererUtil";
 import Share from "../components/popups/Share";
 
 function App(): JSX.Element {
-  const loginState = useSelector((state: AppState) => state.loginState);
+  const loginState = useSelector((state: AppState) => state.login.loginState);
   const topArtist = useSelector((state: AppState) => state.topArtist);
   const offline = useSelector((state: AppState) => state.offline);
   const loading = useSelector((state: AppState) => state.loading);
@@ -37,7 +37,7 @@ function App(): JSX.Element {
   const subNavType = useSelector((state: AppState) => state.subNav.type);
   const subNavId = useSelector((state: AppState) => state.subNav.id);
   const subNavData = useSelector((state: AppState) => state.subNav.data);
-  const authForm = useSelector((state: AppState) => state.loginForm);
+  const authForm = useSelector((state: AppState) => state.login.loginForm);
   const noLog = useSelector((state: AppState) => state.noLog);
   const share = useSelector((state: AppState) => state.shareDialog);
   /*

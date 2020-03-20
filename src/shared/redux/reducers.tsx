@@ -11,12 +11,6 @@ export const SET_SETTINGS = "SET_SETTINGS";
 export const SET_TOP_ARTIST = "SET_TOP_ARTIST";
 export const SET_OFFLINE = "SET_OFFLINE";
 export const SET_SUB_NAV = "SET_SUB_NAV";
-export const SET_LOGIN_STATE = "SET_LOGIN_STATE";
-export const SET_LOGIN_FORM = "SET_LOGIN_FORM";
-export const SET_LOGIN_EMAIL = "SET_LOGIN_EMAIL";
-export const SET_LOGIN_REMEMBER = "SET_LOGIN_REMEMBER";
-export const SET_LOGIN_PASS = "SET_LOGIN_PASS";
-export const SET_CAN_LOGIN = "SET_CAN_LOGIN";
 export const SET_HOME_DATA = "SET_HOME_DATA";
 export const SET_POPUP = "SET_POPUP";
 export const SET_PATREON = "SET_PATREON";
@@ -151,50 +145,36 @@ const subNav = (
   }
 };
 
-const loginState = (state = 1, action: Action): number => {
-  switch (action.type) {
-    case SET_LOGIN_STATE:
-      return action.value;
-    default:
-      return state;
-  }
-};
-
 export interface LoginFormState {
   email: string;
   pass: string;
   rememberme: boolean;
 }
 
-const loginForm = (
-  state: LoginFormState = defaultState.loginForm,
-  action: Action
-): LoginFormState => {
-  switch (action.type) {
-    case SET_LOGIN_PASS:
-      return { ...state, pass: action.value };
-    case SET_LOGIN_EMAIL:
-      return { ...state, email: action.value };
-    case SET_LOGIN_REMEMBER:
-      return { ...state, rememberme: action.value };
-    case SET_LOGIN_FORM:
-      return { ...state, ...action.value };
-    default:
-      return state;
+export const loginSlice = createSlice({
+  name: "login",
+  initialState: defaultState.login,
+  reducers: {
+    setLoginState: (state, action): void => {
+      state.loginState = action.payload;
+    },
+    setLoginPassword: (state, action): void => {
+      state.loginForm.pass = action.payload;
+    },
+    setLoginEmail: (state, action): void => {
+      state.loginForm.email = action.payload;
+    },
+    setLoginRemember: (state, action): void => {
+      state.loginForm.rememberme = action.payload;
+    },
+    setLoginForm: (state, action): void => {
+      state.loginForm = action.payload;
+    },
+    setCanLogin: (state, action): void => {
+      state.canLogin = action.payload;
+    }
   }
-};
-
-const canLogin = (
-  state: boolean = defaultState.canLogin,
-  action: Action
-): boolean => {
-  switch (action.type) {
-    case SET_CAN_LOGIN:
-      return action.value;
-    default:
-      return state;
-  }
-};
+});
 
 export interface HomeDataState {
   wildcards: WildcardsChange[];
@@ -337,11 +317,9 @@ export default combineReducers({
   hover: hoverSlice.reducer,
   offline: offline,
   loading: loadingSlice.reducer,
-  loginState: loginState,
+  login: loginSlice.reducer,
   topNav: topNavSlice.reducer,
   subNav: subNav,
-  loginForm: loginForm,
-  canLogin: canLogin,
   homeData: homeData,
   popup: popup,
   patreon: patreon,

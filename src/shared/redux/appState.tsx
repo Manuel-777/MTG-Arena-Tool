@@ -10,8 +10,6 @@ export interface AppState {
   backgroundColor: string;
   offline: boolean;
   loading: boolean;
-  loginState: number;
-  canLogin: boolean;
   topNav: number;
   updateState: string;
   noLog: boolean;
@@ -32,10 +30,14 @@ export interface AppState {
     patreon: boolean;
     patreonTier: number;
   };
-  loginForm: {
-    email: string;
-    pass: string;
-    rememberme: boolean;
+  login: {
+    canLogin: boolean;
+    loginForm: {
+      email: string;
+      pass: string;
+      rememberme: boolean;
+    };
+    loginState: number;
   };
   homeData: {
     wildcards: WildcardsChange[];
@@ -84,8 +86,6 @@ export const defaultState: AppState = {
   backgroundColor: "rgba(0, 0, 0, 0.25)",
   offline: false,
   loading: false,
-  loginState: LOGIN_AUTH,
-  canLogin: true,
   topNav: 0,
   updateState: "",
   noLog: false,
@@ -109,10 +109,14 @@ export const defaultState: AppState = {
     patreon: false,
     patreonTier: -1
   },
-  loginForm: {
-    email: "",
-    pass: "",
-    rememberme: false
+  login: {
+    canLogin: true,
+    loginForm: {
+      email: "",
+      pass: "",
+      rememberme: false
+    },
+    loginState: LOGIN_AUTH
   },
   homeData: {
     wildcards: [],

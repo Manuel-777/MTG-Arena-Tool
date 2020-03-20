@@ -6,7 +6,7 @@ import { shell } from "electron";
 import Checkbox from "../misc/Checkbox";
 import { ipcSend } from "../../rendererUtil";
 import { HIDDEN_PW } from "../../../shared/constants";
-import { dispatchAction, SET_CAN_LOGIN } from "../../../shared/redux/reducers";
+import { loginSlice } from "../../../shared/redux/reducers";
 const sha1 = require("js-sha1");
 
 function clickRememberMe(value: boolean): void {
@@ -23,8 +23,9 @@ interface AuthProps {
 export default function Auth(props: AuthProps): JSX.Element {
   const [errorMessage, setErrorMessage] = React.useState("");
   const [authForm, setAuthForm] = React.useState(props.authForm);
-  const canLogin = useSelector((state: AppState) => state.canLogin);
+  const canLogin = useSelector((state: AppState) => state.login.canLogin);
   const dispatcher = useDispatch();
+  const { setCanLogin } = loginSlice.actions;
 
   const handleEmailChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -50,13 +51,13 @@ export default function Auth(props: AuthProps): JSX.Element {
     } else {
       setErrorMessage("");
       const pwd = authForm.pass == HIDDEN_PW ? HIDDEN_PW : sha1(authForm.pass);
-      dispatchAction(dispatcher, SET_CAN_LOGIN, false);
+      dispatcher(setCanLogin(false));
       ipcSend("login", {
         username: authForm.email,
         password: pwd
       });
     }
-  }, [dispatcher, authForm.email, authForm.pass]);
+  }, [dispatcher, authForm.email, authForm.pass, setCanLogin]);
 
   return (
     <div className="form-container">
