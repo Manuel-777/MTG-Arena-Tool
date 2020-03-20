@@ -136,6 +136,8 @@ export default function OverlayWindowlet(
   const backgroundColor = settings.overlay_back_color;
 
   const bgStyle: React.CSSProperties = {
+    left: "0px",
+    right: "0px",
     opacity: overlaySettings.alpha_back.toString()
   };
 

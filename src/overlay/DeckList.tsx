@@ -21,7 +21,6 @@ import {
 } from "../shared/util";
 import { Chances } from "../types/Chances";
 import { CardObject } from "../types/Deck";
-import { DbCardData } from "../types/Metadata";
 import { OverlaySettingsData } from "../types/settings";
 import SampleSizePanel from "./SampleSizePanel";
 
