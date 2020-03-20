@@ -10,7 +10,6 @@ import {
   LOGIN_OK,
   LOGIN_FAILED,
   LOGIN_WAITING,
-  SET_LOADING,
   SET_OFFLINE,
   SET_CAN_LOGIN,
   SET_HOME_DATA,
@@ -21,6 +20,7 @@ import {
   SET_UPDATE_STATE,
   SET_NO_LOG,
   SET_SHARE_DIALOG_URL,
+  loadingSlice,
   exploreSlice,
   topNavSlice
 } from "../../shared/redux/reducers";
@@ -35,6 +35,8 @@ import { SETTINGS_ABOUT } from "../../shared/constants";
 import pd from "../../shared/PlayerData";
 import uxMove from "../uxMove";
 
+
+
 export default function ipcListeners(dispatcher: any): void {
   console.log("Set up IPC listeners.");
   const { setTopNav } = topNavSlice.actions;
@@ -43,6 +45,8 @@ export default function ipcListeners(dispatcher: any): void {
     setExploreData,
     setExploreFiltersSkip
   } = exploreSlice.actions;
+
+  const { setLoading } = loadingSlice.actions;
 
   ipc.on("prefill_auth_form", (event: IpcRendererEvent, arg: any): void => {
     dispatchAction(dispatcher, SET_LOGIN_FORM, {
@@ -61,12 +65,12 @@ export default function ipcListeners(dispatcher: any): void {
   });
 
   ipc.on("begin_login", (): void => {
-    dispatchAction(dispatcher, SET_LOADING, true);
+    dispatcher(setLoading(true));
     dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
   });
 
   ipc.on("auth", (event: IpcRendererEvent, arg: any): void => {
-    dispatchAction(dispatcher, SET_LOADING, true);
+    dispatcher(setLoading(true));
     if (arg.ok) {
       dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING);
       if (arg.user == -1) {
@@ -79,13 +83,13 @@ export default function ipcListeners(dispatcher: any): void {
         });
       }
     } else {
-      dispatchAction(dispatcher, SET_LOADING, false);
+      dispatcher(setLoading(false));
       dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED);
     }
   });
 
   ipc.on("initialize", (): void => {
-    dispatchAction(dispatcher, SET_LOADING, false);
+    dispatcher(setLoading(false));
     dispatchAction(dispatcher, SET_LOGIN_STATE, LOGIN_OK);
   });
 
@@ -148,7 +152,7 @@ export default function ipcListeners(dispatcher: any): void {
   });
 
   ipc.on("set_home", (event: IpcRendererEvent, arg: any): void => {
-    dispatchAction(dispatcher, SET_LOADING, false);
+    dispatcher(setLoading(false));
     console.log("Home", arg);
     dispatchAction(dispatcher, SET_HOME_DATA, {
       wildcards: arg.wildcards,
@@ -159,7 +163,7 @@ export default function ipcListeners(dispatcher: any): void {
 
   ipc.on("set_explore_decks", (event: IpcRendererEvent, arg: any): void => {
     console.log("Explore", arg);
-    dispatchAction(dispatcher, SET_LOADING, false);
+    dispatcher(setLoading(false));
     dispatcher(setExploreData(arg));
     dispatcher(setExploreFiltersSkip(arg.results_number));
   });
@@ -180,17 +184,17 @@ export default function ipcListeners(dispatcher: any): void {
 
   ipc.on("set_draft_link", function(event: IpcRendererEvent, arg: string) {
     dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
-    dispatchAction(dispatcher, SET_LOADING, false);
+    dispatcher(setLoading(false));
   });
 
   ipc.on("set_log_link", function(event: IpcRendererEvent, arg: string) {
     dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
-    dispatchAction(dispatcher, SET_LOADING, false);
+    dispatcher(setLoading(false));
   });
 
   ipc.on("set_deck_link", function(event: IpcRendererEvent, arg: string) {
     dispatchAction(dispatcher, SET_SHARE_DIALOG_URL, arg);
-    dispatchAction(dispatcher, SET_LOADING, false);
+    dispatcher(setLoading(false));
   });
 
   ipc.on("set_active_events", function(event: IpcRendererEvent, arg: string) {

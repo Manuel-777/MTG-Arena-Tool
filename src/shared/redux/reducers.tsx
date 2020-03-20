@@ -13,7 +13,6 @@ export const SET_HOVER_IN = "SET_HOVER_IN";
 export const SET_HOVER_OUT = "SET_HOVER_OUT";
 export const SET_HOVER_SIZE = "SET_HOVER_SIZE";
 export const SET_OFFLINE = "SET_OFFLINE";
-export const SET_LOADING = "SET_LOADING";
 export const SET_SUB_NAV = "SET_SUB_NAV";
 export const SET_LOGIN_STATE = "SET_LOGIN_STATE";
 export const SET_LOGIN_FORM = "SET_LOGIN_FORM";
@@ -130,17 +129,13 @@ const offline = (
   }
 };
 
-const loading = (
-  state: boolean = defaultState.loading,
-  action: Action
-): boolean => {
-  switch (action.type) {
-    case SET_LOADING:
-      return action.value;
-    default:
-      return state;
+export const loadingSlice = createSlice({
+  name: "loading",
+  initialState: defaultState.loading,
+  reducers: {
+    setLoading: (state, action): boolean => action.payload
   }
-};
+})
 
 export const topNavSlice = createSlice({
   name: "topNav",
@@ -357,7 +352,7 @@ export default combineReducers({
   topArtist: topArtist,
   hover: hover,
   offline: offline,
-  loading: loading,
+  loading: loadingSlice.reducer,
   loginState: loginState,
   topNav: topNavSlice.reducer,
   subNav: subNav,

@@ -3,7 +3,7 @@ import ReactSelect from "../../../shared/ReactSelect";
 import { ipcSend } from "../../rendererUtil";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../../shared/redux/appState";
-import { SET_LOADING, dispatchAction } from "../../../shared/redux/reducers";
+import { loadingSlice } from "../../../shared/redux/reducers";
 
 function shareTypeId(type: string): number {
   switch (type) {
@@ -47,7 +47,8 @@ export default function Share(props: ShareProps): JSX.Element {
 
   const selectExpire = useCallback(
     (option: string): void => {
-      dispatchAction(dispatcher, SET_LOADING, true);
+      const { setLoading } = loadingSlice.actions;
+      dispatcher(setLoading(true));
       switch (type) {
         case "draft":
           ipcSend("request_draft_link", {

@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   dispatchAction,
   exploreSlice,
-  SET_LOADING,
   SET_BACKGROUND_GRPID,
-  SET_SUB_NAV
+  SET_SUB_NAV,
+  loadingSlice
 } from "../../shared/redux/reducers";
 import ReactSelect from "../../shared/ReactSelect";
 import Button from "../components/misc/Button";
@@ -47,8 +47,10 @@ export default function ExploreTab(): JSX.Element {
 
   const queryExplore = useCallback(
     (filters: ExploreQuery) => {
+      const { setLoading } = loadingSlice.actions;
+
       ipcSend("request_explore", filters);
-      dispatchAction(dispatcher, SET_LOADING, true);
+      dispatcher(setLoading(true));
       dispatcher(setExploreFilters(filters));
     },
     [dispatcher, setExploreFilters]
