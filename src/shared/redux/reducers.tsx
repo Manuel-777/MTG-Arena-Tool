@@ -9,9 +9,6 @@ export const SET_BACKGROUND_GRPID = "SET_BACKGROUND_GRPID";
 export const SET_BACKGROUND_COLOR = "SET_BACKGROUND_COLOR";
 export const SET_SETTINGS = "SET_SETTINGS";
 export const SET_TOP_ARTIST = "SET_TOP_ARTIST";
-export const SET_HOVER_IN = "SET_HOVER_IN";
-export const SET_HOVER_OUT = "SET_HOVER_OUT";
-export const SET_HOVER_SIZE = "SET_HOVER_SIZE";
 export const SET_OFFLINE = "SET_OFFLINE";
 export const SET_LOADING = "SET_LOADING";
 export const SET_SUB_NAV = "SET_SUB_NAV";
@@ -92,31 +89,22 @@ export interface HoverState {
   size: number;
 }
 
-const hover = (
-  state: HoverState = defaultState.hover,
-  action: Action
-): HoverState => {
-  switch (action.type) {
-    case SET_HOVER_IN:
-      return {
-        ...state,
-        grpId: action.value,
-        opacity: 1
-      };
-    case SET_HOVER_OUT:
-      return {
-        ...state,
-        opacity: 0
-      };
-    case SET_HOVER_SIZE:
-      return {
-        ...state,
-        size: action.value
-      };
-    default:
-      return state;
+export const hoverSlice = createSlice({
+  name: "hover",
+  initialState: defaultState.hover,
+  reducers: {
+    setHoverIn: (state, action): void => {
+      state.grpId = action.payload;
+      state.opacity = 1;
+    },
+    setHoverOut: (state): void => {
+      state.opacity = 0;
+    },
+    setHoverSize: (state, action): void => {
+      state.size = action.payload;
+    }
   }
-};
+});
 
 const offline = (
   state: boolean = defaultState.offline,
@@ -267,11 +255,7 @@ const patreon = (
 
 export const exploreSlice = createSlice({
   name: "explore",
-  initialState: {
-    data: defaultState.explore.data,
-    filters: defaultState.explore.filters,
-    activeEvents: defaultState.explore.activeEvents
-  },
+  initialState: defaultState.explore,
   reducers: {
     setExploreData: (state, action): void => {
       const isSameResultType =
@@ -355,7 +339,7 @@ export default combineReducers({
   backgroundGrpId: backgroundGrpId,
   settings: settings,
   topArtist: topArtist,
-  hover: hover,
+  hover: hoverSlice.reducer,
   offline: offline,
   loading: loading,
   loginState: loginState,

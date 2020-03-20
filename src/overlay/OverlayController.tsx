@@ -1,6 +1,7 @@
 import { ipcRenderer as ipc, webFrame } from "electron";
 import { Howl, Howler } from "howler";
 import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import striptags from "striptags";
 import {
   ARENA_MODE_IDLE,
@@ -10,15 +11,13 @@ import {
 } from "../shared/constants";
 import Deck from "../shared/deck";
 import playerData from "../shared/PlayerData";
+import { hoverSlice } from "../shared/redux/reducers";
 import { MatchData } from "../types/currentMatch";
 import { DraftData } from "../types/draft";
 import { InternalActionLog } from "../types/log";
-import { DbCardData } from "../types/Metadata";
-import { OverlaySettingsData, SettingsData } from "../types/settings";
+import { OverlaySettingsData } from "../types/settings";
 import CardDetailsWindowlet from "./CardDetailsWindowlet";
 import OverlayWindowlet from "./OverlayWindowlet";
-import { dispatchAction, SET_HOVER_SIZE } from "../shared/redux/reducers";
-import { useDispatch } from "react-redux";
 
 const sound = new Howl({ src: ["../sounds/blip.mp3"] });
 
@@ -190,10 +189,11 @@ export default function OverlayController(): JSX.Element {
     []
   );
 
+  const { setHoverSize } = hoverSlice.actions;
   const handleSettingsUpdated = useCallback((): void => {
-    dispatchAction(dispatcher, SET_HOVER_SIZE, playerData.cardsSizeHoverCard);
+    dispatcher(setHoverSize(playerData.cardsSizeHoverCard));
     setSettings({ ...playerData.settings });
-  }, []);
+  }, [dispatcher, setHoverSize]);
 
   const handleSetMatch = useCallback((event: unknown, arg: string): void => {
     const newMatch = JSON.parse(arg);
