@@ -631,7 +631,6 @@ function createOverlayWindow(): BrowserWindow {
     width: bounds.width,
     height: bounds.height,
     frame: false,
-    show: false,
     resizable: false,
     skipTaskbar: true,
     focusable: false,
