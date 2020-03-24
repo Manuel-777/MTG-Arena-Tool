@@ -1,9 +1,16 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { createSlice } from "@reduxjs/toolkit";
+import _ from "lodash";
+import { TableState } from "react-table";
 import { combineReducers } from "redux";
 import { MergedSettings } from "../../types/settings";
+import Aggregator, { AggregatorFilters } from "../../window_main/aggregator";
+import { DecksData } from "../../window_main/components/decks/types";
+import { ipcSend } from "../../window_main/rendererUtil";
 import { WildcardsChange } from "../../window_main/tabs/HomeTab";
+import { DECKS_LIST_MODE } from "../constants";
 import { defaultCfg, playerDataDefault } from "../PlayerData";
+import { getReadableFormat } from "../util";
 
 export const LOGIN_AUTH = 1;
 export const LOGIN_WAITING = 2;
@@ -173,6 +180,81 @@ export const homeSlice = createSlice({
   }
 });
 
+interface DecksSliceState {
+  aggFilters: AggregatorFilters;
+  data: DecksData[];
+  events: string[];
+  tableMode: string;
+  tableState?: TableState<DecksData>;
+}
+
+export const decksSlice = createSlice({
+  name: "decks",
+  initialState: {
+    aggFilters: Aggregator.getDefaultFilters(),
+    data: [],
+    events: [],
+    tableMode: DECKS_LIST_MODE
+  } as DecksSliceState,
+  reducers: {
+    addTag: (state, action): void => {
+      const { id, tag } = action.payload;
+      const results = state.data.filter(deck => deck.id === id);
+      const deck = results.length > 0 ? results[0] : undefined;
+
+      if (!deck || !tag) return;
+      if (getReadableFormat(deck.format) === tag) return;
+      if (tag === "Add") return;
+      if (deck.tags && deck.tags.includes(tag)) return;
+
+      if (deck.tags) deck.tags.push(tag);
+      else deck.tags = [tag];
+      ipcSend("add_tag", { deckid: id, tag });
+    },
+    editTag: (state, action): void => {
+      const { color, tag } = action.payload;
+      ipcSend("edit_tag", { tag, color });
+    },
+    deleteTag: (state, action): void => {
+      const { id, tag } = action.payload;
+      const results = state.data.filter(deck => deck.id === id);
+      const deck = results.length > 0 ? results[0] : undefined;
+      if (!deck || !tag) return;
+      if (deck.tags) {
+        _.remove(deck.tags, tag);
+        ipcSend("delete_tag", { deckid: id, tag });
+      }
+    },
+    setAggFilters: (state, action): void => {
+      state.aggFilters = action.payload;
+    },
+    setDecksData: (state, action): void => {
+      state.data = action.payload;
+    },
+    setEvents: (state, action): void => {
+      state.events = action.payload;
+    },
+    setTableMode: (state, action): void => {
+      const decksTableMode = action.payload;
+      state.tableMode = decksTableMode;
+      ipcSend("save_user_settings", { decksTableMode, skipRefresh: true });
+    },
+    setTableState: (state, action): void => {
+      const decksTableState = action.payload;
+      state.tableState = decksTableState;
+      ipcSend("save_user_settings", { decksTableState, skipRefresh: true });
+    },
+    toggleArchived: (state, action): void => {
+      const results = state.data.filter(deck => deck.id === action.payload);
+      const deck = results.length > 0 ? results[0] : undefined;
+      if (deck && deck.custom) {
+        deck.archived = !deck.archived;
+        ipcSend("toggle_deck_archived", deck.id);
+      }
+    }
+  }
+});
+
 export const collectionSlice = createSlice({
   name: "collection",
   initialState: {
@@ -279,6 +361,7 @@ const rootReducer = combineReducers({
   hover: hoverSlice.reducer,
   login: loginSlice.reducer,
   homeData: homeSlice.reducer,
+  decks: decksSlice.reducer,
   collection: collectionSlice.reducer,
   explore: exploreSlice.reducer
 });
