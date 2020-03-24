@@ -1,7 +1,9 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { FilterValue } from "react-table";
 import { DECKS_TABLE_MODES } from "../../../shared/constants";
 import ReactSelect from "../../../shared/ReactSelect";
+import { AppState, decksSlice } from "../../../shared/redux/reducers";
 import { getReadableEvent } from "../../../shared/util";
 import DateFilter from "../../DateFilter";
 import { MediumTextButton, SmallTextButton } from "../misc/display";
@@ -41,14 +43,21 @@ export default function DecksTableControls(
     setAllFilters,
     setFiltersVisible,
     setGlobalFilter,
-    setTableMode,
     setTogglesVisible,
-    tableMode,
     toggleableColumns,
     toggleHideColumn,
     toggleSortBy,
     togglesVisible
   } = props;
+  const tableMode = useSelector((state: AppState) => state.decks.tableMode);
+  const dispatcher = useDispatch();
+  const tableModeCallback = React.useCallback(
+    (tableMode: string): void => {
+      const { setTableMode } = decksSlice.actions;
+      dispatcher(setTableMode(tableMode));
+    },
+    [dispatcher]
+  );
   return (
     <div
       style={{
@@ -141,7 +150,7 @@ export default function DecksTableControls(
         <ReactSelect
           current={tableMode}
           options={DECKS_TABLE_MODES}
-          callback={setTableMode}
+          callback={tableModeCallback}
           className={"decks_table_mode"}
         />
         <GlobalFilter

@@ -1,5 +1,6 @@
 import _ from "lodash";
 import React from "react";
+import { useSelector } from "react-redux";
 import {
   TableInstance,
   TableState,
@@ -9,7 +10,7 @@ import {
   useSortBy,
   useTable
 } from "react-table";
-import pd from "../../../shared/PlayerData";
+import { AppState } from "../../../shared/redux/reducers";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import {
   archivedFilterFn,
@@ -68,14 +69,16 @@ export function useBlurOnEnter(): [
   return [inputRef, onKeyDown];
 }
 
-function getDefaultAggFilters(
+export function useDefaultAggFilters(
   showArchived: boolean,
   aggFiltersArg?: AggregatorFilters
 ): AggregatorFilters {
-  const { last_date_filter: dateFilter } = pd.settings;
+  const date = useSelector(
+    (state: AppState) => state.settings.last_date_filter
+  );
   return {
     ...Aggregator.getDefaultFilters(),
-    date: dateFilter,
+    date,
     eventId: Aggregator.DEFAULT_EVENT,
     ...aggFiltersArg,
     showArchived
@@ -95,12 +98,11 @@ export function useAggregatorData<D extends TableData>({
   data: D[];
   setAggFilters: (aggFilters: AggregatorFilters) => void;
 } {
-  const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
+  const defaultAggFilters = useDefaultAggFilters(showArchived, aggFiltersArg);
   const [aggFilters, setAggFilters] = React.useState(defaultAggFilters);
   React.useEffect(() => {
-    const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
     setAggFilters(defaultAggFilters);
-  }, [aggFiltersArg, showArchived]);
+  }, [defaultAggFilters]);
   const data = React.useMemo(() => {
     const aggregator = new Aggregator(aggFilters);
     return getData(aggregator);

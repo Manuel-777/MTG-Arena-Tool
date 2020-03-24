@@ -38,22 +38,6 @@ export interface DecksData
   lastEditWinrate: number;
 }
 
-export interface DecksTableProps {
-  addTagCallback: (id: string, tag: string) => void;
-  archiveCallback: (id: string | number) => void;
-  aggFilters: AggregatorFilters;
-  cachedState?: TableState<DecksData>;
-  cachedTableMode: string;
-  data: DecksData[];
-  events: string[];
-  deleteTagCallback: (deckid: string, tag: string) => void;
-  editTagCallback: (tag: string, color: string) => void;
-  openDeckCallback: (deck: InternalDeck) => void;
-  setAggFiltersCallback: (filters: AggregatorFilters) => void;
-  tableModeCallback: (tableMode: string) => void;
-  tableStateCallback: (state: TableState<DecksData>) => void;
-}
-
 export interface DecksTableControlsProps extends TableControlsProps<DecksData> {
   setAggFiltersCallback: (filters: AggregatorFilters) => void;
   aggFilters: AggregatorFilters;

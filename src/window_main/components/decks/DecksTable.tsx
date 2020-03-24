@@ -1,8 +1,19 @@
 import React from "react";
-import { Column, Row } from "react-table";
-import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
-import pd from "../../../shared/PlayerData";
+import { useDispatch, useSelector } from "react-redux";
+import { Column, Row, TableState } from "react-table";
+import {
+  DECKS_ART_MODE,
+  DECKS_TABLE_MODE,
+  SUB_DECK
+} from "../../../shared/constants";
+import {
+  AppState,
+  decksSlice,
+  rendererSlice
+} from "../../../shared/redux/reducers";
+import { InternalDeck } from "../../../types/Deck";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
+import uxMove from "../../uxMove";
 import { ListItemDeck } from "../list-item/ListItemDeck";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";
 import ResizableDragger from "../misc/ResizableDragger";
@@ -39,7 +50,7 @@ import {
 import DecksArtViewRow from "./DecksArtViewRow";
 import DecksTableControls from "./DecksTableControls";
 import { deckSearchFilterFn } from "./filters";
-import { DecksData, DecksTableControlsProps, DecksTableProps } from "./types";
+import { DecksData, DecksTableControlsProps } from "./types";
 
 const columns: Column<DecksData>[] = [
   { accessor: "id" },
@@ -254,23 +265,79 @@ function getDataAggFilters(data: Row<DecksData>[]): AggregatorFilters {
   return { deckId };
 }
 
-export default function DecksTable({
-  data,
-  aggFilters,
-  events,
-  setAggFiltersCallback,
-  tableModeCallback,
-  tableStateCallback,
-  cachedState,
-  cachedTableMode,
-  openDeckCallback,
-  ...customProps
-}: DecksTableProps): JSX.Element {
-  const [tableMode, setTableMode] = React.useState(cachedTableMode);
-  React.useEffect(() => tableModeCallback(tableMode), [
+export default function DecksTable(): JSX.Element {
+  const {
+    aggFilters,
+    data,
+    events,
     tableMode,
-    tableModeCallback
-  ]);
+    tableState: cachedState
+  } = useSelector((state: AppState) => state.decks);
+  const dispatcher = useDispatch();
+  const archiveCallback = React.useCallback(
+    (id: string | number): void => {
+      const { toggleArchived } = decksSlice.actions;
+      dispatcher(toggleArchived(id));
+    },
+    [dispatcher]
+  );
+  const addTagCallback = React.useCallback(
+    (id: string, tag: string): void => {
+      const { addTag } = decksSlice.actions;
+      dispatcher(addTag({ id, tag }));
+    },
+    [dispatcher]
+  );
+  const editTagCallback = React.useCallback(
+    (tag: string, color: string): void => {
+      const { editTag } = decksSlice.actions;
+      dispatcher(editTag({ color, tag }));
+    },
+    [dispatcher]
+  );
+  const deleteTagCallback = React.useCallback(
+    (id: string, tag: string): void => {
+      const { deleteTag } = decksSlice.actions;
+      dispatcher(deleteTag({ id, tag }));
+    },
+    [dispatcher]
+  );
+  const openDeckCallback = React.useCallback(
+    (deck: InternalDeck): void => {
+      uxMove(-100);
+      const { setBackgroundGrpId, setSubNav } = rendererSlice.actions;
+      dispatcher(setBackgroundGrpId(deck.deckTileId));
+      dispatcher(
+        setSubNav({
+          type: SUB_DECK,
+          id: deck.id
+        })
+      );
+    },
+    [dispatcher]
+  );
+  const setAggFiltersCallback = React.useCallback(
+    (filters: AggregatorFilters): void => {
+      const { setAggFilters } = decksSlice.actions;
+      dispatcher(setAggFilters(filters));
+    },
+    [dispatcher]
+  );
+  const tableModeCallback = React.useCallback(
+    (tableMode: string): void => {
+      const { setTableMode } = decksSlice.actions;
+      dispatcher(setTableMode(tableMode));
+    },
+    [dispatcher]
+  );
+  const tableStateCallback = React.useCallback(
+    (state: TableState<DecksData>): void => {
+      const { setTableState } = decksSlice.actions;
+      dispatcher(setTableState(state));
+    },
+    [dispatcher]
+  );
+
   const tags = React.useMemo(() => {
     const tagCounts: { [tag: string]: number } = {};
     for (const deck of data) {
@@ -285,14 +352,20 @@ export default function DecksTable({
   const tableProps: BaseTableProps<DecksData> = {
     cachedState,
     columns,
-    customProps: { ...customProps, tags },
+    customProps: {
+      archiveCallback,
+      addTagCallback,
+      editTagCallback,
+      deleteTagCallback,
+      tags
+    },
     data,
     defaultState: {
       filters: [{ id: "archivedCol", value: "hideArchived" }],
       sortBy: [{ id: "timeTouched", desc: true }]
     },
     globalFilter: deckSearchFilterFn,
-    setTableMode,
+    setTableMode: tableModeCallback,
     tableMode,
     tableStateCallback
   };
@@ -315,7 +388,9 @@ export default function DecksTable({
   };
 
   const isTableMode = tableMode === DECKS_TABLE_MODE;
-  const { right_panel_width: panelWidth } = pd.settings;
+  const panelWidth = useSelector(
+    (state: AppState) => state.settings.right_panel_width
+  );
   const sidePanelWidth = panelWidth + "px";
   return (
     <>
@@ -366,7 +441,10 @@ export default function DecksTable({
                     gridTemplateColumns={gridTemplateColumns}
                     openDeckCallback={openDeckCallback}
                     tags={tags}
-                    {...customProps}
+                    archiveCallback={archiveCallback}
+                    addTagCallback={addTagCallback}
+                    editTagCallback={editTagCallback}
+                    deleteTagCallback={deleteTagCallback}
                   />
                 );
               })}
