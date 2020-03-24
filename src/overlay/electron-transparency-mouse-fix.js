@@ -20,7 +20,7 @@ const consoleTag = [
 class TransparencyMouseFix {
   /**
    * Creates an instance of TransparencyMouseFix
-   * @param {Object} options
+   * @param {any} options
    * @param {electron.BrowserWindow} options.electronWindow
    * @param {Window} options.htmlWindow
    * @param {(boolean|string)} options.fixPointerEvents
