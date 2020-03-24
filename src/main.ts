@@ -36,7 +36,7 @@ let mainWindow: BrowserWindow | undefined = undefined;
 let updaterWindow: BrowserWindow | undefined = undefined;
 let background: BrowserWindow | undefined = undefined;
 let overlay: BrowserWindow | undefined = undefined;
-let mainTimeout: NodeJS.Timeout | undefined = undefined;
+let mainTimeout: number | undefined = undefined;
 let settings: Partial<MergedSettings> = {
   close_to_tray: false,
   launch_to_tray: false
@@ -428,7 +428,7 @@ function setSettings(settingsArg: any): void {
   updateOverlayVisibility();
 }
 
-let overlayHideTimeout: NodeJS.Timeout | undefined = undefined;
+let overlayHideTimeout: number | undefined = undefined;
 
 function updateOverlayVisibility(): void {
   const shouldDisplayOverlay = settings.overlays?.some(getOverlayVisible);
@@ -635,6 +635,7 @@ function createOverlayWindow(): BrowserWindow {
     skipTaskbar: true,
     focusable: false,
     title: "Overlay",
+    show: process.platform == "linux" ? false : true,
     webPreferences: {
       nodeIntegration: true
     }
