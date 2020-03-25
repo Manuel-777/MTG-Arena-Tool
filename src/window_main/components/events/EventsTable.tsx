@@ -4,6 +4,7 @@ import { Column, Row } from "react-table";
 import { EVENTS_TABLE_MODE } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
+import { toggleArchived } from "../../rendererUtil";
 import { ListItemEvent } from "../list-item/ListItemEvent";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";
 import ResizableDragger from "../misc/ResizableDragger";
@@ -201,7 +202,7 @@ export default function EventsTable({
   const tableProps: BaseTableProps<EventTableData> = {
     cachedState,
     columns,
-    customProps: { editTagCallback },
+    customProps: { archiveCallback: toggleArchived, editTagCallback },
     data,
     defaultState: {
       filters: [{ id: "archivedCol", value: "hideArchived" }],
