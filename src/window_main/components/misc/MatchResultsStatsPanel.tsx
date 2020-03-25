@@ -279,15 +279,21 @@ export default function MatchResultsStatsPanel({
               {toMMSS(stats.duration)}
             </div>
           </div>
-          <label className={"but_container_label"}>
-            Group by:
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <label className={"but_container_label"}>Group by:</label>
             <ReactSelect
+              className={"match_results_group_select"}
               current={showTags ? "Archetype" : "Color"}
               options={["Archetype", "Color"]}
               callback={(filter): void => setShowTags(filter === "Archetype")}
-              style={{ width: "120px" }}
+              style={{
+                margin: "12px auto auto 4px",
+                textAlign: "left",
+                width: "120px",
+                display: "inline-flex"
+              }}
             />
-          </label>
+          </div>
           {showCharts && (
             <div
               className={
