@@ -108,7 +108,7 @@ export interface InternalMatch {
   eventId: string;
   bestOf: number;
   gameStats: any[];
-  toolVersion: number;
+  toolVersion: string;
   toolRunFromSource: boolean;
   id: string;
   duration: number;
