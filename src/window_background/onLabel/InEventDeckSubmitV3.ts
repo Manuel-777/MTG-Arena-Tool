@@ -10,7 +10,7 @@ interface Entry extends LogEntry {
 
 export default function onLabelInEventDeckSubmitV3(entry: Entry): void {
   const json = entry.json();
-  if (!json) return;
+  if (!json || !json.CourseDeck) return;
   const deck = new Deck(convertDeckFromV3(json.CourseDeck));
   selectDeck(deck);
 }

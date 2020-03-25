@@ -5,7 +5,10 @@ import { ipcSend, setData } from "../backgroundUtil";
 import { InternalDraft } from "../../types/draft";
 import globals from "../globals";
 
-export default function setDraftData(data: InternalDraft, persist = false): void {
+export default function setDraftData(
+  data: InternalDraft,
+  persist = false
+): void {
   console.log("Set draft data:", data);
   globals.currentDraft = data;
 

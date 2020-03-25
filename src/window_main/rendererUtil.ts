@@ -4,7 +4,7 @@ import path from "path";
 import Pikaday from "pikaday";
 import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
 import pd from "../shared/PlayerData";
-import { WinLossGate, WinNoGate } from "../types/event";
+import { WinLossGate } from "../types/event";
 
 export const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),

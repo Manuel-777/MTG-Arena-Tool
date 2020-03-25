@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { TableViewRowProps } from "../tables/types";
 import { EventTableData } from "../events/types";
 import ManaCost from "../misc/ManaCost";
@@ -172,7 +172,9 @@ function EventSubRows({
     [dispatcher]
   );
 
-  const matchRows: Array<InternalMatch | InternalDraft> = React.useMemo(() => {
+  // This will be set on first render, no need to update state again
+  const initialDraft = useRef<InternalDraft | undefined>(undefined);
+  const matchRows: InternalMatch[] = React.useMemo(() => {
     if (!expanded) {
       return [];
     }
@@ -183,18 +185,22 @@ function EventSubRows({
       if (!a || !b) return 0;
       return compareDesc(new Date(a.date), new Date(b.date));
     });
-    const draft = pd.draft(draftId);
-    if (draft) {
-      // This shouldnt be a mixed array, it should be rendered instead
-      matchRows.unshift(draft);
-    }
+
+    initialDraft.current = pd.draft(draftId);
     return matchRows;
-  }, [draftId, event.stats.matchIds, expanded]);
+  }, [draftId, event.stats.matchIds, expanded, initialDraft]);
 
   const style = expanded ? { height: matchRows.length * 64 + "px" } : {};
 
   return (
     <div style={style} className="list_event_expand">
+      {initialDraft.current ? (
+        <ListItemDraft
+          key={initialDraft.current.id}
+          draft={initialDraft.current}
+          openDraftCallback={openDraft}
+        />
+      ) : null}
       {matchRows.map(match => {
         return match.type == "match" ? (
           <ListItemMatch
@@ -203,13 +209,7 @@ function EventSubRows({
             match={match as InternalMatch}
             openMatchCallback={openMatch}
           />
-        ) : (
-          <ListItemDraft
-            key={match.id}
-            draft={match as InternalDraft}
-            openDraftCallback={openDraft}
-          />
-        );
+        ) : null;
       })}
     </div>
   );

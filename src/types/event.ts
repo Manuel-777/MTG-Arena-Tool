@@ -43,15 +43,8 @@ export interface ModuleInstanceData {
   };
   DraftComplete?: boolean;
   HasGranted?: boolean;
-  WinLossGate?: {
-    MaxWins: number;
-    MaxLosses: number;
-    MaxGames: number;
-    CurrentWins: number;
-    CurrentLosses: number;
-    CurrentGames: number;
-    ProcessedMatchIds: string[];
-  };
+  WinLossGate?: WinLossGate;
+  WinNoGate?: WinNoGate;
 }
 
 export interface PlayerCourse {
