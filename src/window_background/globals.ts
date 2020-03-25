@@ -68,7 +68,7 @@ let originalDeck: Deck = new Deck();
 
 let oddsSampleSize = 1;
 
-let toolVersion = "0";
+let toolVersion = 0;
 
 let watchingLog = false;
 

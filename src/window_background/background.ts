@@ -53,10 +53,12 @@ if (!fs.existsSync(globals.actionLogDir)) {
   fs.mkdirSync(globals.actionLogDir);
 }
 
-globals.toolVersion = (app || remote.app)
-  .getVersion()
-  .split(".")
-  .reduce((acc, cur) => +acc * 256 + +cur + "");
+globals.toolVersion = parseInt(
+  (app || remote.app)
+    .getVersion()
+    .split(".")
+    .reduce((acc, cur) => +acc * 256 + +cur + "")
+);
 
 let logLoopInterval: number | undefined = undefined;
 const debugArenaID = undefined;
