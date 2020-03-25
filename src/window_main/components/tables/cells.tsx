@@ -1,7 +1,9 @@
 import isValid from "date-fns/isValid";
 import _ from "lodash";
 import React from "react";
+import { useDispatch } from "react-redux";
 import { Cell, CellProps } from "react-table";
+import { rendererSlice } from "../../../shared/redux/reducers";
 import LocalTime from "../../../shared/time-components/LocalTime";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { toDDHHMMSS, toMMSS } from "../../../shared/util";
@@ -244,6 +246,18 @@ export function ArchivedCell<D extends TableData>({
 }): JSX.Element {
   const data = cell.row.values;
   const isArchived = data.archived;
+  const dataId = data.id;
+  const dispatcher = useDispatch();
+  const onClick = React.useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+      event.stopPropagation();
+      event.nativeEvent.stopImmediatePropagation();
+      const { setArchived } = rendererSlice.actions;
+      dispatcher(setArchived({ id: dataId, archived: !isArchived }));
+      archiveCallback(dataId);
+    },
+    [archiveCallback, dataId, dispatcher, isArchived]
+  );
   if (!data.custom) {
     return <ArchiveSymbol style={{ visibility: "hidden" }} />;
   }
@@ -251,11 +265,7 @@ export function ArchivedCell<D extends TableData>({
     <ColoredArchivedSymbol
       archived={isArchived}
       title={isArchived ? "restore" : "archive (will not delete data)"}
-      onClick={(e): void => {
-        e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation();
-        archiveCallback(data.id);
-      }}
+      onClick={onClick}
     />
   );
 }

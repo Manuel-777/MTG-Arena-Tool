@@ -1,5 +1,6 @@
 import _ from "lodash";
 import React from "react";
+import { useSelector } from "react-redux";
 import {
   TableInstance,
   TableState,
@@ -10,6 +11,7 @@ import {
   useTable
 } from "react-table";
 import pd from "../../../shared/PlayerData";
+import { AppState } from "../../../shared/redux/reducers";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import {
   archivedFilterFn,
@@ -88,7 +90,10 @@ export function useAggregatorData<D extends TableData>({
   showArchived
 }: {
   aggFiltersArg?: AggregatorFilters;
-  getData: (aggregator: Aggregator) => D[];
+  getData: (
+    aggregator: Aggregator,
+    archivedCache: Record<string, boolean>
+  ) => D[];
   showArchived: boolean;
 }): {
   aggFilters: AggregatorFilters;
@@ -101,10 +106,13 @@ export function useAggregatorData<D extends TableData>({
     const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
     setAggFilters(defaultAggFilters);
   }, [aggFiltersArg, showArchived]);
+  const archivedCache = useSelector(
+    (state: AppState) => state.renderer.archivedCache
+  );
   const data = React.useMemo(() => {
     const aggregator = new Aggregator(aggFilters);
-    return getData(aggregator);
-  }, [aggFilters, getData]);
+    return getData(aggregator, archivedCache);
+  }, [aggFilters, archivedCache, getData]);
   return {
     aggFilters,
     data,

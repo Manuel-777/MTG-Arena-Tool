@@ -1,31 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-use-before-define */
 import React from "react";
-
 import db from "../../../shared/database";
 import pd from "../../../shared/PlayerData";
+import LocalTime from "../../../shared/time-components/LocalTime";
 import {
   collectionSortRarity,
+  getCardArtCrop,
   getCardImage,
-  openScryfallCard,
-  getCardArtCrop
+  openScryfallCard
 } from "../../../shared/util";
-import LocalTime from "../../../shared/time-components/LocalTime";
 import { DbCardData } from "../../../types/Metadata";
-
+import useHoverCard from "../../hooks/useHoverCard";
 import {
   formatNumber,
   formatPercent,
   toggleArchived
 } from "../../rendererUtil";
+import { ArchiveButton } from "../list-item/ListItem";
 import {
   getCollationSet,
   getPrettyContext,
-  vaultPercentFormat,
-  getReadableCode
+  getReadableCode,
+  vaultPercentFormat
 } from "./economyUtils";
-
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
-import useHoverCard from "../../hooks/useHoverCard";
 
 function EconomyRowDate(date: Date): JSX.Element {
   return (
@@ -544,40 +542,6 @@ function FlexTop(props: FlexTopProps): JSX.Element {
   );
 }
 
-interface DeleteButtonProps {
-  change: any;
-  economyId: string;
-  hideRowCallback: () => void;
-}
-
-function DeleteButton(props: DeleteButtonProps): JSX.Element {
-  const { change, economyId, hideRowCallback } = props;
-  const archiveClass = change.archived
-    ? "list_item_unarchive"
-    : "list_item_archive";
-
-  const title = change.archived ? "restore" : "archive (will not delete data)";
-
-  const archiveCallback = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      e.stopPropagation();
-      if (!change.archived) {
-        hideRowCallback();
-      }
-      toggleArchived(economyId);
-    },
-    [change, economyId, hideRowCallback]
-  );
-
-  return (
-    <div
-      className={"flex_item " + economyId + "_del " + archiveClass}
-      onClick={archiveCallback}
-      title={title}
-    />
-  );
-}
-
 interface ChangeRowProps {
   economyId: string;
   change: any;
@@ -587,6 +551,14 @@ export function ChangeRow(props: ChangeRowProps): JSX.Element {
   const { economyId, change } = props;
   const fullContext = getPrettyContext(change.originalContext);
   const thingsToCheck = getThingsToCheck(fullContext, change);
+
+  const [hover, setHover] = React.useState(false);
+  const onMouseEnter = React.useCallback(() => {
+    setHover(true);
+  }, []);
+  const onMouseLeave = React.useCallback(() => {
+    setHover(false);
+  }, []);
 
   const flexTopProps = {
     fullContext,
@@ -603,27 +575,22 @@ export function ChangeRow(props: ChangeRowProps): JSX.Element {
     economyId
   };
 
-  const [isHidden, setIsHidden] = React.useState(false);
-
-  const hideRowCallback = React.useCallback(() => {
-    setIsHidden(true);
-  }, []);
-
   return (
     <div
-      className={
-        economyId + " list_economy" + (isHidden ? " economy_row_hidden" : "")
-      }
+      className={economyId + " list_economy"}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <div className={"flex_item flexLeft"}>
         <FlexTop {...flexTopProps} />
         <FlexBottom {...flexBottomProps} />
       </div>
       <FlexRight {...flexRightProps} />
-      <DeleteButton
-        change={change}
-        economyId={economyId}
-        hideRowCallback={hideRowCallback}
+      <ArchiveButton
+        archiveCallback={toggleArchived}
+        dataId={economyId}
+        hover={hover}
+        isArchived={change.archived ?? false}
       />
     </div>
   );

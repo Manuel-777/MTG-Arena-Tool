@@ -103,7 +103,10 @@ function getEventStats(event: InternalEvent): EventStats {
   return stats;
 }
 
-function getEventsData(aggregator: Aggregator): EventTableData[] {
+function getEventsData(
+  aggregator: Aggregator,
+  archivedCache: Record<string, boolean>
+): EventTableData[] {
   return pd.eventList
     .filter((event: InternalEvent) => {
       // legacy filter logic
@@ -118,10 +121,12 @@ function getEventsData(aggregator: Aggregator): EventTableData[] {
         const timestamp = new Date(event.date ?? NaN);
         const colors = event.CourseDeck.colors ?? [];
         const stats = getEventStats(event);
+        const archived = archivedCache[event.id] ?? event.archived ?? false;
         return {
           ...event,
           ...stats,
-          archivedSortVal: event.archived ? 1 : 0,
+          archived,
+          archivedSortVal: archived ? 1 : 0,
           custom: true,
           colors,
           colorSortVal: colors.join(""),

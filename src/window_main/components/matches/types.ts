@@ -61,6 +61,7 @@ export interface ListItemMatchProps {
   tags: TagCounts;
   match: InternalMatch;
   openMatchCallback: (match: InternalMatch) => void;
+  archiveCallback?: (id: string | number) => void;
   addTagCallback?: (id: string, tag: string) => void;
   editTagCallback?: (tag: string, color: string) => void;
   deleteTagCallback?: (id: string, tag: string) => void;

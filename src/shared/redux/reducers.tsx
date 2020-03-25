@@ -47,6 +47,7 @@ export const hoverSlice = createSlice({
 export const rendererSlice = createSlice({
   name: "renderer",
   initialState: {
+    archivedCache: {} as Record<string, boolean>,
     backgroundColor: "rgba(0, 0, 0, 0.25)",
     backgroundGrpId: 0,
     backgroundImage: "default",
@@ -124,6 +125,12 @@ export const rendererSlice = createSlice({
     },
     setUpdateState: (state, action): void => {
       state.updateState = action.payload;
+    },
+    setArchived: (state, action): void => {
+      const { id, archived } = action.payload;
+      if (!id) return;
+      // update local cache (avoids round trip)
+      state.archivedCache[id] = !!archived;
     }
   }
 });

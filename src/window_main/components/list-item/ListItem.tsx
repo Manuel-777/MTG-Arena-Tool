@@ -1,4 +1,6 @@
-import React, { useCallback } from "react";
+import React from "react";
+import { useDispatch } from "react-redux";
+import { rendererSlice } from "../../../shared/redux/reducers";
 import { getCardArtCrop } from "../../../shared/util";
 
 interface ListItemProps extends JSX.ElementChildrenAttribute {
@@ -111,14 +113,20 @@ function archiveButtonStyle(hover: boolean): React.CSSProperties {
 
 export function ArchiveButton(props: ArchiveButtonProps): JSX.Element {
   const { isArchived, archiveCallback, dataId } = props;
-
+  const dispatcher = useDispatch();
+  const onClick = React.useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+      event.stopPropagation();
+      event.nativeEvent.stopImmediatePropagation();
+      const { setArchived } = rendererSlice.actions;
+      dispatcher(setArchived({ id: dataId, archived: !isArchived }));
+      archiveCallback(dataId);
+    },
+    [archiveCallback, dataId, dispatcher, isArchived]
+  );
   return (
     <div
-      onClick={(e): void => {
-        e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation();
-        archiveCallback(dataId);
-      }}
+      onClick={onClick}
       className={isArchived ? "list_item_unarchive" : "list_item_archive"}
       title={isArchived ? "restore" : "archive (will not delete data)"}
       style={archiveButtonStyle(props.hover)}

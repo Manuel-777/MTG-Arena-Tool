@@ -56,12 +56,16 @@ function saveTableMode(decksTableMode: string): void {
   ipcSend("save_user_settings", { decksTableMode, skipRefresh: true });
 }
 
-function getDecksData(aggregator: Aggregator): DecksData[] {
+function getDecksData(
+  aggregator: Aggregator,
+  archivedCache: Record<string, boolean>
+): DecksData[] {
   return pd.deckList.map(
     (deck: InternalDeck): DecksData => {
       const id = deck.id ?? "";
       const name = (deck.name ?? "").replace("?=?Loc/Decks/Precon/", "");
-      const archivedSortVal = deck.archived ? 1 : deck.custom ? 0.5 : 0;
+      const archived = archivedCache[deck.id] ?? deck.archived ?? false;
+      const archivedSortVal = archived ? 1 : deck.custom ? 0.5 : 0;
       const colorSortVal = deck.colors?.join("") ?? "";
       // compute winrate metrics
       const deckStats: AggregatorStats =
@@ -78,6 +82,7 @@ function getDecksData(aggregator: Aggregator): DecksData[] {
       const lastTouched = dateMaxValid(lastUpdated, lastPlayed);
       return {
         ...deck,
+        archived,
         name,
         format: getReadableFormat(deck.format),
         ...deckStats,

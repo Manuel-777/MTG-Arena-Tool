@@ -1,14 +1,15 @@
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import isValid from "date-fns/isValid";
 import React from "react";
+import { useSelector } from "react-redux";
 import { TableState } from "react-table";
 import pd from "../../shared/PlayerData";
-import EconomyTable from "../components/economy/EconomyTable";
-import { TransactionData } from "../components/economy/types";
-import { getPrettyContext } from "../components/economy/economyUtils";
-import { ipcSend, toggleArchived } from "../rendererUtil";
-
+import { AppState } from "../../shared/redux/reducers";
 import { InternalEconomyTransaction } from "../../types/inventory";
+import EconomyTable from "../components/economy/EconomyTable";
+import { getPrettyContext } from "../components/economy/economyUtils";
+import { TransactionData } from "../components/economy/types";
+import { ipcSend, toggleArchived } from "../rendererUtil";
 
 function saveTableState(economyTableState: TableState<TransactionData>): void {
   ipcSend("save_user_settings", { economyTableState, skipRefresh: true });
@@ -25,12 +26,13 @@ const sumBoosterCount = (boosters: { count: number }[]): number =>
     0
   );
 
-function getTxnData(): TransactionData[] {
+function getTxnData(archivedCache: Record<string, boolean>): TransactionData[] {
   const today = new Date();
   return pd.transactionList.map(
     (txn: InternalEconomyTransaction): TransactionData => {
       const ts = new Date(txn.date ?? NaN);
-      const archivedSortVal = txn.archived ? 1 : 0;
+      const archived = archivedCache[txn.id] ?? txn.archived ?? false;
+      const archivedSortVal = archived ? 1 : 0;
       const currentTrackLevel = txn.trackDiff?.currentLevel ?? 0;
       const oldTrackLevel = txn.trackDiff?.oldLevel ?? 0;
       const currentOrbCount = txn.orbCountDiff?.currentOrbCount ?? 0;
@@ -53,6 +55,7 @@ function getTxnData(): TransactionData[] {
         ...txn,
         prettyContext: getPrettyContext(originalContext, false),
         fullContext: getPrettyContext(originalContext, true),
+        archived,
         archivedSortVal,
         custom: true, // all txns may be archived
         trackLevelDelta: currentTrackLevel - oldTrackLevel,
@@ -82,7 +85,10 @@ function getTxnData(): TransactionData[] {
 
 export default function EconomyTab(): JSX.Element {
   const { economyTableMode, economyTableState } = pd.settings;
-  const data = React.useMemo(() => getTxnData(), []);
+  const archivedCache = useSelector(
+    (state: AppState) => state.renderer.archivedCache
+  );
+  const data = React.useMemo(() => getTxnData(archivedCache), [archivedCache]);
   return (
     <div className="ux_item">
       <EconomyTable

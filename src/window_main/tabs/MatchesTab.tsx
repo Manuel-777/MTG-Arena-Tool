@@ -45,7 +45,10 @@ function saveTableMode(matchesTableMode: string): void {
   ipcSend("save_user_settings", { matchesTableMode, skipRefresh: true });
 }
 
-function getMatchesData(aggregator: Aggregator): MatchTableData[] {
+function getMatchesData(
+  aggregator: Aggregator,
+  archivedCache: Record<string, boolean>
+): MatchTableData[] {
   return pd.matchList
     .filter((match: InternalMatch) => {
       // legacy filter logic
@@ -67,9 +70,11 @@ function getMatchesData(aggregator: Aggregator): MatchTableData[] {
         const oppColors = match.oppDeck.colors ?? [];
         const oppArenaId = match.opponent.name ?? "-#000000";
         const oppName = oppArenaId.slice(0, -6);
+        const archived = archivedCache[match.id] ?? match.archived ?? false;
         return {
           ...match,
-          archivedSortVal: match.archived ? 1 : 0,
+          archived,
+          archivedSortVal: archived ? 1 : 0,
           custom: true,
           colors,
           colorSortVal: colors.join(""),
