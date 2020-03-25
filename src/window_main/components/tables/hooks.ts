@@ -106,13 +106,14 @@ export function useAggregatorData<D extends TableData>({
     const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
     setAggFilters(defaultAggFilters);
   }, [aggFiltersArg, showArchived]);
-  const archivedCache = useSelector(
-    (state: AppState) => state.renderer.archivedCache
+  const { archivedCache, playerDataTimestamp } = useSelector(
+    (state: AppState) => state.renderer
   );
   const data = React.useMemo(() => {
+    playerDataTimestamp; // just here to force the memo dependency
     const aggregator = new Aggregator(aggFilters);
     return getData(aggregator, archivedCache);
-  }, [aggFilters, archivedCache, getData]);
+  }, [aggFilters, archivedCache, getData, playerDataTimestamp]);
   return {
     aggFilters,
     data,

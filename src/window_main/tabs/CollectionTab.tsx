@@ -1,22 +1,23 @@
 import { remote } from "electron";
 import React from "react";
+import { useSelector } from "react-redux";
 import { TableState } from "react-table";
 import Colors from "../../shared/colors";
 import { DRAFT_RANKS } from "../../shared/constants";
 import db from "../../shared/database";
+import Deck from "../../shared/deck";
 import pd from "../../shared/PlayerData";
-import { DbCardData } from "../../types/Metadata";
+import { AppState } from "../../shared/redux/reducers";
 import {
   getMissingCardCounts,
   openScryfallCard,
   replaceAll
 } from "../../shared/util";
+import { DbCardData } from "../../types/Metadata";
 import CollectionTable from "../components/collection/CollectionTable";
 import { CardsData } from "../components/collection/types";
-
-import { ipcSend } from "../rendererUtil";
 import { CardCounts } from "../components/decks/types";
-import Deck from "../../shared/deck";
+import { ipcSend } from "../rendererUtil";
 
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
@@ -120,7 +121,13 @@ function getCollectionData(): CardsData[] {
 
 export default function CollectionTab(): JSX.Element {
   const { collectionTableMode, collectionTableState } = pd.settings;
-  const data = React.useMemo(() => getCollectionData(), []);
+  const { playerDataTimestamp } = useSelector(
+    (state: AppState) => state.renderer
+  );
+  const data = React.useMemo(() => {
+    playerDataTimestamp; // just here to force the memo dependency
+    return getCollectionData();
+  }, [playerDataTimestamp]);
   return (
     <div className="ux_item">
       <CollectionTable

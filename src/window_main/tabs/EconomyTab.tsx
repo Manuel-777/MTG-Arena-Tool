@@ -85,10 +85,13 @@ function getTxnData(archivedCache: Record<string, boolean>): TransactionData[] {
 
 export default function EconomyTab(): JSX.Element {
   const { economyTableMode, economyTableState } = pd.settings;
-  const archivedCache = useSelector(
-    (state: AppState) => state.renderer.archivedCache
+  const { archivedCache, playerDataTimestamp } = useSelector(
+    (state: AppState) => state.renderer
   );
-  const data = React.useMemo(() => getTxnData(archivedCache), [archivedCache]);
+  const data = React.useMemo(() => {
+    playerDataTimestamp; // just here to force the memo dependency
+    return getTxnData(archivedCache);
+  }, [archivedCache, playerDataTimestamp]);
   return (
     <div className="ux_item">
       <EconomyTable

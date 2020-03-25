@@ -44,6 +44,7 @@ export default function ipcListeners(dispatcher: any): void {
     setOffline,
     setNoLog,
     setPatreon,
+    setPlayerDataTimestamp,
     setPopup,
     setShareDialogUrl,
     setTopNav,
@@ -187,6 +188,21 @@ export default function ipcListeners(dispatcher: any): void {
     dispatcher(setTopNav(pd.settings.last_open_tab ?? MAIN_HOME));
     dispatcher(setHoverSize(pd.cardsSizeHoverCard));
     dispatcher(setSettings(pd.settings));
+  });
+
+  ipc.on("set_player_data", (event: IpcRendererEvent, arg: any): void => {
+    try {
+      const payload = JSON.parse(arg);
+      // only update the timestamp for data, not settings
+      const keys = Object.keys(payload);
+      const isMoreThanJustSettings =
+        keys.length > 1 || !keys.includes("settings");
+      if (isMoreThanJustSettings) {
+        dispatcher(setPlayerDataTimestamp(Date.now()));
+      }
+    } catch (e) {
+      console.log("Unable to parse player data", e);
+    }
   });
 
   ipc.on("no_log", (): void => {
