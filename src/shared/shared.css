@@ -980,7 +980,7 @@ span {
 }
 
 .ownership-stars-container {
-    background-color: var(--color-back-100);
+    background-color: rgba(0, 0, 0, 0.75);
     width: calc(100% - 32px);
     margin: -38px auto 0 auto;
     height: 38px;

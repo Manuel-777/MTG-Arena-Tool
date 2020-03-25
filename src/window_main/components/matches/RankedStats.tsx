@@ -52,7 +52,7 @@ function getStepsUntilNextRank(mode: boolean, winrate: number): string {
   }
 
   const expectedValue = winrate * stw - (1 - winrate) * stl;
-  if (expectedValue <= 0) return "&#x221e";
+  if (expectedValue <= 0) return "∞";
   const stepsNeeded = st * ct - cs;
   return "~" + Math.ceil(stepsNeeded / expectedValue);
 }
