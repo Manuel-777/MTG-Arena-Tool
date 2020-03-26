@@ -1,7 +1,9 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { rendererSlice } from "../../../shared/redux/reducers";
 import { getCardArtCrop } from "../../../shared/util";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { SET_ARCHIVED } from "../../../shared-redux/constants";
+import { IPC_NONE } from "../../../shared/constants";
 
 interface ListItemProps extends JSX.ElementChildrenAttribute {
   click: VoidFunction;
@@ -118,8 +120,12 @@ export function ArchiveButton(props: ArchiveButtonProps): JSX.Element {
     (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
       event.stopPropagation();
       event.nativeEvent.stopImmediatePropagation();
-      const { setArchived } = rendererSlice.actions;
-      dispatcher(setArchived({ id: dataId, archived: !isArchived }));
+      reduxAction(
+        dispatcher,
+        SET_ARCHIVED,
+        { id: dataId, archived: !isArchived },
+        IPC_NONE
+      );
       archiveCallback(dataId);
     },
     [archiveCallback, dataId, dispatcher, isArchived]

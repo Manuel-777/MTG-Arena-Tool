@@ -5,7 +5,7 @@ import { app, ipcRenderer as ipc, remote } from "electron";
 import fs from "fs";
 import _ from "lodash";
 import path from "path";
-import { HIDDEN_PW, IPC_NONE, IPC_BACKGROUND } from "../shared/constants";
+import { HIDDEN_PW, IPC_NONE } from "../shared/constants";
 import { rememberDefaults } from "../shared/db/databaseUtil";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/PlayerData";
@@ -25,18 +25,9 @@ import {
 } from "./loadPlayerConfig";
 import * as mtgaLog from "./mtgaLog";
 import updateDeck from "./updateDeck";
-import store from "../shared-redux/stores/backgroundStore";
-import { INCREMENT } from "../shared-redux/constants";
-import {
-  initializeRendererReduxIPC,
-  reduxAction
-} from "../shared-redux/sharedRedux";
+import { initializeRendererReduxIPC } from "../shared-redux/sharedRedux";
 
-initializeRendererReduxIPC(store);
-
-setInterval(() => {
-  reduxAction(store.dispatch, INCREMENT, false, IPC_NONE);
-}, 1000);
+initializeRendererReduxIPC(globals.store);
 
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");

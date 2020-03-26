@@ -3,7 +3,6 @@ import _ from "lodash";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { Cell, CellProps } from "react-table";
-import { rendererSlice } from "../../../shared/redux/reducers";
 import LocalTime from "../../../shared/time-components/LocalTime";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { toDDHHMMSS, toMMSS } from "../../../shared/util";
@@ -20,6 +19,9 @@ import {
   TagBubble
 } from "../misc/display";
 import { TableData, TagCounts } from "./types";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { SET_ARCHIVED } from "../../../shared-redux/constants";
+import { IPC_NONE } from "../../../shared/constants";
 
 export function ColorsCell<D extends TableData>({
   cell
@@ -252,8 +254,12 @@ export function ArchivedCell<D extends TableData>({
     (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
       event.stopPropagation();
       event.nativeEvent.stopImmediatePropagation();
-      const { setArchived } = rendererSlice.actions;
-      dispatcher(setArchived({ id: dataId, archived: !isArchived }));
+      reduxAction(
+        dispatcher,
+        SET_ARCHIVED,
+        { id: dataId, archived: !isArchived },
+        IPC_NONE
+      );
       archiveCallback(dataId);
     },
     [archiveCallback, dataId, dispatcher, isArchived]

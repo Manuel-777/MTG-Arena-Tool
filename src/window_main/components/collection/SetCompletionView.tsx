@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import db from "../../../shared/database";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { CollectionStats } from "./collectionStats";
 import { SetCompletionBar } from "./CompletionProgressBar";
 import { SetCompletionStats } from "./SetCompletionStats";

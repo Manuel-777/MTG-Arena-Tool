@@ -10,7 +10,7 @@ import ReactSelect from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
 import Button from "../misc/Button";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 const LANGUAGES = [
   "en",

@@ -1,10 +1,12 @@
 import React from "react";
 import fs from "fs";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { useSelector, useDispatch } from "react-redux";
 import db from "../../../shared/database";
 import { getCardArtCrop } from "../../../shared/util";
-import { rendererSlice } from "../../../shared/redux/reducers";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { SET_TOPARTIST } from "../../../shared-redux/constants";
+import { IPC_NONE } from "../../../shared/constants";
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
 export default function BackgroundImage(): JSX.Element {
@@ -23,15 +25,25 @@ export default function BackgroundImage(): JSX.Element {
   React.useEffect(() => {
     let image = backgroundImage;
     const card = db.card(backgroundGrpId);
-    const { setTopArtist } = rendererSlice.actions;
+
     if (card) {
       // If card grpId exists
       image = getCardArtCrop(backgroundGrpId);
-      dispatcher(setTopArtist(`${card.name} by ${card.artist}`));
+      reduxAction(
+        dispatcher,
+        SET_TOPARTIST,
+        `${card.name} by ${card.artist}`,
+        IPC_NONE
+      );
     } else if (backgroundImage == "" || backgroundImage == "default") {
       // If we selected default or empty
       image = DEFAULT_BACKGROUND;
-      dispatcher(setTopArtist("Bedevil by Seb McKinnon"));
+      reduxAction(
+        dispatcher,
+        SET_TOPARTIST,
+        "Bedevil by Seb McKinnon",
+        IPC_NONE
+      );
     } else {
       if (fs.existsSync(backgroundImage)) {
         // Maybe its a local file then
@@ -50,7 +62,7 @@ export default function BackgroundImage(): JSX.Element {
         xhr.send();
       }
       // We dont know who is the artist..
-      dispatcher(setTopArtist(""));
+      reduxAction(dispatcher, SET_TOPARTIST, "", IPC_NONE);
     }
     setImage(`url(${image})`);
   }, [backgroundGrpId, backgroundImage, dispatcher]);

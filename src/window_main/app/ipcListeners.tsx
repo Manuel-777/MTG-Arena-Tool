@@ -2,122 +2,117 @@
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable no-console */
 import { ipcRenderer as ipc, IpcRendererEvent } from "electron";
-import {
-  LOGIN_OK,
-  LOGIN_FAILED,
-  LOGIN_WAITING,
-  exploreSlice,
-  homeSlice,
-  hoverSlice,
-  loginSlice,
-  rendererSlice,
-  settingsSlice
-} from "../../shared/redux/reducers";
 import { timestamp } from "../../shared/util";
 import {
   MAIN_SETTINGS,
   SETTINGS_OVERLAY,
-  MAIN_HOME
+  MAIN_HOME,
+  IPC_NONE,
+  IPC_OVERLAY
 } from "../../shared/constants";
 import { ipcSend } from "../rendererUtil";
-import { SETTINGS_ABOUT } from "../../shared/constants";
+import {
+  LOGIN_OK,
+  LOGIN_FAILED,
+  LOGIN_WAITING,
+  SETTINGS_ABOUT
+} from "../../shared/constants";
 import pd from "../../shared/PlayerData";
 import uxMove from "../uxMove";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import {
+  SET_HOME_DATA,
+  SET_ACTIVE_EVENTS,
+  SET_EXPLORE_DATA,
+  SET_LOGIN_FORM,
+  SET_LOGIN_PASSWORD,
+  SET_LOGIN_STATE,
+  SET_LOADING,
+  SET_OFFLINE,
+  SET_PATREON,
+  SET_CAN_LOGIN,
+  SET_POPUP,
+  SET_TOPNAV,
+  SET_EXPLORE_FILTERS_SKIP,
+  SET_UPDATE_STATE,
+  SET_NO_LOG,
+  SET_SHARE_DIALOG_URL
+} from "../../shared-redux/constants";
 
 export default function ipcListeners(dispatcher: any): void {
   console.log("Set up IPC listeners.");
-  const { setHomeData } = homeSlice.actions;
-  const {
-    setActiveEvents,
-    setExploreData,
-    setExploreFiltersSkip
-  } = exploreSlice.actions;
-  const { setHoverSize } = hoverSlice.actions;
-  const {
-    setCanLogin,
-    setLoginForm,
-    setLoginPassword,
-    setLoginState
-  } = loginSlice.actions;
-  const {
-    setLoading,
-    setOffline,
-    setNoLog,
-    setPatreon,
-    setPopup,
-    setShareDialogUrl,
-    setTopNav,
-    setUpdateState
-  } = rendererSlice.actions;
-  const { setSettings } = settingsSlice.actions;
 
   ipc.on("prefill_auth_form", (event: IpcRendererEvent, arg: any): void => {
-    dispatcher(
-      setLoginForm({
+    reduxAction(
+      dispatcher,
+      SET_LOGIN_FORM,
+      {
         email: arg.username,
         pass: arg.password,
         rememberme: arg.remember_me
-      })
+      },
+      IPC_NONE
     );
   });
 
   ipc.on("clear_pwd", (): void => {
-    dispatcher(setLoginPassword(""));
+    reduxAction(dispatcher, SET_LOGIN_PASSWORD, "", IPC_NONE);
   });
 
   ipc.on("login_failed", (): void => {
-    dispatcher(setLoginState(LOGIN_FAILED));
+    reduxAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED, IPC_NONE);
   });
 
   ipc.on("begin_login", (): void => {
-    dispatcher(setLoading(true));
-    dispatcher(setLoginState(LOGIN_WAITING));
+    reduxAction(dispatcher, SET_LOADING, true, IPC_NONE);
+    reduxAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING, IPC_NONE);
   });
 
   ipc.on("auth", (event: IpcRendererEvent, arg: any): void => {
-    dispatcher(setLoading(true));
+    reduxAction(dispatcher, SET_LOADING, true, IPC_NONE);
     if (arg.ok) {
-      dispatcher(setLoginState(LOGIN_WAITING));
+      reduxAction(dispatcher, SET_LOGIN_STATE, LOGIN_WAITING, IPC_NONE);
       if (arg.user == -1) {
-        dispatcher(setOffline(true));
+        reduxAction(dispatcher, SET_OFFLINE, true, IPC_NONE);
       }
       if (arg.patreon) {
-        dispatcher(
-          setPatreon({
+        reduxAction(
+          dispatcher,
+          SET_PATREON,
+          {
             patreon: arg.patreon,
             patreonTier: arg.patreon_tier
-          })
+          },
+          IPC_NONE
         );
       }
     } else {
-      dispatcher(setLoading(false));
-      dispatcher(setLoginState(LOGIN_FAILED));
+      reduxAction(dispatcher, SET_LOADING, false, IPC_NONE);
+      reduxAction(dispatcher, SET_LOGIN_STATE, LOGIN_FAILED, IPC_NONE);
     }
   });
 
-  ipc.on("initialize", (): void => {
-    dispatcher(setLoading(false));
-    dispatcher(setLoginState(LOGIN_OK));
-  });
-
   ipc.on("offline", (): void => {
-    dispatcher(setOffline(true));
+    reduxAction(dispatcher, SET_OFFLINE, true, IPC_NONE);
   });
 
   ipc.on("toggle_login", (event: IpcRendererEvent, arg: any): void => {
-    dispatcher(setCanLogin(arg));
+    reduxAction(dispatcher, SET_CAN_LOGIN, arg, IPC_NONE);
   });
 
   ipc.on(
     "popup",
     (event: IpcRendererEvent, text: string, time: number): void => {
       const newTime = timestamp() + time;
-      dispatcher(
-        setPopup({
+      reduxAction(
+        dispatcher,
+        SET_POPUP,
+        {
           text: text,
           time: newTime,
           duration: time
-        })
+        },
+        IPC_NONE
       );
     }
   );
@@ -126,7 +121,7 @@ export default function ipcListeners(dispatcher: any): void {
     "force_open_settings",
     (event: IpcRendererEvent, arg?: number): void => {
       uxMove(0);
-      dispatcher(setTopNav(MAIN_SETTINGS));
+      reduxAction(dispatcher, SET_TOPNAV, MAIN_SETTINGS, IPC_NONE);
       if (arg === -1) {
         ipcSend("save_user_settings", { last_open_tab: MAIN_SETTINGS });
       } else {
@@ -142,7 +137,7 @@ export default function ipcListeners(dispatcher: any): void {
     "force_open_overlay_settings",
     (event: IpcRendererEvent, arg: number): void => {
       uxMove(0);
-      dispatcher(setTopNav(MAIN_SETTINGS));
+      reduxAction(dispatcher, SET_TOPNAV, MAIN_SETTINGS, IPC_NONE);
       ipcSend("save_user_settings", {
         last_open_tab: MAIN_SETTINGS,
         last_settings_section: SETTINGS_OVERLAY,
@@ -153,7 +148,7 @@ export default function ipcListeners(dispatcher: any): void {
 
   ipc.on("force_open_about", (): void => {
     uxMove(0);
-    dispatcher(setTopNav(MAIN_SETTINGS));
+    reduxAction(dispatcher, SET_TOPNAV, MAIN_SETTINGS, IPC_NONE);
     ipcSend("save_user_settings", {
       last_open_tab: MAIN_SETTINGS,
       last_settings_section: SETTINGS_ABOUT
@@ -161,58 +156,60 @@ export default function ipcListeners(dispatcher: any): void {
   });
 
   ipc.on("set_home", (event: IpcRendererEvent, arg: any): void => {
-    dispatcher(setLoading(false));
-    console.log("Home", arg);
-    dispatcher(
-      setHomeData({
+    reduxAction(dispatcher, SET_LOADING, false, IPC_NONE);
+    reduxAction(
+      dispatcher,
+      SET_HOME_DATA,
+      {
         wildcards: arg.wildcards,
         filteredSet: arg.filtered_set,
         usersActive: arg.users_active
-      })
+      },
+      IPC_NONE
     );
+    console.log("Home", arg);
   });
 
   ipc.on("set_explore_decks", (event: IpcRendererEvent, arg: any): void => {
     console.log("Explore", arg);
-    dispatcher(setLoading(false));
-    dispatcher(setExploreData(arg));
-    dispatcher(setExploreFiltersSkip(arg.results_number));
+    reduxAction(dispatcher, SET_LOADING, false, IPC_NONE);
+    reduxAction(dispatcher, SET_EXPLORE_DATA, arg, IPC_NONE);
+    reduxAction(
+      dispatcher,
+      SET_EXPLORE_FILTERS_SKIP,
+      arg.results_number,
+      IPC_NONE
+    );
   });
 
   ipc.on("set_update_state", (event: IpcRendererEvent, arg: any): void => {
-    dispatcher(setUpdateState(arg));
-  });
-
-  ipc.on("settings_updated", (): void => {
-    dispatcher(setTopNav(pd.settings.last_open_tab ?? MAIN_HOME));
-    dispatcher(setHoverSize(pd.cardsSizeHoverCard));
-    dispatcher(setSettings(pd.settings));
+    reduxAction(dispatcher, SET_UPDATE_STATE, arg, IPC_NONE);
   });
 
   ipc.on("no_log", (): void => {
-    dispatcher(setNoLog(true));
+    reduxAction(dispatcher, SET_NO_LOG, false, IPC_NONE);
   });
 
   ipc.on("set_draft_link", function(event: IpcRendererEvent, arg: string) {
-    dispatcher(setShareDialogUrl(arg));
-    dispatcher(setLoading(false));
+    reduxAction(dispatcher, SET_SHARE_DIALOG_URL, arg, IPC_NONE);
+    reduxAction(dispatcher, SET_LOADING, false, IPC_NONE);
   });
 
   ipc.on("set_log_link", function(event: IpcRendererEvent, arg: string) {
-    dispatcher(setShareDialogUrl(arg));
-    dispatcher(setLoading(false));
+    reduxAction(dispatcher, SET_SHARE_DIALOG_URL, arg, IPC_NONE);
+    reduxAction(dispatcher, SET_LOADING, false, IPC_NONE);
   });
 
   ipc.on("set_deck_link", function(event: IpcRendererEvent, arg: string) {
-    dispatcher(setShareDialogUrl(arg));
-    dispatcher(setLoading(false));
+    reduxAction(dispatcher, SET_SHARE_DIALOG_URL, arg, IPC_NONE);
+    reduxAction(dispatcher, SET_LOADING, false, IPC_NONE);
   });
 
   ipc.on("set_active_events", function(event: IpcRendererEvent, arg: string) {
     if (!arg) return;
     try {
       const activeEvents = JSON.parse(arg);
-      dispatcher(setActiveEvents(activeEvents));
+      reduxAction(dispatcher, SET_ACTIVE_EVENTS, activeEvents, IPC_NONE);
     } catch (e) {
       console.log("(set_active_events) Error parsing JSON:", arg);
     }

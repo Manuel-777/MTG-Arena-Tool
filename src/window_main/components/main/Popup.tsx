@@ -1,6 +1,6 @@
 import React from "react";
 import { timestamp } from "../../../shared/util";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { useSelector } from "react-redux";
 
 export default function Popup(): JSX.Element {

@@ -151,6 +151,9 @@ function startApp(): void {
     if (mainLoaded && backLoaded && overlayLoaded) {
       if (mainWindow && background && overlay) {
         initializeMainReduxIPC(store, background, mainWindow, overlay);
+        store.subscribe(() => {
+          setSettings(store.getState().settings);
+        });
       }
       background?.webContents.send("start_background");
     }
@@ -206,10 +209,6 @@ function startApp(): void {
         initialize(arg);
         break;
 
-      case "set_settings":
-        setSettings(arg);
-        break;
-
       case "set_db":
         mainWindow?.webContents.send("set_db", arg);
         overlay?.webContents.send("set_db", arg);
@@ -253,7 +252,7 @@ function startApp(): void {
         break;
 
       case "renderer_window_close":
-        if (settings.close_to_tray) {
+        if (store.getState().settings.close_to_tray) {
           hideWindow();
         } else {
           quit();
@@ -373,7 +372,7 @@ function openOverlayDevTools(): void {
 
 function setArenaState(state: number): void {
   arenaState = state;
-  if (state === ARENA_MODE_MATCH && settings.close_on_match) {
+  if (state === ARENA_MODE_MATCH && store.getState().settings.close_on_match) {
     mainWindow?.hide();
   }
   overlay?.webContents.send("set_arena_state", state);
@@ -386,50 +385,37 @@ function toggleEditMode(): void {
   updateOverlayVisibility();
 }
 
-function setSettings(settingsArg: any): void {
-  try {
-    settings = JSON.parse(settingsArg);
-  } catch (e) {
-    console.log("MAIN: Error parsing settings");
-    console.log(e);
-    return;
-  }
+function setSettings(settings: MergedSettings): void {
   console.log("MAIN:  Updating settings");
-  const settingsData = settings as MergedSettings;
 
   // update keyboard shortcuts
   globalShortcut.unregisterAll();
   if (settings.enable_keyboard_shortcuts) {
-    globalShortcut.register(settingsData.shortcut_devtools_main, openDevTools);
+    globalShortcut.register(settings.shortcut_devtools_main, openDevTools);
     globalShortcut.register(
-      settingsData.shortcut_devtools_overlay,
+      settings.shortcut_devtools_overlay,
       openOverlayDevTools
     );
-    globalShortcut.register(settingsData.shortcut_editmode, () => {
+    globalShortcut.register(settings.shortcut_editmode, () => {
       toggleEditMode();
     });
     settings.overlays?.forEach((_settings, index) => {
       const short = "shortcut_overlay_" + (index + 1);
-      globalShortcut.register(
-        (settings as Record<string, string>)[short],
-        () => {
-          overlay?.webContents.send("close", { action: -1, index: index });
-        }
-      );
+      globalShortcut.register((settings as any)[short], () => {
+        overlay?.webContents.send("close", { action: -1, index: index });
+      });
     });
   }
 
   app.setLoginItemSettings({
     openAtLogin: settings.startup
   });
-  mainWindow?.webContents.send("settings_updated");
 
   // Send settings update
-  overlay?.setAlwaysOnTop(settingsData.overlay_ontop, "pop-up-menu");
-  if (settingsData.overlay_ontop && overlay && !overlay.isAlwaysOnTop()) {
+  overlay?.setAlwaysOnTop(settings.overlay_ontop, "pop-up-menu");
+  if (settings.overlay_ontop && overlay && !overlay.isAlwaysOnTop()) {
     overlay.moveTop();
   }
-  overlay?.webContents.send("set_settings", settingsArg);
 
   updateOverlayVisibility();
 }
@@ -437,7 +423,9 @@ function setSettings(settingsArg: any): void {
 let overlayHideTimeout: NodeJS.Timeout | undefined = undefined;
 
 function updateOverlayVisibility(): void {
-  const shouldDisplayOverlay = settings.overlays?.some(getOverlayVisible);
+  const shouldDisplayOverlay = store
+    .getState()
+    .settings.overlays?.some(getOverlayVisible);
   const isOverlayVisible = isEntireOverlayVisible();
 
   //console.log("shouldDisplayOverlay: ", shouldDisplayOverlay, "isOverlayVisible: ", isOverlayVisible);

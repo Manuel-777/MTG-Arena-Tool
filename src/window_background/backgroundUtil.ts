@@ -5,11 +5,18 @@ import { ipcRenderer as ipc } from "electron";
 import _ from "lodash";
 import parse from "date-fns/parse";
 import isValid from "date-fns/isValid";
-import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY } from "../shared/constants";
+import {
+  IPC_BACKGROUND,
+  IPC_MAIN,
+  IPC_OVERLAY,
+  IPC_NONE
+} from "../shared/constants";
 import playerData from "../shared/PlayerData";
 import globals from "./globals";
 
 import { create, all, MathJsStatic } from "mathjs";
+import { reduxAction } from "../shared-redux/sharedRedux";
+import { SET_SETTINGS } from "../shared-redux/constants";
 const config = { precision: 2000 };
 const math: MathJsStatic = create(all, config) as MathJsStatic;
 
@@ -178,10 +185,4 @@ export function setData(
   const cleanData = _.omit(data, dataBlacklist);
 
   playerData.handleSetData(null, JSON.stringify(cleanData));
-  ipcSend("set_player_data", JSON.stringify(cleanData), IPC_MAIN);
-
-  const overlayData = _.pick(cleanData, overlayWhitelist);
-  // This was left out in develop ?
-  // if (refresh) ipcSend("player_data_refresh");
-  ipcSend("set_player_data", JSON.stringify(overlayData), IPC_OVERLAY);
 }

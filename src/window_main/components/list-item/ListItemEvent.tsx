@@ -15,16 +15,22 @@ import {
 } from "./ListItem";
 import ListItemMatch from "./ListItemMatch";
 import ListItemDraft from "./ListItemDraft";
-import { DEFAULT_TILE, SUB_MATCH, SUB_DRAFT } from "../../../shared/constants";
+import {
+  DEFAULT_TILE,
+  SUB_MATCH,
+  SUB_DRAFT,
+  IPC_NONE
+} from "../../../shared/constants";
 import { getEventWinLossClass, toggleArchived } from "../../rendererUtil";
 import { DbCardData } from "../../../types/Metadata";
 import RoundCard from "../misc/RoundCard";
 import { compareDesc } from "date-fns";
 import { useDispatch } from "react-redux";
-import { rendererSlice } from "../../../shared/redux/reducers";
 import { InternalMatch } from "../../../types/match";
 import { InternalDraft } from "../../../types/draft";
 import uxMove from "../../uxMove";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { SET_BACK_GRPID, SET_SUBNAV } from "../../../shared-redux/constants";
 
 function DraftRares({ event }: { event: EventTableData }): JSX.Element {
   const draftId = event.id + "-draft";
@@ -146,13 +152,20 @@ function EventSubRows({
   const openMatch = React.useCallback(
     (match: InternalMatch): void => {
       uxMove(-100);
-      const { setBackgroundGrpId, setSubNav } = rendererSlice.actions;
-      dispatcher(setBackgroundGrpId(match.playerDeck.deckTileId));
-      dispatcher(
-        setSubNav({
+      reduxAction(
+        dispatcher,
+        SET_BACK_GRPID,
+        match.playerDeck.deckTileId,
+        IPC_NONE
+      );
+      reduxAction(
+        dispatcher,
+        SET_SUBNAV,
+        {
           type: SUB_MATCH,
           id: match.id
-        })
+        },
+        IPC_NONE
       );
     },
     [dispatcher]
@@ -161,12 +174,14 @@ function EventSubRows({
   const openDraft = React.useCallback(
     (id: string | number): void => {
       uxMove(-100);
-      const { setSubNav } = rendererSlice.actions;
-      dispatcher(
-        setSubNav({
+      reduxAction(
+        dispatcher,
+        SET_SUBNAV,
+        {
           type: SUB_DRAFT,
           id: id
-        })
+        },
+        IPC_NONE
       );
     },
     [dispatcher]

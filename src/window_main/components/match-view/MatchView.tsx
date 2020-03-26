@@ -15,8 +15,10 @@ import CardList from "../misc/CardList";
 import CardsList from "../../../shared/cardsList";
 import ActionLog from "./ActionLog";
 import uxMove from "../../uxMove";
-import { rendererSlice } from "../../../shared/redux/reducers";
 import { useDispatch } from "react-redux";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { SET_BACK_GRPID } from "../../../shared-redux/constants";
+import { IPC_NONE } from "../../../shared/constants";
 
 interface MatchViewProps {
   match: InternalMatch;
@@ -42,8 +44,7 @@ export function MatchView(props: MatchViewProps): JSX.Element {
   }
 
   const goBack = (): void => {
-    const { setBackgroundGrpId } = rendererSlice.actions;
-    dispatcher(setBackgroundGrpId(0));
+    reduxAction(dispatcher, SET_BACK_GRPID, 0, IPC_NONE);
     uxMove(0);
   };
 

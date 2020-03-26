@@ -7,6 +7,7 @@ import {
   MatchGameStats
 } from "../types/currentMatch";
 import { InternalDraft } from "../types/draft";
+import store from "../shared-redux/stores/backgroundStore";
 
 export const InternalDraftDefault: InternalDraft = {
   PlayerId: null,
@@ -31,7 +32,6 @@ export const InternalDraftDefault: InternalDraft = {
 // Don't. This is a shadowy place. You must never go here.
 // Hopefully we'll be able to get rid of all of the ones that can change,
 // and put them into stores or better structures than a giant export list.
-
 let actionLogDir = "";
 
 let currentDraft = InternalDraftDefault;
@@ -79,6 +79,7 @@ let cardTypesByZone: ZoneData = {};
 let currentMatch: MatchData = matchDataDefault;
 
 export default {
+  store,
   actionLogDir,
   currentDraft,
   currentDeck,

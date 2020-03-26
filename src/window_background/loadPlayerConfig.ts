@@ -1,6 +1,6 @@
 import { shell } from "electron";
 import _ from "lodash";
-import { IPC_BACKGROUND, IPC_OVERLAY } from "../shared/constants";
+import { IPC_BACKGROUND, IPC_OVERLAY, IPC_MAIN } from "../shared/constants";
 import { ipcSend, setData } from "./backgroundUtil";
 import globals from "./globals";
 
@@ -9,6 +9,8 @@ import playerData from "../shared/PlayerData";
 import { isV2CardsList, ArenaV3Deck } from "../types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
 import convertDeckFromV3 from "./convertDeckFromV3";
+import { reduxAction } from "../shared-redux/sharedRedux";
+import { SET_SETTINGS } from "../shared-redux/constants";
 
 const ipcLog = (message: string): void => ipcSend("ipc_log", message);
 const ipcPop = (args: any): void => ipcSend("popup", args);
@@ -21,8 +23,15 @@ export function syncSettings(
   refresh = globals.debugLog || !globals.firstPass
 ): void {
   const settings = { ...playerData.settings, ...dirtySettings };
-  setData({ settings }, refresh);
-  if (refresh) ipcSend("set_settings", JSON.stringify(settings));
+  if (refresh) {
+    reduxAction(
+      globals.store.dispatch,
+      SET_SETTINGS,
+      settings,
+      IPC_OVERLAY | IPC_MAIN
+    );
+  }
+  setData({ settings });
 }
 
 function ipcUpgradeProgress(progress: number): void {

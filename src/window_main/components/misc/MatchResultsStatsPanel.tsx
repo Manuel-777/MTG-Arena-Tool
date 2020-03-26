@@ -8,7 +8,7 @@ import {
   toMMSS
 } from "../../../shared/util";
 import Aggregator, { AggregatorStats } from "../../aggregator";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 import {
   compareWinrates,
   formatPercent,

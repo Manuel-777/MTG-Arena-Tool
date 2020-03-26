@@ -4,7 +4,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { TableState } from "react-table";
 import pd from "../../shared/PlayerData";
-import { AppState } from "../../shared/redux/reducers";
+import { AppState } from "../../shared-redux/stores/rendererStore";
 import { InternalEconomyTransaction } from "../../types/inventory";
 import EconomyTable from "../components/economy/EconomyTable";
 import { getPrettyContext } from "../components/economy/economyUtils";

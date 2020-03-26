@@ -48,7 +48,7 @@ import {
   CollectionTableProps
 } from "./types";
 import { useSelector } from "react-redux";
-import { AppState, collectionSlice } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   let hasCorrectBoosterFilter = false;

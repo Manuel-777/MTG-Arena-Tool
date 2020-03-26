@@ -2,10 +2,9 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
-import { SUB_MATCH } from "../../shared/constants";
+import { SUB_MATCH, IPC_NONE } from "../../shared/constants";
 import db from "../../shared/database";
 import pd from "../../shared/PlayerData";
-import { rendererSlice } from "../../shared/redux/reducers";
 import { getReadableEvent } from "../../shared/util";
 import { InternalMatch } from "../../types/match";
 import Aggregator, { AggregatorFilters } from "../aggregator";
@@ -16,6 +15,8 @@ import { useAggregatorData } from "../components/tables/hooks";
 import { TagCounts } from "../components/tables/types";
 import { ipcSend, toggleArchived } from "../rendererUtil";
 import uxMove from "../uxMove";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import { SET_BACK_GRPID, SET_SUBNAV } from "../../shared-redux/constants";
 
 const { DEFAULT_ARCH, NO_ARCH } = Aggregator;
 const tagPrompt = "Set archetype";
@@ -142,13 +143,20 @@ export default function MatchesTab({
   const openMatchDetails = React.useCallback(
     (match: InternalMatch): void => {
       uxMove(-100);
-      const { setBackgroundGrpId, setSubNav } = rendererSlice.actions;
-      dispatcher(setBackgroundGrpId(match.playerDeck.deckTileId));
-      dispatcher(
-        setSubNav({
+      reduxAction(
+        dispatcher,
+        SET_BACK_GRPID,
+        match.playerDeck.deckTileId,
+        IPC_NONE
+      );
+      reduxAction(
+        dispatcher,
+        SET_SUBNAV,
+        {
           type: SUB_MATCH,
           id: match.id
-        })
+        },
+        IPC_NONE
       );
     },
     [dispatcher]

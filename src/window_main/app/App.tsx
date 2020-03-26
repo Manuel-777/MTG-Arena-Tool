@@ -1,29 +1,31 @@
 import { remote } from "electron";
 import React from "react";
 import ReactDOM from "react-dom";
-import { configureStore } from "@reduxjs/toolkit";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import appReducer, {
-  LOGIN_WAITING,
-  rendererSlice
-} from "../../shared/redux/reducers";
+import { LOGIN_WAITING, LOGIN_OK, IPC_NONE } from "../../shared/constants";
 import { TopNav } from "../components/main/topNav";
 import { forceOpenAbout, getOpenNav, getOpenSub } from "../tabControl";
 import BackgroundImage from "../components/main/BackgroundImage";
 import TopBar from "../components/main/TopBar";
 import LoadingBar from "../components/main/LoadingBar";
 import Auth from "../components/main/Auth";
-import { LOGIN_OK } from "../../shared/redux/reducers";
 import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";
 import CardHover from "../components/main/CardHover";
-import { AppState } from "../../shared/redux/reducers";
 import OutputLogInput from "../components/popups/OutputLogInput";
 import { ipcSend } from "../rendererUtil";
 import Share from "../components/popups/Share";
+import store, { AppState } from "../../shared-redux/stores/rendererStore";
+import {
+  reduxAction,
+  initializeRendererReduxIPC
+} from "../../shared-redux/sharedRedux";
+import {
+  SET_NO_LOG,
+  SET_SHARE_DIALOG_OPEN
+} from "../../shared-redux/constants";
 
-const store = configureStore({ reducer: appReducer });
-export type AppDispatch = typeof store.dispatch;
+initializeRendererReduxIPC(store);
 
 function App(): JSX.Element {
   const loginState = useSelector((state: AppState) => state.login.loginState);
@@ -60,9 +62,8 @@ function App(): JSX.Element {
   const closeNoLog = React.useCallback(
     (log: string) => {
       setTimeout(() => {
-        const { setNoLog } = rendererSlice.actions;
+        reduxAction(dispatch, SET_NO_LOG, false, IPC_NONE);
         ipcSend("set_log", log);
-        dispatch(setNoLog(false));
       }, 350);
     },
     [dispatch]
@@ -70,8 +71,7 @@ function App(): JSX.Element {
 
   const closeShare = React.useCallback(() => {
     setTimeout(() => {
-      const { setShareDialogOpen } = rendererSlice.actions;
-      dispatch(setShareDialogOpen(false));
+      reduxAction(dispatch, SET_SHARE_DIALOG_OPEN, false, IPC_NONE);
     }, 350);
   }, [dispatch]);
 

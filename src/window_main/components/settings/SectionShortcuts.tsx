@@ -7,7 +7,7 @@ import Toggle from "../misc/Toggle";
 import Button from "../misc/Button";
 import EditKey from "../popups/EditKey";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 function setKeyboardShortcuts(checked: boolean): void {
   ipcSend("save_user_settings", {

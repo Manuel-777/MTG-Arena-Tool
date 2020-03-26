@@ -16,13 +16,15 @@ import {
   MAIN_ECONOMY,
   MAIN_COLLECTION,
   MAIN_CONSTRUCTED,
-  MAIN_LIMITED
+  MAIN_LIMITED,
+  IPC_NONE
 } from "../../../shared/constants";
-import { rendererSlice } from "../../../shared/redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 import useWindowSize from "../../hooks/useWindowSize";
 import uxMove from "../../uxMove";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { SET_TOPNAV, SET_BACK_GRPID } from "../../../shared-redux/constants";
 
 interface TopNavItemProps {
   dispatcher: any;
@@ -37,9 +39,8 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 
   const clickTab = React.useCallback(
     (tabId: number) => (): void => {
-      const { setBackgroundGrpId, setTopNav } = rendererSlice.actions;
-      dispatcher(setTopNav(tabId));
-      dispatcher(setBackgroundGrpId(0));
+      reduxAction(dispatcher, SET_TOPNAV, tabId, IPC_NONE);
+      reduxAction(dispatcher, SET_BACK_GRPID, 0, IPC_NONE);
       uxMove(0);
     },
     [dispatcher]
@@ -95,9 +96,8 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   const selected = currentTab === id;
   const clickTab = React.useCallback(
     tabId => (): void => {
-      const { setBackgroundGrpId, setTopNav } = rendererSlice.actions;
-      dispatcher(setTopNav(tabId));
-      dispatcher(setBackgroundGrpId(0));
+      reduxAction(dispatcher, SET_TOPNAV, tabId, IPC_NONE);
+      reduxAction(dispatcher, SET_BACK_GRPID, 0, IPC_NONE);
       uxMove(0);
     },
     [dispatcher]

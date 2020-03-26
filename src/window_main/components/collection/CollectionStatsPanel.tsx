@@ -1,10 +1,10 @@
 import { shell } from "electron";
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { CARD_RARITIES } from "../../../shared/constants";
+import { CARD_RARITIES, IPC_NONE } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import ReactSelect from "../../../shared/ReactSelect";
-import { AppState, collectionSlice } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { formatNumber } from "../../rendererUtil";
 import {
   BoosterSymbol,
@@ -22,6 +22,14 @@ import {
 import CompletionProgressBar, {
   SetCompletionBar
 } from "./CompletionProgressBar";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import {
+  SET_COUNT_MODE,
+  SET_RARE_DRAFT_FACTOR,
+  SET_MYTHIC_DRAFT_FACTOR,
+  SET_BOOSTER_WIN_FACTOR,
+  SET_FUTURE_BOOSTERS
+} from "../../../shared-redux/constants";
 
 const getRarityKey = (
   rarity: string
@@ -50,13 +58,7 @@ export function CollectionStatsPanel({
     futureBoosters
   } = useSelector((state: AppState) => state.collection);
   const dispatch = useDispatch();
-  const {
-    setCountMode,
-    setRareDraftFactor,
-    setMythicDraftFactor,
-    setBoosterWinFactor,
-    setFutureBoosters
-  } = collectionSlice.actions;
+
   if (!stats) {
     return <></>;
   }
@@ -112,7 +114,7 @@ export function CollectionStatsPanel({
             options={[ALL_CARDS, SINGLETONS, FULL_SETS]}
             current={countMode}
             callback={(mode: string): void => {
-              dispatch(setCountMode(mode));
+              reduxAction(dispatch, SET_COUNT_MODE, mode, IPC_NONE);
             }}
           />
           <SetCompletionBar
@@ -161,7 +163,12 @@ export function CollectionStatsPanel({
                 title={"rare picks per draft"}
                 contStyle={inputStyle}
                 callback={(value: string): void => {
-                  dispatch(setRareDraftFactor(parseFloat(value)));
+                  reduxAction(
+                    dispatch,
+                    SET_RARE_DRAFT_FACTOR,
+                    parseFloat(value),
+                    IPC_NONE
+                  );
                 }}
               />
               <Input
@@ -175,7 +182,12 @@ export function CollectionStatsPanel({
                 title={"mythic picks per draft"}
                 contStyle={inputStyle}
                 callback={(value: string): void => {
-                  dispatch(setMythicDraftFactor(parseFloat(value)));
+                  reduxAction(
+                    dispatch,
+                    SET_MYTHIC_DRAFT_FACTOR,
+                    parseFloat(value),
+                    IPC_NONE
+                  );
                 }}
               />
               <Input
@@ -189,7 +201,12 @@ export function CollectionStatsPanel({
                 title={"prize boosters awarded per draft"}
                 contStyle={inputStyle}
                 callback={(value: string): void => {
-                  dispatch(setBoosterWinFactor(parseFloat(value)));
+                  reduxAction(
+                    dispatch,
+                    SET_BOOSTER_WIN_FACTOR,
+                    parseFloat(value),
+                    IPC_NONE
+                  );
                 }}
               />
               <Input
@@ -203,7 +220,12 @@ export function CollectionStatsPanel({
                 title={"expected additional boosters, e.g. seasonal rewards"}
                 contStyle={inputStyle}
                 callback={(value: string): void => {
-                  dispatch(setFutureBoosters(parseFloat(value)));
+                  reduxAction(
+                    dispatch,
+                    SET_FUTURE_BOOSTERS,
+                    parseFloat(value),
+                    IPC_NONE
+                  );
                 }}
               />
               <div

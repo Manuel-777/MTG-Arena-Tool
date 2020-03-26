@@ -1,7 +1,9 @@
 import React from "react";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { useSelector, useDispatch } from "react-redux";
-import { rendererSlice } from "../../../shared/redux/reducers";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { SET_SHARE_DIALOG } from "../../../shared-redux/constants";
+import { IPC_NONE } from "../../../shared/constants";
 
 interface ShareButtonProps {
   type: "draft" | "deck" | "actionlog";
@@ -17,31 +19,39 @@ export default function ShareButton({
   const click = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
-    const { setShareDialog } = rendererSlice.actions;
     if (type == "draft") {
       const draftData = JSON.stringify(data);
-      dispatcher(
-        setShareDialog({
+      reduxAction(
+        dispatcher,
+        SET_SHARE_DIALOG,
+        {
           data: draftData,
           id: data.id,
           type
-        })
+        },
+        IPC_NONE
       );
     } else if (type == "deck") {
       const deckString = JSON.stringify(data);
-      dispatcher(
-        setShareDialog({
+      reduxAction(
+        dispatcher,
+        SET_SHARE_DIALOG,
+        {
           data: deckString,
           type
-        })
+        },
+        IPC_NONE
       );
     } else if (type == "actionlog") {
-      dispatcher(
-        setShareDialog({
+      reduxAction(
+        dispatcher,
+        SET_SHARE_DIALOG,
+        {
           data: data.log,
           id: data.id,
           type
-        })
+        },
+        IPC_NONE
       );
     }
   };

@@ -1,13 +1,14 @@
-import { configureStore } from "@reduxjs/toolkit";
 import { remote } from "electron";
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import OverlayController from "../overlay/OverlayController";
-import appReducer from "./reducers";
 import TransparencyFix from "./electron-transparency-mouse-fix";
 
-const store = configureStore({ reducer: appReducer });
+import store from "../shared-redux/stores/overlayStore";
+import { initializeRendererReduxIPC } from "../shared-redux/sharedRedux";
+
+initializeRendererReduxIPC(store);
 
 if (!remote.app.isPackaged) {
   const { openNewGitHubIssue, debugInfo } = require("electron-util");

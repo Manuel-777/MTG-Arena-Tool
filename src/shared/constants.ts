@@ -5,6 +5,12 @@ export const IPC_MAIN = 4;
 export const IPC_OVERLAY = 8;
 export const IPC_ALL = IPC_BACKGROUND | IPC_MAIN | IPC_OVERLAY;
 
+// Login states
+export const LOGIN_AUTH = 1;
+export const LOGIN_WAITING = 2;
+export const LOGIN_OK = 3;
+export const LOGIN_FAILED = 4;
+
 // Colour indices
 export const WHITE = 1;
 

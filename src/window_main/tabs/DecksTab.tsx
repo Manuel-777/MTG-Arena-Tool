@@ -2,10 +2,9 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
-import { SUB_DECK } from "../../shared/constants";
+import { SUB_DECK, IPC_NONE } from "../../shared/constants";
 import Deck from "../../shared/deck";
 import pd from "../../shared/PlayerData";
-import { rendererSlice } from "../../shared/redux/reducers";
 import {
   getBoosterCountEstimate,
   getReadableFormat,
@@ -23,6 +22,8 @@ import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/hooks";
 import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import { SET_BACK_GRPID, SET_SUBNAV } from "../../shared-redux/constants";
 
 function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);
@@ -124,13 +125,15 @@ export default function DecksTab({
   const openDeckCallback = React.useCallback(
     (deck: InternalDeck): void => {
       uxMove(-100);
-      const { setBackgroundGrpId, setSubNav } = rendererSlice.actions;
-      dispatcher(setBackgroundGrpId(deck.deckTileId));
-      dispatcher(
-        setSubNav({
+      reduxAction(dispatcher, SET_BACK_GRPID, deck.deckTileId, IPC_NONE);
+      reduxAction(
+        dispatcher,
+        SET_SUBNAV,
+        {
           type: SUB_DECK,
           id: deck.id
-        })
+        },
+        IPC_NONE
       );
     },
     [dispatcher]

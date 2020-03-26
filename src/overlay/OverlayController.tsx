@@ -10,14 +10,13 @@ import {
   IPC_OVERLAY
 } from "../shared/constants";
 import Deck from "../shared/deck";
-import { hoverSlice, settingsSlice, AppState } from "../shared/redux/reducers";
+import { AppState } from "../shared-redux/stores/overlayStore";
 import { MatchData } from "../types/currentMatch";
 import { DraftData } from "../types/draft";
 import { InternalActionLog } from "../types/log";
 import { OverlaySettingsData } from "../types/settings";
 import CardDetailsWindowlet from "./CardDetailsWindowlet";
 import OverlayWindowlet from "./OverlayWindowlet";
-
 const sound = new Howl({ src: ["../sounds/blip.mp3"] });
 
 const byId = (id: string): HTMLElement | null => document.getElementById(id);
@@ -69,7 +68,6 @@ export default function OverlayController(): JSX.Element {
   const [turnPriority, setTurnPriority] = useState(1);
   const settings = useSelector((state: AppState) => state.settings);
   const [lastBeep, setLastBeep] = useState(Date.now());
-  const dispatcher = useDispatch();
 
   const {
     overlay_scale: overlayScale,
@@ -188,20 +186,6 @@ export default function OverlayController(): JSX.Element {
     []
   );
 
-  const handleSettingsUpdated = useCallback(
-    (event: unknown, arg: string): void => {
-      try {
-        const json = JSON.parse(arg);
-        console.log(json);
-        dispatcher(hoverSlice.actions.setHoverSize(json.cardsSizeHoverCard));
-        dispatcher(settingsSlice.actions.setSettings(json));
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    [dispatcher]
-  );
-
   const handleSetMatch = useCallback((event: unknown, arg: string): void => {
     const newMatch = JSON.parse(arg);
     newMatch.oppCards = new Deck(newMatch.oppCards);
@@ -233,7 +217,6 @@ export default function OverlayController(): JSX.Element {
     ipc.on("set_arena_state", handleSetArenaState);
     ipc.on("set_draft_cards", handleSetDraftCards);
     ipc.on("set_match", handleSetMatch);
-    ipc.on("set_settings", handleSettingsUpdated);
     ipc.on("set_turn", handleSetTurn);
 
     return (): void => {
@@ -244,7 +227,6 @@ export default function OverlayController(): JSX.Element {
       ipc.removeListener("set_arena_state", handleSetArenaState);
       ipc.removeListener("set_draft_cards", handleSetDraftCards);
       ipc.removeListener("set_match", handleSetMatch);
-      ipc.removeListener("set_settings", handleSettingsUpdated);
       ipc.removeListener("set_turn", handleSetTurn);
     };
   });

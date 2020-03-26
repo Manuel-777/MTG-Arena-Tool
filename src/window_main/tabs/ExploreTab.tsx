@@ -1,20 +1,23 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { COLORS_LONG, RANKS, SUB_DECK } from "../../shared/constants";
+import { COLORS_LONG, RANKS, SUB_DECK, IPC_NONE } from "../../shared/constants";
 import db from "../../shared/database";
 import ReactSelect from "../../shared/ReactSelect";
-import {
-  AppState,
-  ExploreQuery,
-  exploreSlice,
-  rendererSlice
-} from "../../shared/redux/reducers";
+import { AppState } from "../../shared-redux/stores/rendererStore";
 import { ListItemExplore } from "../components/list-item/ListItemExplore";
 import Button from "../components/misc/Button";
 import Checkbox from "../components/misc/Checkbox";
 import Input from "../components/misc/Input";
 import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import {
+  SET_LOADING,
+  SET_EXPLORE_FILTERS,
+  SET_BACK_GRPID,
+  SET_SUBNAV
+} from "../../shared-redux/constants";
+import { ExploreQuery } from "../../shared-redux/slices/exploreSlice";
 
 export default function ExploreTab(): JSX.Element {
   const dispatcher = useDispatch();
@@ -26,17 +29,14 @@ export default function ExploreTab(): JSX.Element {
 
   const [queryFilters, setQueryFilters] = useState(exploreFilters);
   useEffect(() => setQueryFilters(exploreFilters), [exploreFilters]);
-  const { setExploreFilters } = exploreSlice.actions;
 
   const queryExplore = useCallback(
     (filters: ExploreQuery) => {
-      const { setLoading } = rendererSlice.actions;
-
+      reduxAction(dispatcher, SET_LOADING, true, IPC_NONE);
+      reduxAction(dispatcher, SET_EXPLORE_FILTERS, filters, IPC_NONE);
       ipcSend("request_explore", filters);
-      dispatcher(setLoading(true));
-      dispatcher(setExploreFilters(filters));
     },
-    [dispatcher, setExploreFilters]
+    [dispatcher]
   );
 
   const newQuery = useCallback(() => {
@@ -61,14 +61,16 @@ export default function ExploreTab(): JSX.Element {
         name: row.name,
         id: row._id
       };
-      const { setBackgroundGrpId, setSubNav } = rendererSlice.actions;
-      dispatcher(setBackgroundGrpId(row.tile));
-      dispatcher(
-        setSubNav({
+      reduxAction(dispatcher, SET_BACK_GRPID, row.tile, IPC_NONE);
+      reduxAction(
+        dispatcher,
+        SET_SUBNAV,
+        {
           type: SUB_DECK,
           id: row._id + "_",
           data: deck
-        })
+        },
+        IPC_NONE
       );
     },
     [dispatcher]
@@ -151,7 +153,6 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
   );
   const [eventFilters, setEventFilters] = useState(["Ladder"]);
   const dispatcher = useDispatch();
-  const { setExploreFilters } = exploreSlice.actions;
 
   const typeFilter = ["Events", "Ranked Constructed", "Ranked Draft"];
   const sortFilters = ["By Date", "By Wins", "By Winrate", "By Player"];
@@ -159,9 +160,9 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
 
   const updateFilters = useCallback(
     (filters: ExploreQuery): void => {
-      dispatcher(setExploreFilters(filters));
+      reduxAction(dispatcher, SET_EXPLORE_FILTERS, filters, IPC_NONE);
     },
-    [dispatcher, setExploreFilters]
+    [dispatcher]
   );
 
   const setManaFilter = useCallback(

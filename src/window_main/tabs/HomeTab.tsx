@@ -2,9 +2,11 @@ import React from "react";
 import db from "../../shared/database";
 import { ipcSend } from "../rendererUtil";
 import { timestamp, toDDHHMMSS } from "../../shared/util";
-import { hoverSlice } from "../../shared/redux/reducers";
 import { useSelector, useDispatch } from "react-redux";
-import { AppState } from "../../shared/redux/reducers";
+import { AppState } from "../../shared-redux/stores/rendererStore";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import { SET_HOVER_IN, SET_HOVER_OUT } from "../../shared-redux/constants";
+import { IPC_NONE } from "../../shared/constants";
 
 export interface WildcardsChange {
   grpId: number;
@@ -136,10 +138,9 @@ interface TopWildcardsProps {
 function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
   const lineDark = "line_dark line_bottom_border";
   const dispatcher = useDispatch();
-  const { setHoverIn, setHoverOut } = hoverSlice.actions;
 
   const hoverCard = (id: number, hover: boolean): void => {
-    dispatcher(hover ? setHoverIn(id) : setHoverOut());
+    reduxAction(dispatcher, hover ? SET_HOVER_IN : SET_HOVER_OUT, id, IPC_NONE);
   };
 
   return (

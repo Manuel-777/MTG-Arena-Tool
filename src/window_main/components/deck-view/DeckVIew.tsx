@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { InternalDeck, CardObject } from "../../../types/Deck";
 import pd from "../../../shared/PlayerData";
 import ManaCost from "../misc/ManaCost";
-import { MANA_COLORS } from "../../../shared/constants";
+import { MANA_COLORS, IPC_NONE } from "../../../shared/constants";
 import DeckList from "../misc/DeckList";
 import DeckTypesStats from "../../../shared/DeckTypesStats";
 import DeckManaCurve from "../../../shared/DeckManaCurve";
@@ -10,12 +10,18 @@ import Deck from "../../../shared/deck";
 import Button from "../misc/Button";
 import { ipcSend } from "../../rendererUtil";
 import { useDispatch } from "react-redux";
-import { hoverSlice, rendererSlice } from "../../../shared/redux/reducers";
 import db from "../../../shared/database";
 import ShareButton from "../misc/ShareButton";
 import CraftingCost from "./CraftingCost";
 import { getCardImage } from "../../../shared/util";
 import uxMove from "../../uxMove";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import {
+  SET_BACK_GRPID,
+  SET_POPUP,
+  SET_HOVER_IN,
+  SET_HOVER_OUT
+} from "../../../shared-redux/constants";
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;
@@ -130,8 +136,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const dispatcher = useDispatch();
 
   const goBack = (): void => {
-    const { setBackgroundGrpId } = rendererSlice.actions;
-    dispatcher(setBackgroundGrpId(0));
+    reduxAction(dispatcher, SET_BACK_GRPID, 0, IPC_NONE);
     uxMove(0);
   };
 
@@ -146,12 +151,14 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const arenaExport = (): void => {
     const list = deck.getExportArena();
     ipcSend("set_clipboard", list);
-    const { setPopup } = rendererSlice.actions;
-    dispatcher(
-      setPopup({
+    reduxAction(
+      dispatcher,
+      SET_POPUP,
+      {
         text: "Copied to clipboard",
         time: 2000
-      })
+      },
+      IPC_NONE
     );
   };
 
@@ -262,10 +269,9 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
   const { deck, setRegularView } = props;
   const sz = pd.cardsSize;
   const dispatcher = useDispatch();
-  const { setHoverIn, setHoverOut } = hoverSlice.actions;
 
   const hoverCard = (id: number, hover: boolean): void => {
-    dispatcher(hover ? setHoverIn(id) : setHoverOut());
+    reduxAction(dispatcher, hover ? SET_HOVER_IN : SET_HOVER_OUT, id, IPC_NONE);
   };
 
   // attempt at sorting visually..
