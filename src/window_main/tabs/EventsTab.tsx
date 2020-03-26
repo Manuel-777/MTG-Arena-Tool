@@ -9,7 +9,7 @@ import Aggregator, { AggregatorFilters } from "../aggregator";
 import EventsTable from "../components/events/EventsTable";
 import { EventStats, EventTableData } from "../components/events/types";
 import { isHidingArchived } from "../components/tables/filters";
-import { useAggregatorData } from "../components/tables/hooks";
+import { useAggregatorData } from "../components/tables/useAggregatorData";
 import { ipcSend, toggleArchived } from "../rendererUtil";
 
 function editTag(tag: string, color: string): void {

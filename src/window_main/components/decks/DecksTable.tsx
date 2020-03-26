@@ -23,11 +23,12 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import { useAggregatorArchiveFilter, useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
+import { useAggregatorArchiveFilter } from "../tables/useAggregatorArchiveFilter";
+import { useBaseReactTable } from "../tables/useBaseReactTable";
 import {
   BoosterNeededCell,
   BoosterNeededHeader,

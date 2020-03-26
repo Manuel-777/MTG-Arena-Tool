@@ -11,7 +11,7 @@ import {
   InputContainer,
   MetricText
 } from "../misc/display";
-import { useMultiSelectFilter } from "./hooks";
+import { useMultiSelectFilter } from "./useMultiSelectFilter";
 import { MultiSelectFilterProps, TableData } from "./types";
 
 export function TextBoxFilter<D extends TableData>({
