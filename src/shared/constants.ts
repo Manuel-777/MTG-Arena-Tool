@@ -1,6 +1,9 @@
-export const IPC_BACKGROUND = 0;
-export const IPC_MAIN = 1;
-export const IPC_OVERLAY = 2;
+// Should allow binary ops
+export const IPC_NONE = 0;
+export const IPC_BACKGROUND = 2;
+export const IPC_MAIN = 4;
+export const IPC_OVERLAY = 8;
+export const IPC_ALL = IPC_BACKGROUND | IPC_MAIN | IPC_OVERLAY;
 
 // Colour indices
 export const WHITE = 1;

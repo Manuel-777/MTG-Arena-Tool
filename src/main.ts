@@ -24,6 +24,8 @@ import {
 } from "./shared/constants";
 import { appDb } from "./shared/db/LocalDatabase";
 import { MergedSettings, OverlaySettingsData } from "./types/settings";
+import { initializeMainReduxIPC } from "./shared-redux/sharedRedux";
+import store from "./shared-redux/stores/mainStore";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
@@ -164,13 +166,11 @@ function startApp(): void {
     startBackgroundWhenReady();
   });
 
-  setTimeout(() => {
-    overlay = createOverlayWindow();
-    overlay.webContents.once("dom-ready", () => {
-      overlayLoaded = true;
-      startBackgroundWhenReady();
-    });
-  }, 500);
+  overlay = createOverlayWindow();
+  overlay.webContents.once("dom-ready", () => {
+    overlayLoaded = true;
+    startBackgroundWhenReady();
+  });
 
   // If we destroy updater before creating another renderer
   // Electron shuts down the whole app.
@@ -179,6 +179,9 @@ function startApp(): void {
     updaterWindow = undefined;
   }
 
+  // Redux IPC listener
+  initializeMainReduxIPC(store, background, mainWindow, overlay);
+  // Any other IPC listener
   ipc.on("ipc_switch", function(event, method, from, arg, to) {
     if (debugIPC && method != "log_read") {
       if (debugIPC == 2 && method != "set_status" && method != "set_db") {
