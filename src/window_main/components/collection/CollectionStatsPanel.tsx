@@ -1,18 +1,16 @@
 import { shell } from "electron";
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CARD_RARITIES } from "../../../shared/constants";
 import pd from "../../../shared/PlayerData";
 import ReactSelect from "../../../shared/ReactSelect";
 import { AppState, collectionSlice } from "../../../shared/redux/reducers";
 import { formatNumber } from "../../rendererUtil";
-import {
-  BoosterSymbol,
-  CalendarSymbol,
-  MediumTextButton,
-  RaritySymbol
-} from "../misc/display";
+import { BoosterSymbol } from "../misc/BoosterSymbol";
+import { CalendarSymbol } from "../misc/CalendarSymbol";
 import Input from "../misc/Input";
+import { MediumTextButton } from "../misc/MediumTextButton";
+import { RaritySymbol } from "../misc/RaritySymbol";
 import {
   ALL_CARDS,
   CollectionStats,

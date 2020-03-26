@@ -2,11 +2,9 @@ import React from "react";
 import { FilterValue } from "react-table";
 import { ECONOMY_TABLE_MODES } from "../../../shared/constants";
 import ReactSelect from "../../../shared/ReactSelect";
-import {
-  CheckboxContainer,
-  MediumTextButton,
-  SmallTextButton
-} from "../misc/display";
+import { CheckboxContainer } from "../misc/CheckboxContainer";
+import { MediumTextButton } from "../misc/MediumTextButton";
+import { SmallTextButton } from "../misc/SmallTextButton";
 import ColumnToggles from "../tables/ColumnToggles";
 import { GlobalFilter } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";

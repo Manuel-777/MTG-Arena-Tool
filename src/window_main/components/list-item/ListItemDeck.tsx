@@ -1,24 +1,24 @@
-import React from "react";
+import format from "date-fns/format";
 import _ from "lodash";
-import { DecksTableRowProps } from "../decks/types";
-import ManaCost from "../misc/ManaCost";
+import React from "react";
+import Deck from "../../../shared/deck";
 import {
   formatPercent,
   formatWinrateInterval,
   getWinrateClass
 } from "../../rendererUtil";
-import format from "date-fns/format";
-import { NewTag, TagBubble } from "../misc/display";
+import { DecksTableRowProps } from "../decks/types";
+import ManaCost from "../misc/ManaCost";
+import { NewTag, TagBubble } from "../misc/TagBubble";
 import WildcardsCost from "../misc/WildcardsCost";
 import {
-  ListItem,
+  ArchiveButton,
   Column,
-  HoverTile,
-  FlexTop,
   FlexBottom,
-  ArchiveButton
+  FlexTop,
+  HoverTile,
+  ListItem
 } from "./ListItem";
-import Deck from "../../../shared/deck";
 
 export function ListItemDeck({
   row,

@@ -1,14 +1,12 @@
 import React from "react";
-import {
-  BinarySymbol,
-  BoosterSymbol,
-  FlexLeftContainer,
-  LabelText,
-  RaritySymbol,
-  SetSymbol,
-  TypeSymbol,
-  BriefText
-} from "../misc/display";
+import { BinarySymbol } from "../misc/BinarySymbol";
+import { BoosterSymbol } from "../misc/BoosterSymbol";
+import { BriefText } from "../misc/BriefText";
+import { FlexLeftContainer } from "../misc/FlexContainer";
+import { LabelText } from "../misc/LabelText";
+import { RaritySymbol } from "../misc/RaritySymbol";
+import { SetSymbol } from "../misc/SetSymbol";
+import { TypeSymbol } from "../misc/TypeSymbol";
 import { CollectionTableCellProps } from "./types";
 
 export function RarityCell({ cell }: CollectionTableCellProps): JSX.Element {

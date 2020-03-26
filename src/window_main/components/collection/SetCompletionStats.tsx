@@ -1,20 +1,18 @@
 import React from "react";
+import { OwnershipSymbol } from "../../../shared/OwnershipStars";
+import { BoosterSymbol } from "../misc/BoosterSymbol";
+import { CalendarSymbol } from "../misc/CalendarSymbol";
+import { MetricText } from "../misc/MetricText";
+import { RaritySymbol } from "../misc/RaritySymbol";
+import { TicketSymbol } from "../misc/TicketSymbol";
 import {
   chanceBoosterHasMythic,
   chanceBoosterHasRare,
+  chanceNotWildCard,
   estimateBoosterMythics,
   estimateBoosterRares,
-  SetStats,
-  chanceNotWildCard
+  SetStats
 } from "./collectionStats";
-import {
-  BoosterSymbol,
-  MetricText,
-  RaritySymbol,
-  TicketSymbol,
-  CalendarSymbol
-} from "../misc/display";
-import { OwnershipSymbol } from "../../../shared/OwnershipStars";
 
 export function SetCompletionStats({
   setStats,

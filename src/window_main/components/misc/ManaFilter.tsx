@@ -1,6 +1,6 @@
 import React from "react";
 import { COLORS_BRIEF } from "../../../shared/constants";
-import { ManaSymbol } from "./display";
+import { ManaSymbol } from "./ManaSymbol";
 
 export type ManaFilterKeys = "w" | "u" | "b" | "r" | "g" | "multi";
 
@@ -15,7 +15,7 @@ export interface ManaFilterProps {
 }
 
 export default function ManaFilter(props: ManaFilterProps): JSX.Element {
-  const { filterKey, prefixId, filters } = props;
+  const { filterKey, prefixId, filters, onFilterChanged } = props;
   const colors = filters[filterKey];
 
   const filterLabels: { [key in ManaFilterKeys]: string } = {
@@ -33,9 +33,9 @@ export default function ManaFilter(props: ManaFilterProps): JSX.Element {
     ): void => {
       colors[code] = event.currentTarget.classList.contains("mana_filter_on");
       event.currentTarget.classList.toggle("mana_filter_on");
-      props.onFilterChanged(colors);
+      onFilterChanged(colors);
     },
-    [props.onFilterChanged]
+    [colors, onFilterChanged]
   );
 
   const allFilters: ManaFilterKeys[] = [...COLORS_BRIEF, "multi"];

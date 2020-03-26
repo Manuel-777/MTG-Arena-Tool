@@ -1,20 +1,20 @@
-import React from "react";
 import _ from "lodash";
-import {
-  ListItem,
-  Column,
-  HoverTile,
-  FlexTop,
-  FlexBottom,
-  ArchiveButton
-} from "./ListItem";
-import { ListItemMatchProps } from "../matches/types";
+import React from "react";
 import { DEFAULT_TILE } from "../../../shared/constants";
-import ManaCost from "../misc/ManaCost";
 import { getReadableEvent, toMMSS } from "../../../shared/util";
+import { ListItemMatchProps } from "../matches/types";
+import ManaCost from "../misc/ManaCost";
 import RankSmall from "../misc/RankSmall";
 import ResultDetails from "../misc/ResultDetails";
-import { TagBubble, NewTag } from "../misc/display";
+import { NewTag, TagBubble } from "../misc/TagBubble";
+import {
+  ArchiveButton,
+  Column,
+  FlexBottom,
+  FlexTop,
+  HoverTile,
+  ListItem
+} from "./ListItem";
 
 export default function ListItemMatch({
   match,
