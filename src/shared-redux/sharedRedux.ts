@@ -4,7 +4,12 @@ import electron, {
   BrowserWindow,
   IpcRendererEvent
 } from "electron";
-import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY, IPC_NONE } from "../shared/constants";
+import {
+  IPC_BACKGROUND,
+  IPC_MAIN,
+  IPC_OVERLAY,
+  IPC_NONE
+} from "../shared/constants";
 import actions from "./actions";
 const ipc = electron.ipcMain;
 const ipcRenderer = electron.ipcRenderer;
@@ -34,18 +39,9 @@ export function initializeMainReduxIPC(
     store.dispatch(actions[type](arg));
     // Relay action
     // to is binary to allow any number or relays
-    if (to & IPC_BACKGROUND) {
-      console.log("REDUX ACTION RECV > " + type + ", to IPC_BACKGROUND");
-      back?.webContents.send("redux-action", type, arg);
-    }
-    if (to & IPC_MAIN) {
-      console.log("REDUX ACTION RECV > " + type + ", to IPC_MAIN");
-      main?.webContents.send("redux-action", type, arg);
-    }
-    if (to & IPC_OVERLAY) {
-      console.log("REDUX ACTION RECV > " + type + ", to IPC_OVERLAY");
-      overlay?.webContents.send("redux-action", type, arg);
-    }
+    if (to & IPC_BACKGROUND) back?.webContents.send("redux-action", type, arg);
+    if (to & IPC_MAIN) main?.webContents.send("redux-action", type, arg);
+    if (to & IPC_OVERLAY) overlay?.webContents.send("redux-action", type, arg);
   });
 }
 
