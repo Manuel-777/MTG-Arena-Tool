@@ -24,6 +24,7 @@ import {
 } from "./shared/constants";
 import { appDb } from "./shared/db/LocalDatabase";
 import { MergedSettings, OverlaySettingsData } from "./types/settings";
+import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY } from "./shared/constants";
 import { initializeMainReduxIPC } from "./shared-redux/sharedRedux";
 import store from "./shared-redux/stores/mainStore";
 
@@ -148,6 +149,9 @@ function startApp(): void {
 
   const startBackgroundWhenReady = (): void => {
     if (mainLoaded && backLoaded && overlayLoaded) {
+      if (mainWindow && background && overlay) {
+        initializeMainReduxIPC(store, background, mainWindow, overlay);
+      }
       background?.webContents.send("start_background");
     }
   };
@@ -166,11 +170,13 @@ function startApp(): void {
     startBackgroundWhenReady();
   });
 
-  overlay = createOverlayWindow();
-  overlay.webContents.once("dom-ready", () => {
-    overlayLoaded = true;
-    startBackgroundWhenReady();
-  });
+  setTimeout(() => {
+    overlay = createOverlayWindow();
+    overlay.webContents.once("dom-ready", () => {
+      overlayLoaded = true;
+      startBackgroundWhenReady();
+    });
+  }, 500);
 
   // If we destroy updater before creating another renderer
   // Electron shuts down the whole app.
@@ -179,9 +185,6 @@ function startApp(): void {
     updaterWindow = undefined;
   }
 
-  // Redux IPC listener
-  initializeMainReduxIPC(store, background, mainWindow, overlay);
-  // Any other IPC listener
   ipc.on("ipc_switch", function(event, method, from, arg, to) {
     if (debugIPC && method != "log_read") {
       if (debugIPC == 2 && method != "set_status" && method != "set_db") {
@@ -329,9 +332,9 @@ function startApp(): void {
         break;
 
       default:
-        if (to == 0) background?.webContents.send(method, arg);
-        if (to == 1) mainWindow?.webContents.send(method, arg);
-        if (to === 2) overlay?.webContents.send(method, arg);
+        if (to == IPC_BACKGROUND) background?.webContents.send(method, arg);
+        if (to == IPC_MAIN) mainWindow?.webContents.send(method, arg);
+        if (to === IPC_OVERLAY) overlay?.webContents.send(method, arg);
         break;
     }
   });
