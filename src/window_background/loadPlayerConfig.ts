@@ -1,6 +1,6 @@
 import { shell } from "electron";
 import _ from "lodash";
-import { IPC_BACKGROUND, IPC_OVERLAY, IPC_MAIN } from "../shared/constants";
+import { IPC_BACKGROUND, IPC_OVERLAY, IPC_RENDERER, IPC_MAIN } from "../shared/constants";
 import { ipcSend, setData } from "./backgroundUtil";
 import globals from "./globals";
 
@@ -10,6 +10,7 @@ import { isV2CardsList, ArenaV3Deck } from "../types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
 import convertDeckFromV3 from "./convertDeckFromV3";
 import { reduxAction } from "../shared-redux/sharedRedux";
+import { InternalMatch } from "../types/match";
 
 const ipcLog = (message: string): void => ipcSend("ipc_log", message);
 const ipcPop = (args: any): void => ipcSend("popup", args);
@@ -27,7 +28,7 @@ export function syncSettings(
       globals.store.dispatch,
       "SET_SETTINGS",
       settings,
-      IPC_OVERLAY | IPC_MAIN
+      IPC_OVERLAY | IPC_RENDERER | IPC_MAIN
     );
   }
   setData({ settings });
@@ -113,6 +114,20 @@ export async function loadPlayerConfig(playerId: string): Promise<void> {
   const savedData = await playerDb.findAll();
   const __playerData = _.defaultsDeep(savedData, playerData);
   const { settings } = __playerData;
+  const matchesList: InternalMatch[] = __playerData.matches_index
+    .filter((id: string) => __playerData[id])
+    .map((id: string) => {
+      return {
+        ...__playerData[id],
+        date: new Date(__playerData[id].date).toString()
+      };
+    });
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_MATCHES",
+    matchesList,
+    IPC_RENDERER
+  );
   setData(__playerData, true);
   await fixBadPlayerData();
   ipcSend("renderer_set_bounds", __playerData.windowBounds);

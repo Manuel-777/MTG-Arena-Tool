@@ -24,7 +24,7 @@ import {
 } from "./shared/constants";
 import { appDb } from "./shared/db/LocalDatabase";
 import { MergedSettings, OverlaySettingsData } from "./types/settings";
-import { IPC_BACKGROUND, IPC_MAIN, IPC_OVERLAY } from "./shared/constants";
+import { IPC_BACKGROUND, IPC_RENDERER, IPC_OVERLAY } from "./shared/constants";
 import { initializeMainReduxIPC } from "./shared-redux/sharedRedux";
 import store from "./shared-redux/stores/mainStore";
 
@@ -332,7 +332,7 @@ function startApp(): void {
 
       default:
         if (to == IPC_BACKGROUND) background?.webContents.send(method, arg);
-        if (to == IPC_MAIN) mainWindow?.webContents.send(method, arg);
+        if (to == IPC_RENDERER) mainWindow?.webContents.send(method, arg);
         if (to === IPC_OVERLAY) overlay?.webContents.send(method, arg);
         break;
     }

@@ -1,4 +1,4 @@
-import { Action, EnhancedStore, Dispatch, AnyAction } from "@reduxjs/toolkit";
+import { EnhancedStore, Dispatch, AnyAction } from "@reduxjs/toolkit";
 import electron, {
   IpcMainEvent,
   BrowserWindow,
@@ -6,9 +6,10 @@ import electron, {
 } from "electron";
 import {
   IPC_BACKGROUND,
-  IPC_MAIN,
+  IPC_RENDERER,
   IPC_OVERLAY,
-  IPC_NONE
+  IPC_NONE,
+  IPC_MAIN
 } from "../shared/constants";
 import actions from "./actions";
 const ipc = electron.ipcMain;
@@ -32,16 +33,25 @@ export function initializeMainReduxIPC(
   ipc.on("redux-action", function(
     event: IpcMainEvent,
     type: number,
-    arg: Action,
+    arg: string,
     to: number
   ) {
     // dispatch action
-    store.dispatch(actions[type](arg));
-    // Relay action
-    // to is binary to allow any number or relays
-    if (to & IPC_BACKGROUND) back?.webContents.send("redux-action", type, arg);
-    if (to & IPC_MAIN) main?.webContents.send("redux-action", type, arg);
-    if (to & IPC_OVERLAY) overlay?.webContents.send("redux-action", type, arg);
+    try {
+      if (to & IPC_MAIN) {
+        const action = JSON.parse(arg);
+        store.dispatch(actions[type](action));
+      }
+      // Relay action
+      // to is binary to allow any number or relays
+      if (to & IPC_BACKGROUND)
+        back?.webContents.send("redux-action", type, arg);
+      if (to & IPC_RENDERER) main?.webContents.send("redux-action", type, arg);
+      if (to & IPC_OVERLAY)
+        overlay?.webContents.send("redux-action", type, arg);
+    } catch (e) {
+      console.error("Attempted to parse a Redux Action but failed;", type, e);
+    }
   });
 }
 
@@ -54,9 +64,14 @@ export function initializeMainReduxIPC(
 export function initializeRendererReduxIPC(store: EnhancedStore): void {
   ipcRenderer.on(
     "redux-action",
-    (event: IpcRendererEvent, type: number, arg: Action) => {
+    (event: IpcRendererEvent, type: string, arg: string) => {
       // dispatch action
-      store.dispatch(actions[type](arg));
+      try {
+        const action = JSON.parse(arg);
+        store.dispatch(actions[type](action));
+      } catch (e) {
+        console.error("Attempted to parse a Redux Action but failed;", type, e);
+      }
     }
   );
 }
@@ -76,6 +91,6 @@ export function reduxAction(
 ): void {
   dispatch(actions[type](arg));
   if (to !== IPC_NONE) {
-    ipcRenderer.send("redux-action", type, arg, to);
+    ipcRenderer.send("redux-action", type, JSON.stringify(arg), to);
   }
 }

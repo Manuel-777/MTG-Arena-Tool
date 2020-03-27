@@ -22,7 +22,7 @@ import {
   ARENA_MODE_DRAFT,
   ARENA_MODE_IDLE,
   LOGIN_OK,
-  IPC_MAIN,
+  IPC_RENDERER,
   IPC_OVERLAY
 } from "../shared/constants";
 import updateDeck from "./updateDeck";
@@ -416,11 +416,16 @@ function finishLoading(): void {
       globals.store.dispatch,
       "SET_SETTINGS",
       playerData.settings,
-      IPC_MAIN | IPC_OVERLAY
+      IPC_RENDERER | IPC_OVERLAY
     );
     // replaces ipc "initialize"
-    reduxAction(globals.store.dispatch, "SET_LOADING", false, IPC_MAIN);
-    reduxAction(globals.store.dispatch, "SET_LOGIN_STATE", LOGIN_OK, IPC_MAIN);
+    reduxAction(globals.store.dispatch, "SET_LOADING", false, IPC_RENDERER);
+    reduxAction(
+      globals.store.dispatch,
+      "SET_LOGIN_STATE",
+      LOGIN_OK,
+      IPC_RENDERER
+    );
 
     //ipcSend("set_settings", JSON.stringify(playerData.settings));
     //ipcSend("initialize");

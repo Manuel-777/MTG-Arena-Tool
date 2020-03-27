@@ -1,5 +1,5 @@
 import { app, remote, ipcRenderer as ipc } from "electron";
-import { IPC_MAIN, IPC_BACKGROUND } from "../constants";
+import { IPC_RENDERER, IPC_BACKGROUND } from "../constants";
 
 export const rememberDefaults = {
   email: "",
@@ -25,7 +25,7 @@ export function ipcSend(
   method: string,
   from = IPC_BACKGROUND,
   arg: any,
-  to = IPC_MAIN
+  to = IPC_RENDERER
 ): void {
   // This is crude but works..
   if (process && process.type === "renderer") {

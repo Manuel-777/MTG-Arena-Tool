@@ -1,9 +1,10 @@
 // Should allow binary ops
 export const IPC_NONE = 0;
-export const IPC_BACKGROUND = 2;
-export const IPC_MAIN = 4;
-export const IPC_OVERLAY = 8;
-export const IPC_ALL = IPC_BACKGROUND | IPC_MAIN | IPC_OVERLAY;
+export const IPC_MAIN = 2;
+export const IPC_BACKGROUND = 4;
+export const IPC_RENDERER = 8;
+export const IPC_OVERLAY = 16;
+export const IPC_ALL = IPC_BACKGROUND | IPC_BACKGROUND | IPC_MAIN | IPC_OVERLAY;
 
 // Login states
 export const LOGIN_AUTH = 1;

@@ -1,13 +1,14 @@
 import { ipcRenderer as ipc, webFrame } from "electron";
 import { Howl, Howler } from "howler";
 import React, { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import striptags from "striptags";
 import {
   ARENA_MODE_IDLE,
   IPC_BACKGROUND,
-  IPC_MAIN,
-  IPC_OVERLAY
+  IPC_RENDERER,
+  IPC_OVERLAY,
+  IPC_MAIN
 } from "../shared/constants";
 import Deck from "../shared/deck";
 import { AppState } from "../shared-redux/stores/overlayStore";
@@ -262,7 +263,11 @@ export default function OverlayController(): JSX.Element {
           const overlayProps = {
             handleClickSettings: (): void => {
               ipcSend("renderer_show");
-              ipcSend("force_open_overlay_settings", index, IPC_MAIN);
+              ipcSend(
+                "force_open_overlay_settings",
+                index,
+                IPC_RENDERER | IPC_MAIN
+              );
             },
             handleClickClose: (): void => {
               handleClose(null, { action: -1, index });

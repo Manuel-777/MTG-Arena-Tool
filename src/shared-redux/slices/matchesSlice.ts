@@ -14,6 +14,15 @@ const matchesSlice = createSlice({
         state.matches[match.id] = { ...match };
         state.matchesIndex.push(match.id);
       }
+    },
+    setManyMatches: (state, action): void => {
+      const matches = action.payload as InternalMatch[];
+      matches.map((m: InternalMatch) => {
+        if (state.matchesIndex.indexOf(m.id) === -1) {
+          state.matches[m.id] = { ...m };
+          state.matchesIndex.push(m.id);
+        }
+      });
     }
   }
 });

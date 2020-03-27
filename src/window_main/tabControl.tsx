@@ -15,7 +15,7 @@ import {
   SUB_DECK,
   SUB_DRAFT,
   SUB_MATCH,
-  IPC_MAIN
+  IPC_RENDERER
 } from "../shared/constants";
 import Aggregator from "./aggregator";
 import openDeckSub from "./components/deck-view/DeckVIew";
@@ -105,9 +105,9 @@ export function getOpenSub(
 }
 
 export function forceOpenAbout(): void {
-  ipcSend("force_open_about", undefined, IPC_MAIN);
+  ipcSend("force_open_about", undefined, IPC_RENDERER);
 }
 
 export function forceOpenSettings(section = -1): void {
-  ipcSend("force_open_settings", section, IPC_MAIN);
+  ipcSend("force_open_settings", section, IPC_RENDERER);
 }

@@ -5,7 +5,7 @@ import { ipcRenderer as ipc } from "electron";
 import _ from "lodash";
 import parse from "date-fns/parse";
 import isValid from "date-fns/isValid";
-import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
+import { IPC_BACKGROUND, IPC_RENDERER } from "../shared/constants";
 import playerData from "../shared/PlayerData";
 import globals from "./globals";
 
@@ -14,7 +14,7 @@ const config = { precision: 2000 };
 const math: MathJsStatic = create(all, config) as MathJsStatic;
 
 // Begin of IPC messages recievers
-export function ipcSend(method: string, arg?: any, to = IPC_MAIN): void {
+export function ipcSend(method: string, arg?: any, to = IPC_RENDERER): void {
   if (method == "ipc_log") {
     //
   }

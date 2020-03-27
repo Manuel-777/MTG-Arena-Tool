@@ -47,5 +47,6 @@ actions["SET_EXPLORE_FILTERS"] = exploreSlice.actions.setExploreFilters;
 actions["SET_EXPLORE_FILTERS_SKIP"] =
   exploreSlice.actions.setExploreFiltersSkip;
 actions["SET_MATCH"] = matchesSlice.actions.setMatch;
+actions["SET_MANY_MATCHES"] = matchesSlice.actions.setManyMatches;
 
 export default actions;

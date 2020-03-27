@@ -2,7 +2,7 @@
 import { app, ipcRenderer as ipc, remote } from "electron";
 import path from "path";
 import Pikaday from "pikaday";
-import { IPC_BACKGROUND, IPC_MAIN } from "../shared/constants";
+import { IPC_BACKGROUND, IPC_RENDERER } from "../shared/constants";
 import pd from "../shared/PlayerData";
 import { WinLossGate } from "../types/event";
 
@@ -16,7 +16,7 @@ export function ipcSend(
   arg?: unknown,
   to = IPC_BACKGROUND
 ): void {
-  ipc.send("ipc_switch", method, IPC_MAIN, arg, to);
+  ipc.send("ipc_switch", method, IPC_RENDERER, arg, to);
 }
 
 export function toggleArchived(id: string | number): void {
