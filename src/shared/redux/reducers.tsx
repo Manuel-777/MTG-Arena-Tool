@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import { MergedSettings } from "../../types/settings";
 import { WildcardsChange } from "../../window_main/tabs/HomeTab";
+import { ARENA_MODE_IDLE, ARENA_MODE_MATCH } from "../constants";
 import { defaultCfg, playerDataDefault } from "../PlayerData";
 
 export const LOGIN_AUTH = 1;
@@ -51,6 +52,7 @@ export const rendererSlice = createSlice({
   name: "renderer",
   initialState: {
     archivedCache: {} as Record<string, boolean>,
+    arenaState: ARENA_MODE_IDLE,
     backgroundColor: "rgba(0, 0, 0, 0.25)",
     backgroundGrpId: 0,
     backgroundImage: "default",
@@ -84,6 +86,9 @@ export const rendererSlice = createSlice({
     updateState: ""
   },
   reducers: {
+    setArenaState: (state, action): void => {
+      state.arenaState = action.payload;
+    },
     setBackgroundColor: (state, action): void => {
       state.backgroundColor = action.payload;
     },
@@ -106,7 +111,9 @@ export const rendererSlice = createSlice({
       state.patreon = action.payload;
     },
     setPlayerDataTimestamp: (state, action): void => {
-      state.playerDataTimestamp = action.payload;
+      if (state.arenaState !== ARENA_MODE_MATCH) {
+        state.playerDataTimestamp = action.payload;
+      }
     },
     setPopup: (state, action): void => {
       state.popup = action.payload;

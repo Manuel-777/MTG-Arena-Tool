@@ -3,25 +3,25 @@
 /* eslint-disable no-console */
 import { ipcRenderer as ipc, IpcRendererEvent } from "electron";
 import {
-  LOGIN_OK,
-  LOGIN_FAILED,
-  LOGIN_WAITING,
+  MAIN_HOME,
+  MAIN_SETTINGS,
+  SETTINGS_ABOUT,
+  SETTINGS_OVERLAY
+} from "../../shared/constants";
+import pd from "../../shared/PlayerData";
+import {
   exploreSlice,
   homeSlice,
   hoverSlice,
   loginSlice,
+  LOGIN_FAILED,
+  LOGIN_OK,
+  LOGIN_WAITING,
   rendererSlice,
   settingsSlice
 } from "../../shared/redux/reducers";
 import { timestamp } from "../../shared/util";
-import {
-  MAIN_SETTINGS,
-  SETTINGS_OVERLAY,
-  MAIN_HOME
-} from "../../shared/constants";
 import { ipcSend } from "../rendererUtil";
-import { SETTINGS_ABOUT } from "../../shared/constants";
-import pd from "../../shared/PlayerData";
 import uxMove from "../uxMove";
 
 export default function ipcListeners(dispatcher: any): void {
@@ -40,6 +40,7 @@ export default function ipcListeners(dispatcher: any): void {
     setLoginState
   } = loginSlice.actions;
   const {
+    setArenaState,
     setLoading,
     setOffline,
     setNoLog,
@@ -182,6 +183,10 @@ export default function ipcListeners(dispatcher: any): void {
 
   ipc.on("set_update_state", (event: IpcRendererEvent, arg: any): void => {
     dispatcher(setUpdateState(arg));
+  });
+
+  ipc.on("set_arena_state", (event: IpcRendererEvent, arg: any): void => {
+    dispatcher(setArenaState(arg));
   });
 
   ipc.on("settings_updated", (): void => {
