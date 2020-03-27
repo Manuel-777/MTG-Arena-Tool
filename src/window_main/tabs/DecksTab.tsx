@@ -20,7 +20,7 @@ import Aggregator, {
 import DecksTable from "../components/decks/DecksTable";
 import { DecksData } from "../components/decks/types";
 import { isHidingArchived } from "../components/tables/filters";
-import { useAggregatorData } from "../components/tables/hooks";
+import { useAggregatorData } from "../components/tables/useAggregatorData";
 import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
 

@@ -9,7 +9,7 @@ import { CheckboxContainer } from "../misc/CheckboxContainer";
 import { InputContainer } from "../misc/InputContainer";
 import ManaFilter, { ColorFilter, ManaFilterKeys } from "../misc/ManaFilter";
 import { MetricText } from "../misc/MetricText";
-import { useMultiSelectFilter } from "./hooks";
+import { useMultiSelectFilter } from "./useMultiSelectFilter";
 import { MultiSelectFilterProps, TableData } from "./types";
 
 export function TextBoxFilter<D extends TableData>({

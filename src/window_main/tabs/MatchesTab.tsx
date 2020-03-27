@@ -12,8 +12,8 @@ import Aggregator, { AggregatorFilters } from "../aggregator";
 import MatchesTable from "../components/matches/MatchesTable";
 import { MatchTableData } from "../components/matches/types";
 import { isHidingArchived } from "../components/tables/filters";
-import { useAggregatorData } from "../components/tables/hooks";
 import { TagCounts } from "../components/tables/types";
+import { useAggregatorData } from "../components/tables/useAggregatorData";
 import { ipcSend, toggleArchived } from "../rendererUtil";
 import uxMove from "../uxMove";
 

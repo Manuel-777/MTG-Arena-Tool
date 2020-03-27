@@ -1,6 +1,5 @@
 import _ from "lodash";
 import React from "react";
-import { useSelector } from "react-redux";
 import {
   TableInstance,
   TableState,
@@ -10,115 +9,19 @@ import {
   useSortBy,
   useTable
 } from "react-table";
-import pd from "../../../shared/PlayerData";
-import { AppState } from "../../../shared/redux/reducers";
-import Aggregator, { AggregatorFilters } from "../../aggregator";
 import {
   archivedFilterFn,
   colorsFilterFn,
-  fuzzyTextFilterFn,
-  isHidingArchived
+  fuzzyTextFilterFn
 } from "../tables/filters";
 import {
   BaseTableProps,
   FiltersVisible,
-  MultiSelectFilterProps,
   PagingControlsProps,
   TableControlsProps,
   TableData,
   TableHeadersProps
 } from "../tables/types";
-
-export function useMultiSelectFilter<D>(
-  props: MultiSelectFilterProps<D>
-): [
-  D,
-  (
-    code: string
-  ) => (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
-] {
-  const { filterKey, filters, onFilterChanged } = props;
-  const filterValue = filters[filterKey];
-  const onClickMultiFilter = React.useCallback(
-    (code: string) => (event: React.MouseEvent<HTMLDivElement>): void => {
-      (filterValue as any)[code] = event.currentTarget.classList.contains(
-        "rarity_filter_on"
-      );
-      event.currentTarget.classList.toggle("rarity_filter_on");
-      onFilterChanged(filterValue);
-    },
-    [filterValue, onFilterChanged]
-  );
-  return [filterValue, onClickMultiFilter];
-}
-
-export function useBlurOnEnter(): [
-  React.RefObject<HTMLInputElement>,
-  (e: React.KeyboardEvent<HTMLInputElement>) => void
-] {
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const onKeyDown = React.useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>): void => {
-      if (inputRef?.current) {
-        if (e.keyCode === 13) {
-          inputRef.current.blur();
-        }
-      }
-    },
-    [inputRef]
-  );
-  return [inputRef, onKeyDown];
-}
-
-function getDefaultAggFilters(
-  showArchived: boolean,
-  aggFiltersArg?: AggregatorFilters
-): AggregatorFilters {
-  const { last_date_filter: dateFilter } = pd.settings;
-  return {
-    ...Aggregator.getDefaultFilters(),
-    date: dateFilter,
-    eventId: Aggregator.DEFAULT_EVENT,
-    ...aggFiltersArg,
-    showArchived
-  };
-}
-
-export function useAggregatorData<D extends TableData>({
-  aggFiltersArg,
-  getData,
-  showArchived
-}: {
-  aggFiltersArg?: AggregatorFilters;
-  getData: (
-    aggregator: Aggregator,
-    archivedCache: Record<string, boolean>
-  ) => D[];
-  showArchived: boolean;
-}): {
-  aggFilters: AggregatorFilters;
-  data: D[];
-  setAggFilters: (aggFilters: AggregatorFilters) => void;
-} {
-  const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
-  const [aggFilters, setAggFilters] = React.useState(defaultAggFilters);
-  React.useEffect(() => {
-    const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
-    setAggFilters(defaultAggFilters);
-  }, [aggFiltersArg, showArchived]);
-  const archivedCache = useSelector(
-    (state: AppState) => state.renderer.archivedCache
-  );
-  const data = React.useMemo(() => {
-    const aggregator = new Aggregator(aggFilters);
-    return getData(aggregator, archivedCache);
-  }, [aggFilters, archivedCache, getData]);
-  return {
-    aggFilters,
-    data,
-    setAggFilters
-  };
-}
 
 export function useBaseReactTable<D extends TableData>({
   columns,
@@ -167,7 +70,6 @@ export function useBaseReactTable<D extends TableData>({
       hiddenColumns
     }) as TableState<D>;
     const state = { ...(cachedState ?? mergedDefault) };
-
     // ensure data-only columns are all invisible
     const hiddenSet = new Set(state.hiddenColumns ?? []);
     for (const column of columns) {
@@ -179,7 +81,6 @@ export function useBaseReactTable<D extends TableData>({
     state.hiddenColumns = [...hiddenSet];
     return state;
   }, [cachedState, columns, defaultState]);
-
   const table = useTable<D>(
     {
       columns: React.useMemo(() => columns, [columns]),
@@ -220,11 +121,9 @@ export function useBaseReactTable<D extends TableData>({
   // It seems allComumns can be undefined on some cycles of the table hook
   const allColumns = table.allColumns || [];
   const { filters, pageIndex, pageSize } = state;
-
   React.useEffect(() => {
     tableStateCallback({ ...state });
   }, [state, tableStateCallback]);
-
   const pagingProps: PagingControlsProps = {
     canPreviousPage,
     canNextPage,
@@ -237,7 +136,6 @@ export function useBaseReactTable<D extends TableData>({
     pageIndex,
     pageSize
   };
-
   const visibleHeaders = headers.filter(header => header.isVisible);
   const gridTemplateColumns = visibleHeaders
     .map(header => `minmax(${header.gridWidth ?? "140px"}, auto)`)
@@ -264,7 +162,6 @@ export function useBaseReactTable<D extends TableData>({
     setFiltersVisible,
     visibleHeaders
   };
-
   const tableControlsProps: TableControlsProps<D> = {
     filters,
     allColumns,
@@ -295,22 +192,4 @@ export function useBaseReactTable<D extends TableData>({
     headersProps,
     tableControlsProps
   };
-}
-
-export function useAggregatorArchiveFilter<D extends TableData>(
-  table: TableInstance<D>,
-  aggFilters: AggregatorFilters,
-  setAggFiltersCallback: (filters: AggregatorFilters) => void
-): void {
-  const {
-    state: { filters }
-  } = table;
-  React.useEffect(() => {
-    if (isHidingArchived({ filters }) === !!aggFilters.showArchived) {
-      setAggFiltersCallback({
-        ...aggFilters,
-        showArchived: !isHidingArchived({ filters })
-      });
-    }
-  }, [aggFilters, setAggFiltersCallback, filters]);
 }

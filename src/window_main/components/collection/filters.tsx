@@ -8,8 +8,8 @@ import { RaritySymbol } from "../misc/RaritySymbol";
 import { SetSymbol } from "../misc/SetSymbol";
 import { TypeSymbol } from "../misc/TypeSymbol";
 import { BinaryColumnFilter, BinaryFilterValue } from "../tables/filters";
-import { useMultiSelectFilter } from "../tables/hooks";
 import { MultiSelectFilterProps } from "../tables/types";
+import { useMultiSelectFilter } from "../tables/useMultiSelectFilter";
 import { CardsData } from "./types";
 
 export function InBoostersColumnFilter(props: {

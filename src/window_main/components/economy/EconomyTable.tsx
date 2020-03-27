@@ -2,7 +2,6 @@ import startOfDay from "date-fns/startOfDay";
 import React from "react";
 import { Column, useExpanded, useGroupBy, useSortBy } from "react-table";
 import { EVENTS_TABLE_MODE } from "../../../shared/constants";
-import { vaultPercentFormat } from "./economyUtils";
 import {
   AggregatedContextCell,
   ArchivedCell,
@@ -18,11 +17,12 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { BaseTableProps } from "../tables/types";
+import { useBaseReactTable } from "../tables/useBaseReactTable";
 import EconomyTableControls from "./EconomyTableControls";
+import { vaultPercentFormat } from "./economyUtils";
 import { txnSearchFilterFn } from "./filters";
 import { EconomyTableRow } from "./rows";
 import {
