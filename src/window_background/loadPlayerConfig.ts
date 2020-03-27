@@ -1,6 +1,11 @@
 import { shell } from "electron";
 import _ from "lodash";
-import { IPC_BACKGROUND, IPC_OVERLAY, IPC_RENDERER, IPC_MAIN } from "../shared/constants";
+import {
+  IPC_BACKGROUND,
+  IPC_OVERLAY,
+  IPC_RENDERER,
+  IPC_MAIN
+} from "../shared/constants";
 import { ipcSend, setData } from "./backgroundUtil";
 import globals from "./globals";
 
