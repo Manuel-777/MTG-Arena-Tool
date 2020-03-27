@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { Column, Filters, FilterValue, IdType, Row } from "react-table";
 import {
   COLLECTION_CARD_MODE,
@@ -9,7 +10,7 @@ import {
 } from "../../../shared/constants";
 import db from "../../../shared/database";
 import pd from "../../../shared/PlayerData";
-import { getCollectionStats } from "./collectionStats";
+import { AppState } from "../../../shared/redux/reducers";
 import ResizableDragger from "../misc/ResizableDragger";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {
@@ -17,10 +18,10 @@ import {
   NumberRangeColumnFilter,
   TextBoxFilter
 } from "../tables/filters";
-import { useBaseReactTable } from "../tables/hooks";
 import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { BaseTableProps } from "../tables/types";
+import { useBaseReactTable } from "../tables/useBaseReactTable";
 import {
   InBoostersCell,
   InBoostersHeader,
@@ -29,6 +30,7 @@ import {
   TypeCell
 } from "./cells";
 import ChartView from "./ChartView";
+import { getCollectionStats } from "./collectionStats";
 import { CollectionStatsPanel } from "./CollectionStatsPanel";
 import CollectionTableControls from "./CollectionTableControls";
 import {
@@ -47,8 +49,6 @@ import {
   CollectionTableControlsProps,
   CollectionTableProps
 } from "./types";
-import { useSelector } from "react-redux";
-import { AppState, collectionSlice } from "../../../shared/redux/reducers";
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   let hasCorrectBoosterFilter = false;

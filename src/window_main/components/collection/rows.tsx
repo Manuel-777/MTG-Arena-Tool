@@ -24,7 +24,7 @@ export function CardTableViewRow({
     }
   }, [card, containerEl, contextMenuCallback]);
 
-  const [hoverIn, hoverOut] = useHoverCard(card.id);
+  const [hoverIn, hoverOut] = useHoverCard(card.id, card.wanted);
 
   return (
     <span ref={containerEl}>
@@ -57,7 +57,7 @@ export function CardTileRow({
     }
   }, [card, contextMenuCallback]);
 
-  const [hoverIn, hoverOut] = useHoverCard(card.id);
+  const [hoverIn, hoverOut] = useHoverCard(card.id, card.wanted);
 
   return (
     <div

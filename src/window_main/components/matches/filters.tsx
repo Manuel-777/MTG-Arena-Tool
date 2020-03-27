@@ -5,8 +5,8 @@ import { ColumnInstance, FilterValue, Row } from "react-table";
 import { MANA, RANKS } from "../../../shared/constants";
 import { RankSymbol } from "../misc/display";
 import { BinaryColumnFilter, BinaryFilterValue } from "../tables/filters";
-import { useMultiSelectFilter } from "../tables/hooks";
 import { MultiSelectFilterProps } from "../tables/types";
+import { useMultiSelectFilter } from "../tables/useMultiSelectFilter";
 import { MatchTableData } from "./types";
 
 export function OnPlayColumnFilter(props: {

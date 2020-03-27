@@ -43,6 +43,7 @@ export default function CardHover(): JSX.Element {
   );
   const grpId = useSelector((state: AppState) => state.hover.grpId);
   const opacity = useSelector((state: AppState) => state.hover.opacity);
+  const wanted = useSelector((state: AppState) => state.hover.wanted);
   const hoverSize = useSelector((state: AppState) => state.hover.size);
   const card = db.card(grpId);
   const [frontLoaded, setFrontLoaded] = useState(false);
@@ -135,7 +136,7 @@ export default function CardHover(): JSX.Element {
       >
         {card ? (
           <div className="ownership-stars-container">
-            <OwnershipStars card={card} />
+            <OwnershipStars card={card} wanted={wanted} />
           </div>
         ) : (
           <></>

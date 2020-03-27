@@ -1,26 +1,29 @@
-import _ from "lodash";
-import { app, remote, ipcRenderer as ipc } from "electron";
-import path from "path";
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable @typescript-eslint/no-var-requires */
+import { app, ipcRenderer as ipc, remote } from "electron";
 import fs from "fs";
-import sha1 from "js-sha1";
-import * as httpApi from "./httpApi";
-import { appDb, playerDb } from "../shared/db/LocalDatabase";
+import _ from "lodash";
+import path from "path";
+import { HIDDEN_PW } from "../shared/constants";
 import { rememberDefaults } from "../shared/db/databaseUtil";
+import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/PlayerData";
 import { getReadableFormat } from "../shared/util";
-import { HIDDEN_PW, MAIN_DECKS } from "../shared/constants";
+import { InternalDeck } from "../types/Deck";
+import addCustomDeck from "./addCustomDeck";
+import arenaLogWatcher from "./arena-log-watcher";
 import { ipcSend, setData, unleakString } from "./backgroundUtil";
 import { createDeck } from "./data";
-import * as mtgaLog from "./mtgaLog";
-import globals from "./globals";
-import addCustomDeck from "./addCustomDeck";
 import forceDeckUpdate from "./forceDeckUpdate";
-import arenaLogWatcher from "./arena-log-watcher";
+import globals from "./globals";
+import * as httpApi from "./httpApi";
 import {
   backportNeDbToElectronStore,
   loadPlayerConfig,
   syncSettings
 } from "./loadPlayerConfig";
+import * as mtgaLog from "./mtgaLog";
 import updateDeck from "./updateDeck";
 
 if (!remote.app.isPackaged) {
@@ -28,7 +31,7 @@ if (!remote.app.isPackaged) {
   const unhandled = require("electron-unhandled");
   unhandled({
     showDialog: true,
-    reportButton: error => {
+    reportButton: (error: any) => {
       openNewGitHubIssue({
         user: "Manuel-777",
         repo: "MTG-Arena-Tool",
@@ -50,12 +53,14 @@ if (!fs.existsSync(globals.actionLogDir)) {
   fs.mkdirSync(globals.actionLogDir);
 }
 
-globals.toolVersion = (app || remote.app)
-  .getVersion()
-  .split(".")
-  .reduce((acc, cur) => +acc * 256 + +cur);
+globals.toolVersion = parseInt(
+  (app || remote.app)
+    .getVersion()
+    .split(".")
+    .reduce((acc, cur) => +acc * 256 + +cur + "")
+);
 
-let logLoopInterval = null;
+let logLoopInterval: number | undefined = undefined;
 const debugArenaID = undefined;
 
 //
@@ -86,7 +91,7 @@ ipc.on("save_app_settings_norefresh", function(event, arg) {
   });
 });
 
-function fixBadSettingsData() {
+function fixBadSettingsData(): void {
   appDb.find("", "settings").then(appSettings => {
     // First introduced in 2.8.4 (2019-07-25)
     // Some people's date formats are set to "undefined"
@@ -151,7 +156,7 @@ ipc.on("start_background", async function() {
   ipcSend("ipc_log", `Downloading metadata ${settings.metadata_lang}`);
 });
 
-function offlineLogin() {
+function offlineLogin(): void {
   ipcSend("auth", { ok: true, user: -1 });
   loadPlayerConfig(playerData.arenaId);
   setData({ userName: "", offline: true });
@@ -256,8 +261,9 @@ ipc.on("import_custom_deck", function(event, arg) {
 //
 ipc.on("toggle_deck_archived", function(event, arg) {
   const id = arg;
-  if (!playerData.deckExists(id)) return;
-  const deckData = { ...playerData.deck(id) };
+  const deck = playerData.deck(id);
+  if (!deck) return;
+  const deckData: InternalDeck = { ...deck };
   deckData.archived = !deckData.archived;
   const decks = { ...playerData.decks, [id]: deckData };
 
@@ -268,7 +274,7 @@ ipc.on("toggle_deck_archived", function(event, arg) {
 //
 ipc.on("toggle_archived", function(event, arg) {
   const id = arg;
-  const item = playerData[id];
+  const item = (playerData as Record<string, any>)[id];
   if (!item) return;
   const data = { ...item };
   data.archived = !data.archived;
@@ -384,23 +390,24 @@ ipc.on("set_log", function(event, arg) {
 // Set variables to default first
 let prevLogSize = 0;
 
-function sendSettings() {
-  let tags_colors = playerData.tags_colors;
-  let settingsData = { tags_colors };
+function sendSettings(): void {
+  const tags_colors = playerData.tags_colors;
+  const settingsData = { tags_colors };
   httpApi.httpSetSettings(settingsData);
 }
 
 // Old parser
-async function attemptLogLoop() {
+async function attemptLogLoop(): Promise<void> {
   try {
     await logLoop();
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err);
   }
 }
 
 // Basic logic for reading the log file
-async function logLoop() {
+async function logLoop(): Promise<void> {
   const logUri = playerData.settings.logUri;
   //console.log("logLoop() start");
   //ipcSend("ipc_log", "logLoop() start");
@@ -451,8 +458,8 @@ async function logLoop() {
   // Process only the user data for initial loading (prior to log in)
   // Same logic as processLog() but without the processLogData() function
   const rawString = logSegment;
-  var splitString = rawString.split("[UnityCrossThread");
-  const parsedData = {};
+  const splitString = rawString.split("[UnityCrossThread");
+  const parsedData: Record<string, string> = {};
 
   let detailedLogs = true;
   splitString.forEach(value => {
@@ -476,9 +483,8 @@ async function logLoop() {
     // Get player Id
     strCheck = '\\"playerId\\": \\"';
     if (value.includes(strCheck) && parsedData.arenaId == undefined) {
-      parsedData.arenaId = debugArenaID
-        ? debugArenaID
-        : unleakString(dataChop(value, strCheck, '\\"'));
+      parsedData.arenaId =
+        debugArenaID ?? unleakString(dataChop(value, strCheck, '\\"'));
     }
 
     // Get User name
@@ -501,7 +507,7 @@ async function logLoop() {
 
   if (!detailedLogs) return;
 
-  for (let key in parsedData) {
+  for (const key in parsedData) {
     ipcSend("ipc_log", `Initial log parse: ${key}=${parsedData[key]}`);
   }
   setData(parsedData, false);
@@ -559,9 +565,9 @@ async function logLoop() {
 }
 
 // Cuts the string "data" between first ocurrences of the two selected words "startStr" and "endStr";
-function dataChop(data, startStr, endStr) {
-  var start = data.indexOf(startStr) + startStr.length;
-  var end = data.length;
+function dataChop(data: string, startStr: string, endStr: string): string {
+  let start = data.indexOf(startStr) + startStr.length;
+  let end = data.length;
   data = data.substring(start, end);
 
   if (endStr != "") {

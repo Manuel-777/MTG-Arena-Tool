@@ -265,7 +265,7 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
   const { setHoverIn, setHoverOut } = hoverSlice.actions;
 
   const hoverCard = (id: number, hover: boolean): void => {
-    dispatcher(hover ? setHoverIn(id) : setHoverOut());
+    dispatcher(hover ? setHoverIn({ grpId: id }) : setHoverOut());
   };
 
   // attempt at sorting visually..
