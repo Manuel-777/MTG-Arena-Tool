@@ -28,11 +28,6 @@ import {
 import updateDeck from "./updateDeck";
 import globals from "./globals";
 import { reduxAction } from "../shared-redux/sharedRedux";
-import {
-  SET_SETTINGS,
-  SET_LOGIN_STATE,
-  SET_LOADING
-} from "../shared-redux/constants";
 
 const debugLogSpeed = 0.001;
 let logReadEnd = null;
@@ -419,13 +414,13 @@ function finishLoading(): void {
 
     reduxAction(
       globals.store.dispatch,
-      SET_SETTINGS,
+      "SET_SETTINGS",
       playerData.settings,
       IPC_MAIN | IPC_OVERLAY
     );
     // replaces ipc "initialize"
-    reduxAction(globals.store.dispatch, SET_LOADING, false, IPC_MAIN);
-    reduxAction(globals.store.dispatch, SET_LOGIN_STATE, LOGIN_OK, IPC_MAIN);
+    reduxAction(globals.store.dispatch, "SET_LOADING", false, IPC_MAIN);
+    reduxAction(globals.store.dispatch, "SET_LOGIN_STATE", LOGIN_OK, IPC_MAIN);
 
     //ipcSend("set_settings", JSON.stringify(playerData.settings));
     //ipcSend("initialize");

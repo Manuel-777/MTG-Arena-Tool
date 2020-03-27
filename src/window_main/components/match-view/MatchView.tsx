@@ -17,7 +17,6 @@ import ActionLog from "./ActionLog";
 import uxMove from "../../uxMove";
 import { useDispatch } from "react-redux";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_BACK_GRPID } from "../../../shared-redux/constants";
 import { IPC_NONE } from "../../../shared/constants";
 
 interface MatchViewProps {
@@ -44,7 +43,7 @@ export function MatchView(props: MatchViewProps): JSX.Element {
   }
 
   const goBack = (): void => {
-    reduxAction(dispatcher, SET_BACK_GRPID, 0, IPC_NONE);
+    reduxAction(dispatcher, "SET_BACK_GRPID", 0, IPC_NONE);
     uxMove(0);
   };
 

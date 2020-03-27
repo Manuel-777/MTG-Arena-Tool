@@ -30,7 +30,6 @@ import { InternalMatch } from "../../../types/match";
 import { InternalDraft } from "../../../types/draft";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_BACK_GRPID, SET_SUBNAV } from "../../../shared-redux/constants";
 
 function DraftRares({ event }: { event: EventTableData }): JSX.Element {
   const draftId = event.id + "-draft";
@@ -154,13 +153,13 @@ function EventSubRows({
       uxMove(-100);
       reduxAction(
         dispatcher,
-        SET_BACK_GRPID,
+        "SET_BACK_GRPID",
         match.playerDeck.deckTileId,
         IPC_NONE
       );
       reduxAction(
         dispatcher,
-        SET_SUBNAV,
+        "SET_SUBNAV",
         {
           type: SUB_MATCH,
           id: match.id
@@ -176,7 +175,7 @@ function EventSubRows({
       uxMove(-100);
       reduxAction(
         dispatcher,
-        SET_SUBNAV,
+        "SET_SUBNAV",
         {
           type: SUB_DRAFT,
           id: id

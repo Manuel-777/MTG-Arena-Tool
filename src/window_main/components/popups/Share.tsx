@@ -4,7 +4,6 @@ import { ipcSend } from "../../rendererUtil";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_LOADING } from "../../../shared-redux/constants";
 import { IPC_NONE } from "../../../shared/constants";
 
 function shareTypeId(type: string): number {
@@ -49,7 +48,7 @@ export default function Share(props: ShareProps): JSX.Element {
 
   const selectExpire = useCallback(
     (option: string): void => {
-      reduxAction(dispatcher, SET_LOADING, true, IPC_NONE);
+      reduxAction(dispatcher, "SET_LOADING", true, IPC_NONE);
       switch (type) {
         case "draft":
           ipcSend("request_draft_link", {

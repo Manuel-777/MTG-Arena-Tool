@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from "react-redux";
 import db from "../../../shared/database";
 import { getCardArtCrop } from "../../../shared/util";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_TOPARTIST } from "../../../shared-redux/constants";
 import { IPC_NONE } from "../../../shared/constants";
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -31,7 +30,7 @@ export default function BackgroundImage(): JSX.Element {
       image = getCardArtCrop(backgroundGrpId);
       reduxAction(
         dispatcher,
-        SET_TOPARTIST,
+        "SET_TOPARTIST",
         `${card.name} by ${card.artist}`,
         IPC_NONE
       );
@@ -40,7 +39,7 @@ export default function BackgroundImage(): JSX.Element {
       image = DEFAULT_BACKGROUND;
       reduxAction(
         dispatcher,
-        SET_TOPARTIST,
+        "SET_TOPARTIST",
         "Bedevil by Seb McKinnon",
         IPC_NONE
       );
@@ -62,7 +61,7 @@ export default function BackgroundImage(): JSX.Element {
         xhr.send();
       }
       // We dont know who is the artist..
-      reduxAction(dispatcher, SET_TOPARTIST, "", IPC_NONE);
+      reduxAction(dispatcher, "SET_TOPARTIST", "", IPC_NONE);
     }
     setImage(`url(${image})`);
   }, [backgroundGrpId, backgroundImage, dispatcher]);

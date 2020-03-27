@@ -11,12 +11,6 @@ import Input from "../components/misc/Input";
 import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
-import {
-  SET_LOADING,
-  SET_EXPLORE_FILTERS,
-  SET_BACK_GRPID,
-  SET_SUBNAV
-} from "../../shared-redux/constants";
 import { ExploreQuery } from "../../shared-redux/slices/exploreSlice";
 
 export default function ExploreTab(): JSX.Element {
@@ -32,8 +26,8 @@ export default function ExploreTab(): JSX.Element {
 
   const queryExplore = useCallback(
     (filters: ExploreQuery) => {
-      reduxAction(dispatcher, SET_LOADING, true, IPC_NONE);
-      reduxAction(dispatcher, SET_EXPLORE_FILTERS, filters, IPC_NONE);
+      reduxAction(dispatcher, "SET_LOADING", true, IPC_NONE);
+      reduxAction(dispatcher, "SET_EXPLORE_FILTERS", filters, IPC_NONE);
       ipcSend("request_explore", filters);
     },
     [dispatcher]
@@ -61,10 +55,10 @@ export default function ExploreTab(): JSX.Element {
         name: row.name,
         id: row._id
       };
-      reduxAction(dispatcher, SET_BACK_GRPID, row.tile, IPC_NONE);
+      reduxAction(dispatcher, "SET_BACK_GRPID", row.tile, IPC_NONE);
       reduxAction(
         dispatcher,
-        SET_SUBNAV,
+        "SET_SUBNAV",
         {
           type: SUB_DECK,
           id: row._id + "_",
@@ -160,7 +154,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
 
   const updateFilters = useCallback(
     (filters: ExploreQuery): void => {
-      reduxAction(dispatcher, SET_EXPLORE_FILTERS, filters, IPC_NONE);
+      reduxAction(dispatcher, "SET_EXPLORE_FILTERS", filters, IPC_NONE);
     },
     [dispatcher]
   );

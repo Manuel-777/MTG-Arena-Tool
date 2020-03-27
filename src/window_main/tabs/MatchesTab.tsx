@@ -16,7 +16,6 @@ import { TagCounts } from "../components/tables/types";
 import { ipcSend, toggleArchived } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
-import { SET_BACK_GRPID, SET_SUBNAV } from "../../shared-redux/constants";
 
 const { DEFAULT_ARCH, NO_ARCH } = Aggregator;
 const tagPrompt = "Set archetype";
@@ -145,13 +144,13 @@ export default function MatchesTab({
       uxMove(-100);
       reduxAction(
         dispatcher,
-        SET_BACK_GRPID,
+        "SET_BACK_GRPID",
         match.playerDeck.deckTileId,
         IPC_NONE
       );
       reduxAction(
         dispatcher,
-        SET_SUBNAV,
+        "SET_SUBNAV",
         {
           type: SUB_MATCH,
           id: match.id

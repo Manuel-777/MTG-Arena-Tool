@@ -24,7 +24,6 @@ import { AppState } from "../../../shared-redux/stores/rendererStore";
 import useWindowSize from "../../hooks/useWindowSize";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_TOPNAV, SET_BACK_GRPID } from "../../../shared-redux/constants";
 
 interface TopNavItemProps {
   dispatcher: any;
@@ -39,8 +38,8 @@ function TopNavItem(props: TopNavItemProps): JSX.Element {
 
   const clickTab = React.useCallback(
     (tabId: number) => (): void => {
-      reduxAction(dispatcher, SET_TOPNAV, tabId, IPC_NONE);
-      reduxAction(dispatcher, SET_BACK_GRPID, 0, IPC_NONE);
+      reduxAction(dispatcher, "SET_TOPNAV", tabId, IPC_NONE);
+      reduxAction(dispatcher, "SET_BACK_GRPID", 0, IPC_NONE);
       uxMove(0);
     },
     [dispatcher]
@@ -96,8 +95,8 @@ function TopRankIcon(props: TopRankProps): JSX.Element {
   const selected = currentTab === id;
   const clickTab = React.useCallback(
     tabId => (): void => {
-      reduxAction(dispatcher, SET_TOPNAV, tabId, IPC_NONE);
-      reduxAction(dispatcher, SET_BACK_GRPID, 0, IPC_NONE);
+      reduxAction(dispatcher, "SET_TOPNAV", tabId, IPC_NONE);
+      reduxAction(dispatcher, "SET_BACK_GRPID", 0, IPC_NONE);
       uxMove(0);
     },
     [dispatcher]

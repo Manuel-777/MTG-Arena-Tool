@@ -2,7 +2,6 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { makeResizable } from "../../rendererUtil";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_SETTINGS } from "../../../shared-redux/constants";
 import { IPC_NONE } from "../../../shared/constants";
 
 export default function ResizableDragger(): JSX.Element {
@@ -13,7 +12,7 @@ export default function ResizableDragger(): JSX.Element {
       makeResizable(draggerRef.current, (newWidth: number) => {
         reduxAction(
           dispatcher,
-          SET_SETTINGS,
+          "SET_SETTINGS",
           { right_panel_width: newWidth },
           IPC_NONE
         );

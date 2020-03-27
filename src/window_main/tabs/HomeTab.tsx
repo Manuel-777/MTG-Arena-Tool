@@ -5,7 +5,6 @@ import { timestamp, toDDHHMMSS } from "../../shared/util";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../shared-redux/stores/rendererStore";
 import { reduxAction } from "../../shared-redux/sharedRedux";
-import { SET_HOVER_IN, SET_HOVER_OUT } from "../../shared-redux/constants";
 import { IPC_NONE } from "../../shared/constants";
 
 export interface WildcardsChange {
@@ -140,7 +139,12 @@ function TopWildcards({ wildcards }: TopWildcardsProps): JSX.Element {
   const dispatcher = useDispatch();
 
   const hoverCard = (id: number, hover: boolean): void => {
-    reduxAction(dispatcher, hover ? SET_HOVER_IN : SET_HOVER_OUT, id, IPC_NONE);
+    reduxAction(
+      dispatcher,
+      hover ? "SET_HOVER_IN" : "SET_HOVER_OUT",
+      id,
+      IPC_NONE
+    );
   };
 
   return (

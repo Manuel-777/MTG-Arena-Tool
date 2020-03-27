@@ -2,7 +2,6 @@ import React from "react";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { useSelector, useDispatch } from "react-redux";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_SHARE_DIALOG } from "../../../shared-redux/constants";
 import { IPC_NONE } from "../../../shared/constants";
 
 interface ShareButtonProps {
@@ -23,7 +22,7 @@ export default function ShareButton({
       const draftData = JSON.stringify(data);
       reduxAction(
         dispatcher,
-        SET_SHARE_DIALOG,
+        "SET_SHARE_DIALOG",
         {
           data: draftData,
           id: data.id,
@@ -35,7 +34,7 @@ export default function ShareButton({
       const deckString = JSON.stringify(data);
       reduxAction(
         dispatcher,
-        SET_SHARE_DIALOG,
+        "SET_SHARE_DIALOG",
         {
           data: deckString,
           type
@@ -45,7 +44,7 @@ export default function ShareButton({
     } else if (type == "actionlog") {
       reduxAction(
         dispatcher,
-        SET_SHARE_DIALOG,
+        "SET_SHARE_DIALOG",
         {
           data: data.log,
           id: data.id,

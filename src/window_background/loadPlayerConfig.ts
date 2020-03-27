@@ -10,7 +10,6 @@ import { isV2CardsList, ArenaV3Deck } from "../types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
 import convertDeckFromV3 from "./convertDeckFromV3";
 import { reduxAction } from "../shared-redux/sharedRedux";
-import { SET_SETTINGS } from "../shared-redux/constants";
 
 const ipcLog = (message: string): void => ipcSend("ipc_log", message);
 const ipcPop = (args: any): void => ipcSend("popup", args);
@@ -26,7 +25,7 @@ export function syncSettings(
   if (refresh) {
     reduxAction(
       globals.store.dispatch,
-      SET_SETTINGS,
+      "SET_SETTINGS",
       settings,
       IPC_OVERLAY | IPC_MAIN
     );

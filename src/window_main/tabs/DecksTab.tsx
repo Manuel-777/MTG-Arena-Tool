@@ -23,7 +23,6 @@ import { useAggregatorData } from "../components/tables/hooks";
 import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
-import { SET_BACK_GRPID, SET_SUBNAV } from "../../shared-redux/constants";
 
 function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);
@@ -125,10 +124,10 @@ export default function DecksTab({
   const openDeckCallback = React.useCallback(
     (deck: InternalDeck): void => {
       uxMove(-100);
-      reduxAction(dispatcher, SET_BACK_GRPID, deck.deckTileId, IPC_NONE);
+      reduxAction(dispatcher, "SET_BACK_GRPID", deck.deckTileId, IPC_NONE);
       reduxAction(
         dispatcher,
-        SET_SUBNAV,
+        "SET_SUBNAV",
         {
           type: SUB_DECK,
           id: deck.id

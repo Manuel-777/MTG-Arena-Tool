@@ -20,7 +20,6 @@ import {
 } from "../misc/display";
 import { TableData, TagCounts } from "./types";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_ARCHIVED } from "../../../shared-redux/constants";
 import { IPC_NONE } from "../../../shared/constants";
 
 export function ColorsCell<D extends TableData>({
@@ -256,7 +255,7 @@ export function ArchivedCell<D extends TableData>({
       event.nativeEvent.stopImmediatePropagation();
       reduxAction(
         dispatcher,
-        SET_ARCHIVED,
+        "SET_ARCHIVED",
         { id: dataId, archived: !isArchived },
         IPC_NONE
       );

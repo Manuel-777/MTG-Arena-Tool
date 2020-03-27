@@ -1,6 +1,5 @@
 import { useDispatch } from "react-redux";
 import { reduxAction } from "../../shared-redux/sharedRedux";
-import { SET_HOVER_IN, SET_HOVER_OUT } from "../../shared-redux/constants";
 import { IPC_NONE } from "../../shared/constants";
 
 type HoverCardHook = (() => void)[];
@@ -9,11 +8,11 @@ export default function useHoverCard(card: number): HoverCardHook {
   const dispatcher = useDispatch();
 
   const hoverIn = (): void => {
-    reduxAction(dispatcher, SET_HOVER_IN, card, IPC_NONE);
+    reduxAction(dispatcher, "SET_HOVER_IN", card, IPC_NONE);
   };
 
   const hoverOut = (): void => {
-    reduxAction(dispatcher, SET_HOVER_OUT, card, IPC_NONE);
+    reduxAction(dispatcher, "SET_HOVER_OUT", card, IPC_NONE);
   };
 
   return [hoverIn, hoverOut];

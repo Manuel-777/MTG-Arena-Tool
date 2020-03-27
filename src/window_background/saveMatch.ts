@@ -3,6 +3,8 @@ import globals from "./globals";
 import playerData from "../shared/PlayerData";
 import { playerDb } from "../shared/db/LocalDatabase";
 import { ipcSend, setData } from "./backgroundUtil";
+import { reduxAction } from "../shared-redux/sharedRedux";
+import { IPC_MAIN } from "../shared/constants";
 
 export default function saveMatch(id: string, matchEndTime: number): void {
   //console.log(globals.currentMatch.matchId, id);
@@ -24,10 +26,8 @@ export default function saveMatch(id: string, matchEndTime: number): void {
   }
 
   // console.log("Save match:", match);
-  if (!playerData.matches_index.includes(id)) {
-    const matchesIndex = [...playerData.matches_index, id];
-    playerDb.upsert("", "matches_index", matchesIndex);
-    setData({ matches_index: matchesIndex }, false);
+  if (!globals.store.getState().matches.matchesIndex.includes(id)) {
+    reduxAction(globals.store.dispatch, "SET_MATCH", match, IPC_MAIN);
   }
 
   playerDb.upsert("", id, match);

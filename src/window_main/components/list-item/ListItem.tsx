@@ -2,7 +2,6 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { getCardArtCrop } from "../../../shared/util";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_ARCHIVED } from "../../../shared-redux/constants";
 import { IPC_NONE } from "../../../shared/constants";
 
 interface ListItemProps extends JSX.ElementChildrenAttribute {
@@ -122,7 +121,7 @@ export function ArchiveButton(props: ArchiveButtonProps): JSX.Element {
       event.nativeEvent.stopImmediatePropagation();
       reduxAction(
         dispatcher,
-        SET_ARCHIVED,
+        "SET_ARCHIVED",
         { id: dataId, archived: !isArchived },
         IPC_NONE
       );

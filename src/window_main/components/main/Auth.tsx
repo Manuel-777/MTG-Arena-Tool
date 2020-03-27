@@ -7,7 +7,6 @@ import Checkbox from "../misc/Checkbox";
 import { ipcSend } from "../../rendererUtil";
 import { HIDDEN_PW, IPC_NONE } from "../../../shared/constants";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { SET_CAN_LOGIN } from "../../../shared-redux/constants";
 const sha1 = require("js-sha1");
 
 function clickRememberMe(value: boolean): void {
@@ -51,7 +50,7 @@ export default function Auth(props: AuthProps): JSX.Element {
     } else {
       setErrorMessage("");
       const pwd = authForm.pass == HIDDEN_PW ? HIDDEN_PW : sha1(authForm.pass);
-      reduxAction(dispatcher, SET_CAN_LOGIN, false, IPC_NONE);
+      reduxAction(dispatcher, "SET_CAN_LOGIN", false, IPC_NONE);
       ipcSend("login", {
         username: authForm.email,
         password: pwd

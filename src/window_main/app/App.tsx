@@ -20,10 +20,6 @@ import {
   reduxAction,
   initializeRendererReduxIPC
 } from "../../shared-redux/sharedRedux";
-import {
-  SET_NO_LOG,
-  SET_SHARE_DIALOG_OPEN
-} from "../../shared-redux/constants";
 
 initializeRendererReduxIPC(store);
 
@@ -62,7 +58,7 @@ function App(): JSX.Element {
   const closeNoLog = React.useCallback(
     (log: string) => {
       setTimeout(() => {
-        reduxAction(dispatch, SET_NO_LOG, false, IPC_NONE);
+        reduxAction(dispatch, "SET_NO_LOG", false, IPC_NONE);
         ipcSend("set_log", log);
       }, 350);
     },
@@ -71,7 +67,7 @@ function App(): JSX.Element {
 
   const closeShare = React.useCallback(() => {
     setTimeout(() => {
-      reduxAction(dispatch, SET_SHARE_DIALOG_OPEN, false, IPC_NONE);
+      reduxAction(dispatch, "SET_SHARE_DIALOG_OPEN", false, IPC_NONE);
     }, 350);
   }, [dispatch]);
 

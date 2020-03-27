@@ -16,12 +16,6 @@ import CraftingCost from "./CraftingCost";
 import { getCardImage } from "../../../shared/util";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import {
-  SET_BACK_GRPID,
-  SET_POPUP,
-  SET_HOVER_IN,
-  SET_HOVER_OUT
-} from "../../../shared-redux/constants";
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;
@@ -136,7 +130,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const dispatcher = useDispatch();
 
   const goBack = (): void => {
-    reduxAction(dispatcher, SET_BACK_GRPID, 0, IPC_NONE);
+    reduxAction(dispatcher, "SET_BACK_GRPID", 0, IPC_NONE);
     uxMove(0);
   };
 
@@ -153,7 +147,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     ipcSend("set_clipboard", list);
     reduxAction(
       dispatcher,
-      SET_POPUP,
+      "SET_POPUP",
       {
         text: "Copied to clipboard",
         time: 2000
@@ -271,7 +265,12 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
   const dispatcher = useDispatch();
 
   const hoverCard = (id: number, hover: boolean): void => {
-    reduxAction(dispatcher, hover ? SET_HOVER_IN : SET_HOVER_OUT, id, IPC_NONE);
+    reduxAction(
+      dispatcher,
+      hover ? "SET_HOVER_IN" : "SET_HOVER_OUT",
+      id,
+      IPC_NONE
+    );
   };
 
   // attempt at sorting visually..

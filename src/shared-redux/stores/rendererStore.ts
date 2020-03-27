@@ -8,6 +8,7 @@ import loginSlice from "../slices/loginSlice";
 import homeSlice from "../slices/homeSlice";
 import collectionSlice from "../slices/collectionSlice";
 import exploreSlice from "../slices/exploreSlice";
+import matchesSlice from "../slices/matchesSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
@@ -16,7 +17,8 @@ const rootReducer = combineReducers({
   login: loginSlice.reducer,
   homeData: homeSlice.reducer,
   collection: collectionSlice.reducer,
-  explore: exploreSlice.reducer
+  explore: exploreSlice.reducer,
+  matches: matchesSlice.reducer
 });
 
 const store = configureStore({
