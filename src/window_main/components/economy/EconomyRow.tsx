@@ -24,6 +24,8 @@ import {
   vaultPercentFormat
 } from "./economyUtils";
 import EconomyValueRecord, { EconomyIcon } from "./EconomyValueRecord";
+import { useSelector } from "react-redux";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 function EconomyRowDate(date: Date): JSX.Element {
   return (
@@ -509,7 +511,9 @@ function InventoryCard(props: InventoryCardProps): JSX.Element {
     const lookupCard = db.card(card?.dfcId) ?? card;
     openScryfallCard(lookupCard);
   }, [card]);
-  // inventoryCard.style.width = "39px";
+  const cardQuality = useSelector(
+    (state: AppState) => state.settings.cards_quality
+  );
 
   const [hoverIn, hoverOut] = useHoverCard(card?.id || 0);
 
@@ -528,7 +532,7 @@ function InventoryCard(props: InventoryCardProps): JSX.Element {
           "inventory_card_img 39px" +
           (isAetherized ? " inventory_card_aetherized" : "")
         }
-        src={getCardImage(card)}
+        src={getCardImage(card, cardQuality)}
         title={tooltip}
       />
       {quantity && quantity > 1 && (

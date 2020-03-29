@@ -66,6 +66,9 @@ export default function CardDetailsWindowlet(
   const cardsSizeHoverCard = useSelector(
     (state: AppState) => state.settings.cards_size_hover_card
   );
+  const cardQuality = useSelector(
+    (state: AppState) => state.settings.cards_quality
+  );
   const size = 100 + cardsSizeHoverCard * 15;
   const card = db.card(grpId);
 
@@ -75,7 +78,7 @@ export default function CardDetailsWindowlet(
   const imgProps = {
     alt: card?.name ?? "",
     className: "main_hover",
-    src: getCardImage(card),
+    src: getCardImage(card, cardQuality),
     style: {
       width: size + "px",
       height: size / SCALAR + "px",

@@ -41,6 +41,9 @@ interface DraftCardProps {
 
 function DraftCard(props: DraftCardProps): JSX.Element {
   const { grpId, pick, size } = props;
+  const cardQuality = useSelector(
+    (state: AppState) => state.settings.cards_quality
+  );
   const [hoverIn, hoverOut] = useHoverCard(grpId);
 
   const card = db.card(grpId);
@@ -49,7 +52,7 @@ function DraftCard(props: DraftCardProps): JSX.Element {
     return {
       width: size + "px",
       height: size / 0.71808510638 + "px",
-      backgroundImage: `url(${getCardImage(grpId)})`
+      backgroundImage: `url(${getCardImage(grpId, cardQuality)})`
     };
   }, [grpId, size]);
 

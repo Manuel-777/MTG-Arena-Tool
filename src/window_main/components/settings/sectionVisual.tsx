@@ -211,7 +211,7 @@ export default function SectionVisual(): JSX.Element {
           <img
             className="inventory_card_settings_img"
             style={{ width: cardSize + "px" }}
-            src={getCardImage(card)}
+            src={getCardImage(card, settings.cards_quality)}
           />
         </div>
       </label>

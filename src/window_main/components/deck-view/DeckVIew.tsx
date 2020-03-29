@@ -264,6 +264,9 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
   const { deck, setRegularView } = props;
   const sz =
     100 + useSelector((state: AppState) => state.settings.cards_size) * 15;
+  const cardQuality = useSelector(
+    (state: AppState) => state.settings.cards_quality
+  );
   const dispatcher = useDispatch();
 
   const hoverCard = (id: number, hover: boolean): void => {
@@ -337,7 +340,7 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
                         hoverCard(grpId, false);
                       }}
                       style={{ width: sz + "px" }}
-                      src={getCardImage(cardObj)}
+                      src={getCardImage(cardObj, cardQuality)}
                       className="deck_visual_card_img"
                     ></img>
                   </div>
@@ -390,7 +393,7 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
                         hoverCard(grpId, false);
                       }}
                       style={{ width: sz + "px" }}
-                      src={getCardImage(cardObj)}
+                      src={getCardImage(cardObj, cardQuality)}
                       className="deck_visual_card_img"
                     ></img>
                   </div>
