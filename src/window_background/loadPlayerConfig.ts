@@ -16,6 +16,7 @@ import arenaLogWatcher from "./arena-log-watcher";
 import convertDeckFromV3 from "./convertDeckFromV3";
 import { reduxAction } from "../shared-redux/sharedRedux";
 import { InternalMatch } from "../types/match";
+import globalStore from "../shared-store";
 
 const ipcLog = (message: string): void => ipcSend("ipc_log", message);
 const ipcPop = (args: any): void => ipcSend("popup", args);
@@ -117,22 +118,27 @@ export async function loadPlayerConfig(playerId: string): Promise<void> {
 
   ipcLog("Finding all documents in player database...");
   const savedData = await playerDb.findAll();
+
   const __playerData = _.defaultsDeep(savedData, playerData);
   const { settings } = __playerData;
+
   const matchesList: InternalMatch[] = __playerData.matches_index
     .filter((id: string) => __playerData[id])
     .map((id: string) => {
-      return {
+      globalStore.matches[id] = {
         ...__playerData[id],
         date: new Date(__playerData[id].date).toString()
       };
+      return id;
     });
+
   reduxAction(
     globals.store.dispatch,
     "SET_MANY_MATCHES",
     matchesList,
     IPC_RENDERER
   );
+
   setData(__playerData, true);
   await fixBadPlayerData();
   ipcSend("renderer_set_bounds", __playerData.windowBounds);
