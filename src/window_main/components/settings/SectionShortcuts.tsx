@@ -1,19 +1,25 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React, { useState, useCallback } from "react";
 import { remote } from "electron";
-import { ipcSend } from "../../rendererUtil";
-import { SHORTCUT_NAMES } from "../../../shared/constants";
+import {
+  SHORTCUT_NAMES,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../../shared/constants";
 import Toggle from "../misc/Toggle";
 import Button from "../misc/Button";
 import EditKey from "../popups/EditKey";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
 
 function setKeyboardShortcuts(checked: boolean): void {
-  ipcSend("save_user_settings", {
-    enable_keyboard_shortcuts: checked,
-    skipRefesh: true
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { enable_keyboard_shortcuts: checked },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function ShortcutsRow({
@@ -36,9 +42,12 @@ function ShortcutsRow({
     (key: string): void => {
       setOpenDialog(false);
       ((settings as unknown) as Record<string, string>)[code] = key;
-      ipcSend("save_user_settings", {
-        ...settings
-      });
+      reduxAction(
+        store.dispatch,
+        "SET_SETTINGS",
+        { ...settings },
+        IPC_ALL ^ IPC_RENDERER
+      );
     },
     [code, settings]
   );

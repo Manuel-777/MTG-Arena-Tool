@@ -26,20 +26,6 @@ export interface OverlaySettingsData {
   type_counts: boolean;
 }
 
-export interface AppSettings {
-  auto_login: boolean;
-  beta_channel: boolean;
-  close_to_tray: boolean;
-  email: string;
-  launch_to_tray: boolean;
-  log_locale_format: string;
-  logUri: string;
-  metadata_lang: string;
-  remember_me: boolean;
-  token: string;
-  toolVersion: number;
-}
-
 export interface SettingsData {
   anon_explore: boolean;
   back_color: string;
@@ -49,6 +35,7 @@ export interface SettingsData {
   cards_size: number;
   cards_size_hover_card: number;
   close_on_match: boolean;
+  close_to_tray: boolean;
   collectionTableState?: TableState<CardsData>;
   collectionTableMode: string;
   decksTableMode: string;
@@ -65,7 +52,6 @@ export interface SettingsData {
   last_settings_section: number;
   matchesTableMode: string;
   matchesTableState?: TableState<MatchTableData>;
-  metadata_lang: string;
   overlay_back_color: string;
   overlay_ontop: boolean;
   overlay_scale: number;

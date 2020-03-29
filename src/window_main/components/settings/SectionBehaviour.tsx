@@ -2,63 +2,98 @@
 import React from "react";
 import Toggle from "../misc/Toggle";
 import Input from "../misc/Input";
-import { ipcSend } from "../../rendererUtil";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { IPC_ALL, IPC_RENDERER } from "../../../shared/constants";
 
 function clickBetaChannel(value: boolean): void {
-  ipcSend("save_app_settings_norefresh", {
-    beta_channel: value
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_APP_SETTINGS",
+    {
+      betaChannel: value
+    },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function clickAutoLogin(value: boolean): void {
-  ipcSend("save_app_settings_norefresh", {
-    auto_login: value
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_APP_SETTINGS",
+    {
+      autoLogin: value
+    },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function clickLaunchToTray(value: boolean): void {
-  ipcSend("save_app_settings_norefresh", {
-    launch_to_tray: value
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_APP_SETTINGS",
+    {
+      launchToTray: value
+    },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function clickStartup(value: boolean): void {
-  ipcSend("save_user_settings", { startup: value, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { startup: value },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function clickCloseOnMatch(value: boolean): void {
-  ipcSend("save_user_settings", { close_on_match: value });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { close_on_match: value },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function clickCloseToTray(value: boolean): void {
-  ipcSend("save_app_settings_norefresh", {
-    close_to_tray: value
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { close_to_tray: value },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function changeExportFormat(value: string): void {
-  ipcSend("save_user_settings", { export_format: value, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { export_format: value },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 export default function SectionBehaviour(): JSX.Element {
   const settings = useSelector((state: AppState) => state.settings);
+  const appSettings = useSelector((state: AppState) => state.appsettings);
   return (
     <>
       <Toggle
         text={"Beta updates channel"}
-        value={settings.beta_channel}
+        value={appSettings.betaChannel}
         callback={clickBetaChannel}
       />
       <Toggle
         text={"Login/offline mode automatically"}
-        value={settings.auto_login}
+        value={appSettings.autoLogin}
         callback={clickAutoLogin}
       />
       <Toggle
         text={"Launch to tray"}
-        value={settings.launch_to_tray}
+        value={appSettings.launchToTray}
         callback={clickLaunchToTray}
       />
       <Toggle

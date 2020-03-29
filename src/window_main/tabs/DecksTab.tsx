@@ -2,7 +2,7 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
-import { SUB_DECK, IPC_NONE } from "../../shared/constants";
+import { SUB_DECK, IPC_NONE, IPC_ALL, IPC_RENDERER } from "../../shared/constants";
 import Deck from "../../shared/deck";
 import pd from "../../shared/PlayerData";
 import {
@@ -23,6 +23,7 @@ import { useAggregatorData } from "../components/tables/useAggregatorData";
 import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
+import store from "../../shared-redux/stores/rendererStore";
 
 function addTag(deckid: string, tag: string): void {
   const deck = pd.deck(deckid);
@@ -49,11 +50,21 @@ function toggleDeckArchived(id: string | number): void {
 }
 
 function saveTableState(decksTableState: TableState<DecksData>): void {
-  ipcSend("save_user_settings", { decksTableState, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { decksTableState },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function saveTableMode(decksTableMode: string): void {
-  ipcSend("save_user_settings", { decksTableMode, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { decksTableMode },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function getDecksData(

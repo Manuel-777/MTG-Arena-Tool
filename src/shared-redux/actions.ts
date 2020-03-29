@@ -1,4 +1,5 @@
 import settingsSlice from "./slices/settingsSlice";
+import appSettingsSlice from "./slices/appSettingsSlice";
 import rendererSlice from "./slices/rendererSlice";
 import hoverSlice from "./slices/hoverSlice";
 import loginSlice from "./slices/loginSlice";
@@ -9,6 +10,7 @@ import matchesSlice from "./slices/matchesSlice";
 
 const actions: Record<string, (arg: any) => any> = {};
 actions["SET_SETTINGS"] = settingsSlice.actions.setSettings;
+actions["SET_APP_SETTINGS"] = appSettingsSlice.actions.setAppSettings;
 actions["SET_ARCHIVED"] = rendererSlice.actions.setArchived;
 actions["SET_BACK_COLOR"] = rendererSlice.actions.setBackgroundColor;
 actions["SET_BACK_GRPID"] = rendererSlice.actions.setBackgroundGrpId;

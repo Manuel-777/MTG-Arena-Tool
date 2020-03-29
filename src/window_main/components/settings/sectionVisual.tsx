@@ -1,18 +1,22 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import { ipcSend } from "../../rendererUtil";
-import pd from "../../../shared/PlayerData";
 import _ from "lodash";
 import ReactSelect from "../../../shared/ReactSelect";
-import { CARD_TILE_ARENA, CARD_TILE_FLAT } from "../../../shared/constants";
+import {
+  CARD_TILE_ARENA,
+  CARD_TILE_FLAT,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../../shared/constants";
 import CardTile from "../../../shared/CardTile";
 import db from "../../../shared/database";
 import Input from "../misc/Input";
 import useColorPicker from "../../hooks/useColorPicker";
 import Slider from "../misc/Slider";
 import { getCardImage } from "../../../shared/util";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
 import { useSelector } from "react-redux";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
 
 function getCardStyleName(style: any): string {
   if (style == CARD_TILE_FLAT) return "Flat";
@@ -20,21 +24,39 @@ function getCardStyleName(style: any): string {
 }
 
 function setCardStyle(style: string): void {
-  ipcSend("save_user_settings", { card_tile_style: style });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { card_tile_style: style },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function changeBackgroundImage(value: string): void {
-  ipcSend("save_user_settings", {
-    back_url: value || "default"
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { back_url: value || "default" },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function backColorPicker(color: string): void {
-  ipcSend("save_user_settings", { back_color: color });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { back_color: color },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function setCardQuality(filter: string): void {
-  ipcSend("save_user_settings", { cards_quality: filter });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { cards_quality: filter },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 const card = db.card(70344);
@@ -59,10 +81,13 @@ export default function SectionVisual(): JSX.Element {
 
   const hoverCardSizeDebouce = React.useCallback(
     _.debounce((value: number) => {
-      ipcSend("save_user_settings", {
-        cards_size_hover_card: value
-      });
-    }, 1000),
+      reduxAction(
+        store.dispatch,
+        "SET_SETTINGS",
+        { cards_size_hover_card: value },
+        IPC_ALL ^ IPC_RENDERER
+      );
+    }, 500),
     []
   );
 
@@ -78,10 +103,13 @@ export default function SectionVisual(): JSX.Element {
 
   const collectionCardSizeDebouce = React.useCallback(
     _.debounce((value: number) => {
-      ipcSend("save_user_settings", {
-        cards_size: value
-      });
-    }, 1000),
+      reduxAction(
+        store.dispatch,
+        "SET_SETTINGS",
+        { cards_size: value },
+        IPC_ALL ^ IPC_RENDERER
+      );
+    }, 500),
     []
   );
 

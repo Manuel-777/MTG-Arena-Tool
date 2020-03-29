@@ -20,7 +20,7 @@ import {
 } from "./httpWorker";
 import globals from "./globals";
 import { matchExists } from "../shared-store";
-import { IPC_RENDERER } from "../shared/constants";
+import { IPC_RENDERER, IPC_ALL } from "../shared/constants";
 import { reduxAction } from "../shared-redux/sharedRedux";
 
 let httpQueue: async.AsyncQueue<HttpTask>;
@@ -206,9 +206,15 @@ function handleAuthResponse(
   parsedResult?: any
 ): void {
   if (error || !parsedResult) {
-    syncSettings({ token: "" }, false);
-    appDb.upsert("", "email", "");
-    appDb.upsert("", "token", "");
+    reduxAction(
+      globals.store.dispatch,
+      "SET_APP_SETTINGS",
+      {
+        token: "",
+        email: ""
+      },
+      IPC_ALL ^ IPC_RENDERER
+    );
     ipcSend("auth", {});
     ipcSend("toggle_login", true);
     ipcSend("login_failed", true);
@@ -225,9 +231,16 @@ function handleAuthResponse(
 
   ipcSend("auth", parsedResult);
   //ipcSend("auth", parsedResult.arenaids);
-  if (playerData.settings.remember_me) {
-    appDb.upsert("", "token", parsedResult.token);
-    appDb.upsert("", "email", playerData.userName);
+  if (globals.store.getState().appsettings.rememberMe) {
+    reduxAction(
+      globals.store.dispatch,
+      "SET_APP_SETTINGS",
+      {
+        token: parsedResult.token,
+        email: playerData.userName
+      },
+      IPC_ALL ^ IPC_RENDERER
+    );
   }
   const data: any = {};
   data.patreon = parsedResult.patreon;
@@ -501,7 +514,7 @@ export function httpGetDatabaseVersion(lang: string): void {
       method_path: "/database/latest/" + lang
     },
     makeSimpleResponseHandler((parsedResult: any) => {
-      const lang = playerData.settings.metadata_lang;
+      const lang = globals.store.getState().appsettings.metadataLang;
       if (
         db.metadata &&
         db.metadata.language &&

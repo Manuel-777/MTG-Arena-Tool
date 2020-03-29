@@ -47,9 +47,10 @@ function isValidDate(date: Date): boolean {
 }
 
 export function getDateFormat(dateStr: string): string | undefined {
-  if (playerData.settings.log_locale_format) {
+  const localeFormat = globals.store.getState().appsettings.logLocaleFormat;
+  if (localeFormat) {
     // return the players setting
-    return playerData.settings.log_locale_format;
+    return localeFormat;
   } else {
     // return the first date format which parses
     // the string returning a valid date

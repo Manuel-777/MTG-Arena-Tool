@@ -41,10 +41,6 @@ let updaterWindow: BrowserWindow | undefined = undefined;
 let background: BrowserWindow | undefined = undefined;
 let overlay: BrowserWindow | undefined = undefined;
 let mainTimeout: NodeJS.Timeout | undefined = undefined;
-let settings: Partial<MergedSettings> = {
-  close_to_tray: false,
-  launch_to_tray: false
-};
 let tray = null;
 
 const ipc = electron.ipcMain;
@@ -97,7 +93,7 @@ function startUpdater(): void {
   if (!app.isPackaged) return;
   appDb.init("application");
   appDb.find("", "settings").then(doc => {
-    const allowBeta = doc.beta_channel || false;
+    const allowBeta = doc.betaChannel || false;
     updaterWindow = createUpdaterWindow();
 
     updaterWindow.webContents.on("did-finish-load", function() {
@@ -210,7 +206,7 @@ function startApp(): void {
         console.log("IPC ERROR: ", arg);
         break;
 
-      case "initial_settings":
+      case "initialize_main":
         initialize(arg);
         break;
 
@@ -344,10 +340,9 @@ function startApp(): void {
   });
 }
 
-function initialize(settingsArg: MergedSettings): void {
+function initialize(launchToTray: boolean): void {
   console.log("MAIN:  Initializing");
-  settings = settingsArg;
-  if (!settings.launch_to_tray) showWindow();
+  if (!launchToTray) showWindow();
 }
 
 function openDevTools(): void {

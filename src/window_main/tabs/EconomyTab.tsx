@@ -4,19 +4,31 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { TableState } from "react-table";
 import pd from "../../shared/PlayerData";
-import { AppState } from "../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../shared-redux/stores/rendererStore";
 import { InternalEconomyTransaction } from "../../types/inventory";
 import EconomyTable from "../components/economy/EconomyTable";
 import { getPrettyContext } from "../components/economy/economyUtils";
 import { TransactionData } from "../components/economy/types";
-import { ipcSend, toggleArchived } from "../rendererUtil";
+import { toggleArchived } from "../rendererUtil";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import { IPC_ALL, IPC_RENDERER } from "../../shared/constants";
 
 function saveTableState(economyTableState: TableState<TransactionData>): void {
-  ipcSend("save_user_settings", { economyTableState, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { economyTableState },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function saveTableMode(economyTableMode: string): void {
-  ipcSend("save_user_settings", { economyTableMode, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { economyTableMode },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 const sumBoosterCount = (boosters: { count: number }[]): number =>

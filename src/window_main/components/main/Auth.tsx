@@ -1,19 +1,21 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
 import { shell } from "electron";
 import Checkbox from "../misc/Checkbox";
 import { ipcSend } from "../../rendererUtil";
-import { HIDDEN_PW, IPC_NONE } from "../../../shared/constants";
+import { HIDDEN_PW, IPC_NONE, IPC_BACKGROUND } from "../../../shared/constants";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
 const sha1 = require("js-sha1");
 
 function clickRememberMe(value: boolean): void {
-  const rSettings = {
-    remember_me: value
-  };
-  ipcSend("save_app_settings", rSettings);
+  reduxAction(
+    store.dispatch,
+    "SET_APP_SETTINGS",
+    { rememberMe: value },
+    IPC_BACKGROUND
+  );
 }
 
 interface AuthProps {

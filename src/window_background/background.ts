@@ -5,7 +5,12 @@ import { app, ipcRenderer as ipc, remote } from "electron";
 import fs from "fs";
 import _ from "lodash";
 import path from "path";
-import { HIDDEN_PW, IPC_RENDERER } from "../shared/constants";
+import {
+  HIDDEN_PW,
+  IPC_RENDERER,
+  IPC_ALL,
+  IPC_BACKGROUND
+} from "../shared/constants";
 import { rememberDefaults } from "../shared/db/databaseUtil";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/PlayerData";
@@ -33,24 +38,27 @@ import { getMatch } from "../shared-store";
 
 initializeRendererReduxIPC(globals.store);
 
-if (!remote.app.isPackaged) {
-  const { openNewGitHubIssue, debugInfo } = require("electron-util");
-  const unhandled = require("electron-unhandled");
-  unhandled({
-    showDialog: true,
-    reportButton: (error: any) => {
-      openNewGitHubIssue({
-        user: "Manuel-777",
-        repo: "MTG-Arena-Tool",
-        body: `\`\`\`\n${error.stack}\n\`\`\`\n\n---\n\n${debugInfo()}`
-      });
+let oldSettings = {};
+let oldAppSettings = {};
+
+globals.store.subscribe(() => {
+  const newSettings = globals.store.getState().settings;
+  const newAppSettings = { ...globals.store.getState().appsettings };
+  // Save settings only when they change
+  if (!_.isEqual(oldSettings, newSettings)) {
+    oldSettings = newSettings;
+    playerDb.upsert("", "settings", newSettings);
+  }
+  if (!_.isEqual(oldAppSettings, newAppSettings)) {
+    oldAppSettings = newAppSettings;
+    newAppSettings.toolVersion = globals.toolVersion;
+    if (!newAppSettings.rememberMe) {
+      appDb.upsert("", "settings", { ...newAppSettings, email: "", token: "" });
+    } else {
+      appDb.upsert("", "settings", newAppSettings);
     }
-  });
-  const Sentry = require("@sentry/electron");
-  Sentry.init({
-    dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
-  });
-}
+  }
+});
 
 globals.actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
@@ -70,97 +78,44 @@ globals.toolVersion = parseInt(
 let logLoopInterval: number | undefined = undefined;
 const debugArenaID = undefined;
 
-//
-ipc.on("save_app_settings", function(event, arg) {
-  appDb.find("", "settings").then(appSettings => {
-    appSettings.toolVersion = globals.toolVersion;
-    const updated = { ...appSettings, ...arg };
-    if (!updated.remember_me) {
-      appDb.upsert("", "email", "");
-      appDb.upsert("", "token", "");
-    }
-    appDb.upsert("", "settings", updated);
-    syncSettings(updated);
-  });
-});
-
-//
-ipc.on("save_app_settings_norefresh", function(event, arg) {
-  appDb.find("", "settings").then(appSettings => {
-    appSettings.toolVersion = globals.toolVersion;
-    const updated = { ...appSettings, ...arg };
-    if (!updated.remember_me) {
-      appDb.upsert("", "email", "");
-      appDb.upsert("", "token", "");
-    }
-    appDb.upsert("", "settings", updated);
-    syncSettings(updated, false);
-  });
-});
-
-function fixBadSettingsData(): void {
-  appDb.find("", "settings").then(appSettings => {
-    // First introduced in 2.8.4 (2019-07-25)
-    // Some people's date formats are set to "undefined"
-    // These should be an empty string.
-    if (appSettings.log_locale_format === "undefined") {
-      appSettings.log_locale_format = "";
-    }
-
-    // Define new metadata language setting.
-    if (appSettings.metadata_lang === undefined) {
-      appSettings.metadata_lang = "en";
-    }
-    // include more fixes below. Be as specific
-    // and conservitive as possible.
-
-    appDb.upsert("", "settings", appSettings);
-  });
-}
-
 ipc.on("download_metadata", () => {
-  appDb.find("", "settings").then(appSettings => {
-    httpApi.httpGetDatabaseVersion(appSettings.metadata_lang);
-  });
+  const lang = globals.store.getState().appsettings.metadataLang;
+  httpApi.httpGetDatabaseVersion(lang);
 });
 
 ipc.on("backport_all_data", backportNeDbToElectronStore);
 
 //
 ipc.on("start_background", async function() {
-  appDb.init("application"); // TODO is this redundant with init call in main?
+  appDb.init("application");
   setData({ appDbPath: appDb.filePath }, false);
-  fixBadSettingsData();
 
-  let logUri = await appDb.find("", "logUri");
+  const appSettings = await appDb.find("", "settings");
+  let logUri = appSettings.logUri;
+
   if (typeof process.env.LOGFILE !== "undefined") {
     logUri = process.env.LOGFILE;
   }
   if (!logUri) {
     logUri = mtgaLog.defaultLogUri();
   }
-  const email = await appDb.find("", "email");
-  const token = await appDb.find("", "token");
-  const appSettings = await appDb.find("", "settings");
-  const settings = _.defaultsDeep(
-    {
-      ...appSettings,
-      logUri,
-      email,
-      token
-    },
-    rememberDefaults.settings
+
+  ipcSend("initialize_main", appSettings.launchToTray);
+  //reduxAction(globals.store.dispatch, "SET_SETTINGS", appSettings, IPC_ALL ^ IPC_BACKGROUND);
+  reduxAction(
+    globals.store.dispatch,
+    "SET_APP_SETTINGS",
+    appSettings,
+    IPC_ALL ^ IPC_BACKGROUND
   );
-  syncSettings(settings, false);
-  ipcSend("initial_settings", settings);
 
   // start initial log parse
   logLoopInterval = window.setInterval(attemptLogLoop, 250);
 
   // start http
   httpApi.initHttpQueue();
-  httpApi.httpGetDatabaseVersion(settings.metadata_lang);
-  ipcSend("ipc_log", `Downloading metadata ${settings.metadata_lang}`);
+  httpApi.httpGetDatabaseVersion(appSettings.metadataLang);
+  ipcSend("ipc_log", `Downloading metadata ${appSettings.metadataLang}`);
 });
 
 function offlineLogin(): void {
@@ -234,18 +189,6 @@ ipc.on("save_overlay_settings", function(event, settings) {
   const updated = { ...playerData.settings, overlays };
   playerDb.upsert("settings", "overlays", overlays);
   syncSettings(updated);
-});
-
-//
-ipc.on("save_user_settings", function(event, settings) {
-  // console.log("save_user_settings");
-  let refresh = true;
-  if (settings.skipRefresh) {
-    delete settings.skipRefresh;
-    refresh = false;
-  }
-  syncSettings(settings, refresh);
-  playerDb.upsert("", "settings", playerData.data.settings);
 });
 
 //
@@ -386,8 +329,7 @@ ipc.on("set_log", function(event, arg) {
     globals.stopWatchingLog();
     globals.stopWatchingLog = arenaLogWatcher.startWatchingLog(arg);
   }
-  syncSettings({ logUri: arg });
-  appDb.upsert("", "logUri", arg).then(() => {
+  appDb.upsert("", "settings.logUri", arg).then(() => {
     remote.app.relaunch();
     remote.app.exit(0);
   });
@@ -415,7 +357,7 @@ async function attemptLogLoop(): Promise<void> {
 
 // Basic logic for reading the log file
 async function logLoop(): Promise<void> {
-  const logUri = playerData.settings.logUri;
+  const logUri = globals.store.getState().appsettings.logUri;
   //console.log("logLoop() start");
   //ipcSend("ipc_log", "logLoop() start");
   if (fs.existsSync(logUri)) {
@@ -535,10 +477,10 @@ async function logLoop(): Promise<void> {
   });
   clearInterval(logLoopInterval);
 
-  const { auto_login, remember_me, email, token } = playerData.settings;
+  const { autoLogin, rememberMe, email, token } = globals.store.getState().appsettings;
   let username = "";
   let password = "";
-  if (remember_me) {
+  if (rememberMe) {
     username = email;
     if (email && token) {
       password = HIDDEN_PW;
@@ -548,12 +490,12 @@ async function logLoop(): Promise<void> {
   ipcSend("prefill_auth_form", {
     username,
     password,
-    remember_me
+    rememberMe
   });
 
-  if (auto_login) {
+  if (autoLogin) {
     ipcSend("toggle_login", false);
-    if (remember_me && username && token) {
+    if (rememberMe && username && token) {
       ipcSend("popup", {
         text: "Logging in automatically...",
         time: 0,

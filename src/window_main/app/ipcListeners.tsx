@@ -27,7 +27,7 @@ export default function ipcListeners(dispatcher: any): void {
       {
         email: arg.username,
         pass: arg.password,
-        rememberme: arg.remember_me
+        rememberme: arg.rememberMe
       },
       IPC_NONE
     );
@@ -165,7 +165,7 @@ export default function ipcListeners(dispatcher: any): void {
   });
 
   ipc.on("no_log", (): void => {
-    reduxAction(dispatcher, "SET_NO_LOG", false, IPC_NONE);
+    reduxAction(dispatcher, "SET_NO_LOG", true, IPC_NONE);
   });
 
   ipc.on("set_draft_link", function(event: IpcRendererEvent, arg: string) {

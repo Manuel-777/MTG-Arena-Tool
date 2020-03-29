@@ -10,7 +10,9 @@ import ReactSelect from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
 import Button from "../misc/Button";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { IPC_ALL, IPC_RENDERER } from "../../../shared/constants";
 
 const LANGUAGES = [
   "en",
@@ -53,24 +55,34 @@ function getLanguageName(lang: string): string {
 }
 
 function setCardsLanguage(filter: string): void {
-  ipcSend("save_app_settings_norefresh", {
-    metadata_lang: filter.toLowerCase()
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_APP_SETTINGS",
+    {
+      metadataLang: filter.toLowerCase()
+    },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function firstPassCallback(checked: boolean): void {
-  ipcSend("save_user_settings", {
-    skip_firstpass: !checked,
-    skipRefresh: true
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { skip_firstpass: !checked },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function localeCallback(value: string): void {
-  if (value !== pd.settings.log_locale_format) {
-    ipcSend("save_app_settings_norefresh", {
-      log_locale_format: value
-    });
-  }
+  reduxAction(
+    store.dispatch,
+    "SET_APP_SETTINGS",
+    {
+      logLocaleFormat: value
+    },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function parseLinkOpen(): void {
@@ -96,10 +108,11 @@ function backportClick(): void {
 
 export default function SectionData(): JSX.Element {
   const settings = useSelector((state: AppState) => state.settings);
+  const appSettings = useSelector((state: AppState) => state.appsettings);
 
   const arenaLogCallback = React.useCallback(
     (value: string): void => {
-      if (value === settings.logUri) return;
+      if (value === appSettings.logUri) return;
       if (
         confirm(
           "Changing the Arena log location requires a restart, are you sure?"
@@ -108,14 +121,14 @@ export default function SectionData(): JSX.Element {
         ipcSend("set_log", value);
       }
     },
-    [settings.logUri]
+    [appSettings.logUri]
   );
 
   const openPathDialog = React.useCallback(() => {
     dialog
       .showOpenDialog(remote.getCurrentWindow(), {
         title: "Arena Log Location",
-        defaultPath: settings.logUri,
+        defaultPath: appSettings.logUri,
         buttonLabel: "Select",
         filters: [
           { name: "Text", extensions: ["txt", "text"] },
@@ -129,13 +142,13 @@ export default function SectionData(): JSX.Element {
           arenaLogCallback(paths[0]);
         }
       });
-  }, [arenaLogCallback, settings.logUri]);
+  }, [arenaLogCallback, appSettings.logUri]);
 
   let parsedOutput = <>auto-detection</>;
-  if (settings.log_locale_format) {
+  if (appSettings.logLocaleFormat) {
     const testDate = parse(
       pd.last_log_timestamp,
-      settings.log_locale_format,
+      appSettings.logLocaleFormat,
       new Date()
     );
     if (isValid(testDate) && !isNaN(testDate.getTime())) {
@@ -160,7 +173,7 @@ export default function SectionData(): JSX.Element {
         <label>Arena Data </label>
         <ReactSelect
           options={LANGUAGES}
-          current={settings.metadata_lang}
+          current={appSettings.metadataLang}
           optionFormatter={getLanguageName}
           callback={setCardsLanguage}
         />{" "}
@@ -186,8 +199,8 @@ export default function SectionData(): JSX.Element {
           <div className="open_button" onClick={openPathDialog} />
           <Input
             callback={arenaLogCallback}
-            placeholder={settings.logUri}
-            value={settings.logUri}
+            placeholder={appSettings.logUri}
+            value={appSettings.logUri}
           />
         </div>
       </div>
@@ -217,7 +230,7 @@ export default function SectionData(): JSX.Element {
         <Input
           callback={localeCallback}
           placeholder={"default (auto)"}
-          value={settings.log_locale_format}
+          value={appSettings.logLocaleFormat}
         />
       </div>
       <div className="settings_note">

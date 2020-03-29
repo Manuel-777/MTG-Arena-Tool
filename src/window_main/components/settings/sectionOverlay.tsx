@@ -16,38 +16,54 @@ import {
   OVERLAY_MIXED,
   OVERLAY_DRAFT_BREW,
   OVERLAY_FULL,
-  OVERLAY_DRAFT_MODES
+  OVERLAY_DRAFT_MODES,
+  IPC_RENDERER,
+  IPC_ALL
 } from "../../../shared/constants";
 import ReactSelect from "../../../shared/ReactSelect";
 import useColorPicker from "../../hooks/useColorPicker";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
 
 function toggleEditMode(): void {
   ipcSend("toggle_edit_mode");
 }
 
 function backgroundColorPicker(color: string): void {
-  ipcSend("save_user_settings", { overlay_back_color: color });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { overlay_back_color: color },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function setAlwaysOnTop(checked: boolean): void {
-  ipcSend("save_user_settings", {
-    overlay_ontop: checked
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { overlay_ontop: checked },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function setSoundPriority(checked: boolean): void {
-  ipcSend("save_user_settings", {
-    sound_priority: checked
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { sound_priority: checked },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 export function setCurrentOverlaySettings(current: number): void {
-  ipcSend("save_user_settings", {
-    last_settings_overlay_section: current,
-    skipRefresh: true
-  });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { last_settings_overlay_section: current },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 interface OverlaysTopNavProps {
@@ -375,9 +391,12 @@ export default function SectionOverlay(): JSX.Element {
 
   const overlayScaleDebouce = React.useCallback(
     _.debounce((value: number) => {
-      ipcSend("save_user_settings", {
-        overlay_scale: value
-      });
+      reduxAction(
+        store.dispatch,
+        "SET_SETTINGS",
+        { overlay_scale: value },
+        IPC_ALL ^ IPC_RENDERER
+      );
     }, 1000),
     []
   );
@@ -394,9 +413,12 @@ export default function SectionOverlay(): JSX.Element {
       Howler.volume(value);
       sound.play();
 
-      ipcSend("save_user_settings", {
-        sound_priority_volume: value
-      });
+      reduxAction(
+        store.dispatch,
+        "SET_SETTINGS",
+        { sound_priority_volume: value },
+        IPC_ALL ^ IPC_RENDERER
+      );
     }, 1000),
     []
   );

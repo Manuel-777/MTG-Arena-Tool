@@ -2,6 +2,7 @@
 import { combineReducers } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
 import settingsSlice from "../slices/settingsSlice";
+import appSettingsSlice from "../slices/appSettingsSlice";
 import rendererSlice from "../slices/rendererSlice";
 import hoverSlice from "../slices/hoverSlice";
 import loginSlice from "../slices/loginSlice";
@@ -12,6 +13,7 @@ import matchesSlice from "../slices/matchesSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
+  appsettings: appSettingsSlice.reducer,
   renderer: rendererSlice.reducer,
   hover: hoverSlice.reducer,
   login: loginSlice.reducer,

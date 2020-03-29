@@ -12,17 +12,30 @@ import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/useAggregatorData";
 import { ipcSend, toggleArchived } from "../rendererUtil";
 import { getMatch, matchExists } from "../../shared-store";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import store from "../../shared-redux/stores/rendererStore";
+import { IPC_ALL, IPC_RENDERER } from "../../shared/constants";
 
 function editTag(tag: string, color: string): void {
   ipcSend("edit_tag", { tag, color });
 }
 
 function saveTableState(eventsTableState: TableState<EventTableData>): void {
-  ipcSend("save_user_settings", { eventsTableState, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { eventsTableState },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function saveTableMode(eventsTableMode: string): void {
-  ipcSend("save_user_settings", { eventsTableMode, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { eventsTableMode },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function getValidMatchId(rawMatchId?: string): string | undefined {

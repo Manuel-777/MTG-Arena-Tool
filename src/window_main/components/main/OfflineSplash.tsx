@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { remote, shell } from "electron";
 import React from "react";
-import { SETTINGS_PRIVACY } from "../../../shared/constants";
-import { ipcSend } from "../../rendererUtil";
+import { SETTINGS_PRIVACY, IPC_BACKGROUND } from "../../../shared/constants";
 import { forceOpenSettings } from "../../tabControl";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import store from "../../../shared-redux/stores/rendererStore";
 
 export default function OfflineSplash(): JSX.Element {
   return (
@@ -27,13 +28,20 @@ export default function OfflineSplash(): JSX.Element {
           className="launch_login_link"
           onClick={(): void => {
             const clearAppSettings = {
-              remember_me: false,
-              auto_login: false,
-              launch_to_tray: false
+              rememberMe: false,
+              autoLogin: false,
+              launchToTray: false
             };
-            ipcSend("save_app_settings", clearAppSettings);
-            remote.app.relaunch();
-            remote.app.exit(0);
+            reduxAction(
+              store.dispatch,
+              "SET_APP_SETTINGS",
+              clearAppSettings,
+              IPC_BACKGROUND
+            );
+            setTimeout(() => {
+              remote.app.relaunch();
+              remote.app.exit(0);
+            }, 1000);
           }}
         >
           login to your account

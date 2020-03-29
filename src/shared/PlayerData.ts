@@ -15,7 +15,6 @@ import {
   COLLECTION_CARD_MODE,
   DATE_LAST_30,
   DECKS_ART_MODE,
-  DEFAULT_TILE,
   ECONOMY_LIST_MODE,
   EVENTS_LIST_MODE,
   GREEN,
@@ -43,19 +42,7 @@ export const playerDataDefault = {
   last_log_timestamp: null,
   last_log_format: "",
   appDbPath: "",
-  playerDbPath: "",
-  settings: {
-    email: "",
-    token: "",
-    toolVersion: 0,
-    auto_login: false,
-    launch_to_tray: false,
-    remember_me: true,
-    beta_channel: false,
-    metadata_lang: "en",
-    log_locale_format: "",
-    logUri: ""
-  }
+  playerDbPath: ""
 };
 
 const overlayCfg = {
@@ -231,8 +218,6 @@ export const defaultCfg = {
   tags_colors: {}
 };
 
-
-
 // Cannot use Deck/ColorList classes because it would cause circular dependency
 // tweaked for heavy use in PlayerData/Aggregator
 function getDeckColors(deck: InternalDeck): number[] {
@@ -346,10 +331,6 @@ class PlayerData implements Record<string, any> {
   public offline = false;
   public patreon = false;
   public patreon_tier = -1;
-  public settings: MergedSettings = {
-    ...playerDataDefault.settings,
-    ...defaultCfg.settings
-  };
 
   public last_log_timestamp = "";
   public last_log_format = "";
@@ -428,21 +409,6 @@ class PlayerData implements Record<string, any> {
       data[key] = value;
     });
 
-    const settingsBlacklistKeys = [
-      "toolVersion",
-      "auto_login",
-      "launch_to_tray",
-      "logUri",
-      "log_locale_format",
-      "remember_me",
-      "beta_channel",
-      "metadata_lang",
-      "email",
-      "token"
-    ];
-    data.settings = _.omit(this.settings, settingsBlacklistKeys);
-
-    // console.log(data);
     return data;
   }
 

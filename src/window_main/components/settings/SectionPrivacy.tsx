@@ -4,14 +4,26 @@ import Toggle from "../misc/Toggle";
 import { ipcSend } from "../../rendererUtil";
 import Button from "../misc/Button";
 import { useSelector } from "react-redux";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { IPC_ALL, IPC_RENDERER } from "../../../shared/constants";
 
 function clickAnonExplore(value: boolean): void {
-  ipcSend("save_user_settings", { anon_explore: value });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { anon_explore: value },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function clickSendData(value: boolean): void {
-  ipcSend("save_user_settings", { send_data: value });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { send_data: value },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function eraseData(): void {

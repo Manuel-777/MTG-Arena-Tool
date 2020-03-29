@@ -8,16 +8,18 @@ import {
   IPC_BACKGROUND,
   IPC_RENDERER,
   IPC_OVERLAY,
-  IPC_MAIN
+  IPC_MAIN,
+  IPC_ALL
 } from "../shared/constants";
 import Deck from "../shared/deck";
-import { AppState } from "../shared-redux/stores/overlayStore";
+import store, { AppState } from "../shared-redux/stores/overlayStore";
 import { MatchData } from "../types/currentMatch";
 import { DraftData } from "../types/draft";
 import { InternalActionLog } from "../types/log";
 import { OverlaySettingsData } from "../types/settings";
 import CardDetailsWindowlet from "./CardDetailsWindowlet";
 import OverlayWindowlet from "./OverlayWindowlet";
+import { reduxAction } from "../shared-redux/sharedRedux";
 const sound = new Howl({ src: ["../sounds/blip.mp3"] });
 
 const byId = (id: string): HTMLElement | null => document.getElementById(id);
@@ -133,11 +135,12 @@ export default function OverlayController(): JSX.Element {
         }) ||
         overlayHover;
 
-      ipcSend("save_user_settings", {
-        overlays: newOverlays,
-        overlayHover: newOverlayHover,
-        skipRefresh: true
-      });
+      reduxAction(
+        store.dispatch,
+        "SET_SETTINGS",
+        { overlays: newOverlays, overlayHover: newOverlayHover },
+        IPC_ALL ^ IPC_OVERLAY
+      );
     }
     setEditMode(_editMode);
   };
@@ -176,7 +179,13 @@ export default function OverlayController(): JSX.Element {
       ...overlays[index], // old overlay
       show // new setting
     };
-    ipcSend("save_user_settings", { overlays: newOverlays });
+
+    reduxAction(
+      store.dispatch,
+      "SET_SETTINGS",
+      { overlays: newOverlays },
+      IPC_ALL ^ IPC_OVERLAY
+    );
   };
 
   const handleSetDraftCards = useCallback(

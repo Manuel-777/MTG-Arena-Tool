@@ -3,10 +3,14 @@ import {
   DATE_ALL_TIME,
   DATE_LAST_30,
   DATE_LAST_DAY,
-  DATE_SEASON
+  DATE_SEASON,
+  IPC_ALL,
+  IPC_RENDERER
 } from "../shared/constants";
 import ReactSelect from "../shared/ReactSelect";
 import { ipcSend, showDatepicker } from "./rendererUtil";
+import { reduxAction } from "../shared-redux/sharedRedux";
+import { useDispatch } from "react-redux";
 
 export interface DateFilterProps {
   prefixId: string;
@@ -36,6 +40,7 @@ export default function DateFilter({
   current,
   prefixId
 }: DateFilterProps): JSX.Element {
+  const dispatch = useDispatch();
   const dateSelectCallback = React.useCallback(
     (filter: string): void => {
       if (filter === "Custom") {
@@ -44,17 +49,24 @@ export default function DateFilter({
         showDatepicker(lastWeek, (date: Date) => {
           const filter = date.toISOString();
           callback(filter);
-          ipcSend("save_user_settings", { last_date_filter: filter });
+          reduxAction(
+            dispatch,
+            "SET_SETTINGS",
+            { last_date_filter: filter },
+            IPC_ALL ^ IPC_RENDERER
+          );
         });
       } else {
         callback(filter);
-        ipcSend("save_user_settings", {
-          last_date_filter: filter,
-          skipRefresh: true
-        });
+        reduxAction(
+          dispatch,
+          "SET_SETTINGS",
+          { last_date_filter: filter },
+          IPC_ALL ^ IPC_RENDERER
+        );
       }
     },
-    [callback]
+    [callback, dispatch]
   );
   current = current ?? DATE_LAST_30;
   const options = [...dateOptions];

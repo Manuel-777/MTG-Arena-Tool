@@ -2,7 +2,7 @@ import { remote } from "electron";
 import React from "react";
 import { TableState } from "react-table";
 import Colors from "../../shared/colors";
-import { DRAFT_RANKS } from "../../shared/constants";
+import { DRAFT_RANKS, IPC_ALL, IPC_RENDERER } from "../../shared/constants";
 import db from "../../shared/database";
 import pd from "../../shared/PlayerData";
 import { DbCardData } from "../../types/Metadata";
@@ -17,6 +17,8 @@ import { CardsData } from "../components/collection/types";
 import { ipcSend } from "../rendererUtil";
 import { CardCounts } from "../components/decks/types";
 import Deck from "../../shared/deck";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import store from "../../shared-redux/stores/rendererStore";
 
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
@@ -76,11 +78,21 @@ function exportCards(cardIds: string[]): void {
 }
 
 function saveTableState(collectionTableState: TableState<CardsData>): void {
-  ipcSend("save_user_settings", { collectionTableState, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { collectionTableState },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function saveTableMode(collectionTableMode: string): void {
-  ipcSend("save_user_settings", { collectionTableMode, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { collectionTableMode },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function getCollectionData(): CardsData[] {

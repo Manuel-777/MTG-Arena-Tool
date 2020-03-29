@@ -2,7 +2,7 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
-import { SUB_MATCH, IPC_NONE } from "../../shared/constants";
+import { SUB_MATCH, IPC_NONE, IPC_ALL, IPC_RENDERER } from "../../shared/constants";
 import db from "../../shared/database";
 import pd from "../../shared/PlayerData";
 import { getReadableEvent } from "../../shared/util";
@@ -17,6 +17,7 @@ import { ipcSend, toggleArchived } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import { matchesList, getMatch } from "../../shared-store";
+import store from "../../shared-redux/stores/rendererStore";
 
 const { DEFAULT_ARCH, NO_ARCH } = Aggregator;
 const tagPrompt = "Set archetype";
@@ -39,11 +40,21 @@ function deleteTag(matchid: string, tag: string): void {
 }
 
 function saveTableState(matchesTableState: TableState<MatchTableData>): void {
-  ipcSend("save_user_settings", { matchesTableState, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { matchesTableState },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function saveTableMode(matchesTableMode: string): void {
-  ipcSend("save_user_settings", { matchesTableMode, skipRefresh: true });
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { matchesTableMode },
+    IPC_ALL ^ IPC_RENDERER
+  );
 }
 
 function getMatchesData(
