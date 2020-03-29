@@ -31,6 +31,7 @@ import { reduxAction } from "../shared-redux/sharedRedux";
 
 const debugLogSpeed = 0.001;
 let logReadEnd = null;
+let lastProgressPop = 0;
 
 const fsAsync = {
   close: promisify(fs.close),
@@ -183,7 +184,11 @@ function onLogEntryFound(entry: any): void {
     return;
   } else {
     //console.log("Entry:", entry.label, entry, entry.json());
-    updateLoading(entry);
+    const end = new Date().getTime();
+    if (end < lastProgressPop + 1000) {
+      lastProgressPop = end;
+      updateLoading(entry);
+    }
     if (!(globals.firstPass && playerData.settings.skip_firstpass)) {
       try {
         entrySwitch(entry);
