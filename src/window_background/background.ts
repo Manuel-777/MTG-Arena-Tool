@@ -5,7 +5,7 @@ import { app, ipcRenderer as ipc, remote } from "electron";
 import fs from "fs";
 import _ from "lodash";
 import path from "path";
-import { HIDDEN_PW, IPC_NONE } from "../shared/constants";
+import { HIDDEN_PW, IPC_RENDERER } from "../shared/constants";
 import { rememberDefaults } from "../shared/db/databaseUtil";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/PlayerData";
@@ -25,7 +25,8 @@ import {
 } from "./loadPlayerConfig";
 import * as mtgaLog from "./mtgaLog";
 import updateDeck from "./updateDeck";
-import { initializeRendererReduxIPC } from "../shared-redux/sharedRedux";
+import { initializeRendererReduxIPC, reduxAction } from "../shared-redux/sharedRedux";
+import { getMatch } from "../shared-store";
 
 initializeRendererReduxIPC(globals.store);
 
@@ -344,28 +345,28 @@ ipc.on("add_tag", (event, arg) => {
 
 ipc.on("delete_matches_tag", (event, arg) => {
   const { matchid, tag } = arg;
-  const match = playerData.match(matchid);
+  const match = getMatch(matchid);
   if (!match || !tag) return;
   if (!match.tags || !match.tags.includes(tag)) return;
 
   const tags = [...match.tags];
   tags.splice(tags.indexOf(tag), 1);
-
   const matchData = { ...match, tags };
 
-  setData({ [matchid]: matchData });
+  reduxAction(globals.store.dispatch, "SET_MATCH", matchData, IPC_RENDERER);
   playerDb.upsert(matchid, "tags", tags);
 });
 
 ipc.on("add_matches_tag", (event, arg) => {
   const { matchid, tag } = arg;
-  const match = playerData.match(matchid);
+  const match = getMatch(matchid);
   if (!match || !tag) return;
   if (match.tags && match.tags.includes(tag)) return;
 
   const tags = [...(match.tags || []), tag];
+  const matchData = { ...match, tags };
 
-  setData({ [matchid]: { ...match, tags } });
+  reduxAction(globals.store.dispatch, "SET_MATCH", matchData, IPC_RENDERER);
   playerDb.upsert(matchid, "tags", tags);
   httpApi.httpSetDeckTag(tag, match.oppDeck, match.eventId);
 });

@@ -122,6 +122,7 @@ export async function loadPlayerConfig(playerId: string): Promise<void> {
   const __playerData = _.defaultsDeep(savedData, playerData);
   const { settings } = __playerData;
 
+  // Store Matches data redux/store
   const matchesList: InternalMatch[] = __playerData.matches_index
     .filter((id: string) => __playerData[id])
     .map((id: string) => {

@@ -19,6 +19,9 @@ import {
   makeSimpleResponseHandler
 } from "./httpWorker";
 import globals from "./globals";
+import { matchExists } from "../shared-store";
+import { IPC_RENDERER } from "../shared/constants";
+import { reduxAction } from "../shared-redux/sharedRedux";
 
 let httpQueue: async.AsyncQueue<HttpTask>;
 
@@ -51,18 +54,24 @@ function syncUserData(data: any): void {
     });
   playerDb.upsert("", "courses_index", courses_index);
 
-  // Sync Matches
-  const matches_index = [...playerData.matches_index];
-  data.matches
-    .filter((doc: any) => !playerData.matchExists(doc._id))
+  // Sync Matches (updated)
+  const matches_index = [...globals.store.getState().matches.matchesIndex];
+  const matchesList = data.matches
+    .filter((doc: any) => !matchExists(doc._id))
     .forEach((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
-      matches_index.push(id);
       playerDb.upsert("", id, doc);
-      setData({ [id]: doc }, false);
+      matches_index.push(id);
+      return doc;
     });
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_MATCHES",
+    matchesList,
+    IPC_RENDERER
+  );
   playerDb.upsert("", "matches_index", matches_index);
 
   // Sync Economy

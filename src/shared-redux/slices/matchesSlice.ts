@@ -9,9 +9,12 @@ const matchesSlice = createSlice({
   },
   reducers: {
     setMatch: (state, action): void => {
+      // We send the match along the state but add the match
+      // in a separate store. Adding deep/complex objects to redux
+      // seems to be highly inneficient and requires using inmutability.
       const match = action.payload as InternalMatch;
+      globalStore.matches[match.id] = { ...match };
       if (state.matchesIndex.indexOf(match.id) === -1) {
-        globalStore.matches[match.id] = { ...match };
         state.matchesIndex.push(match.id);
       }
     },
