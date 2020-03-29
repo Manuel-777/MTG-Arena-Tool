@@ -12,4 +12,10 @@ export function matchExists(id: string): boolean {
   return globalStore.matches[id] ? true : false;
 }
 
+export function matchesList(): InternalMatch[] {
+  return Object.keys(globalStore.matches).map(
+    (key: string) => globalStore.matches[key]
+  );
+}
+
 export default globalStore;

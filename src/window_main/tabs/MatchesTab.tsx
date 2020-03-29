@@ -16,6 +16,7 @@ import { TagCounts } from "../components/tables/types";
 import { ipcSend, toggleArchived } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
+import { matchesList } from "../../shared-store";
 
 const { DEFAULT_ARCH, NO_ARCH } = Aggregator;
 const tagPrompt = "Set archetype";
@@ -49,7 +50,7 @@ function getMatchesData(
   aggregator: Aggregator,
   archivedCache: Record<string, boolean>
 ): MatchTableData[] {
-  return pd.matchList
+  return matchesList()
     .filter((match: InternalMatch) => {
       // legacy filter logic
       if (match == undefined) {

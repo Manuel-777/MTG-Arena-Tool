@@ -20,9 +20,10 @@ const matchesSlice = createSlice({
     },
     setManyMatches: (state, action): void => {
       const newList: string[] = [];
-      action.payload.map((id: string) => {
-        if (state.matchesIndex.indexOf(id) === -1) {
-          newList.push(id);
+      action.payload.map((match: InternalMatch) => {
+        if (state.matchesIndex.indexOf(match.id) === -1) {
+          globalStore.matches[match.id] = match;
+          newList.push(match.id);
         }
       });
       state.matchesIndex = [...newList, ...state.matchesIndex];

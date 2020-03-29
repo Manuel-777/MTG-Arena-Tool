@@ -126,11 +126,8 @@ export async function loadPlayerConfig(playerId: string): Promise<void> {
   const matchesList: InternalMatch[] = __playerData.matches_index
     .filter((id: string) => __playerData[id])
     .map((id: string) => {
-      globalStore.matches[id] = {
-        ...__playerData[id],
-        date: new Date(__playerData[id].date).toString()
-      };
-      return id;
+      __playerData[id].date = new Date(__playerData[id].date).toString();
+      return __playerData[id];
     });
 
   reduxAction(

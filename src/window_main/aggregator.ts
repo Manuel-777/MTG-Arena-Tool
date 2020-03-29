@@ -17,6 +17,7 @@ import { normalApproximationInterval } from "../shared/statsFns";
 import { getReadableEvent, getRecentDeckName } from "../shared/util";
 import { InternalDeck } from "../types/Deck";
 import { InternalMatch } from "../types/match";
+import { matchesList } from "../shared-store";
 
 export const dateMaxValid = (a: any, b: any): any => {
   const aValid = isValid(a);
@@ -265,8 +266,10 @@ export default class Aggregator {
     this.constructedStats = {};
     this.limitedStats = {};
 
-    this._matches = pd.matchList.filter(this.filterMatch);
-    this._matches.forEach(this._processMatch);
+    // this._matches
+    matchesList()
+      .filter(this.filterMatch)
+      .map(this._processMatch);
 
     [
       this.stats,
