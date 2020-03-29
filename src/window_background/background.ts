@@ -25,7 +25,10 @@ import {
 } from "./loadPlayerConfig";
 import * as mtgaLog from "./mtgaLog";
 import updateDeck from "./updateDeck";
-import { initializeRendererReduxIPC, reduxAction } from "../shared-redux/sharedRedux";
+import {
+  initializeRendererReduxIPC,
+  reduxAction
+} from "../shared-redux/sharedRedux";
 import { getMatch } from "../shared-store";
 
 initializeRendererReduxIPC(globals.store);
