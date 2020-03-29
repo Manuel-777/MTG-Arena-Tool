@@ -3,6 +3,7 @@ import { get_deck_colors as getDeckColors } from "../shared/util";
 import { DEFAULT_TILE } from "../shared/constants";
 import { prettierDeckData } from "../shared/util";
 import db from "../shared/database";
+import { InternalEvent } from "../types/event";
 
 const defaultDeck = JSON.parse(
   '{"deckTileId":' +
@@ -11,7 +12,8 @@ const defaultDeck = JSON.parse(
 );
 
 const globalStore = {
-  matches: {} as Record<string, InternalMatch>
+  matches: {} as Record<string, InternalMatch>,
+  events: {} as Record<string, InternalEvent>
 };
 
 //
@@ -51,6 +53,29 @@ export function matchExists(id: string): boolean {
 export function matchesList(): InternalMatch[] {
   return Object.keys(globalStore.matches).map(
     (key: string) => globalStore.matches[key]
+  );
+}
+
+//
+// Events utility functions
+//
+export function getEvent(id: string): InternalEvent | undefined {
+  if (!id || !globalStore.events[id]) return undefined;
+  const eventData = globalStore.events[id];
+  return {
+    ...eventData,
+    //custom: !static_events.includes(id),
+    type: "Event"
+  };
+}
+
+export function eventExists(id: string): boolean {
+  return globalStore.events[id] ? true : false;
+}
+
+export function eventsList(): InternalEvent[] {
+  return Object.keys(globalStore.events).map(
+    (key: string) => globalStore.events[key]
   );
 }
 

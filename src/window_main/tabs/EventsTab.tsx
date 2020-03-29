@@ -11,7 +11,7 @@ import { EventStats, EventTableData } from "../components/events/types";
 import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/useAggregatorData";
 import { ipcSend, toggleArchived } from "../rendererUtil";
-import { getMatch, matchExists } from "../../shared-store";
+import { getMatch, matchExists, eventsList } from "../../shared-store";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import store from "../../shared-redux/stores/rendererStore";
 import { IPC_ALL, IPC_RENDERER } from "../../shared/constants";
@@ -121,7 +121,7 @@ function getEventsData(
   aggregator: Aggregator,
   archivedCache: Record<string, boolean>
 ): EventTableData[] {
-  return pd.eventList
+  return eventsList()
     .filter((event: InternalEvent) => {
       // legacy filter logic
       if (event === undefined || event.CourseDeck === undefined) {

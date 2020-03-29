@@ -3,12 +3,14 @@ import rendererSlice from "../slices/rendererSlice";
 import settingsSlice from "../slices/settingsSlice";
 import appSettingsSlice from "../slices/appSettingsSlice";
 import matchesSlice from "../slices/matchesSlice";
+import eventsSlice from "../slices/eventsSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
   appsettings: appSettingsSlice.reducer,
   renderer: rendererSlice.reducer,
-  matches: matchesSlice.reducer
+  matches: matchesSlice.reducer,
+  events: eventsSlice.reducer
 });
 
 const store = configureStore({

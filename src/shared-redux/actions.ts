@@ -7,6 +7,7 @@ import homeSlice from "./slices/homeSlice";
 import collectionSlice from "./slices/collectionSlice";
 import exploreSlice from "./slices/exploreSlice";
 import matchesSlice from "./slices/matchesSlice";
+import eventsSlice from "./slices/eventsSlice";
 
 const actions: Record<string, (arg: any) => any> = {};
 actions["SET_SETTINGS"] = settingsSlice.actions.setSettings;
@@ -49,5 +50,7 @@ actions["SET_EXPLORE_FILTERS_SKIP"] =
   exploreSlice.actions.setExploreFiltersSkip;
 actions["SET_MATCH"] = matchesSlice.actions.setMatch;
 actions["SET_MANY_MATCHES"] = matchesSlice.actions.setManyMatches;
+actions["SET_EVENTS"] = eventsSlice.actions.setEvent;
+actions["SET_MANY_EVENTS"] = eventsSlice.actions.setManyEvents;
 
 export default actions;

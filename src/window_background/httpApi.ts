@@ -19,7 +19,7 @@ import {
   makeSimpleResponseHandler
 } from "./httpWorker";
 import globals from "./globals";
-import { matchExists } from "../shared-store";
+import { matchExists, eventExists } from "../shared-store";
 import { IPC_RENDERER, IPC_ALL } from "../shared/constants";
 import { reduxAction } from "../shared-redux/sharedRedux";
 
@@ -41,9 +41,9 @@ export function isIdle(): boolean {
 function syncUserData(data: any): void {
   // console.log(data);
   // Sync Events
-  const courses_index = [...playerData.courses_index];
+  const courses_index = [...globals.store.getState().events.eventsIndex];
   data.courses
-    .filter((doc: any) => !playerData.eventExists(doc._id))
+    .filter((doc: any) => !eventExists(doc._id))
     .forEach((doc: any) => {
       const id = doc._id;
       doc.id = id;

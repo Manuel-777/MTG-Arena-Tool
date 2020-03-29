@@ -17,6 +17,7 @@ import convertDeckFromV3 from "./convertDeckFromV3";
 import { reduxAction } from "../shared-redux/sharedRedux";
 import { InternalMatch } from "../types/match";
 import store from "../shared-redux/stores/backgroundStore";
+import { InternalEvent } from "../types/event";
 
 const ipcLog = (message: string): void => ipcSend("ipc_log", message);
 const ipcPop = (args: {
@@ -57,7 +58,6 @@ async function fixBadPlayerData(): Promise<void> {
 
   // 2020-01-27 @Manwe discovered that some old decks are saved as Deck objects
   // TODO permanently convert them similar to approach used above
-
   setData({ decks }, false);
 }
 
@@ -72,16 +72,15 @@ export async function loadPlayerConfig(playerId: string): Promise<void> {
 
   ipcLog("Finding all documents in player database...");
   const savedData = await playerDb.findAll();
+  console.log(savedData);
+  const { settings } = savedData;
 
-  const __playerData = _.defaultsDeep(savedData, playerData);
-  const { settings } = __playerData;
-
-  // Store Matches data redux/store
-  const matchesList: InternalMatch[] = __playerData.matches_index
-    .filter((id: string) => __playerData[id])
+  // Get Matches data
+  const matchesList: InternalMatch[] = savedData.matches_index
+    .filter((id: string) => savedData[id])
     .map((id: string) => {
-      __playerData[id].date = new Date(__playerData[id].date).toString();
-      return __playerData[id];
+      savedData[id].date = new Date(savedData[id].date).toString();
+      return savedData[id];
     });
 
   reduxAction(
@@ -91,9 +90,22 @@ export async function loadPlayerConfig(playerId: string): Promise<void> {
     IPC_RENDERER
   );
 
-  setData(__playerData, true);
+  // Get Events data
+  const eventsList: InternalEvent[] = savedData.courses_index
+    .filter((id: string) => savedData[id])
+    .map((id: string) => savedData[id]);
+
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_EVENTS",
+    eventsList,
+    IPC_RENDERER
+  );
+
+  // Other
+  setData(savedData, true);
   await fixBadPlayerData();
-  ipcSend("renderer_set_bounds", __playerData.windowBounds);
+  ipcSend("renderer_set_bounds", savedData.windowBounds);
   syncSettings(settings, true);
 
   // populate draft overlays with last draft if possible

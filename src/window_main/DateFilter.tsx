@@ -8,9 +8,9 @@ import {
   IPC_RENDERER
 } from "../shared/constants";
 import ReactSelect from "../shared/ReactSelect";
-import { ipcSend, showDatepicker } from "./rendererUtil";
 import { reduxAction } from "../shared-redux/sharedRedux";
 import { useDispatch } from "react-redux";
+import { showDatepicker } from "./rendererUtil";
 
 export interface DateFilterProps {
   prefixId: string;

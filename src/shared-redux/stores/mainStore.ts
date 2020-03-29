@@ -10,6 +10,7 @@ import homeSlice from "../slices/homeSlice";
 import collectionSlice from "../slices/collectionSlice";
 import exploreSlice from "../slices/exploreSlice";
 import matchesSlice from "../slices/matchesSlice";
+import eventsSlice from "../slices/eventsSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
@@ -20,7 +21,8 @@ const rootReducer = combineReducers({
   homeData: homeSlice.reducer,
   collection: collectionSlice.reducer,
   explore: exploreSlice.reducer,
-  matches: matchesSlice.reducer
+  matches: matchesSlice.reducer,
+  events: eventsSlice.reducer
 });
 
 const store = configureStore({

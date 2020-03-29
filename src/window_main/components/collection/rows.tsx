@@ -62,6 +62,9 @@ export function CardTileRow({
 
   const cardSize =
     100 + useSelector((state: AppState) => state.settings.cards_size) * 15;
+  const cardsQuality = useSelector(
+    (state: AppState) => state.settings.cards_quality
+  );
 
   return (
     <div
@@ -80,7 +83,7 @@ export function CardTileRow({
         <img
           className={"inventory_card_img"}
           style={{ width: cardSize + "px" }}
-          src={getCardImage(card)}
+          src={getCardImage(card, cardsQuality)}
         />
       </div>
     </div>

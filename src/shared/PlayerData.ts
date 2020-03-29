@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import isValid from "date-fns/isValid";
 import parseISO from "date-fns/parseISO";
-import { ipcRenderer as ipc, remote } from "electron";
+import { remote } from "electron";
 import _ from "lodash";
 import { InternalDeck } from "../types/Deck";
 import { InternalDraft } from "../types/draft";
-import { InternalEvent } from "../types/event";
 import { InternalEconomyTransaction } from "../types/inventory";
 import { InternalRank, InternalRankUpdate } from "../types/rank";
 import {
@@ -322,9 +321,7 @@ class PlayerData implements Record<string, any> {
   public economy = defaultCfg.economy;
   public seasonal: Record<string, InternalRankUpdate> = {};
   public seasonal_rank: Record<string, any> = {};
-  public courses_index: string[] = [];
   public deck_changes_index: string[] = [];
-  public matches_index: string[] = [];
   public economy_index: string[] = [];
   public draft_index: string[] = [];
   public offline = false;
@@ -346,28 +343,15 @@ class PlayerData implements Record<string, any> {
     this.deckExists = this.deckExists.bind(this);
     this.draft = this.draft.bind(this);
     this.draftExists = this.draftExists.bind(this);
-    this.event = this.event.bind(this);
-    this.eventExists = this.eventExists.bind(this);
-    this.handleSetData = this.handleSetData.bind(this);
     this.seasonalExists = this.seasonalExists.bind(this);
     this.transaction = this.transaction.bind(this);
     this.transactionExists = this.transactionExists.bind(this);
 
-    if (ipc) ipc.on("set_player_data", this.handleSetData);
     Object.assign(this, {
       ...playerDataDefault,
       ...defaultCfg
     });
     PlayerData.instance = this;
-  }
-
-  handleSetData(event: unknown, arg: any): void {
-    try {
-      arg = JSON.parse(arg);
-      Object.assign(this, arg);
-    } catch (e) {
-      console.log("Unable to parse player data", e);
-    }
   }
 
   get transactionList(): InternalEconomyTransaction[] {
@@ -382,12 +366,6 @@ class PlayerData implements Record<string, any> {
 
   get draftList(): any[] {
     return this.draft_index.filter(this.draftExists).map(this.draft);
-  }
-
-  get eventList(): InternalEvent[] {
-    return this.courses_index
-      .filter(this.eventExists)
-      .map(this.event) as InternalEvent[];
   }
 
   get data(): Record<string, any> {
@@ -473,21 +451,6 @@ class PlayerData implements Record<string, any> {
 
   draftExists(id?: string): boolean {
     return !!id && this.draft_index.includes(id) && id in this;
-  }
-
-  event(id?: string): InternalEvent | undefined {
-    if (!id || !this.eventExists(id)) return undefined;
-    const data = this as Record<string, any>;
-    const eventData = data[id];
-    return {
-      ...eventData,
-      custom: !this.static_events.includes(id),
-      type: "Event"
-    };
-  }
-
-  eventExists(id?: string): boolean {
-    return !!id && id in this;
   }
 
   seasonalExists(id?: string): boolean {

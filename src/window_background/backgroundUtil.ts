@@ -177,6 +177,5 @@ export function setData(
   refresh = globals.debugLog || !globals.firstPass
 ): void {
   const cleanData = _.omit(data, dataBlacklist);
-
-  playerData.handleSetData(null, JSON.stringify(cleanData));
+  //playerData.handleSetData(null, JSON.stringify(cleanData));
 }
