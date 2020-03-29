@@ -12,6 +12,7 @@ import electron, {
   SaveDialogReturnValue,
   Tray
 } from "electron";
+import _ from "lodash";
 import { autoUpdater } from "electron-updater";
 import fs from "fs";
 import path from "path";
@@ -53,6 +54,8 @@ let backLoaded = false;
 let overlayLoaded = false;
 let arenaState = ARENA_MODE_IDLE;
 let editMode = false;
+
+let oldSettings = {};
 
 const singleLock = app.requestSingleInstanceLock();
 
@@ -152,7 +155,9 @@ function startApp(): void {
       if (mainWindow && background && overlay) {
         initializeMainReduxIPC(store, background, mainWindow, overlay);
         store.subscribe(() => {
-          setSettings(store.getState().settings);
+          if (!_.isEqual(oldSettings, store.getState().settings)) {
+            setSettings(store.getState().settings);
+          }
         });
       }
       background?.webContents.send("start_background");
@@ -386,6 +391,7 @@ function toggleEditMode(): void {
 }
 
 function setSettings(settings: MergedSettings): void {
+  oldSettings = JSON.parse(JSON.stringify(settings));
   console.log("MAIN:  Updating settings");
 
   // update keyboard shortcuts
