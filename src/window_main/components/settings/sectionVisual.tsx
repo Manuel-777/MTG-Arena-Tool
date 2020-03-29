@@ -41,6 +41,7 @@ const card = db.card(70344);
 
 export default function SectionVisual(): JSX.Element {
   const settings = useSelector((state: AppState) => state.settings);
+  const cardSize = 100 + settings.cards_size * 15;
   const containerRef: React.MutableRefObject<HTMLInputElement | null> = React.useRef(
     null
   );
@@ -175,13 +176,13 @@ export default function SectionVisual(): JSX.Element {
           className="inventory_card_settings"
           style={{
             marginTop: "16px",
-            width: pd.cardsSize + "px",
+            width: cardSize + "px",
             alignSelf: "flex-start"
           }}
         >
           <img
             className="inventory_card_settings_img"
-            style={{ width: pd.cardsSize + "px" }}
+            style={{ width: cardSize + "px" }}
             src={getCardImage(card)}
           />
         </div>

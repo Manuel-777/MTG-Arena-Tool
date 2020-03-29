@@ -36,20 +36,22 @@ function pickPackFromPosition(position: number, set: string): PickPack {
 interface DraftCardProps {
   grpId: number;
   pick: boolean;
+  size: number;
 }
 
 function DraftCard(props: DraftCardProps): JSX.Element {
-  const { grpId, pick } = props;
+  const { grpId, pick, size } = props;
   const [hoverIn, hoverOut] = useHoverCard(grpId);
+
   const card = db.card(grpId);
 
   const makeStyle = useCallback(() => {
     return {
-      width: pd.cardsSize + "px",
-      height: pd.cardsSize / 0.71808510638 + "px",
+      width: size + "px",
+      height: size / 0.71808510638 + "px",
       backgroundImage: `url(${getCardImage(grpId)})`
     };
-  }, [grpId]);
+  }, [grpId, size]);
 
   return (
     <div className="draft-card-cont">
@@ -78,7 +80,8 @@ interface DraftViewProps {
 export function DraftView(props: DraftViewProps): JSX.Element {
   const { draft } = props;
   const [pickpack, setPickPack] = React.useState({ pick: 0, pack: 0 });
-  const cardSize = useSelector((state: AppState) => state.settings.cards_size);
+  const cardSize =
+    100 + useSelector((state: AppState) => state.settings.cards_size) * 15;
   const maxPosition = (PACK_SIZES[draft.set] ?? DEFAULT_PACK_SIZE) * 3 - 1;
 
   const downHandler = React.useCallback(
@@ -171,8 +174,7 @@ export function DraftView(props: DraftViewProps): JSX.Element {
           <div
             className="draft-view"
             style={{
-              gridTemplateColumns: `repeat(auto-fit, minmax(${100 +
-                cardSize * 15 +
+              gridTemplateColumns: `repeat(auto-fit, minmax(${cardSize +
                 12}px, 1fr))`
             }}
           >
@@ -181,6 +183,7 @@ export function DraftView(props: DraftViewProps): JSX.Element {
                 <DraftCard
                   pick={getCurrentPick().pick == grpId}
                   key={pickpack.pack + "-" + pickpack.pick + "-" + index}
+                  size={cardSize}
                   grpId={grpId}
                 />
               );

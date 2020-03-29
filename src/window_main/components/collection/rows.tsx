@@ -1,10 +1,11 @@
 import React from "react";
 import OwnershipStars from "../../../shared/OwnershipStars";
-import pd from "../../../shared/PlayerData";
 import { getCardImage } from "../../../shared/util";
 import { TableViewRow } from "../tables/TableViewRow";
 import { CollectionTableRowProps } from "./types";
 import useHoverCard from "../../hooks/useHoverCard";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
+import { useSelector } from "react-redux";
 
 export function CardTableViewRow({
   row,
@@ -59,6 +60,9 @@ export function CardTileRow({
 
   const [hoverIn, hoverOut] = useHoverCard(card.id, card.wanted);
 
+  const cardSize =
+    100 + useSelector((state: AppState) => state.settings.cards_size) * 15;
+
   return (
     <div
       ref={containerEl}
@@ -71,11 +75,11 @@ export function CardTileRow({
         className={"inventory_card"}
         onMouseEnter={hoverIn}
         onMouseLeave={hoverOut}
-        style={{ width: pd.cardsSize + "px" }}
+        style={{ width: cardSize + "px" }}
       >
         <img
           className={"inventory_card_img"}
-          style={{ width: pd.cardsSize + "px" }}
+          style={{ width: cardSize + "px" }}
           src={getCardImage(card)}
         />
       </div>

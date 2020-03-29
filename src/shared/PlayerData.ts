@@ -390,14 +390,6 @@ class PlayerData implements Record<string, any> {
     }
   }
 
-  get cardsSize(): number {
-    return 100 + this.settings.cards_size * 15;
-  }
-
-  get cardsSizeHoverCard(): number {
-    return 100 + this.settings.cards_size_hover_card * 15;
-  }
-
   get transactionList(): InternalEconomyTransaction[] {
     return this.economy_index
       .filter(this.transactionExists)

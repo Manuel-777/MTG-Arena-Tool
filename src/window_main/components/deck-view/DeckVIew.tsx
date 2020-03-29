@@ -9,13 +9,14 @@ import DeckManaCurve from "../../../shared/DeckManaCurve";
 import Deck from "../../../shared/deck";
 import Button from "../misc/Button";
 import { ipcSend } from "../../rendererUtil";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import db from "../../../shared/database";
 import ShareButton from "../misc/ShareButton";
 import CraftingCost from "./CraftingCost";
 import { getCardImage } from "../../../shared/util";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;
@@ -261,7 +262,8 @@ function cmcSort(a: CardObject, b: CardObject): number {
 
 function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
   const { deck, setRegularView } = props;
-  const sz = pd.cardsSize;
+  const sz =
+    100 + useSelector((state: AppState) => state.settings.cards_size) * 15;
   const dispatcher = useDispatch();
 
   const hoverCard = (id: number, hover: boolean): void => {
