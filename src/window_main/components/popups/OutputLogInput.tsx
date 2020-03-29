@@ -3,6 +3,8 @@ import { remote } from "electron";
 const { dialog } = remote;
 import pd from "../../../shared/PlayerData";
 import Button from "../misc/Button";
+import { useSelector } from "react-redux";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 interface OutputLogInputProps {
   closeCallback?: (log: string) => void;
@@ -12,7 +14,8 @@ export default function OutputLogInput(
   props: OutputLogInputProps
 ): JSX.Element {
   const { closeCallback } = props;
-  const [log, setLog] = useState(pd.settings.logUri);
+  const logUri = useSelector((state: AppState) => state.appsettings.logUri);
+  const [log, setLog] = useState(logUri);
   const [open, setOpen] = useState(0);
   const handleClose = useCallback(
     e => {
@@ -33,7 +36,7 @@ export default function OutputLogInput(
     dialog
       .showOpenDialog(remote.getCurrentWindow(), {
         title: "Arena Log Location",
-        defaultPath: pd.settings.logUri,
+        defaultPath: logUri,
         buttonLabel: "Select",
         filters: [
           { name: "Text", extensions: ["txt", "text"] },
@@ -47,7 +50,7 @@ export default function OutputLogInput(
           setLog(paths[0]);
         }
       });
-  }, []);
+  }, [logUri]);
 
   useEffect(() => {
     // React doesnt give css time to know there was a change

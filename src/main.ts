@@ -24,7 +24,7 @@ import {
   OVERLAY_DRAFT_MODES
 } from "./shared/constants";
 import { appDb } from "./shared/db/LocalDatabase";
-import { MergedSettings, OverlaySettingsData } from "./types/settings";
+import { SettingsData, OverlaySettingsData } from "./types/settings";
 import { IPC_BACKGROUND, IPC_RENDERER, IPC_OVERLAY } from "./shared/constants";
 import { initializeMainReduxIPC } from "./shared-redux/sharedRedux";
 import store from "./shared-redux/stores/mainStore";
@@ -385,7 +385,7 @@ function toggleEditMode(): void {
   updateOverlayVisibility();
 }
 
-function setSettings(settings: MergedSettings): void {
+function setSettings(settings: SettingsData): void {
   oldSettings = JSON.parse(JSON.stringify(settings));
   console.log("MAIN:  Updating settings");
 
@@ -400,7 +400,7 @@ function setSettings(settings: MergedSettings): void {
     globalShortcut.register(settings.shortcut_editmode, () => {
       toggleEditMode();
     });
-    settings.overlays?.forEach((_settings, index) => {
+    settings.overlays?.forEach((_settings: any, index: number) => {
       const short = "shortcut_overlay_" + (index + 1);
       globalShortcut.register((settings as any)[short], () => {
         overlay?.webContents.send("close", { action: -1, index: index });

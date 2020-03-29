@@ -115,8 +115,9 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
     "get_database",
     "get_database_version"
   ];
+  const sendData = globals.store.getState().settings.send_data;
   if (
-    (!playerData.settings.send_data || playerData.offline) &&
+    (!sendData || playerData.offline) &&
     !nonPrivacyMethods.includes(task.method)
   ) {
     if (!playerData.offline) {
@@ -128,7 +129,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
     return;
   }
   const _headers: any = { ...task };
-  _headers.token = playerData.settings.token;
+  _headers.token = globals.store.getState().appsettings.token;
   const options = getRequestOptions(task);
   if (globals.debugNet && task.method !== "notifications") {
     ipcLog(

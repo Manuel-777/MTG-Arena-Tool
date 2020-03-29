@@ -23,12 +23,13 @@ import {
 import db from "./database";
 import Deck from "./deck";
 import pd from "./PlayerData";
+import store from "../shared-redux/stores/rendererStore";
 
 const NO_IMG_URL = "../images/notfound.png";
 
 export function getCardImage(
   card?: DbCardData | number,
-  quality: string = pd.settings.cards_quality
+  quality: string = store.getState().settings.cards_quality
 ): string {
   if (card === undefined) {
     return NO_IMG_URL;

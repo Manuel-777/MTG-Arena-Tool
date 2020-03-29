@@ -29,7 +29,6 @@ import {
   MAIN_HOME
 } from "./constants";
 import db from "./database";
-import { MergedSettings } from "../types/settings";
 
 export const playerDataDefault = {
   name: "",

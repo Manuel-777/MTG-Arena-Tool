@@ -76,7 +76,7 @@ export function start({
       position = 0;
     }
     while (position < size) {
-      if (!playerData.settings.skip_firstpass) {
+      if (!globals.store.getState().settings.skip_firstpass) {
         const buffer = await readChunk(
           path,
           position,
@@ -189,7 +189,9 @@ function onLogEntryFound(entry: any): void {
       lastProgressPop = end;
       updateLoading(entry);
     }
-    if (!(globals.firstPass && playerData.settings.skip_firstpass)) {
+    if (
+      !(globals.firstPass && globals.store.getState().settings.skip_firstpass)
+    ) {
       try {
         entrySwitch(entry);
         let timestamp = entry.timestamp;
@@ -417,12 +419,6 @@ function finishLoading(): void {
       ipcSend("set_arena_state", ARENA_MODE_IDLE);
     }
 
-    reduxAction(
-      globals.store.dispatch,
-      "SET_SETTINGS",
-      playerData.settings,
-      IPC_RENDERER | IPC_OVERLAY
-    );
     // replaces ipc "initialize"
     reduxAction(globals.store.dispatch, "SET_LOADING", false, IPC_RENDERER);
     reduxAction(
@@ -431,9 +427,6 @@ function finishLoading(): void {
       LOGIN_OK,
       IPC_RENDERER
     );
-
-    //ipcSend("set_settings", JSON.stringify(playerData.settings));
-    //ipcSend("initialize");
 
     ipcSend("popup", {
       text: "Initialized successfully!",

@@ -96,7 +96,7 @@ function getTxnData(archivedCache: Record<string, boolean>): TransactionData[] {
 }
 
 export default function EconomyTab(): JSX.Element {
-  const { economyTableMode, economyTableState } = pd.settings;
+  const { economyTableMode, economyTableState } = store.getState().settings;
   const archivedCache = useSelector(
     (state: AppState) => state.renderer.archivedCache
   );

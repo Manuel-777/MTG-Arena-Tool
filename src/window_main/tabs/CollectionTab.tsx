@@ -47,7 +47,7 @@ function addCardMenu(div: HTMLElement, card: DbCardData): void {
 }
 
 function getExportString(cardIds: string[]): string {
-  const { export_format: exportFormat } = pd.settings;
+  const { export_format: exportFormat } = store.getState().settings;
   // TODO teach export how to handle all the new optional columns?
   let exportString = "";
   cardIds.forEach(key => {
@@ -131,7 +131,10 @@ function getCollectionData(): CardsData[] {
 }
 
 export default function CollectionTab(): JSX.Element {
-  const { collectionTableMode, collectionTableState } = pd.settings;
+  const {
+    collectionTableMode,
+    collectionTableState
+  } = store.getState().settings;
   const data = React.useMemo(() => getCollectionData(), []);
   return (
     <div className="ux_item">

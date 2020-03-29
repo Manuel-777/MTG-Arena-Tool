@@ -18,6 +18,7 @@ import { getReadableEvent, getRecentDeckName } from "../shared/util";
 import { InternalDeck } from "../types/Deck";
 import { InternalMatch } from "../types/match";
 import { matchesList } from "../shared-store";
+import store from "../shared-redux/stores/rendererStore";
 
 export const dateMaxValid = (a: any, b: any): any => {
   const aValid = isValid(a);
@@ -98,7 +99,7 @@ export default class Aggregator {
       matchIds: undefined,
       eventId: Aggregator.DEFAULT_EVENT,
       deckId: Aggregator.DEFAULT_DECK,
-      date: pd.settings.last_date_filter,
+      date: store.getState().settings.last_date_filter,
       showArchived: false
     };
   }

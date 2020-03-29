@@ -161,13 +161,16 @@ ipc.on("windowBounds", (event, windowBounds) => {
 
 //
 ipc.on("overlayBounds", (event, index, bounds) => {
-  const overlays = [...playerData.settings.overlays];
+  const overlays = [...globals.store.getState().settings.overlays];
   const newOverlay = {
     ...overlays[index], // old overlay
     bounds // new bounds
   };
   overlays[index] = newOverlay;
-  setData({ settings: { ...playerData.settings, overlays } }, false);
+  setData(
+    { settings: { ...globals.store.getState().settings, overlays } },
+    false
+  );
   playerDb.upsert("settings", "overlays", overlays);
 });
 
@@ -177,16 +180,18 @@ ipc.on("save_overlay_settings", function(event, settings) {
   if (settings.index === undefined) return;
 
   const { index } = settings;
-  const overlays = playerData.settings.overlays.map((overlay, _index) => {
-    if (_index === index) {
-      const updatedOverlay = { ...overlay, ...settings };
-      delete updatedOverlay.index;
-      return updatedOverlay;
-    }
-    return overlay;
-  });
+  const overlays = globals.store
+    .getState()
+    .settings.overlays.map((overlay, _index) => {
+      if (_index === index) {
+        const updatedOverlay = { ...overlay, ...settings };
+        delete updatedOverlay.index;
+        return updatedOverlay;
+      }
+      return overlay;
+    });
 
-  const updated = { ...playerData.settings, overlays };
+  const updated = { ...globals.store.getState().settings, overlays };
   playerDb.upsert("settings", "overlays", overlays);
   syncSettings(updated);
 });
@@ -477,7 +482,12 @@ async function logLoop(): Promise<void> {
   });
   clearInterval(logLoopInterval);
 
-  const { autoLogin, rememberMe, email, token } = globals.store.getState().appsettings;
+  const {
+    autoLogin,
+    rememberMe,
+    email,
+    token
+  } = globals.store.getState().appsettings;
   let username = "";
   let password = "";
   if (rememberMe) {

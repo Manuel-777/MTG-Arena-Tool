@@ -2,7 +2,12 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
-import { SUB_DECK, IPC_NONE, IPC_ALL, IPC_RENDERER } from "../../shared/constants";
+import {
+  SUB_DECK,
+  IPC_NONE,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../shared/constants";
 import Deck from "../../shared/deck";
 import pd from "../../shared/PlayerData";
 import {
@@ -125,7 +130,7 @@ export default function DecksTab({
   aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
   const dispatcher = useDispatch();
-  const { decksTableMode, decksTableState } = pd.settings;
+  const { decksTableMode, decksTableState } = store.getState().settings;
   const showArchived = !isHidingArchived(decksTableState);
   const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,

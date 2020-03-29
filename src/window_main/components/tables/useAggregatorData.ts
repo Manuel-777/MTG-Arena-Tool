@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import pd from "../../../shared/PlayerData";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { TableData } from "../tables/types";
 
@@ -9,7 +9,7 @@ export function getDefaultAggFilters(
   showArchived: boolean,
   aggFiltersArg?: AggregatorFilters
 ): AggregatorFilters {
-  const { last_date_filter: dateFilter } = pd.settings;
+  const { last_date_filter: dateFilter } = store.getState().settings;
   return {
     ...Aggregator.getDefaultFilters(),
     date: dateFilter,

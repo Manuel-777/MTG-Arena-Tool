@@ -2,9 +2,13 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { TableState } from "react-table";
-import { SUB_MATCH, IPC_NONE, IPC_ALL, IPC_RENDERER } from "../../shared/constants";
+import {
+  SUB_MATCH,
+  IPC_NONE,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../shared/constants";
 import db from "../../shared/database";
-import pd from "../../shared/PlayerData";
 import { getReadableEvent } from "../../shared/util";
 import { InternalMatch } from "../../types/match";
 import Aggregator, { AggregatorFilters } from "../aggregator";
@@ -144,7 +148,7 @@ export default function MatchesTab({
   aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
   const dispatcher = useDispatch();
-  const { matchesTableMode, matchesTableState } = pd.settings;
+  const { matchesTableMode, matchesTableState } = store.getState().settings;
   const showArchived = !isHidingArchived(matchesTableState);
   const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,

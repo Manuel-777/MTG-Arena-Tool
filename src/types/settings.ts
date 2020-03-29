@@ -67,5 +67,3 @@ export interface SettingsData {
   shortcut_devtools_overlay: string;
   send_data: boolean;
 }
-
-export interface MergedSettings extends AppSettings, SettingsData {}

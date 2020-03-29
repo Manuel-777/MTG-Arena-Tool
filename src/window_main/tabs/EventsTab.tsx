@@ -164,7 +164,7 @@ export default function EventsTab({
 }: {
   aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
-  const { eventsTableMode, eventsTableState } = pd.settings;
+  const { eventsTableMode, eventsTableState } = store.getState().settings;
   const showArchived = !isHidingArchived(eventsTableState);
   const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,

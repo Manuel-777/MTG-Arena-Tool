@@ -285,7 +285,8 @@ function handleAuthResponse(
 
 export function httpSubmitCourse(course: any): void {
   const _id = makeId(6);
-  if (playerData.settings.anon_explore == true) {
+  const anon = globals.store.getState().settings.anon_explore;
+  if (anon == true) {
     course.PlayerId = "000000000000000";
     course.PlayerName = "Anonymous";
   }
@@ -389,7 +390,8 @@ function handleSetDataResponse(
 
 export function httpSetMatch(match: any): void {
   const _id = makeId(6);
-  if (playerData.settings.anon_explore == true) {
+  const anon = globals.store.getState().settings.anon_explore;
+  if (anon == true) {
     match.player.userid = "000000000000000";
     match.player.name = "Anonymous";
   }
