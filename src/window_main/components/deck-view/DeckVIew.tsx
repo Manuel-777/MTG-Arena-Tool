@@ -268,7 +268,7 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
     reduxAction(
       dispatcher,
       hover ? "SET_HOVER_IN" : "SET_HOVER_OUT",
-      id,
+      { grpId: id },
       IPC_NONE
     );
   };

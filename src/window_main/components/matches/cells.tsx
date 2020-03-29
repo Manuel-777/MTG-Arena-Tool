@@ -1,11 +1,9 @@
 import React from "react";
 import { Cell } from "react-table";
-import {
-  BinarySymbol,
-  BriefText,
-  FlexLeftContainer,
-  RankSymbol
-} from "../misc/display";
+import { BinarySymbol } from "../misc/BinarySymbol";
+import { BriefText } from "../misc/BriefText";
+import { FlexLeftContainer } from "../misc/FlexContainer";
+import { RankSymbol } from "../misc/RankSymbol";
 import { TagsCell } from "../tables/cells";
 import { TagCounts } from "../tables/types";
 import { MatchTableData } from "./types";

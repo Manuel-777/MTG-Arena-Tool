@@ -7,17 +7,13 @@ import LocalTime from "../../../shared/time-components/LocalTime";
 import RelativeTime from "../../../shared/time-components/RelativeTime";
 import { toDDHHMMSS, toMMSS } from "../../../shared/util";
 import { formatNumber, formatPercent } from "../../rendererUtil";
-import {
-  ArchiveSymbol,
-  BriefText,
-  ColoredArchivedSymbol,
-  FlexLeftContainer,
-  LabelText,
-  ManaSymbol,
-  MetricText,
-  NewTag,
-  TagBubble
-} from "../misc/display";
+import { ArchiveSymbol, ColoredArchivedSymbol } from "../misc/ArchiveSymbol";
+import { BriefText } from "../misc/BriefText";
+import { FlexLeftContainer } from "../misc/FlexContainer";
+import { LabelText } from "../misc/LabelText";
+import { ManaSymbol } from "../misc/ManaSymbol";
+import { MetricText } from "../misc/MetricText";
+import { NewTag, TagBubble } from "../misc/TagBubble";
 import { TableData, TagCounts } from "./types";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
 import { IPC_NONE } from "../../../shared/constants";

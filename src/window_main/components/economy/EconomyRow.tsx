@@ -160,39 +160,48 @@ function AllWildcardsEconomyValueRecord(
   props: AllWildcardsEconomyValueRecordProps
 ): JSX.Element {
   const { delta, isSmall } = props;
+  console.log(delta);
   return (
     <>
-      {!!delta.wcCommonDelta && (
+      {delta && delta.wcCommonDelta ? (
         <WildcardEconomyValueRecord
           count={delta.wcCommonDelta}
           title={"Common Wildcard"}
           className={"wc_common"}
           smallLabel={isSmall}
         />
+      ) : (
+        <></>
       )}
-      {!!delta.wcUncommonDelta && (
+      {delta && delta.wcUncommonDelta ? (
         <WildcardEconomyValueRecord
           count={delta.wcUncommonDelta}
           title={"Uncommon Wildcard"}
           className={"wc_uncommon"}
           smallLabel={isSmall}
         />
+      ) : (
+        <></>
       )}
-      {!!delta.wcRareDelta && (
+      {delta && delta.wcRareDelta ? (
         <WildcardEconomyValueRecord
           count={delta.wcRareDelta}
           title={"Rare Wildcard"}
           className={"wc_rare"}
           smallLabel={isSmall}
         />
+      ) : (
+        <></>
       )}
-      {!!delta.wcMythicDelta && (
+      {delta && delta.wcMythicDelta ? (
         <WildcardEconomyValueRecord
           count={delta.wcMythicDelta}
           title={"Mythic Wildcard"}
           className={"wc_mythic"}
           smallLabel={isSmall}
         />
+      ) : (
+        <></>
       )}
     </>
   );
@@ -328,12 +337,14 @@ function FlexRight(props: FlexRightProps): JSX.Element {
       (change.orbCountDiff.currentOrbCount || 0) -
         (change.orbCountDiff.oldOrbCount || 0)
     );
-
+  console.log(change, props);
   const checkCards =
-    change.delta.cardsAdded && change.delta.cardsAdded.length > 0;
+    change.cardsAddedCount > 0 &&
+    change.delta.cardsAdded &&
+    change.delta.cardsAdded.length > 0;
   const checkAether =
     checkAetherized &&
-    change.aetherizedCards &&
+    change.aetherizedCards > 0 &&
     change.aetherizedCards.length > 0;
   const aetherCards: string[] = checkAether
     ? change.aetherizedCards.reduce(
@@ -353,86 +364,111 @@ function FlexRight(props: FlexRightProps): JSX.Element {
     : [];
 
   const checkSkins =
-    checkSkinsAdded && change.delta.artSkinsAdded !== undefined;
+    change.artSkinsAddedCount > 0 &&
+    checkSkinsAdded &&
+    change.delta.artSkinsAdded !== undefined;
   const skinsToCards = checkSkins
     ? change.delta.artSkinsAdded.map((obj: { artId: string }) =>
         db.cardFromArt(obj.artId)
       )
     : undefined;
-  const vanityCodes: string[] | undefined = change.delta.vanityItemsAdded;
+  const vanityCodes: string[] | undefined =
+    change.vanityAddedCount > 0 && change.delta.vanityItemsAdded;
 
-  const xpGainedNumber = change.xpGained && parseInt(change.xpGained);
+  const xpGainedNumber = change.xpGained > 0 && parseInt(change.xpGained);
   return (
     <div className={"tiny_scroll list_economy_awarded"} id={economyId}>
-      {fullContext === "Pay Event Entry" && (
+      {fullContext === "Pay Event Entry" ? (
         <EconomyIcon title={"Event Entry"} className={"economy_ticket_med"} />
+      ) : (
+        <></>
       )}
-      {checkGemsEarnt && !!change.delta.gemsDelta && (
+      {checkGemsEarnt && change.delta && !!change.delta.gemsDelta ? (
         <EconomyValueRecord
           iconClassName={"economy_gems"}
           title={"Gems"}
           deltaContent={formatNumber(Math.abs(change.delta.gemsDelta))}
         />
+      ) : (
+        <></>
       )}
-      {checkGoldEarnt && !!change.delta.goldDelta && (
+      {checkGoldEarnt && change.delta && !!change.delta.goldDelta ? (
         <EconomyValueRecord
           iconClassName={"economy_gold marginLeft"}
           title={"Gold"}
           deltaContent={formatNumber(Math.abs(change.delta.goldDelta))}
         />
+      ) : (
+        <></>
       )}
-      {!!lvlDelta && (
+      {lvlDelta ? (
         <EconomyValueRecord
           iconClassName={"economy_mastery_med"}
           title={`Mastery Level (${pd.economy.trackName})`}
           deltaContent={"+" + formatNumber(lvlDelta)}
         />
+      ) : (
+        <></>
       )}
-      {!!orbDelta && (
+      {orbDelta ? (
         <EconomyValueRecord
           iconClassName={"economy_mastery_med"}
           title={"Orbs"}
           deltaContent={formatNumber(orbDelta)}
         />
+      ) : (
+        <></>
       )}
-      {!!xpGainedNumber && (
+      {xpGainedNumber ? (
         <EconomyValueRecord
           iconClassName={"economy_exp"}
           title={"Experience"}
           deltaContent={formatNumber(xpGainedNumber)}
         />
+      ) : (
+        <></>
       )}
-      {Math.abs(change.delta.draftTokensDelta) > 0 && (
+      {change.delta && Math.abs(change.delta.draftTokensDelta) > 0 ? (
         <EconomyValueRecord
           iconClassName={"economy_ticket_med"}
           title={"Traditional Draft Entry Tokens"}
           smallLabel
           deltaContent={formatNumber(change.delta.draftTokensDelta)}
         />
+      ) : (
+        <></>
       )}
-      {Math.abs(change.delta.sealedTokensDelta) > 0 && (
+      {change.delta && Math.abs(change.delta.sealedTokensDelta) > 0 ? (
         <EconomyValueRecord
           iconClassName={"economy_ticket_med"}
           title={"Sealed Entry Tokens"}
           smallLabel
           deltaContent={formatNumber(change.delta.sealedTokensDelta)}
         />
+      ) : (
+        <></>
       )}
-      {checkBoosterAdded &&
-        change.delta.boosterDelta &&
+      {checkBoosterAdded && change.delta && change.delta.boosterDelta ? (
         change.delta.boosterDelta.map((booster: any) => (
           <BoosterDelta booster={booster} key={booster.collationId} />
-        ))}
-      {checkWildcardsAdded && (
-        <AllWildcardsEconomyValueRecord delta={change.delta} />
+        ))
+      ) : (
+        <></>
       )}
-      {(checkCards || checkAether) && (
+      {checkWildcardsAdded ? (
+        <AllWildcardsEconomyValueRecord delta={change.delta} />
+      ) : (
+        <></>
+      )}
+      {checkCards || checkAether ? (
         <CardPoolAddedEconomyValueRecord
           addedCardIds={change.delta.cardsAdded}
           aetherizedCardIds={aetherCards}
         />
+      ) : (
+        <></>
       )}
-      {skinsToCards &&
+      {skinsToCards ? (
         skinsToCards.map((card: any) => (
           <EconomyIcon
             key={economyId + "_" + card.id}
@@ -440,8 +476,11 @@ function FlexRight(props: FlexRightProps): JSX.Element {
             className={"economy_skin_art"}
             url={`url("${getCardArtCrop(card)}")`}
           />
-        ))}
-      {vanityCodes &&
+        ))
+      ) : (
+        <></>
+      )}
+      {vanityCodes ? (
         vanityCodes.map(code => (
           <EconomyValueRecord
             key={economyId + "_" + code}
@@ -450,7 +489,10 @@ function FlexRight(props: FlexRightProps): JSX.Element {
             smallLabel
             deltaContent={getReadableCode(code)}
           />
-        ))}
+        ))
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

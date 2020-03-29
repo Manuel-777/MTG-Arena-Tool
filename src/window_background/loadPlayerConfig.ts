@@ -94,7 +94,7 @@ async function fixBadPlayerData(): Promise<void> {
     if (!isV2CardsList(deck.mainDeck)) {
       ipcLog("Converting v3 deck: " + deck.id);
       const fixedDeck = convertDeckFromV3((deck as unknown) as ArenaV3Deck);
-      decks[deck.id] = fixedDeck;
+      decks[deck.id] = { ...fixedDeck, archived: deck.archived };
       await playerDb.upsert("decks", deck.id, fixedDeck);
     }
   }

@@ -3,10 +3,10 @@ import matchSorter from "match-sorter";
 import React from "react";
 import { ColumnInstance, FilterValue, Row } from "react-table";
 import { MANA, RANKS } from "../../../shared/constants";
-import { RankSymbol } from "../misc/display";
+import { RankSymbol } from "../misc/RankSymbol";
 import { BinaryColumnFilter, BinaryFilterValue } from "../tables/filters";
-import { useMultiSelectFilter } from "../tables/hooks";
 import { MultiSelectFilterProps } from "../tables/types";
+import { useMultiSelectFilter } from "../tables/useMultiSelectFilter";
 import { MatchTableData } from "./types";
 
 export function OnPlayColumnFilter(props: {

@@ -4,11 +4,14 @@ import { IPC_NONE } from "../../shared/constants";
 
 type HoverCardHook = (() => void)[];
 
-export default function useHoverCard(card: number): HoverCardHook {
+export default function useHoverCard(
+  card: number,
+  wanted?: number
+): HoverCardHook {
   const dispatcher = useDispatch();
 
   const hoverIn = (): void => {
-    reduxAction(dispatcher, "SET_HOVER_IN", card, IPC_NONE);
+    reduxAction(dispatcher, "SET_HOVER_IN", { grpId: card, wanted }, IPC_NONE);
   };
 
   const hoverOut = (): void => {

@@ -1,6 +1,7 @@
 import React from "react";
 import ReactSelect from "../../../shared/ReactSelect";
-import { InputContainer, PagingButton } from "../misc/display";
+import { InputContainer } from "../misc/InputContainer";
+import { PagingButton } from "../misc/PagingButton";
 import { PagingControlsProps } from "./types";
 
 export default function PagingControls({

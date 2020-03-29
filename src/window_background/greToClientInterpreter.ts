@@ -661,7 +661,7 @@ export function processAll(): void {
       }
     }
   }
-  globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
   globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
   globals.currentMatch.oppCardsUsed = getOppUsedCards();
 }
@@ -676,7 +676,7 @@ export function GREMessageByID(msgId: number, time: Date): void {
   }
 
   globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
-  globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
   globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
     getOppUsedCards()
   );
@@ -691,7 +691,7 @@ export function GREMessage(message: GreMessage, time: Date): void {
     fn(message);
   }
 
-  globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
   globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
   globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
     getOppUsedCards()
