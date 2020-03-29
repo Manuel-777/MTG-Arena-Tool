@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import pd from "../../../shared/PlayerData";
-import { AppState } from "../../../shared/redux/reducers";
+import { AppState } from "../../../shared-redux/stores/rendererStore"
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { TableData } from "../tables/types";
 

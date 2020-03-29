@@ -27,7 +27,6 @@ actions["SET_TOPNAV"] = rendererSlice.actions.setTopNav;
 actions["SET_UPDATE_STATE"] = rendererSlice.actions.setUpdateState;
 actions["SET_HOVER_IN"] = hoverSlice.actions.setHoverIn;
 actions["SET_HOVER_OUT"] = hoverSlice.actions.setHoverOut;
-actions["SET_HOVER_SIZE"] = hoverSlice.actions.setHoverSize;
 actions["SET_CAN_LOGIN"] = loginSlice.actions.setCanLogin;
 actions["SET_LOGIN_EMAIL"] = loginSlice.actions.setLoginEmail;
 actions["SET_LOGIN_FORM"] = loginSlice.actions.setLoginForm;

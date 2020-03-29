@@ -63,7 +63,10 @@ export default function CardDetailsWindowlet(
   } = props;
   const grpId = useSelector((state: AppState) => state.hover.grpId);
   const opacity = useSelector((state: AppState) => state.hover.opacity);
-  const cardsSizeHoverCard = useSelector((state: AppState) => state.hover.size);
+  const cardsSizeHoverCard = useSelector(
+    (state: AppState) => state.settings.cards_size_hover_card
+  );
+  const size = 100 + cardsSizeHoverCard * 15;
   const card = db.card(grpId);
 
   // TODO remove group lands hack
@@ -74,8 +77,8 @@ export default function CardDetailsWindowlet(
     className: "main_hover",
     src: getCardImage(card),
     style: {
-      width: cardsSizeHoverCard + "px",
-      height: cardsSizeHoverCard / SCALAR + "px",
+      width: size + "px",
+      height: size / SCALAR + "px",
       opacity
     }
   };
@@ -91,10 +94,10 @@ export default function CardDetailsWindowlet(
         opacity: editMode ? "1" : undefined,
         left: overlayHover
           ? `${overlayHover.x}px`
-          : `${window.innerWidth / 2 - cardsSizeHoverCard / 2}px`,
+          : `${window.innerWidth / 2 - size / 2}px`,
         top: overlayHover
           ? `${overlayHover.y}px`
-          : `${window.innerHeight - cardsSizeHoverCard / SCALAR - 50}px`
+          : `${window.innerHeight - size / SCALAR - 50}px`
       }}
     >
       {editMode ? (
