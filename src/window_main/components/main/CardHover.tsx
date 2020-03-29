@@ -44,7 +44,9 @@ export default function CardHover(): JSX.Element {
   const grpId = useSelector((state: AppState) => state.hover.grpId);
   const opacity = useSelector((state: AppState) => state.hover.opacity);
   const wanted = useSelector((state: AppState) => state.hover.wanted);
-  const hoverSize = useSelector((state: AppState) => state.hover.size);
+  const hoverSize = useSelector(
+    (state: AppState) => state.settings.cards_size_hover_card
+  );
   const card = db.card(grpId);
   const [frontLoaded, setFrontLoaded] = useState(false);
   const [backLoaded, setBackLoaded] = useState(false);
@@ -52,6 +54,7 @@ export default function CardHover(): JSX.Element {
   const [frontUrl, setFrontUrl] = useState("");
   const [backUrl, setBackUrl] = useState("");
 
+  const size = 100 + hoverSize * 15;
   const getStyle = useCallback(
     (
       hoverGrpId: number,
@@ -59,14 +62,14 @@ export default function CardHover(): JSX.Element {
       opacity: number
     ): React.CSSProperties => {
       return {
-        width: hoverSize + "px",
-        height: hoverSize / 0.71808510638 + "px",
-        top: `calc(100% - ${hoverSize / 0.71808510638 + 32}px)`,
+        width: size + "px",
+        height: size / 0.71808510638 + "px",
+        top: `calc(100% - ${size / 0.71808510638 + 32}px)`,
         opacity: opacity,
         backgroundImage: `url(${frontLoaded ? frontUrl : NoCard})`
       };
     },
-    [frontUrl, frontLoaded]
+    [frontUrl, frontLoaded, size]
   );
 
   const getStyleDfc = useCallback(
@@ -87,15 +90,15 @@ export default function CardHover(): JSX.Element {
       }
 
       return {
-        width: hoverSize + "px",
-        right: hoverSize + 48 + "px",
-        height: hoverSize / 0.71808510638 + "px",
-        top: `calc(100% - ${hoverSize / 0.71808510638 + 32}px)`,
+        width: size + "px",
+        right: size + 48 + "px",
+        height: size / 0.71808510638 + "px",
+        top: `calc(100% - ${size / 0.71808510638 + 32}px)`,
         opacity: opacity,
         backgroundImage: `url(${backLoaded ? backUrl : NoCard})`
       };
     },
-    [backUrl, backLoaded]
+    [backUrl, backLoaded, size]
   );
 
   useEffect(() => {
