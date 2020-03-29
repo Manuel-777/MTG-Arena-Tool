@@ -18,6 +18,7 @@ import uxMove from "../../uxMove";
 import { useDispatch } from "react-redux";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
 import { IPC_NONE } from "../../../shared/constants";
+import { getMatch } from "../../../shared-store";
 
 interface MatchViewProps {
   match: InternalMatch;
@@ -254,7 +255,7 @@ function GameStats(props: GameStatsProps): JSX.Element {
 }
 
 export default function openMatchSub(matchId: string): JSX.Element {
-  const match = pd.match(matchId);
+  const match = getMatch(matchId);
   if (!match) return <div>{matchId}</div>;
   return <MatchView match={match} />;
 }

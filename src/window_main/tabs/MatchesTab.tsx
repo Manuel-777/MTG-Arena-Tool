@@ -16,13 +16,13 @@ import { useAggregatorData } from "../components/tables/useAggregatorData";
 import { ipcSend, toggleArchived } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
-import { matchesList } from "../../shared-store";
+import { matchesList, getMatch } from "../../shared-store";
 
 const { DEFAULT_ARCH, NO_ARCH } = Aggregator;
 const tagPrompt = "Set archetype";
 
 function addTag(matchid: string, tag: string): void {
-  const match = pd.match(matchid);
+  const match = getMatch(matchid);
   if (!match || [tagPrompt, NO_ARCH].includes(tag)) return;
   if (match.tags?.includes(tag)) return;
   ipcSend("add_matches_tag", { matchid, tag });
@@ -33,7 +33,7 @@ function editTag(tag: string, color: string): void {
 }
 
 function deleteTag(matchid: string, tag: string): void {
-  const match = pd.match(matchid);
+  const match = getMatch(matchid);
   if (!match || !match.tags?.includes(tag)) return;
   ipcSend("delete_matches_tag", { matchid, tag });
 }

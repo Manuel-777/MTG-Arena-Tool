@@ -30,6 +30,7 @@ import { InternalMatch } from "../../../types/match";
 import { InternalDraft } from "../../../types/draft";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
+import { getMatch } from "../../../shared-store";
 
 function DraftRares({ event }: { event: EventTableData }): JSX.Element {
   const draftId = event.id + "-draft";
@@ -193,7 +194,7 @@ function EventSubRows({
       return [];
     }
     const matchRows = event.stats.matchIds
-      .map(pd.match)
+      .map(id => getMatch(id))
       .filter(match => match !== undefined) as InternalMatch[];
     matchRows.sort((a, b) => {
       if (!a || !b) return 0;

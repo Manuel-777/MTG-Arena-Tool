@@ -11,6 +11,7 @@ import { EventStats, EventTableData } from "../components/events/types";
 import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/useAggregatorData";
 import { ipcSend, toggleArchived } from "../rendererUtil";
+import { getMatch, matchExists } from "../../shared-store";
 
 function editTag(tag: string, color: string): void {
   ipcSend("edit_tag", { tag, color });
@@ -25,11 +26,11 @@ function saveTableMode(eventsTableMode: string): void {
 }
 
 function getValidMatchId(rawMatchId?: string): string | undefined {
-  if (pd.matchExists(rawMatchId)) {
+  if (matchExists(rawMatchId || "")) {
     return rawMatchId;
   }
   const newStyleMatchId = `${rawMatchId}-${pd.arenaId}`;
-  if (pd.matchExists(newStyleMatchId)) {
+  if (matchExists(newStyleMatchId)) {
     return newStyleMatchId;
   }
   // We couldn't find a matching index
@@ -74,7 +75,7 @@ function getEventStats(event: InternalEvent): EventStats {
     stats.isMissingMatchData = true;
   }
   stats.matchIds.forEach(matchId => {
-    const match = pd.match(matchId);
+    const match = getMatch(matchId);
     if (!match) {
       stats.isMissingMatchData = true;
       return;

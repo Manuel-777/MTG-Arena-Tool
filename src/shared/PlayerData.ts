@@ -7,7 +7,6 @@ import { InternalDeck } from "../types/Deck";
 import { InternalDraft } from "../types/draft";
 import { InternalEvent } from "../types/event";
 import { InternalEconomyTransaction } from "../types/inventory";
-import { InternalMatch } from "../types/match";
 import { InternalRank, InternalRankUpdate } from "../types/rank";
 import {
   BLACK,
@@ -232,11 +231,7 @@ export const defaultCfg = {
   tags_colors: {}
 };
 
-const defaultDeck = JSON.parse(
-  '{"deckTileId":' +
-    DEFAULT_TILE +
-    ',"description":null,"format":"Standard","colors":[],"id":"00000000-0000-0000-0000-000000000000","isValid":false,"lastUpdated":"2018-05-31T00:06:29.7456958","lockedForEdit":false,"lockedForUse":false,"mainDeck":[],"name":"Undefined","resourceId":"00000000-0000-0000-0000-000000000000","sideboard":[]}'
-);
+
 
 // Cannot use Deck/ColorList classes because it would cause circular dependency
 // tweaked for heavy use in PlayerData/Aggregator
@@ -374,8 +369,6 @@ class PlayerData implements Record<string, any> {
     this.event = this.event.bind(this);
     this.eventExists = this.eventExists.bind(this);
     this.handleSetData = this.handleSetData.bind(this);
-    this.match = this.match.bind(this);
-    this.matchExists = this.matchExists.bind(this);
     this.seasonalExists = this.seasonalExists.bind(this);
     this.transaction = this.transaction.bind(this);
     this.transactionExists = this.transactionExists.bind(this);
@@ -423,12 +416,6 @@ class PlayerData implements Record<string, any> {
     return this.courses_index
       .filter(this.eventExists)
       .map(this.event) as InternalEvent[];
-  }
-
-  get matchList(): InternalMatch[] {
-    return this.matches_index
-      .filter(this.matchExists)
-      .map(this.match) as InternalMatch[];
   }
 
   get data(): Record<string, any> {
@@ -575,37 +562,6 @@ class PlayerData implements Record<string, any> {
 
     // Return tag for references?
     return this.seasonal_rank;
-  }
-
-  match(id?: string): InternalMatch | undefined {
-    if (!id || !this.matchExists(id)) return undefined;
-    const data = this as Record<string, any>;
-    const matchData = data[id];
-    let preconData = {};
-    if (matchData.playerDeck && matchData.playerDeck.id in db.preconDecks) {
-      preconData = db.preconDecks[matchData.playerDeck.id];
-    }
-    const playerDeck = prettierDeckData({
-      ...defaultDeck,
-      ...preconData,
-      ...matchData.playerDeck
-    });
-    playerDeck.colors = getDeckColors(playerDeck);
-
-    const oppDeck = { ...defaultDeck, ...matchData.oppDeck };
-    oppDeck.colors = getDeckColors(oppDeck);
-
-    return {
-      ...matchData,
-      id,
-      oppDeck,
-      playerDeck,
-      type: "match"
-    };
-  }
-
-  matchExists(id?: string): boolean {
-    return !!id && id in this;
   }
 }
 
