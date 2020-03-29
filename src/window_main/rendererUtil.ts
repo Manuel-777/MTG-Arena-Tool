@@ -49,13 +49,6 @@ export function makeResizable(
     }
   };
 
-  const saveWidth = function(width: number): void {
-    ipcSend("save_user_settings", {
-      right_panel_width: width,
-      skipRefresh: true
-    });
-  };
-
   div.addEventListener(
     "mousedown",
     event => {
@@ -70,7 +63,6 @@ export function makeResizable(
     () => {
       document.removeEventListener("mousemove", resize, false);
       if (finalWidth) {
-        saveWidth(finalWidth);
         if (finalCallback instanceof Function) finalCallback(finalWidth);
         finalWidth = undefined;
       }

@@ -45,6 +45,8 @@ import {
   MatchesTableProps,
   MatchTableData
 } from "./types";
+import { useSelector } from "react-redux";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 
@@ -389,7 +391,9 @@ export default function MatchesTable({
     ...tableControlsProps
   };
   const isTableMode = tableMode === MATCHES_TABLE_MODE;
-  const { right_panel_width: panelWidth } = pd.settings;
+  const panelWidth = useSelector(
+    (state: AppState) => state.settings.right_panel_width
+  );
   const sidePanelWidth = panelWidth + "px";
   return (
     <>

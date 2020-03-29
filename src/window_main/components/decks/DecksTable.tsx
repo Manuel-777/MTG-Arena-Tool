@@ -41,6 +41,8 @@ import DecksArtViewRow from "./DecksArtViewRow";
 import DecksTableControls from "./DecksTableControls";
 import { deckSearchFilterFn } from "./filters";
 import { DecksData, DecksTableControlsProps, DecksTableProps } from "./types";
+import { useSelector } from "react-redux";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 const columns: Column<DecksData>[] = [
   { accessor: "id" },
@@ -316,7 +318,9 @@ export default function DecksTable({
   };
 
   const isTableMode = tableMode === DECKS_TABLE_MODE;
-  const { right_panel_width: panelWidth } = pd.settings;
+  const panelWidth = useSelector(
+    (state: AppState) => state.settings.right_panel_width
+  );
   const sidePanelWidth = panelWidth + "px";
   return (
     <>

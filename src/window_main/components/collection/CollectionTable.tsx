@@ -377,7 +377,9 @@ export default function CollectionTable({
         })}
       </div>
     );
-  const { right_panel_width: panelWidth } = pd.settings;
+  const panelWidth = useSelector(
+    (state: AppState) => state.settings.right_panel_width
+  );
   const sidePanelWidth = panelWidth + "px";
   const clickCompletionCallback = React.useCallback((): void => {
     setTableMode(COLLECTION_SETS_MODE);

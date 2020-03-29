@@ -39,6 +39,8 @@ import {
   EventsTableProps,
   EventTableData
 } from "./types";
+import { useSelector } from "react-redux";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 const columns: Column<EventTableData>[] = [
   { accessor: "id" },
@@ -230,7 +232,9 @@ export default function EventsTable({
     ...tableControlsProps
   };
   const isTableMode = tableMode === EVENTS_TABLE_MODE;
-  const { right_panel_width: panelWidth } = pd.settings;
+  const panelWidth = useSelector(
+    (state: AppState) => state.settings.right_panel_width
+  );
   const sidePanelWidth = panelWidth + "px";
   return (
     <>
