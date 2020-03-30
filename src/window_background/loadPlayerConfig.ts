@@ -48,7 +48,8 @@ function fixBadPlayerData(savedData: any): any {
   // 2020-01-27 @Manwe discovered that some old decks are saved as Deck objects
   // TODO permanently convert them similar to approach used above
   const decks = { ...savedData.decks };
-  for (const deck of savedData.deckList) {
+  Object.keys(decks).map((k: string) => {
+    const deck = decks[k];
     if (!isV2CardsList(deck.mainDeck)) {
       ipcLog("Converting v3 deck: " + deck.id);
       const fixedDeck = convertDeckFromV3((deck as unknown) as ArenaV3Deck);
@@ -56,7 +57,7 @@ function fixBadPlayerData(savedData: any): any {
       // as "Deck" by the isV2CardsList() function, thus de-archiving them.
       decks[deck.id] = { ...fixedDeck, archived: deck.archived };
     }
-  }
+  });
   savedData.decks = decks;
   return savedData;
 }
@@ -108,9 +109,8 @@ export async function loadPlayerConfig(): Promise<void> {
   );
 
   // Get Decks data
-  const decksList: InternalDeck[] = savedData.decks_index
-    .filter((id: string) => savedData[id])
-    .map((id: string) => savedData[id]);
+  const decks = { ...savedData.decks };
+  const decksList = Object.keys(decks).map((k: string) => decks[k]);
 
   reduxAction(
     globals.store.dispatch,
