@@ -11,7 +11,6 @@ import {
   IPC_ALL,
   IPC_BACKGROUND
 } from "../shared/constants";
-import { rememberDefaults } from "../shared/db/databaseUtil";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
 import playerData from "../shared/PlayerData";
 import { getReadableFormat } from "../shared/util";
@@ -120,8 +119,14 @@ ipc.on("start_background", async function() {
 
 function offlineLogin(): void {
   ipcSend("auth", { ok: true, user: -1 });
-  loadPlayerConfig(playerData.arenaId);
-  setData({ userName: "", offline: true });
+  loadPlayerConfig();
+  reduxAction(
+    globals.store.dispatch,
+    "SET_APP_SETTINGS",
+    { email: "" },
+    IPC_ALL ^ IPC_BACKGROUND
+  );
+  reduxAction(globals.store.dispatch, "SET_OFFLINE", true, IPC_RENDERER);
 }
 
 //
@@ -239,8 +244,8 @@ ipc.on("toggle_archived", function(event, arg) {
 });
 
 ipc.on("request_explore", function(event, arg) {
-  if (playerData.userName === "") {
-    ipcSend("offline", 1);
+  if (globals.store.getState().appsettings.email === "") {
+    reduxAction(globals.store.dispatch, "SET_OFFLINE", true, IPC_RENDERER);
   } else {
     httpApi.httpGetExplore(arg);
   }
@@ -251,8 +256,8 @@ ipc.on("request_course", function(event, arg) {
 });
 
 ipc.on("request_home", (event, set) => {
-  if (playerData.userName === "") {
-    ipcSend("offline", 1);
+  if (globals.store.getState().appsettings.email === "") {
+    reduxAction(globals.store.dispatch, "SET_OFFLINE", true, IPC_RENDERER);
   } else {
     httpApi.httpHomeGet(set);
   }
@@ -383,11 +388,6 @@ async function logLoop(): Promise<void> {
   if (!globals.firstPass) {
     ipcSend("log_read", 1);
   }
-  /*
-  if (globals.debugLog) {
-    globals.firstPass = false;
-  }
-*/
 
   const { size } = await mtgaLog.stat(logUri);
 
@@ -413,13 +413,17 @@ async function logLoop(): Promise<void> {
   // Same logic as processLog() but without the processLogData() function
   const rawString = logSegment;
   const splitString = rawString.split("[UnityCrossThread");
-  const parsedData: Record<string, string> = {};
+  const parsedData: Record<string, string | undefined> = {
+    arenaId: undefined,
+    name: undefined,
+    arenaVersion: undefined
+  };
 
   let detailedLogs = true;
   splitString.forEach(value => {
-    //ipcSend("ipc_log", "Async: ("+index+")");
-
-    // Check if logs are disabled
+    // Check if detailed logs / plugin support is disabled
+    // This should be an action rather than a simple popup
+    // Renderer should display a special popup with pretty instructions
     let strCheck = "DETAILED LOGS: DISABLED";
     if (value.includes(strCheck)) {
       ipcSend("popup", {
@@ -443,12 +447,12 @@ async function logLoop(): Promise<void> {
 
     // Get User name
     strCheck = '\\"screenName\\": \\"';
-    if (value.includes(strCheck) && parsedData.name == undefined) {
-      parsedData.name = unleakString(dataChop(value, strCheck, '\\"'));
+    if (value.includes(strCheck) && parsedData.playerName == undefined) {
+      parsedData.playerName = unleakString(dataChop(value, strCheck, '\\"'));
     }
 
     // Get Client Version
-    strCheck = '\\"clientVersion\\": "\\';
+    strCheck = '\\"clientVersion\\": \\"';
     if (value.includes(strCheck) && parsedData.arenaVersion == undefined) {
       parsedData.arenaVersion = unleakString(dataChop(value, strCheck, '\\"'));
     }
@@ -464,20 +468,33 @@ async function logLoop(): Promise<void> {
   for (const key in parsedData) {
     ipcSend("ipc_log", `Initial log parse: ${key}=${parsedData[key]}`);
   }
-  setData(parsedData, false);
 
   prevLogSize = size;
-
-  if (!playerData.arenaId || !playerData.name) {
+  const { arenaId, playerName, arenaVersion } = parsedData;
+  if (!arenaId || !playerName) {
     ipcSend("popup", {
       text: "output_log.txt contains no player data",
       time: 0
     });
     return;
+  } else {
+    reduxAction(globals.store.dispatch, "SET_PLAYER_ID", arenaId, IPC_RENDERER);
+    reduxAction(
+      globals.store.dispatch,
+      "SET_PLAYER_NAME",
+      playerName,
+      IPC_RENDERER
+    );
+    reduxAction(
+      globals.store.dispatch,
+      "SET_ARENA_VERSION",
+      arenaVersion,
+      IPC_RENDERER
+    );
   }
 
   ipcSend("popup", {
-    text: "Found Arena log for " + playerData.name,
+    text: "Found Arena log for " + playerName,
     time: 0
   });
   clearInterval(logLoopInterval);

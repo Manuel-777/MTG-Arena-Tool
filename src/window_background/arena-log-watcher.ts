@@ -8,7 +8,6 @@ import ArenaLogDecoder from "./arena-log-decoder/arena-log-decoder";
 
 import LogEntry from "../types/logDecoder";
 import * as Labels from "./onLabel";
-import playerData from "../shared/PlayerData";
 
 import {
   ipcSend,
@@ -22,8 +21,7 @@ import {
   ARENA_MODE_DRAFT,
   ARENA_MODE_IDLE,
   LOGIN_OK,
-  IPC_RENDERER,
-  IPC_OVERLAY
+  IPC_RENDERER
 } from "../shared/constants";
 import updateDeck from "./updateDeck";
 import globals from "./globals";
@@ -180,6 +178,7 @@ function onLogEntryFound(entry: any): void {
       // sleep
     }
   }
+  const playerData = globals.store.getState().playerdata;
   if (entry.playerId && entry.playerId !== playerData.arenaId) {
     return;
   } else {

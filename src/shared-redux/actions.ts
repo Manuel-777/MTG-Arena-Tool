@@ -1,4 +1,5 @@
 import settingsSlice from "./slices/settingsSlice";
+import playerDataSlice from "./slices/playerDataSlice";
 import appSettingsSlice from "./slices/appSettingsSlice";
 import rendererSlice from "./slices/rendererSlice";
 import hoverSlice from "./slices/hoverSlice";
@@ -52,5 +53,8 @@ actions["SET_MATCH"] = matchesSlice.actions.setMatch;
 actions["SET_MANY_MATCHES"] = matchesSlice.actions.setManyMatches;
 actions["SET_EVENTS"] = eventsSlice.actions.setEvent;
 actions["SET_MANY_EVENTS"] = eventsSlice.actions.setManyEvents;
+actions["SET_PLAYER_ID"] = playerDataSlice.actions.setPlayerId;
+actions["SET_PLAYER_NAME"] = playerDataSlice.actions.setPlayerName;
+actions["SET_ARENA_VERSION"] = playerDataSlice.actions.setArenaVersion;
 
 export default actions;

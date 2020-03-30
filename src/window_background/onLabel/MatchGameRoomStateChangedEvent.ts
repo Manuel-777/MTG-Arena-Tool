@@ -1,7 +1,6 @@
 import { ARENA_MODE_IDLE } from "../../shared/constants";
 import { objectClone } from "../../shared/util";
 
-import playerData from "../../shared/PlayerData";
 import globals from "../globals";
 import { ipcSend, parseWotcTimeFallback } from "../backgroundUtil";
 import LogEntry from "../../types/logDecoder";
@@ -36,8 +35,9 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     if (!globals.currentMatch) {
       let oName = "";
       gameRoom.gameRoomConfig.reservedPlayers.forEach(player => {
+        const playerData = globals.store.getState().playerdata;
         if (!(player.userId === playerData.arenaId)) {
-          oName = player.playerName;
+          oName = playerData.playerName;
         }
       });
 
@@ -71,6 +71,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       processMatch(arg, matchBeginTime);
     }
     gameRoom.gameRoomConfig.reservedPlayers.forEach(player => {
+      const playerData = globals.store.getState().playerdata;
       if (player.userId == playerData.arenaId) {
         globals.currentMatch.player.seat = player.systemSeatId;
       } else {
@@ -99,6 +100,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       gameRoom.finalMatchResult.resultList.length - 1;
 
     const matchEndTime = parseWotcTimeFallback(entry.timestamp);
+    const playerData = globals.store.getState().playerdata;
     saveMatch(
       gameRoom.finalMatchResult.matchId + "-" + playerData.arenaId,
       matchEndTime.getTime()
@@ -107,6 +109,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
   if (json.players) {
     json.players.forEach(function(player) {
+      const playerData = globals.store.getState().playerdata;
       if (player.userId == playerData.arenaId) {
         globals.currentMatch.player.seat = player.systemSeatId;
       } else {

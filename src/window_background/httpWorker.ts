@@ -2,9 +2,10 @@ import qs from "qs";
 import http, { RequestOptions } from "https";
 import { IncomingMessage } from "http";
 
-import playerData from "../shared/PlayerData";
 import globals from "./globals";
-import { ipcSend, setData } from "./backgroundUtil";
+import { ipcSend } from "./backgroundUtil";
+import { reduxAction } from "../shared-redux/sharedRedux";
+import { IPC_RENDERER } from "../shared/constants";
 
 const serverAddress = "mtgatool.com";
 
@@ -116,12 +117,10 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
     "get_database_version"
   ];
   const sendData = globals.store.getState().settings.send_data;
-  if (
-    (!sendData || playerData.offline) &&
-    !nonPrivacyMethods.includes(task.method)
-  ) {
-    if (!playerData.offline) {
-      setData({ offline: true });
+  const offline = globals.store.getState().renderer.offline;
+  if ((!sendData || offline) && !nonPrivacyMethods.includes(task.method)) {
+    if (!offline) {
+      reduxAction(globals.store.dispatch, "SET_OFFLINE", true, IPC_RENDERER);
     }
     const text = `WARNING >> currently offline or settings prohibit sharing > (${task.method})`;
     ipcLog(text);

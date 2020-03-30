@@ -2,6 +2,7 @@
 import { combineReducers } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
 import settingsSlice from "../slices/settingsSlice";
+import playerDataSlice from "../slices/playerDataSlice";
 import appSettingsSlice from "../slices/appSettingsSlice";
 import rendererSlice from "../slices/rendererSlice";
 import hoverSlice from "../slices/hoverSlice";
@@ -14,6 +15,7 @@ import eventsSlice from "../slices/eventsSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
+  playerdata: playerDataSlice.reducer,
   appsettings: appSettingsSlice.reducer,
   renderer: rendererSlice.reducer,
   hover: hoverSlice.reducer,

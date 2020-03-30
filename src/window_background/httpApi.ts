@@ -182,7 +182,7 @@ function handleNotificationsResponse(
 
 export function httpAuth(userName: string, pass: string): void {
   const _id = makeId(6);
-  setData({ userName }, false);
+  const playerData = globals.store.getState().playerdata;
   httpQueue.push(
     {
       reqId: _id,
@@ -191,7 +191,7 @@ export function httpAuth(userName: string, pass: string): void {
       email: userName,
       password: pass,
       playerid: playerData.arenaId,
-      playername: encodeURIComponent(playerData.name),
+      playername: encodeURIComponent(playerData.playerName),
       mtgaversion: playerData.arenaVersion,
       version: electron.remote.app.getVersion()
     },
@@ -231,13 +231,14 @@ function handleAuthResponse(
 
   ipcSend("auth", parsedResult);
   //ipcSend("auth", parsedResult.arenaids);
-  if (globals.store.getState().appsettings.rememberMe) {
+  const appSettings = globals.store.getState().appsettings;
+  if (appSettings.rememberMe) {
     reduxAction(
       globals.store.dispatch,
       "SET_APP_SETTINGS",
       {
         token: parsedResult.token,
-        email: playerData.userName
+        email: appSettings.email
       },
       IPC_ALL ^ IPC_RENDERER
     );
@@ -261,7 +262,7 @@ function handleAuthResponse(
     serverData.seasonal = parsedResult.seasonal;
   }
   setData(data, false);
-  loadPlayerConfig(playerData.arenaId).then(() => {
+  loadPlayerConfig().then(() => {
     ipcLog("...called back to http-api.");
     ipcLog("Checking for sync requests...");
     const requestSync = {

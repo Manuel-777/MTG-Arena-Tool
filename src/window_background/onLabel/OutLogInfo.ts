@@ -2,7 +2,6 @@ import _ from "lodash";
 
 import { ARENA_MODE_IDLE } from "../../shared/constants";
 import db from "../../shared/database";
-import playerData from "../../shared/PlayerData";
 import LogEntry from "../../types/logDecoder";
 import { LogInfo } from "../../types/log";
 import { MatchGameStats } from "../../types/currentMatch";
@@ -59,6 +58,7 @@ export default function OutLogInfo(entry: Entry): void {
     const playerName = getNameBySeat(payload.winningTeamId);
     actionLog(-1, globals.logTime, `${playerName} Wins!`);
 
+    const playerData = globals.store.getState().playerdata;
     const mid = payload.matchId + "-" + playerData.arenaId;
     const time = payload.secondsCount;
     if (mid == globals.currentMatch.matchId) {

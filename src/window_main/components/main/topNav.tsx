@@ -1,6 +1,5 @@
 import _ from "lodash";
 import React from "react";
-import pd from "../../../shared/PlayerData";
 
 import {
   get_rank_index as getRankIndex,
@@ -153,6 +152,7 @@ export function TopNav(): JSX.Element {
     (state: AppState) => state.renderer.patreon.patreon
   );
   const currentTab = useSelector((state: AppState) => state.renderer.topNav);
+  const playerData = useSelector((state: AppState) => state.playerdata);
   const topNavIconsRef: any = React.useRef(null);
   const dispatcher = useDispatch();
   const windowSize = useWindowSize();
@@ -179,7 +179,7 @@ export function TopNav(): JSX.Element {
     dispatcher: dispatcher,
     currentTab: currentTab,
     id: MAIN_CONSTRUCTED,
-    rank: pd.rank ? pd.rank.constructed : null,
+    rank: playerData.rank ? playerData.rank.constructed : null,
     rankClass: "top_constructed_rank"
   };
 
@@ -187,7 +187,7 @@ export function TopNav(): JSX.Element {
     dispatcher: dispatcher,
     currentTab: currentTab,
     id: MAIN_LIMITED,
-    rank: pd.rank ? pd.rank.limited : null,
+    rank: playerData.rank ? playerData.rank.limited : null,
     rankClass: "top_limited_rank"
   };
 
@@ -201,8 +201,8 @@ export function TopNav(): JSX.Element {
     }
   }, [windowSize, compact]);
 
-  const userName = pd.name.slice(0, -6);
-  const userNumerical = pd.name.slice(-6);
+  const userName = playerData.playerName.slice(0, -6);
+  const userNumerical = playerData.playerName.slice(-6);
 
   return (
     <div className="top_nav">

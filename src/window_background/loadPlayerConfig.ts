@@ -62,11 +62,12 @@ async function fixBadPlayerData(): Promise<void> {
 }
 
 // Loads this player's configuration file
-export async function loadPlayerConfig(playerId: string): Promise<void> {
+export async function loadPlayerConfig(): Promise<void> {
+  const { playerId, playerName } = globals.store.getState().playerdata;
   ipcLog("Load player ID: " + playerId);
   ipcPop({ text: "Loading player history...", time: 0, progress: 2 });
-  playerDb.init(playerId, playerData.name);
-  playerDbLegacy.init(playerId, playerData.name);
+  playerDb.init(playerId, playerName);
+  playerDbLegacy.init(playerId, playerName);
   setData({ playerDbPath: playerDb.filePath }, false);
   ipcLog("Player database: " + playerDb.filePath);
 

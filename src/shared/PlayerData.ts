@@ -301,8 +301,6 @@ function prettierDeckData(deckData: InternalDeck): InternalDeck {
 class PlayerData implements Record<string, any> {
   private static instance?: PlayerData = undefined;
 
-  public arenaVersion = "";
-  public userName = "";
   public cards: {
     cards_time: number;
     cards_before: Record<string, number>;
@@ -315,18 +313,12 @@ class PlayerData implements Record<string, any> {
   public tags_colors: Record<string, string> = {};
   public decks: Record<string, InternalDeck> = {};
   public decks_tags: Record<string, string[]> = {};
-  public name = "";
-  public arenaId = "";
-  public rank: InternalRank = defaultCfg.rank;
   public economy = defaultCfg.economy;
   public seasonal: Record<string, InternalRankUpdate> = {};
   public seasonal_rank: Record<string, any> = {};
   public deck_changes_index: string[] = [];
   public economy_index: string[] = [];
   public draft_index: string[] = [];
-  public offline = false;
-  public patreon = false;
-  public patreon_tier = -1;
 
   public last_log_timestamp = "";
   public last_log_format = "";

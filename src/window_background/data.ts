@@ -3,7 +3,6 @@ import _ from "lodash";
 import { DEFAULT_TILE } from "../shared/constants";
 import database from "../shared/database";
 import Deck from "../shared/deck";
-import playerData from "../shared/PlayerData";
 import { objectClone } from "../shared/util";
 import { MatchData, matchDataDefault } from "../types/currentMatch";
 import { InternalMatch } from "../types/match";
@@ -38,6 +37,8 @@ export function createMatch(
   match.opponent.cards = [];
 
   match.eventId = json.eventId;
+
+  const playerData = globals.store.getState().playerdata;
   match.matchId = json.matchId + "-" + playerData.arenaId;
   match.gameStage = "";
 
@@ -101,7 +102,7 @@ export function completeMatch(
   if (matchData.eventId === "AIBotMatch") return;
 
   const mode = matchIsLimited(matchData) ? "limited" : "constructed";
-
+  const playerData = globals.store.getState().playerdata;
   const [playerWins, opponentWins, draws] = matchResults(matchData);
 
   match.onThePlay = matchData.onThePlay;
@@ -120,7 +121,7 @@ export function completeMatch(
   };
 
   match.player = {
-    name: playerData.name,
+    name: playerData.playerName,
     rank: playerData.rank[mode].rank,
     tier: playerData.rank[mode].tier,
     step: playerData.rank[mode].step,
