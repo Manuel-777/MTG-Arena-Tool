@@ -2,7 +2,6 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { TableState } from "react-table";
 import db from "../../shared/database";
-import pd from "../../shared/PlayerData";
 import { getReadableEvent } from "../../shared/util";
 import { EventInstanceData, InternalEvent } from "../../types/event";
 import Aggregator, { AggregatorFilters } from "../aggregator";
@@ -42,7 +41,8 @@ function getValidMatchId(rawMatchId?: string): string | undefined {
   if (matchExists(rawMatchId || "")) {
     return rawMatchId;
   }
-  const newStyleMatchId = `${rawMatchId}-${pd.arenaId}`;
+  const playerData = store.getState().playerdata;
+  const newStyleMatchId = `${rawMatchId}-${playerData.arenaId}`;
   if (matchExists(newStyleMatchId)) {
     return newStyleMatchId;
   }

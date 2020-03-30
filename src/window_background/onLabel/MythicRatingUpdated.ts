@@ -1,7 +1,7 @@
 import db from "../../shared/database";
 import { playerDb } from "../../shared/db/LocalDatabase";
 
-import playerData from "../../shared/PlayerData";
+import pd from "../../shared/PlayerData";
 import globals from "../globals";
 import { parseWotcTimeFallback, setData } from "../backgroundUtil";
 
@@ -43,12 +43,13 @@ export default function MythicRatingUpdated(entry: Entry): void {
     type = "limited";
   }
 
+  const playerData = globals.store.getState().playerdata;
   const rank: InternalRank = { ...playerData.rank };
 
   rank.constructed.percentile = newJson.newMythicPercentile;
   rank.constructed.leaderboardPlace = newJson.newMythicLeaderboardPlacement;
 
-  const seasonalRank = playerData.addSeasonalRank(
+  const seasonalRank = pd.addSeasonalRank(
     newJson,
     rank.constructed.seasonOrdinal,
     type

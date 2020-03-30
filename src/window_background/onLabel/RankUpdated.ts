@@ -1,5 +1,5 @@
 import { playerDb } from "../../shared/db/LocalDatabase";
-import playerData from "../../shared/PlayerData";
+import pd from "../../shared/PlayerData";
 import globals from "../globals";
 import { setData } from "../backgroundUtil";
 import LogEntry from "../../types/logDecoder";
@@ -22,18 +22,21 @@ export default function RankUpdated(entry: Entry): void {
     eventId: globals.currentMatch.eventId
   };
 
+  const playerData = globals.store.getState().playerdata;
   const rank = { ...playerData.rank };
 
   // newJson.wasLossProtected
   // newJson.seasonOrdinal
-  const updateType = newJson.rankUpdateType.toLowerCase();
+  const updateType = newJson.rankUpdateType.toLowerCase() as
+    | "constructed"
+    | "limited";
 
   rank[updateType].rank = newJson.newClass;
   rank[updateType].tier = newJson.newLevel;
   rank[updateType].step = newJson.newStep;
   rank[updateType].seasonOrdinal = newJson.seasonOrdinal;
 
-  const seasonalRank = playerData.addSeasonalRank(
+  const seasonalRank = pd.addSeasonalRank(
     newJson,
     newJson.seasonOrdinal,
     updateType

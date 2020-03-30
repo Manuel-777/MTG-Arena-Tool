@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
 import { remote } from "electron";
-import pd from "../../../shared/PlayerData";
 import Button from "../misc/Button";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import store from "../../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../../shared-redux/stores/rendererStore";
 import { IPC_BACKGROUND } from "../../../shared/constants";
+import { useSelector } from "react-redux";
 
 function click(): void {
   const clearAppSettings = {
@@ -26,9 +26,10 @@ function click(): void {
 }
 
 export default function SectionLogin(): JSX.Element {
+  const offline = useSelector((state: AppState) => state.renderer.offline);
   return (
     <div className="about">
-      <Button text={pd.offline ? "Login" : "Logout"} onClick={click} />
+      <Button text={offline ? "Login" : "Logout"} onClick={click} />
     </div>
   );
 }

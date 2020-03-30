@@ -1,8 +1,9 @@
 import React from "react";
 import { DATE_SEASON, RANKS } from "../../../shared/constants";
-import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { formatPercent } from "../../rendererUtil";
+import store from "../../../shared-redux/stores/rendererStore";
+import globals from "../../../window_background/globals";
 
 const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 
@@ -15,7 +16,8 @@ function getNextRank(currentRank: string): undefined | string {
 }
 
 function getStepsUntilNextRank(mode: boolean, winrate: number): string {
-  const rr = mode ? pd.rank.limited : pd.rank.constructed;
+  const playerData = globals.store.getState().playerdata;
+  const rr = mode ? playerData.rank.limited : playerData.rank.constructed;
 
   const cr = rr.rank;
   const cs = rr.step;
@@ -68,6 +70,7 @@ export default function RankedStats({
 }): JSX.Element {
   if (!aggregator.stats?.total) return <></>;
   const { winrate } = aggregator.stats;
+  const playerData = store.getState().playerdata;
   const seasonName = !isLimited ? "constructed" : "limited";
   const switchSeasonName = isLimited ? "constructed" : "limited";
   const switchSeasonFilters: AggregatorFilters = {
@@ -76,8 +79,8 @@ export default function RankedStats({
     eventId: isLimited ? RANKED_CONST : RANKED_DRAFT
   };
   const currentRank = isLimited
-    ? pd.rank.limited.rank
-    : pd.rank.constructed.rank;
+    ? playerData.rank.limited.rank
+    : playerData.rank.constructed.rank;
   const expected = getStepsUntilNextRank(isLimited, winrate);
   return (
     <>

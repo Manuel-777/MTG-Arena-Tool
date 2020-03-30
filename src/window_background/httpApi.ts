@@ -6,7 +6,7 @@ import async from "async";
 import { makeId } from "../shared/util";
 import playerData from "../shared/PlayerData";
 import db from "../shared/database";
-import { appDb, playerDb } from "../shared/db/LocalDatabase";
+import { playerDb } from "../shared/db/LocalDatabase";
 
 import { ipcSend, setData } from "./backgroundUtil";
 import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
@@ -291,6 +291,8 @@ export function httpSubmitCourse(course: any): void {
     course.PlayerId = "000000000000000";
     course.PlayerName = "Anonymous";
   }
+
+  const playerData = globals.store.getState().playerdata;
   course.playerRank = playerData.rank.limited.rank;
   course = JSON.stringify(course);
   httpQueue.push(
