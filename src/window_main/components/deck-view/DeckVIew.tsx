@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { InternalDeck, CardObject } from "../../../types/Deck";
-import pd from "../../../shared/PlayerData";
 import ManaCost from "../misc/ManaCost";
 import { MANA_COLORS, IPC_NONE } from "../../../shared/constants";
 import DeckList from "../misc/DeckList";
@@ -17,6 +16,7 @@ import { getCardImage } from "../../../shared/util";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
+import { getDeck } from "../../../shared-store";
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;
@@ -411,7 +411,7 @@ export default function openDeckSub(
   deckId: string,
   deck: InternalDeck | null = null
 ): JSX.Element {
-  const decklist = deck ?? pd.deck(deckId);
+  const decklist = deck ?? getDeck(deckId);
   if (!decklist) return <div>{deckId}</div>;
   return <DeckView deck={decklist} />;
 }

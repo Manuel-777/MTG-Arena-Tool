@@ -6,6 +6,10 @@ import { playerDb } from "../../shared/db/LocalDatabase";
 import playerData from "../../shared/PlayerData";
 import { setData } from "../backgroundUtil";
 import { ArenaV3Deck } from "../../types/Deck";
+import { getDeck } from "../../shared-store";
+import { IPC_RENDERER } from "../../shared/constants";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import globals from "../globals";
 
 interface Entry extends LogEntry {
   json: () => ArenaV3Deck;
@@ -31,7 +35,7 @@ export default function InDeckUpdateDeckV3(entry: Entry): void {
   if (!json) return;
 
   const entryDeck = convertDeckFromV3(json);
-  const _deck = playerData.deck(json.id) as InternalDeck;
+  const _deck = getDeck(json.id) as InternalDeck;
 
   const changeId = entry.hash;
   const deltaDeck: Changes = {
@@ -116,8 +120,6 @@ export default function InDeckUpdateDeckV3(entry: Entry): void {
     });
   }
 
-  const deckData = { ..._deck, ...entryDeck };
-  const decks = { ...playerData.decks, [entryDeck.id ?? ""]: deckData };
-  playerDb.upsert("decks", entryDeck.id ?? "", deckData);
-  setData({ decks });
+  const deckData = { ..._deck, ...entryDeck, id: entryDeck.id ?? "" };
+  reduxAction(globals.store.dispatch, "SET_DECK", deckData, IPC_RENDERER);
 }

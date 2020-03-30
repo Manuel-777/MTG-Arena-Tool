@@ -3,6 +3,7 @@ import db from "../../../shared/database";
 import pd from "../../../shared/PlayerData";
 import { getMissingCardCounts } from "../../../shared/util";
 import Deck from "../../../shared/deck";
+import { decksList } from "../../../shared-store";
 
 export const ALL_CARDS = "All cards";
 export const SINGLETONS = "Singletons (at least one)";
@@ -112,7 +113,7 @@ export function getCollectionStats(
   cardIds: (string | number)[]
 ): CollectionStats {
   const wantedCards: { [key: string]: number } = {};
-  pd.deckList
+  decksList()
     .filter(deck => deck && !deck.archived)
     .forEach(deck => {
       const missing = getMissingCardCounts(new Deck(deck));

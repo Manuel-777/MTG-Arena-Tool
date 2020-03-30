@@ -4,6 +4,9 @@ import { DEFAULT_TILE } from "../shared/constants";
 import { prettierDeckData } from "../shared/util";
 import db from "../shared/database";
 import { InternalEvent } from "../types/event";
+import { InternalDeck } from "../types/Deck";
+import isValid from "date-fns/isValid";
+import parseISO from "date-fns/parseISO";
 
 const defaultDeck = JSON.parse(
   '{"deckTileId":' +
@@ -13,7 +16,8 @@ const defaultDeck = JSON.parse(
 
 const globalStore = {
   matches: {} as Record<string, InternalMatch>,
-  events: {} as Record<string, InternalEvent>
+  events: {} as Record<string, InternalEvent>,
+  decks: {} as Record<string, InternalDeck>
 };
 
 //
@@ -76,6 +80,45 @@ export function eventExists(id: string): boolean {
 export function eventsList(): InternalEvent[] {
   return Object.keys(globalStore.events).map(
     (key: string) => globalStore.events[key]
+  );
+}
+
+//
+// Decks utility functions
+//
+export function getDeck(id: string): InternalDeck | undefined {
+  if (!id || !globalStore.decks[id]) return undefined;
+  const preconData = db.preconDecks[id] || {};
+  const deckData = {
+    ...preconData,
+    ...globalStore.decks[id],
+    colors: getDeckColors(globalStore.decks[id])
+    //custom: !static_decks.includes(id),
+    //tags: decks_tags[id] || []
+  };
+  // lastUpdated does not specify timezone but implicitly occurs at UTC
+  // attempt to add UTC timezone to lastUpdated iff result would be valid
+  if (
+    deckData.lastUpdated &&
+    !deckData.lastUpdated.includes("Z") &&
+    isValid(parseISO(deckData.lastUpdated + "Z"))
+  ) {
+    deckData.lastUpdated = deckData.lastUpdated + "Z";
+  }
+  return prettierDeckData(deckData);
+}
+
+export function getDeckName(deckId: string): string {
+  return globalStore.decks[deckId]?.name ?? deckId;
+}
+
+export function deckExists(id: string): boolean {
+  return globalStore.decks[id] ? true : false;
+}
+
+export function decksList(): InternalDeck[] {
+  return Object.keys(globalStore.decks).map(
+    (key: string) => globalStore.decks[key]
   );
 }
 

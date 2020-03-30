@@ -19,6 +19,7 @@ import { CardCounts } from "../components/decks/types";
 import Deck from "../../shared/deck";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import store from "../../shared-redux/stores/rendererStore";
+import { decksList } from "../../shared-store";
 
 const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
@@ -97,7 +98,7 @@ function saveTableMode(collectionTableMode: string): void {
 
 function getCollectionData(): CardsData[] {
   const wantedCards: CardCounts = {};
-  pd.deckList
+  decksList()
     .filter(deck => deck && !deck.archived)
     .forEach(deck => {
       const missing = getMissingCardCounts(new Deck(deck));

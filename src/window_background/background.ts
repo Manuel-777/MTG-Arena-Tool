@@ -33,7 +33,7 @@ import {
   initializeRendererReduxIPC,
   reduxAction
 } from "../shared-redux/sharedRedux";
-import { getMatch } from "../shared-store";
+import { getMatch, deckExists, getDeck } from "../shared-store";
 
 initializeRendererReduxIPC(globals.store);
 
@@ -210,7 +210,7 @@ ipc.on("delete_data", function() {
 ipc.on("import_custom_deck", function(event, arg) {
   const data = JSON.parse(arg);
   const id = data.id;
-  if (!id || playerData.deckExists(id)) return;
+  if (!id || deckExists(id)) return;
   const deckData = {
     ...createDeck(),
     ...data
@@ -221,13 +221,11 @@ ipc.on("import_custom_deck", function(event, arg) {
 //
 ipc.on("toggle_deck_archived", function(event, arg) {
   const id = arg;
-  const deck = playerData.deck(id);
+  const deck = getDeck(id);
   if (!deck) return;
-  const deckData: InternalDeck = { ...deck };
-  deckData.archived = !deckData.archived;
-  const decks = { ...playerData.decks, [id]: deckData };
+  const deckData: InternalDeck = { ...deck, archived: !deck.archived };
 
-  setData({ decks });
+  reduxAction(globals.store.dispatch, "SET_DECK", deckData, IPC_RENDERER);
   playerDb.upsert("decks", id, deckData);
 });
 
@@ -273,7 +271,7 @@ ipc.on("edit_tag", (event, arg) => {
 
 ipc.on("delete_tag", (event, arg) => {
   const { deckid, tag } = arg;
-  const deck = playerData.deck(deckid);
+  const deck = getDeck(deckid);
   if (!deck || !tag) return;
   if (!deck.tags || !deck.tags.includes(tag)) return;
 
@@ -287,7 +285,7 @@ ipc.on("delete_tag", (event, arg) => {
 
 ipc.on("add_tag", (event, arg) => {
   const { deckid, tag } = arg;
-  const deck = playerData.deck(deckid);
+  const deck = getDeck(deckid);
   if (!deck || !tag) return;
   if (getReadableFormat(deck.format) === tag) return;
   if (deck.tags && deck.tags.includes(tag)) return;

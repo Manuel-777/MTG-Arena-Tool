@@ -1,33 +1,25 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import isValid from "date-fns/isValid";
-import parseISO from "date-fns/parseISO";
+
 import { remote } from "electron";
 import _ from "lodash";
-import { InternalDeck } from "../types/Deck";
 import { InternalDraft } from "../types/draft";
 import { InternalEconomyTransaction } from "../types/inventory";
-import { InternalRank, InternalRankUpdate } from "../types/rank";
+import { InternalRankUpdate } from "../types/rank";
 import {
-  BLACK,
-  BLUE,
   CARD_TILE_FLAT,
   COLLECTION_CARD_MODE,
   DATE_LAST_30,
   DECKS_ART_MODE,
   ECONOMY_LIST_MODE,
   EVENTS_LIST_MODE,
-  GREEN,
   MATCHES_LIST_MODE,
   OVERLAY_DRAFT,
   OVERLAY_FULL,
   OVERLAY_LEFT,
   OVERLAY_LOG,
   OVERLAY_SEEN,
-  RED,
-  WHITE,
   MAIN_HOME
 } from "./constants";
-import db from "./database";
 
 export const playerDataDefault = {
   name: "",
@@ -216,88 +208,6 @@ export const defaultCfg = {
   tags_colors: {}
 };
 
-// Cannot use Deck/ColorList classes because it would cause circular dependency
-// tweaked for heavy use in PlayerData/Aggregator
-function getDeckColors(deck: InternalDeck): number[] {
-  if (deck.colors && deck.colors instanceof Array) {
-    // if field exists, assume it was correctly pre-computed by latest code
-    return deck.colors;
-  }
-
-  const colorSet = new Set<number>();
-
-  deck.mainDeck.forEach((card: { id: number; quantity: number }) => {
-    if (card.quantity < 1) {
-      return;
-    }
-
-    const cardData = db.card(card.id);
-
-    if (!cardData) {
-      return;
-    }
-
-    const isLand = cardData.type.indexOf("Land") !== -1;
-    const frame = cardData.frame;
-    if (isLand && frame.length < 3) {
-      frame.forEach((colorIndex: number) => colorSet.add(colorIndex));
-    }
-    // TODO this does not work with multi-color symbols
-    cardData.cost.forEach((cost: string) => {
-      if (cost === "w") {
-        colorSet.add(WHITE);
-      } else if (cost === "u") {
-        colorSet.add(BLUE);
-      } else if (cost === "b") {
-        colorSet.add(BLACK);
-      } else if (cost === "r") {
-        colorSet.add(RED);
-      } else if (cost === "g") {
-        colorSet.add(GREEN);
-      }
-    });
-  });
-
-  const colorIndices = [...colorSet];
-  colorIndices.sort();
-  return colorIndices;
-}
-
-function prettierDeckData(deckData: InternalDeck): InternalDeck {
-  // many precon descriptions are total garbage
-  // manually update them with generic descriptions
-  const prettyDescriptions: Record<string, string> = {
-    "Decks/Precon/Precon_EPP_BG_Desc": "Golgari Swarm",
-    "Decks/Precon/Precon_EPP_BR_Desc": "Cult of Rakdos",
-    "Decks/Precon/Precon_EPP_GU_Desc": "Simic Combine",
-    "Decks/Precon/Precon_EPP_GW_Desc": "Selesnya Conclave",
-    "Decks/Precon/Precon_EPP_RG_Desc": "Gruul Clans",
-    "Decks/Precon/Precon_EPP_RW_Desc": "Boros Legion",
-    "Decks/Precon/Precon_EPP_UB_Desc": "House Dimir",
-    "Decks/Precon/Precon_EPP_UR_Desc": "Izzet League",
-    "Decks/Precon/Precon_EPP_WB_Desc": "Orzhov Syndicate",
-    "Decks/Precon/Precon_EPP_WU_Desc": "Azorius Senate",
-    "Decks/Precon/Precon_July_B": "Out for Blood",
-    "Decks/Precon/Precon_July_U": "Azure Skies",
-    "Decks/Precon/Precon_July_G": "Forest's Might",
-    "Decks/Precon/Precon_July_R": "Dome Destruction",
-    "Decks/Precon/Precon_July_W": "Angelic Army",
-    "Decks/Precon/Precon_Brawl_Alela": "Alela, Artful Provocateur",
-    "Decks/Precon/Precon_Brawl_Chulane": "Chulane, Teller of Tales",
-    "Decks/Precon/Precon_Brawl_Korvold": "Korvold, Fae-Cursed King",
-    "Decks/Precon/Precon_Brawl_SyrGwyn": "Syr Gwyn, Hero of Ashvale"
-  };
-  if (deckData.description in prettyDescriptions) {
-    deckData.description = prettyDescriptions[deckData.description];
-  }
-  if (deckData.name.includes("?=?Loc")) {
-    // precon deck names are garbage address locators
-    // mask them with description instead
-    deckData.name = deckData.description || "Preconstructed Deck";
-  }
-  return deckData;
-}
-
 class PlayerData implements Record<string, any> {
   private static instance?: PlayerData = undefined;
 
@@ -308,15 +218,14 @@ class PlayerData implements Record<string, any> {
   } = defaultCfg.cards;
   public cardsNew: Record<string, number> = {};
   public deck_changes: Record<string, any> = {};
+  public decks_tags: Record<string, string[]> = {};
+  public deck_changes_index: string[] = [];
   public static_decks: string[] = [];
   public static_events: string[] = [];
   public tags_colors: Record<string, string> = {};
-  public decks: Record<string, InternalDeck> = {};
-  public decks_tags: Record<string, string[]> = {};
   public economy = defaultCfg.economy;
   public seasonal: Record<string, InternalRankUpdate> = {};
   public seasonal_rank: Record<string, any> = {};
-  public deck_changes_index: string[] = [];
   public economy_index: string[] = [];
   public draft_index: string[] = [];
 
@@ -329,10 +238,8 @@ class PlayerData implements Record<string, any> {
   constructor() {
     if (PlayerData.instance) return PlayerData.instance;
 
-    this.deck = this.deck.bind(this);
     this.deckChangeExists = this.deckChangeExists.bind(this);
     this.deckChanges = this.deckChanges.bind(this);
-    this.deckExists = this.deckExists.bind(this);
     this.draft = this.draft.bind(this);
     this.draftExists = this.draftExists.bind(this);
     this.seasonalExists = this.seasonalExists.bind(this);
@@ -350,10 +257,6 @@ class PlayerData implements Record<string, any> {
     return this.economy_index
       .filter(this.transactionExists)
       .map(this.transaction) as InternalEconomyTransaction[];
-  }
-
-  get deckList(): InternalDeck[] {
-    return Object.keys(this.decks).map(this.deck) as InternalDeck[];
   }
 
   get draftList(): any[] {
@@ -401,34 +304,8 @@ class PlayerData implements Record<string, any> {
     return !!id && id in this.deck_changes;
   }
 
-  deck(id?: string): InternalDeck | undefined {
-    if (!id || !this.deckExists(id)) return undefined;
-    const preconData = db.preconDecks[id] || {};
-    const deckData = {
-      ...preconData,
-      ...this.decks[id],
-      colors: getDeckColors(this.decks[id]),
-      custom: !this.static_decks.includes(id),
-      tags: this.decks_tags[id] || []
-    };
-    // lastUpdated does not specify timezone but implicitly occurs at UTC
-    // attempt to add UTC timezone to lastUpdated iff result would be valid
-    if (
-      deckData.lastUpdated &&
-      !deckData.lastUpdated.includes("Z") &&
-      isValid(parseISO(deckData.lastUpdated + "Z"))
-    ) {
-      deckData.lastUpdated = deckData.lastUpdated + "Z";
-    }
-    return prettierDeckData(deckData);
-  }
-
-  deckExists(id?: string): boolean {
-    return !!id && id in this.decks;
-  }
-
   deckChanges(id?: string): any[] {
-    if (!this.deckExists(id)) return [];
+    //if (!this.deckExists(id)) return [];
     return this.deck_changes_index
       .map(id => this.deck_changes[id])
       .filter(change => change && change.deckId === id);

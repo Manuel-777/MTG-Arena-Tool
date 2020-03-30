@@ -9,6 +9,7 @@ import collectionSlice from "./slices/collectionSlice";
 import exploreSlice from "./slices/exploreSlice";
 import matchesSlice from "./slices/matchesSlice";
 import eventsSlice from "./slices/eventsSlice";
+import decksSlice from "./slices/decksSlice";
 
 const actions: Record<string, (arg: any) => any> = {};
 actions["SET_SETTINGS"] = settingsSlice.actions.setSettings;
@@ -57,5 +58,7 @@ actions["SET_PLAYER_ID"] = playerDataSlice.actions.setPlayerId;
 actions["SET_PLAYER_NAME"] = playerDataSlice.actions.setPlayerName;
 actions["SET_ARENA_VERSION"] = playerDataSlice.actions.setArenaVersion;
 actions["SET_RANK"] = playerDataSlice.actions.setRank;
+actions["SET_DECK"] = decksSlice.actions.setDeck;
+actions["SET_MANY_DECKS"] = decksSlice.actions.setManyDecks;
 
 export default actions;

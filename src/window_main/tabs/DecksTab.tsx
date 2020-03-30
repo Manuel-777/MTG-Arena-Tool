@@ -9,7 +9,6 @@ import {
   IPC_RENDERER
 } from "../../shared/constants";
 import Deck from "../../shared/deck";
-import pd from "../../shared/PlayerData";
 import {
   getBoosterCountEstimate,
   getReadableFormat,
@@ -29,9 +28,10 @@ import { ipcSend } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import store from "../../shared-redux/stores/rendererStore";
+import { getDeck, decksList } from "../../shared-store";
 
 function addTag(deckid: string, tag: string): void {
-  const deck = pd.deck(deckid);
+  const deck = getDeck(deckid);
   if (!deck || !tag) return;
   if (getReadableFormat(deck.format) === tag) return;
   if (tag === "Add") return;
@@ -44,7 +44,7 @@ function editTag(tag: string, color: string): void {
 }
 
 function deleteTag(deckid: string, tag: string): void {
-  const deck = pd.deck(deckid);
+  const deck = getDeck(deckid);
   if (!deck || !tag) return;
   if (!deck.tags || !deck.tags.includes(tag)) return;
   ipcSend("delete_tag", { deckid, tag });
@@ -76,7 +76,7 @@ function getDecksData(
   aggregator: Aggregator,
   archivedCache: Record<string, boolean>
 ): DecksData[] {
-  return pd.deckList.map(
+  return decksList().map(
     (deck: InternalDeck): DecksData => {
       const id = deck.id ?? "";
       const name = (deck.name ?? "").replace("?=?Loc/Decks/Precon/", "");

@@ -2,9 +2,8 @@
   Not used / deprecated?
 */
 import React from "react";
-import { getRecentDeckName } from "../shared/util";
-import pd from "../shared/PlayerData";
 import { COLORS_ALL } from "../shared/constants";
+import { getDeckName, deckExists } from "../shared-store";
 
 export interface DeckOptionDeck {
   colors?: number[];
@@ -20,10 +19,8 @@ export interface DeckOptionProps {
 export default function DeckOption(props: DeckOptionProps): JSX.Element {
   const { deckId, deck } = props;
 
-  const deckExists = pd.deckExists(deckId);
-
-  const deckName: string = deckExists
-    ? getRecentDeckName(deckId)
+  const deckName: string = deckExists(deckId)
+    ? getDeckName(deckId)
     : deck.name || "";
   let maxChars = 10;
   if (deckExists && deck.colors) {

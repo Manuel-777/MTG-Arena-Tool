@@ -1,5 +1,4 @@
 import { shell } from "electron";
-import _ from "lodash";
 import {
   IPC_BACKGROUND,
   IPC_OVERLAY,
@@ -11,7 +10,7 @@ import globals from "./globals";
 
 import { playerDb, playerDbLegacy } from "../shared/db/LocalDatabase";
 import playerData from "../shared/PlayerData";
-import { isV2CardsList, ArenaV3Deck } from "../types/Deck";
+import { isV2CardsList, ArenaV3Deck, InternalDeck } from "../types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
 import convertDeckFromV3 from "./convertDeckFromV3";
 import { reduxAction } from "../shared-redux/sharedRedux";
@@ -43,22 +42,23 @@ export function syncSettings(
   }
 }
 
-async function fixBadPlayerData(): Promise<void> {
+function fixBadPlayerData(savedData: any): any {
   // 2020-01-17 discovered with @Thaoden that some old draft decks might be v3
   // probably caused by a bad label handler that was temporarily on stable
-  const decks = { ...playerData.decks };
-  for (const deck of playerData.deckList) {
+  // 2020-01-27 @Manwe discovered that some old decks are saved as Deck objects
+  // TODO permanently convert them similar to approach used above
+  const decks = { ...savedData.decks };
+  for (const deck of savedData.deckList) {
     if (!isV2CardsList(deck.mainDeck)) {
       ipcLog("Converting v3 deck: " + deck.id);
       const fixedDeck = convertDeckFromV3((deck as unknown) as ArenaV3Deck);
+      // 2020-02-29 discovered by user Soil'n'Rock that empty decks were considered
+      // as "Deck" by the isV2CardsList() function, thus de-archiving them.
       decks[deck.id] = { ...fixedDeck, archived: deck.archived };
-      await playerDb.upsert("decks", deck.id, fixedDeck);
     }
   }
-
-  // 2020-01-27 @Manwe discovered that some old decks are saved as Deck objects
-  // TODO permanently convert them similar to approach used above
-  setData({ decks }, false);
+  savedData.decks = decks;
+  return savedData;
 }
 
 // Loads this player's configuration file
@@ -72,7 +72,8 @@ export async function loadPlayerConfig(): Promise<void> {
   ipcLog("Player database: " + playerDb.filePath);
 
   ipcLog("Finding all documents in player database...");
-  const savedData = await playerDb.findAll();
+  let savedData = await playerDb.findAll();
+  savedData = fixBadPlayerData(savedData);
   console.log(savedData);
   const { settings } = savedData;
 
@@ -106,9 +107,20 @@ export async function loadPlayerConfig(): Promise<void> {
     IPC_RENDERER
   );
 
+  // Get Decks data
+  const decksList: InternalDeck[] = savedData.decks_index
+    .filter((id: string) => savedData[id])
+    .map((id: string) => savedData[id]);
+
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_DECKS",
+    decksList,
+    IPC_RENDERER
+  );
+
   // Other
   setData(savedData, true);
-  await fixBadPlayerData();
   ipcSend("renderer_set_bounds", savedData.windowBounds);
   syncSettings(settings, true);
 

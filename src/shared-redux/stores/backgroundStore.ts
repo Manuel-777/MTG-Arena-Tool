@@ -5,6 +5,7 @@ import settingsSlice from "../slices/settingsSlice";
 import appSettingsSlice from "../slices/appSettingsSlice";
 import matchesSlice from "../slices/matchesSlice";
 import eventsSlice from "../slices/eventsSlice";
+import decksSlice from "../slices/decksSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
   appsettings: appSettingsSlice.reducer,
   renderer: rendererSlice.reducer,
   matches: matchesSlice.reducer,
-  events: eventsSlice.reducer
+  events: eventsSlice.reducer,
+  decks: decksSlice.reducer
 });
 
 const store = configureStore({
