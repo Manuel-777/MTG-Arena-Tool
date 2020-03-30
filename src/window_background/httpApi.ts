@@ -19,7 +19,7 @@ import {
   makeSimpleResponseHandler
 } from "./httpWorker";
 import globals from "./globals";
-import {
+import globalStore, {
   matchExists,
   eventExists,
   transactionExists,
@@ -27,6 +27,7 @@ import {
 } from "../shared-store";
 import { IPC_RENDERER, IPC_ALL } from "../shared/constants";
 import { reduxAction } from "../shared-redux/sharedRedux";
+import { InternalRankUpdate } from "../types/rank";
 
 let httpQueue: async.AsyncQueue<HttpTask>;
 
@@ -126,32 +127,36 @@ function syncUserData(data: any): void {
   playerDb.upsert("", "draft_index", draft_index);
 
   // Sync seasonal
-  data.seasonal.forEach((doc: any) => {
+  const seasonalAdd = data.seasonal.map((doc: any) => {
     const id = doc._id;
     doc.id = id;
     delete doc._id;
-
-    const seasonal_rank = playerData.addSeasonalRank(
-      doc,
-      doc.seasonOrdinal,
-      doc.rankUpdateType
-    );
-    setData({ seasonal_rank });
-
-    const seasonal = { ...playerData.seasonal, [id]: doc };
-    setData({ seasonal });
-
     playerDb.upsert("seasonal", id, doc);
-    playerDb.upsert("", "seasonal_rank", seasonal_rank);
+    return doc;
   });
+  const newSeasonalRank: Record<string, string[]> = {
+    ...globals.store.getState().seasonal.seasonal
+  };
+  seasonalAdd.map((update: InternalRankUpdate) => {
+    const season = `${update.rankUpdateType.toLowerCase()}_${
+      update.seasonOrdinal
+    }`;
+    newSeasonalRank[season] = [...(newSeasonalRank[season] || []), update.id];
+  });
+  playerDb.upsert("", "seasonal_rank", newSeasonalRank);
+
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_SEASONAL",
+    seasonalAdd,
+    IPC_RENDERER
+  );
 
   if (data.settings.tags_colors) {
     const newTags = data.settings.tags_colors;
     setData({ tags_colors: { ...newTags } });
     playerDb.upsert("", "tags_colors", newTags);
   }
-
-  setData({ courses_index, draft_index, economy_index, matches_index });
 }
 
 export function httpNotificationsPull(): void {
@@ -289,11 +294,13 @@ function handleAuthResponse(
     ipcLog("...called back to http-api.");
     ipcLog("Checking for sync requests...");
     const requestSync = {
-      courses: serverData.courses.filter(id => !(id in playerData)),
-      matches: serverData.matches.filter(id => !(id in playerData)),
-      drafts: serverData.drafts.filter(id => !(id in playerData)),
-      economy: serverData.economy.filter(id => !(id in playerData)),
-      seasonal: serverData.seasonal.filter(id => !(id in playerData.seasonal))
+      courses: serverData.courses.filter(id => !(id in globalStore.events)),
+      matches: serverData.matches.filter(id => !(id in globalStore.matches)),
+      drafts: serverData.drafts.filter(id => !(id in globalStore.drafts)),
+      economy: serverData.economy.filter(
+        id => !(id in globalStore.transactions)
+      ),
+      seasonal: serverData.seasonal.filter(id => !(id in globalStore.seasonal))
     };
 
     if (requestSync) {

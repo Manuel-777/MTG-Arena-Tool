@@ -9,7 +9,7 @@ import selectDeck from "../selectDeck";
 import convertDeckFromV3 from "../convertDeckFromV3";
 import { eventExists, getEvent } from "../../shared-store";
 import { reduxAction } from "../../shared-redux/sharedRedux";
-import { IPC_ALL, IPC_BACKGROUND } from "../../shared/constants";
+import { IPC_RENDERER } from "../../shared/constants";
 
 interface Entry extends LogEntry {
   json: () => PlayerCourse;
@@ -27,12 +27,7 @@ function saveCourse(json: InternalEvent): void {
   };
 
   if (!eventExists(id)) {
-    reduxAction(
-      globals.store.dispatch,
-      "SET_EVENT",
-      eventData,
-      IPC_ALL ^ IPC_BACKGROUND
-    );
+    reduxAction(globals.store.dispatch, "SET_EVENT", eventData, IPC_RENDERER);
     const coursesIndex = [...globals.store.getState().events.eventsIndex, id];
     playerDb.upsert("", "courses_index", coursesIndex);
   }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { remote } from "electron";
-import { InternalRankUpdate } from "../types/rank";
+
 import {
   CARD_TILE_FLAT,
   COLLECTION_CARD_MODE,
@@ -205,8 +205,6 @@ class PlayerData implements Record<string, any> {
   public static_events: string[] = [];
   public tags_colors: Record<string, string> = {};
   public economy = defaultCfg.economy;
-  public seasonal: Record<string, InternalRankUpdate> = {};
-  public seasonal_rank: Record<string, any> = {};
 
   public last_log_timestamp = "";
   public last_log_format = "";
@@ -219,7 +217,6 @@ class PlayerData implements Record<string, any> {
 
     this.deckChangeExists = this.deckChangeExists.bind(this);
     this.deckChanges = this.deckChanges.bind(this);
-    this.seasonalExists = this.seasonalExists.bind(this);
 
     PlayerData.instance = this;
   }
@@ -255,12 +252,9 @@ class PlayerData implements Record<string, any> {
       .filter(change => change && change.deckId === id);
   }
 
-  seasonalExists(id?: string): boolean {
-    return !!id && id in this.seasonal;
-  }
-
   // I was not sure weter it was correct to include this here or in the
   // utilities file. here its easier to handle the data.
+  /*
   addSeasonalRank(
     rank: InternalRankUpdate,
     seasonOrdinal: any,
@@ -275,8 +269,6 @@ class PlayerData implements Record<string, any> {
       this.seasonal_rank[seasonTag] = [];
     }
 
-    // Check if this entry exists in the season data.
-    //console.log("id: " + rank.id, this.seasonalExists(rank.id));
     if (!this.seasonalExists(rank.id)) {
       this.seasonal_rank[seasonTag].push(rank.id);
       this.seasonal[rank.id] = rank;
@@ -285,6 +277,7 @@ class PlayerData implements Record<string, any> {
     // Return tag for references?
     return this.seasonal_rank;
   }
+  */
 }
 
 const playerData = new PlayerData();

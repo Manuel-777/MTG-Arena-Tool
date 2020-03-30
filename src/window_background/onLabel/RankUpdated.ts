@@ -1,7 +1,5 @@
 import { playerDb } from "../../shared/db/LocalDatabase";
-import pd from "../../shared/PlayerData";
 import globals from "../globals";
-import { setData } from "../backgroundUtil";
 import LogEntry from "../../types/logDecoder";
 import { RankUpdate, InternalRankUpdate } from "../../types/rank";
 import { IPC_RENDERER } from "../../shared/constants";
@@ -38,17 +36,21 @@ export default function RankUpdated(entry: Entry): void {
   rank[updateType].step = newJson.newStep;
   rank[updateType].seasonOrdinal = newJson.seasonOrdinal;
 
-  const seasonalRank = pd.addSeasonalRank(
-    newJson,
-    newJson.seasonOrdinal,
-    updateType
-  );
+  // Rank update / seasonal
+  reduxAction(globals.store.dispatch, "SET_SEASONAL", newJson, IPC_RENDERER);
+  const newSeasonalRank: Record<string, string[]> = {
+    ...globals.store.getState().seasonal.seasonal
+  };
+  const season = `${newJson.rankUpdateType.toLowerCase()}_${
+    newJson.seasonOrdinal
+  }`;
+  newSeasonalRank[season] = [...(newSeasonalRank[season] || []), newJson.id];
+  playerDb.upsert("", "seasonal_rank", newSeasonalRank);
 
   const httpApi = require("../httpApi");
   httpApi.httpSetSeasonal(newJson);
 
+  // New rank data
   reduxAction(globals.store.dispatch, "SET_RANK", rank, IPC_RENDERER);
-  setData({ seasonalRank });
   playerDb.upsert("", "rank", rank);
-  playerDb.upsert("", "seasonal_rank", seasonalRank);
 }

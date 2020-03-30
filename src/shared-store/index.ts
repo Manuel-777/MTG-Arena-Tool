@@ -7,6 +7,7 @@ import { InternalEvent } from "../types/event";
 import { InternalDeck } from "../types/Deck";
 import { InternalEconomyTransaction } from "../types/inventory";
 import { InternalDraft } from "../types/draft";
+import { InternalRankUpdate } from "../types/rank";
 
 import isValid from "date-fns/isValid";
 import parseISO from "date-fns/parseISO";
@@ -23,7 +24,8 @@ const globalStore = {
   decks: {} as Record<string, InternalDeck>,
   staticDecks: [] as string[],
   transactions: {} as Record<string, InternalEconomyTransaction>,
-  drafts: {} as Record<string, InternalDraft>
+  drafts: {} as Record<string, InternalDraft>,
+  seasonal: {} as Record<string, InternalRankUpdate>
 };
 
 //
@@ -170,6 +172,28 @@ export function draftsList(): InternalDraft[] {
   return Object.keys(globalStore.drafts).map(
     (key: string) => globalStore.drafts[key]
   );
+}
+
+//
+// Seasonal utility functions
+//
+export function getSeasonal(id: string): InternalRankUpdate | undefined {
+  if (!id || !globalStore.seasonal[id]) return undefined;
+  return globalStore.seasonal[id];
+}
+
+export function seasonalExists(id: string): boolean {
+  return globalStore.seasonal[id] ? true : false;
+}
+
+export function seasonalList(ids: string[] = []): InternalRankUpdate[] {
+  if (ids.length == 0) {
+    return Object.keys(globalStore.seasonal).map(
+      (key: string) => globalStore.seasonal[key]
+    );
+  } else {
+    return ids.map(id => globalStore.seasonal[id]).filter(update => update);
+  }
 }
 
 export default globalStore;

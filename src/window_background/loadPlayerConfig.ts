@@ -18,6 +18,7 @@ import { InternalMatch } from "../types/match";
 import store from "../shared-redux/stores/backgroundStore";
 import { InternalEvent } from "../types/event";
 import { InternalEconomyTransaction } from "../types/inventory";
+import { InternalRankUpdate } from "../types/rank";
 
 const ipcLog = (message: string): void => ipcSend("ipc_log", message);
 const ipcPop = (args: {
@@ -123,7 +124,10 @@ export async function loadPlayerConfig(): Promise<void> {
   // Get Economy data
   const economyList: InternalEconomyTransaction[] = savedData.economy_index
     .filter((id: string) => savedData[id])
-    .map((id: string) => savedData[id]);
+    .map((id: string) => {
+      savedData[id].date = new Date(savedData[id].date).toString();
+      return savedData[id];
+    });
 
   reduxAction(
     globals.store.dispatch,
@@ -141,6 +145,14 @@ export async function loadPlayerConfig(): Promise<void> {
     globals.store.dispatch,
     "SET_MANY_DRAFT",
     draftsList,
+    IPC_RENDERER
+  );
+
+  // Get Seasonal data
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_SEASONAL",
+    savedData.seasonal,
     IPC_RENDERER
   );
 

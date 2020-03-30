@@ -8,6 +8,7 @@ import economySlice from "../slices/economySlice";
 import eventsSlice from "../slices/eventsSlice";
 import decksSlice from "../slices/decksSlice";
 import draftsSlice from "../slices/draftsSlice";
+import seasonalSlice from "../slices/seasonalSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
@@ -18,7 +19,8 @@ const rootReducer = combineReducers({
   economy: economySlice.reducer,
   events: eventsSlice.reducer,
   decks: decksSlice.reducer,
-  drafts: draftsSlice.reducer
+  drafts: draftsSlice.reducer,
+  seasonal: seasonalSlice.reducer
 });
 
 const store = configureStore({

@@ -1,9 +1,8 @@
 import db from "../../shared/database";
 import { playerDb } from "../../shared/db/LocalDatabase";
 
-import pd from "../../shared/PlayerData";
 import globals from "../globals";
-import { parseWotcTimeFallback, setData } from "../backgroundUtil";
+import { parseWotcTimeFallback } from "../backgroundUtil";
 
 import LogEntry from "../../types/logDecoder";
 import { InternalRank, RankUpdate } from "../../types/rank";
@@ -51,14 +50,18 @@ export default function MythicRatingUpdated(entry: Entry): void {
   rank.constructed.percentile = newJson.newMythicPercentile;
   rank.constructed.leaderboardPlace = newJson.newMythicLeaderboardPlacement;
 
-  const seasonalRank = pd.addSeasonalRank(
-    newJson,
-    rank.constructed.seasonOrdinal,
-    type
-  );
+  // Rank update / seasonal
+  reduxAction(globals.store.dispatch, "SET_SEASONAL", newJson, IPC_RENDERER);
+  const newSeasonalRank: Record<string, string[]> = {
+    ...globals.store.getState().seasonal.seasonal
+  };
+  const season = `${newJson.rankUpdateType.toLowerCase()}_${
+    newJson.seasonOrdinal
+  }`;
+  newSeasonalRank[season] = [...(newSeasonalRank[season] || []), newJson.id];
+  playerDb.upsert("", "seasonal_rank", newSeasonalRank);
 
+  // New rank data
   reduxAction(globals.store.dispatch, "SET_RANK", rank, IPC_RENDERER);
-  setData({ seasonalRank });
   playerDb.upsert("", "rank", rank);
-  playerDb.upsert("", "seasonal_rank", seasonalRank);
 }
