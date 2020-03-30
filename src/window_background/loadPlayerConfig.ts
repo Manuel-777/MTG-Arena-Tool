@@ -76,6 +76,9 @@ export async function loadPlayerConfig(): Promise<void> {
   console.log(savedData);
   const { settings } = savedData;
 
+  // Get Rank data
+  reduxAction(globals.store.dispatch, "SET_RANK", savedData.rank, IPC_RENDERER);
+
   // Get Matches data
   const matchesList: InternalMatch[] = savedData.matches_index
     .filter((id: string) => savedData[id])

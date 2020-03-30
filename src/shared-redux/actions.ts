@@ -56,5 +56,6 @@ actions["SET_MANY_EVENTS"] = eventsSlice.actions.setManyEvents;
 actions["SET_PLAYER_ID"] = playerDataSlice.actions.setPlayerId;
 actions["SET_PLAYER_NAME"] = playerDataSlice.actions.setPlayerName;
 actions["SET_ARENA_VERSION"] = playerDataSlice.actions.setArenaVersion;
+actions["SET_RANK"] = playerDataSlice.actions.setRank;
 
 export default actions;

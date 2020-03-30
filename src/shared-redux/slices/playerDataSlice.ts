@@ -41,6 +41,9 @@ const playerDataSlice = createSlice({
     },
     setArenaVersion: (state, action): void => {
       state.arenaVersion = action.payload;
+    },
+    setRank: (state, action): void => {
+      state.rank = action.payload;
     }
   }
 });

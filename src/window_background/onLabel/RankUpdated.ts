@@ -4,6 +4,8 @@ import globals from "../globals";
 import { setData } from "../backgroundUtil";
 import LogEntry from "../../types/logDecoder";
 import { RankUpdate, InternalRankUpdate } from "../../types/rank";
+import { IPC_RENDERER } from "../../shared/constants";
+import { reduxAction } from "../../shared-redux/sharedRedux";
 
 interface Entry extends LogEntry {
   json: () => RankUpdate;
@@ -45,7 +47,8 @@ export default function RankUpdated(entry: Entry): void {
   const httpApi = require("../httpApi");
   httpApi.httpSetSeasonal(newJson);
 
-  setData({ rank, seasonalRank });
+  reduxAction(globals.store.dispatch, "SET_RANK", rank, IPC_RENDERER);
+  setData({ seasonalRank });
   playerDb.upsert("", "rank", rank);
   playerDb.upsert("", "seasonal_rank", seasonalRank);
 }

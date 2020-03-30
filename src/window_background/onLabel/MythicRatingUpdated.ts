@@ -7,6 +7,8 @@ import { parseWotcTimeFallback, setData } from "../backgroundUtil";
 
 import LogEntry from "../../types/logDecoder";
 import { InternalRank, RankUpdate } from "../../types/rank";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import { IPC_RENDERER } from "../../shared/constants";
 
 interface Entry extends LogEntry {
   json: () => RankUpdate;
@@ -55,7 +57,8 @@ export default function MythicRatingUpdated(entry: Entry): void {
     type
   );
 
-  setData({ rank, seasonalRank });
+  reduxAction(globals.store.dispatch, "SET_RANK", rank, IPC_RENDERER);
+  setData({ seasonalRank });
   playerDb.upsert("", "rank", rank);
   playerDb.upsert("", "seasonal_rank", seasonalRank);
 }
