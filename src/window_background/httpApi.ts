@@ -19,7 +19,7 @@ import {
   makeSimpleResponseHandler
 } from "./httpWorker";
 import globals from "./globals";
-import { matchExists, eventExists } from "../shared-store";
+import { matchExists, eventExists, transactionExists } from "../shared-store";
 import { IPC_RENDERER, IPC_ALL } from "../shared/constants";
 import { reduxAction } from "../shared-redux/sharedRedux";
 
@@ -42,23 +42,29 @@ function syncUserData(data: any): void {
   // console.log(data);
   // Sync Events
   const courses_index = [...globals.store.getState().events.eventsIndex];
-  data.courses
+  const coursesList = data.courses
     .filter((doc: any) => !eventExists(doc._id))
-    .forEach((doc: any) => {
+    .map((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
-      courses_index.push(id);
       playerDb.upsert("", id, doc);
-      setData({ [id]: doc }, false);
+      courses_index.push(id);
+      return doc;
     });
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_EVENTS",
+    coursesList,
+    IPC_RENDERER
+  );
   playerDb.upsert("", "courses_index", courses_index);
 
   // Sync Matches (updated)
   const matches_index = [...globals.store.getState().matches.matchesIndex];
   const matchesList = data.matches
     .filter((doc: any) => !matchExists(doc._id))
-    .forEach((doc: any) => {
+    .map((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
@@ -75,31 +81,45 @@ function syncUserData(data: any): void {
   playerDb.upsert("", "matches_index", matches_index);
 
   // Sync Economy
-  const economy_index = [...playerData.economy_index];
-  data.economy
-    .filter((doc: any) => !playerData.transactionExists(doc._id))
-    .forEach((doc: any) => {
+  const economy_index = [...globals.store.getState().economy.economyIndex];
+  const transactionsList = data.economy
+    .filter((doc: any) => !transactionExists(doc._id))
+    .map((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
-      economy_index.push(id);
       playerDb.upsert("", id, doc);
-      setData({ [id]: doc }, false);
+      economy_index.push(id);
+      return doc;
     });
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_ECONOMY",
+    transactionsList,
+    IPC_RENDERER
+  );
   playerDb.upsert("", "economy_index", economy_index);
 
   // Sync Drafts
   const draft_index = [...playerData.draft_index];
-  data.drafts
+  const draftsList = data.drafts
     .filter((doc: any) => !playerData.draftExists(doc._id))
-    .forEach((doc: any) => {
+    .map((doc: any) => {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
-      draft_index.push(id);
       playerDb.upsert("", id, doc);
-      setData({ [id]: doc }, false);
+      draft_index.push(id);
+      return doc;
     });
+  /*
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_DRAFTS",
+    draftsList,
+    IPC_RENDERER
+  );
+  */
   playerDb.upsert("", "draft_index", draft_index);
 
   // Sync seasonal

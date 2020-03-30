@@ -11,6 +11,7 @@ import homeSlice from "../slices/homeSlice";
 import collectionSlice from "../slices/collectionSlice";
 import exploreSlice from "../slices/exploreSlice";
 import matchesSlice from "../slices/matchesSlice";
+import economySlice from "../slices/economySlice";
 import eventsSlice from "../slices/eventsSlice";
 import decksSlice from "../slices/decksSlice";
 
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   collection: collectionSlice.reducer,
   explore: exploreSlice.reducer,
   matches: matchesSlice.reducer,
+  economy: economySlice.reducer,
   events: eventsSlice.reducer,
   decks: decksSlice.reducer
 });

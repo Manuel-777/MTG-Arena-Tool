@@ -4,6 +4,7 @@ import playerDataSlice from "../slices/playerDataSlice";
 import settingsSlice from "../slices/settingsSlice";
 import appSettingsSlice from "../slices/appSettingsSlice";
 import matchesSlice from "../slices/matchesSlice";
+import economySlice from "../slices/economySlice";
 import eventsSlice from "../slices/eventsSlice";
 import decksSlice from "../slices/decksSlice";
 
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   appsettings: appSettingsSlice.reducer,
   renderer: rendererSlice.reducer,
   matches: matchesSlice.reducer,
+  economy: economySlice.reducer,
   events: eventsSlice.reducer,
   decks: decksSlice.reducer
 });

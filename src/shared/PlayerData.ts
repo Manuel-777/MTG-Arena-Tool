@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-
 import { remote } from "electron";
-import _ from "lodash";
 import { InternalDraft } from "../types/draft";
-import { InternalEconomyTransaction } from "../types/inventory";
 import { InternalRankUpdate } from "../types/rank";
 import {
   CARD_TILE_FLAT,
@@ -211,7 +208,6 @@ class PlayerData implements Record<string, any> {
   public economy = defaultCfg.economy;
   public seasonal: Record<string, InternalRankUpdate> = {};
   public seasonal_rank: Record<string, any> = {};
-  public economy_index: string[] = [];
   public draft_index: string[] = [];
 
   public last_log_timestamp = "";
@@ -228,16 +224,8 @@ class PlayerData implements Record<string, any> {
     this.draft = this.draft.bind(this);
     this.draftExists = this.draftExists.bind(this);
     this.seasonalExists = this.seasonalExists.bind(this);
-    this.transaction = this.transaction.bind(this);
-    this.transactionExists = this.transactionExists.bind(this);
 
     PlayerData.instance = this;
-  }
-
-  get transactionList(): InternalEconomyTransaction[] {
-    return this.economy_index
-      .filter(this.transactionExists)
-      .map(this.transaction) as InternalEconomyTransaction[];
   }
 
   get draftList(): any[] {
@@ -262,22 +250,6 @@ class PlayerData implements Record<string, any> {
     });
 
     return data;
-  }
-
-  transaction(id?: string): InternalEconomyTransaction | undefined {
-    if (!id || !this.transactionExists(id)) return undefined;
-    const data = this as Record<string, any>;
-    const txnData = data[id];
-    return {
-      ...txnData,
-      // Some old data stores the raw original context in ".originalContext"
-      // All NEW data stores this in ".context" and ".originalContext" is blank.
-      originalContext: txnData.originalContext ?? txnData.context
-    };
-  }
-
-  transactionExists(id?: string): boolean {
-    return !!id && id in this;
   }
 
   deckChangeExists(id?: string): boolean {

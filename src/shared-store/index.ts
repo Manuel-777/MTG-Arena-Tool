@@ -5,6 +5,7 @@ import { prettierDeckData } from "../shared/util";
 import db from "../shared/database";
 import { InternalEvent } from "../types/event";
 import { InternalDeck } from "../types/Deck";
+import { InternalEconomyTransaction } from "../types/inventory";
 import isValid from "date-fns/isValid";
 import parseISO from "date-fns/parseISO";
 
@@ -18,7 +19,8 @@ const globalStore = {
   matches: {} as Record<string, InternalMatch>,
   events: {} as Record<string, InternalEvent>,
   decks: {} as Record<string, InternalDeck>,
-  staticDecks: [] as string[]
+  staticDecks: [] as string[],
+  transactions: {} as Record<string, InternalEconomyTransaction>
 };
 
 //
@@ -120,6 +122,32 @@ export function deckExists(id: string): boolean {
 export function decksList(): InternalDeck[] {
   return Object.keys(globalStore.decks).map(
     (key: string) => globalStore.decks[key]
+  );
+}
+
+//
+// Economy utility functions
+//
+export function getTransaction(
+  id: string
+): InternalEconomyTransaction | undefined {
+  if (!id || !globalStore.transactions[id]) return undefined;
+  const txnData = globalStore.transactions[id];
+  return {
+    ...txnData,
+    // Some old data stores the raw original context in ".originalContext"
+    // All NEW data stores this in ".context" and ".originalContext" is blank.
+    originalContext: txnData.originalContext ?? txnData.context
+  };
+}
+
+export function transactionExists(id: string): boolean {
+  return globalStore.transactions[id] ? true : false;
+}
+
+export function transactionsList(): InternalEconomyTransaction[] {
+  return Object.keys(globalStore.transactions).map(
+    (key: string) => globalStore.transactions[key]
   );
 }
 

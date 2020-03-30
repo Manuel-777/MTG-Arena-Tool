@@ -3,7 +3,6 @@ import isValid from "date-fns/isValid";
 import React from "react";
 import { useSelector } from "react-redux";
 import { TableState } from "react-table";
-import pd from "../../shared/PlayerData";
 import store, { AppState } from "../../shared-redux/stores/rendererStore";
 import { InternalEconomyTransaction } from "../../types/inventory";
 import EconomyTable from "../components/economy/EconomyTable";
@@ -12,6 +11,7 @@ import { TransactionData } from "../components/economy/types";
 import { toggleArchived } from "../rendererUtil";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import { IPC_ALL, IPC_RENDERER } from "../../shared/constants";
+import { transactionsList } from "../../shared-store";
 
 function saveTableState(economyTableState: TableState<TransactionData>): void {
   reduxAction(
@@ -40,7 +40,7 @@ const sumBoosterCount = (boosters: { count: number }[]): number =>
 
 function getTxnData(archivedCache: Record<string, boolean>): TransactionData[] {
   const today = new Date();
-  return pd.transactionList.map(
+  return transactionsList().map(
     (txn: InternalEconomyTransaction): TransactionData => {
       const ts = new Date(txn.date ?? NaN);
       const archived = archivedCache[txn.id] ?? txn.archived ?? false;
