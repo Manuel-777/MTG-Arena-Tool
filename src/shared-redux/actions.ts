@@ -60,5 +60,6 @@ actions["SET_ARENA_VERSION"] = playerDataSlice.actions.setArenaVersion;
 actions["SET_RANK"] = playerDataSlice.actions.setRank;
 actions["SET_DECK"] = decksSlice.actions.setDeck;
 actions["SET_MANY_DECKS"] = decksSlice.actions.setManyDecks;
+actions["SET_MANY_STATIC_DECKS"] = decksSlice.actions.setManyStaticDecks;
 
 export default actions;

@@ -21,20 +21,6 @@ import {
   MAIN_HOME
 } from "./constants";
 
-export const playerDataDefault = {
-  name: "",
-  userName: "",
-  arenaId: "",
-  arenaVersion: "",
-  offline: false,
-  patreon: false,
-  patreon_tier: -1,
-  last_log_timestamp: null,
-  last_log_format: "",
-  appDbPath: "",
-  playerDbPath: ""
-};
-
 const overlayCfg = {
   alpha: 1,
   alpha_back: 1,
@@ -220,7 +206,6 @@ class PlayerData implements Record<string, any> {
   public deck_changes: Record<string, any> = {};
   public decks_tags: Record<string, string[]> = {};
   public deck_changes_index: string[] = [];
-  public static_decks: string[] = [];
   public static_events: string[] = [];
   public tags_colors: Record<string, string> = {};
   public economy = defaultCfg.economy;
@@ -246,10 +231,6 @@ class PlayerData implements Record<string, any> {
     this.transaction = this.transaction.bind(this);
     this.transactionExists = this.transactionExists.bind(this);
 
-    Object.assign(this, {
-      ...playerDataDefault,
-      ...defaultCfg
-    });
     PlayerData.instance = this;
   }
 
@@ -266,7 +247,6 @@ class PlayerData implements Record<string, any> {
   get data(): Record<string, any> {
     const data: Record<string, any> = {};
     const blacklistKeys = [
-      ...Object.keys(playerDataDefault),
       "defaultCfg",
       "gems_history",
       "gold_history",

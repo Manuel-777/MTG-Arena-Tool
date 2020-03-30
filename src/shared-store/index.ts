@@ -17,7 +17,8 @@ const defaultDeck = JSON.parse(
 const globalStore = {
   matches: {} as Record<string, InternalMatch>,
   events: {} as Record<string, InternalEvent>,
-  decks: {} as Record<string, InternalDeck>
+  decks: {} as Record<string, InternalDeck>,
+  staticDecks: [] as string[]
 };
 
 //
@@ -92,8 +93,8 @@ export function getDeck(id: string): InternalDeck | undefined {
   const deckData = {
     ...preconData,
     ...globalStore.decks[id],
-    colors: getDeckColors(globalStore.decks[id])
-    //custom: !static_decks.includes(id),
+    colors: getDeckColors(globalStore.decks[id]),
+    custom: !globalStore.staticDecks.includes(id)
     //tags: decks_tags[id] || []
   };
   // lastUpdated does not specify timezone but implicitly occurs at UTC

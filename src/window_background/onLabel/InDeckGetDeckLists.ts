@@ -18,11 +18,15 @@ export default function InDeckGetDeckLists(
   if (json.length == 0) return;
 
   const decks: InternalDeck[] = [];
-  const staticDecks: any[] = [];
   json.forEach(deck => {
     const deckData = { ...(getDeck(deck.id) || {}), ...deck };
     decks.push(convertDeckFromV3(deckData));
   });
 
-  reduxAction(globals.store.dispatch, "SET_MANY_DECKS", decks, IPC_RENDERER);
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_STATIC_DECKS",
+    decks,
+    IPC_RENDERER
+  );
 }
