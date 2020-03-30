@@ -20,7 +20,9 @@ const getRarityKey = (
 
 export default function WildcardsCost(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
-  const playerEconomy = useSelector((state: AppState) => state.playerdata.economy);
+  const playerEconomy = useSelector(
+    (state: AppState) => state.playerdata.economy
+  );
   const missingWildcards = getDeckMissing(deck);
   const totalMissing =
     missingWildcards.common +

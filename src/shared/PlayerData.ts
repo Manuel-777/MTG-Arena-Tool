@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { remote } from "electron";
-import { InternalDraft } from "../types/draft";
 import { InternalRankUpdate } from "../types/rank";
 import {
   CARD_TILE_FLAT,
@@ -208,7 +207,6 @@ class PlayerData implements Record<string, any> {
   public economy = defaultCfg.economy;
   public seasonal: Record<string, InternalRankUpdate> = {};
   public seasonal_rank: Record<string, any> = {};
-  public draft_index: string[] = [];
 
   public last_log_timestamp = "";
   public last_log_format = "";
@@ -221,15 +219,9 @@ class PlayerData implements Record<string, any> {
 
     this.deckChangeExists = this.deckChangeExists.bind(this);
     this.deckChanges = this.deckChanges.bind(this);
-    this.draft = this.draft.bind(this);
-    this.draftExists = this.draftExists.bind(this);
     this.seasonalExists = this.seasonalExists.bind(this);
 
     PlayerData.instance = this;
-  }
-
-  get draftList(): any[] {
-    return this.draft_index.filter(this.draftExists).map(this.draft);
   }
 
   get data(): Record<string, any> {
@@ -261,17 +253,6 @@ class PlayerData implements Record<string, any> {
     return this.deck_changes_index
       .map(id => this.deck_changes[id])
       .filter(change => change && change.deckId === id);
-  }
-
-  draft(id?: string): InternalDraft | undefined {
-    if (!id || !this.draftExists(id)) return undefined;
-    const data = this as Record<string, any>;
-    const draftData = data[id];
-    return { ...draftData, type: "draft" };
-  }
-
-  draftExists(id?: string): boolean {
-    return !!id && this.draft_index.includes(id) && id in this;
   }
 
   seasonalExists(id?: string): boolean {

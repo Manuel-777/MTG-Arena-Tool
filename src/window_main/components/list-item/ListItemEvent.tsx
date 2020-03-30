@@ -3,7 +3,6 @@ import { TableViewRowProps } from "../tables/types";
 import { EventTableData } from "../events/types";
 import ManaCost from "../misc/ManaCost";
 import db from "../../../shared/database";
-import pd from "../../../shared/PlayerData";
 
 import {
   ListItem,
@@ -30,13 +29,13 @@ import { InternalMatch } from "../../../types/match";
 import { InternalDraft } from "../../../types/draft";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { getMatch } from "../../../shared-store";
+import { getMatch, draftExists, getDraft } from "../../../shared-store";
 
 function DraftRares({ event }: { event: EventTableData }): JSX.Element {
   const draftId = event.id + "-draft";
   let draftRares: JSX.Element[] = [];
-  if (pd.draftExists(draftId)) {
-    const draft = pd.draft(draftId);
+  if (draftExists(draftId)) {
+    const draft = getDraft(draftId);
     if (draft) {
       const pool = [...draft.CardPool];
       draftRares = pool
@@ -201,7 +200,7 @@ function EventSubRows({
       return compareDesc(new Date(a.date), new Date(b.date));
     });
 
-    initialDraft.current = pd.draft(draftId);
+    initialDraft.current = getDraft(draftId);
     return matchRows;
   }, [draftId, event.stats.matchIds, expanded, initialDraft]);
 

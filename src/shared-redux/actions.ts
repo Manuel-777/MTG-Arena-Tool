@@ -11,6 +11,7 @@ import matchesSlice from "./slices/matchesSlice";
 import eventsSlice from "./slices/eventsSlice";
 import decksSlice from "./slices/decksSlice";
 import economySlice from "./slices/economySlice";
+import draftsSlice from "./slices/draftsSlice";
 
 const actions: Record<string, (arg: any) => any> = {};
 actions["SET_SETTINGS"] = settingsSlice.actions.setSettings;
@@ -65,5 +66,7 @@ actions["SET_MANY_DECKS"] = decksSlice.actions.setManyDecks;
 actions["SET_MANY_STATIC_DECKS"] = decksSlice.actions.setManyStaticDecks;
 actions["SET_ECONOMY"] = economySlice.actions.setEconomy;
 actions["SET_MANY_ECONOMY"] = economySlice.actions.setManyEconomy;
+actions["SET_DRAFT"] = draftsSlice.actions.setDraft;
+actions["SET_MANY_DRAFT"] = draftsSlice.actions.setManyDrafts;
 
 export default actions;

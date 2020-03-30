@@ -1,9 +1,9 @@
-import { IPC_OVERLAY } from "../../shared/constants";
+import { IPC_OVERLAY, IPC_RENDERER } from "../../shared/constants";
 import { playerDb } from "../../shared/db/LocalDatabase";
-import playerData from "../../shared/PlayerData";
-import { ipcSend, setData } from "../backgroundUtil";
+import { ipcSend } from "../backgroundUtil";
 import { InternalDraft } from "../../types/draft";
 import globals from "../globals";
+import { reduxAction } from "../../shared-redux/sharedRedux";
 
 export default function setDraftData(
   data: InternalDraft,
@@ -18,17 +18,19 @@ export default function setDraftData(
     const { id } = data;
 
     // Add to indexes
-    if (!playerData.draft_index.includes(id)) {
-      const draftIndex = [...playerData.draft_index, id];
+    let draftIndex = globals.store.getState().drafts.draftsIndex;
+    if (!draftIndex.includes(id)) {
+      draftIndex = [...draftIndex, id];
       playerDb.upsert("", "draft_index", draftIndex);
-      setData({ draft_index: draftIndex }, false);
+      reduxAction(globals.store.dispatch, "SET_DRAFT", data, IPC_RENDERER);
     }
     // Add to db
+    /*
     setData({
-      [id]: data,
       cards: playerData.cards,
       cardsNew: playerData.cardsNew
     });
+    */
     playerDb.upsert("", id, data);
   } else if (persist) {
     console.log("Couldnt save draft without id:", data);

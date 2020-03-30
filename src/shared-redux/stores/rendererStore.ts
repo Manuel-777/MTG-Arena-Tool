@@ -14,6 +14,7 @@ import matchesSlice from "../slices/matchesSlice";
 import economySlice from "../slices/economySlice";
 import eventsSlice from "../slices/eventsSlice";
 import decksSlice from "../slices/decksSlice";
+import draftsSlice from "../slices/draftsSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
@@ -28,7 +29,8 @@ const rootReducer = combineReducers({
   matches: matchesSlice.reducer,
   economy: economySlice.reducer,
   events: eventsSlice.reducer,
-  decks: decksSlice.reducer
+  decks: decksSlice.reducer,
+  drafts: draftsSlice.reducer
 });
 
 const store = configureStore({

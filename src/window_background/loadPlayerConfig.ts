@@ -132,14 +132,26 @@ export async function loadPlayerConfig(): Promise<void> {
     IPC_RENDERER
   );
 
+  // Get Drafts data
+  const draftsList: InternalEconomyTransaction[] = savedData.draft_index
+    .filter((id: string) => savedData[id])
+    .map((id: string) => savedData[id]);
+
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_DRAFT",
+    draftsList,
+    IPC_RENDERER
+  );
+
   // Other
   setData(savedData, true);
   ipcSend("renderer_set_bounds", savedData.windowBounds);
   syncSettings(settings, true);
 
   // populate draft overlays with last draft if possible
-  if (playerData.draftList.length) {
-    const lastDraft = playerData.draftList[playerData.draftList.length - 1];
+  if (draftsList.length) {
+    const lastDraft = draftsList[draftsList.length - 1];
     ipcSend("set_draft_cards", lastDraft, IPC_OVERLAY);
   }
 

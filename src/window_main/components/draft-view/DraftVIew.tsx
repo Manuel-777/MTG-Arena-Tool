@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import pd from "../../../shared/PlayerData";
 import Slider, { SliderPosition } from "../misc/Slider";
 import DeckList from "../misc/DeckList";
 import Deck from "../../../shared/deck";
@@ -11,6 +10,7 @@ import uxMove from "../../uxMove";
 import db from "../../../shared/database";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
+import { getDraft } from "../../../shared-store";
 
 interface PickPack {
   pack: number;
@@ -202,7 +202,7 @@ export function DraftView(props: DraftViewProps): JSX.Element {
 }
 
 export default function openDraftSub(draftId: string): JSX.Element {
-  const draft = pd.draft(draftId);
+  const draft = getDraft(draftId);
   if (!draft) return <div>{draftId}</div>;
   return <DraftView draft={draft} />;
 }

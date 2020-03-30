@@ -19,7 +19,12 @@ import {
   makeSimpleResponseHandler
 } from "./httpWorker";
 import globals from "./globals";
-import { matchExists, eventExists, transactionExists } from "../shared-store";
+import {
+  matchExists,
+  eventExists,
+  transactionExists,
+  draftExists
+} from "../shared-store";
 import { IPC_RENDERER, IPC_ALL } from "../shared/constants";
 import { reduxAction } from "../shared-redux/sharedRedux";
 
@@ -101,9 +106,9 @@ function syncUserData(data: any): void {
   playerDb.upsert("", "economy_index", economy_index);
 
   // Sync Drafts
-  const draft_index = [...playerData.draft_index];
+  const draft_index = [...globals.store.getState().drafts.draftsIndex];
   const draftsList = data.drafts
-    .filter((doc: any) => !playerData.draftExists(doc._id))
+    .filter((doc: any) => !draftExists(doc._id))
     .map((doc: any) => {
       const id = doc._id;
       doc.id = id;
@@ -112,14 +117,12 @@ function syncUserData(data: any): void {
       draft_index.push(id);
       return doc;
     });
-  /*
   reduxAction(
     globals.store.dispatch,
     "SET_MANY_DRAFTS",
     draftsList,
     IPC_RENDERER
   );
-  */
   playerDb.upsert("", "draft_index", draft_index);
 
   // Sync seasonal

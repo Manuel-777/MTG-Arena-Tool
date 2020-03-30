@@ -6,6 +6,8 @@ import db from "../shared/database";
 import { InternalEvent } from "../types/event";
 import { InternalDeck } from "../types/Deck";
 import { InternalEconomyTransaction } from "../types/inventory";
+import { InternalDraft } from "../types/draft";
+
 import isValid from "date-fns/isValid";
 import parseISO from "date-fns/parseISO";
 
@@ -20,7 +22,8 @@ const globalStore = {
   events: {} as Record<string, InternalEvent>,
   decks: {} as Record<string, InternalDeck>,
   staticDecks: [] as string[],
-  transactions: {} as Record<string, InternalEconomyTransaction>
+  transactions: {} as Record<string, InternalEconomyTransaction>,
+  drafts: {} as Record<string, InternalDraft>
 };
 
 //
@@ -148,6 +151,24 @@ export function transactionExists(id: string): boolean {
 export function transactionsList(): InternalEconomyTransaction[] {
   return Object.keys(globalStore.transactions).map(
     (key: string) => globalStore.transactions[key]
+  );
+}
+
+//
+// Draft utility functions
+//
+export function getDraft(id: string): InternalDraft | undefined {
+  if (!id || !globalStore.drafts[id]) return undefined;
+  return globalStore.drafts[id];
+}
+
+export function draftExists(id: string): boolean {
+  return globalStore.drafts[id] ? true : false;
+}
+
+export function draftsList(): InternalDraft[] {
+  return Object.keys(globalStore.drafts).map(
+    (key: string) => globalStore.drafts[key]
   );
 }
 

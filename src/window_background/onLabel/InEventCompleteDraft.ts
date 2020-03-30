@@ -1,5 +1,4 @@
 import getDraftSet from "../draft/getDraftSet";
-import clearDraftData from "../draft/clearDraftData";
 import setDraftData from "../draft/setDraftData";
 import endDraft from "../draft/endDraft";
 
@@ -17,7 +16,7 @@ export default function InEventCompleteDraft(entry: Entry): void {
   if (!json) return;
   const toolId = json.Id + "-draft";
 
-  const draftId = json.ModuleInstanceData.DraftInfo?.DraftId || "";
+  //const draftId = json.ModuleInstanceData.DraftInfo?.DraftId || "";
   const data = {
     ...globals.currentDraft,
     ...json,
@@ -25,8 +24,6 @@ export default function InEventCompleteDraft(entry: Entry): void {
   };
   data.set = getDraftSet(json.InternalEventName) || data.set;
   data.id = toolId;
-  // clear working-space draft data
-  clearDraftData(draftId);
   // save final version of draft
   setDraftData(data, true);
   endDraft(data);
