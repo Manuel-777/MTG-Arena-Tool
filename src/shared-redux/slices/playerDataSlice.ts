@@ -7,6 +7,22 @@ const playerDataSlice = createSlice({
     arenaId: "",
     playerName: "",
     arenaVersion: "",
+    economy: {
+      gold: 0,
+      gems: 0,
+      vault: 0,
+      wcTrack: 0,
+      wcCommon: 0,
+      wcUncommon: 0,
+      wcRare: 0,
+      wcMythic: 0,
+      trackName: "",
+      trackTier: 0,
+      currentLevel: 0,
+      currentExp: 0,
+      currentOrbCount: 0,
+      boosters: []
+    },
     rank: {
       constructed: {
         rank: "",
@@ -44,6 +60,9 @@ const playerDataSlice = createSlice({
     },
     setRank: (state, action): void => {
       state.rank = action.payload;
+    },
+    setEconomy: (state, action): void => {
+      Object.assign(state.economy, action.payload);
     }
   }
 });

@@ -3,6 +3,9 @@ import { setData } from "../backgroundUtil";
 import { playerDb } from "../../shared/db/LocalDatabase";
 import playerData from "../../shared/PlayerData";
 import { PlayerProgression } from "../../types/progression";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import { IPC_RENDERER } from "../../shared/constants";
+import globals from "../globals";
 
 interface Entry extends LogEntry {
   json: () => PlayerProgression;
@@ -23,6 +26,11 @@ export default function onLabelInProgressionGetPlayerProgress(
     currentExp: activeTrack.currentExp,
     currentOrbCount: activeTrack.currentOrbCount
   };
-  setData({ economy });
+  reduxAction(
+    globals.store.dispatch,
+    "SET_PLAYER_ECONOMY",
+    economy,
+    IPC_RENDERER
+  );
   playerDb.upsert("", "economy", economy);
 }

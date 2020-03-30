@@ -2,7 +2,6 @@ import _ from "lodash";
 import React from "react";
 import { Column, Row } from "react-table";
 import { EVENTS_TABLE_MODE } from "../../../shared/constants";
-import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { toggleArchived } from "../../rendererUtil";
 import { ListItemEvent } from "../list-item/ListItemEvent";

@@ -16,7 +16,6 @@ import {
 } from "./util";
 import { DbCardData, Rarity } from "../types/Metadata";
 import useHoverCard from "../window_main/hooks/useHoverCard";
-import pd from "./PlayerData";
 import { useSelector } from "react-redux";
 import { AppState } from "../shared-redux/stores/rendererStore";
 

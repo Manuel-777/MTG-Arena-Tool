@@ -8,7 +8,6 @@ import {
   DRAFT_RANKS
 } from "../../../shared/constants";
 import db from "../../../shared/database";
-import pd from "../../../shared/PlayerData";
 import ResizableDragger from "../misc/ResizableDragger";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {

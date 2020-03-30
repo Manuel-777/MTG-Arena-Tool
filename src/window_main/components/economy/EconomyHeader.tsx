@@ -1,22 +1,25 @@
 import { formatNumber, formatPercent } from "../../rendererUtil";
-import pd from "../../../shared/PlayerData";
-
 import { vaultPercentFormat } from "./economyUtils";
 import EconomyValueRecord from "./EconomyValueRecord";
 import React from "react";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
+import { useSelector } from "react-redux";
 
 export function EconomyHeader(): JSX.Element {
-  const total = pd.economy.boosters.reduce(
+  const playerEconomy = useSelector(
+    (state: AppState) => state.playerdata.economy
+  );
+  const total = playerEconomy.boosters.reduce(
     (accumulator: number, booster: { count: number }) =>
       accumulator + booster.count,
     0
   );
   // TODO: remove this any cast once renderer-util is a typescript file.
   const vaultTotal = formatPercent(
-    pd.economy.vault / 100,
+    playerEconomy.vault / 100,
     vaultPercentFormat as any
   );
-  const masteryLevel = pd.economy.currentLevel + 1;
+  const masteryLevel = playerEconomy.currentLevel + 1;
 
   return (
     <>
@@ -33,42 +36,42 @@ export function EconomyHeader(): JSX.Element {
       <EconomyValueRecord
         title={"Common Wildcards"}
         iconClassName={"economy_wc_med wc_common"}
-        deltaContent={formatNumber(pd.economy.wcCommon)}
+        deltaContent={formatNumber(playerEconomy.wcCommon)}
       />
       <EconomyValueRecord
         title={"Uncommon Wildcards"}
         iconClassName={"economy_wc_med wc_uncommon"}
-        deltaContent={formatNumber(pd.economy.wcUncommon)}
+        deltaContent={formatNumber(playerEconomy.wcUncommon)}
       />
       <EconomyValueRecord
         title={"Rare Wildcards"}
         iconClassName={"economy_wc_med wc_rare"}
-        deltaContent={formatNumber(pd.economy.wcRare)}
+        deltaContent={formatNumber(playerEconomy.wcRare)}
       />
       <EconomyValueRecord
         title={"Mythic Wildcards"}
         iconClassName={"economy_wc_med wc_mythic"}
-        deltaContent={formatNumber(pd.economy.wcMythic)}
+        deltaContent={formatNumber(playerEconomy.wcMythic)}
       />
       <EconomyValueRecord
         title={"Gold"}
         iconClassName={"economy_gold marginLeft"}
-        deltaContent={formatNumber(pd.economy.gold)}
+        deltaContent={formatNumber(playerEconomy.gold)}
       />
       <EconomyValueRecord
         title={"Gems"}
         iconClassName={"economy_gems economyIconMargin"}
-        deltaContent={formatNumber(pd.economy.gems)}
+        deltaContent={formatNumber(playerEconomy.gems)}
       />
       <EconomyValueRecord
-        title={`Mastery Level (${pd.economy.trackName})`}
+        title={`Mastery Level (${playerEconomy.trackName})`}
         iconClassName={"economy_mastery_med"}
         deltaContent={formatNumber(masteryLevel)}
       />
       <EconomyValueRecord
         title={"Experience"}
         iconClassName={"economy_exp economyIconMargin"}
-        deltaContent={formatNumber(pd.economy.currentExp || 0)}
+        deltaContent={formatNumber(playerEconomy.currentExp || 0)}
       />
     </>
   );

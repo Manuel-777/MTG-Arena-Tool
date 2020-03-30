@@ -1,7 +1,6 @@
 import React, { useState, useCallback, ChangeEvent, useEffect } from "react";
 import { remote } from "electron";
 const { dialog } = remote;
-import pd from "../../../shared/PlayerData";
 import Button from "../misc/Button";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";

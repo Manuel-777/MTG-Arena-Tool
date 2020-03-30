@@ -5,7 +5,8 @@ import {
   get_deck_missing,
   getBoosterCountEstimate
 } from "../../../shared/util";
-import pd from "../../../shared/PlayerData";
+import { useSelector } from "react-redux";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
 
 interface CraftingCostProps {
   deck: Deck;
@@ -15,12 +16,14 @@ type IndexableObject = { [key: string]: number };
 
 export default function CraftingCost(props: CraftingCostProps): JSX.Element {
   const { deck } = props;
-
+  const { wcCommon, wcUncommon, wcRare, wcMythic } = useSelector(
+    (state: AppState) => state.playerdata.economy
+  );
   const ownedWildcards: IndexableObject = {
-    common: pd.economy.wcCommon,
-    uncommon: pd.economy.wcUncommon,
-    rare: pd.economy.wcRare,
-    mythic: pd.economy.wcMythic
+    common: wcCommon,
+    uncommon: wcUncommon,
+    rare: wcRare,
+    mythic: wcMythic
   };
   // Another deck.getSave() conversion here..
   const missingWildcards: any = get_deck_missing(deck);

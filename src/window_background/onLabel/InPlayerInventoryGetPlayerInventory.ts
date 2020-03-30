@@ -1,8 +1,9 @@
-import playerData from "../../shared/PlayerData";
-import { setData } from "../backgroundUtil";
 import { playerDb } from "../../shared/db/LocalDatabase";
 import LogEntry from "../../types/logDecoder";
 import { PlayerInventory } from "../../types/inventory";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import globals from "../globals";
+import { IPC_RENDERER } from "../../shared/constants";
 
 interface Entry extends LogEntry {
   json: () => PlayerInventory;
@@ -14,7 +15,6 @@ export default function InPlayerInventoryGetPlayerInventory(
   const json = entry.json();
   if (!json) return;
   const economy = {
-    ...playerData.economy,
     gold: json.gold,
     gems: json.gems,
     vault: json.vaultProgress,
@@ -25,6 +25,11 @@ export default function InPlayerInventoryGetPlayerInventory(
     wcMythic: json.wcMythic,
     boosters: json.boosters
   };
-  setData({ economy });
+  reduxAction(
+    globals.store.dispatch,
+    "SET_PLAYER_ECONOMY",
+    economy,
+    IPC_RENDERER
+  );
   playerDb.upsert("", "economy", economy);
 }

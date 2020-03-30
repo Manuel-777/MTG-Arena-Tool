@@ -16,16 +16,15 @@ export default function saveEconomyTransaction(
   };
 
   if (!transactionExists(id)) {
-    reduxAction(
-      globals.store.dispatch,
-      "SET_ECONOMY",
-      txnData,
-      IPC_ALL ^ IPC_BACKGROUND
-    );
     const economyIndex = [...globals.store.getState().economy.economyIndex, id];
     playerDb.upsert("", "economy_index", economyIndex);
   }
-
+  reduxAction(
+    globals.store.dispatch,
+    "SET_ECONOMY",
+    txnData,
+    IPC_ALL ^ IPC_BACKGROUND
+  );
   playerDb.upsert("", id, txnData);
   const httpApi = require("./httpApi");
   httpApi.httpSetEconomy(txnData);

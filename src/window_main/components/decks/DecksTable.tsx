@@ -1,7 +1,6 @@
 import React from "react";
 import { Column, Row } from "react-table";
 import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
-import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { ListItemDeck } from "../list-item/ListItemDeck";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";

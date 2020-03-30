@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-use-before-define */
 import React from "react";
 import db from "../../../shared/database";
-import pd from "../../../shared/PlayerData";
 import LocalTime from "../../../shared/time-components/LocalTime";
 import {
   collectionSortRarity,
@@ -317,6 +316,9 @@ interface FlexRightProps {
 }
 
 function FlexRight(props: FlexRightProps): JSX.Element {
+  const { trackName } = useSelector(
+    (state: AppState) => state.playerdata.economy
+  );
   const { fullContext, change, thingsToCheck, economyId } = props;
   const {
     checkAetherized,
@@ -406,7 +408,7 @@ function FlexRight(props: FlexRightProps): JSX.Element {
       {lvlDelta ? (
         <EconomyValueRecord
           iconClassName={"economy_mastery_med"}
-          title={`Mastery Level (${pd.economy.trackName})`}
+          title={`Mastery Level (${trackName})`}
           deltaContent={"+" + formatNumber(lvlDelta)}
         />
       ) : (

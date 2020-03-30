@@ -2,7 +2,6 @@ import format from "date-fns/format";
 import _ from "lodash";
 import React from "react";
 import { HeaderProps } from "react-table";
-import pd from "../../../shared/PlayerData";
 import {
   formatPercent,
   formatWinrateInterval,
@@ -12,6 +11,7 @@ import { BoosterSymbol } from "../misc/BoosterSymbol";
 import { MetricText } from "../misc/MetricText";
 import { RaritySymbol } from "../misc/RaritySymbol";
 import { DecksData, DecksTableCellProps } from "./types";
+import store from "../../../shared-redux/stores/rendererStore";
 
 export function WinRateCell({ cell }: DecksTableCellProps): JSX.Element {
   const {
@@ -83,10 +83,11 @@ export function BoosterNeededHeader(): JSX.Element {
 }
 
 export function WildcardCell({ cell }: DecksTableCellProps): JSX.Element {
+  const playerEconomy = store.getState().playerdata.economy;
   const rarity = cell.column.id;
   const value = cell.value;
   const owned =
-    ((pd.economy as unknown) as Record<string, number>)[
+    ((playerEconomy as unknown) as Record<string, number>)[
       "wc" + _.capitalize(rarity)
     ] ?? 0;
   return (

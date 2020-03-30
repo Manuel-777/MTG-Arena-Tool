@@ -1,7 +1,6 @@
 import React from "react";
 import { Column, Row } from "react-table";
 import { DATE_SEASON, MATCHES_TABLE_MODE } from "../../../shared/constants";
-import pd from "../../../shared/PlayerData";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import ListItemMatch from "../list-item/ListItemMatch";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";

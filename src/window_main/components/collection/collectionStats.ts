@@ -4,6 +4,7 @@ import pd from "../../../shared/PlayerData";
 import { getMissingCardCounts } from "../../../shared/util";
 import Deck from "../../../shared/deck";
 import { decksList } from "../../../shared-store";
+import store from "../../../shared-redux/stores/rendererStore";
 
 export const ALL_CARDS = "All cards";
 export const SINGLETONS = "Singletons (at least one)";
@@ -112,6 +113,7 @@ export interface CollectionStats {
 export function getCollectionStats(
   cardIds: (string | number)[]
 ): CollectionStats {
+  const playerEconomy = store.getState().playerdata.economy;
   const wantedCards: { [key: string]: number } = {};
   decksList()
     .filter(deck => deck && !deck.archived)
@@ -127,7 +129,7 @@ export function getCollectionStats(
   };
   Object.keys(db.sets).forEach(setName => {
     const setStats = new SetStats(setName);
-    setStats.boosters = pd.economy.boosters
+    setStats.boosters = playerEconomy.boosters
       .filter(
         ({ collationId }: { collationId: number }) =>
           db.sets[setName]?.collation === collationId

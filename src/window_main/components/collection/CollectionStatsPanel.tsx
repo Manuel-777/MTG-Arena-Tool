@@ -2,7 +2,6 @@ import { shell } from "electron";
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { CARD_RARITIES, IPC_NONE } from "../../../shared/constants";
-import pd from "../../../shared/PlayerData";
 import ReactSelect from "../../../shared/ReactSelect";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { formatNumber } from "../../rendererUtil";
@@ -49,7 +48,9 @@ export function CollectionStatsPanel({
     futureBoosters
   } = useSelector((state: AppState) => state.collection);
   const dispatch = useDispatch();
-
+  const playerEconomy = useSelector(
+    (state: AppState) => state.playerdata.economy
+  );
   if (!stats) {
     return <></>;
   }
@@ -83,13 +84,13 @@ export function CollectionStatsPanel({
         }}
       >
         <div className={"economy_wc wc_common"}></div>
-        <div>{formatNumber(pd.economy.wcCommon)}</div>
+        <div>{formatNumber(playerEconomy.wcCommon)}</div>
         <div className={"economy_wc wc_uncommon"}></div>
-        <div>{formatNumber(pd.economy.wcUncommon)}</div>
+        <div>{formatNumber(playerEconomy.wcUncommon)}</div>
         <div className={"economy_wc wc_rare"}></div>
-        <div>{formatNumber(pd.economy.wcRare)}</div>
+        <div>{formatNumber(playerEconomy.wcRare)}</div>
         <div className={"economy_wc wc_mythic"}></div>
-        <div>{formatNumber(pd.economy.wcMythic)}</div>
+        <div>{formatNumber(playerEconomy.wcMythic)}</div>
       </div>
       <div className={"flex_item"}>
         <div className={"main_stats"}>
