@@ -72,6 +72,16 @@ export interface CardSkin {
   ccv: string;
 }
 
+export interface DeckChange {
+  id: string;
+  deckId: string;
+  date: Date;
+  changesMain: CardObject[];
+  changesSide: CardObject[];
+  previousMain: v2cardsList;
+  previousSide: v2cardsList;
+}
+
 // Formats can be added to the logs cosntantly
 // and there are more than just these
 //export type Format = "" | "Standard" | "Draft" | "precon" | "Brawl";

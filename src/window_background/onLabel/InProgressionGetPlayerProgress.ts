@@ -1,7 +1,5 @@
 import LogEntry from "../../types/logDecoder";
-import { setData } from "../backgroundUtil";
 import { playerDb } from "../../shared/db/LocalDatabase";
-import playerData from "../../shared/PlayerData";
 import { PlayerProgression } from "../../types/progression";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import { IPC_RENDERER } from "../../shared/constants";

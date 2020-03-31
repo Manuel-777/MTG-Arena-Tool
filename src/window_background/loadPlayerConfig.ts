@@ -10,7 +10,7 @@ import globals from "./globals";
 
 import { playerDb, playerDbLegacy } from "../shared/db/LocalDatabase";
 import playerData from "../shared/PlayerData";
-import { isV2CardsList, ArenaV3Deck } from "../types/Deck";
+import { isV2CardsList, ArenaV3Deck, DeckChange } from "../types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
 import convertDeckFromV3 from "./convertDeckFromV3";
 import { reduxAction } from "../shared-redux/sharedRedux";
@@ -18,7 +18,6 @@ import { InternalMatch } from "../types/match";
 import store from "../shared-redux/stores/backgroundStore";
 import { InternalEvent } from "../types/event";
 import { InternalEconomyTransaction } from "../types/inventory";
-import { InternalRankUpdate } from "../types/rank";
 
 const ipcLog = (message: string): void => ipcSend("ipc_log", message);
 const ipcPop = (args: {
@@ -118,6 +117,18 @@ export async function loadPlayerConfig(): Promise<void> {
     globals.store.dispatch,
     "SET_MANY_DECKS",
     decksList,
+    IPC_RENDERER
+  );
+
+  // Get Deck Changes data
+  const changesList: DeckChange[] = savedData.deck_changes_index
+    .filter((id: string) => savedData[id])
+    .map((id: string) => savedData[id]);
+
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_DECK_CHANGES",
+    changesList,
     IPC_RENDERER
   );
 

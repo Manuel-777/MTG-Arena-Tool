@@ -13,6 +13,7 @@ import decksSlice from "./slices/decksSlice";
 import economySlice from "./slices/economySlice";
 import draftsSlice from "./slices/draftsSlice";
 import seasonalSlice from "./slices/seasonalSlice";
+import deckChangesSlice from "./slices/deckChangesSlice";
 
 const actions: Record<string, (arg: any) => any> = {};
 actions["SET_SETTINGS"] = settingsSlice.actions.setSettings;
@@ -73,5 +74,7 @@ actions["SET_DRAFT"] = draftsSlice.actions.setDraft;
 actions["SET_MANY_DRAFT"] = draftsSlice.actions.setManyDrafts;
 actions["SET_SEASONAL"] = seasonalSlice.actions.setSeasonal;
 actions["SET_MANY_SEASONAL"] = seasonalSlice.actions.setManySeasonal;
+actions["SET_DECK_CHANGE"] = deckChangesSlice.actions.setChange;
+actions["SET_MANY_DECK_CHANGES"] = deckChangesSlice.actions.setManyChangees;
 
 export default actions;

@@ -10,9 +10,7 @@ class PlayerData implements Record<string, any> {
     cards: Record<string, number>;
   } = defaultConfig.cards;
   public cardsNew: Record<string, number> = {};
-  public deck_changes: Record<string, any> = {};
   public decks_tags: Record<string, string[]> = {};
-  public deck_changes_index: string[] = [];
   public static_events: string[] = [];
 
   public last_log_timestamp = "";
@@ -22,9 +20,6 @@ class PlayerData implements Record<string, any> {
 
   constructor() {
     if (PlayerData.instance) return PlayerData.instance;
-
-    this.deckChangeExists = this.deckChangeExists.bind(this);
-    this.deckChanges = this.deckChanges.bind(this);
 
     PlayerData.instance = this;
   }
@@ -37,17 +32,6 @@ class PlayerData implements Record<string, any> {
     });
 
     return data;
-  }
-
-  deckChangeExists(id?: string): boolean {
-    return !!id && id in this.deck_changes;
-  }
-
-  deckChanges(id?: string): any[] {
-    //if (!this.deckExists(id)) return [];
-    return this.deck_changes_index
-      .map(id => this.deck_changes[id])
-      .filter(change => change && change.deckId === id);
   }
 }
 

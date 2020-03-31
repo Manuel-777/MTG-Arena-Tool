@@ -11,6 +11,7 @@ import { InternalRankUpdate } from "../types/rank";
 
 import isValid from "date-fns/isValid";
 import parseISO from "date-fns/parseISO";
+import { DeckChange } from "../types/Deck";
 
 const defaultDeck = JSON.parse(
   '{"deckTileId":' +
@@ -25,7 +26,8 @@ const globalStore = {
   staticDecks: [] as string[],
   transactions: {} as Record<string, InternalEconomyTransaction>,
   drafts: {} as Record<string, InternalDraft>,
-  seasonal: {} as Record<string, InternalRankUpdate>
+  seasonal: {} as Record<string, InternalRankUpdate>,
+  deckChanges: {} as Record<string, DeckChange>
 };
 
 //
@@ -128,6 +130,24 @@ export function decksList(): InternalDeck[] {
   return Object.keys(globalStore.decks).map(
     (key: string) => globalStore.decks[key]
   );
+}
+
+//
+// Deck Changes utility functions
+//
+export function getDeckChange(id: string): DeckChange | undefined {
+  if (!id || !globalStore.events[id]) return undefined;
+  return globalStore.deckChanges[id];
+}
+
+export function deckChangeExists(id: string): boolean {
+  return globalStore.deckChanges[id] ? true : false;
+}
+
+export function getDeckChangesList(id?: string): DeckChange[] {
+  return Object.keys(globalStore.deckChanges)
+    .map(id => globalStore.deckChanges[id])
+    .filter(change => change && change.deckId === id);
 }
 
 //

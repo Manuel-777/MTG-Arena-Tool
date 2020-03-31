@@ -1,6 +1,5 @@
 //import { playerDb } from "../../shared/db/LocalDatabase";
-//import playerData from "../../shared/PlayerData";
-//import { parseWotcTimeFallback, setData } from "../backgroundUtil";
+//import { parseWotcTimeFallback } from "../backgroundUtil";
 import LogEntry from "../../types/logDecoder";
 //import saveEconomyTransaction from "../saveEconomyTransaction";
 import { RankRewards } from "../../types/event";
@@ -53,7 +52,6 @@ export default function TrackRewardTierUpdated(entry: Entry): void {
   saveEconomyTransaction(transaction);
 
   // console.log(economy);
-  setData({ economy });
   playerDb.upsert("", "economy", economy);
   */
 }

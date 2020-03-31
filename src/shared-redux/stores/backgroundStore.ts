@@ -9,6 +9,7 @@ import eventsSlice from "../slices/eventsSlice";
 import decksSlice from "../slices/decksSlice";
 import draftsSlice from "../slices/draftsSlice";
 import seasonalSlice from "../slices/seasonalSlice";
+import deckChangesSlice from "../slices/deckChangesSlice";
 
 const rootReducer = combineReducers({
   settings: settingsSlice.reducer,
@@ -20,7 +21,8 @@ const rootReducer = combineReducers({
   events: eventsSlice.reducer,
   decks: decksSlice.reducer,
   drafts: draftsSlice.reducer,
-  seasonal: seasonalSlice.reducer
+  seasonal: seasonalSlice.reducer,
+  deckChanges: deckChangesSlice.reducer
 });
 
 const store = configureStore({
