@@ -1,12 +1,10 @@
 import React from "react";
 import Deck from "../../../shared/deck";
 import { CARD_RARITIES } from "../../../shared/constants";
-import {
-  get_deck_missing,
-  getBoosterCountEstimate
-} from "../../../shared/util";
+import { get_deck_missing } from "../../../shared/util";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
+import { getBoosterCountEstimate } from "../../rendererUtil";
 
 interface CraftingCostProps {
   deck: Deck;

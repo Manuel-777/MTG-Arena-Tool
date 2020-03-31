@@ -10,7 +10,6 @@ import {
 } from "../../shared/constants";
 import Deck from "../../shared/deck";
 import {
-  getBoosterCountEstimate,
   getReadableFormat,
   get_deck_missing as getDeckMissing
 } from "../../shared/util";
@@ -24,7 +23,7 @@ import DecksTable from "../components/decks/DecksTable";
 import { DecksData } from "../components/decks/types";
 import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/useAggregatorData";
-import { ipcSend } from "../rendererUtil";
+import { ipcSend, getBoosterCountEstimate } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import store from "../../shared-redux/stores/rendererStore";

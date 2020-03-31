@@ -1,8 +1,8 @@
 import React from "react";
-import { getBoosterCountEstimate } from "../../../shared/util";
 import { CARD_RARITIES } from "../../../shared/constants";
 import _ from "lodash";
 import { MissingWildcards } from "../decks/types";
+import { getBoosterCountEstimate } from "../../rendererUtil";
 
 const getRarityKey = (
   rarity: string

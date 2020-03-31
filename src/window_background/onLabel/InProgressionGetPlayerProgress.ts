@@ -18,7 +18,7 @@ export default function onLabelInProgressionGetPlayerProgress(
   if (!json || !json.activeBattlePass) return;
   const activeTrack = json.activeBattlePass;
   const economy = {
-    ...playerData.economy,
+    ...globals.store.getState().playerdata.economy,
     trackName: activeTrack.trackName,
     // this one is not in my logs, but I havent purchased the pass this season
     trackTier: activeTrack.currentTier,

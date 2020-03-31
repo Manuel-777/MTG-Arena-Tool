@@ -2,10 +2,14 @@
 import { app, ipcRenderer as ipc, remote } from "electron";
 import path from "path";
 import Pikaday from "pikaday";
-import { IPC_BACKGROUND, IPC_RENDERER } from "../shared/constants";
-import pd from "../shared/PlayerData";
+import {
+  IPC_BACKGROUND,
+  IPC_RENDERER,
+  CARD_RARITIES
+} from "../shared/constants";
 import { WinLossGate } from "../types/event";
 import store from "../shared-redux/stores/rendererStore";
+import { MissingWildcards } from "./components/decks/types";
 
 export const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
@@ -171,4 +175,36 @@ export function compareColorWinrates(winA: Winrate, winB: Winrate): -1 | 0 | 1 {
   if (sa > sb) return 1;
 
   return 0;
+}
+
+export function getBoosterCountEstimate(
+  neededWildcards: MissingWildcards
+): number {
+  let boosterCost = 0;
+  const boosterEstimates = {
+    common: 3.36,
+    uncommon: 2.6,
+    rare: 5.72,
+    mythic: 13.24
+  };
+
+  const playerEconomy = store.getState().playerdata.economy;
+
+  const ownedWildcards = {
+    common: playerEconomy.wcCommon,
+    uncommon: playerEconomy.wcUncommon,
+    rare: playerEconomy.wcRare,
+    mythic: playerEconomy.wcMythic
+  };
+
+  CARD_RARITIES.map(rarity => {
+    if (rarity !== "land") {
+      const needed = neededWildcards[rarity] || 0;
+      const owned = ownedWildcards[rarity] || 0;
+      const missing = Math.max(0, needed - owned);
+      boosterCost = Math.max(boosterCost, boosterEstimates[rarity] * missing);
+    }
+  });
+
+  return Math.round(boosterCost);
 }

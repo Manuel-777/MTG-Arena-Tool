@@ -1,14 +1,12 @@
 import React from "react";
-import {
-  get_deck_missing as getDeckMissing,
-  getBoosterCountEstimate
-} from "../../../shared/util";
+import { get_deck_missing as getDeckMissing } from "../../../shared/util";
 import { CARD_RARITIES } from "../../../shared/constants";
 import _ from "lodash";
 import { MissingWildcards } from "../decks/types";
 import Deck from "../../../shared/deck";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
+import { getBoosterCountEstimate } from "../../rendererUtil";
 
 const getRarityKey = (
   rarity: string
@@ -17,7 +15,6 @@ const getRarityKey = (
     return rarity as any;
   return undefined;
 };
-
 export default function WildcardsCost(props: { deck: Deck }): JSX.Element {
   const { deck } = props;
   const playerEconomy = useSelector(

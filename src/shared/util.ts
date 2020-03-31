@@ -13,7 +13,6 @@ import {
 import {
   BLACK,
   BLUE,
-  CARD_RARITIES,
   FACE_DFC_FRONT,
   FORMATS,
   GREEN,
@@ -408,36 +407,6 @@ export function getMissingCardCounts(deck: Deck): CardCounts {
     }
   });
   return missingCards;
-}
-
-export function getBoosterCountEstimate(
-  neededWildcards: MissingWildcards
-): number {
-  let boosterCost = 0;
-  const boosterEstimates = {
-    common: 3.36,
-    uncommon: 2.6,
-    rare: 5.72,
-    mythic: 13.24
-  };
-
-  const ownedWildcards = {
-    common: pd.economy.wcCommon,
-    uncommon: pd.economy.wcUncommon,
-    rare: pd.economy.wcRare,
-    mythic: pd.economy.wcMythic
-  };
-
-  CARD_RARITIES.map(rarity => {
-    if (rarity !== "land") {
-      const needed = neededWildcards[rarity] || 0;
-      const owned = ownedWildcards[rarity] || 0;
-      const missing = Math.max(0, needed - owned);
-      boosterCost = Math.max(boosterCost, boosterEstimates[rarity] * missing);
-    }
-  });
-
-  return Math.round(boosterCost);
 }
 
 export function get_deck_export(deck: InternalDeck): string {
