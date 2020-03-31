@@ -216,4 +216,18 @@ export function seasonalList(ids: string[] = []): InternalRankUpdate[] {
   }
 }
 
+export function archive(id: string): any {
+  let data = undefined;
+  if (deckExists(id)) data = getDeck(id);
+  if (draftExists(id)) data = getDraft(id);
+  if (matchExists(id)) data = getMatch(id);
+  if (eventExists(id)) data = getEvent(id);
+  if (transactionExists(id)) data = getTransaction(id);
+
+  if (data) {
+    return { ...data, archived: !data.archived };
+  }
+  return undefined;
+}
+
 export default globalStore;

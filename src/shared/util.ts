@@ -6,10 +6,7 @@ import { CardObject, InternalDeck, v2cardsList } from "../types/Deck";
 import { InternalPlayer } from "../types/match";
 import { DbCardData } from "../types/Metadata";
 import { InternalRankData } from "../types/rank";
-import {
-  CardCounts,
-  MissingWildcards
-} from "../window_main/components/decks/types";
+
 import {
   BLACK,
   BLUE,
@@ -20,9 +17,6 @@ import {
   WHITE
 } from "./constants";
 import db from "./database";
-import Deck from "./deck";
-import pd from "./PlayerData";
-
 const NO_IMG_URL = "../images/notfound.png";
 
 export function getCardImage(

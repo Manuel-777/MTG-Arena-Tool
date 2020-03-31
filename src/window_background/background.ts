@@ -12,7 +12,6 @@ import {
   IPC_BACKGROUND
 } from "../shared/constants";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
-import playerData from "../shared/PlayerData";
 import { getReadableFormat } from "../shared/util";
 import { InternalDeck } from "../types/Deck";
 import addCustomDeck from "./addCustomDeck";
@@ -33,7 +32,7 @@ import {
   initializeRendererReduxIPC,
   reduxAction
 } from "../shared-redux/sharedRedux";
-import { getMatch, deckExists, getDeck } from "../shared-store";
+import { archive, getMatch, deckExists, getDeck } from "../shared-store";
 
 initializeRendererReduxIPC(globals.store);
 
@@ -230,15 +229,11 @@ ipc.on("toggle_deck_archived", function(event, arg) {
 });
 
 //
-ipc.on("toggle_archived", function(event, arg) {
-  const id = arg;
-  const item = (playerData as Record<string, any>)[id];
-  if (!item) return;
-  const data = { ...item };
-  data.archived = !data.archived;
-
-  setData({ [id]: data });
-  playerDb.upsert("", id, data);
+ipc.on("toggle_archived", function(event, id) {
+  const data = archive(id);
+  if (data) {
+    playerDb.upsert("", id, data);
+  }
 });
 
 ipc.on("request_explore", function(event, arg) {
