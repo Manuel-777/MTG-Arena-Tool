@@ -245,7 +245,7 @@ function handleAuthResponse(
         token: "",
         email: ""
       },
-      IPC_ALL ^ IPC_RENDERER
+      IPC_ALL
     );
     ipcSend("auth", {});
     ipcSend("toggle_login", true);
@@ -272,7 +272,7 @@ function handleAuthResponse(
         token: parsedResult.token,
         email: appSettings.email
       },
-      IPC_ALL ^ IPC_RENDERER
+      IPC_ALL
     );
   }
   const data: any = {};

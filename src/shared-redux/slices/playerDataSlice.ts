@@ -98,6 +98,7 @@ const playerDataSlice = createSlice({
         newCards.cards_before = { ...newCards.cards };
         newCards.cards_time = now;
       }
+      newCards.cards = json;
       // Get the diff on cardsNew
       Object.keys(json).forEach((key: string) => {
         if (newCards.cards_before[key] === undefined) {
@@ -107,6 +108,19 @@ const playerDataSlice = createSlice({
         }
       });
       state.cards = newCards;
+    },
+    addCardsFromStore: (state, action): void => {
+      Object.assign(state.cards, action.payload);
+      const json = action.payload;
+      const newCards = { ...state.cardsNew };
+      Object.keys(json.cards).forEach((key: string) => {
+        if (json.cards_before[key] === undefined) {
+          newCards[key] = json.cards[key];
+        } else if (json.cards_before[key] < json.cards[key]) {
+          newCards[key] = json.cards[key] - json.cards_before[key];
+        }
+      });
+      state.cardsNew = newCards;
     }
   }
 });

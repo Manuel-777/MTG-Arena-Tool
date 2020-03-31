@@ -30,7 +30,7 @@ export default function InventoryUpdated(entry: Entry): void {
       subContext: update.context,
       context: transaction.context + "." + update.context.source,
       id: sha1(JSON.stringify(update) + entry.hash),
-      date: globals.logTime
+      date: globals.logTime.toISOString()
     };
 
     // Add delta to our current values

@@ -68,6 +68,7 @@ actions["SET_RANK"] = playerDataSlice.actions.setRank;
 actions["ADD_CARD"] = playerDataSlice.actions.addCard;
 actions["ADD_CARDS_LIST"] = playerDataSlice.actions.addCardsList;
 actions["ADD_CARDS_KEYS"] = playerDataSlice.actions.addCardsKeys;
+actions["ADD_CARDS_FROM_STORE"] = playerDataSlice.actions.addCardsFromStore;
 actions["SET_DECK"] = decksSlice.actions.setDeck;
 actions["SET_MANY_DECKS"] = decksSlice.actions.setManyDecks;
 actions["SET_MANY_STATIC_DECKS"] = decksSlice.actions.setManyStaticDecks;

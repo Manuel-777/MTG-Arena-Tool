@@ -167,6 +167,14 @@ export async function loadPlayerConfig(): Promise<void> {
     IPC_RENDERER
   );
 
+  // Get cards data
+  reduxAction(
+    globals.store.dispatch,
+    "ADD_CARDS_FROM_STORE",
+    savedData.cards,
+    IPC_RENDERER
+  );
+
   // Other
   setData(savedData, true);
   ipcSend("renderer_set_bounds", savedData.windowBounds);

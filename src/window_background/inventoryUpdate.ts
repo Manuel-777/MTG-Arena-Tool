@@ -38,7 +38,7 @@ export default function inventoryUpdate(
     ...update,
     // Reduce the size for storage
     id: "",
-    date: globals.logTime,
+    date: globals.logTime.toISOString(),
     delta: update.delta,
     context,
     subContext: update.context // preserve sub-context object data
