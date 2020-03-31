@@ -1,12 +1,14 @@
 import React from "react";
-import { get_deck_missing as getDeckMissing } from "../../../shared/util";
 import { CARD_RARITIES } from "../../../shared/constants";
 import _ from "lodash";
 import { MissingWildcards } from "../decks/types";
 import Deck from "../../../shared/deck";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
-import { getBoosterCountEstimate } from "../../rendererUtil";
+import {
+  getBoosterCountEstimate,
+  get_deck_missing as getDeckMissing
+} from "../../rendererUtil";
 
 const getRarityKey = (
   rarity: string

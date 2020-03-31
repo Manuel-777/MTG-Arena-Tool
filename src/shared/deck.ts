@@ -10,12 +10,7 @@ import CardsList from "./cardsList";
 import Colors from "./colors";
 import { DEFAULT_TILE } from "./constants";
 import db from "./database";
-import {
-  compare_cards,
-  get_set_code,
-  getWildcardsMissing,
-  objectClone
-} from "./util";
+import { compare_cards, get_set_code, objectClone } from "./util";
 
 class Deck {
   private mainboard: CardsList;
@@ -211,49 +206,6 @@ class Deck {
     }
 
     return this._colors;
-  }
-
-  /**
-   * Return how many of each wildcard we need to complete this deck.
-   * By default it only counts the mainboard cards.
-   * @param countMainboard weter or not to count the mainboard cards.
-   * @param countSideboard weter or not to count the sideboard cards.
-   */
-  getMissingWildcards(countMainboard = true, countSideboard = true) {
-    const missing: Record<string, number> = {
-      rare: 0,
-      common: 0,
-      uncommon: 0,
-      mythic: 0,
-      token: 0,
-      land: 0
-    };
-
-    if (countMainboard) {
-      this.mainboard.get().forEach(cardObj => {
-        const grpid = cardObj.id;
-        const card = db.card(grpid);
-        if (card !== undefined) {
-          const rarity = card.rarity;
-          const add = getWildcardsMissing(this, grpid, false);
-          missing[rarity] += add;
-        }
-      });
-    }
-
-    if (countSideboard) {
-      this.sideboard.get().forEach(cardObj => {
-        const grpid = cardObj.id;
-        const card = db.card(grpid);
-        if (card !== undefined) {
-          const rarity = card.rarity;
-          const add = getWildcardsMissing(this, grpid, false);
-          missing[rarity] += add;
-        }
-      });
-    }
-
-    return missing;
   }
 
   /**

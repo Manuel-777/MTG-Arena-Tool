@@ -4,7 +4,6 @@ import electron from "electron";
 import async from "async";
 
 import { makeId } from "../shared/util";
-import playerData from "../shared/PlayerData";
 import db from "../shared/database";
 import { playerDb } from "../shared/db/LocalDatabase";
 
@@ -343,6 +342,7 @@ export function httpSubmitCourse(course: any): void {
 
 export function httpGetExplore(query: any): void {
   const _id = makeId(6);
+  const playerData = globals.store.getState().playerdata;
   httpQueue.unshift(
     {
       reqId: _id,

@@ -8,16 +8,12 @@ import {
   FACE_ADVENTURE_MAIN
 } from "./constants";
 import Deck from "./deck";
-import {
-  getWildcardsMissing,
-  getCardArtCrop,
-  getRankColorClass,
-  openScryfallCard
-} from "./util";
+import { getCardArtCrop, getRankColorClass, openScryfallCard } from "./util";
 import { DbCardData, Rarity } from "../types/Metadata";
 import useHoverCard from "../window_main/hooks/useHoverCard";
 import { useSelector } from "react-redux";
 import { AppState } from "../shared-redux/stores/rendererStore";
+import { getWildcardsMissing } from "../window_main/rendererUtil";
 
 export interface CardTileProps {
   card: DbCardData;

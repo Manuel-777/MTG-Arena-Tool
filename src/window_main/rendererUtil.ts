@@ -9,7 +9,9 @@ import {
 } from "../shared/constants";
 import { WinLossGate } from "../types/event";
 import store from "../shared-redux/stores/rendererStore";
-import { MissingWildcards } from "./components/decks/types";
+import { MissingWildcards, CardCounts } from "./components/decks/types";
+import Deck from "../shared/deck";
+import db from "../shared/database";
 
 export const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
@@ -207,4 +209,146 @@ export function getBoosterCountEstimate(
   });
 
   return Math.round(boosterCost);
+}
+
+export function getWildcardsMissing(
+  deck: Deck,
+  grpid: number,
+  isSideboard?: boolean
+): number {
+  let mainQuantity = 0;
+  const cards = store.getState().playerdata.cards;
+  const mainMatches = deck
+    .getMainboard()
+    .get()
+    .filter(card => card.id == grpid);
+  if (mainMatches.length) {
+    mainQuantity = mainMatches[0].quantity;
+  }
+
+  let sideboardQuantity = 0;
+  const sideboardMatches = deck
+    .getSideboard()
+    .get()
+    .filter(card => card.id == grpid);
+  if (sideboardMatches.length) {
+    sideboardQuantity = sideboardMatches[0].quantity;
+  }
+
+  let needed = mainQuantity;
+  if (isSideboard) {
+    needed = sideboardQuantity;
+  }
+  // cap at 4 copies to handle petitioners, rat colony, etc
+  needed = Math.min(4, needed);
+
+  const card = db.card(grpid);
+  let arr = [];
+  if (!card?.reprints) arr = [grpid];
+  else arr.push(grpid);
+
+  let have = 0;
+  arr.forEach(id => {
+    const n = cards.cards[id];
+    if (n !== undefined) {
+      have += n;
+    }
+  });
+
+  let copiesLeft = have;
+  if (isSideboard) {
+    copiesLeft = Math.max(0, copiesLeft - mainQuantity);
+
+    const infiniteCards = [67306, 69172]; // petitioners, rat colony, etc
+    if (have >= 4 && infiniteCards.indexOf(grpid) >= 0) {
+      copiesLeft = 4;
+    }
+  }
+
+  return Math.max(0, needed - copiesLeft);
+}
+/*
+  // This is the function that was in the Deck class
+  getMissingWildcards(countMainboard = true, countSideboard = true) {
+    const missing: Record<string, number> = {
+      rare: 0,
+      common: 0,
+      uncommon: 0,
+      mythic: 0,
+      token: 0,
+      land: 0
+    };
+
+    if (countMainboard) {
+      this.mainboard.get().forEach(cardObj => {
+        const grpid = cardObj.id;
+        const card = db.card(grpid);
+        if (card !== undefined) {
+          const rarity = card.rarity;
+          const add = getWildcardsMissing(this, grpid, false);
+          missing[rarity] += add;
+        }
+      });
+    }
+
+    if (countSideboard) {
+      this.sideboard.get().forEach(cardObj => {
+        const grpid = cardObj.id;
+        const card = db.card(grpid);
+        if (card !== undefined) {
+          const rarity = card.rarity;
+          const add = getWildcardsMissing(this, grpid, false);
+          missing[rarity] += add;
+        }
+      });
+    }
+
+    return missing;
+  }
+*/
+
+export function getCardsMissingCount(deck: Deck, grpid: number): number {
+  const mainMissing = getWildcardsMissing(deck, grpid, false);
+  const sideboardMissing = getWildcardsMissing(deck, grpid, true);
+  return mainMissing + sideboardMissing;
+}
+
+export function get_deck_missing(deck: Deck): MissingWildcards {
+  const missing = { rare: 0, common: 0, uncommon: 0, mythic: 0 };
+  const alreadySeenIds = new Set(); // prevents double counting cards across main/sideboard
+  const entireDeck = [
+    ...deck.getMainboard().get(),
+    ...deck.getSideboard().get()
+  ];
+
+  entireDeck.forEach(card => {
+    const grpid = card.id;
+    // process each card at most once
+    if (alreadySeenIds.has(grpid)) {
+      return;
+    }
+    const rarity = db.card(grpid)?.rarity;
+    if (rarity && rarity !== "land") {
+      missing[rarity] += getCardsMissingCount(deck, grpid);
+      alreadySeenIds.add(grpid); // remember this card
+    }
+  });
+
+  return missing;
+}
+
+export function getMissingCardCounts(deck: Deck): CardCounts {
+  const missingCards: CardCounts = {};
+  const allCardIds = new Set(
+    [...deck.getMainboard().get(), ...deck.getSideboard().get()].map(
+      card => card.id
+    )
+  );
+  allCardIds.forEach(grpid => {
+    const missing = getCardsMissingCount(deck, grpid);
+    if (missing > 0) {
+      missingCards[grpid] = missing;
+    }
+  });
+  return missingCards;
 }

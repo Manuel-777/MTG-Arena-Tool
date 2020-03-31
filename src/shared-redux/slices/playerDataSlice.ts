@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { differenceInDays } from "date-fns";
 
 const playerDataSlice = createSlice({
   name: "playerdata",
@@ -8,6 +9,12 @@ const playerDataSlice = createSlice({
     playerName: "",
     arenaVersion: "",
     tagsColors: {} as Record<string, string>,
+    cards: {
+      cards_time: Date.now(),
+      cards_before: {} as Record<string, number>,
+      cards: {} as Record<string, number>
+    },
+    cardsNew: {} as Record<string, number>,
     economy: {
       gold: 0,
       gems: 0,
@@ -71,6 +78,35 @@ const playerDataSlice = createSlice({
     editTagColor: (state, action): void => {
       const { tag, color } = action.payload;
       state.tagsColors = { ...state.tagsColors, [tag]: color };
+    },
+    addCard: (state, action): void => {
+      const grpId = action.payload;
+      state.cards.cards[grpId] = state.cards.cards[grpId] + 1 || 1;
+      state.cardsNew[grpId] = state.cardsNew[grpId] + 1 || 1;
+    },
+    addCardsList: (state, action): void => {
+      action.payload.forEach((grpId: number) => {
+        state.cardsNew[grpId] = state.cardsNew[grpId] + 1 || 1;
+      });
+    },
+    addCardsKeys: (state, action): void => {
+      const now = Date.now();
+      const json = action.payload;
+      const newCards = { ...state.cards };
+      // Update if a day has passed
+      if (differenceInDays(now, new Date(newCards.cards_time)) > 0) {
+        newCards.cards_before = { ...newCards.cards };
+        newCards.cards_time = now;
+      }
+      // Get the diff on cardsNew
+      Object.keys(json).forEach((key: string) => {
+        if (newCards.cards_before[key] === undefined) {
+          state.cardsNew[key] = json[key];
+        } else if (newCards.cards_before[key] < json[key]) {
+          state.cardsNew[key] = json[key] - newCards.cards_before[key];
+        }
+      });
+      state.cards = newCards;
     }
   }
 });

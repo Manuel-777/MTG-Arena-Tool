@@ -4,17 +4,12 @@ import { TableState } from "react-table";
 import Colors from "../../shared/colors";
 import { DRAFT_RANKS, IPC_ALL, IPC_RENDERER } from "../../shared/constants";
 import db from "../../shared/database";
-import pd from "../../shared/PlayerData";
 import { DbCardData } from "../../types/Metadata";
-import {
-  getMissingCardCounts,
-  openScryfallCard,
-  replaceAll
-} from "../../shared/util";
+import { openScryfallCard, replaceAll } from "../../shared/util";
 import CollectionTable from "../components/collection/CollectionTable";
 import { CardsData } from "../components/collection/types";
 
-import { ipcSend } from "../rendererUtil";
+import { ipcSend, getMissingCardCounts } from "../rendererUtil";
 import { CardCounts } from "../components/decks/types";
 import Deck from "../../shared/deck";
 import { reduxAction } from "../../shared-redux/sharedRedux";
@@ -49,6 +44,7 @@ function addCardMenu(div: HTMLElement, card: DbCardData): void {
 
 function getExportString(cardIds: string[]): string {
   const { export_format: exportFormat } = store.getState().settings;
+  const cards = store.getState().playerdata.cards;
   // TODO teach export how to handle all the new optional columns?
   let exportString = "";
   cardIds.forEach(key => {
@@ -56,7 +52,7 @@ function getExportString(cardIds: string[]): string {
     const card = db.card(key);
     if (card) {
       const name = replaceAll(card.name, "///", "//");
-      const count = pd.cards.cards[key] === 9999 ? 1 : pd.cards.cards[key] ?? 0;
+      const count = cards.cards[key] === 9999 ? 1 : cards.cards[key] ?? 0;
       const code = db.sets[card.set]?.code ?? "???";
       add = add
         .replace("$Name", '"' + name + '"')
@@ -98,6 +94,8 @@ function saveTableMode(collectionTableMode: string): void {
 
 function getCollectionData(): CardsData[] {
   const wantedCards: CardCounts = {};
+  const cards = store.getState().playerdata.cards;
+  const cardsNew = store.getState().playerdata.cardsNew;
   decksList()
     .filter(deck => deck && !deck.archived)
     .forEach(deck => {
@@ -110,8 +108,8 @@ function getCollectionData(): CardsData[] {
     .filter(card => card.collectible)
     .map(
       (card): CardsData => {
-        const owned = pd.cards.cards[card.id] ?? 0;
-        const acquired = pd.cardsNew[card.id] ?? 0;
+        const owned = cards.cards[card.id] ?? 0;
+        const acquired = cardsNew[card.id] ?? 0;
         const wanted = wantedCards[card.id] ?? 0;
         const colorsObj = new Colors();
         colorsObj.addFromCost(card.cost);

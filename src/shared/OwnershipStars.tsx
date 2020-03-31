@@ -1,9 +1,10 @@
 import * as React from "react";
 
-import playerData from "./PlayerData";
 import { cardHasType } from "./cardTypes";
 import { DbCardData } from "../types/Metadata";
 import styled from "styled-components";
+import { useSelector } from "react-redux";
+import { AppState } from "../shared-redux/stores/rendererStore";
 
 function OwnershipInfinity(props: OwnershipProps): JSX.Element {
   const { owned, acquired, wanted } = props;
@@ -79,6 +80,7 @@ export default function OwnershipStars(props: {
   wanted?: number;
 }): JSX.Element {
   const { card } = props;
+  const playerData = useSelector((state: AppState) => state.playerdata);
   if (!card || !card.type) {
     return <></>;
   }
