@@ -2,7 +2,6 @@
 import React from "react";
 import Button from "../misc/Button";
 import { ipcSend } from "../../rendererUtil";
-import pd from "../../../shared/PlayerData";
 import Toggle from "../misc/Toggle";
 import Slider from "../misc/Slider";
 import _ from "lodash";
@@ -25,6 +24,7 @@ import useColorPicker from "../../hooks/useColorPicker";
 import { useSelector } from "react-redux";
 import store, { AppState } from "../../../shared-redux/stores/rendererStore";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
+import defaultConfig from "../../../shared/defaultConfig";
 
 function toggleEditMode(): void {
   ipcSend("toggle_edit_mode");
@@ -353,7 +353,7 @@ function OverlaySettingsSection(props: SectionProps): JSX.Element {
           saveOverlaySettings(
             current,
             {
-              ...pd.defaultCfg.settings.overlays[0].bounds
+              ...defaultConfig.settings.overlays[0].bounds
             },
             "bounds"
           )

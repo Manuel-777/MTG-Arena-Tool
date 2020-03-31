@@ -7,6 +7,7 @@ const playerDataSlice = createSlice({
     arenaId: "",
     playerName: "",
     arenaVersion: "",
+    tagsColors: {} as Record<string, string>,
     economy: {
       gold: 0,
       gems: 0,
@@ -63,6 +64,13 @@ const playerDataSlice = createSlice({
     },
     setEconomy: (state, action): void => {
       Object.assign(state.economy, action.payload);
+    },
+    setTagColors: (state, action): void => {
+      Object.assign(state.tagsColors, action.payload);
+    },
+    editTagColor: (state, action): void => {
+      const { tag, color } = action.payload;
+      state.tagsColors = { ...state.tagsColors, [tag]: color };
     }
   }
 });

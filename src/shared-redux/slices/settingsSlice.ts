@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { defaultCfg } from "../../shared/PlayerData";
+import defaultConfig from "../../shared/defaultConfig";
 
 const settingsSlice = createSlice({
   name: "settings",
   initialState: {
-    ...defaultCfg.settings
+    ...defaultConfig.settings
   },
   reducers: {
     setSettings: (state, action): void => {

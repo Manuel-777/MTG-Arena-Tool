@@ -263,9 +263,12 @@ ipc.on("request_home", (event, set) => {
 
 ipc.on("edit_tag", (event, arg) => {
   const { tag, color } = arg;
-  const tags_colors = { ...playerData.tags_colors, [tag]: color };
-  setData({ tags_colors });
-  playerDb.upsert("", "tags_colors", tags_colors);
+  const tags = {
+    ...globals.store.getState().playerdata.tagsColors,
+    [tag]: color
+  };
+  playerDb.upsert("", "tags_colors", tags);
+  reduxAction(globals.store.dispatch, "EDIT_TAG_COLOR", arg, IPC_RENDERER);
   sendSettings();
 });
 
@@ -348,8 +351,9 @@ ipc.on("set_log", function(event, arg) {
 let prevLogSize = 0;
 
 function sendSettings(): void {
-  const tags_colors = playerData.tags_colors;
-  const settingsData = { tags_colors };
+  const settingsData = {
+    tags_colors: globals.store.getState().playerdata.tagsColors
+  };
   httpApi.httpSetSettings(settingsData);
 }
 

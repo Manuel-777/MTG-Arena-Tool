@@ -8,6 +8,7 @@ import {
   hideBusyIfDone
 } from "./databaseUtil";
 import { LocalDatabase, DatabaseNotInitializedError } from "./LocalDatabase";
+import defaultConfig from "../defaultConfig";
 
 /**
  * This style of database uses electron-store:
@@ -57,10 +58,9 @@ export class ElectronStoreDatabase implements LocalDatabase {
         defaults: settingsDefaults
       });
     } else {
-      const playerData = require("../PlayerData") as any;
       this.playerStore = new Store({
         name: dbName,
-        defaults: playerData.defaultCfg
+        defaults: defaultConfig
       });
     }
   }

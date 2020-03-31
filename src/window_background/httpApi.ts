@@ -154,7 +154,12 @@ function syncUserData(data: any): void {
 
   if (data.settings.tags_colors) {
     const newTags = data.settings.tags_colors;
-    setData({ tags_colors: { ...newTags } });
+    reduxAction(
+      globals.store.dispatch,
+      "SET_TAG_COLORS",
+      newTags,
+      IPC_RENDERER
+    );
     playerDb.upsert("", "tags_colors", newTags);
   }
 }

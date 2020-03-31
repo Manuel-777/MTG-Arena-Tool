@@ -5,6 +5,7 @@ import Pikaday from "pikaday";
 import { IPC_BACKGROUND, IPC_RENDERER } from "../shared/constants";
 import pd from "../shared/PlayerData";
 import { WinLossGate } from "../types/event";
+import store from "../shared-redux/stores/rendererStore";
 
 export const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
@@ -24,7 +25,9 @@ export function toggleArchived(id: string | number): void {
 }
 
 export function getTagColor(tag?: string): string {
-  return (tag ? pd.tags_colors[tag] : undefined) ?? "#FAE5D2";
+  return (
+    (tag ? store.getState().playerdata.tagsColors[tag] : undefined) ?? "#FAE5D2"
+  );
 }
 
 export function makeResizable(
