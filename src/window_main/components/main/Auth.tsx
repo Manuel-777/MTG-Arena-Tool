@@ -5,7 +5,13 @@ import store, { AppState } from "../../../shared-redux/stores/rendererStore";
 import { shell } from "electron";
 import Checkbox from "../misc/Checkbox";
 import { ipcSend } from "../../rendererUtil";
-import { HIDDEN_PW, IPC_NONE, IPC_BACKGROUND } from "../../../shared/constants";
+import {
+  HIDDEN_PW,
+  IPC_NONE,
+  IPC_BACKGROUND,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../../shared/constants";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
 const sha1 = require("js-sha1");
 
@@ -53,6 +59,12 @@ export default function Auth(props: AuthProps): JSX.Element {
       setErrorMessage("");
       const pwd = authForm.pass == HIDDEN_PW ? HIDDEN_PW : sha1(authForm.pass);
       reduxAction(dispatcher, "SET_CAN_LOGIN", false, IPC_NONE);
+      reduxAction(
+        dispatcher,
+        "SET_APP_SETTINGS",
+        { email: authForm.email },
+        IPC_ALL ^ IPC_RENDERER
+      );
       ipcSend("login", {
         username: authForm.email,
         password: pwd

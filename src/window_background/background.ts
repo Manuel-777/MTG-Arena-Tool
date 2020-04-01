@@ -39,7 +39,7 @@ initializeRendererReduxIPC(globals.store);
 let oldState: AppState;
 
 globals.store.subscribe(() => {
-  const newState = { ...globals.store.getState() };
+  const newState = globals.store.getState();
   if (!oldState) {
     oldState = newState;
     return;
@@ -51,7 +51,7 @@ globals.store.subscribe(() => {
   }
 
   // App settings
-  const newAppSettings = newState.appsettings;
+  const newAppSettings = { ...newState.appsettings };
   if (!_.isEqual(oldState.appsettings, newAppSettings)) {
     newAppSettings.toolVersion = globals.toolVersion;
     if (!newAppSettings.rememberMe) {
@@ -147,7 +147,6 @@ ipc.on("login", function(event, arg) {
   } else if (arg.username === "" && arg.password === "") {
     offlineLogin();
   } else {
-    syncSettings({ token: "" }, false);
     httpApi.httpAuth(arg.username, arg.password);
   }
 });

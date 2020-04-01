@@ -23,7 +23,7 @@ export default function RankUpdated(entry: Entry): void {
   };
 
   const playerData = globals.store.getState().playerdata;
-  const rank = { ...playerData.rank };
+  const rank = JSON.parse(JSON.stringify(playerData.rank));
 
   // newJson.wasLossProtected
   // newJson.seasonOrdinal
