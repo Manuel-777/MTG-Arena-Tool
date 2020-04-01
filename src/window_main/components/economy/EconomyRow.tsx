@@ -597,7 +597,7 @@ interface ChangeRowProps {
 
 export function ChangeRow(props: ChangeRowProps): JSX.Element {
   const { economyId, change } = props;
-  const fullContext = getPrettyContext(change.originalContext);
+  const fullContext = change.fullContext;
   const thingsToCheck = getThingsToCheck(fullContext, change);
 
   const [hover, setHover] = React.useState(false);

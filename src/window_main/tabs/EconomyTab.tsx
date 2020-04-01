@@ -49,7 +49,7 @@ function getTxnData(archivedCache: Record<string, boolean>): TransactionData[] {
       const oldTrackLevel = txn.trackDiff?.oldLevel ?? 0;
       const currentOrbCount = txn.orbCountDiff?.currentOrbCount ?? 0;
       const oldOrbCount = txn.orbCountDiff?.oldOrbCount ?? 0;
-      const originalContext = txn.originalContext ?? "";
+      const originalContext = txn.originalContext || txn.context || "";
       const artSkinsAdded = txn.delta?.artSkinsAdded ?? [];
       const boosterDelta = txn.delta?.boosterDelta ?? [];
       const cardsAdded = txn.delta?.cardsAdded ?? [];
