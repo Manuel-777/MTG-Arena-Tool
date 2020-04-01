@@ -100,7 +100,11 @@ export default function EconomyTab(): JSX.Element {
   const archivedCache = useSelector(
     (state: AppState) => state.renderer.archivedCache
   );
-  const data = React.useMemo(() => getTxnData(archivedCache), [archivedCache]);
+  const txnList = useSelector((state: AppState) => state.economy.economyIndex);
+  const data = React.useMemo(() => {
+    txnList;
+    return getTxnData(archivedCache);
+  }, [archivedCache, txnList]);
   return (
     <div className="ux_item">
       <EconomyTable
