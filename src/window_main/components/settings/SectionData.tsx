@@ -4,7 +4,6 @@ import { remote, shell } from "electron";
 const { dialog } = remote;
 import Toggle from "../misc/Toggle";
 import Input from "../misc/Input";
-import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../rendererUtil";
 import ReactSelect from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
@@ -89,16 +88,17 @@ function parseLinkOpen(): void {
 }
 
 function openAppDbLink(): void {
-  shell.showItemInFolder(pd.appDbPath);
+  shell.showItemInFolder(store.getState().playerdata.appDbPath);
 }
 
 function openPlayerDbLink(): void {
-  shell.showItemInFolder(pd.playerDbPath);
+  shell.showItemInFolder(store.getState().playerdata.playerDbPath);
 }
 
 export default function SectionData(): JSX.Element {
   const settings = useSelector((state: AppState) => state.settings);
   const appSettings = useSelector((state: AppState) => state.appsettings);
+  const playerData = useSelector((state: AppState) => state.playerdata);
 
   const arenaLogCallback = React.useCallback(
     (value: string): void => {
@@ -137,7 +137,7 @@ export default function SectionData(): JSX.Element {
   let parsedOutput = <>auto-detection</>;
   if (appSettings.logLocaleFormat) {
     const testDate = parse(
-      pd.last_log_timestamp,
+      playerData.lastLogTimestamp,
       appSettings.logLocaleFormat,
       new Date()
     );
@@ -240,25 +240,19 @@ export default function SectionData(): JSX.Element {
             .
           </p>
         </i>
-        <p>
-          Last log timestamp: <b>{pd.last_log_timestamp}</b>
-        </p>
-        <p>
-          Last format used: <b>{pd.last_log_format}</b>
-        </p>
       </div>
       <div className="settings_title">Local Data</div>
       <div className="settings_note">
         <p>
           Current application settings:
           <a onClick={openAppDbLink} className="link app_db_link">
-            {pd.appDbPath}
+            {playerData.appDbPath}
           </a>
         </p>
         <p>
           Current player settings and history:
           <a onClick={openPlayerDbLink} className="link player_db_link">
-            {pd.playerDbPath}
+            {playerData.playerDbPath}
           </a>
         </p>
       </div>

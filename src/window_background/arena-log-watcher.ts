@@ -202,10 +202,8 @@ function onLogEntryFound(entry: any): void {
         }
         if (timestamp) {
           globals.logTime = parseWotcTimeFallback(timestamp);
-          setData({
-            last_log_timestamp: timestamp,
-            last_log_format: getDateFormat(timestamp)
-          });
+          //reduxAction(globals.store.dispatch, "SET_LOG_TIMESTAMP", timestamp, IPC_RENDERER);
+          //reduxAction(globals.store.dispatch, "SET_LOG_FORMAT", getDateFormat(timestamp), IPC_RENDERER);
         }
       } catch (err) {
         console.log(entry.label, entry.position, entry.json());

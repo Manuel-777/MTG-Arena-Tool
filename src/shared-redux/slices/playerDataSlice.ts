@@ -10,6 +10,10 @@ const playerDataSlice = createSlice({
     arenaVersion: "",
     tagsColors: {} as Record<string, string>,
     deckTags: {} as Record<string, string[]>,
+    playerDbPath: "",
+    appDbPath: "",
+    lastLogTimestamp: "",
+    lastLogFormat: "",
     cards: {
       cards_time: Date.now(),
       cards_before: {} as Record<string, number>,
@@ -136,6 +140,12 @@ const playerDataSlice = createSlice({
         tags.splice(tags.indexOf(tag), 1);
       }
       state.deckTags[deck] = tags;
+    },
+    setPlayerDb: (state, action): void => {
+      state.playerDbPath = action.payload;
+    },
+    setAppDb: (state, action): void => {
+      state.appDbPath = action.payload;
     }
   }
 });

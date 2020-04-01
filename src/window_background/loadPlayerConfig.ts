@@ -69,7 +69,13 @@ export async function loadPlayerConfig(): Promise<void> {
   ipcPop({ text: "Loading player history...", time: 0, progress: 2 });
   playerDb.init(playerId, playerName);
   playerDbLegacy.init(playerId, playerName);
-  setData({ playerDbPath: playerDb.filePath }, false);
+
+  reduxAction(
+    globals.store.dispatch,
+    "SET_PLAYERDB",
+    playerDb.filePath,
+    IPC_RENDERER
+  );
   ipcLog("Player database: " + playerDb.filePath);
 
   ipcLog("Finding all documents in player database...");

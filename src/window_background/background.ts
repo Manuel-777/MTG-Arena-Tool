@@ -91,7 +91,12 @@ ipc.on("download_metadata", () => {
 //
 ipc.on("start_background", async function() {
   appDb.init("application");
-  setData({ appDbPath: appDb.filePath }, false);
+  reduxAction(
+    globals.store.dispatch,
+    "SET_APPDB",
+    appDb.filePath,
+    IPC_RENDERER
+  );
 
   const appSettings = await appDb.find("", "settings");
   let logUri = appSettings.logUri;
