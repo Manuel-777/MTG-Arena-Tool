@@ -18,7 +18,6 @@ import {
 import { ArchiveButton } from "../list-item/ListItem";
 import {
   getCollationSet,
-  getPrettyContext,
   getReadableCode,
   vaultPercentFormat
 } from "./economyUtils";
@@ -161,7 +160,6 @@ function AllWildcardsEconomyValueRecord(
   props: AllWildcardsEconomyValueRecordProps
 ): JSX.Element {
   const { delta, isSmall } = props;
-  console.log(delta);
   return (
     <>
       {delta && delta.wcCommonDelta ? (

@@ -211,4 +211,3 @@ export async function loadPlayerConfig(): Promise<void> {
     ipcLog("Calling back to http-api...");
   }
 }
-
