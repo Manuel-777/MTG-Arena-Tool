@@ -109,6 +109,10 @@ function getDecksData(
       const lastTouched = dateMaxValid(lastUpdated, lastPlayed);
       return {
         ...deck,
+        tags: [
+          ...(store.getState().playerdata.deckTags[deck.id] || []),
+          ...deck.tags
+        ],
         archived,
         name,
         format: getReadableFormat(deck.format),

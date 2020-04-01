@@ -40,9 +40,11 @@ globals.store.subscribe(() => {
     oldState = newState;
     return;
   }
+  //console.log("Store updated");
   // Save settings only when they change
   const newSettings = newState.settings;
   if (!_.isEqual(oldState.settings, newSettings)) {
+    //console.log(".settings updated");
     playerDb.upsert("", "settings", newSettings);
   }
 
@@ -50,6 +52,7 @@ globals.store.subscribe(() => {
   const newAppSettings = { ...newState.appsettings };
   if (!_.isEqual(oldState.appsettings, newAppSettings)) {
     newAppSettings.toolVersion = globals.toolVersion;
+    //console.log(".appsettings updated");
     if (!newAppSettings.rememberMe) {
       appDb.upsert("", "settings", { ...newAppSettings, email: "", token: "" });
     } else {
@@ -60,7 +63,16 @@ globals.store.subscribe(() => {
   // Deck tags
   const newDeckTags = newState.playerdata.deckTags;
   if (!_.isEqual(oldState.playerdata.deckTags, newDeckTags)) {
-    playerDb.upsert("", "decks_tags", newDeckTags);
+    //console.log(".deck_tags updated");
+    playerDb.upsert("", "deck_tags", newDeckTags);
+  }
+  oldState = newState;
+
+  // Tags colors
+  const newColors = newState.playerdata.tagsColors;
+  if (!_.isEqual(oldState.playerdata.tagsColors, newColors)) {
+    //console.log(".tags_colors updated");
+    playerDb.upsert("", "tags_colors", newColors);
   }
   oldState = newState;
 });
@@ -273,7 +285,7 @@ ipc.on("edit_tag", (event, arg) => {
   };
   playerDb.upsert("", "tags_colors", tags);
   reduxAction(globals.store.dispatch, "EDIT_TAG_COLOR", arg, IPC_RENDERER);
-  sendSettings();
+  //sendSettings();
 });
 
 ipc.on("delete_matches_tag", (event, arg) => {

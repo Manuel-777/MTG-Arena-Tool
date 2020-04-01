@@ -81,7 +81,6 @@ export async function loadPlayerConfig(): Promise<void> {
   ipcLog("Finding all documents in player database...");
   let savedData = await playerDb.findAll();
   savedData = fixBadPlayerData(savedData);
-  console.log(savedData);
   const { settings } = savedData;
 
   // Get Rank data
@@ -190,6 +189,22 @@ export async function loadPlayerConfig(): Promise<void> {
     globals.store.dispatch,
     "ADD_CARDS_FROM_STORE",
     savedData.cards,
+    IPC_RENDERER
+  );
+
+  // Get tags colors data
+  reduxAction(
+    globals.store.dispatch,
+    "SET_TAG_COLORS",
+    savedData.tags_colors,
+    IPC_RENDERER
+  );
+
+  // Get deck tags data
+  reduxAction(
+    globals.store.dispatch,
+    "SET_DECK_TAGS",
+    savedData.deck_tags,
     IPC_RENDERER
   );
 

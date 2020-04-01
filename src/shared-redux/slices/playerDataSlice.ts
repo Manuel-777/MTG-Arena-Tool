@@ -141,6 +141,9 @@ const playerDataSlice = createSlice({
       }
       state.deckTags[deck] = tags;
     },
+    setDeckTags: (state, action): void => {
+      state.deckTags = action.payload;
+    },
     setPlayerDb: (state, action): void => {
       state.playerDbPath = action.payload;
     },

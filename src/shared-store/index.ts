@@ -104,7 +104,6 @@ export function getDeck(id: string): InternalDeck | undefined {
     ...globalStore.decks[id],
     colors: getDeckColors(globalStore.decks[id]),
     custom: !globalStore.staticDecks.includes(id)
-    //tags: decks_tags[id] || []
   };
   // lastUpdated does not specify timezone but implicitly occurs at UTC
   // attempt to add UTC timezone to lastUpdated iff result would be valid
