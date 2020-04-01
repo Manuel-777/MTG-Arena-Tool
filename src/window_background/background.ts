@@ -12,7 +12,6 @@ import {
   IPC_BACKGROUND
 } from "../shared/constants";
 import { appDb, playerDb } from "../shared/db/LocalDatabase";
-import { getReadableFormat } from "../shared/util";
 import { InternalDeck } from "../types/Deck";
 import addCustomDeck from "./addCustomDeck";
 import arenaLogWatcher from "./arena-log-watcher";
@@ -33,22 +32,27 @@ import {
   reduxAction
 } from "../shared-redux/sharedRedux";
 import { archive, getMatch, deckExists, getDeck } from "../shared-store";
+import { AppState } from "../shared-redux/stores/backgroundStore";
 
 initializeRendererReduxIPC(globals.store);
 
-let oldSettings = {};
-let oldAppSettings = {};
+let oldState: AppState;
 
 globals.store.subscribe(() => {
-  const newSettings = globals.store.getState().settings;
-  const newAppSettings = { ...globals.store.getState().appsettings };
+  const newState = { ...globals.store.getState() };
+  if (!oldState) {
+    oldState = newState;
+    return;
+  }
   // Save settings only when they change
-  if (!_.isEqual(oldSettings, newSettings)) {
-    oldSettings = newSettings;
+  const newSettings = newState.settings;
+  if (!_.isEqual(oldState.settings, newSettings)) {
     playerDb.upsert("", "settings", newSettings);
   }
-  if (!_.isEqual(oldAppSettings, newAppSettings)) {
-    oldAppSettings = newAppSettings;
+
+  // App settings
+  const newAppSettings = newState.appsettings;
+  if (!_.isEqual(oldState.appsettings, newAppSettings)) {
     newAppSettings.toolVersion = globals.toolVersion;
     if (!newAppSettings.rememberMe) {
       appDb.upsert("", "settings", { ...newAppSettings, email: "", token: "" });
@@ -56,6 +60,13 @@ globals.store.subscribe(() => {
       appDb.upsert("", "settings", newAppSettings);
     }
   }
+
+  // Deck tags
+  const newDeckTags = newState.playerdata.deckTags;
+  if (!_.isEqual(oldState.playerdata.deckTags, newDeckTags)) {
+    playerDb.upsert("", "decks_tags", newDeckTags);
+  }
+  oldState = newState;
 });
 
 globals.actionLogDir = path.join(
@@ -265,34 +276,6 @@ ipc.on("edit_tag", (event, arg) => {
   playerDb.upsert("", "tags_colors", tags);
   reduxAction(globals.store.dispatch, "EDIT_TAG_COLOR", arg, IPC_RENDERER);
   sendSettings();
-});
-
-ipc.on("delete_tag", (event, arg) => {
-  const { deckid, tag } = arg;
-  const deck = getDeck(deckid);
-  if (!deck || !tag) return;
-  if (!deck.tags || !deck.tags.includes(tag)) return;
-
-  const tags = [...deck.tags];
-  tags.splice(tags.indexOf(tag), 1);
-
-  const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
-  setData({ decks_tags });
-  playerDb.upsert("", "decks_tags", decks_tags);
-});
-
-ipc.on("add_tag", (event, arg) => {
-  const { deckid, tag } = arg;
-  const deck = getDeck(deckid);
-  if (!deck || !tag) return;
-  if (getReadableFormat(deck.format) === tag) return;
-  if (deck.tags && deck.tags.includes(tag)) return;
-
-  const tags = [...deck.tags, tag];
-
-  const decks_tags = { ...playerData.decks_tags, [deckid]: tags };
-  setData({ decks_tags });
-  playerDb.upsert("", "decks_tags", decks_tags);
 });
 
 ipc.on("delete_matches_tag", (event, arg) => {

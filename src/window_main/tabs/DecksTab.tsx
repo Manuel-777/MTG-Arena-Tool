@@ -6,7 +6,8 @@ import {
   SUB_DECK,
   IPC_NONE,
   IPC_ALL,
-  IPC_RENDERER
+  IPC_RENDERER,
+  IPC_BACKGROUND
 } from "../../shared/constants";
 import Deck from "../../shared/deck";
 import { getReadableFormat } from "../../shared/util";
@@ -36,7 +37,12 @@ function addTag(deckid: string, tag: string): void {
   if (getReadableFormat(deck.format) === tag) return;
   if (tag === "Add") return;
   if (deck.tags && deck.tags.includes(tag)) return;
-  ipcSend("add_tag", { deckid, tag });
+  reduxAction(
+    store.dispatch,
+    "ADD_DECK_TAG",
+    { tag: tag, deck: deckid },
+    IPC_BACKGROUND
+  );
 }
 
 function editTag(tag: string, color: string): void {
@@ -47,7 +53,12 @@ function deleteTag(deckid: string, tag: string): void {
   const deck = getDeck(deckid);
   if (!deck || !tag) return;
   if (!deck.tags || !deck.tags.includes(tag)) return;
-  ipcSend("delete_tag", { deckid, tag });
+  reduxAction(
+    store.dispatch,
+    "REMOVE_DECK_TAG",
+    { tag: tag, deck: deckid },
+    IPC_BACKGROUND
+  );
 }
 
 function toggleDeckArchived(id: string | number): void {

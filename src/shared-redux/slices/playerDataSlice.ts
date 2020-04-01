@@ -9,6 +9,7 @@ const playerDataSlice = createSlice({
     playerName: "",
     arenaVersion: "",
     tagsColors: {} as Record<string, string>,
+    deckTags: {} as Record<string, string[]>,
     cards: {
       cards_time: Date.now(),
       cards_before: {} as Record<string, number>,
@@ -121,6 +122,20 @@ const playerDataSlice = createSlice({
         }
       });
       state.cardsNew = newCards;
+    },
+    addDeckTag: (state, action): void => {
+      const { tag, deck } = action.payload;
+      const tags = state.deckTags[deck] || [];
+      if (tags.indexOf(tag) == -1) tags.push(tag);
+      state.deckTags[deck] = tags;
+    },
+    removeDeckTag: (state, action): void => {
+      const { tag, deck } = action.payload;
+      const tags = state.deckTags[deck] || [];
+      if (tags.includes(tag)) {
+        tags.splice(tags.indexOf(tag), 1);
+      }
+      state.deckTags[deck] = tags;
     }
   }
 });
