@@ -183,8 +183,8 @@ function onLogEntryFound(entry: any): void {
     return;
   } else {
     //console.log("Entry:", entry.label, entry, entry.json());
-    const end = new Date().getTime();
-    if (end < lastProgressPop + 1000) {
+    const end = Date.now();
+    if (end > lastProgressPop + 1000) {
       lastProgressPop = end;
       updateLoading(entry);
     }

@@ -1,5 +1,4 @@
-import React from "react";
-import { timestamp } from "../../../shared/util";
+import React, { useRef } from "react";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { useSelector } from "react-redux";
 
@@ -7,17 +6,20 @@ export default function Popup(): JSX.Element {
   const [opacity, setOpacity] = React.useState(0);
   const time = useSelector((state: AppState) => state.renderer.popup.time);
   const text = useSelector((state: AppState) => state.renderer.popup.text);
+  const timeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const duration = useSelector(
     (state: AppState) => state.renderer.popup.duration
   );
 
   React.useEffect(() => {
-    const diff = time - timestamp();
     setOpacity(1);
-    if (diff > 0 && duration > 0) {
-      setTimeout(() => {
+    if (timeout.current) {
+      clearTimeout(timeout.current);
+    }
+    if (duration > 0) {
+      timeout.current = setTimeout(() => {
         setOpacity(0);
-      }, diff);
+      }, duration);
     }
   }, [time, duration]);
 
