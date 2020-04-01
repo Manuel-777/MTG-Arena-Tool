@@ -8,7 +8,6 @@ import pd from "../../../shared/PlayerData";
 import { ipcSend } from "../../rendererUtil";
 import ReactSelect from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
-import Button from "../misc/Button";
 import { useSelector } from "react-redux";
 import store, { AppState } from "../../../shared-redux/stores/rendererStore";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
@@ -95,15 +94,6 @@ function openAppDbLink(): void {
 
 function openPlayerDbLink(): void {
   shell.showItemInFolder(pd.playerDbPath);
-}
-
-function backportClick(): void {
-  ipcSend("popup", {
-    text: "Backporting all player data...",
-    time: 0,
-    progress: 2
-  });
-  ipcSend("backport_all_data");
 }
 
 export default function SectionData(): JSX.Element {
@@ -272,11 +262,6 @@ export default function SectionData(): JSX.Element {
           </a>
         </p>
       </div>
-      <Button
-        text="Backport Data to Legacy JSON"
-        onClick={backportClick}
-        style={{ width: "300px" }}
-      />
     </>
   );
 }

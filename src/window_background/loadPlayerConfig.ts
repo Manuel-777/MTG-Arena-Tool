@@ -9,7 +9,6 @@ import { ipcSend, setData } from "./backgroundUtil";
 import globals from "./globals";
 
 import { playerDb, playerDbLegacy } from "../shared/db/LocalDatabase";
-import playerData from "../shared/PlayerData";
 import { isV2CardsList, ArenaV3Deck, DeckChange } from "../types/Deck";
 import arenaLogWatcher from "./arena-log-watcher";
 import convertDeckFromV3 from "./convertDeckFromV3";
@@ -213,15 +212,3 @@ export async function loadPlayerConfig(): Promise<void> {
   }
 }
 
-export function backportNeDbToElectronStore(): void {
-  ipcLog("Backporting player database...");
-  playerDbLegacy.upsertAll(playerData.data).then(num => {
-    ipcLog(`...backported ${num} records from nedb to electron-store`);
-    ipcPop({
-      text: "Successfully backported all player data to JSON.",
-      time: 3000,
-      progress: -1
-    });
-    shell.showItemInFolder(playerDbLegacy.filePath);
-  });
-}

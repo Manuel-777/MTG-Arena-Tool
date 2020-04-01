@@ -20,11 +20,7 @@ import { createDeck } from "./data";
 import forceDeckUpdate from "./forceDeckUpdate";
 import globals from "./globals";
 import * as httpApi from "./httpApi";
-import {
-  backportNeDbToElectronStore,
-  loadPlayerConfig,
-  syncSettings
-} from "./loadPlayerConfig";
+import { loadPlayerConfig, syncSettings } from "./loadPlayerConfig";
 import * as mtgaLog from "./mtgaLog";
 import updateDeck from "./updateDeck";
 import {
@@ -91,8 +87,6 @@ ipc.on("download_metadata", () => {
   const lang = globals.store.getState().appsettings.metadataLang;
   httpApi.httpGetDatabaseVersion(lang);
 });
-
-ipc.on("backport_all_data", backportNeDbToElectronStore);
 
 //
 ipc.on("start_background", async function() {

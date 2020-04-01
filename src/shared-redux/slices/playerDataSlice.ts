@@ -59,7 +59,7 @@ const playerDataSlice = createSlice({
   },
   reducers: {
     setPlayerId: (state, action): void => {
-      state.playerId = action.payload;
+      state.arenaId = action.payload;
     },
     setPlayerName: (state, action): void => {
       state.playerName = action.payload;
