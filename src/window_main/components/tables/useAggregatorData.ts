@@ -21,7 +21,8 @@ export function getDefaultAggFilters(
 export function useAggregatorData<D extends TableData>({
   aggFiltersArg,
   getData,
-  showArchived
+  showArchived,
+  forceMemo
 }: {
   aggFiltersArg?: AggregatorFilters;
   getData: (
@@ -29,6 +30,7 @@ export function useAggregatorData<D extends TableData>({
     archivedCache: Record<string, boolean>
   ) => D[];
   showArchived: boolean;
+  forceMemo?: any;
 }): {
   aggFilters: AggregatorFilters;
   data: D[];
@@ -44,9 +46,10 @@ export function useAggregatorData<D extends TableData>({
     (state: AppState) => state.renderer.archivedCache
   );
   const data = React.useMemo(() => {
+    forceMemo;
     const aggregator = new Aggregator(aggFilters);
     return getData(aggregator, archivedCache);
-  }, [aggFilters, archivedCache, getData]);
+  }, [aggFilters, archivedCache, getData, forceMemo]);
   return {
     aggFilters,
     data,

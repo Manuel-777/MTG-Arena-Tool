@@ -1,6 +1,6 @@
 import isValid from "date-fns/isValid";
-import React from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { TableState } from "react-table";
 import {
   SUB_MATCH,
@@ -21,7 +21,7 @@ import { ipcSend, toggleArchived } from "../rendererUtil";
 import uxMove from "../uxMove";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import { matchesList, getMatch } from "../../shared-store";
-import store from "../../shared-redux/stores/rendererStore";
+import store, { AppState } from "../../shared-redux/stores/rendererStore";
 
 const { DEFAULT_ARCH, NO_ARCH } = Aggregator;
 const tagPrompt = "Set archetype";
@@ -148,13 +148,18 @@ export default function MatchesTab({
   aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
   const dispatcher = useDispatch();
+  const matchesList = useSelector(
+    (state: AppState) => state.matches.matchesIndex
+  );
   const { matchesTableMode, matchesTableState } = store.getState().settings;
   const showArchived = !isHidingArchived(matchesTableState);
   const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,
     getData: getMatchesData,
-    showArchived
+    showArchived,
+    forceMemo: matchesList
   });
+
   const openMatchDetails = React.useCallback(
     (match: InternalMatch): void => {
       uxMove(-100);
@@ -176,6 +181,7 @@ export default function MatchesTab({
     },
     [dispatcher]
   );
+
   const [events, tags] = React.useMemo(getTotalAggData, []);
   return (
     <div className="ux_item">
