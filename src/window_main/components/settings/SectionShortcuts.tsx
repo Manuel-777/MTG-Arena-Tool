@@ -41,11 +41,10 @@ function ShortcutsRow({
   const closeKeyCombDialog = useCallback(
     (key: string): void => {
       setOpenDialog(false);
-      ((settings as unknown) as Record<string, string>)[code] = key;
       reduxAction(
         store.dispatch,
         "SET_SETTINGS",
-        { ...settings },
+        { ...settings, [code]: key },
         IPC_ALL ^ IPC_RENDERER
       );
     },
