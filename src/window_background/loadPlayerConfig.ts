@@ -100,7 +100,10 @@ export async function loadPlayerConfig(): Promise<void> {
   // Get Events data
   const eventsList: InternalEvent[] = savedData.courses_index
     .filter((id: string) => savedData[id])
-    .map((id: string) => savedData[id]);
+    .map((id: string) => {
+      savedData[id].date = new Date(savedData[id].date).getTime();
+      return savedData[id];
+    });
 
   reduxAction(
     globals.store.dispatch,
@@ -160,10 +163,20 @@ export async function loadPlayerConfig(): Promise<void> {
   );
 
   // Get Seasonal data
+  const newSeasonal = { ...savedData.seasonal };
+  Object.keys(newSeasonal).forEach((id: string) => {
+    const update = newSeasonal[id] as any;
+    // Ugh.. some timestamps are stored as Date
+    if (update.timestamp instanceof Date) {
+      update.timestamp = update.timestamp.getTime();
+      newSeasonal[id] = update;
+    }
+  });
+
   reduxAction(
     globals.store.dispatch,
     "SET_MANY_SEASONAL",
-    savedData.seasonal,
+    newSeasonal,
     IPC_RENDERER
   );
 

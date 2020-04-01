@@ -29,7 +29,7 @@ export interface InternalEvent {
   archived?: boolean;
   CurrentEventState: string | number;
   custom: boolean;
-  date: string;
+  date: number;
   InternalEventName: string;
   ModuleInstanceData: ModuleInstanceData;
   type: "Event";

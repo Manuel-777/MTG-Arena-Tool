@@ -52,7 +52,7 @@ export default function InEventGetPlayerCourseV2(entry: Entry): void {
     ModuleInstanceData: json.ModuleInstanceData,
     type: "Event",
     id: json.Id,
-    date: globals.logTime.toISOString()
+    date: globals.logTime.getTime()
   };
 
   if (v2Deck) {

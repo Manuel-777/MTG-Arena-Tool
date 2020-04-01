@@ -22,11 +22,6 @@ const seasonalSlice = createSlice({
       const newSeasonal = { ...state.seasonal };
       Object.keys(action.payload).forEach((id: string) => {
         const update = action.payload[id] as InternalRankUpdate;
-        // Ugh.. some timestamps are stored as Date
-        if ((update.timestamp as any) instanceof Date) {
-          const nd = update.timestamp as unknown;
-          update.timestamp = (nd as Date).getTime();
-        }
         // Add to global store
         globalStore.seasonal[update.id] = update;
         const season = `${update.rankUpdateType.toLowerCase()}_${
