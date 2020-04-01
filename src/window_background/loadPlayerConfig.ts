@@ -1,4 +1,3 @@
-import { shell } from "electron";
 import {
   IPC_BACKGROUND,
   IPC_OVERLAY,

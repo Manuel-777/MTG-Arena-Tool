@@ -1,7 +1,7 @@
 import { completeMatch } from "./data";
 import globals from "./globals";
 import { playerDb } from "../shared/db/LocalDatabase";
-import { ipcSend, setData } from "./backgroundUtil";
+import { ipcSend } from "./backgroundUtil";
 import { reduxAction } from "../shared-redux/sharedRedux";
 import { IPC_RENDERER } from "../shared/constants";
 import { getMatch } from "../shared-store";
@@ -32,7 +32,6 @@ export default function saveMatch(id: string, matchEndTime: number): void {
   }
 
   playerDb.upsert("", id, match);
-  setData({ [id]: match });
   if (globals.matchCompletedOnGameNumber === globals.gameNumberCompleted) {
     const httpApi = require("./httpApi");
     httpApi.httpSetMatch(match);

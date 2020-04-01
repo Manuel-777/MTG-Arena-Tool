@@ -11,9 +11,7 @@ import * as Labels from "./onLabel";
 
 import {
   ipcSend,
-  getDateFormat,
   parseWotcTimeFallback,
-  setData,
   updateLoading
 } from "./backgroundUtil";
 import {

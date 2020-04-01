@@ -3,7 +3,6 @@ import { setData } from "../backgroundUtil";
 import { playerDb } from "../../shared/db/LocalDatabase";
 import { PlayerCourse } from "../../types/event";
 import addCustomDeck from "../addCustomDeck";
-import Deck from "../../shared/deck";
 import convertDeckFromV3 from "../convertDeckFromV3";
 
 interface Entry extends LogEntry {

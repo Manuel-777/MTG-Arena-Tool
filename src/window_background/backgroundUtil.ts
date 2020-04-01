@@ -149,32 +149,11 @@ export function unleakString(s: string): string {
   return (" " + s).substr(1);
 }
 
-const dataBlacklist = [
-  "transactionList",
-  "draftList",
-  "eventList",
-  "matchList"
-];
-
-const overlayWhitelist = [
-  "name",
-  "userName",
-  "arenaId",
-  "arenaVersion",
-  "patreon",
-  "patreon_tier",
-  "rank",
-  "cards",
-  "cardsNew",
-  "settings"
-];
-
-// convenience fn to update player data singletons in all processes
-// (update is destructive, be sure to use spread syntax if necessary)
 export function setData(
   data: any,
   refresh = globals.debugLog || !globals.firstPass
 ): void {
-  const cleanData = _.omit(data, dataBlacklist);
-  //playerData.handleSetData(null, JSON.stringify(cleanData));
+  // Unused now, and should be removed.
+  // Any uses of it currently mean something needs
+  // to be updated to the new redux ways.
 }

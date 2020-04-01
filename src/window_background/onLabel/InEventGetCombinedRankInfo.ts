@@ -1,7 +1,9 @@
 import LogEntry from "../../types/logDecoder";
-import { setData } from "../backgroundUtil";
 import { playerDb } from "../../shared/db/LocalDatabase";
 import { InternalRank } from "../../types/rank";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import globals from "../globals";
+import { IPC_RENDERER } from "../../shared/constants";
 
 interface EntryJson {
   playerId: string;
@@ -65,6 +67,6 @@ export default function InEventGetCombinedRankInfo(entry: Entry): void {
     console.warn("rankInfo is not processing all data.", Object.keys(json));
   }
 
-  setData({ rank });
+  reduxAction(globals.store.dispatch, "SET_RANK", rank, IPC_RENDERER);
   playerDb.upsert("", "rank", rank);
 }
