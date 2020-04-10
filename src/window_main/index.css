@@ -2603,6 +2603,19 @@ a:hover {
     background-color: rgba(65, 50, 40, 0.75);
 }
 
+.deck-changes-expand {
+    overflow: hidden;
+}
+
+.expand-arrow {
+    width: 18px;
+    height: 18px;
+    margin: auto 2px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url(../images/to_right.png);
+}
+
 .change-add {
     width: 30px;
     height: 30px;

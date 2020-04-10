@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { InternalDeck, CardObject, DeckChange } from "../../../types/Deck";
 import ManaCost from "../misc/ManaCost";
 import { MANA_COLORS, IPC_NONE } from "../../../shared/constants";
@@ -17,6 +17,9 @@ import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { getDeck, getDeckChangesList } from "../../../shared-store";
+import { useSprings, animated } from "react-spring";
+import CardTile from "../../../shared/CardTile";
+
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;
@@ -430,7 +433,30 @@ function sortDeckChanges(ad: DeckChange, bd: DeckChange): number {
 
 function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
   const { deck, setRegularView } = props;
+
   const changes = getDeckChangesList(deck.id).sort(sortDeckChanges);
+  const numberOfChanges = changes.map(
+    ch => [...ch.changesMain, ...ch.changesSide].length + 2
+  );
+  const [expandSprings, expandSet] = useSprings(changes.length, index => ({
+    height: 0
+  }));
+  const [arrowSprings, arrowSet] = useSprings(changes.length, index => ({
+    transform: "rotate(0deg)"
+  }));
+
+  const expand = (index: number): void => {
+    // This is fine, not sure why ts goes mad about it
+    expandSet((i: number) => {
+      if (i == index) return { height: numberOfChanges[index] * 32 };
+      else return { height: 0 };
+    });
+    arrowSet((i: number) => {
+      if (i == index) return { transform: "rotate(90deg)" };
+      else return { transform: "rotate(0deg)" };
+    });
+  };
+
   return (
     <>
       <Button text="Normal View" onClick={setRegularView} />
@@ -439,24 +465,79 @@ function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
           <DeckList deck={deck} showWildcards={true} />
         </div>
         <div style={{ padding: "47px 0" }} className="stats">
-          {changes.map(ch => {
+          {changes.map((ch, index) => {
             const bothChanges = [...ch.changesMain, ...ch.changesSide];
             const added = bothChanges
               .filter(c => c.quantity > 0)
               .reduce((ca, cb) => ca + cb.quantity, 0);
             const removed = bothChanges
-              .filter(c => c.quantity > 0)
+              .filter(c => c.quantity < 0)
               .reduce((ca, cb) => ca + cb.quantity, 0);
             return (
-              <div className="deck-change" key={ch.id}>
-                <div style={{ marginRight: "auto" }}>
-                  <relative-time datetime={ch.date}>{ch.date}</relative-time>
+              <>
+                <div
+                  className="deck-change"
+                  key={ch.id}
+                  onClick={(): void => expand(index)}
+                >
+                  <animated.div
+                    className="expand-arrow"
+                    style={arrowSprings[index]}
+                  ></animated.div>
+                  <div style={{ marginRight: "auto" }}>
+                    <relative-time datetime={ch.date}>{ch.date}</relative-time>
+                  </div>
+                  <div className="change-add" />
+                  {added}
+                  <div className="change-remove" />
+                  {removed}
                 </div>
-                <div className="change-add" />
-                {added}
-                <div className="change-remove" />
-                {removed}
-              </div>
+                <animated.div
+                  style={expandSprings[index]}
+                  className="deck-changes-expand"
+                >
+                  <div className="card_tile_separator">Mainboard</div>
+                  {ch.changesMain.map(card => {
+                    const cardObj = db.card(card.id);
+                    if (cardObj)
+                      return (
+                        <CardTile
+                          indent="a"
+                          key={"main-" + card.id}
+                          card={cardObj}
+                          isHighlighted={false}
+                          isSideboard={false}
+                          showWildcards={false}
+                          quantity={
+                            card.quantity > 0
+                              ? "+" + card.quantity
+                              : card.quantity
+                          }
+                        />
+                      );
+                  })}
+                  <div className="card_tile_separator">Sideboard</div>
+                  {ch.changesSide.map(card => {
+                    const cardObj = db.card(card.id);
+                    if (cardObj)
+                      return (
+                        <CardTile
+                          indent="a"
+                          key={"main-" + card.id}
+                          card={cardObj}
+                          isHighlighted={false}
+                          isSideboard={false}
+                          showWildcards={false}
+                          quantity={
+                            card.quantity > 0
+                              ? "+" + card.quantity
+                              : card.quantity
+                          }
+                        />
+                      );
+                  })}
+                </animated.div>
+              </>
             );
           })}
         </div>
