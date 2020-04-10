@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { InternalDeck, CardObject, DeckChange } from "../../../types/Deck";
 import ManaCost from "../misc/ManaCost";
 import { MANA_COLORS, IPC_NONE } from "../../../shared/constants";
@@ -448,8 +448,8 @@ function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
   const expand = (index: number): void => {
     // This is fine, not sure why ts goes mad about it
     expandSet((i: number) => {
-      if (i == index) return { height: numberOfChanges[index] * 32 };
-      else return { height: 0 };
+      if (i == index) return { height: numberOfChanges[index] * 32 + 1 };
+      else return { height: 1 };
     });
     arrowSet((i: number) => {
       if (i == index) return { transform: "rotate(90deg)" };
@@ -491,6 +491,7 @@ function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
                   {added}
                   <div className="change-remove" />
                   {removed}
+                  <div style={{ marginRight: "8px" }} />
                 </div>
                 <animated.div
                   style={expandSprings[index]}
