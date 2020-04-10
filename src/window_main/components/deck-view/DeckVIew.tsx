@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { InternalDeck, CardObject } from "../../../types/Deck";
+import { InternalDeck, CardObject, DeckChange } from "../../../types/Deck";
 import ManaCost from "../misc/ManaCost";
 import { MANA_COLORS, IPC_NONE } from "../../../shared/constants";
 import DeckList from "../misc/DeckList";
@@ -16,11 +16,12 @@ import { getCardImage } from "../../../shared/util";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
-import { getDeck } from "../../../shared-store";
+import { getDeck, getDeckChangesList } from "../../../shared-store";
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;
 const VIEW_REGULAR = 1;
+const VIEW_CHANGES = 2;
 
 interface DeckViewProps {
   deck: InternalDeck;
@@ -135,6 +136,10 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     uxMove(0);
   };
 
+  const deckChangesView = (): void => {
+    setDeckView(VIEW_CHANGES);
+  };
+
   const visualView = (): void => {
     setDeckView(VIEW_VISUAL);
   };
@@ -191,16 +196,25 @@ export function DeckView(props: DeckViewProps): JSX.Element {
       </div>
       <div
         className="flex_item"
-        style={deckView == VIEW_VISUAL ? { flexDirection: "column" } : {}}
+        style={deckView !== VIEW_REGULAR ? { flexDirection: "column" } : {}}
       >
-        {deckView == VIEW_VISUAL ? (
+        {deckView == VIEW_VISUAL && (
           <VisualDeckView deck={deck} setRegularView={regularView} />
-        ) : (
+        )}
+        {deckView == VIEW_CHANGES && (
+          <ChangesDeckView deck={deck} setRegularView={regularView} />
+        )}
+        {deckView == VIEW_REGULAR && (
           <>
             <div className="decklist">
               <DeckList deck={deck} showWildcards={true} />
             </div>
             <div className="stats">
+              <Button
+                className="button_simple exportDeck"
+                text="Deck Changes"
+                onClick={deckChangesView}
+              />
               <Button
                 className="button_simple exportDeck"
                 text="Visual View"
@@ -401,6 +415,50 @@ function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
               }
             })}
           </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function sortDeckChanges(ad: DeckChange, bd: DeckChange): number {
+  const a = ad.date;
+  const b = bd.date;
+  if (a == b) return 0;
+  return a < b ? 1 : -1;
+}
+
+function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
+  const { deck, setRegularView } = props;
+  const changes = getDeckChangesList(deck.id).sort(sortDeckChanges);
+  return (
+    <>
+      <Button text="Normal View" onClick={setRegularView} />
+      <div style={{ display: "flex" }}>
+        <div className="decklist">
+          <DeckList deck={deck} showWildcards={true} />
+        </div>
+        <div style={{ padding: "47px 0" }} className="stats">
+          {changes.map(ch => {
+            const bothChanges = [...ch.changesMain, ...ch.changesSide];
+            const added = bothChanges
+              .filter(c => c.quantity > 0)
+              .reduce((ca, cb) => ca + cb.quantity, 0);
+            const removed = bothChanges
+              .filter(c => c.quantity > 0)
+              .reduce((ca, cb) => ca + cb.quantity, 0);
+            return (
+              <div className="deck-change" key={ch.id}>
+                <div style={{ marginRight: "auto" }}>
+                  <relative-time datetime={ch.date}>{ch.date}</relative-time>
+                </div>
+                <div className="change-add" />
+                {added}
+                <div className="change-remove" />
+                {removed}
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
