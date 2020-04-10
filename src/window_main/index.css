@@ -2628,6 +2628,13 @@ a:hover {
     background: url(../images/removed.png) no-repeat center;
 }
 
+.change-warning {
+    font-size: 18px;
+    font-family: var(--main-font-name-it);
+    color: var(--color-r);
+    text-align: center;
+}
+
 
 .explore_buttons_container {
     width: 100%;

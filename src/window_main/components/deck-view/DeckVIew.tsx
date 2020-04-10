@@ -433,8 +433,8 @@ function sortDeckChanges(ad: DeckChange, bd: DeckChange): number {
 
 function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
   const { deck, setRegularView } = props;
-
   const changes = getDeckChangesList(deck.id).sort(sortDeckChanges);
+  const [currentDeck, setDeck] = useState<Deck>(deck);
   const numberOfChanges = changes.map(
     ch => [...ch.changesMain, ...ch.changesSide].length + 2
   );
@@ -446,6 +446,12 @@ function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
   }));
 
   const expand = (index: number): void => {
+    const newDeck = new Deck(
+      {},
+      changes[index].previousMain,
+      changes[index].previousSide
+    );
+    setDeck(newDeck);
     // This is fine, not sure why ts goes mad about it
     expandSet((i: number) => {
       if (i == index) return { height: numberOfChanges[index] * 32 + 1 };
@@ -462,85 +468,91 @@ function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
       <Button text="Normal View" onClick={setRegularView} />
       <div style={{ display: "flex" }}>
         <div className="decklist">
-          <DeckList deck={deck} showWildcards={true} />
+          <DeckList deck={currentDeck} showWildcards={true} />
         </div>
         <div style={{ padding: "47px 0" }} className="stats">
-          {changes.map((ch, index) => {
-            const bothChanges = [...ch.changesMain, ...ch.changesSide];
-            const added = bothChanges
-              .filter(c => c.quantity > 0)
-              .reduce((ca, cb) => ca + cb.quantity, 0);
-            const removed = bothChanges
-              .filter(c => c.quantity < 0)
-              .reduce((ca, cb) => ca + Math.abs(cb.quantity), 0);
-            return (
-              <>
-                <div
-                  className="deck-change"
-                  key={ch.id}
-                  onClick={(): void => expand(index)}
-                >
-                  <animated.div
-                    className="expand-arrow"
-                    style={arrowSprings[index]}
-                  ></animated.div>
-                  <div style={{ marginRight: "auto" }}>
-                    <relative-time datetime={ch.date}>{ch.date}</relative-time>
+          {changes.length > 0 ? (
+            changes.map((ch, index) => {
+              const bothChanges = [...ch.changesMain, ...ch.changesSide];
+              const added = bothChanges
+                .filter(c => c.quantity > 0)
+                .reduce((ca, cb) => ca + cb.quantity, 0);
+              const removed = bothChanges
+                .filter(c => c.quantity < 0)
+                .reduce((ca, cb) => ca + Math.abs(cb.quantity), 0);
+              return (
+                <React.Fragment key={ch.id}>
+                  <div
+                    className="deck-change"
+                    key={ch.id}
+                    onClick={(): void => expand(index)}
+                  >
+                    <animated.div
+                      className="expand-arrow"
+                      style={arrowSprings[index]}
+                    ></animated.div>
+                    <div style={{ marginRight: "auto" }}>
+                      <relative-time datetime={ch.date}>
+                        {ch.date}
+                      </relative-time>
+                    </div>
+                    <div className="change-add" />
+                    {added}
+                    <div className="change-remove" />
+                    {removed}
+                    <div style={{ marginRight: "8px" }} />
                   </div>
-                  <div className="change-add" />
-                  {added}
-                  <div className="change-remove" />
-                  {removed}
-                  <div style={{ marginRight: "8px" }} />
-                </div>
-                <animated.div
-                  style={expandSprings[index]}
-                  className="deck-changes-expand"
-                >
-                  <div className="card_tile_separator">Mainboard</div>
-                  {ch.changesMain.map(card => {
-                    const cardObj = db.card(card.id);
-                    if (cardObj)
-                      return (
-                        <CardTile
-                          indent="a"
-                          key={"main-" + card.id}
-                          card={cardObj}
-                          isHighlighted={false}
-                          isSideboard={false}
-                          showWildcards={false}
-                          quantity={
-                            card.quantity > 0
-                              ? "+" + card.quantity
-                              : card.quantity
-                          }
-                        />
-                      );
-                  })}
-                  <div className="card_tile_separator">Sideboard</div>
-                  {ch.changesSide.map(card => {
-                    const cardObj = db.card(card.id);
-                    if (cardObj)
-                      return (
-                        <CardTile
-                          indent="a"
-                          key={"main-" + card.id}
-                          card={cardObj}
-                          isHighlighted={false}
-                          isSideboard={false}
-                          showWildcards={false}
-                          quantity={
-                            card.quantity > 0
-                              ? "+" + card.quantity
-                              : card.quantity
-                          }
-                        />
-                      );
-                  })}
-                </animated.div>
-              </>
-            );
-          })}
+                  <animated.div
+                    style={expandSprings[index]}
+                    className="deck-changes-expand"
+                  >
+                    <div className="card_tile_separator">Mainboard</div>
+                    {ch.changesMain.map(card => {
+                      const cardObj = db.card(card.id);
+                      if (cardObj)
+                        return (
+                          <CardTile
+                            indent="a"
+                            key={"main-" + card.id}
+                            card={cardObj}
+                            isHighlighted={false}
+                            isSideboard={false}
+                            showWildcards={false}
+                            quantity={
+                              card.quantity > 0
+                                ? "+" + card.quantity
+                                : card.quantity
+                            }
+                          />
+                        );
+                    })}
+                    <div className="card_tile_separator">Sideboard</div>
+                    {ch.changesSide.map(card => {
+                      const cardObj = db.card(card.id);
+                      if (cardObj)
+                        return (
+                          <CardTile
+                            indent="a"
+                            key={"main-" + card.id}
+                            card={cardObj}
+                            isHighlighted={false}
+                            isSideboard={false}
+                            showWildcards={false}
+                            quantity={
+                              card.quantity > 0
+                                ? "+" + card.quantity
+                                : card.quantity
+                            }
+                          />
+                        );
+                    })}
+                  </animated.div>
+                </React.Fragment>
+              );
+            })
+          ) : (
+            <div className="change-warning">No changes recorded.</div>
+          )}
         </div>
       </div>
     </>
