@@ -472,7 +472,7 @@ function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
               .reduce((ca, cb) => ca + cb.quantity, 0);
             const removed = bothChanges
               .filter(c => c.quantity < 0)
-              .reduce((ca, cb) => ca + cb.quantity, 0);
+              .reduce((ca, cb) => ca + Math.abs(cb.quantity), 0);
             return (
               <>
                 <div
