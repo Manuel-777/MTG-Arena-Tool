@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { InternalDeck, CardObject, DeckChange } from "../../../types/Deck";
+import { InternalDeck, CardObject } from "../../../types/Deck";
 import ManaCost from "../misc/ManaCost";
 import { MANA_COLORS, IPC_NONE } from "../../../shared/constants";
 import DeckList from "../misc/DeckList";
@@ -8,17 +8,15 @@ import DeckManaCurve from "../../../shared/DeckManaCurve";
 import Deck from "../../../shared/deck";
 import Button from "../misc/Button";
 import { ipcSend } from "../../rendererUtil";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import db from "../../../shared/database";
 import ShareButton from "../misc/ShareButton";
 import CraftingCost from "./CraftingCost";
-import { getCardImage } from "../../../shared/util";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
-import { getDeck, getDeckChangesList } from "../../../shared-store";
-import { useSprings, animated } from "react-spring";
-import CardTile from "../../../shared/CardTile";
+import { getDeck } from "../../../shared-store";
+import VisualDeckView from "./VisualDeckView";
+import ChangesDeckView from "./ChangesDeckView";
 
 const ReactSvgPieChart = require("react-svg-piechart");
 
@@ -235,11 +233,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
               />
               <DeckTypesStats deck={deck} />
               <DeckManaCurve deck={deck} />
-              {/*
-            WildcardsCost should use Deck class to
-            render. Im not changing it now because
-            it will break other parts of the UI
-          */}
               <div className="pie_container_outer">
                 <div className="pie_container">
                   <span>Mana Symbols</span>
@@ -256,306 +249,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
         )}
       </div>
     </div>
-  );
-}
-
-interface VisualDeckViewProps {
-  deck: Deck;
-  setRegularView: { (): void };
-}
-
-type SplitIds = [number, number, number, number];
-
-function cmcSort(a: CardObject, b: CardObject): number {
-  const ca = db.card(a.id);
-  const cb = db.card(b.id);
-
-  if (ca && cb) {
-    return cb.cmc - ca.cmc;
-  } else {
-    return 0;
-  }
-}
-
-function VisualDeckView(props: VisualDeckViewProps): JSX.Element {
-  const { deck, setRegularView } = props;
-  const sz =
-    100 + useSelector((state: AppState) => state.settings.cards_size) * 15;
-  const cardQuality = useSelector(
-    (state: AppState) => state.settings.cards_quality
-  );
-  const dispatcher = useDispatch();
-
-  const hoverCard = (id: number, hover: boolean): void => {
-    reduxAction(
-      dispatcher,
-      hover ? "SET_HOVER_IN" : "SET_HOVER_OUT",
-      { grpId: id },
-      IPC_NONE
-    );
-  };
-
-  // attempt at sorting visually..
-  const newMainDeck: number[] = [];
-  deck
-    .getMainboard()
-    .get()
-    .sort(cmcSort)
-    .map((c: CardObject) => {
-      for (let i = 0; i < c.quantity; i++) {
-        newMainDeck.push(c.id);
-      }
-    });
-
-  const splitDeck: SplitIds[] = [];
-  for (let i = 0; i < newMainDeck.length; i += 4) {
-    splitDeck.push([
-      newMainDeck[i] || 0,
-      newMainDeck[i + 1] || 0,
-      newMainDeck[i + 2] || 0,
-      newMainDeck[i + 3] || 0
-    ]);
-  }
-
-  const newSideboard: number[] = [];
-  deck
-    .getSideboard()
-    .get()
-    .map((c: CardObject) => {
-      for (let i = 0; i < c.quantity; i++) {
-        newSideboard.push(c.id);
-      }
-    });
-
-  return (
-    <>
-      <DeckTypesStats deck={deck} />
-      <Button text="Normal View" onClick={setRegularView} />
-      <div
-        className="decklist"
-        style={{ display: "flex", width: "auto", margin: "0 auto" }}
-      >
-        <div
-          className="visual_mainboard"
-          style={{ display: "flex", flexWrap: "wrap", alignContent: "start" }}
-        >
-          {splitDeck.map((idsList: SplitIds, index: number) => {
-            const cards = idsList.map((grpId: number, cindex: number) => {
-              const cardObj = db.card(grpId);
-              if (cardObj) {
-                return (
-                  <div
-                    style={{ width: sz + "px", height: sz * 0.166 + "px" }}
-                    key={"visual-main-" + cindex}
-                    className="deck_visual_card"
-                  >
-                    <img
-                      onMouseEnter={(): void => {
-                        hoverCard(grpId, true);
-                      }}
-                      onMouseLeave={(): void => {
-                        hoverCard(grpId, false);
-                      }}
-                      style={{ width: sz + "px" }}
-                      src={getCardImage(cardObj, cardQuality)}
-                      className="deck_visual_card_img"
-                    ></img>
-                  </div>
-                );
-              }
-            });
-            return (
-              <div
-                key={"visual-" + index}
-                style={{ marginBottom: sz * 0.5 + "px" }}
-                className="deck_visual_tile"
-              >
-                {cards}
-              </div>
-            );
-          })}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            marginLeft: "32px",
-            alignContent: "start",
-            maxWidth: (sz + 6) * 1.5 + "px"
-          }}
-          className="visual_sideboard"
-        >
-          <div
-            style={{ width: (sz + 6) * 5 + "px" }}
-            className="deck_visual_tile_side"
-          >
-            {newSideboard.map((grpId: number, _n: number) => {
-              const cardObj = db.card(grpId);
-              if (cardObj) {
-                return (
-                  <div
-                    key={"visual-side-" + _n}
-                    style={{
-                      width: sz + "px",
-                      height: sz * 0.166 + "px",
-                      marginLeft: _n % 2 == 0 ? "60px" : ""
-                    }}
-                    className="deck_visual_card_side"
-                  >
-                    <img
-                      onMouseEnter={(): void => {
-                        hoverCard(grpId, true);
-                      }}
-                      onMouseLeave={(): void => {
-                        hoverCard(grpId, false);
-                      }}
-                      style={{ width: sz + "px" }}
-                      src={getCardImage(cardObj, cardQuality)}
-                      className="deck_visual_card_img"
-                    ></img>
-                  </div>
-                );
-              }
-            })}
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
-function sortDeckChanges(ad: DeckChange, bd: DeckChange): number {
-  const a = ad.date;
-  const b = bd.date;
-  if (a == b) return 0;
-  return a < b ? 1 : -1;
-}
-
-function ChangesDeckView(props: VisualDeckViewProps): JSX.Element {
-  const { deck, setRegularView } = props;
-  const changes = getDeckChangesList(deck.id).sort(sortDeckChanges);
-  const [currentDeck, setDeck] = useState<Deck>(deck);
-  const numberOfChanges = changes.map(
-    ch => [...ch.changesMain, ...ch.changesSide].length + 2
-  );
-  const [expandSprings, expandSet] = useSprings(changes.length, index => ({
-    height: 0
-  }));
-  const [arrowSprings, arrowSet] = useSprings(changes.length, index => ({
-    transform: "rotate(0deg)"
-  }));
-
-  const expand = (index: number): void => {
-    const newDeck = new Deck(
-      {},
-      changes[index].previousMain,
-      changes[index].previousSide
-    );
-    setDeck(newDeck);
-    // This is fine, not sure why ts goes mad about it
-    expandSet((i: number) => {
-      if (i == index) return { height: numberOfChanges[index] * 32 + 1 };
-      else return { height: 1 };
-    });
-    arrowSet((i: number) => {
-      if (i == index) return { transform: "rotate(90deg)" };
-      else return { transform: "rotate(0deg)" };
-    });
-  };
-
-  return (
-    <>
-      <Button text="Normal View" onClick={setRegularView} />
-      <div style={{ display: "flex" }}>
-        <div className="decklist">
-          <DeckList deck={currentDeck} showWildcards={true} />
-        </div>
-        <div style={{ padding: "47px 0" }} className="stats">
-          {changes.length > 0 ? (
-            changes.map((ch, index) => {
-              const bothChanges = [...ch.changesMain, ...ch.changesSide];
-              const added = bothChanges
-                .filter(c => c.quantity > 0)
-                .reduce((ca, cb) => ca + cb.quantity, 0);
-              const removed = bothChanges
-                .filter(c => c.quantity < 0)
-                .reduce((ca, cb) => ca + Math.abs(cb.quantity), 0);
-              return (
-                <React.Fragment key={ch.id}>
-                  <div
-                    className="deck-change"
-                    key={ch.id}
-                    onClick={(): void => expand(index)}
-                  >
-                    <animated.div
-                      className="expand-arrow"
-                      style={arrowSprings[index]}
-                    ></animated.div>
-                    <div style={{ marginRight: "auto" }}>
-                      <relative-time datetime={ch.date}>
-                        {ch.date}
-                      </relative-time>
-                    </div>
-                    <div className="change-add" />
-                    {added}
-                    <div className="change-remove" />
-                    {removed}
-                    <div style={{ marginRight: "8px" }} />
-                  </div>
-                  <animated.div
-                    style={expandSprings[index]}
-                    className="deck-changes-expand"
-                  >
-                    <div className="card_tile_separator">Mainboard</div>
-                    {ch.changesMain.map(card => {
-                      const cardObj = db.card(card.id);
-                      if (cardObj)
-                        return (
-                          <CardTile
-                            indent="a"
-                            key={"main-" + card.id}
-                            card={cardObj}
-                            isHighlighted={false}
-                            isSideboard={false}
-                            showWildcards={false}
-                            quantity={
-                              card.quantity > 0
-                                ? "+" + card.quantity
-                                : card.quantity
-                            }
-                          />
-                        );
-                    })}
-                    <div className="card_tile_separator">Sideboard</div>
-                    {ch.changesSide.map(card => {
-                      const cardObj = db.card(card.id);
-                      if (cardObj)
-                        return (
-                          <CardTile
-                            indent="a"
-                            key={"main-" + card.id}
-                            card={cardObj}
-                            isHighlighted={false}
-                            isSideboard={false}
-                            showWildcards={false}
-                            quantity={
-                              card.quantity > 0
-                                ? "+" + card.quantity
-                                : card.quantity
-                            }
-                          />
-                        );
-                    })}
-                  </animated.div>
-                </React.Fragment>
-              );
-            })
-          ) : (
-            <div className="change-warning">No changes recorded.</div>
-          )}
-        </div>
-      </div>
-    </>
   );
 }
 
