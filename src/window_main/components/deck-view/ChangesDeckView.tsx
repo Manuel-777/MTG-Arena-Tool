@@ -20,16 +20,20 @@ interface ChangesDeckViewProps {
   setRegularView: { (): void };
 }
 
-export default function ChangesDeckView(props: ChangesDeckViewProps): JSX.Element {
+export default function ChangesDeckView(
+  props: ChangesDeckViewProps
+): JSX.Element {
   const { deck, setRegularView } = props;
   const changes = getDeckChangesList(deck.id).sort(sortDeckChanges);
   const [currentDeck, setDeck] = useState<Deck>(deck);
   const numberOfChanges = changes.map(
     ch => [...ch.changesMain, ...ch.changesSide].length + 2
   );
+
   const [expandSprings, expandSet] = useSprings(changes.length, () => ({
     height: 0
   }));
+
   const [arrowSprings, arrowSet] = useSprings(changes.length, () => ({
     transform: "rotate(0deg)"
   }));
@@ -42,8 +46,7 @@ export default function ChangesDeckView(props: ChangesDeckViewProps): JSX.Elemen
     );
     setDeck(newDeck);
     // This is fine, not sure why ts goes mad about it
-    expandSet((i: number): => {
-      console.log(i, index);
+    expandSet((i: number) => {
       if (i == index) return { height: numberOfChanges[index] * 32 + 1 };
       else return { height: 1 };
     });
