@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { LOGIN_WAITING, LOGIN_OK, IPC_NONE } from "../../shared/constants";
+import ErrorBoundary from "./ErrorBoundary";
 import { TopNav } from "../components/main/topNav";
 import { forceOpenAbout, getOpenNav, getOpenSub } from "../tabControl";
 import BackgroundImage from "../components/main/BackgroundImage";
@@ -86,21 +87,23 @@ function App(): JSX.Element {
         ) : (
           <></>
         )}
-        {loginState == LOGIN_OK ? (
-          <div className="wrapper">
-            <div className="overflow_ux_main">
-              <div className="moving_ux">
-                {getOpenNav(topNav, offline)}
-                <div className="ux_item">
-                  {getOpenSub(subNavType, subNavId, subNavData)}
+        <ErrorBoundary>
+          {loginState == LOGIN_OK ? (
+            <div className="wrapper">
+              <div className="overflow_ux_main">
+                <div className="moving_ux">
+                  {getOpenNav(topNav, offline)}
+                  <div className="ux_item">
+                    {getOpenSub(subNavType, subNavId, subNavData)}
+                  </div>
+                  <div className="ux_item"></div>
                 </div>
-                <div className="ux_item"></div>
               </div>
             </div>
-          </div>
-        ) : (
-          <Auth authForm={authForm} />
-        )}
+          ) : (
+            <Auth authForm={authForm} />
+          )}
+        </ErrorBoundary>
       </div>
       <div className={"version_number"} onClick={forceOpenAbout}>
         v{remote.app.getVersion()}
