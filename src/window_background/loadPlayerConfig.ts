@@ -156,7 +156,7 @@ export async function loadPlayerConfig(): Promise<void> {
       .map((id: string) => {
         savedData.deck_changes[id].date = new Date(
           savedData.deck_changes[id].date
-        ).toString();
+        ).toISOString();
         return savedData.deck_changes[id];
       });
 

@@ -2581,86 +2581,60 @@ a:hover {
     font-size: 14px;
 }
 
-.changes_timeline {
-    width: 100%;
+.deck-changes-container {
     display: flex;
     flex-direction: column;
 }
 
-.change {
-    width: 100%;
-    min-height: 48px;
+.deck-change {
     display: flex;
-    justify-content: space-between;
-}
-
-.change_button_cont {
-    background: url(../images/timeline.png) no-repeat;
-    background-size: 100% 50%;
-    width: 64px;
-}
-
-.change_button {
-    top: calc(50% - 12px);
-    position: relative;
-    width: 24px;
-    border-radius: 50%;
-    margin: auto auto;
-    height: 24px;
-    background-color: rgb(220, 195, 150);
-    -webkit-transition: all .1s ease-in-out;
-}
-
-.change_button_active {
-    top: calc(50% - 16px) !important;
-    width: 32px !important;
-    height: 32px !important;
-}
-
-.change_data {
-    width: calc(100% - 64px);
-}
-
-.change_data_box {
-    margin-top: 12px;
-    line-height: 24px;
-    font-size: 20px;
+    height: 31px;
+    margin-bottom: 1px;
+    background-color: rgba(0,0,0,0.75);
+    -webkit-transition: all .15s ease-in;
+    cursor: pointer;
+    width: 100%;
     color: var(--color-light);
-    width: 100%;
-    height: 24px;
-    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
+    line-height: 29px;
+    font-family: var(--main-font-name);
 }
 
-.change_data_box_inside {
-    width: 100%;
-    height: 0px;
+.deck-change:hover {
+    background-color: rgba(65, 50, 40, 0.75);
+}
+
+.deck-changes-expand {
     overflow: hidden;
-    -webkit-transition: all .25s cubic-bezier(0.2, 0.5, 0.35, 1);
 }
 
-.change_item_box {
-    width: 100%;
-    height: 30px;
-    display: flex;
+.expand-arrow {
+    width: 18px;
+    height: 18px;
+    margin: auto 2px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url(../images/to_right.png);
 }
 
-.change_add {
+.change-add {
     width: 30px;
     height: 30px;
     background: url(../images/added.png) no-repeat center;
 }
 
-.change_remove {
+.change-remove {
     width: 30px;
     height: 30px;
     background: url(../images/removed.png) no-repeat center;
 }
 
-.change_title {
-    font-size: 16px;
-    line-height: 24px;
-    color: var(--color-light);
+.change-warning {
+    font-size: 18px;
+    font-family: var(--main-font-name-it);
+    color: var(--color-r);
+    text-align: center;
 }
+
 
 .explore_buttons_container {
     width: 100%;

@@ -1,4 +1,4 @@
-import { CardObject, InternalDeck, DeckChange } from "../../types/Deck";
+import { CardObject, DeckChange } from "../../types/Deck";
 import convertDeckFromV3 from "../convertDeckFromV3";
 import db from "../../shared/database";
 import LogEntry from "../../types/logDecoder";
