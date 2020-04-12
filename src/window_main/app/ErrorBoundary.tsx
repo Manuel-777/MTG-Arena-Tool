@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+import ErrorInfo from "../components/popups/ErrorInfo";
 
 interface ErrorState {
   error: any;
@@ -20,21 +21,23 @@ export default class ErrorBoundary extends React.Component<{}, ErrorState> {
     // You can also log error messages to an error reporting service here
   }
 
+  closeErrorDialog = (): void => {
+    setTimeout(() => {
+      this.setState({
+        error: null,
+        errorInfo: null
+      });
+    }, 350);
+  };
+
   render(): ReactNode {
-    if (this.state.errorInfo) {
-      // Error path
-      return (
-        <div>
-          <h2>Something went wrong.</h2>
-          <details style={{ whiteSpace: "pre-wrap" }}>
-            {this.state.error && this.state.error.toString()}
-            <br />
-            {this.state.errorInfo.componentStack}
-          </details>
-        </div>
-      );
-    }
-    // Normally, just render children
-    return this.props.children;
+    return (
+      <>
+        {this.state.errorInfo && (
+          <ErrorInfo {...this.state} closeCallback={this.closeErrorDialog} />
+        )}
+        {this.props.children}
+      </>
+    );
   }
 }
