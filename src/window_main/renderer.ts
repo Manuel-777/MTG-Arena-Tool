@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { remote } from "electron";
-import React from "react";
 
 if (!remote.app.isPackaged) {
+  /*
   const { openNewGitHubIssue, debugInfo } = require("electron-util");
   const unhandled = require("electron-unhandled");
   unhandled({
@@ -20,6 +20,7 @@ if (!remote.app.isPackaged) {
   Sentry.init({
     dsn: "https://4ec87bda1b064120a878eada5fc0b10f@sentry.io/1778171"
   });
+  */
   /*
   const whyDidYouRender = require("@welldone-software/why-did-you-render");
   whyDidYouRender(React, {
