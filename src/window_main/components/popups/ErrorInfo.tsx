@@ -41,25 +41,23 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
       <div
         className="popup-div-nopadding"
         style={{
-          height: `${open * 340}px`,
-          width: `${open * 520}px`,
+          height: `${open * 400}px`,
+          width: `${open * 640}px`,
           overflow: "initial"
         }}
         onClick={(e): void => {
           e.stopPropagation();
         }}
       >
-        <div style={{ margin: "16px" }} className="message_sub">
-          An error ocurred
-        </div>
-        <div
-          style={{ margin: "16px", fontSize: "16px" }}
-          className="message_sub"
-        >
-          <div>{error && error.toString()}</div>
-          <details style={{ whiteSpace: "pre-wrap" }}>
-            <div>{errorInfo.componentStack}</div>
-          </details>
+        <div className="error-info-top"></div>
+        <div className="error-info-bottom">
+          <div className="error-info-title">An error ocurred</div>
+          <div className="error-info-text">
+            <div>{error && error.toString()}</div>
+            <details style={{ whiteSpace: "pre-wrap" }}>
+              <div>{errorInfo.componentStack}</div>
+            </details>
+          </div>
         </div>
       </div>
     </div>
