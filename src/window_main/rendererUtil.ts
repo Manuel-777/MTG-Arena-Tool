@@ -137,7 +137,7 @@ export function getWinrateClass(wr: number): string {
 export function getEventWinLossClass(wlGate: Partial<WinLossGate>): string {
   if (wlGate === undefined) return "white";
   if (wlGate.MaxWins === wlGate.CurrentWins) return "blue";
-  if (wlGate.CurrentWins && wlGate.CurrentLosses) {
+  if (wlGate.CurrentWins !== undefined && wlGate.CurrentLosses !== undefined) {
     if (wlGate.CurrentWins > wlGate.CurrentLosses) return "green";
     if (wlGate.CurrentWins * 2 > wlGate.CurrentLosses) return "orange";
   }
