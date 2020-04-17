@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-// MtGA 1.06.00.02
+// MtGA 1.07.00.00
 
 message AIConfig {
 	MatchConfig matchConfig = 1;
@@ -235,7 +235,7 @@ enum AbilityType {
 	AbilityType_Scry4 = 181;
 	AbilityType_ScryX = 182;
 	AbilityType_SacrificeTreasure = 183;
-	AbilityType_ProtectionFromChosen = 184;
+	AbilityType_ProtectionFromChosenColor = 184;
 	AbilityType_ProtectionFromW = 185;
 	AbilityType_ProtectionFromU = 186;
 	AbilityType_ProtectionFromB = 187;
@@ -253,10 +253,15 @@ enum AbilityType {
 	AbilityType_Escape = 199;
 	AbilityType_Fight = 200;
 	AbilityType_UntapOptional = 201;
-	AbilityType_Placeholder2 = 202;
-	AbilityType_Placeholder3 = 203;
+	AbilityType_Companion = 202;
+	AbilityType_Mutate = 203;
 	AbilityType_Placeholder4 = 204;
 	AbilityType_Placeholder5 = 205;
+	AbilityType_Placeholder6 = 206;
+	AbilityType_Placeholder7 = 207;
+	AbilityType_Placeholder1 = 208;
+	AbilityType_Placeholder2 = 209;
+	AbilityType_Placeholder3 = 210;
 	AbilityType_GildCards_Test = 988;
 	AbilityType_Twiddle_Test = 989;
 	AbilityType_Donate_Test = 990;
@@ -346,6 +351,7 @@ enum ActionType {
 	ActionType_CombatCost = 14;
 	ActionType_OpeningHandAction = 15;
 	ActionType_CastAdventure = 16;
+	ActionType_FloatMana = 17;
 }
 
 message ActionsAvailableReq {
@@ -759,12 +765,13 @@ enum CardMechanicType {
 	CardMechanicType_Explore = 46;
 	CardMechanicType_Provoke = 47;
 	CardMechanicType_Riot = 48;
-	CardMechanicType_Placeholder1 = 49;
-	CardMechanicType_Placeholder2 = 50;
-	CardMechanicType_Placeholder3 = 51;
-	CardMechanicType_Placeholder4 = 52;
-	CardMechanicType_Placeholder5 = 53;
-	CardMechanicType_GraveyardExile = 54;
+	CardMechanicType_Mutate = 49;
+	CardMechanicType_GraveyardExile = 50;
+	CardMechanicType_Placeholder1 = 51;
+	CardMechanicType_Placeholder2 = 52;
+	CardMechanicType_Placeholder3 = 53;
+	CardMechanicType_Placeholder4 = 54;
+	CardMechanicType_Placeholder5 = 55;
 }
 
 message CardSkinTuple {
@@ -1302,19 +1309,31 @@ enum CounterType {
 	CounterType_Knowledge = 132;
 	CounterType_Task = 133;
 	CounterType_Coin = 134;
-	CounterType_PlaceholderCounterType3 = 135;
-	CounterType_PlaceholderCounterType4 = 136;
-	CounterType_PlaceholderCounterType5 = 137;
-	CounterType_PlaceholderCounterType6 = 138;
-	CounterType_PlaceholderCounterType7 = 139;
-	CounterType_PlaceholderCounterType8 = 140;
-	CounterType_PlaceholderCounterType9 = 141;
-	CounterType_PlaceholderCounterType10 = 142;
-	CounterType_PlaceholderCounterType11 = 143;
-	CounterType_PlaceholderCounterType12 = 144;
+	CounterType_Deathtouch = 135;
+	CounterType_FirstStrike = 136;
+	CounterType_Flying = 137;
+	CounterType_Hexproof = 138;
+	CounterType_Lifelink = 139;
+	CounterType_Menace = 140;
+	CounterType_Reach = 141;
+	CounterType_Trample = 142;
+	CounterType_Vigilance = 143;
+	CounterType_Foreshadow = 144;
 	CounterType_PlaceholderCounterType13 = 145;
 	CounterType_PlaceholderCounterType14 = 146;
 	CounterType_PlaceholderCounterType15 = 147;
+	CounterType_PlaceholderCounterType1 = 148;
+	CounterType_PlaceholderCounterType2 = 149;
+	CounterType_PlaceholderCounterType3 = 150;
+	CounterType_PlaceholderCounterType4 = 151;
+	CounterType_PlaceholderCounterType5 = 152;
+	CounterType_PlaceholderCounterType6 = 153;
+	CounterType_PlaceholderCounterType7 = 154;
+	CounterType_PlaceholderCounterType8 = 155;
+	CounterType_PlaceholderCounterType9 = 156;
+	CounterType_PlaceholderCounterType10 = 157;
+	CounterType_PlaceholderCounterType11 = 158;
+	CounterType_PlaceholderCounterType12 = 159;
 }
 
 message CreateMatchGameRoomRequest {
@@ -1443,6 +1462,7 @@ message DistributionReq {
 	repeated uint32 existingDistributionValues = 6;
 	repeated uint32 requiredDistributionValues = 7;
 	repeated uint32 validSelectedTargetIds = 8;
+	uint32 sourceId = 9;
 }
 
 message DistributionResp {
@@ -1895,6 +1915,7 @@ message GameObjectInfo {
 	bool isFacedown = 33;
 	string skinCode = 34;
 	UInt32Value loyaltyUsed = 35;
+	repeated uint32 abilityOriginalCardGrpIds = 36;
 }
 
 enum GameObjectType {
@@ -2076,6 +2097,7 @@ message GroupReq {
 	uint32 idx = 4;
 	GroupType groupType = 5;
 	GroupingContext context = 6;
+	uint32 sourceId = 7;
 }
 
 message GroupResp {
@@ -2752,6 +2774,7 @@ message NumericInputReq {
 	uint32 minValue = 2;
 	uint32 maxValue = 3;
 	uint32 stepSize = 4;
+	uint32 sourceId = 5;
 }
 
 message NumericInputResp {
@@ -3096,6 +3119,7 @@ enum ProtoVersion {
 	ProtoVersion_MulliganReq = 32;
 	ProtoVersion_AutoTapSolution = 33;
 	ProtoVersion_ManaPaymentDeprecated = 34;
+	ProtoVersion_SelectFromGroupRespGroups = 35;
 }
 
 message QueueInfo {
@@ -3194,11 +3218,13 @@ message SearchFromGroupsReq {
 	repeated uint32 zonesToSearch = 4;
 	repeated Group groups = 5;
 	GroupingStyle groupingStyle = 6;
+	uint32 sourceId = 7;
 }
 
 message SearchFromGroupsResp {
 	uint32 optionIndex = 1;
 	repeated uint32 itemsFound = 2;
+	repeated Group groups = 3;
 }
 
 message SearchReq {
@@ -3208,6 +3234,7 @@ message SearchReq {
 	repeated uint32 zonesToSearch = 4;
 	repeated uint32 itemsToSearch = 5;
 	repeated uint32 itemsSought = 6;
+	uint32 sourceId = 7;
 }
 
 message SearchResp {
@@ -3248,16 +3275,19 @@ message SelectFromGroupsReq {
 	uint32 maxTotalSel = 6;
 	GroupingStyle groupingStyle = 7;
 	repeated uint32 unfilteredIds = 8;
+	uint32 sourceId = 9;
 }
 
 message SelectFromGroupsResp {
 	uint32 idx = 1;
 	repeated uint32 ids = 2;
+	repeated Group groups = 3;
 }
 
 message SelectManaTypeReq {
 	uint32 index = 1;
 	repeated ManaColor manaColors = 2;
+	uint32 sourceId = 3;
 }
 
 message SelectManaTypeResp {
@@ -3271,6 +3301,7 @@ message SelectNGroupReq {
 	uint32 maxSel = 2;
 	repeated Group groups = 3;
 	uint32 idx = 4;
+	uint32 sourceId = 5;
 }
 
 message SelectNGroupResp {
@@ -3910,9 +3941,9 @@ enum SubType {
 	SubType_Azra = 373;
 	SubType_Pangolin = 374;
 	SubType_Calix = 375;
-	SubType_PlaceholderSubType7 = 376;
-	SubType_PlaceholderSubType8 = 377;
-	SubType_PlaceholderSubType9 = 378;
+	SubType_Lukka = 376;
+	SubType_Otter = 377;
+	SubType_Shark = 378;
 	SubType_PlaceholderSubType1 = 379;
 	SubType_PlaceholderSubType2 = 380;
 	SubType_PlaceholderSubType3 = 381;
@@ -4035,6 +4066,7 @@ message TestConfig {
 	uint32 bestCandidateShuffleCount = 23;
 	AutoRespondPermission autoRespondPermission = 24;
 	bool disableDeferredActionCostPayment = 25;
+	bool disableIndividualDamageAssignments = 26;
 }
 
 message TimeoutConfig {
@@ -4242,5 +4274,6 @@ enum ZoneType {
 	ZoneType_Sideboard = 10;
 	ZoneType_Pending = 11;
 	ZoneType_PhasedOut = 12;
+	ZoneType_Suppressed = 13;
 }
 
