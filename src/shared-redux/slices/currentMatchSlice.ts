@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  Phase,
-  Step,
-  GameType,
-  GameVariant,
-  MulliganType,
-  SuperFormat,
-  MatchWinCondition,
+  EnumPhase,
+  EnumStep,
+  EnumGameType,
+  EnumGameVariant,
+  EnumMulliganType,
+  EnumSuperFormat,
+  EnumMatchWinCondition,
   PlayerInfo,
   ResultSpec
 } from "../../proto/GreTypes";
@@ -16,23 +16,23 @@ const currentMatchSlice = createSlice({
   initialState: {
     players: [] as PlayerInfo[],
     turnInfo: {
-      phase: "Phase_None" as Phase,
-      step: "Step_None" as Step,
+      phase: "Phase_None" as EnumPhase,
+      step: "Step_None" as EnumStep,
       turnNumber: 0,
       activePlayer: 0,
       priorityPlayer: 0,
       decisionPlayer: 0,
       stormCount: 0,
-      nextPhase: "Phase_None" as Phase,
-      nextStep: "Step_None" as Step
+      nextPhase: "Phase_None" as EnumPhase,
+      nextStep: "Step_None" as EnumStep
     },
-    gameType: "GameType_None" as GameType,
+    gameType: "GameType_None" as EnumGameType,
     gameNumber: 0,
-    gameVariant: "GameVariant_None" as GameVariant,
+    gameVariant: "GameVariant_None" as EnumGameVariant,
     results: [] as ResultSpec[],
-    mulliganType: "MulliganType_None" as MulliganType,
-    superFormat: "SuperFormat_None" as SuperFormat,
-    matchWinCondition: "MatchWinCondition_None" as MatchWinCondition,
+    mulliganType: "MulliganType_None" as EnumMulliganType,
+    superFormat: "SuperFormat_None" as EnumSuperFormat,
+    matchWinCondition: "MatchWinCondition_None" as EnumMatchWinCondition,
     deckConstraintInfo: {
       minDeckSize: 0,
       maxDeckSize: 0,

@@ -1,6 +1,0 @@
-tests/
-.idea/
-definitions/
-runTests.sh
-tests.js
-*.iml
