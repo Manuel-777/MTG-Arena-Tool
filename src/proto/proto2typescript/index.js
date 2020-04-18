@@ -95,21 +95,12 @@ function generateNames(model, prefix, name = "") {
       model.fullPackageName + (model.name ? "." + model.name : "");
   }
 
-  // For fields of types which are defined in the same message,
-  // update the field type in consequence
-  for (key in model.fields) {
-    const field = model.fields[key];
-    if (typeof newDefinitions[field.type] !== "undefined") {
-      field.type = model.name + "." + field.type;
-    }
-  }
-
   // Add the new definitions in the model for generate builders
   const definitions = [];
   for (key in newDefinitions) {
     definitions.push({
       name: key,
-      type: (model.name ? model.name + "." : "") + key + newDefinitions[key]
+      type: key + newDefinitions[key]
     });
   }
 
@@ -154,6 +145,6 @@ proto2typescript(fileStr, (err, out) => {
     console.error(err);
     process.exit(1);
   } else {
-    fs.writeFile(__dirname + "../GreTypes.ts", out, () => {});
+    fs.writeFile(__dirname + "/../GreTypes.ts", out, () => {});
   }
 });
