@@ -2780,6 +2780,12 @@
           "type": "uint32",
           "name": "validSelectedTargetIds",
           "id": 8
+        },
+        {
+          "rule": "optional",
+          "type": "uint32",
+          "name": "sourceId",
+          "id": 9
         }
       ]
     },
@@ -4087,6 +4093,12 @@
           "type": "UInt32Value",
           "name": "loyaltyUsed",
           "id": 35
+        },
+        {
+          "rule": "repeated",
+          "type": "uint32",
+          "name": "abilityOriginalCardGrpIds",
+          "id": 36
         }
       ]
     },
@@ -4528,6 +4540,12 @@
           "type": "GroupingContext",
           "name": "context",
           "id": 6
+        },
+        {
+          "rule": "optional",
+          "type": "uint32",
+          "name": "sourceId",
+          "id": 7
         }
       ]
     },
@@ -6309,6 +6327,12 @@
           "type": "uint32",
           "name": "stepSize",
           "id": 4
+        },
+        {
+          "rule": "optional",
+          "type": "uint32",
+          "name": "sourceId",
+          "id": 5
         }
       ]
     },
@@ -7248,6 +7272,12 @@
           "type": "GroupingStyle",
           "name": "groupingStyle",
           "id": 6
+        },
+        {
+          "rule": "optional",
+          "type": "uint32",
+          "name": "sourceId",
+          "id": 7
         }
       ]
     },
@@ -7265,6 +7295,12 @@
           "type": "uint32",
           "name": "itemsFound",
           "id": 2
+        },
+        {
+          "rule": "repeated",
+          "type": "Group",
+          "name": "groups",
+          "id": 3
         }
       ]
     },
@@ -7306,6 +7342,12 @@
           "type": "uint32",
           "name": "itemsSought",
           "id": 6
+        },
+        {
+          "rule": "optional",
+          "type": "uint32",
+          "name": "sourceId",
+          "id": 7
         }
       ]
     },
@@ -7458,6 +7500,12 @@
           "type": "uint32",
           "name": "unfilteredIds",
           "id": 8
+        },
+        {
+          "rule": "optional",
+          "type": "uint32",
+          "name": "sourceId",
+          "id": 9
         }
       ]
     },
@@ -7475,6 +7523,12 @@
           "type": "uint32",
           "name": "ids",
           "id": 2
+        },
+        {
+          "rule": "repeated",
+          "type": "Group",
+          "name": "groups",
+          "id": 3
         }
       ]
     },
@@ -7492,6 +7546,12 @@
           "type": "ManaColor",
           "name": "manaColors",
           "id": 2
+        },
+        {
+          "rule": "optional",
+          "type": "uint32",
+          "name": "sourceId",
+          "id": 3
         }
       ]
     },
@@ -7544,6 +7604,12 @@
           "type": "uint32",
           "name": "idx",
           "id": 4
+        },
+        {
+          "rule": "optional",
+          "type": "uint32",
+          "name": "sourceId",
+          "id": 5
         }
       ]
     },
@@ -8498,6 +8564,12 @@
           "type": "bool",
           "name": "disableDeferredActionCostPayment",
           "id": 25
+        },
+        {
+          "rule": "optional",
+          "type": "bool",
+          "name": "disableIndividualDamageAssignments",
+          "id": 26
         }
       ]
     },
@@ -9663,7 +9735,7 @@
           "id": 183
         },
         {
-          "name": "AbilityType_ProtectionFromChosen",
+          "name": "AbilityType_ProtectionFromChosenColor",
           "id": 184
         },
         {
@@ -9735,11 +9807,11 @@
           "id": 201
         },
         {
-          "name": "AbilityType_Placeholder2",
+          "name": "AbilityType_Companion",
           "id": 202
         },
         {
-          "name": "AbilityType_Placeholder3",
+          "name": "AbilityType_Mutate",
           "id": 203
         },
         {
@@ -9749,6 +9821,26 @@
         {
           "name": "AbilityType_Placeholder5",
           "id": 205
+        },
+        {
+          "name": "AbilityType_Placeholder6",
+          "id": 206
+        },
+        {
+          "name": "AbilityType_Placeholder7",
+          "id": 207
+        },
+        {
+          "name": "AbilityType_Placeholder1",
+          "id": 208
+        },
+        {
+          "name": "AbilityType_Placeholder2",
+          "id": 209
+        },
+        {
+          "name": "AbilityType_Placeholder3",
+          "id": 210
         },
         {
           "name": "AbilityType_GildCards_Test",
@@ -9915,6 +10007,10 @@
         {
           "name": "ActionType_CastAdventure",
           "id": 16
+        },
+        {
+          "name": "ActionType_FloatMana",
+          "id": 17
         }
       ]
     },
@@ -10698,28 +10794,32 @@
           "id": 48
         },
         {
-          "name": "CardMechanicType_Placeholder1",
+          "name": "CardMechanicType_Mutate",
           "id": 49
         },
         {
-          "name": "CardMechanicType_Placeholder2",
+          "name": "CardMechanicType_GraveyardExile",
           "id": 50
         },
         {
-          "name": "CardMechanicType_Placeholder3",
+          "name": "CardMechanicType_Placeholder1",
           "id": 51
         },
         {
-          "name": "CardMechanicType_Placeholder4",
+          "name": "CardMechanicType_Placeholder2",
           "id": 52
         },
         {
-          "name": "CardMechanicType_Placeholder5",
+          "name": "CardMechanicType_Placeholder3",
           "id": 53
         },
         {
-          "name": "CardMechanicType_GraveyardExile",
+          "name": "CardMechanicType_Placeholder4",
           "id": 54
+        },
+        {
+          "name": "CardMechanicType_Placeholder5",
+          "id": 55
         }
       ]
     },
@@ -11767,43 +11867,43 @@
           "id": 134
         },
         {
-          "name": "CounterType_PlaceholderCounterType3",
+          "name": "CounterType_Deathtouch",
           "id": 135
         },
         {
-          "name": "CounterType_PlaceholderCounterType4",
+          "name": "CounterType_FirstStrike",
           "id": 136
         },
         {
-          "name": "CounterType_PlaceholderCounterType5",
+          "name": "CounterType_Flying",
           "id": 137
         },
         {
-          "name": "CounterType_PlaceholderCounterType6",
+          "name": "CounterType_Hexproof",
           "id": 138
         },
         {
-          "name": "CounterType_PlaceholderCounterType7",
+          "name": "CounterType_Lifelink",
           "id": 139
         },
         {
-          "name": "CounterType_PlaceholderCounterType8",
+          "name": "CounterType_Menace",
           "id": 140
         },
         {
-          "name": "CounterType_PlaceholderCounterType9",
+          "name": "CounterType_Reach",
           "id": 141
         },
         {
-          "name": "CounterType_PlaceholderCounterType10",
+          "name": "CounterType_Trample",
           "id": 142
         },
         {
-          "name": "CounterType_PlaceholderCounterType11",
+          "name": "CounterType_Vigilance",
           "id": 143
         },
         {
-          "name": "CounterType_PlaceholderCounterType12",
+          "name": "CounterType_Foreshadow",
           "id": 144
         },
         {
@@ -11817,6 +11917,54 @@
         {
           "name": "CounterType_PlaceholderCounterType15",
           "id": 147
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType1",
+          "id": 148
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType2",
+          "id": 149
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType3",
+          "id": 150
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType4",
+          "id": 151
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType5",
+          "id": 152
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType6",
+          "id": 153
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType7",
+          "id": 154
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType8",
+          "id": 155
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType9",
+          "id": 156
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType10",
+          "id": 157
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType11",
+          "id": 158
+        },
+        {
+          "name": "CounterType_PlaceholderCounterType12",
+          "id": 159
         }
       ]
     },
@@ -13990,6 +14138,10 @@
         {
           "name": "ProtoVersion_ManaPaymentDeprecated",
           "id": 34
+        },
+        {
+          "name": "ProtoVersion_SelectFromGroupRespGroups",
+          "id": 35
         }
       ]
     },
@@ -16056,15 +16208,15 @@
           "id": 375
         },
         {
-          "name": "SubType_PlaceholderSubType7",
+          "name": "SubType_Lukka",
           "id": 376
         },
         {
-          "name": "SubType_PlaceholderSubType8",
+          "name": "SubType_Otter",
           "id": 377
         },
         {
-          "name": "SubType_PlaceholderSubType9",
+          "name": "SubType_Shark",
           "id": 378
         },
         {
@@ -16554,6 +16706,10 @@
         {
           "name": "ZoneType_PhasedOut",
           "id": 12
+        },
+        {
+          "name": "ZoneType_Suppressed",
+          "id": 13
         }
       ]
     }

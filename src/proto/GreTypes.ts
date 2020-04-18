@@ -640,6 +640,7 @@ export interface DistributionReq {
   existingDistributionValues: number[];
   requiredDistributionValues: number[];
   validSelectedTargetIds: number[];
+  sourceId?: number;
 }
 
 export interface DistributionResp {
@@ -947,6 +948,7 @@ export interface GameObjectInfo {
   isFacedown?: boolean;
   skinCode?: string;
   loyaltyUsed?: UInt32Value;
+  abilityOriginalCardGrpIds: number[];
 }
 
 export interface GameStateMessage {
@@ -1059,6 +1061,7 @@ export interface GroupReq {
   idx?: number;
   groupType?: GroupType;
   context?: GroupingContext;
+  sourceId?: number;
 }
 
 export interface GroupResp {
@@ -1467,6 +1470,7 @@ export interface NumericInputReq {
   minValue?: number;
   maxValue?: number;
   stepSize?: number;
+  sourceId?: number;
 }
 
 export interface NumericInputResp {
@@ -1695,11 +1699,13 @@ export interface SearchFromGroupsReq {
   zonesToSearch: number[];
   groups: Group[];
   groupingStyle?: GroupingStyle;
+  sourceId?: number;
 }
 
 export interface SearchFromGroupsResp {
   optionIndex?: number;
   itemsFound: number[];
+  groups: Group[];
 }
 
 export interface SearchReq {
@@ -1709,6 +1715,7 @@ export interface SearchReq {
   zonesToSearch: number[];
   itemsToSearch: number[];
   itemsSought: number[];
+  sourceId?: number;
 }
 
 export interface SearchResp {
@@ -1743,16 +1750,19 @@ export interface SelectFromGroupsReq {
   maxTotalSel?: number;
   groupingStyle?: GroupingStyle;
   unfilteredIds: number[];
+  sourceId?: number;
 }
 
 export interface SelectFromGroupsResp {
   idx?: number;
   ids: number[];
+  groups: Group[];
 }
 
 export interface SelectManaTypeReq {
   index?: number;
   manaColors: ManaColor[];
+  sourceId?: number;
 }
 
 export interface SelectManaTypeResp {
@@ -1766,6 +1776,7 @@ export interface SelectNGroupReq {
   maxSel?: number;
   groups: Group[];
   idx?: number;
+  sourceId?: number;
 }
 
 export interface SelectNGroupResp {
@@ -1987,6 +1998,7 @@ export interface TestConfig {
   bestCandidateShuffleCount?: number;
   autoRespondPermission?: AutoRespondPermission;
   disableDeferredActionCostPayment?: boolean;
+  disableIndividualDamageAssignments?: boolean;
 }
 
 export interface TimeoutConfig {
@@ -2287,7 +2299,7 @@ export enum AbilityType {
   AbilityType_Scry4 = 181,
   AbilityType_ScryX = 182,
   AbilityType_SacrificeTreasure = 183,
-  AbilityType_ProtectionFromChosen = 184,
+  AbilityType_ProtectionFromChosenColor = 184,
   AbilityType_ProtectionFromW = 185,
   AbilityType_ProtectionFromU = 186,
   AbilityType_ProtectionFromB = 187,
@@ -2305,10 +2317,15 @@ export enum AbilityType {
   AbilityType_Escape = 199,
   AbilityType_Fight = 200,
   AbilityType_UntapOptional = 201,
-  AbilityType_Placeholder2 = 202,
-  AbilityType_Placeholder3 = 203,
+  AbilityType_Companion = 202,
+  AbilityType_Mutate = 203,
   AbilityType_Placeholder4 = 204,
   AbilityType_Placeholder5 = 205,
+  AbilityType_Placeholder6 = 206,
+  AbilityType_Placeholder7 = 207,
+  AbilityType_Placeholder1 = 208,
+  AbilityType_Placeholder2 = 209,
+  AbilityType_Placeholder3 = 210,
   AbilityType_GildCards_Test = 988,
   AbilityType_Twiddle_Test = 989,
   AbilityType_Donate_Test = 990,
@@ -2357,7 +2374,8 @@ export enum ActionType {
   ActionType_CastingTimeOption = 13,
   ActionType_CombatCost = 14,
   ActionType_OpeningHandAction = 15,
-  ActionType_CastAdventure = 16
+  ActionType_CastAdventure = 16,
+  ActionType_FloatMana = 17
 }
 
 export type EnumActionType = keyof typeof ActionType;
@@ -2602,12 +2620,13 @@ export enum CardMechanicType {
   CardMechanicType_Explore = 46,
   CardMechanicType_Provoke = 47,
   CardMechanicType_Riot = 48,
-  CardMechanicType_Placeholder1 = 49,
-  CardMechanicType_Placeholder2 = 50,
-  CardMechanicType_Placeholder3 = 51,
-  CardMechanicType_Placeholder4 = 52,
-  CardMechanicType_Placeholder5 = 53,
-  CardMechanicType_GraveyardExile = 54
+  CardMechanicType_Mutate = 49,
+  CardMechanicType_GraveyardExile = 50,
+  CardMechanicType_Placeholder1 = 51,
+  CardMechanicType_Placeholder2 = 52,
+  CardMechanicType_Placeholder3 = 53,
+  CardMechanicType_Placeholder4 = 54,
+  CardMechanicType_Placeholder5 = 55
 }
 
 export type EnumCardMechanicType = keyof typeof CardMechanicType;
@@ -2918,19 +2937,31 @@ export enum CounterType {
   CounterType_Knowledge = 132,
   CounterType_Task = 133,
   CounterType_Coin = 134,
-  CounterType_PlaceholderCounterType3 = 135,
-  CounterType_PlaceholderCounterType4 = 136,
-  CounterType_PlaceholderCounterType5 = 137,
-  CounterType_PlaceholderCounterType6 = 138,
-  CounterType_PlaceholderCounterType7 = 139,
-  CounterType_PlaceholderCounterType8 = 140,
-  CounterType_PlaceholderCounterType9 = 141,
-  CounterType_PlaceholderCounterType10 = 142,
-  CounterType_PlaceholderCounterType11 = 143,
-  CounterType_PlaceholderCounterType12 = 144,
+  CounterType_Deathtouch = 135,
+  CounterType_FirstStrike = 136,
+  CounterType_Flying = 137,
+  CounterType_Hexproof = 138,
+  CounterType_Lifelink = 139,
+  CounterType_Menace = 140,
+  CounterType_Reach = 141,
+  CounterType_Trample = 142,
+  CounterType_Vigilance = 143,
+  CounterType_Foreshadow = 144,
   CounterType_PlaceholderCounterType13 = 145,
   CounterType_PlaceholderCounterType14 = 146,
-  CounterType_PlaceholderCounterType15 = 147
+  CounterType_PlaceholderCounterType15 = 147,
+  CounterType_PlaceholderCounterType1 = 148,
+  CounterType_PlaceholderCounterType2 = 149,
+  CounterType_PlaceholderCounterType3 = 150,
+  CounterType_PlaceholderCounterType4 = 151,
+  CounterType_PlaceholderCounterType5 = 152,
+  CounterType_PlaceholderCounterType6 = 153,
+  CounterType_PlaceholderCounterType7 = 154,
+  CounterType_PlaceholderCounterType8 = 155,
+  CounterType_PlaceholderCounterType9 = 156,
+  CounterType_PlaceholderCounterType10 = 157,
+  CounterType_PlaceholderCounterType11 = 158,
+  CounterType_PlaceholderCounterType12 = 159
 }
 
 export type EnumCounterType = keyof typeof CounterType;
@@ -3657,7 +3688,8 @@ export enum ProtoVersion {
   ProtoVersion_PerformAutoTapActions = 31,
   ProtoVersion_MulliganReq = 32,
   ProtoVersion_AutoTapSolution = 33,
-  ProtoVersion_ManaPaymentDeprecated = 34
+  ProtoVersion_ManaPaymentDeprecated = 34,
+  ProtoVersion_SelectFromGroupRespGroups = 35
 }
 
 export type EnumProtoVersion = keyof typeof ProtoVersion;
@@ -4249,9 +4281,9 @@ export enum SubType {
   SubType_Azra = 373,
   SubType_Pangolin = 374,
   SubType_Calix = 375,
-  SubType_PlaceholderSubType7 = 376,
-  SubType_PlaceholderSubType8 = 377,
-  SubType_PlaceholderSubType9 = 378,
+  SubType_Lukka = 376,
+  SubType_Otter = 377,
+  SubType_Shark = 378,
   SubType_PlaceholderSubType1 = 379,
   SubType_PlaceholderSubType2 = 380,
   SubType_PlaceholderSubType3 = 381,
@@ -4418,7 +4450,8 @@ export enum ZoneType {
   ZoneType_Limbo = 9,
   ZoneType_Sideboard = 10,
   ZoneType_Pending = 11,
-  ZoneType_PhasedOut = 12
+  ZoneType_PhasedOut = 12,
+  ZoneType_Suppressed = 13
 }
 
 export type EnumZoneType = keyof typeof ZoneType;

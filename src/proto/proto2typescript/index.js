@@ -154,6 +154,6 @@ proto2typescript(fileStr, (err, out) => {
     console.error(err);
     process.exit(1);
   } else {
-    fs.writeFile(__dirname + "/GreTypes.ts", out, () => {});
+    fs.writeFile(__dirname + "../GreTypes.ts", out, () => {});
   }
 });
