@@ -83,6 +83,7 @@
     "@reduxjs/toolkit": "^1.2.5",
     "animejs": "^3.1.0",
     "async": "^3.2.0",
+    "bytebuffer": "^5.0.1",
     "chart.js": "^2.9.3",
     "conic-gradient": "^1.0.0",
     "date-fns": "^2.11.0",
@@ -97,6 +98,7 @@
     "interactjs": "1.9.4",
     "js-sha1": "^0.6.0",
     "lodash": "^4.17.15",
+    "long": "^4.0.0",
     "match-sorter": "^4.0.2",
     "mathjs": "^6.6.1",
     "nedb": "^1.8.0",
@@ -118,7 +120,8 @@
     "sanitize-filename": "^1.6.3",
     "striptags": "^3.1.1",
     "styled-components": "^5.0.1",
-    "stylis": "^3.5.4"
+    "stylis": "^3.5.4",
+    "ts-protoc-gen": "^0.12.1-pre.a78a914"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -162,6 +165,7 @@
     "eslint-plugin-react-hooks": "^2.5.0",
     "jest": "^25.1.0",
     "prettier": "^1.19.1",
+    "proto2typescript": "^2.2.0",
     "rimraf": "=3.0.0",
     "ts-jest": "^25.2.1",
     "typescript": "^3.8.3"

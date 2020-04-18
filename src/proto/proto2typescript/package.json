@@ -1,0 +1,61 @@
+{
+  "_from": "proto2typescript",
+  "_id": "proto2typescript@2.2.0",
+  "_inBundle": false,
+  "_integrity": "sha1-nXryvzzSpdZMkfzXgJHaijsjVbU=",
+  "_location": "/proto2typescript",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "proto2typescript",
+    "name": "proto2typescript",
+    "escapedName": "proto2typescript",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/proto2typescript/-/proto2typescript-2.2.0.tgz",
+  "_shasum": "9d7af2bf3cd2a5d64c91fcd78091da8a3b2355b5",
+  "_spec": "proto2typescript",
+  "_where": "C:\\Users\\manuh\\Documents\\GitHub\\MTG-Arena-Tool",
+  "bin": {
+    "proto2typescript": "bin/proto2typescript-bin.js"
+  },
+  "bugs": {
+    "url": "https://github.com/aliok/Proto2TypeScript/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "dustjs-linkedin": "~2.3.3",
+    "optimist": "~0.6.1",
+    "protobufjs": "~4.0.0",
+    "vinyl-file": "^1.2.1"
+  },
+  "deprecated": false,
+  "description": "Typescript definition generator for Protocol Buffer definitions",
+  "devDependencies": {
+    "expect.js": "~0.3.1",
+    "mocha": "~1.17.1"
+  },
+  "homepage": "https://github.com/aliok/Proto2TypeScript",
+  "keywords": [
+    "net",
+    "buffer",
+    "protobuf",
+    "serialization",
+    "bytebuffer",
+    "websocket",
+    "typescript"
+  ],
+  "main": "lib/proto2typescript.js",
+  "name": "proto2typescript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aliok/Proto2TypeScript.git"
+  },
+  "version": "2.2.0"
+}

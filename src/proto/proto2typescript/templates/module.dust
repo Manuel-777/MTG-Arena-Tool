@@ -1,0 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
+// generated file, do not touch!
+{#messages}
+{>interface:./}{/messages}{#enums}
+{>enum:./}
+{/enums}
