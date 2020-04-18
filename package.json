@@ -83,7 +83,6 @@
     "@reduxjs/toolkit": "^1.2.5",
     "animejs": "^3.1.0",
     "async": "^3.2.0",
-    "bytebuffer": "^5.0.1",
     "chart.js": "^2.9.3",
     "conic-gradient": "^1.0.0",
     "date-fns": "^2.11.0",
@@ -98,7 +97,6 @@
     "interactjs": "1.9.4",
     "js-sha1": "^0.6.0",
     "lodash": "^4.17.15",
-    "long": "^4.0.0",
     "match-sorter": "^4.0.2",
     "mathjs": "^6.6.1",
     "nedb": "^1.8.0",
@@ -120,10 +118,12 @@
     "sanitize-filename": "^1.6.3",
     "striptags": "^3.1.1",
     "styled-components": "^5.0.1",
-    "stylis": "^3.5.4",
-    "ts-protoc-gen": "^0.12.1-pre.a78a914"
+    "stylis": "^3.5.4"
   },
   "devDependencies": {
+    "bytebuffer": "^5.0.1",
+    "long": "^4.0.0",
+    "ts-protoc-gen": "^0.12.1-pre.a78a914",
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
