@@ -14,6 +14,7 @@ import economySlice from "./slices/economySlice";
 import draftsSlice from "./slices/draftsSlice";
 import seasonalSlice from "./slices/seasonalSlice";
 import deckChangesSlice from "./slices/deckChangesSlice";
+import currentMatchSlice from "./slices/currentMatchSlice";
 
 const actions: Record<string, (arg: any) => any> = {};
 actions["SET_SETTINGS"] = settingsSlice.actions.setSettings;
@@ -87,5 +88,20 @@ actions["SET_SEASONAL"] = seasonalSlice.actions.setSeasonal;
 actions["SET_MANY_SEASONAL"] = seasonalSlice.actions.setManySeasonal;
 actions["SET_DECK_CHANGE"] = deckChangesSlice.actions.setChange;
 actions["SET_MANY_DECK_CHANGES"] = deckChangesSlice.actions.setManyChangees;
+
+actions["RESET_CURRENT_GAME"] = currentMatchSlice.actions.resetCurrentGame;
+actions["SET_CURRENT_MATCH_MANY"] = currentMatchSlice.actions.setMany;
+actions["SET_GAME_NUMBER"] = currentMatchSlice.actions.setGameNumber;
+actions["SET_TURNINFO"] = currentMatchSlice.actions.setGameNumber;
+actions["SET_GAMEINFO"] = currentMatchSlice.actions.setGameInfo;
+actions["SET_SUPER_FORMAT"] = currentMatchSlice.actions.setSuperFormat;
+actions["SET_PLAYERS"] = currentMatchSlice.actions.setPlayers;
+actions["SET_ZONE"] = currentMatchSlice.actions.setZone;
+actions["SET_GAMEOBJ"] = currentMatchSlice.actions.setGameObject;
+actions["SET_ANNOTATION"] = currentMatchSlice.actions.setAnnotation;
+actions["SET_ANNOTATION_PROC"] = currentMatchSlice.actions.setAnnotationProcessed;
+actions["CLEAN_ANNOTATIONS"] = currentMatchSlice.actions.removeProcessedAnnotations;
+actions["SET_IDCHANGE"] = currentMatchSlice.actions.setIdChange;
+actions["SET_ONTHEPLAY"] = currentMatchSlice.actions.setOnThePlay;
 
 export default actions;

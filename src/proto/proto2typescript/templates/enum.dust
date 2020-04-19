@@ -1,6 +1,6 @@
-export enum {name} {
+export enum Enum{name} {
   {#values}{name} = {id},
   {/values}
 }
 
-export type Enum{name} = keyof typeof {name};
+export type {name} = keyof typeof Enum{name};

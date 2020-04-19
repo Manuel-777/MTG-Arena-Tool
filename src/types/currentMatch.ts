@@ -2,7 +2,6 @@ import { Chances } from "./Chances";
 import Deck from "../shared/deck";
 import {
   GameInfo,
-  GreMessage,
   AnnotationType,
   GameObject,
   ZoneType,
@@ -12,6 +11,7 @@ import {
   Timer,
   Result
 } from "./greInterpreter";
+import { GREToClientMessage } from "../proto/GreTypes";
 import { InternalDeck } from "./Deck";
 
 export interface MatchPlayer {
@@ -62,7 +62,7 @@ export interface MatchData {
   cardsCast: CardCast[];
   latestMessage: number;
   msgId: number;
-  GREtoClient: GreMessage[];
+  GREtoClient: GREToClientMessage[];
   cardTypesByZone: ZoneData;
   playerCardsUsed: number[];
   oppCardsUsed: number[];
