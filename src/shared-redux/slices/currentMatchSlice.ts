@@ -12,9 +12,10 @@ import {
   ResultSpec,
   ZoneInfo,
   AnnotationInfo,
-  GameObjectInfo,
   GameInfo
 } from "../../proto/GreTypes";
+
+import { CardCast } from "../../types/currentMatch";
 
 import { GameObject } from "../../types/greInterpreter";
 
@@ -31,7 +32,8 @@ const initialStateObject = {
     decisionPlayer: 0,
     stormCount: 0,
     nextPhase: "Phase_None" as Phase,
-    nextStep: "Step_None" as Step
+    nextStep: "Step_None" as Step,
+    currentPriority: 0
   },
   gameInfo: {} as GameInfo,
   gameStage: "GameStage_None" as GameStage,
@@ -54,7 +56,8 @@ const initialStateObject = {
   processedAnnotations: [] as number[],
   gameObjects: {} as Record<number, GameObject>,
   instanceToCardIdMap: {} as Record<number, number>,
-  idChanges: {} as Record<number, number>
+  idChanges: {} as Record<number, number>,
+  cardsCast: [] as CardCast[]
 };
 
 const currentMatchSlice = createSlice({
@@ -113,6 +116,9 @@ const currentMatchSlice = createSlice({
     setIdChange: (state, action): void => {
       const details = action.payload;
       state.idChanges[details.orig_id] = details.new_id;
+    },
+    addCardCast: (state, action): void => {
+      state.cardsCast.push(action.payload);
     }
   }
 });

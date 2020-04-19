@@ -231,7 +231,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
       turn: globals.currentMatch.turnInfo.turnNumber,
       player: seat
     };
-    globals.currentMatch.cardsCast.push(cast);
+    reduxAction(dispatch, "ADD_CARD_CAST", cast, IPC_NONE);
 
     actionLog(
       seat,
@@ -439,7 +439,8 @@ annotationFunctions.AnnotationType_ModifiedLife = function(
   if (ann.type !== "AnnotationType_ModifiedLife") return;
   const affected = ann.affectedIds[0];
   const total = globals.currentMatch.players[affected].lifeTotal;
-  const lifeStr = ann.details.life > 0 ? "+" + ann.details.life : ann.details.life;
+  const lifeStr =
+    ann.details.life > 0 ? "+" + ann.details.life : ann.details.life;
 
   actionLog(
     affected,
@@ -793,6 +794,7 @@ function checkGameInfo(gameInfo: GameInfo): void {
 }
 
 function checkTurnDiff(turnInfo: TurnInfo): void {
+  const currentTurnInfo = globals.store.getState().currentmatch.turnInfo;
   if (
     turnInfo.turnNumber &&
     turnInfo.turnNumber == 1 &&
@@ -801,13 +803,11 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
   ) {
     globals.currentMatch.onThePlay = turnInfo.activePlayer;
   }
-  if (globals.currentMatch.turnInfo.turnNumber !== turnInfo.turnNumber) {
-    if (
-      turnInfo.priorityPlayer !== globals.currentMatch.turnInfo.currentPriority
-    ) {
+  if (currentTurnInfo.turnNumber !== turnInfo.turnNumber) {
+    if (turnInfo.priorityPlayer !== currentTurnInfo.currentPriority) {
       changePriority(
         turnInfo.priorityPlayer || 0,
-        globals.currentMatch.turnInfo.currentPriority,
+        currentTurnInfo.currentPriority,
         globals.logTime
       );
     }
@@ -853,7 +853,6 @@ GREMessages.GREMessageType_GameStateMessage = function(
 
     globals.currentMatch.opponent.cards = globals.currentMatch.oppCardsUsed;
     globals.currentMatch.processedAnnotations = [];
-    globals.currentMatch.timers = {};
     globals.currentMatch.zones = {};
     globals.currentMatch.players = {};
     globals.currentMatch.annotations = [];

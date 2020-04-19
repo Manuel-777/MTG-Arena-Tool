@@ -103,5 +103,6 @@ actions["SET_ANNOTATION_PROC"] = currentMatchSlice.actions.setAnnotationProcesse
 actions["CLEAN_ANNOTATIONS"] = currentMatchSlice.actions.removeProcessedAnnotations;
 actions["SET_IDCHANGE"] = currentMatchSlice.actions.setIdChange;
 actions["SET_ONTHEPLAY"] = currentMatchSlice.actions.setOnThePlay;
+actions["ADD_CARD_CAST"] = currentMatchSlice.actions.addCardCast;
 
 export default actions;

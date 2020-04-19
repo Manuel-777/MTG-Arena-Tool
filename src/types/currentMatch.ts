@@ -1,17 +1,18 @@
 import { Chances } from "./Chances";
 import Deck from "../shared/deck";
 import {
-  GameInfo,
-  AnnotationType,
   GameObject,
   ZoneType,
   ZoneData,
   PlayerData,
-  TurnInfo,
-  Timer,
   Result
 } from "./greInterpreter";
-import { GREToClientMessage } from "../proto/GreTypes";
+import {
+  GREToClientMessage,
+  AnnotationInfo,
+  TurnInfo,
+  GameInfo
+} from "../proto/GreTypes";
 import { InternalDeck } from "./Deck";
 
 export interface MatchPlayer {
@@ -30,7 +31,7 @@ export interface MatchPlayer {
   leaderboardPlace: number;
 }
 
-interface CardCast {
+export interface CardCast {
   grpId: number;
   turn: number;
   player: number;
@@ -52,7 +53,7 @@ export interface MatchData {
   beginTime: Date;
   gameStage: string;
   playerCardsLeft: Deck;
-  annotations: AnnotationType[];
+  annotations: AnnotationInfo[];
   processedAnnotations: number[];
   gameObjs: { [key: number]: GameObject };
   turnInfo: TurnInfo;
@@ -66,7 +67,6 @@ export interface MatchData {
   cardTypesByZone: ZoneData;
   playerCardsUsed: number[];
   oppCardsUsed: number[];
-  timers: { [key: number]: Timer };
   gameInfo: GameInfo;
   results: Result[];
   onThePlay: number;
@@ -138,7 +138,6 @@ export const matchDataDefault: MatchData = {
   oppCards: new Deck(),
   onThePlay: 0,
   processedAnnotations: [],
-  timers: {},
   zones: {},
   players: {},
   annotations: [],
@@ -146,17 +145,17 @@ export const matchDataDefault: MatchData = {
   gameInfo: {
     matchID: "",
     gameNumber: 0,
-    stage: "",
-    type: "",
-    variant: "",
-    matchState: "",
-    matchWinCondition: "",
+    stage: "GameStage_None",
+    type: "GameType_None",
+    variant: "GameVariant_None",
+    matchState: "MatchState_None",
+    matchWinCondition: "MatchWinCondition_None",
     maxTimeoutCount: 0,
     maxPipCount: 0,
     timeoutDurationSec: 0,
     results: [],
-    superFormat: "",
-    mulliganType: "",
+    superFormat: "SuperFormat_None",
+    mulliganType: "MulliganType_None",
     freeMulliganCount: 0,
     deckConstraintInfo: {
       minDeckSize: 0,
@@ -168,14 +167,13 @@ export const matchDataDefault: MatchData = {
   turnInfo: {
     activePlayer: 0,
     decisionPlayer: 0,
-    phase: 0,
-    step: 0,
+    phase: "Phase_None",
+    step: "Step_None",
     turnNumber: 0,
     priorityPlayer: 0,
     stormCount: 0,
-    nextPhase: 0,
-    nextStep: 0,
-    currentPriority: 0
+    nextPhase: "Phase_None",
+    nextStep: "Step_None"
   },
   playerCardsUsed: [],
   oppCardsUsed: [],
