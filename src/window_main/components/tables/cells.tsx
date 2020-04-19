@@ -24,7 +24,7 @@ export function ColorsCell<D extends TableData>({
   const data = cell.row.values;
   // assume data key is fooColors and cell.column.id is fooColorSortVal
   const key = cell.column.id.replace("SortVal", "s");
-  const colors = data[key] ?? cell.value;
+  const colors = data[key] || [];
   return (
     <FlexLeftContainer>
       {colors?.map((color: number, index: number) => {
