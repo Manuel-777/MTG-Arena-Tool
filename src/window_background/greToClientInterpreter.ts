@@ -10,10 +10,9 @@ import forceDeckUpdate from "./forceDeckUpdate";
 import getNameBySeat from "./getNameBySeat";
 import updateDeck from "./updateDeck";
 import {
-  ZoneType,
   Annotations,
   GameObject,
-  GameObjectTypeAbility,
+  //GameObjectTypeAbility,
   DetailsType
 } from "../types/greInterpreter";
 
@@ -23,7 +22,8 @@ import {
   AnnotationInfo,
   GameInfo,
   GameObjectInfo,
-  TurnInfo
+  TurnInfo,
+  ZoneInfo
 } from "../proto/GreTypes";
 
 import getMatchGameStats from "./getMatchGameStats";
@@ -50,6 +50,10 @@ function changePriority(previous: number, current: number, time: Date): void {
 
 function getGameObject(id: number): GameObject {
   return globals.store.getState().currentmatch.gameObjects[id];
+}
+
+function getZone(id: number): ZoneInfo {
+  return globals.store.getState().currentmatch.zones[id];
 }
 
 function getAllAnnotations(): AnnotationInfo[] {
@@ -104,9 +108,9 @@ function instanceIdToObject(instanceID: number): GameObject {
     return instance;
   }
   throw new NoInstanceException(orig, instanceID, instance);
-  //return false;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function keyValuePair(obj: KeyValuePairInfo, addTo: any): DetailsType {
   // the f value is not in the GreTypes..
   if (obj.key) {
@@ -142,17 +146,19 @@ const annotationFunctions: {
 } = {};
 
 function processAnnotations(): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getAllAnnotations().forEach((ann: any) => {
     // if this annotation has already been processed, skip
     if (isAnnotationProcessed(ann.id || 0)) return;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let details: any = {};
     if (ann.details) {
       ann.details.forEach(
         (detail: KeyValuePairInfo) => (details = keyValuePair(detail, details))
       );
     }
-    console.log(ann, details);
+    //console.log(ann, details);
 
     try {
       ann.type.forEach((type: string) => {
@@ -203,8 +209,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
 
   // A player drew a card
   if (ann.details.category == "Draw") {
-    const zone = globals.currentMatch.zones[ann.details.zone_src];
-    const playerName = getNameBySeat(zone.ownerSeatId);
+    const zone = getZone(ann.details.zone_src);
+    const playerName = getNameBySeat(zone.ownerSeatId || 0);
     const obj = getGameObject(ann.affectedIds[0]);
     if (zone.ownerSeatId == globals.currentMatch.player.seat && obj) {
       const grpId = obj.grpId || 0;
@@ -215,7 +221,11 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
         grpId
       );
     } else {
-      actionLog(zone.ownerSeatId, globals.logTime, `${playerName} drew a card`);
+      actionLog(
+        zone.ownerSeatId || 0,
+        globals.logTime,
+        `${playerName} drew a card`
+      );
     }
   }
 
@@ -257,7 +267,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
 
   // A player puts a card in a zone
   if (ann.details.category == "Put") {
-    const zone = globals.currentMatch.zones[ann.details.zone_dest].type;
+    const zone = getZone(ann.details.zone_dest).type;
     const obj = instanceIdToObject(ann.affectedIds[0]);
     const grpId = obj.grpId;
     const affector = instanceIdToObject(ann.affectorId);
@@ -281,7 +291,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
 
   // A card is returned to a zone
   if (ann.details.category == "Return") {
-    const zone = globals.currentMatch.zones[ann.details.zone_dest].type;
+    const zone = getZone(ann.details.zone_dest).type;
     const affected = instanceIdToObject(ann.affectedIds[0]);
     const affector = instanceIdToObject(ann.affectorId);
 
@@ -367,7 +377,7 @@ annotationFunctions.AnnotationType_AbilityInstanceCreated = function(
   ann: Annotations
 ): void {
   if (ann.type !== "AnnotationType_AbilityInstanceCreated") return;
-
+  /*
   const affected = ann.affectedIds[0];
   const affector = instanceIdToObject(ann.affectorId);
 
@@ -384,8 +394,9 @@ annotationFunctions.AnnotationType_AbilityInstanceCreated = function(
       objectSourceGrpId: affector.grpId,
       parentId: affector.instanceId
     } as GameObjectTypeAbility;
-    //reduxAction(dispatch, "SET_GAMEOBJ", newObj, IPC_NONE);
+    reduxAction(dispatch, "SET_GAMEOBJ", newObj, IPC_NONE);
   }
+  */
 };
 
 annotationFunctions.AnnotationType_ResolutionStart = function(
@@ -537,8 +548,8 @@ annotationFunctions.AnnotationType_CardRevealed = function(
   if (!ann.ignoreForSeatIds.includes(globals.currentMatch.player.seat)) return;
 
   ann.affectedIds.forEach((grpId: number) => {
-    const zone = globals.currentMatch.zones[ann.details.source_zone];
-    const owner = zone.ownerSeatId;
+    const zone = getZone(ann.details.source_zone);
+    const owner = zone.ownerSeatId || 0;
 
     actionLog(
       owner,
@@ -551,9 +562,9 @@ annotationFunctions.AnnotationType_CardRevealed = function(
 
 function getOppUsedCards(): number[] {
   const cardsUsed: number[] = [];
-  Object.keys(globals.currentMatch.zones).forEach(key => {
-    const zone = globals.currentMatch.zones[key];
-    const zoneType = zone.type.trim();
+  Object.keys(globals.store.getState().currentmatch.zones).forEach(key => {
+    const zone = getZone(parseInt(key));
+    const zoneType = (zone.type || "ZoneType_None").trim();
     if (zone.objectInstanceIds && zoneType !== "ZoneType_Limbo") {
       zone.objectInstanceIds.forEach((id: number) => {
         let grpId;
@@ -583,8 +594,8 @@ function onlyUnique(value: string, index: number, self: string[]): boolean {
 
 function getCardsTypeZone(): ZoneData {
   const data: ZoneData = {};
-  Object.keys(globals.currentMatch.zones).forEach(key => {
-    const zone = globals.currentMatch.zones[key];
+  Object.keys(globals.store.getSate().currentmatch.zones).forEach(key => {
+    const zone = getZone(key);
     const zoneType = zone.type;
     if (zone.objectInstanceIds) {
       zone.objectInstanceIds.forEach((id: number) => {
@@ -622,9 +633,9 @@ function getCardsTypeZone(): ZoneData {
 
 function getPlayerUsedCards(): number[] {
   const cardsUsed: number[] = [];
-  Object.keys(globals.currentMatch.zones).forEach(key => {
-    const zone = globals.currentMatch.zones[key];
-    const zoneType = zone.type.trim();
+  Object.keys(globals.store.getState().currentmatch.zones).forEach(key => {
+    const zone = getZone(parseInt(key));
+    const zoneType = (zone.type || "ZoneType_None").trim();
     const ignoreZones = [
       "ZoneType_Limbo",
       "ZoneType_Library",
@@ -727,21 +738,21 @@ GREMessages.GREMessageType_ConnectResp = function(
   }
 };
 
-const defaultZone = {
+const defaultZone: ZoneInfo = {
   zoneId: 0,
-  type: "",
-  visibility: "",
+  type: "ZoneType_None",
+  visibility: "Visibility_None",
   ownerSeatId: 0,
   objectInstanceIds: [],
   viewers: []
 };
 
 function checkForStartingLibrary(): boolean {
-  let zoneHand: ZoneType = defaultZone;
-  let zoneLibrary: ZoneType = defaultZone;
+  let zoneHand: ZoneInfo = defaultZone;
+  let zoneLibrary: ZoneInfo = defaultZone;
 
   Object.keys(globals.currentMatch.zones).forEach(key => {
-    const zone = globals.currentMatch.zones[key];
+    const zone = getZone(parseInt(key));
     if (zone.ownerSeatId == globals.currentMatch.player.seat) {
       if (zone.type == "ZoneType_Hand") {
         zoneHand = zone;
@@ -754,8 +765,8 @@ function checkForStartingLibrary(): boolean {
 
   // Probably just escape valves?
   if (globals.currentMatch.gameStage !== "GameStage_Start") return false;
-  if (zoneHand.type == "") return false;
-  if (zoneLibrary.type == "") return false;
+  if (zoneHand.type == "ZoneType_None") return false;
+  if (zoneLibrary.type == "ZoneType_None") return false;
 
   const hand = zoneHand.objectInstanceIds || [];
   const library = zoneLibrary.objectInstanceIds || [];
@@ -891,9 +902,7 @@ GREMessages.GREMessageType_GameStateMessage = function(
     }
     */
     if (gameState.zones) {
-      gameState.zones.forEach(zone => {
-        reduxAction(dispatch, "SET_ZONE", zone, IPC_NONE);
-      });
+      reduxAction(dispatch, "SET_MANY_ZONES", gameState.zones, IPC_NONE);
     }
 
     if (gameState.players) {
@@ -901,15 +910,21 @@ GREMessages.GREMessageType_GameStateMessage = function(
     }
 
     if (gameState.gameObjects) {
-      gameState.gameObjects.forEach((obj: GameObjectInfo) => {
-        reduxAction(dispatch, "SET_GAMEOBJ", obj, IPC_NONE);
-      });
+      reduxAction(
+        dispatch,
+        "SET_MANY_GAMEOBJ",
+        gameState.gameObjects,
+        IPC_NONE
+      );
     }
 
     if (gameState.annotations) {
-      gameState.annotations.forEach((annotation: AnnotationInfo) => {
-        reduxAction(dispatch, "SET_ANNOTATION", annotation, IPC_NONE);
-      });
+      reduxAction(
+        dispatch,
+        "SET_MANY_ANNOTATIONS",
+        gameState.annotations,
+        IPC_NONE
+      );
     }
   }
 

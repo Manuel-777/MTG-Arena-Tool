@@ -97,10 +97,15 @@ actions["SET_GAMEINFO"] = currentMatchSlice.actions.setGameInfo;
 actions["SET_SUPER_FORMAT"] = currentMatchSlice.actions.setSuperFormat;
 actions["SET_PLAYERS"] = currentMatchSlice.actions.setPlayers;
 actions["SET_ZONE"] = currentMatchSlice.actions.setZone;
+actions["SET_MANY_ZONES"] = currentMatchSlice.actions.setManyZones;
 actions["SET_GAMEOBJ"] = currentMatchSlice.actions.setGameObject;
+actions["SET_MANY_GAMEOBJ"] = currentMatchSlice.actions.setManyGameObjects;
 actions["SET_ANNOTATION"] = currentMatchSlice.actions.setAnnotation;
-actions["SET_ANNOTATION_PROC"] = currentMatchSlice.actions.setAnnotationProcessed;
-actions["CLEAN_ANNOTATIONS"] = currentMatchSlice.actions.removeProcessedAnnotations;
+actions["SET_MANY_ANNOTATIONS"] = currentMatchSlice.actions.setManyAnnotations;
+actions["SET_ANNOTATION_PROC"] =
+  currentMatchSlice.actions.setAnnotationProcessed;
+actions["CLEAN_ANNOTATIONS"] =
+  currentMatchSlice.actions.removeProcessedAnnotations;
 actions["SET_IDCHANGE"] = currentMatchSlice.actions.setIdChange;
 actions["SET_ONTHEPLAY"] = currentMatchSlice.actions.setOnThePlay;
 actions["ADD_CARD_CAST"] = currentMatchSlice.actions.addCardCast;

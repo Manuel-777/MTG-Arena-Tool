@@ -12,7 +12,8 @@ import {
   ResultSpec,
   ZoneInfo,
   AnnotationInfo,
-  GameInfo
+  GameInfo,
+  GameObjectInfo
 } from "../../proto/GreTypes";
 
 import { CardCast } from "../../types/currentMatch";
@@ -51,10 +52,10 @@ const initialStateObject = {
     minCommanderSize: 0,
     maxCommanderSize: 0
   },
-  zones: {} as Record<number, ZoneInfo>,
+  zones: [] as ZoneInfo[],
   annotations: [] as AnnotationInfo[],
   processedAnnotations: [] as number[],
-  gameObjects: {} as Record<number, GameObject>,
+  gameObjects: [] as GameObject[],
   instanceToCardIdMap: {} as Record<number, number>,
   idChanges: {} as Record<number, number>,
   cardsCast: [] as CardCast[]
@@ -91,9 +92,23 @@ const currentMatchSlice = createSlice({
     setZone: (state, action): void => {
       state.zones[action.payload.zoneId] = action.payload;
     },
+    setManyZones: (state, action): void => {
+      const newZones = { ...state.zones };
+      action.payload.forEach((zone: ZoneInfo) => {
+        newZones[zone.zoneId || 0] = zone;
+      });
+      Object.assign(state.zones, newZones);
+    },
     setAnnotation: (state, action): void => {
       const ann = action.payload as AnnotationInfo;
       state.annotations[ann.id || 0] = ann;
+    },
+    setManyAnnotations: (state, action): void => {
+      const newAnn = { ...state.annotations };
+      action.payload.forEach((annotation: AnnotationInfo) => {
+        newAnn[annotation.id || 0] = annotation;
+      });
+      Object.assign(state.annotations, newAnn);
     },
     setAnnotationProcessed: (state, action): void => {
       state.processedAnnotations.push(action.payload);
@@ -112,6 +127,18 @@ const currentMatchSlice = createSlice({
           state.instanceToCardIdMap[obj.instanceId] = obj.grpId;
         }
       }
+    },
+    setManyGameObjects: (state, action): void => {
+      const newObjs = { ...state.gameObjects };
+      action.payload.forEach((obj: GameObject) => {
+        if (obj.instanceId) {
+          newObjs[obj.instanceId] = obj;
+          if (obj.grpId) {
+            state.instanceToCardIdMap[obj.instanceId] = obj.grpId;
+          }
+        }
+      });
+      Object.assign(state.gameObjects, newObjs);
     },
     setIdChange: (state, action): void => {
       const details = action.payload;
