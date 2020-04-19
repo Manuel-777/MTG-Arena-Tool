@@ -63,7 +63,7 @@ function fixBadPlayerData(savedData: any): any {
 
 // Loads this player's configuration file
 export async function loadPlayerConfig(): Promise<void> {
-  const { playerId, playerName } = globals.store.getState().playerdata;
+  const { arenaId, playerId, playerName } = globals.store.getState().playerdata;
   ipcLog("Load player ID: " + playerId);
   ipcPop({ text: "Loading player history...", time: 0, progress: 2 });
   playerDb.init(playerId, playerName);
@@ -103,26 +103,31 @@ export async function loadPlayerConfig(): Promise<void> {
   }
 
   // Get Matches data
-  if (savedData.matches_index) {
-    const matchesList: InternalMatch[] = savedData.matches_index
-      .filter(
-        (id: string) =>
-          savedData[id] &&
-          savedData[id]?.gameStats &&
-          savedData[id]?.gameStats[0]?.win !== undefined
-      )
-      .map((id: string) => {
-        savedData[id].date = new Date(savedData[id].date).toString();
-        return savedData[id];
-      });
+  const newMatchesIndex: string[] = [];
+  Object.keys(savedData).forEach(k => {
+    if (k.indexOf("-" + arenaId) !== -1) {
+      newMatchesIndex.push(k);
+    }
+  });
 
-    reduxAction(
-      globals.store.dispatch,
-      "SET_MANY_MATCHES",
-      matchesList,
-      IPC_RENDERER
-    );
-  }
+  const matchesList: InternalMatch[] = newMatchesIndex
+    .filter(
+      (id: string) =>
+        savedData[id] &&
+        savedData[id].gameStats?.length > 0 &&
+        savedData[id]?.gameStats[0] !== undefined
+    )
+    .map((id: string) => {
+      savedData[id].date = new Date(savedData[id].date).toString();
+      return savedData[id];
+    });
+
+  reduxAction(
+    globals.store.dispatch,
+    "SET_MANY_MATCHES",
+    matchesList,
+    IPC_RENDERER
+  );
 
   // Get Events data
   if (savedData.courses_index) {
