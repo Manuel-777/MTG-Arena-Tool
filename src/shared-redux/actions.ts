@@ -101,10 +101,7 @@ actions["SET_GAMEOBJ"] = currentMatchSlice.actions.setGameObject;
 actions["SET_MANY_GAMEOBJ"] = currentMatchSlice.actions.setManyGameObjects;
 actions["SET_ANNOTATION"] = currentMatchSlice.actions.setAnnotation;
 actions["SET_MANY_ANNOTATIONS"] = currentMatchSlice.actions.setManyAnnotations;
-actions["SET_ANNOTATION_PROC"] =
-  currentMatchSlice.actions.setAnnotationProcessed;
-actions["CLEAN_ANNOTATIONS"] =
-  currentMatchSlice.actions.removeProcessedAnnotations;
+actions["REMOVE_ANNOTATIONS"] = currentMatchSlice.actions.removeAnnotations;
 actions["SET_IDCHANGE"] = currentMatchSlice.actions.setIdChange;
 actions["SET_ONTHEPLAY"] = currentMatchSlice.actions.setOnThePlay;
 actions["ADD_CARD_CAST"] = currentMatchSlice.actions.addCardCast;

@@ -9,7 +9,7 @@ import {
 
 import { CardCast, PriorityTimers } from "../../types/currentMatch";
 
-import { GameObject } from "../../types/greInterpreter";
+import { GameObject, DetailsIdChange } from "../../types/greInterpreter";
 
 const initialStateObject = {
   onThePlay: 0,
@@ -24,10 +24,10 @@ const initialStateObject = {
   } as PriorityTimers,
   currentPriority: 0,
   // Zones, objects, annotations, ids tracking
-  zones: [] as ZoneInfo[],
-  annotations: [] as AnnotationInfo[],
+  zones: {} as Record<number, ZoneInfo>,
+  annotations: {} as Record<number, AnnotationInfo>,
   processedAnnotations: [] as number[],
-  gameObjects: [] as GameObject[],
+  gameObjects: {} as Record<number, GameObject>,
   instanceToCardIdMap: {} as Record<number, number>,
   idChanges: {} as Record<number, number>,
   cardsCast: [] as CardCast[]
@@ -74,16 +74,20 @@ const currentMatchSlice = createSlice({
       action.payload.forEach((annotation: AnnotationInfo) => {
         newAnn[annotation.id || 0] = annotation;
       });
+    },
+    removeAnnotations: (state, action): void => {
+      const newProcessed = [...state.processedAnnotations, ...action.payload];
+      const newAnn = {} as Record<number, AnnotationInfo>;
+
+      Object.keys(state.annotations).map((k: string) => {
+        const id = parseInt(k);
+        if (!newProcessed.includes(id)) {
+          newAnn[id] = state.annotations[id];
+        }
+      });
+
       Object.assign(state.annotations, newAnn);
-    },
-    setAnnotationProcessed: (state, action): void => {
-      state.processedAnnotations.push(action.payload);
-    },
-    removeProcessedAnnotations: (state): void => {
-      state.annotations = state.annotations.filter(
-        (ann: AnnotationInfo) =>
-          !state.processedAnnotations.includes(ann.id || 0)
-      );
+      Object.assign(state.processedAnnotations, newProcessed);
     },
     setGameObject: (state, action): void => {
       const obj = action.payload as GameObject;
@@ -107,7 +111,7 @@ const currentMatchSlice = createSlice({
       Object.assign(state.gameObjects, newObjs);
     },
     setIdChange: (state, action): void => {
-      const details = action.payload;
+      const details = action.payload as DetailsIdChange;
       state.idChanges[details.orig_id] = details.new_id;
     },
     addCardCast: (state, action): void => {

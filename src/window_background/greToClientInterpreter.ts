@@ -20,23 +20,17 @@ import {
   KeyValuePairInfo,
   GREToClientMessage,
   AnnotationInfo,
-  GameInfo,
   GameObjectInfo,
   TurnInfo,
-  ZoneInfo
+  ZoneInfo,
+  GREMessageType,
+  AnnotationType
 } from "../proto/GreTypes";
 
 import getMatchGameStats from "./getMatchGameStats";
 import { reduxAction } from "../shared-redux/sharedRedux";
 import { objectClone } from "../shared/util";
 const dispatch = globals.store.dispatch;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function cleanUndefinedKeys(obj: any): void {
-  Object.keys(obj).forEach(key =>
-    obj[key] === undefined ? delete obj[key] : {}
-  );
-}
 
 function changePriority(previous: number, current: number, time: number): void {
   const priorityTimers = objectClone(
@@ -65,7 +59,8 @@ function getZone(id: number): ZoneInfo {
 }
 
 function getAllAnnotations(): AnnotationInfo[] {
-  return globals.store.getState().currentmatch.annotations;
+  const annotations = globals.store.getState().currentmatch.annotations;
+  return Object.values(annotations);
 }
 
 function isAnnotationProcessed(id: number): boolean {
@@ -123,23 +118,34 @@ function keyValuePair(obj: KeyValuePairInfo, addTo: any): DetailsType {
   // the f value is not in the GreTypes..
   if (obj.key) {
     try {
-      if (obj.type == "KeyValuePairValueType_uint32")
-        addTo[obj.key] = obj.valueUint32;
-      if (obj.type == "KeyValuePairValueType_int32")
-        addTo[obj.key] = obj.valueInt32;
-      if (obj.type == "KeyValuePairValueType_uint64")
-        addTo[obj.key] = obj.valueUint64;
-      if (obj.type == "KeyValuePairValueType_int64")
-        addTo[obj.key] = obj.valueInt64;
-      if (obj.type == "KeyValuePairValueType_bool")
-        addTo[obj.key] = obj.valueBool;
-      if (obj.type == "KeyValuePairValueType_string")
-        addTo[obj.key] = obj.valueString;
-      if (obj.type == "KeyValuePairValueType_float")
-        addTo[obj.key] = obj.valueFloat;
-      if (obj.type == "KeyValuePairValueType_double")
-        addTo[obj.key] = obj.valueDouble;
-
+      switch (obj.type) {
+        case "KeyValuePairValueType_uint32":
+          addTo[obj.key] = obj.valueUint32;
+          break;
+        case "KeyValuePairValueType_int32":
+          addTo[obj.key] = obj.valueInt32;
+          break;
+        case "KeyValuePairValueType_uint64":
+          addTo[obj.key] = obj.valueUint64;
+          break;
+        case "KeyValuePairValueType_int64":
+          addTo[obj.key] = obj.valueInt64;
+          break;
+        case "KeyValuePairValueType_bool":
+          addTo[obj.key] = obj.valueBool;
+          break;
+        case "KeyValuePairValueType_string":
+          addTo[obj.key] = obj.valueString;
+          break;
+        case "KeyValuePairValueType_float":
+          addTo[obj.key] = obj.valueFloat;
+          break;
+        case "KeyValuePairValueType_double":
+          addTo[obj.key] = obj.valueDouble;
+          break;
+        default:
+          break;
+      }
       if (addTo[obj.key].length == 1) addTo[obj.key] = addTo[obj.key][0];
     } catch (e) {
       addTo[obj.key] = undefined;
@@ -149,58 +155,14 @@ function keyValuePair(obj: KeyValuePairInfo, addTo: any): DetailsType {
   return addTo;
 }
 
-const annotationFunctions: {
-  [key: string]: (ann: Annotations) => void;
-} = {};
-
-function processAnnotations(): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getAllAnnotations().forEach((ann: any) => {
-    // if this annotation has already been processed, skip
-    if (isAnnotationProcessed(ann.id || 0)) return;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let details: any = {};
-    if (ann.details) {
-      ann.details.forEach(
-        (detail: KeyValuePairInfo) => (details = keyValuePair(detail, details))
-      );
-    }
-    //console.log(ann, details);
-
-    try {
-      ann.type.forEach((type: string) => {
-        const fn = annotationFunctions[type];
-        if (typeof fn == "function") {
-          fn({ ...ann, type: type, details: details } as Annotations);
-        }
-
-        //globals.currentMatch.annotations = globals.currentMatch.annotations.splice(index, 1);
-        // add this annotation to the list of processed
-        reduxAction(dispatch, "SET_ANNOTATION_PROC", ann.id || 0, IPC_NONE);
-      });
-    } catch (e) {
-      // console.log(ann, e);
-    }
-  });
-}
-
-function removeProcessedAnnotations(): void {
-  reduxAction(dispatch, "CLEAN_ANNOTATIONS", true, IPC_NONE);
-}
-
-annotationFunctions.AnnotationType_ObjectIdChanged = function(
-  ann: Annotations
-): void {
+const AnnotationType_ObjectIdChanged = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ObjectIdChanged") return;
   //let newObj = cloneDeep(getGameObject(details.orig_id));
   //getGameObject(details.new_id) = newObj;
   reduxAction(dispatch, "SET_IDCHANGE", ann.details, IPC_NONE);
 };
 
-annotationFunctions.AnnotationType_ZoneTransfer = function(
-  ann: Annotations
-): void {
+const AnnotationType_ZoneTransfer = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ZoneTransfer") return;
 
   // A player played a land
@@ -381,9 +343,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
   }
 };
 
-annotationFunctions.AnnotationType_AbilityInstanceCreated = function(
-  ann: Annotations
-): void {
+const AnnotationType_AbilityInstanceCreated = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_AbilityInstanceCreated") return;
   /*
   const affected = ann.affectedIds[0];
@@ -407,9 +367,7 @@ annotationFunctions.AnnotationType_AbilityInstanceCreated = function(
   */
 };
 
-annotationFunctions.AnnotationType_ResolutionStart = function(
-  ann: Annotations
-): void {
+const AnnotationType_ResolutionStart = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ResolutionStart") return;
   const affected = instanceIdToObject(ann.affectedIds[0]);
   const grpId = ann.details.grpid;
@@ -427,9 +385,7 @@ annotationFunctions.AnnotationType_ResolutionStart = function(
   }
 };
 
-annotationFunctions.AnnotationType_DamageDealt = function(
-  ann: Annotations
-): void {
+const AnnotationType_DamageDealt = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_DamageDealt") return;
   let recipient = "";
   if (ann.affectedIds[0] < 5) {
@@ -452,9 +408,7 @@ annotationFunctions.AnnotationType_DamageDealt = function(
   );
 };
 
-annotationFunctions.AnnotationType_ModifiedLife = function(
-  ann: Annotations
-): void {
+const AnnotationType_ModifiedLife = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ModifiedLife") return;
   const affected = ann.affectedIds[0];
   const total = globals.currentMatch.players[affected].lifeTotal;
@@ -468,9 +422,7 @@ annotationFunctions.AnnotationType_ModifiedLife = function(
   );
 };
 
-annotationFunctions.AnnotationType_TargetSpec = function(
-  ann: Annotations
-): void {
+const AnnotationType_TargetSpec = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_TargetSpec") return;
   let target;
   if (ann.affectedIds[0] < 5) {
@@ -494,7 +446,7 @@ annotationFunctions.AnnotationType_TargetSpec = function(
   actionLog(seat, globals.logTime, `${text} targetted ${target}`);
 };
 
-annotationFunctions.AnnotationType_Scry = function(ann: Annotations): void {
+const AnnotationType_Scry = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_Scry") return;
   // REVIEW SCRY ANNOTATION
   let affector = ann.affectorId;
@@ -549,9 +501,7 @@ annotationFunctions.AnnotationType_Scry = function(ann: Annotations): void {
   }
 };
 
-annotationFunctions.AnnotationType_CardRevealed = function(
-  ann: Annotations
-): void {
+const AnnotationType_CardRevealed = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_CardRevealed") return;
   if (!ann.ignoreForSeatIds.includes(globals.currentMatch.player.seat)) return;
 
@@ -567,6 +517,77 @@ annotationFunctions.AnnotationType_CardRevealed = function(
     );
   });
 };
+
+function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
+  switch (type) {
+    case "AnnotationType_ObjectIdChanged":
+      AnnotationType_ObjectIdChanged(ann);
+      break;
+    case "AnnotationType_ZoneTransfer":
+      AnnotationType_ZoneTransfer(ann);
+      break;
+    case "AnnotationType_AbilityInstanceCreated":
+      AnnotationType_AbilityInstanceCreated(ann);
+      break;
+    case "AnnotationType_ResolutionStart":
+      AnnotationType_ResolutionStart(ann);
+      break;
+    case "AnnotationType_DamageDealt":
+      AnnotationType_DamageDealt(ann);
+      break;
+    case "AnnotationType_ModifiedLife":
+      AnnotationType_ModifiedLife(ann);
+      break;
+    case "AnnotationType_TargetSpec":
+      AnnotationType_TargetSpec(ann);
+      break;
+    case "AnnotationType_Scry":
+      AnnotationType_Scry(ann);
+      break;
+    case "AnnotationType_CardRevealed":
+      AnnotationType_CardRevealed(ann);
+      break;
+    default:
+      break;
+  }
+}
+
+function processAnnotations(): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const removeIds = [] as number[];
+  const anns = getAllAnnotations();
+  for (let i = 0; i < anns.length; i++) {
+    const ann = anns[i] as any;
+    // if this annotation has already been processed, skip
+    if (isAnnotationProcessed(ann.id || 0)) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let details: any = {};
+    if (ann.details) {
+      ann.details.forEach(
+        (detail: KeyValuePairInfo) => (details = keyValuePair(detail, details))
+      );
+    }
+    //console.log(ann, details);
+
+    try {
+      ann.type.forEach((type: AnnotationType) => {
+        annotationsSwitch(
+          { ...ann, type: type, details: details } as Annotations,
+          type
+        );
+        // add this annotation to the list of processed
+        removeIds.push(ann.id);
+      });
+    } catch (e) {
+      // console.log(ann, e);
+    }
+  }
+  console.log(removeIds.length, anns.length);
+  if (removeIds.length > 0) {
+    reduxAction(dispatch, "REMOVE_ANNOTATIONS", removeIds, IPC_NONE);
+  }
+}
 
 function getOppUsedCards(): number[] {
   const cardsUsed: number[] = [];
@@ -674,67 +695,7 @@ function getPlayerUsedCards(): number[] {
   return cardsUsed;
 }
 
-const GREMessages: { [key: string]: (msg: GREToClientMessage) => void } = {};
-
-// Used for debug only.
-export function processAll(): void {
-  for (let i = 0; i < globals.currentMatch.latestMessage; i++) {
-    const message = globals.currentMatch.GREtoClient[i];
-    if (message) {
-      const fn = GREMessages[message.type || ""];
-      if (typeof fn == "function") {
-        console.log(`Process: ${message.type} (${message.msgId})`);
-        fn(message);
-      }
-    }
-  }
-  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
-  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
-  globals.currentMatch.oppCardsUsed = getOppUsedCards();
-}
-
-export function GREMessageByID(msgId: number, time: Date): void {
-  const message = globals.currentMatch.GREtoClient[msgId];
-  globals.logTime = time;
-
-  const fn = GREMessages[message.type || ""];
-  if (typeof fn == "function") {
-    fn(message);
-  }
-
-  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
-  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
-  globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
-    getOppUsedCards()
-  );
-}
-
-export function GREMessage(message: GREToClientMessage, time: Date): void {
-  globals.currentMatch.GREtoClient[message.msgId || 0] = message;
-  globals.logTime = time;
-
-  const fn = GREMessages[message.type || ""];
-  if (typeof fn == "function") {
-    fn(message);
-  }
-
-  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
-  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
-  globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
-    getOppUsedCards()
-  );
-}
-
-// Some game state messages are sent as queued
-GREMessages.GREMessageType_QueuedGameStateMessage = function(
-  msg: GREToClientMessage
-): void {
-  GREMessages.GREMessageType_GameStateMessage(msg);
-};
-
-GREMessages.GREMessageType_ConnectResp = function(
-  msg: GREToClientMessage
-): void {
+const GREMessageType_ConnectResp = (msg: GREToClientMessage): void => {
   if (
     msg.connectResp?.deckMessage?.deckCards &&
     globals.currentMatch.player.originalDeck == null
@@ -842,9 +803,7 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
   }
 }
 
-GREMessages.GREMessageType_GameStateMessage = function(
-  msg: GREToClientMessage
-): void {
+const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
   if (
     msg.msgId &&
     (!globals.currentMatch.msgId ||
@@ -865,6 +824,7 @@ GREMessages.GREMessageType_GameStateMessage = function(
 
   const gameState = msg.gameStateMessage;
   if (gameState) {
+    //(gameState) {
     if (gameState.gameInfo) {
       reduxAction(dispatch, "SET_GAMEINFO", gameState.gameInfo, IPC_NONE);
       if (gameState.gameInfo.stage == "GameStage_GameOver") {
@@ -914,7 +874,6 @@ GREMessages.GREMessageType_GameStateMessage = function(
   }
 
   processAnnotations();
-  removeProcessedAnnotations();
   checkForStartingLibrary();
 
   globals.currentMatch.playerCardsLeft = globals.currentMatch.player.deck.clone();
@@ -922,7 +881,14 @@ GREMessages.GREMessageType_GameStateMessage = function(
   updateDeck(false);
 };
 
-GREMessages.GREMessageType_DieRollResultsResp = function(msg): void {
+// Some game state messages are sent as queued
+const GREMessageType_QueuedGameStateMessage = (
+  msg: GREToClientMessage
+): void => {
+  GREMessageType_GameStateMessage(msg);
+};
+
+const GREMessageType_DieRollResultsResp = (msg: GREToClientMessage): void => {
   if (msg.dieRollResultsResp) {
     const highest = msg.dieRollResultsResp.playerDieRolls.reduce((a, b) => {
       if ((a.rollValue ?? 0) > (b.rollValue ?? 0)) {
@@ -934,3 +900,63 @@ GREMessages.GREMessageType_DieRollResultsResp = function(msg): void {
     reduxAction(dispatch, "SET_ONTHEPLAY", highest.systemSeatId, IPC_NONE);
   }
 };
+
+function GREMessagesSwitch(
+  message: GREToClientMessage,
+  type: GREMessageType | undefined
+): void {
+  //console.log(`Process: ${message.type} (${message.msgId})`);
+  switch (type) {
+    case "GREMessageType_QueuedGameStateMessage":
+      GREMessageType_QueuedGameStateMessage(message);
+      break;
+    case "GREMessageType_ConnectResp":
+      GREMessageType_ConnectResp(message);
+      break;
+    case "GREMessageType_GameStateMessage":
+      GREMessageType_GameStateMessage(message);
+      break;
+    case "GREMessageType_DieRollResultsResp":
+      GREMessageType_DieRollResultsResp(message);
+      break;
+  }
+}
+
+// Used for debug only.
+export function processAll(): void {
+  for (let i = 0; i < globals.currentMatch.latestMessage; i++) {
+    const message = globals.currentMatch.GREtoClient[i];
+    if (message) {
+      GREMessagesSwitch(message, message.type);
+    }
+  }
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
+  globals.currentMatch.oppCardsUsed = getOppUsedCards();
+}
+
+export function GREMessageByID(msgId: number, time: Date): void {
+  const message = globals.currentMatch.GREtoClient[msgId];
+  globals.logTime = time;
+
+  GREMessagesSwitch(message, message.type);
+
+  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
+    getOppUsedCards()
+  );
+}
+
+export function GREMessage(message: GREToClientMessage, time: Date): void {
+  //globals.currentMatch.GREtoClient[message.msgId || 0] = message;
+  globals.logTime = time;
+
+  GREMessagesSwitch(message, message.type);
+
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
+  globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
+    getOppUsedCards()
+  );
+}
