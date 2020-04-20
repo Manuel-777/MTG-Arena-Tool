@@ -5,11 +5,9 @@ import { ipcSend } from "./backgroundUtil";
 import { reduxAction } from "../shared-redux/sharedRedux";
 import { IPC_RENDERER } from "../shared/constants";
 import { getMatch } from "../shared-store";
-import getMatchGameStats from "./getMatchGameStats";
 
 export default function saveMatch(id: string, matchEndTime: number): void {
   console.log(globals.currentMatch, id);
-  getMatchGameStats();
   if (!globals.currentMatch || globals.currentMatch.matchId !== id) {
     return;
   }

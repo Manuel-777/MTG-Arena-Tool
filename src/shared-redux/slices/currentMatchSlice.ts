@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   PlayerInfo,
-  ResultSpec,
   ZoneInfo,
   AnnotationInfo,
   GameInfo,
@@ -13,27 +12,17 @@ import { CardCast, PriorityTimers } from "../../types/currentMatch";
 import { GameObject } from "../../types/greInterpreter";
 
 const initialStateObject = {
-  gameNumber: 0,
   onThePlay: 0,
   msgId: 0,
   players: [] as PlayerInfo[],
   turnInfo: {} as TurnInfo,
   gameInfo: {} as GameInfo,
-  results: [] as ResultSpec[],
   // Time stuff
   priorityTimers: {
     last: 0,
     timers: [0, 0, 0, 0, 0] as number[]
   } as PriorityTimers,
   currentPriority: 0,
-  deckConstraintInfo: {
-    minDeckSize: 0,
-    maxDeckSize: 0,
-    minSideboardSize: 0,
-    maxSideboardSize: 0,
-    minCommanderSize: 0,
-    maxCommanderSize: 0
-  },
   // Zones, objects, annotations, ids tracking
   zones: [] as ZoneInfo[],
   annotations: [] as AnnotationInfo[],
@@ -53,9 +42,6 @@ const currentMatchSlice = createSlice({
     },
     setOnThePlay: (state, action): void => {
       Object.assign(state.onThePlay, action.payload);
-    },
-    setGameNumber: (state, action): void => {
-      Object.assign(state.gameNumber, action.payload);
     },
     setTurnInfo: (state, action): void => {
       Object.assign(state.turnInfo, action.payload);
@@ -126,6 +112,9 @@ const currentMatchSlice = createSlice({
     },
     addCardCast: (state, action): void => {
       state.cardsCast.push(action.payload);
+    },
+    clearCardsCast: (state): void => {
+      Object.assign(state.cardsCast, []);
     }
   }
 });

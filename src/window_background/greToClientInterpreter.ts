@@ -794,14 +794,9 @@ function checkForStartingLibrary(): boolean {
   return true;
 }
 
-function checkGameInfo(gameInfo: GameInfo): void {
-  if (gameInfo.stage == "GameStage_GameOver") {
-    getMatchGameStats();
-  }
-}
-
 function checkTurnDiff(turnInfo: TurnInfo): void {
-  const gameNumber = globals.store.getState().currentmatch.gameNumber;
+  const gameNumber =
+    globals.store.getState().currentmatch.gameInfo.gameNumber || 0;
   const currentTurnInfo = globals.store.getState().currentmatch.turnInfo;
   const currentPriority = globals.store.getState().currentmatch.currentPriority;
   if (
@@ -871,8 +866,10 @@ GREMessages.GREMessageType_GameStateMessage = function(
   const gameState = msg.gameStateMessage;
   if (gameState) {
     if (gameState.gameInfo) {
-      checkGameInfo(gameState.gameInfo);
       reduxAction(dispatch, "SET_GAMEINFO", gameState.gameInfo, IPC_NONE);
+      if (gameState.gameInfo.stage == "GameStage_GameOver") {
+        getMatchGameStats();
+      }
     }
 
     if (gameState.turnInfo) {
@@ -881,6 +878,8 @@ GREMessages.GREMessageType_GameStateMessage = function(
     }
     /*
     // Not used yet
+    // Im not sure how but we should be able to see player
+    // timeouts and stuff like that using this.
     if (gameState.timers) {
       gameState.timers.forEach(timer => {
         globals.currentMatch.timers[timer.timerId] = timer;

@@ -3,23 +3,34 @@ import db from "../shared/database";
 import globals from "./globals";
 import { MatchGameStats } from "../types/currentMatch";
 import { getDeckChanges } from "./getDeckChanges";
+import { reduxAction } from "../shared-redux/sharedRedux";
+import { IPC_NONE } from "../shared/constants";
 
 export default function getMatchGameStats(): void {
+  const currentMatch = globals.store.getState().currentmatch;
   globals.currentMatch.opponent.cards = globals.currentMatch.oppCardsUsed;
 
+  const players = currentMatch.players.map(
+    player => player.systemSeatNumber || 0
+  );
+  // Calculate time of this game
+  const time = players.reduce((acc, cur) => {
+    console.log(acc, currentMatch.priorityTimers.timers[cur]);
+    return acc + currentMatch.priorityTimers.timers[cur];
+  }, 0);
   // Get current number of games completed
-  const gameNumberCompleted = globals.currentMatch.results.filter(
+  const gameNumberCompleted = currentMatch.gameInfo.results.filter(
     res => res.scope == "MatchScope_Game"
   ).length;
 
   // get winner of the game
   const winningTeamId =
-    globals.currentMatch.results.filter(
+    currentMatch.gameInfo.results.filter(
       res => res.scope == "MatchScope_Match"
     )[0]?.winningTeamId || -1;
 
   const game: MatchGameStats = {
-    time: 0,
+    time: Math.round((time || 0) / 1000),
     winner: winningTeamId,
     win: winningTeamId == globals.currentMatch.player.seat,
     shuffledOrder: [],
@@ -133,8 +144,8 @@ export default function getMatchGameStats(): void {
     landsInDeck - game.handLands[game.handLands.length - 1];
   const librarySize = deckSize - handSize;
 
-  game.cardsCast = _.cloneDeep(globals.currentMatch.cardsCast);
-  globals.currentMatch.cardsCast = [];
+  game.cardsCast = _.cloneDeep(currentMatch.cardsCast);
+  reduxAction(globals.store.dispatch, "CLEAR_CARDS_CAST", true, IPC_NONE);
   game.deckSize = deckSize;
   game.landsInDeck = landsInDeck;
   game.multiCardPositions = multiCardPositions;
@@ -143,10 +154,8 @@ export default function getMatchGameStats(): void {
   game.libraryLands = libraryLands;
 
   globals.matchGameStats[gameNumberCompleted - 1] = game;
-  /*
   globals.currentMatch.matchTime = globals.matchGameStats.reduce(
     (acc, cur) => acc + cur.time,
     0
   );
-  */
 }

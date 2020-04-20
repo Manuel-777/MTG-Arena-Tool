@@ -91,7 +91,7 @@ actions["SET_MANY_DECK_CHANGES"] = deckChangesSlice.actions.setManyChangees;
 
 actions["RESET_CURRENT_GAME"] = currentMatchSlice.actions.resetCurrentGame;
 actions["SET_CURRENT_MATCH_MANY"] = currentMatchSlice.actions.setMany;
-actions["SET_GAME_NUMBER"] = currentMatchSlice.actions.setGameNumber;
+actions["CLEAR_CARDS_CAST"] = currentMatchSlice.actions.clearCardsCast;
 actions["SET_TURNINFO"] = currentMatchSlice.actions.setTurnInfo;
 actions["SET_GAMEINFO"] = currentMatchSlice.actions.setGameInfo;
 actions["SET_PLAYERS"] = currentMatchSlice.actions.setPlayers;
