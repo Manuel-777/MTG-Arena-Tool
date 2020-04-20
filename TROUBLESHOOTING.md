@@ -51,6 +51,17 @@ If you have a patreon subscription with data syncing it is best to directly emai
 
 Otherwise, with a large amount of bad data, it's best to rename the *user-data file*. (the .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`)
 
+### The tool didn't record some data (e.g. a match). Is there any way to restore it?
+- Go to the folder `<mtgainstallfolder>\MTGA_Data\Logs\Logs` (Default: `C:\Program Files (x86)\Magic The Gathering Arena\MTGArena\MTGA_Data\Logs\Logs`)
+- Copy all files with UTC_Log - xxx.log to a backup location
+- Open them with your favorite text editor with regex search & replace capability (e.g. `Notepad++`)
+- perform a search & replace 
+  - tick `Regular Expressions` 
+  - search field: `[\d+]`
+  - leave the replace field empty
+- save the edited files
+- in the tool go to `Settings > Arena Data` and point the `Arena Log` to the previously modified files one by one
+
 ### If you have any other unexpected behaviour
 
 First of all, uninstalling and installing again will probably not change anything, as most errors are either configuration errors or log processing errors. Neither of them are solved by uninstalling. So, just to save you some time, make sure you have the latest version only.
