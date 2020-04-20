@@ -38,8 +38,7 @@ export interface CardCast {
 }
 
 export interface PriorityTimers {
-  date: Date;
-  last: Date;
+  last: number;
   timers: number[];
 }
 
@@ -58,7 +57,6 @@ export interface MatchData {
   gameObjs: { [key: number]: GameObject };
   turnInfo: TurnInfo;
   priorityTimers: PriorityTimers;
-  lastPriorityChangeTime: Date;
   currentPriority: number;
   cardsCast: CardCast[];
   latestMessage: number;
@@ -89,11 +87,9 @@ export const matchDataDefault: MatchData = {
   bestOf: 1,
   game: 0,
   priorityTimers: {
-    date: new Date(),
-    last: new Date(),
+    last: 0,
     timers: []
   },
-  lastPriorityChangeTime: new Date(),
   latestMessage: 0,
   msgId: 0,
   GREtoClient: [],

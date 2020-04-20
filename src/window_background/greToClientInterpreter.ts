@@ -28,6 +28,7 @@ import {
 
 import getMatchGameStats from "./getMatchGameStats";
 import { reduxAction } from "../shared-redux/sharedRedux";
+import { objectClone } from "../shared/util";
 const dispatch = globals.store.dispatch;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,15 +38,22 @@ function cleanUndefinedKeys(obj: any): void {
   );
 }
 
-function changePriority(previous: number, current: number, time: Date): void {
-  globals.currentMatch.priorityTimers.timers[previous] +=
-    time.getTime() - globals.currentMatch.priorityTimers.last.getTime();
+function changePriority(previous: number, current: number, time: number): void {
+  const priorityTimers = objectClone(
+    globals.store.getState().currentmatch.priorityTimers
+  );
+  priorityTimers.timers[previous] += time - priorityTimers.last;
+  priorityTimers.last = time;
 
-  globals.currentMatch.lastPriorityChangeTime = time;
-  globals.currentMatch.priorityTimers.date =
-    globals.currentMatch.priorityTimers.last;
-
-  globals.currentMatch.currentPriority = current;
+  reduxAction(
+    dispatch,
+    "SET_CURRENT_MATCH_MANY",
+    {
+      priorityTimers: priorityTimers,
+      currentPriority: current
+    },
+    IPC_NONE
+  );
 }
 
 function getGameObject(id: number): GameObject {
@@ -787,42 +795,31 @@ function checkForStartingLibrary(): boolean {
 }
 
 function checkGameInfo(gameInfo: GameInfo): void {
-  //console.log(`>> GameStage: ${gameInfo.stage} (${globals.currentMatch.gameStage})`);
-  //actionLog(-1, globals.logTime, `>> GameStage: ${gameInfo.stage} (${globals.currentMatch.gameStage})`);
-  const assign = {
-    gameNumber: gameInfo.gameNumber,
-    gameStage: gameInfo.stage,
-    matchWinCondition: gameInfo.matchWinCondition,
-    results: gameInfo.results
-  };
-  cleanUndefinedKeys(assign);
-
-  reduxAction(dispatch, "SET_CURRENT_MATCH_MANY", assign, IPC_NONE);
-
   if (gameInfo.stage == "GameStage_GameOver") {
     getMatchGameStats();
   }
 }
 
 function checkTurnDiff(turnInfo: TurnInfo): void {
+  const gameNumber = globals.store.getState().currentmatch.gameNumber;
   const currentTurnInfo = globals.store.getState().currentmatch.turnInfo;
+  const currentPriority = globals.store.getState().currentmatch.currentPriority;
   if (
     turnInfo.turnNumber &&
     turnInfo.turnNumber == 1 &&
     turnInfo.activePlayer &&
-    globals.currentMatch.game == 1
+    gameNumber == 1
   ) {
-    globals.currentMatch.onThePlay = turnInfo.activePlayer;
+    reduxAction(dispatch, "SET_ONTHEPLAY", turnInfo.activePlayer, IPC_NONE);
+  }
+  if (turnInfo.priorityPlayer !== currentPriority) {
+    changePriority(
+      turnInfo.priorityPlayer || 0,
+      currentPriority,
+      globals.logTime.getTime()
+    );
   }
   if (currentTurnInfo.turnNumber !== turnInfo.turnNumber) {
-    if (turnInfo.priorityPlayer !== currentTurnInfo.currentPriority) {
-      changePriority(
-        turnInfo.priorityPlayer || 0,
-        currentTurnInfo.currentPriority,
-        globals.logTime
-      );
-    }
-
     actionLog(
       -1,
       globals.logTime,
@@ -860,32 +857,21 @@ GREMessages.GREMessageType_GameStateMessage = function(
       msg.msgId < globals.currentMatch.msgId)
   ) {
     // New game, reset per-game fields.
-    reduxAction(dispatch, "RESET_CURRENT_GAME", true, IPC_NONE);
-
-    globals.currentMatch.opponent.cards = globals.currentMatch.oppCardsUsed;
-    globals.currentMatch.processedAnnotations = [];
-    globals.currentMatch.zones = {};
-    globals.currentMatch.players = {};
-    globals.currentMatch.annotations = [];
-    globals.currentMatch.gameObjs = {};
-    globals.currentMatch.gameInfo;
-    globals.currentMatch.turnInfo;
-    globals.currentMatch.playerCardsUsed = [];
-    globals.currentMatch.oppCardsUsed = [];
-    globals.initialLibraryInstanceIds = [];
-    globals.cardTypesByZone = [];
-    globals.idChanges = {};
-    globals.instanceToCardIdMap = {};
+    //reduxAction(dispatch, "RESET_CURRENT_GAME", true, IPC_NONE);
   }
   if (msg.msgId) {
-    globals.currentMatch.msgId = msg.msgId;
+    reduxAction(
+      dispatch,
+      "SET_CURRENT_MATCH_MANY",
+      { msgId: msg.msgId },
+      IPC_NONE
+    );
   }
 
   const gameState = msg.gameStateMessage;
   if (gameState) {
     if (gameState.gameInfo) {
       checkGameInfo(gameState.gameInfo);
-      reduxAction(dispatch, "RESET_CURRENT_GAME", true, IPC_NONE);
       reduxAction(dispatch, "SET_GAMEINFO", gameState.gameInfo, IPC_NONE);
     }
 

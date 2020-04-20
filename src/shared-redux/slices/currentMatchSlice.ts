@@ -1,49 +1,31 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  Phase,
-  Step,
-  GameType,
-  GameStage,
-  GameVariant,
-  MulliganType,
-  SuperFormat,
-  MatchWinCondition,
   PlayerInfo,
   ResultSpec,
   ZoneInfo,
   AnnotationInfo,
   GameInfo,
-  GameObjectInfo
+  TurnInfo
 } from "../../proto/GreTypes";
 
-import { CardCast } from "../../types/currentMatch";
+import { CardCast, PriorityTimers } from "../../types/currentMatch";
 
 import { GameObject } from "../../types/greInterpreter";
 
 const initialStateObject = {
   gameNumber: 0,
   onThePlay: 0,
+  msgId: 0,
   players: [] as PlayerInfo[],
-  turnInfo: {
-    phase: "Phase_None" as Phase,
-    step: "Step_None" as Step,
-    turnNumber: 0,
-    activePlayer: 0,
-    priorityPlayer: 0,
-    decisionPlayer: 0,
-    stormCount: 0,
-    nextPhase: "Phase_None" as Phase,
-    nextStep: "Step_None" as Step,
-    currentPriority: 0
-  },
+  turnInfo: {} as TurnInfo,
   gameInfo: {} as GameInfo,
-  gameStage: "GameStage_None" as GameStage,
-  gameType: "GameType_None" as GameType,
-  gameVariant: "GameVariant_None" as GameVariant,
   results: [] as ResultSpec[],
-  mulliganType: "MulliganType_None" as MulliganType,
-  superFormat: "SuperFormat_None" as SuperFormat,
-  matchWinCondition: "MatchWinCondition_None" as MatchWinCondition,
+  // Time stuff
+  priorityTimers: {
+    last: 0,
+    timers: [0, 0, 0, 0, 0] as number[]
+  } as PriorityTimers,
+  currentPriority: 0,
   deckConstraintInfo: {
     minDeckSize: 0,
     maxDeckSize: 0,
@@ -52,6 +34,7 @@ const initialStateObject = {
     minCommanderSize: 0,
     maxCommanderSize: 0
   },
+  // Zones, objects, annotations, ids tracking
   zones: [] as ZoneInfo[],
   annotations: [] as AnnotationInfo[],
   processedAnnotations: [] as number[],
@@ -73,9 +56,6 @@ const currentMatchSlice = createSlice({
     },
     setGameNumber: (state, action): void => {
       Object.assign(state.gameNumber, action.payload);
-    },
-    setSuperFormat: (state, action): void => {
-      Object.assign(state.superFormat, action.payload);
     },
     setTurnInfo: (state, action): void => {
       Object.assign(state.turnInfo, action.payload);

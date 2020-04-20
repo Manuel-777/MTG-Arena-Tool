@@ -44,8 +44,6 @@ export function createMatch(
 
   match.beginTime = matchBeginTime;
 
-  match.lastPriorityChangeTime = matchBeginTime;
-
   return match;
 }
 
