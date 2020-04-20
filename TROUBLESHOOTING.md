@@ -13,7 +13,6 @@ Refer to this issue, the solution is in the comments:
 ### "No log file found" error or "Output log contains no user data"
 
 Close MTG Arena (MTGA) and Mtgatool, then start MTGA. Once MTGA is loaded run Mtgatool again.
->>>>>>> master
 
 If that does not work, go to `%APPDATA%/mtg-arena-tool/` and delete `settings.json`, then load Mtgatool again.
 You might be asked to point at the path of the output log again.
