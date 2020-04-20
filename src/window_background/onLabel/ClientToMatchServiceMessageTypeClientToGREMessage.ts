@@ -4,6 +4,8 @@ import LogEntry from "../../types/logDecoder";
 import { normaliseFields } from "../backgroundUtil";
 import Deck from "../../shared/deck";
 import { v2cardsList } from "../../types/Deck";
+import { reduxAction } from "../../shared-redux/sharedRedux";
+import { IPC_NONE } from "../../shared/constants";
 
 interface Payload {
   submitdeckresp: {
@@ -81,12 +83,13 @@ export default function ClientToMatchServiceMessageTypeClientToGREMessage(
     // Get sideboard changes
     const deckResp = payload.submitdeckresp.deck;
 
-    const currentDeck = globals.currentMatch.player.deck.getSave();
+    const currentDeck = globals.currentDeck.getSave();
 
-    globals.currentMatch.player.deck = new Deck(
+    const newDeck = new Deck(
       currentDeck,
       deckResp.deckcards,
       deckResp.sideboardcards
     );
+    globals.currentDeck = newDeck;
   }
 }

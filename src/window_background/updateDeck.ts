@@ -14,7 +14,7 @@ function updateDeck(force: boolean): void {
     nd.getTime() - lastDeckUpdate.getTime() > 1000
   ) {
     forceDeckUpdate();
-
+    /*
     let currentMatchCopy = objectClone(globals.currentMatch);
     currentMatchCopy.oppCards = getOpponentDeck();
     currentMatchCopy.playerCardsLeft = globals.currentMatch.playerCardsLeft.getSave();
@@ -31,6 +31,7 @@ function updateDeck(force: boolean): void {
     delete currentMatchCopy.zones;
     currentMatchCopy = JSON.stringify(currentMatchCopy);
     ipcSend("set_match", currentMatchCopy, IPC_OVERLAY);
+    */
   }
 }
 

@@ -27,8 +27,8 @@ export default function RankUpdated(entry: Entry): void {
     id: entry.hash,
     //date: globals.logTime.toISOString(),
     timestamp: globals.logTime.getTime(),
-    lastMatchId: globals.currentMatch.matchId,
-    eventId: globals.currentMatch.eventId
+    lastMatchId: globals.store.getState().currentmatch.matchId,
+    eventId: globals.store.getState().currentmatch.eventId
   };
 
   // newJson.wasLossProtected

@@ -27,7 +27,10 @@ const actionLog = function(
 
     try {
       fs.writeFileSync(
-        path.join(globals.actionLogDir, globals.currentMatch.matchId + ".txt"),
+        path.join(
+          globals.actionLogDir,
+          globals.store.getState().currentmatch.matchId + ".txt"
+        ),
         currentActionLog,
         "utf-8"
       );

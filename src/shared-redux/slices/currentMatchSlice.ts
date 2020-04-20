@@ -10,10 +10,18 @@ import {
 import { CardCast, PriorityTimers } from "../../types/currentMatch";
 
 import { GameObject, DetailsIdChange } from "../../types/greInterpreter";
+import { InternalPlayer } from "../../types/match";
 
 const initialStateObject = {
+  matchId: "",
+  eventId: "",
   onThePlay: 0,
   msgId: 0,
+  playerSeat: 0,
+  oppSeat: 0,
+  opponent: {} as InternalPlayer,
+  // Info
+  player: {} as InternalPlayer,
   players: [] as PlayerInfo[],
   turnInfo: {} as TurnInfo,
   gameInfo: {} as GameInfo,
@@ -28,6 +36,7 @@ const initialStateObject = {
   annotations: {} as Record<number, AnnotationInfo>,
   processedAnnotations: [] as number[],
   gameObjects: {} as Record<number, GameObject>,
+  initialLibraryInstanceIds: [] as number[],
   instanceToCardIdMap: {} as Record<number, number>,
   idChanges: {} as Record<number, number>,
   cardsCast: [] as CardCast[]
@@ -37,11 +46,46 @@ const currentMatchSlice = createSlice({
   name: "currentMatch",
   initialState: initialStateObject,
   reducers: {
-    resetCurrentGame: (state): void => {
+    setMatchId: (state, action): void => {
+      state.matchId = action.payload;
+    },
+    setEventId: (state, action): void => {
+      state.eventId = action.payload;
+    },
+    setPlayer: (state, action): void => {
+      Object.assign(state.player, action.payload);
+    },
+    setOpponent: (state, action): void => {
+      Object.assign(state.opponent, action.payload);
+    },
+    setPlayerCardsUsed: (state, action): void => {
+      state.player.cardsUsed = action.payload;
+    },
+    setOppCardsUsed: (state, action): void => {
+      state.opponent.cardsUsed = action.payload;
+    },
+    resetCurrentMatch: (state): void => {
       Object.assign(state, initialStateObject);
     },
+    resetCurrentGame: (state): void => {
+      Object.assign(state, {
+        msgId: 0,
+        turnInfo: {},
+        Info: {},
+        priorityTimers: initialStateObject.priorityTimers,
+        currentPriority: 0,
+        zones: {},
+        annotations: {},
+        processedAnnotations: [],
+        gameObjects: {},
+        initialLibraryInstanceIds: [],
+        instanceToCardIdMap: {},
+        idChanges: {},
+        cardsCast: []
+      });
+    },
     setOnThePlay: (state, action): void => {
-      Object.assign(state.onThePlay, action.payload);
+      state.onThePlay = action.payload;
     },
     setTurnInfo: (state, action): void => {
       Object.assign(state.turnInfo, action.payload);
@@ -74,6 +118,7 @@ const currentMatchSlice = createSlice({
       action.payload.forEach((annotation: AnnotationInfo) => {
         newAnn[annotation.id || 0] = annotation;
       });
+      state.annotations = newAnn;
     },
     removeAnnotations: (state, action): void => {
       const newProcessed = [...state.processedAnnotations, ...action.payload];
@@ -115,10 +160,13 @@ const currentMatchSlice = createSlice({
       state.idChanges[details.orig_id] = details.new_id;
     },
     addCardCast: (state, action): void => {
-      state.cardsCast.push(action.payload);
+      state.cardsCast = [...state.cardsCast, action.payload];
     },
     clearCardsCast: (state): void => {
       Object.assign(state.cardsCast, []);
+    },
+    setInitialLibraryInstanceIds: (state, action): void => {
+      Object.assign(state.initialLibraryInstanceIds, action.payload);
     }
   }
 });
