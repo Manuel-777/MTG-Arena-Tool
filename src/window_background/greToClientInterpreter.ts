@@ -752,9 +752,9 @@ function checkForStartingLibrary(): boolean {
 
   const hand = zoneHand.objectInstanceIds || [];
   const library = zoneLibrary.objectInstanceIds || [];
-  console.log("Hand", hand);
-  console.log("Library", library);
-  console.log("current deck", globalStore.currentMatch.currentDeck);
+  //console.log("Hand", hand);
+  //console.log("Library", library);
+  //console.log("current deck", globalStore.currentMatch.currentDeck);
   // Check that a post-mulligan scry hasn't been done
   if (library.length == 0 || library[library.length - 1] < library[0]) {
     return false;
