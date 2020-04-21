@@ -425,7 +425,7 @@ const AnnotationType_ModifiedLife = function(ann: Annotations): void {
   const players = globalStore.currentMatch.players;
   const affected = ann.affectedIds[0];
   const total = players[affected].lifeTotal;
-const lifeStr = (ann.details.life > 0 ? "+" : "") + ann.details.life;
+  const lifeStr = (ann.details.life > 0 ? "+" : "") + ann.details.life;
 
   actionLog(
     affected,
