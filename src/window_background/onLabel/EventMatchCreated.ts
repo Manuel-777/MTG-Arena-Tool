@@ -3,7 +3,6 @@ import globals from "../globals";
 import LogEntry from "../../types/logDecoder";
 import actionLog from "../actionLog";
 import { ipcSend } from "../backgroundUtil";
-import { createMatch } from "../data";
 import { ARENA_MODE_MATCH, IPC_NONE } from "../../shared/constants";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 

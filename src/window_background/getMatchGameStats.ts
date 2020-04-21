@@ -28,6 +28,7 @@ export default function getMatchGameStats(): void {
 
   const game: MatchGameStats = {
     time: Math.round(time / 1000),
+    onThePlay: currentMatch.onThePlay,
     winner: winningTeamId,
     win: winningTeamId == currentMatch.playerSeat,
     shuffledOrder: [],

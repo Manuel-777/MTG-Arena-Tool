@@ -93,7 +93,7 @@ export default function saveMatch(id: string, matchEndTime: number): void {
     return;
   }
 
-  const existingMatch = getMatch(id) || {};
+  const existingMatch = getMatch(id) || { archived: false };
   const match = completeMatch(existingMatch, matchEndTime);
   if (!match) {
     return;

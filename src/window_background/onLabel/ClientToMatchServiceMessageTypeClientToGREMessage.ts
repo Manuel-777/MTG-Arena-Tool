@@ -2,25 +2,13 @@
 import globals from "../globals";
 import LogEntry from "../../types/logDecoder";
 import { normaliseFields } from "../backgroundUtil";
-import Deck from "../../shared/deck";
-import { v2cardsList } from "../../types/Deck";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import { IPC_NONE } from "../../shared/constants";
-
-interface Payload {
-  submitdeckresp: {
-    deck: {
-      deckcardsList: number[];
-      sideboardcardsList: number[];
-      deckcards: v2cardsList; // might be v3?
-      sideboardcards: v2cardsList; // might be v3?
-    };
-  };
-  type: string;
-}
+import { ClientToGREMessage } from "../../proto/GreTypes";
+import Deck from "../../shared/deck";
 
 interface Entry extends LogEntry {
-  json: () => Payload;
+  json: () => ClientToGREMessage;
 }
 
 function decodePayload(payload: any, msgType: string): any {
@@ -61,7 +49,7 @@ export default function ClientToMatchServiceMessageTypeClientToGREMessage(
   const json = entry.json();
   if (!json) return;
   //if (skipMatch) return;
-  let payload: Payload = json;
+  let payload: ClientToGREMessage = json;
   /*
   if (json.Payload) {
     payload = json.Payload;
@@ -78,18 +66,32 @@ export default function ClientToMatchServiceMessageTypeClientToGREMessage(
   // format in case Arena changes it again.
   payload = normaliseFields(payload);
 
-  if (payload.submitdeckresp) {
+  if (payload.submitDeckResp) {
     //console.log("Client To GRE: ", payload);
     // Get sideboard changes
-    const deckResp = payload.submitdeckresp.deck;
+    const deckResp = payload.submitDeckResp?.deck || {
+      deckCards: [],
+      sideboardCards: [],
+      commanderCards: []
+    };
 
     const currentDeck = globals.currentDeck.getSave();
 
     const newDeck = new Deck(
       currentDeck,
-      deckResp.deckcards,
-      deckResp.sideboardcards
+      deckResp.deckCards,
+      deckResp.sideboardCards
     );
     globals.currentDeck = newDeck;
+  }
+  // We can safely handle these messages too now !
+  if (payload.type == "ClientMessageType_ChooseStartingPlayerResp") {
+    if (payload.chooseStartingPlayerResp) {
+      const startingPlayer = payload.chooseStartingPlayerResp.systemSeatId;
+      if (startingPlayer) {
+        const dispatch = globals.store.dispatch;
+        reduxAction(dispatch, "SET_ONTHEPLAY", startingPlayer, IPC_NONE);
+      }
+    }
   }
 }
