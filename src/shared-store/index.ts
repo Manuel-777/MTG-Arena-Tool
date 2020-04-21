@@ -8,6 +8,7 @@ import { InternalDeck } from "../types/Deck";
 import { InternalEconomyTransaction } from "../types/inventory";
 import { InternalDraft } from "../types/draft";
 import { SeasonalRankData } from "../types/Season";
+import { matchStateObject } from "./currentMatchStore";
 
 import isValid from "date-fns/isValid";
 import parseISO from "date-fns/parseISO";
@@ -19,6 +20,8 @@ const defaultDeck = JSON.parse(
     ',"description":null,"format":"Standard","colors":[],"id":"00000000-0000-0000-0000-000000000000","isValid":false,"lastUpdated":"2018-05-31T00:06:29.7456958","lockedForEdit":false,"lockedForUse":false,"mainDeck":[],"name":"Undefined","resourceId":"00000000-0000-0000-0000-000000000000","sideboard":[]}'
 );
 
+// Use this store only when redux struggles with the data (too complex, too deep)
+// Or when there is not need to use the redux/react selector wizardy.
 const globalStore = {
   matches: {} as Record<string, InternalMatch>,
   events: {} as Record<string, InternalEvent>,
@@ -27,7 +30,8 @@ const globalStore = {
   transactions: {} as Record<string, InternalEconomyTransaction>,
   drafts: {} as Record<string, InternalDraft>,
   seasonal: {} as Record<string, SeasonalRankData>,
-  deckChanges: {} as Record<string, DeckChange>
+  deckChanges: {} as Record<string, DeckChange>,
+  currentMatch: matchStateObject
 };
 
 //

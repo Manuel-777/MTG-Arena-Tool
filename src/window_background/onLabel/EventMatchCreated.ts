@@ -3,8 +3,14 @@ import globals from "../globals";
 import LogEntry from "../../types/logDecoder";
 import actionLog from "../actionLog";
 import { ipcSend } from "../backgroundUtil";
-import { ARENA_MODE_MATCH, IPC_NONE } from "../../shared/constants";
-import { reduxAction } from "../../shared-redux/sharedRedux";
+import { ARENA_MODE_MATCH } from "../../shared/constants";
+
+import {
+  setEventId,
+  setPlayer,
+  setOpponent,
+  resetCurrentMatch
+} from "../../shared-store/currentMatchStore";
 
 export interface EntryJson {
   controllerFabricUri: string;
@@ -49,8 +55,7 @@ export default function EventMatchCreated(entry: Entry): void {
   ipcSend("ipc_log", "MATCH CREATED: " + matchBeginTime);
   if (json.eventId != "NPE") {
     actionLog(-99, globals.logTime, "");
-    const dispatch = globals.store.dispatch;
-    reduxAction(dispatch, "RESET_CURRENT_MATCH", true, IPC_NONE);
+    resetCurrentMatch();
 
     if (globals.debugLog || !globals.firstPass) {
       ipcSend("set_arena_state", ARENA_MODE_MATCH);
@@ -66,13 +71,13 @@ export default function EventMatchCreated(entry: Entry): void {
       leaderboardPlace: json.opponentMythicLeaderboardPlace,
       commanderGrpIds: json.opponentCommanderGrpIds
     };
-    reduxAction(dispatch, "SET_OPPONENT", opponent, IPC_NONE);
+    setOpponent(opponent);
 
     const player = {
       commanderGrpIds: json.commanderGrpIds
     };
-    reduxAction(dispatch, "SET_PLAYER", player, IPC_NONE);
+    setPlayer(player);
 
-    reduxAction(dispatch, "SET_EVENTID", json.eventId, IPC_NONE);
+    setEventId(json.eventId);
   }
 }

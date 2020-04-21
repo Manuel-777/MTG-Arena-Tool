@@ -5,6 +5,7 @@ import { IPC_OVERLAY } from "../shared/constants";
 import globals from "./globals";
 import format from "date-fns/format";
 import { InternalActionLog } from "../types/log";
+import globalStore from "../shared-store";
 
 let currentActionLog = "";
 
@@ -29,7 +30,7 @@ const actionLog = function(
       fs.writeFileSync(
         path.join(
           globals.actionLogDir,
-          globals.store.getState().currentmatch.matchId + ".txt"
+          globalStore.currentMatch.matchId + ".txt"
         ),
         currentActionLog,
         "utf-8"

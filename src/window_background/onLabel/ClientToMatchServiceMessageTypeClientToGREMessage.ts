@@ -6,6 +6,7 @@ import { reduxAction } from "../../shared-redux/sharedRedux";
 import { IPC_NONE } from "../../shared/constants";
 import { ClientToGREMessage } from "../../proto/GreTypes";
 import Deck from "../../shared/deck";
+import { setOnThePlay } from "../../shared-store/currentMatchStore";
 
 interface Entry extends LogEntry {
   json: () => ClientToGREMessage;
@@ -90,7 +91,7 @@ export default function ClientToMatchServiceMessageTypeClientToGREMessage(
       const startingPlayer = payload.chooseStartingPlayerResp.systemSeatId;
       if (startingPlayer) {
         const dispatch = globals.store.dispatch;
-        reduxAction(dispatch, "SET_ONTHEPLAY", startingPlayer, IPC_NONE);
+        setOnThePlay(startingPlayer);
       }
     }
   }

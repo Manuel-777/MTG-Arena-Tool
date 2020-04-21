@@ -2,6 +2,7 @@ import globals from "./globals";
 import { hypergeometricRange } from "../shared/statsFns";
 import { CardObject } from "../types/Deck";
 import { Chances } from "../types/Chances";
+import globalStore from "../shared-store";
 
 function chanceType(
   quantity: number,
@@ -31,7 +32,7 @@ const forceDeckUpdate = function(removeUsed = true): void {
   let typeArt = 0;
   let typeEnc = 0;
   let typeLan = 0;
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   const playerCardsUsed = currentMatch.player.cardsUsed;
   const playerCardsLeft = globals.currentDeck.clone();
 

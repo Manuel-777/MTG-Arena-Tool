@@ -1,8 +1,8 @@
-import globals from "./globals";
 import db from "../shared/database";
 import Deck from "../shared/deck";
 import { InternalDeck } from "../types/Deck";
-import { DbCardData, Archetype } from "../types/Metadata";
+import { Archetype } from "../types/Metadata";
+import globalStore from "../shared-store";
 
 function calculateDeviation(values: number[]): number {
   return Math.sqrt(values.reduce((a, b) => a + b) / (values.length - 1));
@@ -60,7 +60,7 @@ function getBestArchetype(deck: Deck): string {
 }
 
 function getOpponentDeck(): InternalDeck {
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   const _deck = new Deck(undefined, currentMatch.opponent.cardsUsed, []);
   _deck.getMainboard().removeDuplicates(true);
   _deck.colors;

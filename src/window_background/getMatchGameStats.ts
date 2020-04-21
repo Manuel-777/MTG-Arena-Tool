@@ -3,9 +3,10 @@ import db from "../shared/database";
 import globals from "./globals";
 import { MatchGameStats } from "../types/currentMatch";
 import { getDeckChanges } from "./getDeckChanges";
+import globalStore from "../shared-store";
 
 export default function getMatchGameStats(): void {
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   //const oppCardsUsed = currentMatch.opponent.cardsUsed;
 
   const players = currentMatch.players.map(
@@ -143,7 +144,7 @@ export default function getMatchGameStats(): void {
   const librarySize = deckSize - handSize;
 
   game.cardsCast = _.cloneDeep(currentMatch.cardsCast);
-  //reduxAction(globals.store.dispatch, "CLEAR_CARDS_CAST", true, IPC_NONE);
+  //clearCardsCast();
   game.deckSize = deckSize;
   game.landsInDeck = landsInDeck;
   game.multiCardPositions = multiCardPositions;

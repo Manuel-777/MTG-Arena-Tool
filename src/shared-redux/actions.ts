@@ -14,7 +14,6 @@ import economySlice from "./slices/economySlice";
 import draftsSlice from "./slices/draftsSlice";
 import seasonalSlice from "./slices/seasonalSlice";
 import deckChangesSlice from "./slices/deckChangesSlice";
-import currentMatchSlice from "./slices/currentMatchSlice";
 
 const actions: Record<string, (arg: any) => any> = {};
 actions["SET_SETTINGS"] = settingsSlice.actions.setSettings;
@@ -88,31 +87,5 @@ actions["SET_SEASONAL"] = seasonalSlice.actions.setSeasonal;
 actions["SET_MANY_SEASONAL"] = seasonalSlice.actions.setManySeasonal;
 actions["SET_DECK_CHANGE"] = deckChangesSlice.actions.setChange;
 actions["SET_MANY_DECK_CHANGES"] = deckChangesSlice.actions.setManyChangees;
-
-actions["SET_MATCHID"] = currentMatchSlice.actions.setMatchId;
-actions["SET_EVENTID"] = currentMatchSlice.actions.setEventId;
-actions["SET_PLAYER"] = currentMatchSlice.actions.setPlayer;
-actions["SET_OPPONENT"] = currentMatchSlice.actions.setOpponent;
-actions["SET_PLAYER_CARDS_USED"] = currentMatchSlice.actions.setPlayerCardsUsed;
-actions["SET_OPP_CARDS_USED"] = currentMatchSlice.actions.setOppCardsUsed;
-actions["RESET_CURRENT_MATCH"] = currentMatchSlice.actions.resetCurrentMatch;
-actions["RESET_CURRENT_GAME"] = currentMatchSlice.actions.resetCurrentGame;
-actions["SET_CURRENT_MATCH_MANY"] = currentMatchSlice.actions.setMany;
-actions["CLEAR_CARDS_CAST"] = currentMatchSlice.actions.clearCardsCast;
-actions["SET_TURNINFO"] = currentMatchSlice.actions.setTurnInfo;
-actions["SET_GAMEINFO"] = currentMatchSlice.actions.setGameInfo;
-actions["SET_PLAYERS"] = currentMatchSlice.actions.setPlayers;
-actions["SET_ZONE"] = currentMatchSlice.actions.setZone;
-actions["SET_MANY_ZONES"] = currentMatchSlice.actions.setManyZones;
-actions["SET_GAMEOBJ"] = currentMatchSlice.actions.setGameObject;
-actions["SET_MANY_GAMEOBJ"] = currentMatchSlice.actions.setManyGameObjects;
-actions["SET_ANNOTATION"] = currentMatchSlice.actions.setAnnotation;
-actions["SET_MANY_ANNOTATIONS"] = currentMatchSlice.actions.setManyAnnotations;
-actions["REMOVE_ANNOTATIONS"] = currentMatchSlice.actions.removeAnnotations;
-actions["SET_IDCHANGE"] = currentMatchSlice.actions.setIdChange;
-actions["SET_ONTHEPLAY"] = currentMatchSlice.actions.setOnThePlay;
-actions["ADD_CARD_CAST"] = currentMatchSlice.actions.addCardCast;
-actions["SET_INIT_LIBRARY_IDS"] =
-  currentMatchSlice.actions.setInitialLibraryInstanceIds;
 
 export default actions;

@@ -4,7 +4,7 @@ import { playerDb } from "../shared/db/LocalDatabase";
 import { ipcSend } from "./backgroundUtil";
 import { reduxAction } from "../shared-redux/sharedRedux";
 import { IPC_RENDERER } from "../shared/constants";
-import { getMatch } from "../shared-store";
+import globalStore, { getMatch } from "../shared-store";
 import { InternalMatch } from "../types/match";
 import { ResultSpec } from "../proto/GreTypes";
 import getOpponentDeck from "./getOpponentDeck";
@@ -13,7 +13,7 @@ function matchResults(results: ResultSpec[]): number[] {
   let playerWins = 0;
   let opponentWins = 0;
   let draws = 0;
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   results.forEach(function(res) {
     if (res.scope == "MatchScope_Game") {
       if (res.result == "ResultType_Draw") {
@@ -36,7 +36,7 @@ export function completeMatch(
   match: any,
   matchEndTime: number
 ): InternalMatch | undefined {
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   if (currentMatch.eventId === "AIBotMatch") return;
 
   const [playerWins, opponentWins, draws] = matchResults(
@@ -87,7 +87,7 @@ export function completeMatch(
 }
 
 export default function saveMatch(id: string, matchEndTime: number): void {
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   console.log(currentMatch, id);
   if (currentMatch.matchId !== id) {
     return;

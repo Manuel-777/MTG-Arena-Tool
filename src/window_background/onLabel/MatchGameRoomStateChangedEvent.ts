@@ -7,6 +7,12 @@ import { MatchGameRoomStateChange } from "../../types/match";
 import clearDeck from "../clearDeck";
 import saveMatch from "../saveMatch";
 import { reduxAction } from "../../shared-redux/sharedRedux";
+import globalStore from "../../shared-store";
+import {
+  setPlayer,
+  setOpponent,
+  setCurrentMatchMany
+} from "../../shared-store/currentMatchStore";
 
 interface Entry extends LogEntry {
   json: () => MatchGameRoomStateChange;
@@ -25,14 +31,9 @@ export default function onLabelMatchGameRoomStateChangedEvent(
 
   if (gameRoom.gameRoomConfig) {
     eventId = gameRoom.gameRoomConfig.eventId;
-    reduxAction(
-      dispatch,
-      "SET_CURRENT_MATCH_MANY",
-      {
-        eventId: eventId
-      },
-      IPC_NONE
-    );
+    setCurrentMatchMany({
+      eventId: eventId
+    });
     globals.duringMatch = true;
   }
 
@@ -42,31 +43,16 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   if (gameRoom.stateType == "MatchGameRoomStateType_Playing") {
     gameRoom.gameRoomConfig.reservedPlayers.forEach(player => {
       if (player.userId == playerData.arenaId) {
-        reduxAction(
-          dispatch,
-          "SET_CURRENT_MATCH_MANY",
-          {
-            playerSeat: player.systemSeatId
-          },
-          IPC_NONE
-        );
+        setCurrentMatchMany({
+          playerSeat: player.systemSeatId
+        });
       } else {
-        reduxAction(
-          dispatch,
-          "SET_OPPONENT",
-          {
-            userid: player.userId
-          },
-          IPC_NONE
-        );
-        reduxAction(
-          dispatch,
-          "SET_CURRENT_MATCH_MANY",
-          {
-            oppSeat: player.systemSeatId
-          },
-          IPC_NONE
-        );
+        setOpponent({
+          userid: player.userId
+        });
+        setCurrentMatchMany({
+          oppSeat: player.systemSeatId
+        });
       }
     });
   }
@@ -74,7 +60,7 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   if (gameRoom.stateType == "MatchGameRoomStateType_MatchCompleted") {
     //gameRoom.finalMatchResult.resultList
 
-    const currentMatch = globals.store.getState().currentmatch;
+    const currentMatch = globalStore.currentMatch;
     const playerRank = playerData.rank;
     const format =
       currentMatch.gameInfo.superFormat == "SuperFormat_Constructed"
@@ -89,12 +75,12 @@ export default function onLabelMatchGameRoomStateChangedEvent(
       leaderboardPlace: playerRank[format].leaderboardPlace,
       seat: currentMatch.playerSeat
     };
-    reduxAction(dispatch, "SET_PLAYER", player, IPC_NONE);
+    setPlayer(player);
 
     const opponent = {
       seat: currentMatch.oppSeat
     };
-    reduxAction(dispatch, "SET_OPPONENT", opponent, IPC_NONE);
+    setOpponent(opponent);
 
     gameRoom.finalMatchResult.resultList.forEach(function(res) {
       if (res.scope == "MatchScope_Match") {
@@ -118,28 +104,18 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   // Only update if needed
   if (json.players) {
     json.players.forEach(function(player) {
-      const currentMatch = globals.store.getState().currentmatch;
+      const currentMatch = globalStore.currentMatch;
       if (
         player.userId == playerData.arenaId &&
         currentMatch.playerSeat !== player.systemSeatId
       ) {
-        reduxAction(
-          dispatch,
-          "SET_CURRENT_MATCH_MANY",
-          {
-            playerSeat: player.systemSeatId
-          },
-          IPC_NONE
-        );
+        setCurrentMatchMany({
+          playerSeat: player.systemSeatId
+        });
       } else if (currentMatch.oppSeat !== player.systemSeatId) {
-        reduxAction(
-          dispatch,
-          "SET_CURRENT_MATCH_MANY",
-          {
-            oppSeat: player.systemSeatId
-          },
-          IPC_NONE
-        );
+        setCurrentMatchMany({
+          oppSeat: player.systemSeatId
+        });
       }
     });
   }

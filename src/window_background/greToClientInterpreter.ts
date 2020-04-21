@@ -27,43 +27,55 @@ import {
 } from "../proto/GreTypes";
 
 import getMatchGameStats from "./getMatchGameStats";
-import { reduxAction } from "../shared-redux/sharedRedux";
+//import { reduxAction } from "../shared-redux/sharedRedux";
 import { objectClone } from "../shared/util";
+import globalStore from "../shared-store";
+import {
+  setMatchId,
+  setPlayerCardsUsed,
+  setOppCardsUsed,
+  setCurrentMatchMany,
+  setIdChange,
+  addCardCast,
+  removeAnnotations,
+  setInitialLibraryInstanceIds,
+  setOnThePlay,
+  setGameInfo,
+  setTurnInfo,
+  setManyZones,
+  setPlayers,
+  setManyGameObjects,
+  setManyAnnotations
+} from "../shared-store/currentMatchStore";
+import { set } from "date-fns";
 const dispatch = globals.store.dispatch;
 
 function changePriority(previous: number, current: number, time: number): void {
-  const priorityTimers = objectClone(
-    globals.store.getState().currentmatch.priorityTimers
-  );
+  const priorityTimers = objectClone(globalStore.currentMatch.priorityTimers);
   priorityTimers.timers[previous] += time - priorityTimers.last;
   priorityTimers.last = time;
 
-  reduxAction(
-    dispatch,
-    "SET_CURRENT_MATCH_MANY",
-    {
-      priorityTimers: priorityTimers,
-      currentPriority: current
-    },
-    IPC_NONE
-  );
+  setCurrentMatchMany({
+    priorityTimers: priorityTimers,
+    currentPriority: current
+  });
 }
 
 function getGameObject(id: number): GameObject {
-  return globals.store.getState().currentmatch.gameObjects[id];
+  return globalStore.currentMatch.gameObjects[id];
 }
 
 function getZone(id: number): ZoneInfo {
-  return globals.store.getState().currentmatch.zones[id];
+  return globalStore.currentMatch.zones[id];
 }
 
 function getAllAnnotations(): AnnotationInfo[] {
-  const annotations = globals.store.getState().currentmatch.annotations;
+  const annotations = globalStore.currentMatch.annotations;
   return Object.values(annotations);
 }
 
 function isAnnotationProcessed(id: number): boolean {
-  const anns = globals.store.getState().currentmatch.processedAnnotations;
+  const anns = globalStore.currentMatch.processedAnnotations;
   return anns.includes(id);
 }
 
@@ -101,7 +113,7 @@ class NoInstanceException {
 
 function instanceIdToObject(instanceID: number): GameObject {
   const orig = instanceID;
-  const idChanges = globals.store.getState().currentmatch.idChanges;
+  const idChanges = globalStore.currentMatch.idChanges;
   while (!getGameObject(instanceID) && idChanges[instanceID]) {
     instanceID = idChanges[instanceID];
   }
@@ -159,7 +171,7 @@ const AnnotationType_ObjectIdChanged = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ObjectIdChanged") return;
   //let newObj = cloneDeep(getGameObject(details.orig_id));
   //getGameObject(details.new_id) = newObj;
-  reduxAction(dispatch, "SET_IDCHANGE", ann.details, IPC_NONE);
+  setIdChange(ann.details);
 };
 
 const AnnotationType_ZoneTransfer = function(ann: Annotations): void {
@@ -182,7 +194,7 @@ const AnnotationType_ZoneTransfer = function(ann: Annotations): void {
     const zone = getZone(ann.details.zone_src);
     const playerName = getNameBySeat(zone.ownerSeatId || 0);
     const obj = getGameObject(ann.affectedIds[0]);
-    const playerSeat = globals.store.getState().currentmatch.playerSeat;
+    const playerSeat = globalStore.currentMatch.playerSeat;
     if (zone.ownerSeatId == playerSeat && obj) {
       const grpId = obj.grpId || 0;
       actionLog(
@@ -206,15 +218,14 @@ const AnnotationType_ZoneTransfer = function(ann: Annotations): void {
     const grpId = obj.grpId || 0;
     const seat = obj.ownerSeatId || 0;
     const playerName = getNameBySeat(seat);
-    const turnNumber = globals.store.getState().currentmatch.turnInfo
-      .turnNumber;
+    const turnNumber = globalStore.currentMatch.turnInfo.turnNumber;
 
     const cast = {
       grpId: grpId,
-      turn: turnNumber,
+      turn: turnNumber || 0,
       player: seat
     };
-    reduxAction(dispatch, "ADD_CARD_CAST", cast, IPC_NONE);
+    addCardCast(cast);
 
     actionLog(
       seat,
@@ -365,7 +376,7 @@ const AnnotationType_AbilityInstanceCreated = function(ann: Annotations): void {
       objectSourceGrpId: affector.grpId,
       parentId: affector.instanceId
     } as GameObjectTypeAbility;
-    reduxAction(dispatch, "SET_GAMEOBJ", newObj, IPC_NONE);
+    setGameObj(newObj);
   }
   */
 };
@@ -413,7 +424,7 @@ const AnnotationType_DamageDealt = function(ann: Annotations): void {
 
 const AnnotationType_ModifiedLife = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ModifiedLife") return;
-  const players = globals.store.getState().currentmatch.players;
+  const players = globalStore.currentMatch.players;
   const affected = ann.affectedIds[0];
   const total = players[affected].lifeTotal;
   const lifeStr =
@@ -457,7 +468,7 @@ const AnnotationType_Scry = function(ann: Annotations): void {
   if (affector > 3) {
     affector = instanceIdToObject(affector).ownerSeatId;
   }
-  const playerSeat = globals.store.getState().currentmatch.playerSeat;
+  const playerSeat = globalStore.currentMatch.playerSeat;
   const player = getNameBySeat(affector);
 
   const top = ann.details.topIds;
@@ -508,7 +519,7 @@ const AnnotationType_Scry = function(ann: Annotations): void {
 };
 
 const AnnotationType_CardRevealed = function(ann: Annotations): void {
-  const playerSeat = globals.store.getState().currentmatch.playerSeat;
+  const playerSeat = globalStore.currentMatch.playerSeat;
   if (ann.type !== "AnnotationType_CardRevealed") return;
   if (!ann.ignoreForSeatIds.includes(playerSeat)) return;
 
@@ -589,14 +600,14 @@ function processAnnotations(): void {
   });
   //console.log(anns.length, removeIds.length);
   if (removeIds.length > 0) {
-    reduxAction(dispatch, "REMOVE_ANNOTATIONS", removeIds, IPC_NONE);
+    removeAnnotations(removeIds);
   }
 }
 
 function getOppUsedCards(): number[] {
   const cardsUsed: number[] = [];
-  const oppSeat = globals.store.getState().currentmatch.oppSeat;
-  Object.keys(globals.store.getState().currentmatch.zones).forEach(key => {
+  const oppSeat = globalStore.currentMatch.oppSeat;
+  Object.keys(globalStore.currentMatch.zones).forEach(key => {
     const zone = getZone(parseInt(key));
     const zoneType = (zone.type || "ZoneType_None").trim();
     if (zone.objectInstanceIds && zoneType !== "ZoneType_Limbo") {
@@ -625,7 +636,7 @@ function onlyUnique(value: string, index: number, self: string[]): boolean {
 
 function getCardsTypeZone(): ZoneData {
   const data: ZoneData = {};
-  Object.keys(globals.store.getSate().currentmatch.zones).forEach(key => {
+  Object.keys(globalStore.currentMatch.zones).forEach(key => {
     const zone = getZone(key);
     const zoneType = zone.type;
     if (zone.objectInstanceIds) {
@@ -664,8 +675,8 @@ function getCardsTypeZone(): ZoneData {
 
 function getPlayerUsedCards(): number[] {
   const cardsUsed: number[] = [];
-  const playerSeat = globals.store.getState().currentmatch.playerSeat;
-  Object.keys(globals.store.getState().currentmatch.zones).forEach(key => {
+  const playerSeat = globalStore.currentMatch.playerSeat;
+  Object.keys(globalStore.currentMatch.zones).forEach(key => {
     const zone = getZone(parseInt(key));
     const zoneType = (zone.type || "ZoneType_None").trim();
     const ignoreZones = [
@@ -720,7 +731,7 @@ const defaultZone: ZoneInfo = {
 };
 
 function checkForStartingLibrary(): boolean {
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   let zoneHand: ZoneInfo = defaultZone;
   let zoneLibrary: ZoneInfo = defaultZone;
 
@@ -743,6 +754,8 @@ function checkForStartingLibrary(): boolean {
 
   const hand = zoneHand.objectInstanceIds || [];
   const library = zoneLibrary.objectInstanceIds || [];
+  console.log("Hand", hand);
+  console.log("Library", library);
   // Check that a post-mulligan scry hasn't been done
   if (library.length == 0 || library[library.length - 1] < library[0]) {
     return false;
@@ -753,19 +766,14 @@ function checkForStartingLibrary(): boolean {
     globals.currentDeck.getMainboard().count()
   ) {
     if (hand.length >= 2 && hand[0] == hand[1] + 1) hand.reverse();
-    reduxAction(
-      dispatch,
-      "SET_INIT_LIBRARY_IDS",
-      [...hand, ...library],
-      IPC_NONE
-    );
+    setInitialLibraryInstanceIds([...hand, ...library]);
   }
 
   return true;
 }
 
 function checkTurnDiff(turnInfo: TurnInfo): void {
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   const gameNumber = currentMatch.gameInfo.gameNumber || 0;
   const currentTurnInfo = currentMatch.turnInfo;
   const currentPriority = currentMatch.currentPriority;
@@ -775,7 +783,7 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
     turnInfo.activePlayer &&
     gameNumber == 1
   ) {
-    reduxAction(dispatch, "SET_ONTHEPLAY", turnInfo.activePlayer, IPC_NONE);
+    setOnThePlay( turnInfo.activePlayer);
   }
   if (turnInfo.priorityPlayer !== currentPriority) {
     changePriority(
@@ -813,36 +821,28 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
 }
 
 const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
-  const currentMatch = globals.store.getState().currentmatch;
+  const currentMatch = globalStore.currentMatch;
   if (
     msg.msgId &&
     (!currentMatch.msgId || msg.msgId === 1 || msg.msgId < currentMatch.msgId)
   ) {
     // New game, reset per-game fields.
-    //reduxAction(dispatch, "RESET_CURRENT_GAME", true, IPC_NONE);
+    //resetCurrentGame();
   }
   if (msg.msgId) {
-    reduxAction(
-      dispatch,
-      "SET_CURRENT_MATCH_MANY",
-      { msgId: msg.msgId },
-      IPC_NONE
-    );
+    setCurrentMatchMany({ msgId: msg.msgId });
   }
 
   const gameState = msg.gameStateMessage;
   if (gameState) {
     //(gameState) {
     if (gameState.gameInfo) {
-      reduxAction(dispatch, "SET_GAMEINFO", gameState.gameInfo, IPC_NONE);
+      setGameInfo(gameState.gameInfo);
       if (gameState.gameInfo.matchID) {
-        reduxAction(
-          dispatch,
-          "SET_MATCHID",
+        setMatchId(
           gameState.gameInfo.matchID +
             "-" +
-            globals.store.getState().playerdata.arenaId,
-          IPC_NONE
+            globals.store.getState().playerdata.arenaId
         );
       }
       if (gameState.gameInfo.stage == "GameStage_GameOver") {
@@ -852,7 +852,7 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
 
     if (gameState.turnInfo) {
       checkTurnDiff(gameState.turnInfo);
-      reduxAction(dispatch, "SET_TURNINFO", gameState.turnInfo, IPC_NONE);
+      setTurnInfo(gameState.turnInfo);
     }
     /*
     // Not used yet
@@ -865,29 +865,19 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
     }
     */
     if (gameState.zones) {
-      reduxAction(dispatch, "SET_MANY_ZONES", gameState.zones, IPC_NONE);
+      setManyZones(gameState.zones);
     }
 
     if (gameState.players) {
-      reduxAction(dispatch, "SET_PLAYERS", gameState.players, IPC_NONE);
+      setPlayers(gameState.players);
     }
 
     if (gameState.gameObjects) {
-      reduxAction(
-        dispatch,
-        "SET_MANY_GAMEOBJ",
-        gameState.gameObjects,
-        IPC_NONE
-      );
+      setManyGameObjects(gameState.gameObjects);
     }
 
     if (gameState.annotations) {
-      reduxAction(
-        dispatch,
-        "SET_MANY_ANNOTATIONS",
-        gameState.annotations,
-        IPC_NONE
-      );
+      setManyAnnotations(gameState.annotations);
     }
   }
 
@@ -914,7 +904,7 @@ const GREMessageType_DieRollResultsResp = (msg: GREToClientMessage): void => {
         return b;
       }
     });
-    reduxAction(dispatch, "SET_ONTHEPLAY", highest.systemSeatId, IPC_NONE);
+    setOnThePlay(highest.systemSeatId || 0);
   }
 };
 
@@ -974,12 +964,7 @@ export function GREMessage(message: GREToClientMessage, time: Date): void {
   GREMessagesSwitch(message, message.type);
 
   //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
-  reduxAction(
-    dispatch,
-    "SET_PLAYER_CARDS_USED",
-    getPlayerUsedCards(),
-    IPC_NONE
-  );
-  reduxAction(dispatch, "SET_OPP_CARDS_USED", getOppUsedCards(), IPC_NONE);
+  setPlayerCardsUsed(getPlayerUsedCards());
+  setOppCardsUsed(getOppUsedCards());
   //globals.currentMatch.opponent.cards.concat(getOppUsedCards())
 }

@@ -7,7 +7,7 @@ import LogEntry from "../../types/logDecoder";
 import { MythicRatingUpdate } from "../../types/rank";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import { IPC_RENDERER } from "../../shared/constants";
-import { seasonalList } from "../../shared-store";
+import globalStore, { seasonalList } from "../../shared-store";
 import { SeasonalRankData } from "../../types/Season";
 
 interface Entry extends LogEntry {
@@ -24,8 +24,7 @@ export default function MythicRatingUpdated(entry: Entry): void {
   if (!json) return;
   // Ugh, no type on the mythic rank update!
   const type =
-    globals.store.getState().currentmatch.gameInfo.superFormat ==
-    "SuperFormat_Limited"
+    globalStore.currentMatch.gameInfo.superFormat == "SuperFormat_Limited"
       ? "limited"
       : "constructed";
 
@@ -44,8 +43,8 @@ export default function MythicRatingUpdated(entry: Entry): void {
     seasonOrdinal: rank[type].seasonOrdinal,
     id: entry.hash,
     timestamp: parseWotcTimeFallback(entry.timestamp).getTime(),
-    lastMatchId: globals.store.getState().currentmatch.matchId,
-    eventId: globals.store.getState().currentmatch.eventId
+    lastMatchId: globalStore.currentMatch.matchId,
+    eventId: globalStore.currentMatch.eventId
   };
 
   rank[type].percentile = json.newMythicPercentile;
