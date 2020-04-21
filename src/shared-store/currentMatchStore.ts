@@ -11,6 +11,7 @@ import { CardCast, PriorityTimers } from "../types/currentMatch";
 import { GameObject, DetailsIdChange } from "../types/greInterpreter";
 import { InternalPlayer } from "../types/match";
 import globalStore from ".";
+import Deck from "../shared/deck";
 
 export const matchStateObject = {
   matchId: "",
@@ -20,6 +21,10 @@ export const matchStateObject = {
   playerSeat: 0,
   oppSeat: 0,
   opponent: {} as InternalPlayer,
+  // Decks
+  currentDeck: new Deck(),
+  originalDeck: new Deck(),
+  cardsLeft: new Deck(),
   // Info
   player: {} as InternalPlayer,
   players: [] as PlayerInfo[],

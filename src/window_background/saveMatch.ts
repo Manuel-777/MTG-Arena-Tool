@@ -51,8 +51,8 @@ export function completeMatch(
   match.draws = draws;
 
   match.eventId = currentMatch.eventId;
-  if (globals.originalDeck) {
-    match.playerDeck = globals.originalDeck.getSave(true);
+  if (globalStore.currentMatch.originalDeck) {
+    match.playerDeck = globalStore.currentMatch.originalDeck.getSave(true);
   }
   match.oppDeck = getOpponentDeck();
   match.oppDeck.commandZoneGRPIds = currentMatch.opponent.commanderGrpIds;

@@ -34,7 +34,7 @@ const forceDeckUpdate = function(removeUsed = true): void {
   let typeLan = 0;
   const currentMatch = globalStore.currentMatch;
   const playerCardsUsed = currentMatch.player.cardsUsed;
-  const playerCardsLeft = globals.currentDeck.clone();
+  const playerCardsLeft = globalStore.currentMatch.currentDeck.clone();
 
   if (globals.debugLog || !globals.firstPass) {
     playerCardsLeft
@@ -150,7 +150,7 @@ const forceDeckUpdate = function(removeUsed = true): void {
     //const chancesObj = new Chances();
     //playerChances = chancesObj;
   }
-  globals.cardsLeft = playerCardsLeft;
+  globalStore.currentMatch.cardsLeft = playerCardsLeft;
 };
 
 export default forceDeckUpdate;

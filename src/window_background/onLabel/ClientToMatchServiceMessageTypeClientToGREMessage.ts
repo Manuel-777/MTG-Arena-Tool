@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import globals from "../globals";
 import LogEntry from "../../types/logDecoder";
 import { normaliseFields } from "../backgroundUtil";
-import { reduxAction } from "../../shared-redux/sharedRedux";
-import { IPC_NONE } from "../../shared/constants";
 import { ClientToGREMessage } from "../../proto/GreTypes";
 import Deck from "../../shared/deck";
 import { setOnThePlay } from "../../shared-store/currentMatchStore";
+import globalStore from "../../shared-store";
 
 interface Entry extends LogEntry {
   json: () => ClientToGREMessage;
@@ -76,21 +74,20 @@ export default function ClientToMatchServiceMessageTypeClientToGREMessage(
       commanderCards: []
     };
 
-    const currentDeck = globals.currentDeck.getSave();
+    const currentDeck = globalStore.currentMatch.currentDeck.getSave();
 
     const newDeck = new Deck(
       currentDeck,
       deckResp.deckCards,
       deckResp.sideboardCards
     );
-    globals.currentDeck = newDeck;
+    globalStore.currentMatch.currentDeck = newDeck;
   }
   // We can safely handle these messages too now !
   if (payload.type == "ClientMessageType_ChooseStartingPlayerResp") {
     if (payload.chooseStartingPlayerResp) {
       const startingPlayer = payload.chooseStartingPlayerResp.systemSeatId;
       if (startingPlayer) {
-        const dispatch = globals.store.dispatch;
         setOnThePlay(startingPlayer);
       }
     }

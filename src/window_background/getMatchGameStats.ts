@@ -85,8 +85,8 @@ export default function getMatchGameStats(): void {
   game.handsDrawn.push(game.shuffledOrder.slice(0, 7));
 
   if (gameNumberCompleted > 1) {
-    const originalDeck = globals.originalDeck.clone();
-    const newDeck = globals.currentDeck.clone();
+    const originalDeck = globalStore.currentMatch.originalDeck.clone();
+    const newDeck = globalStore.currentMatch.currentDeck.clone();
     const sideboardChanges = getDeckChanges(
       newDeck,
       originalDeck,
@@ -108,7 +108,7 @@ export default function getMatchGameStats(): void {
     "4": {}
   };
   const cardCounts: { [key: string]: number } = {};
-  globals.originalDeck
+  globalStore.currentMatch.originalDeck
     .getMainboard()
     .get()
     .forEach(card => {

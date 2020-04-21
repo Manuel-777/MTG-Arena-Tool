@@ -62,10 +62,6 @@ let stopWatchingLog: any;
 
 let cardTypesByZone: ZoneData = {};
 
-const originalDeck = new Deck();
-const currentDeck = new Deck();
-const cardsLeft = new Deck();
-
 export default {
   store,
   actionLogDir,
@@ -84,8 +80,5 @@ export default {
   cardTypesByZone,
   stopWatchingLog,
   toolVersion,
-  watchingLog,
-  currentDeck,
-  originalDeck,
-  cardsLeft
+  watchingLog
 };
