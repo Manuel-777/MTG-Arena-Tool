@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/camelcase */
-import { IPC_OVERLAY, IPC_NONE } from "../shared/constants";
+import { IPC_OVERLAY } from "../shared/constants";
 import { ipcSend } from "./backgroundUtil";
 import globals from "./globals";
 import actionLog from "./actionLog";
@@ -47,8 +47,6 @@ import {
   setManyGameObjects,
   setManyAnnotations
 } from "../shared-store/currentMatchStore";
-import { set } from "date-fns";
-const dispatch = globals.store.dispatch;
 
 function changePriority(previous: number, current: number, time: number): void {
   const priorityTimers = objectClone(globalStore.currentMatch.priorityTimers);
@@ -783,7 +781,7 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
     turnInfo.activePlayer &&
     gameNumber == 1
   ) {
-    setOnThePlay( turnInfo.activePlayer);
+    setOnThePlay(turnInfo.activePlayer);
   }
   if (turnInfo.priorityPlayer !== currentPriority) {
     changePriority(

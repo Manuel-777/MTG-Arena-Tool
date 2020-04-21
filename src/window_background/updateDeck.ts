@@ -1,9 +1,5 @@
 import globals from "./globals";
-import { IPC_OVERLAY } from "../shared/constants";
-import { ipcSend } from "./backgroundUtil";
 import forceDeckUpdate from "./forceDeckUpdate";
-import getOpponentDeck from "./getOpponentDeck";
-import { objectClone } from "../shared/util";
 
 const lastDeckUpdate = new Date();
 
