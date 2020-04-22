@@ -24,7 +24,7 @@ export default function getMatchGameStats(): void {
   // get winner of the game
   const winningTeamId =
     currentMatch.gameInfo.results.filter(
-      res => res.scope == "MatchScope_Match"
+      res => res.scope == "MatchScope_Game"
     )[0]?.winningTeamId || -1;
 
   const game: MatchGameStats = {
