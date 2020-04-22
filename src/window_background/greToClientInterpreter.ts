@@ -45,7 +45,8 @@ import {
   setManyZones,
   setPlayers,
   setManyGameObjects,
-  setManyAnnotations
+  setManyAnnotations,
+  resetCurrentGame
 } from "../shared-store/currentMatchStore";
 
 function changePriority(previous: number, current: number, time: number): void {
@@ -825,7 +826,7 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
     (!currentMatch.msgId || msg.msgId === 1 || msg.msgId < currentMatch.msgId)
   ) {
     // New game, reset per-game fields.
-    //resetCurrentGame();
+    resetCurrentGame();
   }
   if (msg.msgId) {
     setCurrentMatchMany({ msgId: msg.msgId });

@@ -87,11 +87,8 @@ export default function getMatchGameStats(): void {
   if (gameNumberCompleted > 1) {
     const originalDeck = globalStore.currentMatch.originalDeck.clone();
     const newDeck = globalStore.currentMatch.currentDeck.clone();
-    const sideboardChanges = getDeckChanges(
-      newDeck,
-      originalDeck,
-      globals.matchGameStats
-    );
+
+    const sideboardChanges = getDeckChanges(newDeck, originalDeck);
     game.sideboardChanges = sideboardChanges;
     game.deck = newDeck.clone().getSave(true);
   }
@@ -144,7 +141,6 @@ export default function getMatchGameStats(): void {
   const librarySize = deckSize - handSize;
 
   game.cardsCast = _.cloneDeep(currentMatch.cardsCast);
-  //clearCardsCast();
   game.deckSize = deckSize;
   game.landsInDeck = landsInDeck;
   game.multiCardPositions = multiCardPositions;
