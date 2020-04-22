@@ -105,7 +105,7 @@ export default function getMatchGameStats(): void {
     "4": {}
   };
   const cardCounts: { [key: string]: number } = {};
-  globalStore.currentMatch.originalDeck
+  globalStore.currentMatch.currentDeck
     .getMainboard()
     .get()
     .forEach(card => {
