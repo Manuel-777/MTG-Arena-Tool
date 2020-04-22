@@ -3,6 +3,7 @@ import { hypergeometricRange } from "../shared/statsFns";
 import { CardObject } from "../types/Deck";
 import { Chances } from "../types/Chances";
 import globalStore from "../shared-store";
+import { setCardsOdds } from "../shared-store/currentMatchStore";
 
 function chanceType(
   quantity: number,
@@ -142,13 +143,13 @@ const forceDeckUpdate = function(removeUsed = true): void {
 
     chancesObj.deckSize = decksize;
     chancesObj.cardsLeft = cardsleft;
-    //playerChances = chancesObj;
+
+    setCardsOdds(chancesObj);
   } else {
     const main = playerCardsLeft.getMainboard();
     main.addChance(() => 1);
-
-    //const chancesObj = new Chances();
-    //playerChances = chancesObj;
+    const chancesObj = new Chances();
+    setCardsOdds(chancesObj);
   }
   globalStore.currentMatch.cardsLeft = playerCardsLeft;
 };

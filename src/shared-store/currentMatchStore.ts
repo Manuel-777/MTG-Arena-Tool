@@ -16,6 +16,7 @@ import { GameObject, DetailsIdChange } from "../types/greInterpreter";
 import { InternalPlayer } from "../types/match";
 import globalStore from ".";
 import Deck from "../shared/deck";
+import { Chances } from "../types/Chances";
 
 export const matchStateObject = {
   matchId: "",
@@ -35,6 +36,7 @@ export const matchStateObject = {
   turnInfo: {} as TurnInfo,
   gameInfo: {} as GameInfo,
   // Time stuff
+  beginTime: new Date(),
   priorityTimers: {
     last: 0,
     timers: [0, 0, 0, 0, 0] as number[]
@@ -50,7 +52,8 @@ export const matchStateObject = {
   idChanges: {} as Record<number, number>,
   cardsCast: [] as CardCast[],
   handsDrawn: [] as number[][],
-  matchGameStats: [] as MatchGameStats[]
+  matchGameStats: [] as MatchGameStats[],
+  cardsOdds: new Chances()
 };
 
 export function setMatchId(arg: string): void {
@@ -99,6 +102,10 @@ export function resetCurrentGame(): void {
     handsDrawn: [],
     cardsCast: []
   });
+}
+
+export function setGameBeginTime(arg: Date): void {
+  globalStore.currentMatch.beginTime = arg;
 }
 
 export function setOnThePlay(arg: number): void {
@@ -211,4 +218,8 @@ export function setMatchGameStats(game: number, arg: MatchGameStats): void {
 
 export function setHandDrawn(hand: number, arg: number[]): void {
   globalStore.currentMatch.handsDrawn[hand] = arg;
+}
+
+export function setCardsOdds(arg: Chances): void {
+  globalStore.currentMatch.cardsOdds = arg;
 }
