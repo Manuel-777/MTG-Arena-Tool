@@ -24,7 +24,6 @@ export default function onLabelMatchGameRoomStateChangedEvent(
   const json = entry.json();
   if (!json) return;
   const playerData = globals.store.getState().playerdata;
-  const dispatch = globals.store.dispatch;
 
   const gameRoom = json.matchGameRoomStateChangedEvent.gameRoomInfo;
   let eventId = "";
@@ -44,10 +43,13 @@ export default function onLabelMatchGameRoomStateChangedEvent(
     gameRoom.gameRoomConfig.reservedPlayers.forEach(player => {
       if (player.userId == playerData.arenaId) {
         setCurrentMatchMany({
-          playerSeat: player.systemSeatId
+          name: player.playerName,
+          playerSeat: player.systemSeatId,
+          userid: player.userId
         });
       } else {
         setOpponent({
+          name: player.playerName,
           userid: player.userId
         });
         setCurrentMatchMany({

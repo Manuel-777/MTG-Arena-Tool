@@ -65,7 +65,7 @@ export default function EventMatchCreated(entry: Entry): void {
 
     const opponent = {
       tier: json.opponentRankingTier,
-      name: json.opponentScreenName,
+      name: json.opponentScreenName + "#00000",
       rank: json.opponentRankingClass,
       percentile: json.opponentMythicPercentile,
       leaderboardPlace: json.opponentMythicLeaderboardPlace,
