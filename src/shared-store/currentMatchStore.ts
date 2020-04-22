@@ -7,7 +7,11 @@ import {
   GameObjectInfo
 } from "../proto/GreTypes";
 
-import { CardCast, PriorityTimers } from "../types/currentMatch";
+import {
+  CardCast,
+  PriorityTimers,
+  MatchGameStats
+} from "../types/currentMatch";
 import { GameObject, DetailsIdChange } from "../types/greInterpreter";
 import { InternalPlayer } from "../types/match";
 import globalStore from ".";
@@ -44,7 +48,9 @@ export const matchStateObject = {
   initialLibraryInstanceIds: [] as number[],
   instanceToCardIdMap: {} as Record<number, number>,
   idChanges: {} as Record<number, number>,
-  cardsCast: [] as CardCast[]
+  cardsCast: [] as CardCast[],
+  handsDrawn: [] as number[][],
+  matchGameStats: [] as MatchGameStats[]
 };
 
 export function setMatchId(arg: string): void {
@@ -79,7 +85,8 @@ export function resetCurrentGame(): void {
   Object.assign(globalStore.currentMatch, {
     msgId: 0,
     turnInfo: {},
-    Info: {},
+    gameInfo: {},
+    players: [],
     priorityTimers: matchStateObject.priorityTimers,
     currentPriority: 0,
     zones: {},
@@ -89,6 +96,7 @@ export function resetCurrentGame(): void {
     initialLibraryInstanceIds: [],
     instanceToCardIdMap: {},
     idChanges: {},
+    handsDrawn: [],
     cardsCast: []
   });
 }
@@ -195,4 +203,12 @@ export function clearCardsCast(): void {
 
 export function setInitialLibraryInstanceIds(arg: number[]): void {
   globalStore.currentMatch.initialLibraryInstanceIds = arg;
+}
+
+export function setMatchGameStats(game: number, arg: MatchGameStats): void {
+  globalStore.currentMatch.matchGameStats[game] = arg;
+}
+
+export function setHandDrawn(hand: number, arg: number[]): void {
+  globalStore.currentMatch.handsDrawn[hand] = arg;
 }

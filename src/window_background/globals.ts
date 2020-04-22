@@ -50,8 +50,6 @@ let logTimestamp = 0;
 
 let matchCompletedOnGameNumber = 0;
 
-let matchGameStats: MatchGameStats[] = [];
-
 let oddsSampleSize = 1;
 
 let toolVersion = 0;
@@ -75,7 +73,6 @@ export default {
   logTime,
   logTimestamp,
   matchCompletedOnGameNumber,
-  matchGameStats,
   oddsSampleSize,
   cardTypesByZone,
   stopWatchingLog,

@@ -1,9 +1,9 @@
 import _ from "lodash";
 import db from "../shared/database";
-import globals from "./globals";
 import { MatchGameStats } from "../types/currentMatch";
 import { getDeckChanges } from "./getDeckChanges";
 import globalStore from "../shared-store";
+import { setMatchGameStats } from "../shared-store/currentMatchStore";
 
 export default function getMatchGameStats(): void {
   const currentMatch = globalStore.currentMatch;
@@ -34,7 +34,7 @@ export default function getMatchGameStats(): void {
     win: winningTeamId == currentMatch.playerSeat,
     shuffledOrder: [],
     // defaults
-    handsDrawn: [],
+    handsDrawn: currentMatch.handsDrawn,
     handLands: [],
     cardsCast: [],
     deckSize: 0,
@@ -77,12 +77,6 @@ export default function getMatchGameStats(): void {
       break;
     }
   }
-  /*
-  game.handsDrawn = payload.mulliganedHands.map(hand =>
-    hand.map(card => card.grpId)
-  );
-  */
-  game.handsDrawn.push(game.shuffledOrder.slice(0, 7));
 
   if (gameNumberCompleted > 1) {
     const originalDeck = globalStore.currentMatch.originalDeck.clone();
@@ -148,5 +142,5 @@ export default function getMatchGameStats(): void {
   game.landsInLibrary = landsInLibrary;
   game.libraryLands = libraryLands;
 
-  globals.matchGameStats[gameNumberCompleted - 1] = game;
+  setMatchGameStats(gameNumberCompleted - 1, game);
 }

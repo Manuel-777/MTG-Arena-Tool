@@ -23,7 +23,9 @@ import {
   TurnInfo,
   ZoneInfo,
   GREMessageType,
-  AnnotationType
+  AnnotationType,
+  PlayerInfo,
+  GameStateMessage
 } from "../proto/GreTypes";
 
 import getMatchGameStats from "./getMatchGameStats";
@@ -46,7 +48,8 @@ import {
   setPlayers,
   setManyGameObjects,
   setManyAnnotations,
-  resetCurrentGame
+  resetCurrentGame,
+  setHandDrawn
 } from "../shared-store/currentMatchStore";
 
 function changePriority(previous: number, current: number, time: number): void {
@@ -728,7 +731,7 @@ const defaultZone: ZoneInfo = {
   viewers: []
 };
 
-function checkForStartingLibrary(): boolean {
+function checkForStartingLibrary(gameState?: GameStateMessage): boolean {
   const currentMatch = globalStore.currentMatch;
   let zoneHand: ZoneInfo = defaultZone;
   let zoneLibrary: ZoneInfo = defaultZone;
@@ -745,16 +748,30 @@ function checkForStartingLibrary(): boolean {
     }
   });
 
-  // Probably just escape valves?
-  if (currentMatch.gameInfo.stage !== "GameStage_Start") return false;
   if (zoneHand.type == "ZoneType_None") return false;
   if (zoneLibrary.type == "ZoneType_None") return false;
-
   const hand = zoneHand.objectInstanceIds || [];
   const library = zoneLibrary.objectInstanceIds || [];
-  //console.log("Hand", hand);
-  //console.log("Library", library);
-  //console.log("current deck", globalStore.currentMatch.currentDeck);
+
+  // Try to get the mulligans
+  // Get from the current gameState msg
+  gameState?.players?.forEach((player: PlayerInfo) => {
+    if (
+      player.controllerSeatId == currentMatch.playerSeat &&
+      player.pendingMessageType == "ClientMessageType_MulliganResp"
+    ) {
+      const mull = player.mulliganCount || 0;
+      // If this is the first hand drawn or we made a mulligan
+      if (mull > 0 || currentMatch.handsDrawn.length == 0) {
+        const drawn = hand.map(n => getGameObject(n).grpId);
+        setHandDrawn(mull, drawn);
+        console.log("Mulligan: " + mull, drawn);
+      }
+    }
+  });
+
+  if (currentMatch.gameInfo.stage !== "GameStage_Start") return false;
+
   // Check that a post-mulligan scry hasn't been done
   if (library.length == 0 || library[library.length - 1] < library[0]) {
     return false;
@@ -881,7 +898,7 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
   }
 
   processAnnotations();
-  checkForStartingLibrary();
+  checkForStartingLibrary(gameState);
 
   forceDeckUpdate();
   updateDeck(false);

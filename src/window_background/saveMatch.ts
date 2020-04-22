@@ -73,11 +73,11 @@ export function completeMatch(
   if (currentMatch.gameInfo.matchWinCondition == "MatchWinCondition_Best3of5")
     match.bestOf = 5;
 
-  match.duration = globals.matchGameStats.reduce(
+  match.duration = currentMatch.matchGameStats.reduce(
     (acc, cur) => acc + cur.time,
     0
   );
-  match.gameStats = globals.matchGameStats;
+  match.gameStats = currentMatch.matchGameStats;
 
   // Convert string "2.2.19" into number for easy comparison, 1 byte per part, allowing for versions up to 255.255.255
   match.toolVersion = globals.toolVersion;
