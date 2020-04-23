@@ -565,8 +565,5 @@ export function isEpochTimestamp(timestamp: number): boolean {
   const asDate = new Date(timestamp);
   // Even if we have a date in epoch between 2000 and
   // 2100 it will be parsed as 1970.
-  if (asDate && asDate.getUTCFullYear() < 2000) {
-    return true;
-  }
-  return false;
+  return asDate && asDate == asDate && asDate.getUTCFullYear() < 2000;
 }
