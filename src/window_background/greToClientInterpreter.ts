@@ -578,7 +578,7 @@ function processAnnotations(): void {
   const removeIds = [] as number[];
   const anns = getAllAnnotations();
   anns.forEach(ann => {
-    if (isAnnotationProcessed(ann.id || 0)) return;
+    if (ann.id && isAnnotationProcessed(ann.id)) return;
 
     let details: Partial<DetailsType> = {};
     if (ann.details) {
