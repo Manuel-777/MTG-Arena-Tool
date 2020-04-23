@@ -81,8 +81,12 @@ export default function getMatchGameStats(): void {
   if (gameNumberCompleted > 1) {
     const originalDeck = globalStore.currentMatch.originalDeck.clone();
     const newDeck = globalStore.currentMatch.currentDeck.clone();
-
-    const sideboardChanges = getDeckChanges(newDeck, originalDeck);
+    const sideboardChanges = getDeckChanges(
+      newDeck,
+      originalDeck,
+      currentMatch.matchGameStats.slice(0, gameNumberCompleted - 1)
+    );
+    //console.log("Sideboard: " + gameNumberCompleted, currentMatch.gameInfo.results, newDeck.getSideboard(), originalDeck.getSideboard(), sideboardChanges);
     game.sideboardChanges = sideboardChanges;
     game.deck = newDeck.clone().getSave(true);
   }
