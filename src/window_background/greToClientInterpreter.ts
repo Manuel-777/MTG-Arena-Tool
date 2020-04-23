@@ -577,8 +577,7 @@ function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
 function processAnnotations(): void {
   const removeIds = [] as number[];
   const anns = getAllAnnotations();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  anns.forEach((ann: any) => {
+  anns.forEach(ann => {
     if (isAnnotationProcessed(ann.id || 0)) return;
 
     let details: Partial<DetailsType> = {};
@@ -595,7 +594,7 @@ function processAnnotations(): void {
           type
         );
         // add this annotation to the list of processed
-        removeIds.push(ann.id);
+        removeIds.push(ann.id || 0);
       });
     } catch (e) {
       //console.log(ann, e);
