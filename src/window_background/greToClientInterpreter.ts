@@ -50,7 +50,8 @@ import {
   setManyAnnotations,
   resetCurrentGame,
   setHandDrawn,
-  setGameBeginTime
+  setGameBeginTime,
+  setGameWinner
 } from "../shared-store/currentMatchStore";
 
 function changePriority(previous: number, current: number, time: number): void {
@@ -926,6 +927,23 @@ const GREMessageType_DieRollResultsResp = (msg: GREToClientMessage): void => {
   }
 };
 
+const GREMessageType_IntermissionReq = (msg: GREToClientMessage): void => {
+  if (msg.intermissionReq?.result) {
+    const result = msg.intermissionReq?.result;
+    setGameWinner(result.winningTeamId || 0);
+    const winnerName = getNameBySeat(result.winningTeamId || 0);
+    const loserName = getNameBySeat(result.winningTeamId == 2 ? 1 : 2);
+
+    if (result.reason == "ResultReason_Concede") {
+      actionLog(-1, globals.logTime, `${loserName} conceded.`);
+    } else if (result.reason == "ResultReason_Timeout") {
+      actionLog(-1, globals.logTime, `${loserName} timed out.`);
+    }
+    actionLog(-1, globals.logTime, `${winnerName} wins!`);
+  }
+  getMatchGameStats();
+};
+
 function GREMessagesSwitch(
   message: GREToClientMessage,
   type: GREMessageType | undefined
@@ -943,6 +961,9 @@ function GREMessagesSwitch(
       break;
     case "GREMessageType_DieRollResultsResp":
       GREMessageType_DieRollResultsResp(message);
+      break;
+    case "GREMessageType_IntermissionReq":
+      GREMessageType_IntermissionReq(message);
       break;
   }
 }

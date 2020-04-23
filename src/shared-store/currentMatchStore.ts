@@ -26,6 +26,7 @@ export const matchStateObject = {
   playerSeat: 0,
   oppSeat: 0,
   opponent: {} as InternalPlayer,
+  gameWinner: 0,
   // Decks
   currentDeck: new Deck(),
   originalDeck: new Deck(),
@@ -222,4 +223,8 @@ export function setHandDrawn(hand: number, arg: number[]): void {
 
 export function setCardsOdds(arg: Chances): void {
   globalStore.currentMatch.cardsOdds = arg;
+}
+
+export function setGameWinner(arg: number): void {
+  globalStore.currentMatch.gameWinner = arg;
 }

@@ -6,8 +6,9 @@ import globalStore from "../shared-store";
 import { setMatchGameStats } from "../shared-store/currentMatchStore";
 
 export default function getMatchGameStats(): void {
+  // This function should be able to be called multiple times, and not
+  // modify state. So every time its called the result should be the same
   const currentMatch = globalStore.currentMatch;
-  //const oppCardsUsed = currentMatch.opponent.cardsUsed;
 
   const players = currentMatch.players.map(
     player => player.systemSeatNumber || 0
@@ -21,17 +22,11 @@ export default function getMatchGameStats(): void {
     res => res.scope == "MatchScope_Game"
   ).length;
 
-  // get winner of the game
-  const winningTeamId =
-    currentMatch.gameInfo.results.filter(
-      res => res.scope == "MatchScope_Game"
-    )[0]?.winningTeamId || -1;
-
   const game: MatchGameStats = {
     time: Math.round(time / 1000),
     onThePlay: currentMatch.onThePlay,
-    winner: winningTeamId,
-    win: winningTeamId == currentMatch.playerSeat,
+    winner: currentMatch.gameWinner,
+    win: currentMatch.gameWinner == currentMatch.playerSeat,
     shuffledOrder: [],
     // defaults
     handsDrawn: currentMatch.handsDrawn,
