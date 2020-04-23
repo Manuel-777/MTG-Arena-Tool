@@ -84,7 +84,7 @@ function syncUserData(data: any): void {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
-      if (isEpochTimestamp(doc.date)) doc.date = doc.date * 1000;
+      if (isEpochTimestamp(doc.date)) doc.date *= 1000;
       playerDb.upsert("", id, doc);
       courses_index.push(id);
       return doc;
