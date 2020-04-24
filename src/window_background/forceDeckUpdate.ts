@@ -2,6 +2,8 @@ import globals from "./globals";
 import { hypergeometricRange } from "../shared/statsFns";
 import { CardObject } from "../types/Deck";
 import { Chances } from "../types/Chances";
+import globalStore from "../shared-store";
+import { setCardsOdds } from "../shared-store/currentMatchStore";
 
 function chanceType(
   quantity: number,
@@ -31,11 +33,12 @@ const forceDeckUpdate = function(removeUsed = true): void {
   let typeArt = 0;
   let typeEnc = 0;
   let typeLan = 0;
-
-  globals.currentMatch.playerCardsLeft = globals.currentMatch.player.deck.clone();
+  const currentMatch = globalStore.currentMatch;
+  const playerCardsUsed = currentMatch.player.cardsUsed;
+  const playerCardsLeft = globalStore.currentMatch.currentDeck.clone();
 
   if (globals.debugLog || !globals.firstPass) {
-    globals.currentMatch.playerCardsLeft
+    playerCardsLeft
       .getMainboard()
       .get()
       .forEach((card: CardObject) => {
@@ -45,12 +48,12 @@ const forceDeckUpdate = function(removeUsed = true): void {
       });
 
     if (removeUsed) {
-      cardsleft -= globals.currentMatch.playerCardsUsed.length;
-      globals.currentMatch.playerCardsUsed.forEach((grpId: number) => {
-        globals.currentMatch.playerCardsLeft.getMainboard().remove(grpId, 1);
+      cardsleft -= playerCardsUsed.length;
+      playerCardsUsed.forEach((grpId: number) => {
+        playerCardsLeft.getMainboard().remove(grpId, 1);
       });
     }
-    const main = globals.currentMatch.playerCardsLeft.getMainboard();
+    const main = playerCardsLeft.getMainboard();
     //main.addProperty("chance", card =>
     main.addChance((card: CardObject) =>
       Math.round(
@@ -140,14 +143,15 @@ const forceDeckUpdate = function(removeUsed = true): void {
 
     chancesObj.deckSize = decksize;
     chancesObj.cardsLeft = cardsleft;
-    globals.currentMatch.playerChances = chancesObj;
-  } else {
-    const main = globals.currentMatch.playerCardsLeft.getMainboard();
-    main.addChance(() => 1);
 
+    setCardsOdds(chancesObj);
+  } else {
+    const main = playerCardsLeft.getMainboard();
+    main.addChance(() => 1);
     const chancesObj = new Chances();
-    globals.currentMatch.playerChances = chancesObj;
+    setCardsOdds(chancesObj);
   }
+  globalStore.currentMatch.cardsLeft = playerCardsLeft;
 };
 
 export default forceDeckUpdate;

@@ -227,12 +227,6 @@ function onLogEntryFound(entry: any): void {
 function entrySwitch(entry: LogEntry): void {
   // console.log(entry, entry.json());
   switch (entry.label) {
-    case "Log.BI":
-      if (entry.arrow == "==>") {
-        Labels.OutLogInfo(entry);
-      }
-      break;
-
     case "GreToClientEvent":
       Labels.GreToClient(entry);
       break;

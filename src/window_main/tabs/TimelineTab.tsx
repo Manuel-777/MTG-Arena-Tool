@@ -61,6 +61,7 @@ function getRankY(rank: string, tier: number, steps: number): number {
       break;
     case "Mythic":
       value = regularSteps * 5;
+      steps = steps == 0 ? 1500 : steps;
       return value + (48 / 1500) * (1500 - steps);
       break;
   }
@@ -116,10 +117,10 @@ function getSeasonData(
     .map((id: string) => getSeasonal(id) as SeasonalRankData);
 
   return newData
+    .sort(sortByTimestamp)
     .map((data: SeasonalRankData, i: number) =>
       morphData(data, i > 0 ? newData[i - 1] : undefined)
-    )
-    .sort(sortByTimestamp);
+    );
 }
 
 interface TimelinePartProps extends SeasonalRankData {

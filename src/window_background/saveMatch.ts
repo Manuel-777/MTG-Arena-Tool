@@ -1,35 +1,110 @@
-import { completeMatch } from "./data";
+import electron from "electron";
 import globals from "./globals";
 import { playerDb } from "../shared/db/LocalDatabase";
 import { ipcSend } from "./backgroundUtil";
 import { reduxAction } from "../shared-redux/sharedRedux";
 import { IPC_RENDERER } from "../shared/constants";
-import { getMatch } from "../shared-store";
-import getMatchGameStats from "./getMatchGameStats";
+import globalStore, { getMatch } from "../shared-store";
+import { InternalMatch } from "../types/match";
+import { ResultSpec } from "../proto/GreTypes";
+import getOpponentDeck from "./getOpponentDeck";
+
+function matchResults(results: ResultSpec[]): number[] {
+  let playerWins = 0;
+  let opponentWins = 0;
+  let draws = 0;
+  const currentMatch = globalStore.currentMatch;
+  results.forEach(function(res) {
+    if (res.scope == "MatchScope_Game") {
+      if (res.result == "ResultType_Draw") {
+        draws += 1;
+      } else if (res.winningTeamId == currentMatch.playerSeat) {
+        playerWins += 1;
+      }
+      if (res.winningTeamId == currentMatch.oppSeat) {
+        opponentWins += 1;
+      }
+    }
+  });
+
+  return [playerWins, opponentWins, draws];
+}
+
+// Given match data calculates derived data for storage.
+// This is called when a match is complete.
+export function completeMatch(
+  match: any,
+  matchEndTime: number
+): InternalMatch | undefined {
+  const currentMatch = globalStore.currentMatch;
+  if (currentMatch.eventId === "AIBotMatch") return;
+
+  const [playerWins, opponentWins, draws] = matchResults(
+    currentMatch.gameInfo.results
+  );
+
+  match.onThePlay = currentMatch.onThePlay;
+  match.id = currentMatch.matchId;
+
+  match.opponent = { ...currentMatch.opponent, win: opponentWins };
+  match.player = { ...currentMatch.player, win: playerWins };
+  match.draws = draws;
+
+  match.eventId = currentMatch.eventId;
+  if (globalStore.currentMatch.originalDeck) {
+    match.playerDeck = globalStore.currentMatch.originalDeck.getSave(true);
+  }
+  match.oppDeck = getOpponentDeck();
+  match.oppDeck.commandZoneGRPIds = currentMatch.opponent.commanderGrpIds;
+
+  if (
+    (!match.tags || !match.tags.length) &&
+    match.oppDeck.archetype &&
+    match.oppDeck.archetype !== "-"
+  ) {
+    match.tags = [match.oppDeck.archetype];
+  }
+  if (matchEndTime) {
+    match.date = new Date(matchEndTime).toISOString();
+  }
+  match.bestOf = 1;
+  if (currentMatch.gameInfo.matchWinCondition == "MatchWinCondition_Best2of3")
+    match.bestOf = 3;
+  if (currentMatch.gameInfo.matchWinCondition == "MatchWinCondition_Best3of5")
+    match.bestOf = 5;
+
+  match.duration = currentMatch.matchGameStats.reduce(
+    (acc, cur) => acc + cur.time,
+    0
+  );
+  match.gameStats = currentMatch.matchGameStats;
+
+  // Convert string "2.2.19" into number for easy comparison, 1 byte per part, allowing for versions up to 255.255.255
+  match.toolVersion = globals.toolVersion;
+  match.toolRunFromSource = !electron.remote.app.isPackaged;
+
+  return match;
+}
 
 export default function saveMatch(id: string, matchEndTime: number): void {
-  console.log(globals.currentMatch, id);
-  getMatchGameStats();
-  if (!globals.currentMatch || globals.currentMatch.matchId !== id) {
+  const currentMatch = globalStore.currentMatch;
+  console.log(currentMatch, id);
+  if (currentMatch.matchId !== id) {
     return;
   }
 
-  const existingMatch = getMatch(id) || {};
-  const match = completeMatch(
-    existingMatch,
-    globals.currentMatch,
-    matchEndTime
-  );
+  const existingMatch = getMatch(id) || { archived: false };
+  const match = completeMatch(existingMatch, matchEndTime);
   if (!match) {
     return;
   }
 
-  // console.log("Save match:", match);
+  console.log("Save match:", match);
   const matches_index = [...globals.store.getState().matches.matchesIndex];
   reduxAction(globals.store.dispatch, "SET_MATCH", match, IPC_RENDERER);
   playerDb.upsert("", id, match);
 
-  const gameNumberCompleted = globals.currentMatch.results.filter(
+  const gameNumberCompleted = currentMatch.gameInfo.results.filter(
     res => res.scope == "MatchScope_Match"
   ).length;
 

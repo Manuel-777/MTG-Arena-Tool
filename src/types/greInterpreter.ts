@@ -1,36 +1,191 @@
-export interface KeyValuePair {
-  key: string;
-  type: string;
-  f?: number[];
-  valueNone?: number[];
-  valueUint32?: number[];
-  valueInt32?: number[];
-  valueUint64?: number[];
-  valueInt64?: number[];
-  valueBool?: boolean[];
-  valueString?: string[];
-  valueFloat?: number[];
-  valueDouble?: number[];
+export interface Details {
+  category?: string;
 }
 
-export interface DetailsType {
-  [key: string]: any;
+export interface DetailsSourceZone extends Details {
+  source_zone: number;
 }
 
-export interface AnnotationType {
+export interface DetailsIdChange extends Details {
+  orig_id: number;
+  new_id: number;
+}
+
+export interface DetailsGrpId extends Details {
+  grpid: number;
+}
+
+export interface DetailsDamage extends Details {
+  damage: number;
+  type: number;
+}
+
+export interface DetailsLife extends Details {
+  life: number;
+}
+
+export interface DetailsPhaseStep extends Details {
+  phase: number;
+  step: number;
+}
+
+export interface DetailsAbilityGrpId extends Details {
+  abilityGrpId: number;
+  index: number;
+}
+
+export interface DetailsScry extends Details {
+  topIds: number | undefined;
+  bottomIds: number | undefined;
+}
+
+export interface DetailsSrcDest extends Details {
+  category:
+    | "PlayLand"
+    | "Draw"
+    | "Put"
+    | "SBA_Damage"
+    | "CastSpell"
+    | "Discard"
+    | "Return"
+    | "Exile"
+    | "Countered"
+    | "Destroy";
+  zone_src: number;
+  zone_dest: number;
+}
+
+export type DetailsType =
+  | DetailsSrcDest
+  | DetailsSourceZone
+  | DetailsIdChange
+  | DetailsGrpId
+  | DetailsDamage
+  | DetailsLife
+  | DetailsPhaseStep
+  | DetailsAbilityGrpId
+  | DetailsScry;
+
+/**
+ * Annotations union types
+ */
+
+interface AnnotationAbilityInstanceCreated {
   id: number;
   affectorId: number;
   affectedIds: number[];
-  type: string[];
-  AnnotationType?: string;
-  KeyValuePairInfo?: KeyValuePair;
-  details?: KeyValuePair[];
-  ignoreForSeatIds?: number;
+  type: "AnnotationType_AbilityInstanceCreated";
+  details: DetailsSourceZone;
 }
 
-interface ValueType {
-  value: number;
+interface AnnotationZoneTransfer {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  type: "AnnotationType_ZoneTransfer";
+  details: DetailsSrcDest;
 }
+
+interface AnnotationEnteredZoneThisTurn {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  type: "AnnotationType_EnteredZoneThisTurn";
+}
+
+interface AnnotationObjectIdChanged {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  type: "AnnotationType_ObjectIdChanged";
+  details: DetailsIdChange;
+}
+
+interface AnnotationResolutionStart {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  type: "AnnotationType_ResolutionStart";
+  details: DetailsGrpId;
+}
+
+interface AnnotationDamageDealt {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  details: DetailsDamage;
+  type: "AnnotationType_DamageDealt";
+}
+
+interface AnnotationModifiedLife {
+  id: number;
+  affectedIds: number[];
+  details: DetailsLife;
+  type: "AnnotationType_ModifiedLife";
+}
+
+interface AnnotationPhaseOrStepModified {
+  id: number;
+  affectedIds: number[];
+  details: DetailsPhaseStep;
+  type: "AnnotationType_PhaseOrStepModified";
+}
+
+interface AnnotationEnteredZoneThisTurn {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  type: "AnnotationType_EnteredZoneThisTurn";
+}
+
+interface AnnotationTargetSpec {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  details: DetailsAbilityGrpId;
+  type: "AnnotationType_TargetSpec";
+  allowRedaction: boolean;
+}
+
+interface AnnotationResolutionComplete {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  details: DetailsGrpId;
+  type: "AnnotationType_ResolutionComplete";
+}
+
+interface AnnotationScry {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  details: DetailsScry;
+  type: "AnnotationType_Scry";
+}
+
+interface AnnotationCardRevealed {
+  id: number;
+  affectorId: number;
+  affectedIds: number[];
+  details: DetailsSourceZone;
+  ignoreForSeatIds: number[];
+  type: "AnnotationType_CardRevealed";
+}
+
+export type Annotations =
+  | AnnotationZoneTransfer
+  | AnnotationAbilityInstanceCreated
+  | AnnotationEnteredZoneThisTurn
+  | AnnotationObjectIdChanged
+  | AnnotationResolutionStart
+  | AnnotationDamageDealt
+  | AnnotationPhaseOrStepModified
+  | AnnotationModifiedLife
+  | AnnotationEnteredZoneThisTurn
+  | AnnotationTargetSpec
+  | AnnotationResolutionComplete
+  | AnnotationScry
+  | AnnotationCardRevealed;
 
 export interface GameObjectType {
   type: string;
@@ -40,33 +195,10 @@ export interface GameObjectType {
   instanceId: number;
   ownerSeatId: number;
   visibility: string;
-  /*
-  groupId: number;
-  superTypes: string[];
-  cardTypes: string[];
-  subtypes: string[];
-  color: string[];
-  power: ValueType;
-  toughness: ValueType;
-  isCopy: number;
-  isTapped: number;
-  hasSummoningSickness: boolean;
-  attackState: number;
-  blockState: number;
-  damage: number;
-  attackInfo: number;
-  blockInfo: number;
-  viewers: number[];
-  loyalty: number;
-  objectSourceGrpId: number;
-  name: number;
-  abilities: number[];
-  parentId: number;
-  overlayGrpId: number;
-  isFacedown: boolean;
-  skinCode: number;
-  loyaltyUsed: ValueType;
-  */
+}
+
+interface ValueType {
+  value: number;
 }
 
 interface GameObjectTypeCard extends GameObjectType {
@@ -163,41 +295,6 @@ export type GameObject =
   | GameObjectTypeTriggerHolder
   | GameObjectTypeAdventure;
 
-export interface GameInfo {
-  matchID: string;
-  gameNumber: number;
-  stage: string;
-  type: string;
-  variant: string;
-  matchState: string;
-  matchWinCondition: string;
-  maxTimeoutCount: number;
-  maxPipCount: number;
-  timeoutDurationSec: number;
-  results: Result[];
-  superFormat: string;
-  mulliganType: string;
-  freeMulliganCount: number;
-  deckConstraintInfo: DeckConstraintInfo;
-}
-
-interface DeckConstraintInfo {
-  minDeckSize: number;
-  maxDeckSize: number;
-  maxSideboardSize: number;
-}
-
-export interface Timer {
-  timerId: number;
-  type: string;
-  durationSec: number;
-  elapsedSec: number;
-  running: number;
-  behavior: string;
-  warningThresholdSec: number;
-  elapsedMs: number;
-}
-
 export interface PlayerData {
   lifeTotal: number;
   systemSeatNumber: number;
@@ -208,19 +305,6 @@ export interface PlayerData {
   controllerType: string;
   pendingMessageType: string;
   startingLifeTotal: number;
-}
-
-export interface TurnInfo {
-  activePlayer: number;
-  decisionPlayer: number;
-  phase: number;
-  step: number;
-  turnNumber: number;
-  priorityPlayer: number;
-  stormCount: number;
-  nextPhase: number;
-  nextStep: number;
-  currentPriority: number;
 }
 
 interface ManaColor {
@@ -275,61 +359,4 @@ export interface ZoneTypeData {
 
 export interface CardTypeData {
   [key: string]: number[];
-}
-
-interface GameStateMessage {
-  type: string;
-  gameStateId: number;
-  gameInfo: GameInfo;
-  teams: Team[];
-  players: PlayerData[];
-  turnInfo: TurnInfo;
-  zones: ZoneType[];
-  GameObjectTypes: GameObject[];
-  annotations: AnnotationType[];
-  diffDeletedInstanceIds: number[];
-  pendingMessageCount: number;
-  prevGameStateId: number;
-  timers: Timer[];
-  update: string;
-  actions: Action[];
-  gameObjects: GameObject[];
-}
-
-export interface GreMessage {
-  type: string;
-  msgId: number;
-  gameStateMessage: GameStateMessage;
-  gameStateId?: number;
-  dieRollResultsResp?: {
-    playerDieRolls: { systemSeatId: number; rollValue?: number }[];
-  };
-  connectResp?: {
-    status: string;
-    majorVer: string;
-    minorVer: string;
-    revisionVer: string;
-    buildVer: string;
-    protoVer: string;
-    seatId: string;
-    settings: string;
-    deckMessage: {
-      deckCards: number[];
-      sideboardCards: number[];
-      commanderCards: number[];
-    };
-  };
-  setSettingsResp?: {
-    settings: {
-      stops: Stop[];
-      autoPassOption: string;
-      graveyardOrder: string;
-      manaSelectionType: string;
-      defaultAutoPassOption: string;
-      smartStopsSetting: string;
-      autoTapStopsSetting: string;
-      autoOptionalPaymentCancellationSetting: string;
-      transientStops: Stop[];
-    };
-  };
 }

@@ -1,8 +1,8 @@
-import globals from "./globals";
 import db from "../shared/database";
 import Deck from "../shared/deck";
 import { InternalDeck } from "../types/Deck";
-import { DbCardData, Archetype } from "../types/Metadata";
+import { Archetype } from "../types/Metadata";
+import globalStore from "../shared-store";
 
 function calculateDeviation(values: number[]): number {
   return Math.sqrt(values.reduce((a, b) => a + b) / (values.length - 1));
@@ -60,29 +60,28 @@ function getBestArchetype(deck: Deck): string {
 }
 
 function getOpponentDeck(): InternalDeck {
-  const _deck = new Deck(undefined, globals.currentMatch.oppCardsUsed, []);
+  const currentMatch = globalStore.currentMatch;
+  const _deck = new Deck(undefined, currentMatch.opponent.cardsUsed, []);
   _deck.getMainboard().removeDuplicates(true);
   _deck.colors;
 
-  const format = db.events_format[globals.currentMatch.eventId];
-  globals.currentMatch.opponent.deck.archetype = "-";
+  const format = db.events_format[currentMatch.eventId];
+  //currentMatch.opponent.deck.archetype = "-";
   const deckSave = _deck.getSave();
 
-  globals.currentMatch.oppArchetype = getBestArchetype(_deck);
+  let oppArchetype = getBestArchetype(_deck);
   if (
     (format !== "Standard" && format !== "Traditional Standard") ||
-    globals.currentMatch.oppArchetype == "Unknown"
+    oppArchetype == "Unknown"
   ) {
-    // console.log(_deck);
-    // console.log(_deck.colors);
-    if (globals.currentMatch.opponent.commanderGrpIds?.length) {
-      const card = db.card(globals.currentMatch.opponent.commanderGrpIds[0]);
-      globals.currentMatch.oppArchetype = card ? card.name : "";
+    if (currentMatch.opponent.commanderGrpIds?.length) {
+      const card = db.card(currentMatch.opponent.commanderGrpIds[0]);
+      oppArchetype = card ? card.name : "";
     } else {
-      globals.currentMatch.oppArchetype = _deck.colors.getColorArchetype();
+      oppArchetype = _deck.colors.getColorArchetype();
     }
   }
-  deckSave.archetype = globals.currentMatch.oppArchetype;
+  deckSave.archetype = oppArchetype;
 
   return deckSave;
 }

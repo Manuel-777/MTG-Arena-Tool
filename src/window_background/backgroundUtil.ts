@@ -139,7 +139,7 @@ export function normaliseFields(object: any): any {
       });
     }
     return _.transform(object, (result: any, value: any, key: string) => {
-      result[key.replace(/List$/, "").toLowerCase()] = normaliseFields(value);
+      result[key.replace(/List$/, "")] = normaliseFields(value);
     });
   }
   return object;
