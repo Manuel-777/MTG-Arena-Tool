@@ -86,14 +86,14 @@ function isAnnotationProcessed(id: number): boolean {
   return anns.includes(id);
 }
 
-const actionLogGenerateLink = function (grpId: number): string {
+const actionLogGenerateLink = function(grpId: number): string {
   const card = db.card(grpId);
   return card
     ? '<log-card id="' + grpId + '">' + card.name + "</log-card>"
     : "";
 };
 
-const actionLogGenerateAbilityLink = function (abId: number): string {
+const actionLogGenerateAbilityLink = function(abId: number): string {
   return `<log-ability id="${abId}">ability</log-ability>`;
 };
 
@@ -132,14 +132,14 @@ function instanceIdToObject(instanceID: number): GameObject {
   throw new NoInstanceException(orig, instanceID, instance);
 }
 
-const AnnotationType_ObjectIdChanged = function (ann: Annotations): void {
+const AnnotationType_ObjectIdChanged = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ObjectIdChanged") return;
   //let newObj = cloneDeep(getGameObject(details.orig_id));
   //getGameObject(details.new_id) = newObj;
   setIdChange(ann.details);
 };
 
-const AnnotationType_ZoneTransfer = function (ann: Annotations): void {
+const AnnotationType_ZoneTransfer = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ZoneTransfer") return;
 
   // A player played a land
@@ -322,7 +322,7 @@ const AnnotationType_ZoneTransfer = function (ann: Annotations): void {
   }
 };
 
-const AnnotationType_AbilityInstanceCreated = function (ann: Annotations): void {
+const AnnotationType_AbilityInstanceCreated = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_AbilityInstanceCreated") return;
   /*
   const affected = ann.affectedIds[0];
@@ -346,7 +346,7 @@ const AnnotationType_AbilityInstanceCreated = function (ann: Annotations): void 
   */
 };
 
-const AnnotationType_ResolutionStart = function (ann: Annotations): void {
+const AnnotationType_ResolutionStart = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ResolutionStart") return;
   const affected = instanceIdToObject(ann.affectedIds[0]);
   const grpId = ann.details.grpid;
@@ -364,7 +364,7 @@ const AnnotationType_ResolutionStart = function (ann: Annotations): void {
   }
 };
 
-const AnnotationType_DamageDealt = function (ann: Annotations): void {
+const AnnotationType_DamageDealt = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_DamageDealt") return;
   let recipient = "";
   if (ann.affectedIds[0] < 5) {
@@ -387,7 +387,7 @@ const AnnotationType_DamageDealt = function (ann: Annotations): void {
   );
 };
 
-const AnnotationType_ModifiedLife = function (ann: Annotations): void {
+const AnnotationType_ModifiedLife = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_ModifiedLife") return;
   const players = globalStore.currentMatch.players;
   const affected = ann.affectedIds[0];
@@ -401,7 +401,7 @@ const AnnotationType_ModifiedLife = function (ann: Annotations): void {
   );
 };
 
-const AnnotationType_TargetSpec = function (ann: Annotations): void {
+const AnnotationType_TargetSpec = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_TargetSpec") return;
   let target;
   if (ann.affectedIds[0] < 5) {
@@ -425,7 +425,7 @@ const AnnotationType_TargetSpec = function (ann: Annotations): void {
   actionLog(seat, globals.logTime, `${text} targetted ${target}`);
 };
 
-const AnnotationType_Scry = function (ann: Annotations): void {
+const AnnotationType_Scry = function(ann: Annotations): void {
   if (ann.type !== "AnnotationType_Scry") return;
   // REVIEW SCRY ANNOTATION
   let affector = ann.affectorId;
@@ -482,7 +482,7 @@ const AnnotationType_Scry = function (ann: Annotations): void {
   }
 };
 
-const AnnotationType_CardRevealed = function (ann: Annotations): void {
+const AnnotationType_CardRevealed = function(ann: Annotations): void {
   const playerSeat = globalStore.currentMatch.playerSeat;
   if (ann.type !== "AnnotationType_CardRevealed") return;
   if (!ann.ignoreForSeatIds.includes(playerSeat)) return;
@@ -864,9 +864,9 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
       -1,
       globals.logTime,
       getNameBySeat(turnInfo.activePlayer || 0) +
-      "'s turn begin. (#" +
-      turnInfo.turnNumber +
-      ")"
+        "'s turn begin. (#" +
+        turnInfo.turnNumber +
+        ")"
     );
   }
 
@@ -909,8 +909,8 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
       if (gameState.gameInfo.matchID) {
         setMatchId(
           gameState.gameInfo.matchID +
-          "-" +
-          globals.store.getState().playerdata.arenaId
+            "-" +
+            globals.store.getState().playerdata.arenaId
         );
       }
       if (gameState.gameInfo.stage == "GameStage_GameOver") {

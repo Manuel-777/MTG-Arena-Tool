@@ -48,7 +48,7 @@ export type DetailsSrcDestCategoryType =
   | "Destroy";
 
 export interface DetailsSrcDest {
-  category?: DetailsSrcDestCategoryType
+  category?: DetailsSrcDestCategoryType;
   zone_src: number;
   zone_dest: number;
 }
@@ -64,19 +64,17 @@ export type DetailsType =
   | DetailsAbilityGrpId
   | DetailsScry;
 
-export type AggregatedDetailsType =
-  & DetailsSrcDest
-  & DetailsSourceZone
-  & DetailsIdChange
-  & DetailsGrpId
-  & DetailsDamage
-  & DetailsLife
-  & DetailsPhaseStep
-  & DetailsAbilityGrpId
-  & DetailsScry;
+export type AggregatedDetailsType = DetailsSrcDest &
+  DetailsSourceZone &
+  DetailsIdChange &
+  DetailsGrpId &
+  DetailsDamage &
+  DetailsLife &
+  DetailsPhaseStep &
+  DetailsAbilityGrpId &
+  DetailsScry;
 
-export type DetailsKeyType =
-  keyof AggregatedDetailsType;
+export type DetailsKeyType = keyof AggregatedDetailsType;
 
 /**
  * Annotations union types
