@@ -12,7 +12,10 @@ import {
   Annotations,
   GameObject,
   //GameObjectTypeAbility,
-  DetailsType
+  DetailsType,
+  DetailsPhaseStep,
+  AggregatedDetailsType,
+  DetailsSrcDestCategoryType
 } from "../types/greInterpreter";
 
 import {
@@ -83,14 +86,14 @@ function isAnnotationProcessed(id: number): boolean {
   return anns.includes(id);
 }
 
-const actionLogGenerateLink = function(grpId: number): string {
+const actionLogGenerateLink = function (grpId: number): string {
   const card = db.card(grpId);
   return card
     ? '<log-card id="' + grpId + '">' + card.name + "</log-card>"
     : "";
 };
 
-const actionLogGenerateAbilityLink = function(abId: number): string {
+const actionLogGenerateAbilityLink = function (abId: number): string {
   return `<log-ability id="${abId}">ability</log-ability>`;
 };
 
@@ -129,56 +132,14 @@ function instanceIdToObject(instanceID: number): GameObject {
   throw new NoInstanceException(orig, instanceID, instance);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function keyValuePair(obj: KeyValuePairInfo, addTo: any): DetailsType {
-  // the f value is not in the GreTypes..
-  if (obj.key) {
-    try {
-      switch (obj.type) {
-        case "KeyValuePairValueType_uint32":
-          addTo[obj.key] = obj.valueUint32;
-          break;
-        case "KeyValuePairValueType_int32":
-          addTo[obj.key] = obj.valueInt32;
-          break;
-        case "KeyValuePairValueType_uint64":
-          addTo[obj.key] = obj.valueUint64;
-          break;
-        case "KeyValuePairValueType_int64":
-          addTo[obj.key] = obj.valueInt64;
-          break;
-        case "KeyValuePairValueType_bool":
-          addTo[obj.key] = obj.valueBool;
-          break;
-        case "KeyValuePairValueType_string":
-          addTo[obj.key] = obj.valueString;
-          break;
-        case "KeyValuePairValueType_float":
-          addTo[obj.key] = obj.valueFloat;
-          break;
-        case "KeyValuePairValueType_double":
-          addTo[obj.key] = obj.valueDouble;
-          break;
-        default:
-          break;
-      }
-      if (addTo[obj.key].length == 1) addTo[obj.key] = addTo[obj.key][0];
-    } catch (e) {
-      addTo[obj.key] = undefined;
-    }
-  }
-
-  return addTo;
-}
-
-const AnnotationType_ObjectIdChanged = function(ann: Annotations): void {
+const AnnotationType_ObjectIdChanged = function (ann: Annotations): void {
   if (ann.type !== "AnnotationType_ObjectIdChanged") return;
   //let newObj = cloneDeep(getGameObject(details.orig_id));
   //getGameObject(details.new_id) = newObj;
   setIdChange(ann.details);
 };
 
-const AnnotationType_ZoneTransfer = function(ann: Annotations): void {
+const AnnotationType_ZoneTransfer = function (ann: Annotations): void {
   if (ann.type !== "AnnotationType_ZoneTransfer") return;
 
   // A player played a land
@@ -361,7 +322,7 @@ const AnnotationType_ZoneTransfer = function(ann: Annotations): void {
   }
 };
 
-const AnnotationType_AbilityInstanceCreated = function(ann: Annotations): void {
+const AnnotationType_AbilityInstanceCreated = function (ann: Annotations): void {
   if (ann.type !== "AnnotationType_AbilityInstanceCreated") return;
   /*
   const affected = ann.affectedIds[0];
@@ -385,7 +346,7 @@ const AnnotationType_AbilityInstanceCreated = function(ann: Annotations): void {
   */
 };
 
-const AnnotationType_ResolutionStart = function(ann: Annotations): void {
+const AnnotationType_ResolutionStart = function (ann: Annotations): void {
   if (ann.type !== "AnnotationType_ResolutionStart") return;
   const affected = instanceIdToObject(ann.affectedIds[0]);
   const grpId = ann.details.grpid;
@@ -403,7 +364,7 @@ const AnnotationType_ResolutionStart = function(ann: Annotations): void {
   }
 };
 
-const AnnotationType_DamageDealt = function(ann: Annotations): void {
+const AnnotationType_DamageDealt = function (ann: Annotations): void {
   if (ann.type !== "AnnotationType_DamageDealt") return;
   let recipient = "";
   if (ann.affectedIds[0] < 5) {
@@ -426,7 +387,7 @@ const AnnotationType_DamageDealt = function(ann: Annotations): void {
   );
 };
 
-const AnnotationType_ModifiedLife = function(ann: Annotations): void {
+const AnnotationType_ModifiedLife = function (ann: Annotations): void {
   if (ann.type !== "AnnotationType_ModifiedLife") return;
   const players = globalStore.currentMatch.players;
   const affected = ann.affectedIds[0];
@@ -440,7 +401,7 @@ const AnnotationType_ModifiedLife = function(ann: Annotations): void {
   );
 };
 
-const AnnotationType_TargetSpec = function(ann: Annotations): void {
+const AnnotationType_TargetSpec = function (ann: Annotations): void {
   if (ann.type !== "AnnotationType_TargetSpec") return;
   let target;
   if (ann.affectedIds[0] < 5) {
@@ -464,7 +425,7 @@ const AnnotationType_TargetSpec = function(ann: Annotations): void {
   actionLog(seat, globals.logTime, `${text} targetted ${target}`);
 };
 
-const AnnotationType_Scry = function(ann: Annotations): void {
+const AnnotationType_Scry = function (ann: Annotations): void {
   if (ann.type !== "AnnotationType_Scry") return;
   // REVIEW SCRY ANNOTATION
   let affector = ann.affectorId;
@@ -521,7 +482,7 @@ const AnnotationType_Scry = function(ann: Annotations): void {
   }
 };
 
-const AnnotationType_CardRevealed = function(ann: Annotations): void {
+const AnnotationType_CardRevealed = function (ann: Annotations): void {
   const playerSeat = globalStore.currentMatch.playerSeat;
   if (ann.type !== "AnnotationType_CardRevealed") return;
   if (!ann.ignoreForSeatIds.includes(playerSeat)) return;
@@ -574,18 +535,107 @@ function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
   }
 }
 
+function extractNumberFromKVP(obj: KeyValuePairInfo): number | undefined {
+  switch (obj.type) {
+    case "KeyValuePairValueType_uint32":
+      return obj.valueUint32[0];
+    case "KeyValuePairValueType_int32":
+      return obj.valueInt32[0];
+    case "KeyValuePairValueType_uint64":
+      return obj.valueUint64[0];
+    case "KeyValuePairValueType_int64":
+      return obj.valueInt64[0];
+    case "KeyValuePairValueType_float":
+      return obj.valueFloat[0];
+    case "KeyValuePairValueType_double":
+      return obj.valueDouble[0];
+  }
+}
+
+function keyValuePair(kvp: KeyValuePairInfo[]): AggregatedDetailsType {
+  let aggregate: AggregatedDetailsType = {
+    abilityGrpId: 0,
+    bottomIds: undefined,
+    category: undefined,
+    damage: 0,
+    grpid: 0,
+    index: 0,
+    life: 0,
+    new_id: 0,
+    orig_id: 0,
+    phase: 0,
+    source_zone: 0,
+    step: 0,
+    topIds: undefined,
+    type: 0,
+    zone_dest: 0,
+    zone_src: 0
+  };
+
+  for (const obj of kvp) {
+    switch (obj.key) {
+      case undefined:
+        break;
+      case "abilityGrpId":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "bottomIds":
+        aggregate[obj.key] = extractNumberFromKVP(obj);
+        break;
+      case "category":
+        aggregate[obj.key] = obj.valueString[0] as DetailsSrcDestCategoryType;
+        break;
+      case "damage":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "grpid":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "index":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "life":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "new_id":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "orig_id":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "phase":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "source_zone":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "step":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "topIds":
+        aggregate[obj.key] = extractNumberFromKVP(obj);
+        break;
+      case "type":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "zone_dest":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+      case "zone_src":
+        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        break;
+    }
+  }
+  return aggregate;
+}
+
 function processAnnotations(): void {
   const removeIds = [] as number[];
   const anns = getAllAnnotations();
   anns.forEach(ann => {
     if (ann.id && isAnnotationProcessed(ann.id)) return;
 
-    let details: Partial<DetailsType> = {};
-    if (ann.details) {
-      ann.details.forEach(
-        (detail: KeyValuePairInfo) => (details = keyValuePair(detail, details))
-      );
-    }
+    const details = keyValuePair(ann.details);
 
     try {
       ann.type.forEach((type: AnnotationType) => {
@@ -814,9 +864,9 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
       -1,
       globals.logTime,
       getNameBySeat(turnInfo.activePlayer || 0) +
-        "'s turn begin. (#" +
-        turnInfo.turnNumber +
-        ")"
+      "'s turn begin. (#" +
+      turnInfo.turnNumber +
+      ")"
     );
   }
 
@@ -859,8 +909,8 @@ const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
       if (gameState.gameInfo.matchID) {
         setMatchId(
           gameState.gameInfo.matchID +
-            "-" +
-            globals.store.getState().playerdata.arenaId
+          "-" +
+          globals.store.getState().playerdata.arenaId
         );
       }
       if (gameState.gameInfo.stage == "GameStage_GameOver") {

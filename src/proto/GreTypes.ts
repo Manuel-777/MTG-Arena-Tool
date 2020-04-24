@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 // generated file, do not touch!
 import ByteBuffer from "bytebuffer";
+import { DetailsKeyType } from "../types/greInterpreter";
 
 export interface AIConfig {
   matchConfig?: MatchConfig;
@@ -1141,7 +1142,7 @@ export interface JoinQueueResponse {
 }
 
 export interface KeyValuePairInfo {
-  key?: string;
+  key?: DetailsKeyType;
   type?: KeyValuePairValueType;
   valueUint32: number[];
   valueInt32: number[];

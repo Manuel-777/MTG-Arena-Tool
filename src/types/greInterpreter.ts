@@ -1,56 +1,54 @@
-export interface Details {
-  category?: string;
-}
-
-export interface DetailsSourceZone extends Details {
+export interface DetailsSourceZone {
   source_zone: number;
 }
 
-export interface DetailsIdChange extends Details {
+export interface DetailsIdChange {
   orig_id: number;
   new_id: number;
 }
 
-export interface DetailsGrpId extends Details {
+export interface DetailsGrpId {
   grpid: number;
 }
 
-export interface DetailsDamage extends Details {
+export interface DetailsDamage {
   damage: number;
   type: number;
 }
 
-export interface DetailsLife extends Details {
+export interface DetailsLife {
   life: number;
 }
 
-export interface DetailsPhaseStep extends Details {
+export interface DetailsPhaseStep {
   phase: number;
   step: number;
 }
 
-export interface DetailsAbilityGrpId extends Details {
+export interface DetailsAbilityGrpId {
   abilityGrpId: number;
   index: number;
 }
 
-export interface DetailsScry extends Details {
+export interface DetailsScry {
   topIds: number | undefined;
   bottomIds: number | undefined;
 }
 
-export interface DetailsSrcDest extends Details {
-  category:
-    | "PlayLand"
-    | "Draw"
-    | "Put"
-    | "SBA_Damage"
-    | "CastSpell"
-    | "Discard"
-    | "Return"
-    | "Exile"
-    | "Countered"
-    | "Destroy";
+export type DetailsSrcDestCategoryType =
+  | "PlayLand"
+  | "Draw"
+  | "Put"
+  | "SBA_Damage"
+  | "CastSpell"
+  | "Discard"
+  | "Return"
+  | "Exile"
+  | "Countered"
+  | "Destroy";
+
+export interface DetailsSrcDest {
+  category?: DetailsSrcDestCategoryType
   zone_src: number;
   zone_dest: number;
 }
@@ -65,6 +63,20 @@ export type DetailsType =
   | DetailsPhaseStep
   | DetailsAbilityGrpId
   | DetailsScry;
+
+export type AggregatedDetailsType =
+  & DetailsSrcDest
+  & DetailsSourceZone
+  & DetailsIdChange
+  & DetailsGrpId
+  & DetailsDamage
+  & DetailsLife
+  & DetailsPhaseStep
+  & DetailsAbilityGrpId
+  & DetailsScry;
+
+export type DetailsKeyType =
+  keyof AggregatedDetailsType;
 
 /**
  * Annotations union types
