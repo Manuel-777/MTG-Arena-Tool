@@ -61,7 +61,7 @@ export default function InEventGetCombinedRankInfo(entry: Entry): void {
     }
   };
 
-  setSeasonalRankFromCombinedRank(rank, entry.hash, entry.timestamp);
+  setSeasonalRankFromCombinedRank(rank, entry.hash);
 
   const infoLength = Object.keys(json).length - 1;
   const processedLength = [rank.limited, rank.constructed]
