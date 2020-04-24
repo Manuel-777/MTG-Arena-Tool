@@ -37,6 +37,50 @@ function getBackUrl(hoverGrpId: number, quality: string): string {
   return newImg || NotFound;
 }
 
+const getStyle = (
+  hoverGrpId: number,
+  hoverSize: number,
+  url: string,
+  opacity: number
+): React.CSSProperties => {
+  const size = 100 + hoverSize * 15;
+  return {
+    width: size + "px",
+    height: size / 0.71808510638 + "px",
+    top: `calc(100% - ${size / 0.71808510638 + 32}px)`,
+    opacity: opacity,
+    backgroundImage: `url(${url})`
+  };
+};
+
+const getStyleDfc = (
+  hoverGrpId: number,
+  hoverSize: number,
+  url: string,
+  opacity: number
+): React.CSSProperties => {
+  const size = 100 + hoverSize * 15;
+  const cardObj = db.card(hoverGrpId);
+  if (
+    !(
+      cardObj &&
+      (cardObj.dfc == FACE_DFC_BACK || cardObj.dfc == FACE_DFC_FRONT) &&
+      cardObj.dfcId
+    )
+  ) {
+    opacity = 0;
+  }
+
+  return {
+    width: size + "px",
+    right: size + 48 + "px",
+    height: size / 0.71808510638 + "px",
+    top: `calc(100% - ${size / 0.71808510638 + 32}px)`,
+    opacity: opacity,
+    backgroundImage: `url(${url})`
+  };
+};
+
 export default function CardHover(): JSX.Element {
   const quality = useSelector(
     (state: AppState) => state.settings.cards_quality
@@ -53,53 +97,6 @@ export default function CardHover(): JSX.Element {
 
   const [frontUrl, setFrontUrl] = useState("");
   const [backUrl, setBackUrl] = useState("");
-
-  const size = 100 + hoverSize * 15;
-  const getStyle = useCallback(
-    (
-      hoverGrpId: number,
-      hoverSize: number,
-      opacity: number
-    ): React.CSSProperties => {
-      return {
-        width: size + "px",
-        height: size / 0.71808510638 + "px",
-        top: `calc(100% - ${size / 0.71808510638 + 32}px)`,
-        opacity: opacity,
-        backgroundImage: `url(${frontLoaded ? frontUrl : NoCard})`
-      };
-    },
-    [frontUrl, frontLoaded, size]
-  );
-
-  const getStyleDfc = useCallback(
-    (
-      hoverGrpId: number,
-      hoverSize: number,
-      opacity: number
-    ): React.CSSProperties => {
-      const cardObj = db.card(hoverGrpId);
-      if (
-        !(
-          cardObj &&
-          (cardObj.dfc == FACE_DFC_BACK || cardObj.dfc == FACE_DFC_FRONT) &&
-          cardObj.dfcId
-        )
-      ) {
-        opacity = 0;
-      }
-
-      return {
-        width: size + "px",
-        right: size + 48 + "px",
-        height: size / 0.71808510638 + "px",
-        top: `calc(100% - ${size / 0.71808510638 + 32}px)`,
-        opacity: opacity,
-        backgroundImage: `url(${backLoaded ? backUrl : NoCard})`
-      };
-    },
-    [backUrl, backLoaded, size]
-  );
 
   useEffect(() => {
     // Reset the image, begin new loading and clear state
@@ -130,11 +127,21 @@ export default function CardHover(): JSX.Element {
   return (
     <>
       <div
-        style={getStyleDfc(grpId, hoverSize, opacity)}
+        style={getStyleDfc(
+          grpId,
+          hoverSize,
+          backLoaded ? backUrl : NoCard,
+          opacity
+        )}
         className="card-hover-dfc"
       />
       <div
-        style={getStyle(grpId, hoverSize, opacity)}
+        style={getStyle(
+          grpId,
+          hoverSize,
+          frontLoaded ? frontUrl : NoCard,
+          opacity
+        )}
         className="card-hover-main"
       >
         {card ? (
