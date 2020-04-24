@@ -1,9 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/camelcase */
 import { IPC_OVERLAY } from "../shared/constants";
-import { objectClone } from "../shared/util";
 import { ipcSend } from "./backgroundUtil";
-import Deck from "../shared/deck";
 import globals from "./globals";
 import actionLog from "./actionLog";
 import db from "../shared/database";
@@ -11,46 +9,78 @@ import forceDeckUpdate from "./forceDeckUpdate";
 import getNameBySeat from "./getNameBySeat";
 import updateDeck from "./updateDeck";
 import {
-  GreMessage,
-  AnnotationType,
-  DetailsType,
-  ZoneData,
-  ZoneType,
-  KeyValuePair,
-  GameInfo,
-  TurnInfo,
+  Annotations,
   GameObject,
-  GameObjectTypeAbility
+  //GameObjectTypeAbility,
+  DetailsType
 } from "../types/greInterpreter";
+
+import {
+  KeyValuePairInfo,
+  GREToClientMessage,
+  AnnotationInfo,
+  GameObjectInfo,
+  TurnInfo,
+  ZoneInfo,
+  GREMessageType,
+  AnnotationType,
+  PlayerInfo,
+  GameStateMessage
+} from "../proto/GreTypes";
+
 import getMatchGameStats from "./getMatchGameStats";
+//import { reduxAction } from "../shared-redux/sharedRedux";
+import { objectClone } from "../shared/util";
+import globalStore from "../shared-store";
+import {
+  setMatchId,
+  setPlayerCardsUsed,
+  setOppCardsUsed,
+  setCurrentMatchMany,
+  setIdChange,
+  addCardCast,
+  removeAnnotations,
+  setInitialLibraryInstanceIds,
+  setOnThePlay,
+  setGameInfo,
+  setTurnInfo,
+  setManyZones,
+  setPlayers,
+  setManyGameObjects,
+  setManyAnnotations,
+  resetCurrentGame,
+  setHandDrawn,
+  setGameBeginTime,
+  setGameWinner
+} from "../shared-store/currentMatchStore";
 
-const actionType = [];
-actionType[0] = "ActionType_None";
-actionType[1] = "ActionType_Cast";
-actionType[2] = "ActionType_Activate";
-actionType[3] = "ActionType_Play";
-actionType[4] = "ActionType_Activate_Mana";
-actionType[5] = "ActionType_Pass";
-actionType[6] = "ActionType_Activate_Test";
-actionType[7] = "ActionType_Mode";
-actionType[8] = "ActionType_Special_TurnFaceUp";
-actionType[9] = "ActionType_ResolutionCost";
-actionType[10] = "ActionType_CastLeft";
-actionType[11] = "ActionType_CastRight";
-actionType[12] = "ActionType_Make_Payment";
-actionType[13] = "ActionType_CastingTimeOption";
-actionType[14] = "ActionType_CombatCost";
-actionType[15] = "ActionType_OpeningHandAction";
+function changePriority(previous: number, current: number, time: number): void {
+  const priorityTimers = objectClone(globalStore.currentMatch.priorityTimers);
+  priorityTimers.timers[previous] += time - priorityTimers.last;
+  priorityTimers.last = time;
 
-function changePriority(previous: number, current: number, time: Date): void {
-  globals.currentMatch.priorityTimers.timers[previous] +=
-    time.getTime() - globals.currentMatch.priorityTimers.last.getTime();
+  setCurrentMatchMany({
+    priorityTimers: priorityTimers,
+    currentPriority: current
+  });
+}
 
-  globals.currentMatch.lastPriorityChangeTime = time;
-  globals.currentMatch.priorityTimers.date =
-    globals.currentMatch.priorityTimers.last;
+function getGameObject(id: number): GameObject {
+  return globalStore.currentMatch.gameObjects[id];
+}
 
-  globals.currentMatch.currentPriority = current;
+function getZone(id: number): ZoneInfo {
+  return globalStore.currentMatch.zones[id];
+}
+
+function getAllAnnotations(): AnnotationInfo[] {
+  const annotations = globalStore.currentMatch.annotations;
+  return Object.values(annotations);
+}
+
+function isAnnotationProcessed(id: number): boolean {
+  const anns = globalStore.currentMatch.processedAnnotations;
+  return anns.includes(id);
 }
 
 const actionLogGenerateLink = function(grpId: number): string {
@@ -76,9 +106,9 @@ function isObjectACard(card: GameObject): boolean {
 class NoInstanceException {
   private message: string;
   private instanceID: number;
-  private instance: GameObject;
+  private instance: GameObjectInfo;
 
-  constructor(orig: number, instanceID: number, instance: GameObject) {
+  constructor(orig: number, instanceID: number, instance: GameObjectInfo) {
     this.message = `No instance with ID ${orig} found.`;
     this.instanceID = instanceID;
     this.instance = instance;
@@ -87,111 +117,73 @@ class NoInstanceException {
 
 function instanceIdToObject(instanceID: number): GameObject {
   const orig = instanceID;
-  while (
-    !globals.currentMatch.gameObjs[instanceID] &&
-    globals.idChanges[instanceID]
-  ) {
-    instanceID = globals.idChanges[instanceID];
+  const idChanges = globalStore.currentMatch.idChanges;
+  while (!getGameObject(instanceID) && idChanges[instanceID]) {
+    instanceID = idChanges[instanceID];
   }
 
-  const instance = globals.currentMatch.gameObjs[instanceID];
+  const instance = getGameObject(instanceID);
   if (instance) {
     return instance;
   }
   throw new NoInstanceException(orig, instanceID, instance);
-  //return false;
 }
 
-function keyValuePair(obj: KeyValuePair, addTo: DetailsType): DetailsType {
-  // I found some times we get f as the value array.. *shrug*
-  if (obj.f) {
-    addTo[obj.key] = obj.f[0];
-    return addTo;
-  }
-  try {
-    if (obj.type == "KeyValuePairValueType_None")
-      addTo[obj.key] = obj.valueNone;
-    if (obj.type == "KeyValuePairValueType_uint32")
-      addTo[obj.key] = obj.valueUint32;
-    if (obj.type == "KeyValuePairValueType_int32")
-      addTo[obj.key] = obj.valueInt32;
-    if (obj.type == "KeyValuePairValueType_uint64")
-      addTo[obj.key] = obj.valueUint64;
-    if (obj.type == "KeyValuePairValueType_int64")
-      addTo[obj.key] = obj.valueInt64;
-    if (obj.type == "KeyValuePairValueType_bool")
-      addTo[obj.key] = obj.valueBool;
-    if (obj.type == "KeyValuePairValueType_string")
-      addTo[obj.key] = obj.valueString;
-    if (obj.type == "KeyValuePairValueType_float")
-      addTo[obj.key] = obj.valueFloat;
-    if (obj.type == "KeyValuePairValueType_double")
-      addTo[obj.key] = obj.valueDouble;
-
-    if (addTo[obj.key].length == 1) addTo[obj.key] = addTo[obj.key][0];
-  } catch (e) {
-    addTo[obj.key] = undefined;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function keyValuePair(obj: KeyValuePairInfo, addTo: any): DetailsType {
+  // the f value is not in the GreTypes..
+  if (obj.key) {
+    try {
+      switch (obj.type) {
+        case "KeyValuePairValueType_uint32":
+          addTo[obj.key] = obj.valueUint32;
+          break;
+        case "KeyValuePairValueType_int32":
+          addTo[obj.key] = obj.valueInt32;
+          break;
+        case "KeyValuePairValueType_uint64":
+          addTo[obj.key] = obj.valueUint64;
+          break;
+        case "KeyValuePairValueType_int64":
+          addTo[obj.key] = obj.valueInt64;
+          break;
+        case "KeyValuePairValueType_bool":
+          addTo[obj.key] = obj.valueBool;
+          break;
+        case "KeyValuePairValueType_string":
+          addTo[obj.key] = obj.valueString;
+          break;
+        case "KeyValuePairValueType_float":
+          addTo[obj.key] = obj.valueFloat;
+          break;
+        case "KeyValuePairValueType_double":
+          addTo[obj.key] = obj.valueDouble;
+          break;
+        default:
+          break;
+      }
+      if (addTo[obj.key].length == 1) addTo[obj.key] = addTo[obj.key][0];
+    } catch (e) {
+      addTo[obj.key] = undefined;
+    }
   }
 
   return addTo;
 }
 
-const annotationFunctions: {
-  [key: string]: (ann: AnnotationType, details: DetailsType) => void;
-} = {};
-
-function processAnnotations(): void {
-  globals.currentMatch.annotations.forEach((ann: AnnotationType) => {
-    // if this annotation has already been processed, skip
-    if (globals.currentMatch.processedAnnotations.includes(ann.id)) return;
-
-    let details: DetailsType = {};
-    if (ann.details) {
-      ann.details.forEach(
-        (detail: KeyValuePair) => (details = keyValuePair(detail, details))
-      );
-    }
-
-    try {
-      ann.type.forEach((type: string) => {
-        const fn = annotationFunctions[type];
-        if (typeof fn == "function") {
-          fn(ann, details);
-        }
-
-        //globals.currentMatch.annotations = globals.currentMatch.annotations.splice(index, 1);
-        // add this annotation to the list of processed
-        globals.currentMatch.processedAnnotations.push(ann.id);
-      });
-    } catch (e) {
-      // console.log(ann, e);
-    }
-  });
-}
-
-function removeProcessedAnnotations(): void {
-  globals.currentMatch.annotations = globals.currentMatch.annotations.filter(
-    (ann: AnnotationType) =>
-      !globals.currentMatch.processedAnnotations.includes(ann.id)
-  );
-}
-
-annotationFunctions.AnnotationType_ObjectIdChanged = function(
-  ann: AnnotationType,
-  details: DetailsType
-): void {
-  //let newObj = cloneDeep(globals.currentMatch.gameObjs[details.orig_id]);
-  //globals.currentMatch.gameObjs[details.new_id] = newObj;
-  globals.idChanges[details.orig_id] = details.new_id;
+const AnnotationType_ObjectIdChanged = function(ann: Annotations): void {
+  if (ann.type !== "AnnotationType_ObjectIdChanged") return;
+  //let newObj = cloneDeep(getGameObject(details.orig_id));
+  //getGameObject(details.new_id) = newObj;
+  setIdChange(ann.details);
 };
 
-annotationFunctions.AnnotationType_ZoneTransfer = function(
-  ann: AnnotationType,
-  details: DetailsType
-): void {
+const AnnotationType_ZoneTransfer = function(ann: Annotations): void {
+  if (ann.type !== "AnnotationType_ZoneTransfer") return;
+
   // A player played a land
-  if (details.category == "PlayLand") {
-    const grpId = instanceIdToObject(ann.affectedIds[0]).grpId;
+  if (ann.details.category == "PlayLand") {
+    const grpId = instanceIdToObject(ann.affectedIds[0]).grpId || 0;
     const playerName = getNameBySeat(ann.affectorId);
     actionLog(
       ann.affectorId,
@@ -202,36 +194,42 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
   }
 
   // A player drew a card
-  if (details.category == "Draw") {
-    const zone = globals.currentMatch.zones[details.zone_src];
-    const playerName = getNameBySeat(zone.ownerSeatId);
-    const obj = globals.currentMatch.gameObjs[ann.affectedIds[0]];
-    if (zone.ownerSeatId == globals.currentMatch.player.seat && obj) {
-      const grpId = obj.grpId;
+  if (ann.details.category == "Draw") {
+    const zone = getZone(ann.details.zone_src);
+    const playerName = getNameBySeat(zone.ownerSeatId || 0);
+    const obj = getGameObject(ann.affectedIds[0]);
+    const playerSeat = globalStore.currentMatch.playerSeat;
+    if (zone.ownerSeatId == playerSeat && obj) {
+      const grpId = obj.grpId || 0;
       actionLog(
-        zone.ownerSeatId,
+        zone.ownerSeatId || 0,
         globals.logTime,
         `${playerName} drew ${actionLogGenerateLink(grpId)}`,
         grpId
       );
     } else {
-      actionLog(zone.ownerSeatId, globals.logTime, `${playerName} drew a card`);
+      actionLog(
+        zone.ownerSeatId || 0,
+        globals.logTime,
+        `${playerName} drew a card`
+      );
     }
   }
 
   // A player casts a spell
-  if (details.category == "CastSpell") {
+  if (ann.details.category == "CastSpell") {
     const obj = instanceIdToObject(ann.affectedIds[0]);
-    const grpId = obj.grpId;
-    const seat = obj.ownerSeatId;
+    const grpId = obj.grpId || 0;
+    const seat = obj.ownerSeatId || 0;
     const playerName = getNameBySeat(seat);
+    const turnNumber = globalStore.currentMatch.turnInfo.turnNumber;
 
     const cast = {
       grpId: grpId,
-      turn: globals.currentMatch.turnInfo.turnNumber,
+      turn: turnNumber || 0,
       player: seat
     };
-    globals.currentMatch.cardsCast.push(cast);
+    addCardCast(cast);
 
     actionLog(
       seat,
@@ -242,10 +240,10 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
   }
 
   // A player discards a card
-  if (details.category == "Discard") {
+  if (ann.details.category == "Discard") {
     const obj = instanceIdToObject(ann.affectedIds[0]);
-    const grpId = obj.grpId;
-    const seat = obj.ownerSeatId;
+    const grpId = obj.grpId || 0;
+    const seat = obj.ownerSeatId || 0;
     const playerName = getNameBySeat(seat);
     actionLog(
       seat,
@@ -256,12 +254,12 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
   }
 
   // A player puts a card in a zone
-  if (details.category == "Put") {
-    const zone = globals.currentMatch.zones[details.zone_dest].type;
+  if (ann.details.category == "Put") {
+    const zone = getZone(ann.details.zone_dest).type;
     const obj = instanceIdToObject(ann.affectedIds[0]);
     const grpId = obj.grpId;
     const affector = instanceIdToObject(ann.affectorId);
-    const seat = obj.ownerSeatId;
+    const seat = obj.ownerSeatId || 0;
     let text = getNameBySeat(seat);
     if (affector.type == "GameObjectType_Ability") {
       text = `${actionLogGenerateLink(
@@ -280,8 +278,8 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
   }
 
   // A card is returned to a zone
-  if (details.category == "Return") {
-    const zone = globals.currentMatch.zones[details.zone_dest].type;
+  if (ann.details.category == "Return") {
+    const zone = getZone(ann.details.zone_dest).type;
     const affected = instanceIdToObject(ann.affectedIds[0]);
     const affector = instanceIdToObject(ann.affectorId);
 
@@ -305,7 +303,7 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
   }
 
   // A card was exiled
-  if (details.category == "Exile") {
+  if (ann.details.category == "Exile") {
     const affected = instanceIdToObject(ann.affectedIds[0]);
     const affector = instanceIdToObject(ann.affectorId);
 
@@ -329,12 +327,12 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
   }
 
   // Saw this one when Lava coil exiled a creature (??)
-  if (details.category == "SBA_Damage") {
+  if (ann.details.category == "SBA_Damage") {
     //
   }
 
   // A spell or ability counters something
-  if (details.category == "Countered") {
+  if (ann.details.category == "Countered") {
     const affector = instanceIdToObject(ann.affectorId);
     const affected = instanceIdToObject(ann.affectedIds[0]);
 
@@ -358,19 +356,20 @@ annotationFunctions.AnnotationType_ZoneTransfer = function(
   }
 
   // A spell or ability destroys something
-  if (details.category == "Destroy") {
+  if (ann.details.category == "Destroy") {
     //
   }
 };
 
-annotationFunctions.AnnotationType_AbilityInstanceCreated = function(
-  ann: AnnotationType
-): void {
+const AnnotationType_AbilityInstanceCreated = function(ann: Annotations): void {
+  if (ann.type !== "AnnotationType_AbilityInstanceCreated") return;
+  /*
   const affected = ann.affectedIds[0];
   const affector = instanceIdToObject(ann.affectorId);
 
   if (affector) {
-    globals.currentMatch.gameObjs[affected] = {
+    //currentMatch.gameObjs[affected]
+    const newObj = {
       type: "GameObjectType_Ability",
       instanceId: affected,
       grpId: affector.grpId,
@@ -381,18 +380,18 @@ annotationFunctions.AnnotationType_AbilityInstanceCreated = function(
       objectSourceGrpId: affector.grpId,
       parentId: affector.instanceId
     } as GameObjectTypeAbility;
+    setGameObj(newObj);
   }
+  */
 };
 
-annotationFunctions.AnnotationType_ResolutionStart = function(
-  ann: AnnotationType,
-  details: DetailsType
-): void {
+const AnnotationType_ResolutionStart = function(ann: Annotations): void {
+  if (ann.type !== "AnnotationType_ResolutionStart") return;
   const affected = instanceIdToObject(ann.affectedIds[0]);
-  const grpId = details.grpid;
+  const grpId = ann.details.grpid;
 
   if (affected.type == "GameObjectType_Ability") {
-    affected.grpId = grpId;
+    //affected.grpId = grpId;
     actionLog(
       affected.controllerSeatId,
       globals.logTime,
@@ -404,10 +403,8 @@ annotationFunctions.AnnotationType_ResolutionStart = function(
   }
 };
 
-annotationFunctions.AnnotationType_DamageDealt = function(
-  ann: AnnotationType,
-  details: DetailsType
-): void {
+const AnnotationType_DamageDealt = function(ann: Annotations): void {
+  if (ann.type !== "AnnotationType_DamageDealt") return;
   let recipient = "";
   if (ann.affectedIds[0] < 5) {
     recipient = getNameBySeat(ann.affectedIds[0]);
@@ -417,7 +414,7 @@ annotationFunctions.AnnotationType_DamageDealt = function(
   }
 
   const affector = instanceIdToObject(ann.affectorId);
-  const dmg = details.damage;
+  const dmg = ann.details.damage;
 
   actionLog(
     affector.controllerSeatId,
@@ -429,13 +426,12 @@ annotationFunctions.AnnotationType_DamageDealt = function(
   );
 };
 
-annotationFunctions.AnnotationType_ModifiedLife = function(
-  ann: AnnotationType,
-  details: DetailsType
-): void {
+const AnnotationType_ModifiedLife = function(ann: Annotations): void {
+  if (ann.type !== "AnnotationType_ModifiedLife") return;
+  const players = globalStore.currentMatch.players;
   const affected = ann.affectedIds[0];
-  const total = globals.currentMatch.players[affected].lifeTotal;
-  const lifeStr = details.life > 0 ? "+" + details.life : details.life;
+  const total = players[affected].lifeTotal;
+  const lifeStr = (ann.details.life > 0 ? "+" : "") + ann.details.life;
 
   actionLog(
     affected,
@@ -444,9 +440,8 @@ annotationFunctions.AnnotationType_ModifiedLife = function(
   );
 };
 
-annotationFunctions.AnnotationType_TargetSpec = function(
-  ann: AnnotationType
-): void {
+const AnnotationType_TargetSpec = function(ann: Annotations): void {
+  if (ann.type !== "AnnotationType_TargetSpec") return;
   let target;
   if (ann.affectedIds[0] < 5) {
     target = getNameBySeat(ann.affectedIds[0]);
@@ -469,19 +464,18 @@ annotationFunctions.AnnotationType_TargetSpec = function(
   actionLog(seat, globals.logTime, `${text} targetted ${target}`);
 };
 
-annotationFunctions.AnnotationType_Scry = function(
-  ann: AnnotationType,
-  details: DetailsType
-): void {
+const AnnotationType_Scry = function(ann: Annotations): void {
+  if (ann.type !== "AnnotationType_Scry") return;
   // REVIEW SCRY ANNOTATION
   let affector = ann.affectorId;
   if (affector > 3) {
     affector = instanceIdToObject(affector).ownerSeatId;
   }
+  const playerSeat = globalStore.currentMatch.playerSeat;
   const player = getNameBySeat(affector);
 
-  const top = details.topIds;
-  const bottom = details.bottomIds;
+  const top = ann.details.topIds;
+  const bottom = ann.details.bottomIds;
 
   let newTop: number[] = [];
   let newBottom: number[] = [];
@@ -500,7 +494,8 @@ annotationFunctions.AnnotationType_Scry = function(
     globals.logTime,
     `${player} scry ${scrySize}: ${xtop} top, ${xbottom} bottom`
   );
-  if (affector == globals.currentMatch.player.seat) {
+
+  if (affector == playerSeat) {
     if (xtop > 0) {
       newTop.forEach((instanceId: number) => {
         const grpId = instanceIdToObject(instanceId).grpId;
@@ -526,15 +521,14 @@ annotationFunctions.AnnotationType_Scry = function(
   }
 };
 
-annotationFunctions.AnnotationType_CardRevealed = function(
-  ann: AnnotationType,
-  details: DetailsType
-): void {
-  if (ann.ignoreForSeatIds == globals.currentMatch.player.seat) return;
+const AnnotationType_CardRevealed = function(ann: Annotations): void {
+  const playerSeat = globalStore.currentMatch.playerSeat;
+  if (ann.type !== "AnnotationType_CardRevealed") return;
+  if (!ann.ignoreForSeatIds.includes(playerSeat)) return;
 
   ann.affectedIds.forEach((grpId: number) => {
-    const zone = globals.currentMatch.zones[details.source_zone];
-    const owner = zone.ownerSeatId;
+    const zone = getZone(ann.details.source_zone);
+    const owner = zone.ownerSeatId || 0;
 
     actionLog(
       owner,
@@ -545,20 +539,85 @@ annotationFunctions.AnnotationType_CardRevealed = function(
   });
 };
 
+function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
+  //console.log(type, ann);
+  switch (type) {
+    case "AnnotationType_ObjectIdChanged":
+      AnnotationType_ObjectIdChanged(ann);
+      break;
+    case "AnnotationType_ZoneTransfer":
+      AnnotationType_ZoneTransfer(ann);
+      break;
+    case "AnnotationType_AbilityInstanceCreated":
+      AnnotationType_AbilityInstanceCreated(ann);
+      break;
+    case "AnnotationType_ResolutionStart":
+      AnnotationType_ResolutionStart(ann);
+      break;
+    case "AnnotationType_DamageDealt":
+      AnnotationType_DamageDealt(ann);
+      break;
+    case "AnnotationType_ModifiedLife":
+      AnnotationType_ModifiedLife(ann);
+      break;
+    case "AnnotationType_TargetSpec":
+      AnnotationType_TargetSpec(ann);
+      break;
+    case "AnnotationType_Scry":
+      AnnotationType_Scry(ann);
+      break;
+    case "AnnotationType_CardRevealed":
+      AnnotationType_CardRevealed(ann);
+      break;
+    default:
+      break;
+  }
+}
+
+function processAnnotations(): void {
+  const removeIds = [] as number[];
+  const anns = getAllAnnotations();
+  anns.forEach(ann => {
+    if (ann.id && isAnnotationProcessed(ann.id)) return;
+
+    let details: Partial<DetailsType> = {};
+    if (ann.details) {
+      ann.details.forEach(
+        (detail: KeyValuePairInfo) => (details = keyValuePair(detail, details))
+      );
+    }
+
+    try {
+      ann.type.forEach((type: AnnotationType) => {
+        annotationsSwitch(
+          { ...ann, type: type, details: details } as Annotations,
+          type
+        );
+        // add this annotation to the list of processed
+        removeIds.push(ann.id || 0);
+      });
+    } catch (e) {
+      //console.log(ann, e);
+    }
+  });
+  //console.log(anns.length, removeIds.length);
+  if (removeIds.length > 0) {
+    removeAnnotations(removeIds);
+  }
+}
+
 function getOppUsedCards(): number[] {
   const cardsUsed: number[] = [];
-  Object.keys(globals.currentMatch.zones).forEach(key => {
-    const zone = globals.currentMatch.zones[key];
-    const zoneType = zone.type.trim();
+  const oppSeat = globalStore.currentMatch.oppSeat;
+  Object.keys(globalStore.currentMatch.zones).forEach(key => {
+    const zone = getZone(parseInt(key));
+    const zoneType = (zone.type || "ZoneType_None").trim();
     if (zone.objectInstanceIds && zoneType !== "ZoneType_Limbo") {
       zone.objectInstanceIds.forEach((id: number) => {
         let grpId;
         try {
-          const obj = globals.currentMatch.gameObjs[id];
-          if (
-            obj.ownerSeatId == globals.currentMatch.opponent.seat &&
-            isObjectACard(obj)
-          ) {
+          const obj = getGameObject(id);
+          if (obj.ownerSeatId == oppSeat && isObjectACard(obj)) {
             grpId = obj.grpId;
             // console.log(zone.type, db.card(grpId).name, obj);
             if (grpId !== FACE_DOWN_CARD) cardsUsed.push(grpId);
@@ -572,19 +631,20 @@ function getOppUsedCards(): number[] {
   return cardsUsed;
 }
 
+/*
 function onlyUnique(value: string, index: number, self: string[]): boolean {
   return self.indexOf(value) === index;
 }
 
 function getCardsTypeZone(): ZoneData {
   const data: ZoneData = {};
-  Object.keys(globals.currentMatch.zones).forEach(key => {
-    const zone = globals.currentMatch.zones[key];
+  Object.keys(globalStore.currentMatch.zones).forEach(key => {
+    const zone = getZone(key);
     const zoneType = zone.type;
     if (zone.objectInstanceIds) {
       zone.objectInstanceIds.forEach((id: number) => {
         try {
-          const obj = globals.currentMatch.gameObjs[id] as GameObject;
+          const obj = getGameObject(id);
           if (
             (obj.type == "GameObjectType_Card" ||
               obj.type == "GameObjectType_SplitCard") &&
@@ -613,12 +673,14 @@ function getCardsTypeZone(): ZoneData {
 
   return data;
 }
+*/
 
 function getPlayerUsedCards(): number[] {
   const cardsUsed: number[] = [];
-  Object.keys(globals.currentMatch.zones).forEach(key => {
-    const zone = globals.currentMatch.zones[key];
-    const zoneType = zone.type.trim();
+  const playerSeat = globalStore.currentMatch.playerSeat;
+  Object.keys(globalStore.currentMatch.zones).forEach(key => {
+    const zone = getZone(parseInt(key));
+    const zoneType = (zone.type || "ZoneType_None").trim();
     const ignoreZones = [
       "ZoneType_Limbo",
       "ZoneType_Library",
@@ -629,10 +691,11 @@ function getPlayerUsedCards(): number[] {
       zone.objectInstanceIds.forEach((id: number) => {
         let grpId;
         try {
-          const obj = globals.currentMatch.gameObjs[id];
+          const obj = getGameObject(id);
           if (
-            obj.ownerSeatId == globals.currentMatch.player.seat &&
-            isObjectACard(obj)
+            obj.ownerSeatId == playerSeat &&
+            isObjectACard(obj) &&
+            obj.grpId
           ) {
             grpId = obj.grpId;
             // console.log(zone.type, db.card(grpId).name, obj);
@@ -647,68 +710,10 @@ function getPlayerUsedCards(): number[] {
 
   return cardsUsed;
 }
-
-const GREMessages: { [key: string]: (msg: GreMessage) => void } = {};
-
-// Used for debug only.
-export function processAll(): void {
-  for (let i = 0; i < globals.currentMatch.latestMessage; i++) {
-    const message = globals.currentMatch.GREtoClient[i];
-    if (message) {
-      const fn = GREMessages[message.type];
-      if (typeof fn == "function") {
-        console.log(`Process: ${message.type} (${message.msgId})`);
-        fn(message);
-      }
-    }
-  }
-  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
-  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
-  globals.currentMatch.oppCardsUsed = getOppUsedCards();
-}
-
-export function GREMessageByID(msgId: number, time: Date): void {
-  const message = globals.currentMatch.GREtoClient[msgId];
-  globals.logTime = time;
-
-  const fn = GREMessages[message.type];
-  if (typeof fn == "function") {
-    fn(message);
-  }
-
-  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
-  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
-  globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
-    getOppUsedCards()
-  );
-}
-
-export function GREMessage(message: GreMessage, time: Date): void {
-  globals.currentMatch.GREtoClient[message.msgId] = message;
-  globals.logTime = time;
-
-  const fn = GREMessages[message.type];
-  if (typeof fn == "function") {
-    fn(message);
-  }
-
-  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
-  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
-  globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
-    getOppUsedCards()
-  );
-}
-
-// Some game state messages are sent as queued
-GREMessages.GREMessageType_QueuedGameStateMessage = function(
-  msg: GreMessage
-): void {
-  GREMessages.GREMessageType_GameStateMessage(msg);
-};
-
-GREMessages.GREMessageType_ConnectResp = function(msg: GreMessage): void {
+/*
+const GREMessageType_ConnectResp = (msg: GREToClientMessage): void => {
   if (
-    msg.connectResp?.deckMessage.deckCards &&
+    msg.connectResp?.deckMessage?.deckCards &&
     globals.currentMatch.player.originalDeck == null
   ) {
     const deck = new Deck(undefined, msg.connectResp.deckMessage.deckCards);
@@ -717,23 +722,24 @@ GREMessages.GREMessageType_ConnectResp = function(msg: GreMessage): void {
     globals.currentMatch.playerCardsLeft = deck.clone();
   }
 };
-
-const defaultZone = {
+*/
+const defaultZone: ZoneInfo = {
   zoneId: 0,
-  type: "",
-  visibility: "",
+  type: "ZoneType_None",
+  visibility: "Visibility_None",
   ownerSeatId: 0,
   objectInstanceIds: [],
   viewers: []
 };
 
-function checkForStartingLibrary(): boolean {
-  let zoneHand: ZoneType = defaultZone;
-  let zoneLibrary: ZoneType = defaultZone;
+function checkForStartingLibrary(gameState?: GameStateMessage): boolean {
+  const currentMatch = globalStore.currentMatch;
+  let zoneHand: ZoneInfo = defaultZone;
+  let zoneLibrary: ZoneInfo = defaultZone;
 
-  Object.keys(globals.currentMatch.zones).forEach(key => {
-    const zone = globals.currentMatch.zones[key];
-    if (zone.ownerSeatId == globals.currentMatch.player.seat) {
+  Object.keys(currentMatch.zones).forEach(key => {
+    const zone = getZone(parseInt(key));
+    if (zone.ownerSeatId == currentMatch.playerSeat) {
       if (zone.type == "ZoneType_Hand") {
         zoneHand = zone;
       }
@@ -743,13 +749,30 @@ function checkForStartingLibrary(): boolean {
     }
   });
 
-  // Probably just escape valves?
-  if (globals.currentMatch.gameStage !== "GameStage_Start") return false;
-  if (zoneHand.type == "") return false;
-  if (zoneLibrary.type == "") return false;
-
+  if (zoneHand.type == "ZoneType_None") return false;
+  if (zoneLibrary.type == "ZoneType_None") return false;
   const hand = zoneHand.objectInstanceIds || [];
   const library = zoneLibrary.objectInstanceIds || [];
+
+  // Try to get the mulligans
+  // Get from the current gameState msg
+  gameState?.players?.forEach((player: PlayerInfo) => {
+    if (
+      player.controllerSeatId == currentMatch.playerSeat &&
+      player.pendingMessageType == "ClientMessageType_MulliganResp"
+    ) {
+      const mull = player.mulliganCount || 0;
+      // If this is the first hand drawn or we made a mulligan
+      if (mull > 0 || currentMatch.handsDrawn.length == 0) {
+        const drawn = hand.map(n => getGameObject(n).grpId);
+        setHandDrawn(mull, drawn);
+        console.log("Mulligan: " + mull, drawn);
+      }
+    }
+  });
+
+  if (currentMatch.gameInfo.stage !== "GameStage_Start") return false;
+
   // Check that a post-mulligan scry hasn't been done
   if (library.length == 0 || library[library.length - 1] < library[0]) {
     return false;
@@ -757,64 +780,40 @@ function checkForStartingLibrary(): boolean {
 
   if (
     hand.length + library.length ==
-    globals.currentDeck.getMainboard().count()
+    globalStore.currentMatch.currentDeck.getMainboard().count()
   ) {
     if (hand.length >= 2 && hand[0] == hand[1] + 1) hand.reverse();
-    globals.initialLibraryInstanceIds = [...hand, ...library];
+    setInitialLibraryInstanceIds([...hand, ...library]);
   }
 
   return true;
 }
 
-function checkGameInfo(gameInfo: GameInfo): void {
-  //console.log(`>> GameStage: ${gameInfo.stage} (${globals.currentMatch.gameStage})`);
-  //actionLog(-1, globals.logTime, `>> GameStage: ${gameInfo.stage} (${globals.currentMatch.gameStage})`);
-  globals.currentMatch.gameStage = gameInfo.stage;
-  globals.currentMatch.game = gameInfo.gameNumber;
-
-  if (gameInfo.matchWinCondition) {
-    if (gameInfo.matchWinCondition == "MatchWinCondition_SingleElimination") {
-      globals.currentMatch.bestOf = 1;
-    } else if (gameInfo.matchWinCondition == "MatchWinCondition_Best2of3") {
-      globals.currentMatch.bestOf = 3;
-    } else {
-      globals.currentMatch.bestOf = 0;
-    }
-  }
-
-  if (gameInfo.results) {
-    globals.currentMatch.results = objectClone(gameInfo.results);
-  }
-
-  if (gameInfo.stage == "GameStage_GameOver") {
-    getMatchGameStats();
-  }
-}
-
 function checkTurnDiff(turnInfo: TurnInfo): void {
+  const currentMatch = globalStore.currentMatch;
+  const gameNumber = currentMatch.gameInfo.gameNumber || 0;
+  const currentTurnInfo = currentMatch.turnInfo;
+  const currentPriority = currentMatch.currentPriority;
   if (
     turnInfo.turnNumber &&
     turnInfo.turnNumber == 1 &&
     turnInfo.activePlayer &&
-    globals.currentMatch.game == 1
+    gameNumber == 1
   ) {
-    globals.currentMatch.onThePlay = turnInfo.activePlayer;
+    setOnThePlay(turnInfo.activePlayer);
   }
-  if (globals.currentMatch.turnInfo.turnNumber !== turnInfo.turnNumber) {
-    if (
-      turnInfo.priorityPlayer !== globals.currentMatch.turnInfo.currentPriority
-    ) {
-      changePriority(
-        turnInfo.priorityPlayer,
-        globals.currentMatch.turnInfo.currentPriority,
-        globals.logTime
-      );
-    }
-
+  if (turnInfo.priorityPlayer !== currentPriority) {
+    changePriority(
+      turnInfo.priorityPlayer || 0,
+      currentPriority,
+      globals.logTime.getTime()
+    );
+  }
+  if (currentTurnInfo.turnNumber !== turnInfo.turnNumber) {
     actionLog(
       -1,
       globals.logTime,
-      getNameBySeat(turnInfo.activePlayer) +
+      getNameBySeat(turnInfo.activePlayer || 0) +
         "'s turn begin. (#" +
         turnInfo.turnNumber +
         ")"
@@ -825,7 +824,7 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
     ipcSend(
       "set_turn",
       {
-        playerSeat: globals.currentMatch.player.seat,
+        playerSeat: currentMatch.playerSeat,
         turnPhase: turnInfo.phase,
         turnStep: turnInfo.step,
         turnNumber: turnInfo.turnNumber,
@@ -838,87 +837,83 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
   }
 }
 
-GREMessages.GREMessageType_GameStateMessage = function(msg: GreMessage): void {
+const GREMessageType_GameStateMessage = (msg: GREToClientMessage): void => {
+  const currentMatch = globalStore.currentMatch;
   if (
-    !globals.currentMatch.msgId ||
-    msg.msgId === 1 ||
-    msg.msgId < globals.currentMatch.msgId
+    msg.msgId &&
+    (!currentMatch.msgId || msg.msgId === 1 || msg.msgId < currentMatch.msgId)
   ) {
     // New game, reset per-game fields.
-    globals.currentMatch.gameStage = "GameStage_Start";
-    globals.currentMatch.opponent.cards = globals.currentMatch.oppCardsUsed;
-    globals.currentMatch.processedAnnotations = [];
-    globals.currentMatch.timers = {};
-    globals.currentMatch.zones = {};
-    globals.currentMatch.players = {};
-    globals.currentMatch.annotations = [];
-    globals.currentMatch.gameObjs = {};
-    globals.currentMatch.gameInfo;
-    globals.currentMatch.turnInfo;
-    globals.currentMatch.playerCardsUsed = [];
-    globals.currentMatch.oppCardsUsed = [];
-    globals.initialLibraryInstanceIds = [];
-    globals.cardTypesByZone = [];
-    globals.idChanges = {};
-    globals.instanceToCardIdMap = {};
+    resetCurrentGame();
+    setGameBeginTime(globals.logTime);
   }
   if (msg.msgId) {
-    globals.currentMatch.msgId = msg.msgId;
+    setCurrentMatchMany({ msgId: msg.msgId });
   }
 
   const gameState = msg.gameStateMessage;
+  if (gameState) {
+    //(gameState) {
+    if (gameState.gameInfo) {
+      setGameInfo(gameState.gameInfo);
+      if (gameState.gameInfo.matchID) {
+        setMatchId(
+          gameState.gameInfo.matchID +
+            "-" +
+            globals.store.getState().playerdata.arenaId
+        );
+      }
+      if (gameState.gameInfo.stage == "GameStage_GameOver") {
+        getMatchGameStats();
+      }
+    }
 
-  if (gameState.gameInfo) {
-    checkGameInfo(gameState.gameInfo);
-    globals.currentMatch.gameInfo = gameState.gameInfo;
-  }
+    if (gameState.turnInfo) {
+      checkTurnDiff(gameState.turnInfo);
+      setTurnInfo(gameState.turnInfo);
+    }
+    /*
+    // Not used yet
+    // Im not sure how but we should be able to see player
+    // timeouts and stuff like that using this.
+    if (gameState.timers) {
+      gameState.timers.forEach(timer => {
+        globals.currentMatch.timers[timer.timerId] = timer;
+      });
+    }
+    */
+    if (gameState.zones) {
+      setManyZones(gameState.zones);
+    }
 
-  if (gameState.turnInfo) {
-    checkTurnDiff(gameState.turnInfo);
-    globals.currentMatch.turnInfo = gameState.turnInfo;
-  }
+    if (gameState.players) {
+      setPlayers(gameState.players);
+    }
 
-  if (gameState.timers) {
-    gameState.timers.forEach(timer => {
-      globals.currentMatch.timers[timer.timerId] = timer;
-    });
-  }
+    if (gameState.gameObjects) {
+      setManyGameObjects(gameState.gameObjects);
+    }
 
-  if (gameState.zones) {
-    gameState.zones.forEach(zone => {
-      globals.currentMatch.zones[zone.zoneId] = zone;
-    });
-  }
-
-  if (gameState.players) {
-    gameState.players.forEach(player => {
-      globals.currentMatch.players[player.controllerSeatId] = player;
-    });
-  }
-
-  if (gameState.gameObjects) {
-    gameState.gameObjects.forEach((obj: GameObject) => {
-      globals.currentMatch.gameObjs[obj.instanceId] = obj;
-      globals.instanceToCardIdMap[obj.instanceId] = obj.grpId;
-    });
-  }
-
-  if (gameState.annotations) {
-    gameState.annotations.forEach((annotation: AnnotationType) => {
-      globals.currentMatch.annotations[annotation.id] = annotation;
-    });
+    if (gameState.annotations) {
+      setManyAnnotations(gameState.annotations);
+    }
   }
 
   processAnnotations();
-  removeProcessedAnnotations();
-  checkForStartingLibrary();
+  checkForStartingLibrary(gameState);
 
-  globals.currentMatch.playerCardsLeft = globals.currentMatch.player.deck.clone();
   forceDeckUpdate();
   updateDeck(false);
 };
 
-GREMessages.GREMessageType_DieRollResultsResp = function(msg): void {
+// Some game state messages are sent as queued
+const GREMessageType_QueuedGameStateMessage = (
+  msg: GREToClientMessage
+): void => {
+  GREMessageType_GameStateMessage(msg);
+};
+
+const GREMessageType_DieRollResultsResp = (msg: GREToClientMessage): void => {
   if (msg.dieRollResultsResp) {
     const highest = msg.dieRollResultsResp.playerDieRolls.reduce((a, b) => {
       if ((a.rollValue ?? 0) > (b.rollValue ?? 0)) {
@@ -927,6 +922,87 @@ GREMessages.GREMessageType_DieRollResultsResp = function(msg): void {
         return b;
       }
     });
-    globals.currentMatch.onThePlay = highest.systemSeatId;
+    setOnThePlay(highest.systemSeatId || 0);
   }
 };
+
+const GREMessageType_IntermissionReq = (msg: GREToClientMessage): void => {
+  if (msg.intermissionReq?.result) {
+    const result = msg.intermissionReq?.result;
+    setGameWinner(result.winningTeamId || 0);
+    const winnerName = getNameBySeat(result.winningTeamId || 0);
+    const loserName = getNameBySeat(result.winningTeamId == 2 ? 1 : 2);
+
+    if (result.reason == "ResultReason_Concede") {
+      actionLog(-1, globals.logTime, `${loserName} conceded.`);
+    } else if (result.reason == "ResultReason_Timeout") {
+      actionLog(-1, globals.logTime, `${loserName} timed out.`);
+    }
+    actionLog(-1, globals.logTime, `${winnerName} wins!`);
+  }
+  getMatchGameStats();
+};
+
+function GREMessagesSwitch(
+  message: GREToClientMessage,
+  type: GREMessageType | undefined
+): void {
+  //console.log(`Process: ${message.type} (${message.msgId})`);
+  switch (type) {
+    case "GREMessageType_QueuedGameStateMessage":
+      GREMessageType_QueuedGameStateMessage(message);
+      break;
+    //case "GREMessageType_ConnectResp":
+    //  GREMessageType_ConnectResp(message);
+    //  break;
+    case "GREMessageType_GameStateMessage":
+      GREMessageType_GameStateMessage(message);
+      break;
+    case "GREMessageType_DieRollResultsResp":
+      GREMessageType_DieRollResultsResp(message);
+      break;
+    case "GREMessageType_IntermissionReq":
+      GREMessageType_IntermissionReq(message);
+      break;
+  }
+}
+
+// Used for debug only.
+/*
+export function processAll(): void {
+  for (let i = 0; i < globals.currentMatch.latestMessage; i++) {
+    const message = globals.currentMatch.GREtoClient[i];
+    if (message) {
+      GREMessagesSwitch(message, message.type);
+    }
+  }
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
+  globals.currentMatch.oppCardsUsed = getOppUsedCards();
+}
+
+export function GREMessageByID(msgId: number, time: Date): void {
+  const message = globals.currentMatch.GREtoClient[msgId];
+  globals.logTime = time;
+
+  GREMessagesSwitch(message, message.type);
+
+  globals.currentMatch.playerCardsUsed = getPlayerUsedCards();
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  globals.currentMatch.oppCardsUsed = globals.currentMatch.opponent.cards.concat(
+    getOppUsedCards()
+  );
+}
+*/
+
+export function GREMessage(message: GREToClientMessage, time: Date): void {
+  //globals.currentMatch.GREtoClient[message.msgId || 0] = message;
+  globals.logTime = time;
+
+  GREMessagesSwitch(message, message.type);
+
+  //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
+  setPlayerCardsUsed(getPlayerUsedCards());
+  setOppCardsUsed(getOppUsedCards());
+  //globals.currentMatch.opponent.cards.concat(getOppUsedCards())
+}

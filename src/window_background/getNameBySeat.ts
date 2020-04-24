@@ -1,4 +1,5 @@
 import globals from "./globals";
+import globalStore from "../shared-store";
 
 const suffixLength = "#12345".length;
 
@@ -8,13 +9,14 @@ function getPlayerNameWithoutSuffix(playerName: string): string {
 
 // Get player name by seat in the game
 const getNameBySeat = function(seat: number): string {
+  const currentMatch = globalStore.currentMatch;
   try {
-    if (seat === globals.currentMatch.player.seat) {
+    if (seat === currentMatch.playerSeat) {
       const playerData = globals.store.getState().playerdata;
       return getPlayerNameWithoutSuffix(playerData.playerName);
     }
 
-    let oppName = globals.currentMatch.opponent.name;
+    const oppName = currentMatch.opponent.name;
     if (!oppName) {
       return "Opponent";
     }

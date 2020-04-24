@@ -1,8 +1,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import globals from "../globals";
 import LogEntry from "../../types/logDecoder";
-import processMatch from "../processMatch";
+import actionLog from "../actionLog";
 import { ipcSend } from "../backgroundUtil";
+import { ARENA_MODE_MATCH } from "../../shared/constants";
+
+import {
+  setEventId,
+  setPlayer,
+  setOpponent,
+  resetCurrentMatch
+} from "../../shared-store/currentMatchStore";
 
 export interface EntryJson {
   controllerFabricUri: string;
@@ -46,6 +54,30 @@ export default function EventMatchCreated(entry: Entry): void {
 
   ipcSend("ipc_log", "MATCH CREATED: " + matchBeginTime);
   if (json.eventId != "NPE") {
-    processMatch(json, matchBeginTime);
+    actionLog(-99, globals.logTime, "");
+    resetCurrentMatch();
+
+    if (globals.debugLog || !globals.firstPass) {
+      ipcSend("set_arena_state", ARENA_MODE_MATCH);
+    }
+
+    ipcSend("ipc_log", "vs " + json.opponentScreenName);
+
+    const opponent = {
+      tier: json.opponentRankingTier,
+      name: json.opponentScreenName + "#00000",
+      rank: json.opponentRankingClass,
+      percentile: json.opponentMythicPercentile,
+      leaderboardPlace: json.opponentMythicLeaderboardPlace,
+      commanderGrpIds: json.opponentCommanderGrpIds
+    };
+    setOpponent(opponent);
+
+    const player = {
+      commanderGrpIds: json.commanderGrpIds
+    };
+    setPlayer(player);
+
+    setEventId(json.eventId);
   }
 }

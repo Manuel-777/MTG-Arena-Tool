@@ -1,4 +1,3 @@
-export { default as OutLogInfo } from "./OutLogInfo";
 export { default as GreToClient } from "./GreToClient";
 export { default as ClientToMatchServiceMessageTypeClientToGREMessage } from "./ClientToMatchServiceMessageTypeClientToGREMessage";
 export { default as InEventGetPlayerCourseV2 } from "./InEventGetPlayerCourseV2";

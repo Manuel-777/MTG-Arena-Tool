@@ -1,30 +1,35 @@
 import _ from "lodash";
 import db from "../shared/database";
-import globals from "./globals";
 import { MatchGameStats } from "../types/currentMatch";
 import { getDeckChanges } from "./getDeckChanges";
+import globalStore from "../shared-store";
+import { setMatchGameStats } from "../shared-store/currentMatchStore";
 
 export default function getMatchGameStats(): void {
-  globals.currentMatch.opponent.cards = globals.currentMatch.oppCardsUsed;
+  // This function should be able to be called multiple times, and not
+  // modify state. So every time its called the result should be the same
+  const currentMatch = globalStore.currentMatch;
 
+  const players = currentMatch.players.map(
+    player => player.systemSeatNumber || 0
+  );
+  // Calculate time of this game
+  const time = players.reduce((acc, cur) => {
+    return acc + currentMatch.priorityTimers.timers[cur];
+  }, 0);
   // Get current number of games completed
-  const gameNumberCompleted = globals.currentMatch.results.filter(
+  const gameNumberCompleted = currentMatch.gameInfo.results.filter(
     res => res.scope == "MatchScope_Game"
   ).length;
 
-  // get winner of the game
-  const winningTeamId =
-    globals.currentMatch.results.filter(
-      res => res.scope == "MatchScope_Match"
-    )[0]?.winningTeamId || -1;
-
   const game: MatchGameStats = {
-    time: 0,
-    winner: winningTeamId,
-    win: winningTeamId == globals.currentMatch.player.seat,
+    time: Math.round(time / 1000),
+    onThePlay: currentMatch.onThePlay,
+    winner: currentMatch.gameWinner,
+    win: currentMatch.gameWinner == currentMatch.playerSeat,
     shuffledOrder: [],
     // defaults
-    handsDrawn: [],
+    handsDrawn: currentMatch.handsDrawn,
     handLands: [],
     cardsCast: [],
     deckSize: 0,
@@ -51,37 +56,32 @@ export default function getMatchGameStats(): void {
     }
   };
 
-  for (let i = 0; i < globals.initialLibraryInstanceIds.length; i++) {
-    let instance = globals.initialLibraryInstanceIds[i];
+  for (let i = 0; i < currentMatch.initialLibraryInstanceIds.length; i++) {
+    let instance = currentMatch.initialLibraryInstanceIds[i];
     while (
-      (!globals.instanceToCardIdMap[instance] ||
-        !db.card(globals.instanceToCardIdMap[instance])) &&
-      globals.idChanges[instance]
+      (!currentMatch.instanceToCardIdMap[instance] ||
+        !db.card(currentMatch.instanceToCardIdMap[instance])) &&
+      currentMatch.idChanges[instance]
     ) {
-      instance = globals.idChanges[instance];
+      instance = currentMatch.idChanges[instance];
     }
-    const cardId = globals.instanceToCardIdMap[instance];
+    const cardId = currentMatch.instanceToCardIdMap[instance];
     if (db.card(cardId) !== undefined) {
       game.shuffledOrder.push(cardId);
     } else {
       break;
     }
   }
-  /*
-  game.handsDrawn = payload.mulliganedHands.map(hand =>
-    hand.map(card => card.grpId)
-  );
-  */
-  game.handsDrawn.push(game.shuffledOrder.slice(0, 7));
 
   if (gameNumberCompleted > 1) {
-    const originalDeck = globals.currentMatch.player.originalDeck.clone();
-    const newDeck = globals.currentMatch.player.deck.clone();
+    const originalDeck = globalStore.currentMatch.originalDeck.clone();
+    const newDeck = globalStore.currentMatch.currentDeck.clone();
     const sideboardChanges = getDeckChanges(
       newDeck,
       originalDeck,
-      globals.matchGameStats
+      currentMatch.matchGameStats.slice(0, gameNumberCompleted - 1)
     );
+    //console.log("Sideboard: " + gameNumberCompleted, currentMatch.gameInfo.results, newDeck.getSideboard(), originalDeck.getSideboard(), sideboardChanges);
     game.sideboardChanges = sideboardChanges;
     game.deck = newDeck.clone().getSave(true);
   }
@@ -98,7 +98,7 @@ export default function getMatchGameStats(): void {
     "4": {}
   };
   const cardCounts: { [key: string]: number } = {};
-  globals.currentMatch.player.deck
+  globalStore.currentMatch.currentDeck
     .getMainboard()
     .get()
     .forEach(card => {
@@ -133,8 +133,7 @@ export default function getMatchGameStats(): void {
     landsInDeck - game.handLands[game.handLands.length - 1];
   const librarySize = deckSize - handSize;
 
-  game.cardsCast = _.cloneDeep(globals.currentMatch.cardsCast);
-  globals.currentMatch.cardsCast = [];
+  game.cardsCast = _.cloneDeep(currentMatch.cardsCast);
   game.deckSize = deckSize;
   game.landsInDeck = landsInDeck;
   game.multiCardPositions = multiCardPositions;
@@ -142,11 +141,5 @@ export default function getMatchGameStats(): void {
   game.landsInLibrary = landsInLibrary;
   game.libraryLands = libraryLands;
 
-  globals.matchGameStats[gameNumberCompleted - 1] = game;
-  /*
-  globals.currentMatch.matchTime = globals.matchGameStats.reduce(
-    (acc, cur) => acc + cur.time,
-    0
-  );
-  */
+  setMatchGameStats(gameNumberCompleted - 1, game);
 }

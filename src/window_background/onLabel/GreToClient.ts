@@ -2,14 +2,14 @@ import globals from "../globals";
 import LogEntry from "../../types/logDecoder";
 import * as greToClientInterpreter from "../greToClientInterpreter";
 import { parseLogTimestamp } from "../backgroundUtil";
-import { GreMessage } from "../../types/greInterpreter";
+import { GREToClientMessage } from "../../proto/GreTypes";
 
 // timestamp example : "637130091622772767"
 interface EntryJson {
   transactionId: string;
   timestamp: string;
   greToClientEvent: {
-    greToClientMessages: GreMessage[];
+    greToClientMessages: GREToClientMessage[];
   };
 }
 

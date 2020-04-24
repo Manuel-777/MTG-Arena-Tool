@@ -5,7 +5,7 @@ import { RankUpdate } from "../../types/rank";
 import { SeasonalRankData } from "../../types/Season";
 import { IPC_RENDERER } from "../../shared/constants";
 import { reduxAction } from "../../shared-redux/sharedRedux";
-import { seasonalList } from "../../shared-store";
+import globalStore, { seasonalList } from "../../shared-store";
 
 interface Entry extends LogEntry {
   json: () => RankUpdate;
@@ -27,8 +27,8 @@ export default function RankUpdated(entry: Entry): void {
     id: entry.hash,
     //date: globals.logTime.toISOString(),
     timestamp: globals.logTime.getTime(),
-    lastMatchId: globals.currentMatch.matchId,
-    eventId: globals.currentMatch.eventId
+    lastMatchId: globalStore.currentMatch.matchId,
+    eventId: globalStore.currentMatch.eventId
   };
 
   // newJson.wasLossProtected

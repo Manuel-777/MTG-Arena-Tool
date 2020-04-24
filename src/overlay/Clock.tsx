@@ -80,7 +80,8 @@ export default function Clock(props: ClockProps): JSX.Element {
 
   // Clock Mode BOTH
   const lastDurationInSec = Math.floor(
-    (now.getTime() - new Date(priorityTimers.date).getTime()) / 1000
+    // Eh, not sure about this one
+    (now.getTime() - new Date(priorityTimers.last).getTime()) / 1000
   );
   let duration1 = Math.floor(priorityTimers.timers[1] / 1000);
   if (turnPriority === 1 && duration1 > 0) {

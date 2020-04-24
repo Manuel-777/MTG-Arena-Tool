@@ -3,7 +3,7 @@
 import electron from "electron";
 import async from "async";
 
-import { makeId } from "../shared/util";
+import { makeId, isEpochTimestamp } from "../shared/util";
 import db from "../shared/database";
 import { playerDb } from "../shared/db/LocalDatabase";
 
@@ -84,6 +84,7 @@ function syncUserData(data: any): void {
       const id = doc._id;
       doc.id = id;
       delete doc._id;
+      if (isEpochTimestamp(doc.date)) doc.date *= 1000;
       playerDb.upsert("", id, doc);
       courses_index.push(id);
       return doc;
