@@ -14,6 +14,8 @@ export default function setSeasonalRankFromCombinedRank(
   const currentMatch = globalStore.currentMatch;
   const owner = globals.store.getState().appsettings.email;
 
+  if (currentMatch.matchId == "") return;
+
   // get these from current match
   const type =
     currentMatch.gameInfo.superFormat == "SuperFormat_Constructed"
@@ -53,6 +55,6 @@ export default function setSeasonalRankFromCombinedRank(
   reduxAction(globals.store.dispatch, "SET_SEASONAL", newJson, IPC_RENDERER);
   playerDb.upsert("", "seasonal_rank", newSeasonal);
 
-  const httpApi = require("../httpApi");
+  const httpApi = require("./httpApi");
   httpApi.httpSetSeasonal(newJson);
 }

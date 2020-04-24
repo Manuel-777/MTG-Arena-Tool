@@ -4,7 +4,6 @@ import { InternalRank } from "../../types/rank";
 import { reduxAction } from "../../shared-redux/sharedRedux";
 import globals from "../globals";
 import { IPC_RENDERER } from "../../shared/constants";
-import { SeasonalRankData } from "../../types/Season";
 import setSeasonalRankFromCombinedRank from "../setSeasonalRankFromCombinedRank";
 
 interface EntryJson {
