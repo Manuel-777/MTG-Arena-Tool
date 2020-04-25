@@ -35,6 +35,7 @@ const forceDeckUpdate = function(removeUsed = true): void {
   let typeLan = 0;
   const currentMatch = globalStore.currentMatch;
   const playerCardsUsed = currentMatch.player.cardsUsed;
+  const playerCardsBottom = currentMatch.cardsBottom;
   const playerCardsLeft = globalStore.currentMatch.currentDeck.clone();
 
   if (globals.debugLog || !globals.firstPass) {
@@ -53,6 +54,12 @@ const forceDeckUpdate = function(removeUsed = true): void {
         playerCardsLeft.getMainboard().remove(grpId, 1);
       });
     }
+    // Remove cards that were put on the bottom
+    playerCardsBottom.forEach((grpId: number) => {
+      playerCardsLeft.getMainboard().remove(grpId, 1);
+    });
+    cardsleft -= playerCardsBottom.length;
+
     const main = playerCardsLeft.getMainboard();
     //main.addProperty("chance", card =>
     main.addChance((card: CardObject) =>

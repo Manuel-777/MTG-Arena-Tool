@@ -51,7 +51,8 @@ import {
   resetCurrentGame,
   setHandDrawn,
   setGameBeginTime,
-  setGameWinner
+  setGameWinner,
+  setCardsBottom
 } from "../shared-store/currentMatchStore";
 
 function changePriority(previous: number, current: number, time: number): void {
@@ -71,6 +72,20 @@ function getGameObject(id: number): GameObject {
 
 function getZone(id: number): ZoneInfo {
   return globalStore.currentMatch.zones[id];
+}
+
+function getZoneByType(
+  type: ZoneInfo["type"],
+  seat: number
+): ZoneInfo | undefined {
+  const currentMatch = globalStore.currentMatch;
+  let ret = undefined;
+  Object.values(currentMatch.zones).forEach(zone => {
+    if (zone.type == type && zone.ownerSeatId == seat) {
+      ret = zone;
+    }
+  });
+  return ret;
 }
 
 function getAllAnnotations(): AnnotationInfo[] {
@@ -1004,5 +1019,25 @@ export function GREMessage(message: GREToClientMessage, time: Date): void {
   //globals.currentMatch.cardTypesByZone = getCardsTypeZone();
   setPlayerCardsUsed(getPlayerUsedCards());
   setOppCardsUsed(getOppUsedCards());
+
+  const zoneLibrary = getZoneByType(
+    "ZoneType_Library",
+    globalStore.currentMatch.playerSeat
+  );
+  if (zoneLibrary) {
+    const iids = zoneLibrary.objectInstanceIds;
+    let i = iids.length - 1;
+    const onBottom = [];
+    while (i > 0) {
+      const instance = getGameObject(iids[i])?.grpId;
+      if (instance) {
+        onBottom.push(instance);
+        i--;
+      } else {
+        i = 0;
+      }
+    }
+    setCardsBottom(onBottom);
+  }
   //globals.currentMatch.opponent.cards.concat(getOppUsedCards())
 }
