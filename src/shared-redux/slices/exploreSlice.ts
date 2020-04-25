@@ -55,6 +55,9 @@ const exploreSlice = createSlice({
         state.data = action.payload;
       } else if (action.payload.results_number === 0) {
         // query has no future results
+        if (!isSubsequentResult) {
+          state.data = action.payload;
+        }
         state.data.results_number = -1;
       } else {
         state.data = action.payload;

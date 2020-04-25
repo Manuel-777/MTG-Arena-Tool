@@ -83,6 +83,7 @@ export function setOppCardsUsed(arg: number[]): void {
 
 export function resetCurrentMatch(): void {
   Object.assign(globalStore.currentMatch, matchStateObject);
+  globalStore.currentMatch.matchGameStats = [];
 }
 
 export function resetCurrentGame(): void {
@@ -91,7 +92,10 @@ export function resetCurrentGame(): void {
     turnInfo: {},
     gameInfo: {},
     players: [],
-    priorityTimers: matchStateObject.priorityTimers,
+    priorityTimers: {
+      last: 0,
+      timers: [0, 0, 0, 0, 0]
+    },
     currentPriority: 0,
     zones: {},
     annotations: {},

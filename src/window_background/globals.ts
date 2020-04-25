@@ -1,7 +1,5 @@
 /* eslint-disable prefer-const */
-import Deck from "../shared/deck";
 import { ZoneData } from "../types/greInterpreter";
-import { MatchGameStats } from "../types/currentMatch";
 import { InternalDraft } from "../types/draft";
 import store from "../shared-redux/stores/backgroundStore";
 

@@ -218,6 +218,22 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
     [filters, activeEvents]
   );
 
+  const getFirstEvent = useCallback(
+    (filter: string): string => {
+      let ret = "%%";
+      let i = 0;
+      while (ret.startsWith("%%")) {
+        ret = getFilterEvents({
+          ...filters,
+          filterType: filter
+        })[i];
+        i++;
+      }
+      return ret;
+    },
+    [filters, getFilterEvents]
+  );
+
   return (
     <div className="explore_buttons_container">
       <div className="explore_buttons_row explore_buttons_top">
@@ -228,10 +244,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
             updateFilters({
               ...filters,
               filterType: filter,
-              filterEvent: getFilterEvents({
-                ...filters,
-                filterType: filter
-              })[0]
+              filterEvent: getFirstEvent(filter)
             })
           }
         />

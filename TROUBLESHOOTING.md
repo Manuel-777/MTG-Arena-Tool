@@ -13,7 +13,6 @@ Refer to this issue, the solution is in the comments:
 ### "No log file found" error or "Output log contains no user data"
 
 Close MTG Arena (MTGA) and Mtgatool, then start MTGA. Once MTGA is loaded run Mtgatool again.
->>>>>>> master
 
 If that does not work, go to `%APPDATA%/mtg-arena-tool/` and delete `settings.json`, then load Mtgatool again.
 You might be asked to point at the path of the output log again.
@@ -50,6 +49,17 @@ If the amount of data is __small__ you can archive it all. The intended purpose 
 If you have a patreon subscription with data syncing it is best to directly email [mtgatool@gmail.com](mailto:mtgatool@gmail.com). Otherwise some deleted data will be resynced.
 
 Otherwise, with a large amount of bad data, it's best to rename the *user-data file*. (the .json file named with your User ID, something like `0A1F2E3E4D5C6B7A.json`)
+
+### The tool didn't record some data (e.g. a match). Is there any way to restore it?
+- Go to the folder `<mtgainstallfolder>\MTGA_Data\Logs\Logs` (Default: `C:\Program Files (x86)\Magic The Gathering Arena\MTGArena\MTGA_Data\Logs\Logs`)
+- Copy all files with UTC_Log - xxx.log to a backup location
+- Open them with your favorite text editor with regex search & replace capability (e.g. `Notepad++`)
+- perform a search & replace 
+  - tick `Regular Expressions` 
+  - search field: `[\d+]`
+  - leave the replace field empty
+- save the edited files
+- in the tool go to `Settings > Arena Data` and point the `Arena Log` to the previously modified files one by one
 
 ### If you have any other unexpected behaviour
 

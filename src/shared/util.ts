@@ -567,3 +567,12 @@ export function isEpochTimestamp(timestamp: number): boolean {
   // 2100 it will be parsed as 1970.
   return asDate && asDate == asDate && asDate.getUTCFullYear() < 2000;
 }
+
+export function isRankedEvent(eventId: string): boolean {
+  return (
+    db.standard_ranked_events.includes(eventId) ||
+    db.limited_ranked_events.includes(eventId) ||
+    eventId.indexOf("QuickDraft") !== -1 ||
+    eventId.indexOf("Ladder") !== -1
+  );
+}

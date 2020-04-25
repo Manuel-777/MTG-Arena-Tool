@@ -135,7 +135,7 @@ export async function loadPlayerConfig(): Promise<void> {
     const eventsList: InternalEvent[] = savedData.courses_index
       .filter((id: string) => savedData[id])
       .map((id: string) => {
-        if (isEpochTimestamp(savedData[id].date)) savedData[id].date * 1000;
+        if (isEpochTimestamp(savedData[id].date)) savedData[id].date *= 1000;
         savedData[id].date = new Date(savedData[id].date).getTime();
         return savedData[id];
       });
