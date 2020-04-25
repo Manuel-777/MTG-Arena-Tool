@@ -12,10 +12,9 @@ import {
   Annotations,
   GameObject,
   //GameObjectTypeAbility,
-  DetailsType,
-  DetailsPhaseStep,
   AggregatedDetailsType,
-  DetailsSrcDestCategoryType
+  DetailsSrcDestCategoryType,
+  DetailsKeyType
 } from "../types/greInterpreter";
 
 import {
@@ -573,56 +572,57 @@ function keyValuePair(kvp: KeyValuePairInfo[]): AggregatedDetailsType {
   };
 
   for (const obj of kvp) {
-    switch (obj.key) {
+    const key = obj.key as DetailsKeyType | undefined;
+    switch (key) {
       case undefined:
         break;
       case "abilityGrpId":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "bottomIds":
-        aggregate[obj.key] = extractNumberFromKVP(obj);
+        aggregate[key] = extractNumberFromKVP(obj);
         break;
       case "category":
-        aggregate[obj.key] = obj.valueString[0] as DetailsSrcDestCategoryType;
+        aggregate[key] = obj.valueString[0] as DetailsSrcDestCategoryType;
         break;
       case "damage":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "grpid":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "index":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "life":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "new_id":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "orig_id":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "phase":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "source_zone":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "step":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "topIds":
-        aggregate[obj.key] = extractNumberFromKVP(obj);
+        aggregate[key] = extractNumberFromKVP(obj);
         break;
       case "type":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "zone_dest":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
       case "zone_src":
-        aggregate[obj.key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
         break;
     }
   }
