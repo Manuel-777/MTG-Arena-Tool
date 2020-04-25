@@ -534,29 +534,47 @@ function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
   }
 }
 
-function extractValueFromKVP(
-  obj: KeyValuePairInfo
-): number | string | boolean | number[] | string[] | boolean[] | undefined {
+function extractNumberValueFromKVP(obj: KeyValuePairInfo): number | undefined {
+  const numberArray = extractNumberArrayFromKVP(obj);
+
+  return numberArray.length > 0 ? numberArray[0] : undefined;
+}
+
+function extractNumberArrayFromKVP(obj: KeyValuePairInfo): number[] {
   switch (obj.type) {
     case "KeyValuePairValueType_uint32":
-      return obj.valueUint32.length == 1 ? obj.valueUint32[0] : obj.valueUint32;
+      return obj.valueUint32;
     case "KeyValuePairValueType_int32":
-      return obj.valueInt32.length == 1 ? obj.valueInt32[0] : obj.valueInt32;
+      return obj.valueInt32;
     case "KeyValuePairValueType_uint64":
-      return obj.valueUint64.length == 1 ? obj.valueUint64[0] : obj.valueUint64;
+      return obj.valueUint64;
     case "KeyValuePairValueType_int64":
-      return obj.valueInt64.length == 1 ? obj.valueInt64[0] : obj.valueInt64;
+      return obj.valueInt64;
     case "KeyValuePairValueType_float":
-      return obj.valueFloat.length == 1 ? obj.valueFloat[0] : obj.valueFloat;
+      return obj.valueFloat;
     case "KeyValuePairValueType_double":
-      return obj.valueDouble.length == 1 ? obj.valueDouble[0] : obj.valueDouble;
-    case "KeyValuePairValueType_string":
-      return obj.valueString.length == 1 ? obj.valueString[0] : obj.valueString;
-    case "KeyValuePairValueType_bool":
-      return obj.valueBool.length == 1 ? obj.valueBool[0] : obj.valueBool;
+      return obj.valueDouble;
     default:
-      return undefined;
+      return [];
   }
+}
+
+function extractBooleanValueFromKVP(
+  obj: KeyValuePairInfo
+): boolean | undefined {
+  return obj.valueBool.length > 0 ? obj.valueBool[0] : undefined;
+}
+
+function extractBooleanArrayFromKVP(obj: KeyValuePairInfo): boolean[] {
+  return obj.valueBool;
+}
+
+function extractStringValueFromKVP(obj: KeyValuePairInfo): string | undefined {
+  return obj.valueString.length > 0 ? obj.valueString[0] : undefined;
+}
+
+function extractStringArrayFromKVP(obj: KeyValuePairInfo): string[] {
+  return obj.valueString;
 }
 
 function keyValuePair(kvp: KeyValuePairInfo[]): AggregatedDetailsType {
@@ -597,14 +615,16 @@ function keyValuePair(kvp: KeyValuePairInfo[]): AggregatedDetailsType {
       case "type":
       case "zone_dest":
       case "zone_src":
-        aggregate[key] = (extractValueFromKVP(obj) as number) ?? 0;
+        aggregate[key] = extractNumberValueFromKVP(obj) ?? 0;
         break;
       case "bottomIds":
       case "topIds":
-        aggregate[key] = extractValueFromKVP(obj) as number;
+        aggregate[key] = extractNumberValueFromKVP(obj);
         break;
       case "category":
-        aggregate[key] = extractValueFromKVP(obj) as DetailsSrcDestCategoryType;
+        aggregate[key] = extractStringValueFromKVP(
+          obj
+        ) as DetailsSrcDestCategoryType;
         break;
     }
   }
