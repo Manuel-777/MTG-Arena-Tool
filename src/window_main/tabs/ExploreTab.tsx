@@ -221,7 +221,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
   const getFirstEvent = useCallback(
     (filter: string): string => {
       let ret = "%%";
-      const i = 0;
+      let i = 0;
       while (ret.startsWith("%%")) {
         ret = getFilterEvents({
           ...filters,
