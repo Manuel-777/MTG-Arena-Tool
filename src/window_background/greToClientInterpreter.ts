@@ -537,7 +537,7 @@ function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
 function extractNumberValueFromKVP(obj: KeyValuePairInfo): number | undefined {
   const numberArray = extractNumberArrayFromKVP(obj);
 
-  return numberArray.length > 0 ? numberArray[0] : undefined;
+  return numberArray.length === 1 ? numberArray[0] : undefined;
 }
 
 function extractNumberArrayFromKVP(obj: KeyValuePairInfo): number[] {
@@ -562,7 +562,7 @@ function extractNumberArrayFromKVP(obj: KeyValuePairInfo): number[] {
 function extractBooleanValueFromKVP(
   obj: KeyValuePairInfo
 ): boolean | undefined {
-  return obj.valueBool.length > 0 ? obj.valueBool[0] : undefined;
+  return obj.valueBool.length === 1 ? obj.valueBool[0] : undefined;
 }
 
 function extractBooleanArrayFromKVP(obj: KeyValuePairInfo): boolean[] {
@@ -570,7 +570,7 @@ function extractBooleanArrayFromKVP(obj: KeyValuePairInfo): boolean[] {
 }
 
 function extractStringValueFromKVP(obj: KeyValuePairInfo): string | undefined {
-  return obj.valueString.length > 0 ? obj.valueString[0] : undefined;
+  return obj.valueString.length === 1 ? obj.valueString[0] : undefined;
 }
 
 function extractStringArrayFromKVP(obj: KeyValuePairInfo): string[] {
