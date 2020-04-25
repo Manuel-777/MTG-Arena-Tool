@@ -534,25 +534,33 @@ function annotationsSwitch(ann: Annotations, type: AnnotationType): void {
   }
 }
 
-function extractNumberFromKVP(obj: KeyValuePairInfo): number | undefined {
+function extractValueFromKVP(
+  obj: KeyValuePairInfo
+): number | string | boolean | number[] | string[] | boolean[] | undefined {
   switch (obj.type) {
     case "KeyValuePairValueType_uint32":
-      return obj.valueUint32[0];
+      return obj.valueUint32.length == 1 ? obj.valueUint32[0] : obj.valueUint32;
     case "KeyValuePairValueType_int32":
-      return obj.valueInt32[0];
+      return obj.valueInt32.length == 1 ? obj.valueInt32[0] : obj.valueInt32;
     case "KeyValuePairValueType_uint64":
-      return obj.valueUint64[0];
+      return obj.valueUint64.length == 1 ? obj.valueUint64[0] : obj.valueUint64;
     case "KeyValuePairValueType_int64":
-      return obj.valueInt64[0];
+      return obj.valueInt64.length == 1 ? obj.valueInt64[0] : obj.valueInt64;
     case "KeyValuePairValueType_float":
-      return obj.valueFloat[0];
+      return obj.valueFloat.length == 1 ? obj.valueFloat[0] : obj.valueFloat;
     case "KeyValuePairValueType_double":
-      return obj.valueDouble[0];
+      return obj.valueDouble.length == 1 ? obj.valueDouble[0] : obj.valueDouble;
+    case "KeyValuePairValueType_string":
+      return obj.valueString.length == 1 ? obj.valueString[0] : obj.valueString;
+    case "KeyValuePairValueType_bool":
+      return obj.valueBool.length == 1 ? obj.valueBool[0] : obj.valueBool;
+    default:
+      return undefined;
   }
 }
 
 function keyValuePair(kvp: KeyValuePairInfo[]): AggregatedDetailsType {
-  let aggregate: AggregatedDetailsType = {
+  const aggregate: AggregatedDetailsType = {
     abilityGrpId: 0,
     bottomIds: undefined,
     category: undefined,
@@ -577,52 +585,26 @@ function keyValuePair(kvp: KeyValuePairInfo[]): AggregatedDetailsType {
       case undefined:
         break;
       case "abilityGrpId":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
+      case "grpid":
+      case "damage":
+      case "index":
+      case "life":
+      case "new_id":
+      case "orig_id":
+      case "phase":
+      case "source_zone":
+      case "step":
+      case "type":
+      case "zone_dest":
+      case "zone_src":
+        aggregate[key] = (extractValueFromKVP(obj) as number) ?? 0;
         break;
       case "bottomIds":
-        aggregate[key] = extractNumberFromKVP(obj);
+      case "topIds":
+        aggregate[key] = extractValueFromKVP(obj) as number;
         break;
       case "category":
-        aggregate[key] = obj.valueString[0] as DetailsSrcDestCategoryType;
-        break;
-      case "damage":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "grpid":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "index":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "life":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "new_id":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "orig_id":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "phase":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "source_zone":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "step":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "topIds":
-        aggregate[key] = extractNumberFromKVP(obj);
-        break;
-      case "type":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "zone_dest":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
-        break;
-      case "zone_src":
-        aggregate[key] = extractNumberFromKVP(obj) ?? 0;
+        aggregate[key] = extractValueFromKVP(obj) as DetailsSrcDestCategoryType;
         break;
     }
   }
