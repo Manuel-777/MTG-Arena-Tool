@@ -61,6 +61,7 @@ const defaultConfig = {
     cards_size_hover_card: 10,
     export_format: "$Name,$Count,$Rarity,$SetName,$Collector",
     back_color: "rgba(0,0,0,0.3)",
+    back_shadow: true,
     overlay_back_color: "rgba(0,0,0,0.0)",
     back_url: "",
     right_panel_width: 400,

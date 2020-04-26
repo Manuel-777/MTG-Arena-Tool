@@ -7,8 +7,7 @@ import { IPC_RENDERER } from "../shared/constants";
 import { playerDb } from "../shared/db/LocalDatabase";
 
 export default function setSeasonalRankFromCombinedRank(
-  rank: InternalRank,
-  id: string
+  rank: InternalRank
 ): void {
   const playerData = globals.store.getState().playerdata;
   const currentMatch = globalStore.currentMatch;
@@ -28,7 +27,7 @@ export default function setSeasonalRankFromCombinedRank(
     player: playerData.playerName,
     playerId: playerData.arenaId,
     rankUpdateType: type,
-    id,
+    id: currentMatch.matchId,
     eventId: currentMatch.eventId,
     lastMatchId: currentMatch.matchId,
     newClass: rank[type].rank,

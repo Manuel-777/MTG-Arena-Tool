@@ -84,6 +84,7 @@ export function setOppCardsUsed(arg: number[]): void {
 
 export function resetCurrentMatch(): void {
   Object.assign(globalStore.currentMatch, matchStateObject);
+  globalStore.currentMatch.matchGameStats = [];
 }
 
 export function resetCurrentGame(): void {

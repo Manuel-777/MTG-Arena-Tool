@@ -64,7 +64,7 @@ export default function InEventGetCombinedRankInfo(entry: Entry): void {
 
   const eventId = globalStore.currentMatch.eventId;
   if (isRankedEvent(eventId)) {
-    setSeasonalRankFromCombinedRank(rank, entry.hash);
+    setSeasonalRankFromCombinedRank(rank);
   }
 
   const infoLength = Object.keys(json).length - 1;

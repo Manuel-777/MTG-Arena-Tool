@@ -13,6 +13,8 @@ import { SettingsData } from "../types/settings";
 import DraftElements from "./DraftElements";
 import MatchElements from "./MatchElements";
 import { getEditModeClass, useEditModeOnRef } from "./overlayUtil";
+import { useSelector } from "react-redux";
+import { AppState } from "../shared-redux/stores/overlayStore";
 
 const DEFAULT_BACKGROUND = "../images/Bedevil-Art.jpg";
 
@@ -134,6 +136,9 @@ export default function OverlayWindowlet(
     ")";
 
   const backgroundColor = settings.overlay_back_color;
+  const backgroundShade = useSelector(
+    (state: AppState) => state.settings.back_shadow
+  );
 
   const bgStyle: React.CSSProperties = {
     left: "0px",
@@ -168,12 +173,15 @@ export default function OverlayWindowlet(
     >
       <div className="outer_wrapper">
         <div
-          className={
-            "overlay_wrapper overlay_bg_image " +
-            (solidBg ? "after_hidden" : "")
-          }
+          className={"main_wrapper " + (solidBg ? "after_hidden" : "")}
           style={bgStyle}
-        />
+        >
+          {!solidBg && backgroundShade ? (
+            <div className="wrapper_after"></div>
+          ) : (
+            <></>
+          )}
+        </div>
       </div>
       {overlaySettings.top && (
         <div className="outer_wrapper top_nav_wrapper">

@@ -19,6 +19,9 @@ export default function BackgroundImage(): JSX.Element {
   const backgroundColor = useSelector(
     (state: AppState) => state.settings.back_color
   );
+  const backgroundShade = useSelector(
+    (state: AppState) => state.settings.back_shadow
+  );
 
   const [image, setImage] = React.useState(DEFAULT_BACKGROUND);
   React.useEffect(() => {
@@ -68,5 +71,9 @@ export default function BackgroundImage(): JSX.Element {
 
   const style = { backgroundImage: image, backgroundColor };
 
-  return <div className="main_wrapper main_bg_image" style={style} />;
+  return (
+    <div className="main_wrapper main_bg_image" style={style}>
+      {backgroundShade ? <div className="wrapper_after" /> : <></>}
+    </div>
+  );
 }

@@ -67,7 +67,7 @@ function firstPassCallback(checked: boolean): void {
   reduxAction(
     store.dispatch,
     "SET_SETTINGS",
-    { skip_firstpass: !checked },
+    { skip_firstpass: checked },
     IPC_ALL ^ IPC_RENDERER
   );
 }

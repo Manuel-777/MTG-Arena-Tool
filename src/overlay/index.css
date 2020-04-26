@@ -5,7 +5,7 @@ body {
     -webkit-app-region: no-drag;
 }
 
-.main_wrapper, .overlay_wrapper, .outer_wrapper {
+.main_wrapper, .outer_wrapper {
     padding: 0 !important;
     height: 100% !important;
     width: 100% !important;

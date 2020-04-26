@@ -11,6 +11,7 @@ import {
 import CardTile from "../../../shared/CardTile";
 import db from "../../../shared/database";
 import Input from "../misc/Input";
+import Toggle from "../misc/Toggle";
 import useColorPicker from "../../hooks/useColorPicker";
 import Slider from "../misc/Slider";
 import { getCardImage } from "../../../shared/util";
@@ -56,6 +57,15 @@ function setCardQuality(filter: string): void {
     "SET_SETTINGS",
     { cards_quality: filter },
     IPC_ALL ^ IPC_RENDERER
+  );
+}
+
+function backShadowCallback(checked: boolean): void {
+  reduxAction(
+    store.dispatch,
+    "SET_SETTINGS",
+    { back_shadow: checked },
+    IPC_ALL
   );
 }
 
@@ -128,9 +138,13 @@ export default function SectionVisual(): JSX.Element {
           callback={changeBackgroundImage}
         />
       </div>
-
+      <Toggle
+        text="Show Background Shade"
+        value={settings.back_shadow}
+        callback={backShadowCallback}
+      />
       <label className="centered_setting_container">
-        <span style={{ marginRight: "32px" }}>Background shade:</span>
+        <span style={{ marginRight: "32px" }}>Background hue:</span>
         <input
           onClick={pickerDoShow}
           ref={containerRef}
