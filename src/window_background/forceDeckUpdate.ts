@@ -152,12 +152,20 @@ const forceDeckUpdate = function(removeUsed = true): void {
     chancesObj.cardsLeft = cardsleft;
 
     setCardsOdds(chancesObj);
+
+    // Add that that were put on the bottom again, so it
+    // doesnt affect the display of the decklist
+    playerCardsBottom.forEach((grpId: number) => {
+      playerCardsLeft.getMainboard().add(grpId, 1);
+    });
+    cardsleft += playerCardsBottom.length;
   } else {
     const main = playerCardsLeft.getMainboard();
     main.addChance(() => 1);
     const chancesObj = new Chances();
     setCardsOdds(chancesObj);
   }
+
   globalStore.currentMatch.cardsLeft = playerCardsLeft;
 };
 
