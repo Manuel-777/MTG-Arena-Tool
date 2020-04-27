@@ -102,7 +102,7 @@ export interface AnnotationInfo {
   affectorId?: number;
   affectedIds: number[];
   type: AnnotationType[];
-  details: KeyValuePairInfo[];
+  details?: KeyValuePairInfo[];
   allowRedaction?: boolean;
   ignoreForSeatIds: number[];
   redactAffected?: boolean;
