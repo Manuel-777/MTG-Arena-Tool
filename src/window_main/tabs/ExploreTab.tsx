@@ -348,12 +348,12 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
           value={filters.filterWCM}
           placeholder=""
           onChange={validateWildcardValues}
-          callback={(value: string): void => {
+          callback={(value: string): void =>
             updateFilters({
               ...filters,
               filterWCM: value
-            });
-          }}
+            })
+          }
         />
       </div>
       <div className="explore_buttons_row explore_buttons_bottom">
