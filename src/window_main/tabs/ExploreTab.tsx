@@ -345,7 +345,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
         <Input
           type="number"
           containerClassName="input_container_explore explore_wc_input"
-          value={parseInt(filters.filterWCM) < 0 ? "" : filters.filterWCM}
+          value={filters.filterWCM}
           placeholder=""
           onChange={validateWildcardValues}
           callback={(value: string): void => {
