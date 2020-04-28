@@ -150,20 +150,29 @@ function Seat(props: SeatProps): JSX.Element {
   const { player, eventId, won, match } = props;
 
   // v4.1.0: Introduced by-game cards seen
-  const gameDetails = match && match.toolVersion >= 262400;
+  const gameDetails = match && match.toolVersion >= 262400; // 262164 for debug
   const [gameSeen, setGameSeen] = useState(0);
+
+  let combinedList: number[] = [];
+  match?.gameStats.forEach((stats: MatchGameStats) => {
+    combinedList = [...combinedList, ...stats.cardsSeen];
+  });
 
   const deck =
     gameDetails && match
-      ? new Deck({}, match.gameStats[gameSeen].cardsSeen)
+      ? new Deck(
+          {},
+          gameSeen == match.gameStats.length
+            ? combinedList
+            : match.gameStats[gameSeen].cardsSeen
+        )
       : props.deck;
 
   const gamePrev = useCallback(() => {
     if (gameSeen > 0) setGameSeen(gameSeen - 1);
   }, [gameSeen]);
   const gameNext = useCallback(() => {
-    if (match && gameSeen < match.gameStats.length - 1)
-      setGameSeen(gameSeen + 1);
+    if (match && gameSeen < match.gameStats.length) setGameSeen(gameSeen + 1);
   }, [gameSeen, match]);
 
   const isLimited = db.limited_ranked_events.includes(eventId);
@@ -203,7 +212,11 @@ function Seat(props: SeatProps): JSX.Element {
           <>
             <div className="game_swap">
               <div className="game_prev" onClick={gamePrev} />
-              <div>Seen in game {gameSeen + 1}</div>
+              <div>
+                {gameSeen == match.gameStats.length
+                  ? `Combined`
+                  : `Seen in game ${gameSeen + 1}`}
+              </div>
               <div className="game_next" onClick={gameNext} />
             </div>
             <DeckList deck={deck} showWildcards={true} />
