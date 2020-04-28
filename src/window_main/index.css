@@ -4572,3 +4572,33 @@ a:hover {
     height: calc(100% - 112px);
     overflow: scroll;
 }
+
+
+.game_prev {
+    cursor: pointer;
+    background: url(../images/prev.png) no-repeat center;
+    opacity: 0.5;
+    width: 24px;
+    height: 24px;
+    -webkit-transition: all .2s ease-in;
+}
+
+.game_swap {
+    color: var(--color-light);
+    display: flex;
+    justify-content: space-around;
+    margin: 4px 0;
+}
+
+.game_next {
+    cursor: pointer;
+    background: url(../images/next.png) no-repeat center;
+    opacity: 0.5;
+    width: 24px;
+    height: 24px;
+    -webkit-transition: all .2s ease-in;
+}
+
+.game_prev:hover, .game_next:hover {
+    opacity: 1;
+}

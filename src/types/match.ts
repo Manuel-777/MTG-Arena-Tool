@@ -1,6 +1,7 @@
 import Deck from "../shared/deck";
 import { InternalDeck } from "./Deck";
 import { Result } from "./greInterpreter";
+import { MatchGameStats } from "./currentMatch";
 
 interface ReservedPlayer {
   userId: string;
@@ -108,7 +109,7 @@ export interface InternalMatch {
   onThePlay: number;
   eventId: string;
   bestOf: number;
-  gameStats: any[];
+  gameStats: MatchGameStats[];
   toolVersion: number;
   toolRunFromSource: boolean;
   id: string;

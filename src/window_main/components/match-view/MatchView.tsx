@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import fs from "fs";
 import path from "path";
 import { InternalMatch, InternalPlayer } from "../../../types/match";
@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
 import { IPC_NONE } from "../../../shared/constants";
 import { getMatch } from "../../../shared-store";
+import { MatchGameStats } from "../../../types/currentMatch";
 
 interface MatchViewProps {
   match: InternalMatch;
@@ -102,11 +103,12 @@ export function MatchView(props: MatchViewProps): JSX.Element {
                 player={match.opponent}
                 deck={oppDeck}
                 eventId={match.eventId}
+                match={match}
                 won={match.opponent.win > match.player.win}
               />
             </div>
             <div>
-              {match.gameStats.map((stats: any, index: number) => {
+              {match.gameStats.map((stats: MatchGameStats, index: number) => {
                 if (stats)
                   return (
                     <GameStats
@@ -141,10 +143,28 @@ interface SeatProps {
   eventId: string;
   player: InternalPlayer;
   won: boolean;
+  match?: InternalMatch;
 }
 
 function Seat(props: SeatProps): JSX.Element {
-  const { deck, player, eventId, won } = props;
+  const { player, eventId, won, match } = props;
+
+  // v4.1.0: Introduced by-game cards seen
+  const gameDetails = match && match.toolVersion >= 262400;
+  const [gameSeen, setGameSeen] = useState(0);
+
+  const deck =
+    gameDetails && match
+      ? new Deck({}, match.gameStats[gameSeen].cardsSeen)
+      : props.deck;
+
+  const gamePrev = useCallback(() => {
+    if (gameSeen > 0) setGameSeen(gameSeen - 1);
+  }, [gameSeen]);
+  const gameNext = useCallback(() => {
+    if (match && gameSeen < match.gameStats.length - 1)
+      setGameSeen(gameSeen + 1);
+  }, [gameSeen, match]);
 
   const isLimited = db.limited_ranked_events.includes(eventId);
   const clickAdd = (): void => {
@@ -179,14 +199,25 @@ function Seat(props: SeatProps): JSX.Element {
         <Button text="Add to Decks" onClick={clickAdd} />
         <Button text="Export to Arena" onClick={clickArena} />
         <Button text="Export to .txt" onClick={clickTxt} />
-        <DeckList deck={deck} showWildcards={true} />
+        {gameDetails && match ? (
+          <>
+            <div className="game_swap">
+              <div className="game_prev" onClick={gamePrev} />
+              <div>Seen in game {gameSeen + 1}</div>
+              <div className="game_next" onClick={gameNext} />
+            </div>
+            <DeckList deck={deck} showWildcards={true} />
+          </>
+        ) : (
+          <DeckList deck={deck} showWildcards={true} />
+        )}
       </div>
     </>
   );
 }
 
 interface GameStatsProps {
-  game: any;
+  game: MatchGameStats;
   index: number;
 }
 
