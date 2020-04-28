@@ -305,7 +305,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
           containerClassName="input_container_explore explore_wc_input"
           value={filters.filterWCC}
           placeholder=""
-          onChange={validateWildcardValues}
+          validate={validateWildcardValues}
           callback={(value: string): void =>
             updateFilters({
               ...filters,
@@ -319,7 +319,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
           containerClassName="input_container_explore explore_wc_input"
           value={filters.filterWCU}
           placeholder=""
-          onChange={validateWildcardValues}
+          validate={validateWildcardValues}
           callback={(value: string): void =>
             updateFilters({
               ...filters,
@@ -333,7 +333,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
           containerClassName="input_container_explore explore_wc_input"
           value={filters.filterWCR}
           placeholder=""
-          onChange={validateWildcardValues}
+          validate={validateWildcardValues}
           callback={(value: string): void =>
             updateFilters({
               ...filters,
@@ -347,7 +347,7 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
           containerClassName="input_container_explore explore_wc_input"
           value={filters.filterWCM}
           placeholder=""
-          onChange={validateWildcardValues}
+          validate={validateWildcardValues}
           callback={(value: string): void =>
             updateFilters({
               ...filters,
