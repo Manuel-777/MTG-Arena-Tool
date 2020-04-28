@@ -42,6 +42,7 @@ export default function getMatchGameStats(): void {
       added: [],
       removed: []
     },
+    cardsSeen: currentMatch.opponent.cardsUsed,
     deck: {
       id: "",
       commandZoneGRPIds: [],

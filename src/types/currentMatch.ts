@@ -231,5 +231,6 @@ export interface MatchGameStats {
   libraryLands: number[];
   sideboardChanges: DeckChanges;
   deck: InternalDeck;
+  cardsSeen: number[];
   onThePlay: number;
 }
