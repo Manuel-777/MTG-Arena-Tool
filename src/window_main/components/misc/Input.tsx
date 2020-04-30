@@ -10,6 +10,7 @@ interface InputProps {
   title?: string;
   autocomplete?: string;
   callback?: (value: string) => void;
+  validate?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 function InputBase(
@@ -31,6 +32,9 @@ function InputBase(
 
   const onChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
+      if (props.validate) {
+        props.validate(e);
+      }
       setCurrentValue(e.target.value);
     },
     []
