@@ -70,12 +70,6 @@ export default function ExploreTab(): JSX.Element {
     [dispatcher]
   );
 
-  useEffect(() => {
-    if (!loading && exploreData.results_number === 0) {
-      newQuery(); // no data and no query in flight, autolaunch
-    }
-  }, [exploreData.results_number, loading, newQuery]);
-
   const containerRef = React.useRef<HTMLDivElement>(null);
   const onScroll = React.useCallback(() => {
     if (containerRef?.current) {
