@@ -1,6 +1,11 @@
 import React, { useCallback } from "react";
 import { Column, Row } from "react-table";
-import { DATE_SEASON, MATCHES_TABLE_MODE, IPC_ALL, IPC_RENDERER } from "../../../shared/constants";
+import {
+  DATE_SEASON,
+  MATCHES_TABLE_MODE,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../../shared/constants";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import ListItemMatch from "../list-item/ListItemMatch";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";

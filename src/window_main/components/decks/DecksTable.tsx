@@ -1,6 +1,11 @@
 import React, { useCallback } from "react";
 import { Column, Row } from "react-table";
-import { DECKS_ART_MODE, DECKS_TABLE_MODE, IPC_ALL, IPC_RENDERER } from "../../../shared/constants";
+import {
+  DECKS_ART_MODE,
+  DECKS_TABLE_MODE,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../../shared/constants";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { ListItemDeck } from "../list-item/ListItemDeck";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";

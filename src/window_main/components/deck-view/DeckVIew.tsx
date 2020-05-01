@@ -212,7 +212,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   );
   const [width, bind] = useResize(panelWidth, finishResize);
 
-
   const dateFilter = useSelector(
     (state: AppState) => state.settings.last_date_filter
   );

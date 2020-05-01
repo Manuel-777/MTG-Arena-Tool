@@ -1,7 +1,11 @@
 import _ from "lodash";
 import React, { useCallback } from "react";
 import { Column, Row } from "react-table";
-import { EVENTS_TABLE_MODE, IPC_ALL, IPC_RENDERER } from "../../../shared/constants";
+import {
+  EVENTS_TABLE_MODE,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../../shared/constants";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { toggleArchived } from "../../rendererUtil";
 import { ListItemEvent } from "../list-item/ListItemEvent";
