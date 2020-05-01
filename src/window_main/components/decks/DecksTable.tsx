@@ -4,7 +4,6 @@ import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { ListItemDeck } from "../list-item/ListItemDeck";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";
-import ResizableDragger from "../misc/ResizableDragger";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -42,6 +41,8 @@ import { deckSearchFilterFn } from "./filters";
 import { DecksData, DecksTableControlsProps, DecksTableProps } from "./types";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
+import { animated } from "react-spring";
+import useResize from "../../hooks/useResize";
 
 const columns: Column<DecksData>[] = [
   { accessor: "id" },
@@ -320,7 +321,9 @@ export default function DecksTable({
   const panelWidth = useSelector(
     (state: AppState) => state.settings.right_panel_width
   );
-  const sidePanelWidth = panelWidth + "px";
+
+  const [width, bind] = useResize(panelWidth);
+
   return (
     <>
       <div className={"wrapper_column"}>
@@ -379,14 +382,11 @@ export default function DecksTable({
           <PagingControls {...pagingProps} />
         </div>
       </div>
-      <div
-        className={"wrapper_column sidebar_column_l"}
-        style={{
-          width: sidePanelWidth,
-          flex: `0 0 ${sidePanelWidth}`
-        }}
+      <animated.div {...bind()} className={"sidebar-dragger"}></animated.div>
+      <animated.div
+        className={"sidebar-main"}
+        style={{ width, minWidth: width, maxWidth: width }}
       >
-        <ResizableDragger />
         <MatchResultsStatsPanel
           prefixId={"decks_top"}
           aggregator={
@@ -394,7 +394,7 @@ export default function DecksTable({
           }
           showCharts
         />
-      </div>
+      </animated.div>
     </>
   );
 }

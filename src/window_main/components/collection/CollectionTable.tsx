@@ -8,7 +8,6 @@ import {
   DRAFT_RANKS
 } from "../../../shared/constants";
 import db from "../../../shared/database";
-import ResizableDragger from "../misc/ResizableDragger";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
 import {
   ColorColumnFilter,
@@ -48,6 +47,8 @@ import {
 } from "./types";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
+import useResize from "../../hooks/useResize";
+import { animated } from "react-spring";
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   let hasCorrectBoosterFilter = false;
@@ -376,16 +377,19 @@ export default function CollectionTable({
         })}
       </div>
     );
-  const panelWidth = useSelector(
-    (state: AppState) => state.settings.right_panel_width
-  );
-  const sidePanelWidth = panelWidth + "px";
+
   const clickCompletionCallback = React.useCallback((): void => {
     setTableMode(COLLECTION_SETS_MODE);
     setAllFilters((): FilterValue[] => [
       { id: "booster", value: { true: true, false: false } }
     ]);
   }, [setAllFilters]);
+
+  const panelWidth = useSelector(
+    (state: AppState) => state.settings.right_panel_width
+  );
+  const [width, bind] = useResize(panelWidth);
+
   return (
     <>
       <div className={"wrapper_column"}>
@@ -410,20 +414,17 @@ export default function CollectionTable({
           ) && <PagingControls {...pagingProps} />}
         </div>
       </div>
-      <div
-        className={"wrapper_column sidebar_column_l"}
-        style={{
-          width: sidePanelWidth,
-          flex: `0 0 ${sidePanelWidth}`
-        }}
+      <animated.div {...bind()} className={"sidebar-dragger"}></animated.div>
+      <animated.div
+        className={"sidebar-main"}
+        style={{ width, minWidth: width, maxWidth: width }}
       >
-        <ResizableDragger />
         <CollectionStatsPanel
           stats={stats}
           boosterMath={boosterMath}
           clickCompletionCallback={clickCompletionCallback}
         />
-      </div>
+      </animated.div>
     </>
   );
 }

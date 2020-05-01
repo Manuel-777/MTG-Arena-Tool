@@ -1,5 +1,4 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useRef, useCallback, useState } from "react";
 import { MANA, RANKS } from "../../../shared/constants";
 import ReactSelect from "../../../shared/ReactSelect";
 import {
@@ -8,7 +7,6 @@ import {
   toMMSS
 } from "../../../shared/util";
 import Aggregator, { AggregatorStats } from "../../aggregator";
-import { AppState } from "../../../shared-redux/stores/rendererStore";
 import {
   compareWinrates,
   formatPercent,
@@ -186,9 +184,30 @@ export default function MatchResultsStatsPanel({
     ? aggregator.constructedStats
     : undefined;
   const [showTags, setShowTags] = React.useState(true);
-  const panelWidth = useSelector(
-    (state: AppState) => state.settings.right_panel_width
-  );
+
+  // Set up panel width and ref
+  const [panelWidth, setPanelWidth] = useState(0);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Check if we resized the panelRef div
+  const checkResize = useCallback((): void => {
+    const newWidth =
+      panelRef && panelRef.current ? panelRef.current.offsetWidth : 0;
+    if (panelWidth !== newWidth) {
+      setPanelWidth(newWidth);
+    }
+  }, [panelWidth, panelRef, setPanelWidth]);
+
+  // Make an interval to listen for the resize of the div
+  React.useEffect(() => {
+    const interval = setInterval(function() {
+      checkResize();
+    }, 500);
+    return (): void => {
+      clearInterval(interval);
+    };
+  }, [checkResize]);
+
   const barsToShow = Math.max(3, Math.round(panelWidth / 40));
   // Archetypes
   const tagsWinrates = [...Object.values(tagStats)];
@@ -199,133 +218,117 @@ export default function MatchResultsStatsPanel({
   colorsWinrates.sort(frequencySort);
   const freqColorStats = colorsWinrates.slice(0, barsToShow);
   return (
-    <div className={"flex_item"}>
-      <div className={"main_stats"}>
-        <div className={prefixId + "_winrate"}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <div
-              className={"list_deck_winrate"}
-              style={{ margin: "0 auto 0 0" }}
-            >
-              Overall:
-            </div>
-            <div
-              className={"list_deck_winrate"}
-              style={{ margin: "0 0 0 auto" }}
-            >
-              {`${stats.wins}:${stats.losses} `}(
-              <ColoredWinrate stats={stats} />)
-            </div>
+    <div className={"main_stats"} ref={panelRef}>
+      <div className={prefixId + "_winrate"}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div className={"list_deck_winrate"} style={{ margin: "0 auto 0 0" }}>
+            Overall:
           </div>
-          {!!rankedStats &&
-            RANKS.map(rank => {
-              const stats = rankedStats[rank.toLowerCase()];
-              if (!stats || !stats.total) {
-                return <React.Fragment key={rank} />;
-              }
-              return (
+          <div className={"list_deck_winrate"} style={{ margin: "0 0 0 auto" }}>
+            {`${stats.wins}:${stats.losses} `}(
+            <ColoredWinrate stats={stats} />)
+          </div>
+        </div>
+        {!!rankedStats &&
+          RANKS.map(rank => {
+            const stats = rankedStats[rank.toLowerCase()];
+            if (!stats || !stats.total) {
+              return <React.Fragment key={rank} />;
+            }
+            return (
+              <div
+                key={rank}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
                 <div
-                  key={rank}
+                  className={
+                    isLimited ? "top_limited_rank" : "top_constructed_rank"
+                  }
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center"
+                    margin: "0 auto 0 0",
+                    backgroundPosition: `${getRankIndex(rank, 1) * -48}px 0px`
                   }}
+                  title={rank}
+                ></div>
+                <div
+                  className={"list_deck_winrate"}
+                  style={{ margin: "0 0 0 auto" }}
                 >
-                  <div
-                    className={
-                      isLimited ? "top_limited_rank" : "top_constructed_rank"
-                    }
-                    style={{
-                      margin: "0 auto 0 0",
-                      backgroundPosition: `${getRankIndex(rank, 1) * -48}px 0px`
-                    }}
-                    title={rank}
-                  ></div>
-                  <div
-                    className={"list_deck_winrate"}
-                    style={{ margin: "0 0 0 auto" }}
-                  >
-                    {`${stats.wins}:${stats.losses} `}(
-                    <ColoredWinrate stats={stats} />)
-                  </div>
+                  {`${stats.wins}:${stats.losses} `}(
+                  <ColoredWinrate stats={stats} />)
                 </div>
-              );
-            })}
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <div
-              className={"list_deck_winrate"}
-              style={{ margin: "0 auto 0 0" }}
-            >
-              Play/Draw:
-            </div>
-            <div
-              className={"list_deck_winrate"}
-              style={{ margin: "0 0 0 auto" }}
-            >
-              <ColoredWinrate stats={playStats} />/
-              <ColoredWinrate stats={drawStats} />
-            </div>
+              </div>
+            );
+          })}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div className={"list_deck_winrate"} style={{ margin: "0 auto 0 0" }}>
+            Play/Draw:
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <div className={"list_match_time"} style={{ margin: "0 auto 0 0" }}>
-              Duration:
-            </div>
-            <div
-              className={"list_match_time"}
-              style={{ margin: "0 0 0 auto" }}
-              title={toDDHHMMSS(stats.duration)}
-            >
-              {toMMSS(stats.duration)}
-            </div>
+          <div className={"list_deck_winrate"} style={{ margin: "0 0 0 auto" }}>
+            <ColoredWinrate stats={playStats} />/
+            <ColoredWinrate stats={drawStats} />
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <label className={"but_container_label"}>Group by:</label>
-            <ReactSelect
-              className={"match_results_group_select"}
-              current={showTags ? "Archetype" : "Color"}
-              options={["Archetype", "Color"]}
-              callback={(filter): void => setShowTags(filter === "Archetype")}
-              style={{
-                margin: "12px auto auto 4px",
-                textAlign: "left",
-                width: "120px",
-                display: "inline-flex"
-              }}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div className={"list_match_time"} style={{ margin: "0 auto 0 0" }}>
+            Duration:
+          </div>
+          <div
+            className={"list_match_time"}
+            style={{ margin: "0 0 0 auto" }}
+            title={toDDHHMMSS(stats.duration)}
+          >
+            {toMMSS(stats.duration)}
+          </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <label className={"but_container_label"}>Group by:</label>
+          <ReactSelect
+            className={"match_results_group_select"}
+            current={showTags ? "Archetype" : "Color"}
+            options={["Archetype", "Color"]}
+            callback={(filter): void => setShowTags(filter === "Archetype")}
+            style={{
+              margin: "12px auto auto 4px",
+              textAlign: "left",
+              width: "120px",
+              display: "inline-flex"
+            }}
+          />
+        </div>
+        {showCharts && (
+          <div
+            className={
+              showTags ? "stats_panel_arch_charts" : "stats_panel_color_charts"
+            }
+          >
+            <div
+              className={"ranks_history_title"}
+              style={{ marginTop: "24px" }}
+            >
+              Frequent Matchups
+            </div>
+            <FrequencyChart
+              winrates={showTags ? freqTagStats : freqColorStats}
+              total={stats.total}
+              showTags={showTags}
+            />
+            <div
+              className={"ranks_history_title"}
+              style={{ marginTop: "24px" }}
+            >
+              Wins vs Losses
+            </div>
+            <WinrateChart
+              winrates={showTags ? freqTagStats : freqColorStats}
+              showTags={showTags}
             />
           </div>
-          {showCharts && (
-            <div
-              className={
-                showTags
-                  ? "stats_panel_arch_charts"
-                  : "stats_panel_color_charts"
-              }
-            >
-              <div
-                className={"ranks_history_title"}
-                style={{ marginTop: "24px" }}
-              >
-                Frequent Matchups
-              </div>
-              <FrequencyChart
-                winrates={showTags ? freqTagStats : freqColorStats}
-                total={stats.total}
-                showTags={showTags}
-              />
-              <div
-                className={"ranks_history_title"}
-                style={{ marginTop: "24px" }}
-              >
-                Wins vs Losses
-              </div>
-              <WinrateChart
-                winrates={showTags ? freqTagStats : freqColorStats}
-                showTags={showTags}
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

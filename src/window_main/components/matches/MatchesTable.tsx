@@ -4,7 +4,6 @@ import { DATE_SEASON, MATCHES_TABLE_MODE } from "../../../shared/constants";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import ListItemMatch from "../list-item/ListItemMatch";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";
-import ResizableDragger from "../misc/ResizableDragger";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -46,6 +45,8 @@ import {
 } from "./types";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
+import { animated } from "react-spring";
+import useResize from "../../hooks/useResize";
 
 const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 
@@ -390,10 +391,12 @@ export default function MatchesTable({
     ...tableControlsProps
   };
   const isTableMode = tableMode === MATCHES_TABLE_MODE;
+
   const panelWidth = useSelector(
     (state: AppState) => state.settings.right_panel_width
   );
-  const sidePanelWidth = panelWidth + "px";
+  const [width, bind] = useResize(panelWidth);
+
   return (
     <>
       <div className={"wrapper_column"}>
@@ -447,19 +450,17 @@ export default function MatchesTable({
           <PagingControls {...pagingProps} />
         </div>
       </div>
-      <div
-        className={"wrapper_column sidebar_column_l"}
-        style={{
-          width: sidePanelWidth,
-          flex: `0 0 ${sidePanelWidth}`
-        }}
+
+      <animated.div {...bind()} className={"sidebar-dragger"}></animated.div>
+      <animated.div
+        className={"sidebar-main"}
+        style={{ width, minWidth: width, maxWidth: width }}
       >
-        <ResizableDragger />
         <MatchesSidePanel
           subAggFilters={{ ...aggFilters, ...getDataAggFilters(rows) }}
           setAggFiltersCallback={setAggFiltersCallback}
         />
-      </div>
+      </animated.div>
     </>
   );
 }

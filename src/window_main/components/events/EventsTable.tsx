@@ -6,7 +6,6 @@ import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { toggleArchived } from "../../rendererUtil";
 import { ListItemEvent } from "../list-item/ListItemEvent";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";
-import ResizableDragger from "../misc/ResizableDragger";
 import {
   ArchivedCell,
   ArchiveHeader,
@@ -40,6 +39,8 @@ import {
 } from "./types";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
+import useResize from "../../hooks/useResize";
+import { animated } from "react-spring";
 
 const columns: Column<EventTableData>[] = [
   { accessor: "id" },
@@ -234,7 +235,8 @@ export default function EventsTable({
   const panelWidth = useSelector(
     (state: AppState) => state.settings.right_panel_width
   );
-  const sidePanelWidth = panelWidth + "px";
+  const [width, bind] = useResize(panelWidth);
+
   return (
     <>
       <div className={"wrapper_column"}>
@@ -284,14 +286,11 @@ export default function EventsTable({
           <PagingControls {...pagingProps} />
         </div>
       </div>
-      <div
-        className={"wrapper_column sidebar_column_l"}
-        style={{
-          width: sidePanelWidth,
-          flex: `0 0 ${sidePanelWidth}`
-        }}
+      <animated.div {...bind()} className={"sidebar-dragger"}></animated.div>
+      <animated.div
+        className={"sidebar-main"}
+        style={{ width, minWidth: width, maxWidth: width }}
       >
-        <ResizableDragger />
         <MatchResultsStatsPanel
           prefixId={"events_top"}
           aggregator={
@@ -299,7 +298,7 @@ export default function EventsTable({
           }
           showCharts
         />
-      </div>
+      </animated.div>
     </>
   );
 }

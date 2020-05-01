@@ -2470,6 +2470,19 @@ a:hover {
     overflow-y: auto;
 }
 
+.sidebar-main {
+    display: flex;
+    overflow-x: hidden;
+    justify-content: space-between;
+    border-right: solid 1px var(--color-mid-40);
+}
+
+.sidebar-dragger {
+    cursor: e-resize;
+    min-width: 3px;
+    background-color: var(--color-b);
+}
+
 .sidebar_column_r {
     margin-top: 16px;
     height: calc(100% - 16px);
@@ -2478,6 +2491,11 @@ a:hover {
     border-width: 2px;
     border-style: none solid none none;
     border-image: linear-gradient(to bottom, rgba(250, 229, 210, 0) 10px, var(--color-light-50) 10px, rgba(250, 229, 210, 0)) 1 100%;
+}
+
+.sidebar_column_l {
+    border-width: 2px;
+    border-style: none none none solid;
 }
 
 .sidebar_column_l {

@@ -1,22 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { InternalDeck, CardObject } from "../../../types/Deck";
 import ManaCost from "../misc/ManaCost";
-import { MANA_COLORS, IPC_NONE } from "../../../shared/constants";
+import {
+  MANA_COLORS,
+  IPC_NONE,
+  IPC_ALL,
+  IPC_RENDERER
+} from "../../../shared/constants";
 import DeckList from "../misc/DeckList";
 import DeckTypesStats from "../../../shared/DeckTypesStats";
 import DeckManaCurve from "../../../shared/DeckManaCurve";
 import Deck from "../../../shared/deck";
 import Button from "../misc/Button";
 import { ipcSend } from "../../rendererUtil";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import db from "../../../shared/database";
 import ShareButton from "../misc/ShareButton";
 import CraftingCost from "./CraftingCost";
 import uxMove from "../../uxMove";
 import { reduxAction } from "../../../shared-redux/sharedRedux";
-import { getDeck } from "../../../shared-store";
+import { getDeck, decksList } from "../../../shared-store";
 import VisualDeckView from "./VisualDeckView";
 import ChangesDeckView from "./ChangesDeckView";
+import { AppState } from "../../../shared-redux/stores/rendererStore";
+import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";
+import Aggregator from "../../aggregator";
+import { useAggregatorData } from "../tables/useAggregatorData";
+import { animated } from "react-spring";
+import useResize from "../../hooks/useResize";
 
 const ReactSvgPieChart = require("react-svg-piechart");
 
@@ -185,70 +196,103 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     { title: "Green", value: landCounts.g, color: MANA_COLORS[4] }
   ];
 
+  const [width, bind] = useResize(200);
+
+  const initFilters = useMemo(() => {
+    return { deckId: deck.id };
+  }, [deck.id]);
+
+  const { aggFilters } = useAggregatorData({
+    aggFiltersArg: initFilters,
+    getData: decksList,
+    showArchived: false
+  });
+
+  const aggregator = useMemo(() => new Aggregator({ ...aggFilters }), [
+    aggFilters
+  ]);
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-      <div className="decklist_top">
-        <div className="button back" onClick={goBack}></div>
-        <div className="deck_name">{deck.getName()}</div>
-        <ShareButton type="deck" data={deck.getSave()} />
-        <div className="deck_top_colors">
-          <ManaCost colors={deck.getColors().get()} />
+    <>
+      <div className="wrapper_column">
+        <div
+          style={{ display: "flex", flexDirection: "column", width: "100%" }}
+        >
+          <div className="decklist_top">
+            <div className="button back" onClick={goBack}></div>
+            <div className="deck_name">{deck.getName()}</div>
+            <ShareButton type="deck" data={deck.getSave()} />
+            <div className="deck_top_colors">
+              <ManaCost colors={deck.getColors().get()} />
+            </div>
+          </div>
+          <div
+            className="flex_item"
+            style={deckView !== VIEW_REGULAR ? { flexDirection: "column" } : {}}
+          >
+            {deckView == VIEW_VISUAL && (
+              <VisualDeckView deck={deck} setRegularView={regularView} />
+            )}
+            {deckView == VIEW_CHANGES && (
+              <ChangesDeckView deck={deck} setRegularView={regularView} />
+            )}
+            {deckView == VIEW_REGULAR && (
+              <>
+                <div className="decklist">
+                  <DeckList deck={deck} showWildcards={true} />
+                </div>
+                <div className="stats">
+                  <Button
+                    className="button_simple exportDeck"
+                    text="Deck Changes"
+                    onClick={deckChangesView}
+                  />
+                  <Button
+                    className="button_simple exportDeck"
+                    text="Visual View"
+                    onClick={visualView}
+                  />
+                  <Button
+                    className="button_simple exportDeck"
+                    text="Export to Arena"
+                    onClick={arenaExport}
+                  />
+                  <Button
+                    className="button_simple exportDeck"
+                    text="Export to .txt"
+                    onClick={txtExport}
+                  />
+                  <DeckTypesStats deck={deck} />
+                  <DeckManaCurve deck={deck} />
+                  <div className="pie_container_outer">
+                    <div className="pie_container">
+                      <span>Mana Symbols</span>
+                      <ReactSvgPieChart strokeWidth={0} data={colorsPie} />
+                    </div>
+                    <div className="pie_container">
+                      <span>Mana Sources</span>
+                      <ReactSvgPieChart strokeWidth={0} data={landsPie} />
+                    </div>
+                  </div>
+                  <CraftingCost deck={deck} />
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
-      <div
-        className="flex_item"
-        style={deckView !== VIEW_REGULAR ? { flexDirection: "column" } : {}}
+      <animated.div {...bind()} className={"sidebar-dragger"}></animated.div>
+      <animated.div
+        className={"sidebar-main"}
+        style={{ width, minWidth: width, maxWidth: width }}
       >
-        {deckView == VIEW_VISUAL && (
-          <VisualDeckView deck={deck} setRegularView={regularView} />
-        )}
-        {deckView == VIEW_CHANGES && (
-          <ChangesDeckView deck={deck} setRegularView={regularView} />
-        )}
-        {deckView == VIEW_REGULAR && (
-          <>
-            <div className="decklist">
-              <DeckList deck={deck} showWildcards={true} />
-            </div>
-            <div className="stats">
-              <Button
-                className="button_simple exportDeck"
-                text="Deck Changes"
-                onClick={deckChangesView}
-              />
-              <Button
-                className="button_simple exportDeck"
-                text="Visual View"
-                onClick={visualView}
-              />
-              <Button
-                className="button_simple exportDeck"
-                text="Export to Arena"
-                onClick={arenaExport}
-              />
-              <Button
-                className="button_simple exportDeck"
-                text="Export to .txt"
-                onClick={txtExport}
-              />
-              <DeckTypesStats deck={deck} />
-              <DeckManaCurve deck={deck} />
-              <div className="pie_container_outer">
-                <div className="pie_container">
-                  <span>Mana Symbols</span>
-                  <ReactSvgPieChart strokeWidth={0} data={colorsPie} />
-                </div>
-                <div className="pie_container">
-                  <span>Mana Sources</span>
-                  <ReactSvgPieChart strokeWidth={0} data={landsPie} />
-                </div>
-              </div>
-              <CraftingCost deck={deck} />
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+        <MatchResultsStatsPanel
+          prefixId={"deck_view"}
+          aggregator={aggregator}
+          showCharts
+        />
+      </animated.div>
+    </>
   );
 }
 

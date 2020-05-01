@@ -36,50 +36,6 @@ export function getTagColor(tag?: string): string {
   );
 }
 
-export function makeResizable(
-  div: HTMLElement,
-  resizeCallback?: (width: number) => void,
-  finalCallback?: (width: number) => void
-): void {
-  let mPos: number;
-  let finalWidth: number | undefined;
-
-  const resize = function(e: MouseEvent): void {
-    const parent = div.parentNode;
-    if (parent) {
-      const parEl = parent as HTMLElement;
-      const dx = mPos - e.x;
-      mPos = e.x;
-      const newWidth = Math.max(10, parseInt(parEl.style.width) + dx);
-      parEl.style.width = `${newWidth}px`;
-      parEl.style.flex = `0 0 ${newWidth}px`;
-      if (resizeCallback instanceof Function) resizeCallback(newWidth);
-      finalWidth = newWidth;
-    }
-  };
-
-  div.addEventListener(
-    "mousedown",
-    event => {
-      mPos = event.x;
-      document.addEventListener("mousemove", resize, false);
-    },
-    false
-  );
-
-  document.addEventListener(
-    "mouseup",
-    () => {
-      document.removeEventListener("mousemove", resize, false);
-      if (finalWidth) {
-        if (finalCallback instanceof Function) finalCallback(finalWidth);
-        finalWidth = undefined;
-      }
-    },
-    false
-  );
-}
-
 export function showDatepicker(
   defaultDate: Date | undefined,
   onChange: (date: Date) => void | undefined,
