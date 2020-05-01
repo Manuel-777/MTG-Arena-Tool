@@ -413,7 +413,7 @@ export default function MatchesTable({
     },
     [dispatcher]
   );
-  const [width, bind] = useResize(panelWidth);
+  const [width, bind] = useResize(panelWidth, finishResize);
 
   return (
     <>

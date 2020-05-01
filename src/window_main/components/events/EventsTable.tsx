@@ -252,7 +252,7 @@ export default function EventsTable({
     },
     [dispatcher]
   );
-  const [width, bind] = useResize(panelWidth);
+  const [width, bind] = useResize(panelWidth, finishResize);
 
   return (
     <>
