@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { InternalDeck, CardObject } from "../../../types/Deck";
 import ManaCost from "../misc/ManaCost";
 import {
@@ -196,7 +196,18 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     { title: "Green", value: landCounts.g, color: MANA_COLORS[4] }
   ];
 
-  const [width, bind] = useResize(200);
+  const finishResize = useCallback(
+    (newWidth: number) => {
+      reduxAction(
+        dispatcher,
+        "SET_SETTINGS",
+        { right_panel_width: newWidth },
+        IPC_ALL ^ IPC_RENDERER
+      );
+    },
+    [dispatcher]
+  );
+  const [width, bind] = useResize(200, finishResize);
 
   const initFilters = useMemo(() => {
     return { deckId: deck.id };

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Column, Row } from "react-table";
-import { DECKS_ART_MODE, DECKS_TABLE_MODE } from "../../../shared/constants";
+import { DECKS_ART_MODE, DECKS_TABLE_MODE, IPC_ALL, IPC_RENDERER } from "../../../shared/constants";
 import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { ListItemDeck } from "../list-item/ListItemDeck";
 import MatchResultsStatsPanel from "../misc/MatchResultsStatsPanel";
@@ -39,10 +39,11 @@ import DecksArtViewRow from "./DecksArtViewRow";
 import DecksTableControls from "./DecksTableControls";
 import { deckSearchFilterFn } from "./filters";
 import { DecksData, DecksTableControlsProps, DecksTableProps } from "./types";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
 import { animated } from "react-spring";
 import useResize from "../../hooks/useResize";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
 
 const columns: Column<DecksData>[] = [
   { accessor: "id" },
@@ -270,6 +271,7 @@ export default function DecksTable({
   ...customProps
 }: DecksTableProps): JSX.Element {
   const [tableMode, setTableMode] = React.useState(cachedTableMode);
+  const dispatcher = useDispatch();
   React.useEffect(() => tableModeCallback(tableMode), [
     tableMode,
     tableModeCallback
@@ -322,7 +324,18 @@ export default function DecksTable({
     (state: AppState) => state.settings.right_panel_width
   );
 
-  const [width, bind] = useResize(panelWidth);
+  const finishResize = useCallback(
+    (newWidth: number) => {
+      reduxAction(
+        dispatcher,
+        "SET_SETTINGS",
+        { right_panel_width: newWidth },
+        IPC_ALL ^ IPC_RENDERER
+      );
+    },
+    [dispatcher]
+  );
+  const [width, bind] = useResize(panelWidth, finishResize);
 
   return (
     <>

@@ -1,11 +1,13 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { Column, Filters, FilterValue, IdType, Row } from "react-table";
 import {
   COLLECTION_CARD_MODE,
   COLLECTION_CHART_MODE,
   COLLECTION_SETS_MODE,
   COLLECTION_TABLE_MODE,
-  DRAFT_RANKS
+  DRAFT_RANKS,
+  IPC_ALL,
+  IPC_RENDERER
 } from "../../../shared/constants";
 import db from "../../../shared/database";
 import { ColorsCell, MetricCell, ShortTextCell } from "../tables/cells";
@@ -45,10 +47,11 @@ import {
   CollectionTableControlsProps,
   CollectionTableProps
 } from "./types";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../../shared-redux/stores/rendererStore";
 import useResize from "../../hooks/useResize";
 import { animated } from "react-spring";
+import { reduxAction } from "../../../shared-redux/sharedRedux";
 
 function isBoosterMathValid(filters: Filters<CardsData>): boolean {
   let hasCorrectBoosterFilter = false;
@@ -388,7 +391,19 @@ export default function CollectionTable({
   const panelWidth = useSelector(
     (state: AppState) => state.settings.right_panel_width
   );
-  const [width, bind] = useResize(panelWidth);
+  const dispatcher = useDispatch();
+  const finishResize = useCallback(
+    (newWidth: number) => {
+      reduxAction(
+        dispatcher,
+        "SET_SETTINGS",
+        { right_panel_width: newWidth },
+        IPC_ALL ^ IPC_RENDERER
+      );
+    },
+    [dispatcher]
+  );
+  const [width, bind] = useResize(panelWidth, finishResize);
 
   return (
     <>
