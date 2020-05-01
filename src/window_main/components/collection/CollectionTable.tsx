@@ -417,7 +417,13 @@ export default function CollectionTable({
       <animated.div {...bind()} className={"sidebar-dragger"}></animated.div>
       <animated.div
         className={"sidebar-main"}
-        style={{ width, minWidth: width, maxWidth: width }}
+        style={{
+          width,
+          minWidth: width,
+          maxWidth: width,
+          display: "flex",
+          flexDirection: "column"
+        }}
       >
         <CollectionStatsPanel
           stats={stats}
