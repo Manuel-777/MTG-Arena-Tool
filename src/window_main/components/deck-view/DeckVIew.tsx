@@ -196,6 +196,9 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     { title: "Green", value: landCounts.g, color: MANA_COLORS[4] }
   ];
 
+  const panelWidth = useSelector(
+    (state: AppState) => state.settings.right_panel_width
+  );
   const finishResize = useCallback(
     (newWidth: number) => {
       reduxAction(
@@ -207,11 +210,20 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     },
     [dispatcher]
   );
-  const [width, bind] = useResize(200, finishResize);
+  const [width, bind] = useResize(panelWidth, finishResize);
+
+
+  const dateFilter = useSelector(
+    (state: AppState) => state.settings.last_date_filter
+  );
+  const DecksTableState = useSelector(
+    (state: AppState) => state.settings.decksTableState
+  );
 
   const initFilters = useMemo(() => {
+    dateFilter && DecksTableState;
     return { deckId: deck.id };
-  }, [deck.id]);
+  }, [deck.id, dateFilter, DecksTableState]);
 
   const { aggFilters } = useAggregatorData({
     aggFiltersArg: initFilters,
@@ -219,9 +231,9 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     showArchived: false
   });
 
-  const aggregator = useMemo(() => new Aggregator({ ...aggFilters }), [
-    aggFilters
-  ]);
+  const aggregator = useMemo(() => {
+    return new Aggregator({ ...aggFilters });
+  }, [aggFilters]);
 
   return (
     <>
