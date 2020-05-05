@@ -21,7 +21,7 @@ If you would like to compile and run the latest source, see [the contribution gu
 
 
 ## Documentation
-Visit https://mtgatool.com/ to learn more or join [our community discussion on Discord](https://discord.gg/K9bPkJy).
+Visit [https://mtgatool.com/docs](https://mtgatool.com/docs), or join [our community discussion on Discord](https://discord.gg/K9bPkJy).
 
 ### Troubleshooting
 Please see [our troubleshooting guide.](./TROUBLESHOOTING.md)
@@ -33,31 +33,6 @@ Please see [our contributing guide.](./CONTRIBUTING.md)
 ## License
 
 [GPLv3](./LICENSE.md)
-
-### Disclaimer
-Even though no official statement has been made about third party software by MTG Arena developers, I am obliged to put a warning about the use of this software.
-
-It is not stated if it is legal or allowed by Wizards of the Coast to use Deck Trackers and other tools alike while playing MTG Arena, therefore MTG Arena Tool developers are not responsible if your account gets banned, locked or suspended for using this software. `Use at your own risk.`
-
-MtG Arena Tool is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.
-
-Please read about [our Privacy Policy and How we use your data here](./PRIVACY.md)
-
-### Credits
-[Electron](https://electronjs.org/)
-
-[Electron Store by Sindre Sorhus](https://github.com/sindresorhus/electron-store)
-
-[Conic Gradient Polyfill by Lea Verou](https://leaverou.github.io/conic-gradient/)
-
-[vanilla-picker by Andreas Borgen, Adam Brooks](https://vanilla-picker.js.org/)
-
-[howler.js by James Simpson and GoldFire Studios, Inc.](https://github.com/goldfire/howler.js)
-
-[Draft ranking by Magic Community Set Reviews](https://www.mtgcommunityreview.com/)
-
-[Scryfall.com](http://scryfall.com) in particular, for making an absolutely stunning database of every single card in the multiverse.
-
 
 ## Contact
 You can find me at any of these;
