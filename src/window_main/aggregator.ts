@@ -580,8 +580,8 @@ export default class Aggregator {
           });
 
           // Add the previos changes to the current ones
-          addDelta = [...addDelta, ...(game.sideboardChanges?.added || 0)];
-          remDelta = [...remDelta, ...(game.sideboardChanges?.removed || 0)];
+          addDelta = [...addDelta, ...(game.sideboardChanges?.added || [])];
+          remDelta = [...remDelta, ...(game.sideboardChanges?.removed || [])];
 
           addDelta.forEach(grpId => {
             // define
