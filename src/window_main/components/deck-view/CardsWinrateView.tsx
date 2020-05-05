@@ -104,7 +104,7 @@ export default function CardsWinratesView(
   const { aggregator, deck, setRegularView } = props;
 
   const winrates = aggregator.getCardsWinrates();
-  console.log(winrates);
+  // console.log(winrates);
   deck.sortMainboard(compare_cards);
   deck.sortSideboard(compare_cards);
   return (
