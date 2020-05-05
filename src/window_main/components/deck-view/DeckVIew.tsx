@@ -265,7 +265,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   />
                   <Button
                     className="button_simple exportDeck"
-                    text="Cards Breakdown"
+                    text="Card Winrates"
                     onClick={deckWinratesView}
                   />
                   <Button

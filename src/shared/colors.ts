@@ -26,14 +26,26 @@ class Colors {
    * inside an array.
    */
   get() {
-    let _arr = [];
+    const _arr = [];
     if (this.w !== 0) _arr.push(WHITE);
     if (this.u !== 0) _arr.push(BLUE);
     if (this.b !== 0) _arr.push(BLACK);
     if (this.r !== 0) _arr.push(RED);
     if (this.g !== 0) _arr.push(GREEN);
-
     return _arr;
+  }
+
+  /**
+   * Returns an Integer that identifies this color as a "bitshift" sum
+   */
+  getBits(): number {
+    let sum = 0;
+    if (this.w !== 0) sum = sum | 2;
+    if (this.u !== 0) sum = sum | 4;
+    if (this.b !== 0) sum = sum | 8;
+    if (this.r !== 0) sum = sum | 16;
+    if (this.g !== 0) sum = sum | 32;
+    return sum;
   }
 
   /**
@@ -127,6 +139,19 @@ class Colors {
     this.b += color.b;
     this.r += color.r;
     this.g += color.g;
+
+    return this;
+  }
+
+  /**
+   * Merges a "bitshift" integer into this color.
+   */
+  addFromBits(color: number) {
+    this.w += color & 2 ? 1 : 0;
+    this.u += color & 4 ? 1 : 0;
+    this.b += color & 8 ? 1 : 0;
+    this.r += color & 16 ? 1 : 0;
+    this.g += color & 32 ? 1 : 0;
 
     return this;
   }
