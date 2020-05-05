@@ -23,12 +23,14 @@ import Aggregator from "../../aggregator";
 import { useAggregatorData } from "../tables/useAggregatorData";
 import { animated } from "react-spring";
 import useResizePanel from "../../hooks/useResizePanel";
+import CardsWinratesView from "./CardsWinrateView";
 
 const ReactSvgPieChart = require("react-svg-piechart");
 
 const VIEW_VISUAL = 0;
 const VIEW_REGULAR = 1;
 const VIEW_CHANGES = 2;
+const VIEW_WINRATES = 3;
 
 interface DeckViewProps {
   deck: InternalDeck;
@@ -143,6 +145,10 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     uxMove(0);
   };
 
+  const deckWinratesView = (): void => {
+    setDeckView(VIEW_WINRATES);
+  };
+
   const deckChangesView = (): void => {
     setDeckView(VIEW_CHANGES);
   };
@@ -239,6 +245,13 @@ export function DeckView(props: DeckViewProps): JSX.Element {
             {deckView == VIEW_CHANGES && (
               <ChangesDeckView deck={deck} setRegularView={regularView} />
             )}
+            {deckView == VIEW_WINRATES && (
+              <CardsWinratesView
+                deck={deck}
+                setRegularView={regularView}
+                aggregator={aggregator}
+              />
+            )}
             {deckView == VIEW_REGULAR && (
               <>
                 <div className="decklist">
@@ -249,6 +262,11 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                     className="button_simple exportDeck"
                     text="Deck Changes"
                     onClick={deckChangesView}
+                  />
+                  <Button
+                    className="button_simple exportDeck"
+                    text="Cards Breakdown"
+                    onClick={deckWinratesView}
                   />
                   <Button
                     className="button_simple exportDeck"

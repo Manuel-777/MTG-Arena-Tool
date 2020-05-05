@@ -4622,3 +4622,53 @@ a:hover {
 .game_prev:hover, .game_next:hover {
     opacity: 1;
 }
+
+.card-wr-stats {
+    display: flex;
+    margin: 32px;
+    width: calc(100% - 64px);
+    flex-direction: column;
+}
+
+.card-wr-line {
+    margin-top: 1px;
+    display: grid;
+    grid-template-columns: minmax(200px, 50%) 8px minmax(32px, 1fr) minmax(32px, 1fr) minmax(32px, 1fr) minmax(32px, 1fr) minmax(32px, 1fr) minmax(32px, 1fr);
+}
+
+.card-wr-item {
+    margin-right: 1px;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: var(--color-light);
+    font-size: 14px;
+    line-height: 32px;
+    text-align: center;
+}
+
+.card-wr-line-card {
+    grid-area: 1 / 1 / 1 / 2;
+}
+
+.card-wr-line-wr {
+    grid-area: 1 / 3 / 1 / 4;
+}
+
+.card-wr-line-sided-in {
+    grid-area: 1 / 4 / 1 / 5;
+}
+
+.card-wr-line-sided-out {
+    grid-area: 1 / 5 / 1 / 6;
+}
+
+.card-wr-line-sided-in-wr {
+    grid-area: 1 / 6 / 1 / 7;
+}
+
+.card-wr-line-sided-out-wr {
+    grid-area: 1 / 7 / 1 / 8;
+}
+
+.card-wr-line-avg-turn {
+    grid-area: 1 / 8 / 1 / 9;
+}
