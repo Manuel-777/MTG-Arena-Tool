@@ -99,11 +99,16 @@ export default function CardsWinratesView(
   return (
     <>
       <Button text="Normal View" onClick={setRegularView} />
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <div className="settings_note" style={{ textAlign: "center" }}>
+          All winrates shown correspond to the times when the card in question
+          was cast during a game, except for the &quot;Sided out WR&quot;
+          column.
+        </div>
         <div className="card-wr-stats">
           <div className="card-wr-line">
             <div className="card-wr-item card-wr-line-card">Mainboard</div>
-            <div className="card-wr-item card-wr-line-wr">Winrate</div>
+            <div className="card-wr-item card-wr-line-wr">Cast WR</div>
             <div className="card-wr-item card-wr-line-hand-wr">Hand WR</div>
             <div className="card-wr-item card-wr-line-sided-in">Sided in</div>
             <div className="card-wr-item card-wr-line-sided-out">Sided out</div>
