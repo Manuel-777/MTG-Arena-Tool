@@ -40,11 +40,11 @@ class Colors {
    */
   getBits(): number {
     let bits = 0;
-    if (this.w !== 0) bits = bits | 2;
-    if (this.u !== 0) bits = bits | 4;
-    if (this.b !== 0) bits = bits | 8;
-    if (this.r !== 0) bits = bits | 16;
-    if (this.g !== 0) bits = bits | 32;
+    if (this.w !== 0) bits = bits | 1;
+    if (this.u !== 0) bits = bits | 2;
+    if (this.b !== 0) bits = bits | 4;
+    if (this.r !== 0) bits = bits | 8;
+    if (this.g !== 0) bits = bits | 16;
     return bits;
   }
 
@@ -147,11 +147,11 @@ class Colors {
    * Merges a "bitshift" integer into this color.
    */
   addFromBits(color: number) {
-    this.w += color & 2 ? 1 : 0;
-    this.u += color & 4 ? 1 : 0;
-    this.b += color & 8 ? 1 : 0;
-    this.r += color & 16 ? 1 : 0;
-    this.g += color & 32 ? 1 : 0;
+    this.w += color & 1 ? 1 : 0;
+    this.u += color & 2 ? 1 : 0;
+    this.b += color & 4 ? 1 : 0;
+    this.r += color & 8 ? 1 : 0;
+    this.g += color & 16 ? 1 : 0;
 
     return this;
   }
