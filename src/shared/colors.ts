@@ -1,4 +1,12 @@
 import { WHITE, BLUE, BLACK, RED, GREEN, MULTI, COLORLESS } from "./constants";
+const colorFlags = {
+  NONE: 0,
+  W: 1,
+  U: 2,
+  B: 4,
+  R: 8,
+  G: 16
+};
 
 class Colors {
   private w: number;
@@ -40,11 +48,11 @@ class Colors {
    */
   getBits(): number {
     let bits = 0;
-    if (this.w !== 0) bits = bits | 1;
-    if (this.u !== 0) bits = bits | 2;
-    if (this.b !== 0) bits = bits | 4;
-    if (this.r !== 0) bits = bits | 8;
-    if (this.g !== 0) bits = bits | 16;
+    if (this.w !== 0) bits |= colorFlags.W;
+    if (this.u !== 0) bits |= colorFlags.U;
+    if (this.b !== 0) bits |= colorFlags.B;
+    if (this.r !== 0) bits |= colorFlags.R;
+    if (this.g !== 0) bits |= colorFlags.G;
     return bits;
   }
 
@@ -147,11 +155,11 @@ class Colors {
    * Merges a "bitshift" integer into this color.
    */
   addFromBits(color: number) {
-    this.w += color & 1 ? 1 : 0;
-    this.u += color & 2 ? 1 : 0;
-    this.b += color & 4 ? 1 : 0;
-    this.r += color & 8 ? 1 : 0;
-    this.g += color & 16 ? 1 : 0;
+    this.w += color & colorFlags.W ? 1 : 0;
+    this.u += color & colorFlags.U ? 1 : 0;
+    this.b += color & colorFlags.B ? 1 : 0;
+    this.r += color & colorFlags.R ? 1 : 0;
+    this.g += color & colorFlags.G ? 1 : 0;
 
     return this;
   }
@@ -170,15 +178,6 @@ class Colors {
   }
 
   getColorArchetype(): string {
-    const colorFlags = {
-      NONE: 0,
-      W: 1,
-      U: 2,
-      B: 4,
-      R: 8,
-      G: 16
-    };
-
     let currentColorFlags: number = colorFlags.NONE;
     if (this.w) currentColorFlags |= colorFlags.W;
     if (this.u) currentColorFlags |= colorFlags.U;
