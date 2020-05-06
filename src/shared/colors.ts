@@ -33,7 +33,7 @@ class Colors {
    * Returns an array containing the colors as non-repeating constants
    * inside an array.
    */
-  get() {
+  get(): number[] {
     const _arr = [];
     if (this.w !== 0) _arr.push(WHITE);
     if (this.u !== 0) _arr.push(BLUE);
@@ -59,7 +59,7 @@ class Colors {
   /**
    * Return the color, multicolor or colorless.
    */
-  getBaseColor() {
+  getBaseColor(): number {
     if (this.length > 1) {
       return MULTI;
     } else if (this.length === 0) {
@@ -71,7 +71,7 @@ class Colors {
   /**
    * Returns the number of colors
    */
-  get length() {
+  get length(): number {
     let ret = 0;
     if (this.w > 0) ret += 1;
     if (this.u > 0) ret += 1;
@@ -85,7 +85,7 @@ class Colors {
   /**
    * Adds a string mana cost to this class.
    */
-  addFromCost(cost: string[]) {
+  addFromCost(cost: string[]): Colors {
     cost.forEach(symbol => {
       for (const c of symbol) {
         switch (c) {
@@ -114,7 +114,7 @@ class Colors {
   /**
    * Adds an array mana cost to this one.
    */
-  addFromArray(cost: number[]) {
+  addFromArray(cost: number[]): Colors {
     cost.forEach(color => {
       switch (color) {
         case WHITE:
@@ -141,7 +141,7 @@ class Colors {
   /**
    * Merges another instance of Colors into this one.
    */
-  addFromColor(color: Colors) {
+  addFromColor(color: Colors): Colors {
     this.w += color.w;
     this.u += color.u;
     this.b += color.b;
@@ -154,12 +154,12 @@ class Colors {
   /**
    * Merges a "bitshift" integer into this color.
    */
-  addFromBits(color: number) {
-    this.w += color & colorFlags.W ? 1 : 0;
-    this.u += color & colorFlags.U ? 1 : 0;
-    this.b += color & colorFlags.B ? 1 : 0;
-    this.r += color & colorFlags.R ? 1 : 0;
-    this.g += color & colorFlags.G ? 1 : 0;
+  addFromBits(colorBits: number): Colors {
+    this.w += colorBits & colorFlags.W ? 1 : 0;
+    this.u += colorBits & colorFlags.U ? 1 : 0;
+    this.b += colorBits & colorFlags.B ? 1 : 0;
+    this.r += colorBits & colorFlags.R ? 1 : 0;
+    this.g += colorBits & colorFlags.G ? 1 : 0;
 
     return this;
   }
