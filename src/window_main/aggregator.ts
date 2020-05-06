@@ -537,6 +537,8 @@ export default class Aggregator {
         let remDelta: number[] = [];
         match.gameStats.forEach(game => {
           const gameCards: number[] = [];
+          const wins = game.win ? 1 : 0;
+          const losses = game.win ? 0 : 1;
           // For each card cast
           game.cardsCast.forEach(cardCast => {
             const { grpId, player, turn } = cardCast;
@@ -546,8 +548,8 @@ export default class Aggregator {
               if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
               // Only once per card cast!
               if (!gameCards.includes(grpId)) {
-                winrates[grpId].wins += game.win ? 1 : 0;
-                winrates[grpId].losses += game.win ? 0 : 1;
+                winrates[grpId].wins += wins;
+                winrates[grpId].losses += losses;
 
                 const colors = new Colors();
                 colors.addFromArray(match.oppDeck.colors || []);
@@ -559,8 +561,8 @@ export default class Aggregator {
                       losses: 0
                     };
                   }
-                  winrates[grpId].colors[bits].wins += game.win ? 1 : 0;
-                  winrates[grpId].colors[bits].losses += game.win ? 0 : 1;
+                  winrates[grpId].colors[bits].wins += wins;
+                  winrates[grpId].colors[bits].losses += losses;
                   gameCards.push(grpId);
                 }
               }
@@ -573,8 +575,8 @@ export default class Aggregator {
           game.handsDrawn[game.handsDrawn.length - 1]?.forEach(grpId => {
             // define
             if (!winrates[grpId]) winrates[grpId] = newCardWinrate(grpId);
-            winrates[grpId].initHandWins += game.win ? 1 : 0;
-            winrates[grpId].initHandsLosses += game.win ? 0 : 1;
+            winrates[grpId].initHandWins += wins;
+            winrates[grpId].initHandsLosses += losses;
           });
 
           // Add the previos changes to the current ones
@@ -587,8 +589,8 @@ export default class Aggregator {
             winrates[grpId].sidedIn++;
             // Only add if the card was used
             if (gameCards.includes(grpId)) {
-              winrates[grpId].sideInWins += game.win ? 1 : 0;
-              winrates[grpId].sideInLosses += game.win ? 0 : 1;
+              winrates[grpId].sideInWins += wins;
+              winrates[grpId].sideInLosses += losses;
             }
           });
           remDelta.forEach(grpId => {
@@ -597,8 +599,8 @@ export default class Aggregator {
             winrates[grpId].sidedOut++;
             // Only add if the card was not used
             if (!gameCards.includes(grpId)) {
-              winrates[grpId].sideOutWins += game.win ? 1 : 0;
-              winrates[grpId].sideOutLosses += game.win ? 0 : 1;
+              winrates[grpId].sideOutWins += wins;
+              winrates[grpId].sideOutLosses += losses;
             }
           });
         });
