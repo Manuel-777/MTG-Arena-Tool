@@ -565,9 +565,7 @@ export default class Aggregator {
                 }
               }
               // Do this for every card cast in the game
-              winrates[grpId].turnsUsed.push(
-Math.ceil(turn / 2);
-              );
+              winrates[grpId].turnsUsed.push(Math.ceil(turn / 2));
             }
           });
 
