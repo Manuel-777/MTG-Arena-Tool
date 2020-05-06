@@ -9,6 +9,10 @@ import { getWinrateClass } from "../../rendererUtil";
 import { DbCardData } from "../../../types/Metadata";
 import { compare_cards } from "../../../shared/util";
 
+function getWinrateValue(wins: number, losses: number): number {
+  return wins + losses == 0 ? -1 : Math.round((100 / (wins + losses)) * wins);
+}
+
 function cardWinrateLine(
   winrates: Record<number, CardWinrateData>,
   cardObj: DbCardData,
@@ -16,26 +20,11 @@ function cardWinrateLine(
   index: number
 ): JSX.Element {
   const wr = winrates[cardObj.id];
-  const winrate =
-    wr.wins + wr.losses == 0
-      ? -1
-      : Math.round((100 / (wr.wins + wr.losses)) * wr.wins);
-  const sideInWinrate =
-    wr.sideInWins + wr.sideInLosses == 0
-      ? -1
-      : Math.round((100 / (wr.sideInWins + wr.sideInLosses)) * wr.sideInWins);
-  const initHandWinrate =
-    wr.initHandWins + wr.initHandsLosses == 0
-      ? -1
-      : Math.round(
-          (100 / (wr.initHandWins + wr.initHandsLosses)) * wr.initHandWins
-        );
-  const sideOutWinrate =
-    wr.sideOutWins + wr.sideOutLosses == 0
-      ? -1
-      : Math.round(
-          (100 / (wr.sideOutWins + wr.sideOutLosses)) * wr.sideOutWins
-        );
+  const winrate = getWinrateValue(wr.wins, wr.losses);
+  const sideInWinrate = getWinrateValue(wr.sideInWins, wr.sideInLosses);
+  const initHandWinrate = getWinrateValue(wr.initHandWins, wr.initHandsLosses);
+  const sideOutWinrate = getWinrateValue(wr.sideOutWins, wr.sideOutLosses);
+
   const sum = wr.turnsUsed.reduce((a, b) => a + b, 0);
   const avgTurn = sum / wr.turnsUsed.length || 0;
   return (
