@@ -39,13 +39,13 @@ class Colors {
    * Returns an Integer that identifies this color as a "bitshift" sum
    */
   getBits(): number {
-    let sum = 0;
-    if (this.w !== 0) sum = sum | 2;
-    if (this.u !== 0) sum = sum | 4;
-    if (this.b !== 0) sum = sum | 8;
-    if (this.r !== 0) sum = sum | 16;
-    if (this.g !== 0) sum = sum | 32;
-    return sum;
+    let bits = 0;
+    if (this.w !== 0) bits = bits | 2;
+    if (this.u !== 0) bits = bits | 4;
+    if (this.b !== 0) bits = bits | 8;
+    if (this.r !== 0) bits = bits | 16;
+    if (this.g !== 0) bits = bits | 32;
+    return bits;
   }
 
   /**
