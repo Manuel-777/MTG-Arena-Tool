@@ -910,7 +910,7 @@ function checkTurnDiff(turnInfo: TurnInfo): void {
       -1,
       globals.logTime,
       getNameBySeat(turnInfo.activePlayer || 0) +
-        "'s turn begin. (#" +
+        "'s turn begins. (#" +
         turnInfo.turnNumber +
         ")"
     );
