@@ -29,7 +29,7 @@ Locate your log and config files;
 - Copy the path to the "Arena Log"
 - Close MTG Arena and MTG Arena Tool.
 - Open the "Arena Log" path in a file browser
-- Rename `output_log.txt`, do not delete it!
+- Rename `Player.log`, do not delete it!
 - Run MTGA, once open, run Mtgatool again.
 
 If this works, send the the old log file file to [mtgatool@gmail.com](mailto:mtgatool@gmail.com) to analyze the error.

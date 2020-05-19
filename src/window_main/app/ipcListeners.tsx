@@ -163,7 +163,10 @@ export default function ipcListeners(dispatcher: any): void {
     reduxAction(dispatcher, "SET_UPDATE_STATE", arg, IPC_NONE);
   });
 
-  ipc.on("no_log", (): void => {
+  ipc.on("no_log", function(event: IpcRendererEvent, arg: string) {
+    if (arg) {
+      reduxAction(dispatcher, "SET_APP_SETTINGS", { logUri: arg }, IPC_NONE);
+    }
     reduxAction(dispatcher, "SET_NO_LOG", true, IPC_NONE);
   });
 

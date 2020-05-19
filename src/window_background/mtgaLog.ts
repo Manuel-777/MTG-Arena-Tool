@@ -14,12 +14,12 @@ export function defaultLogUri(): string {
       process.env.HOME +
       "/.wine/drive_c/user/" +
       process.env.USER +
-      "/AppData/LocalLow/Wizards of the Coast/MTGA/output_log.txt"
+      "/AppData/LocalLow/Wizards of the Coast/MTGA/Player.log"
     );
   }
 
   const windowsMtgaLogFolder =
-    "LocalLow\\Wizards Of The Coast\\MTGA\\output_log.txt";
+    "LocalLow\\Wizards Of The Coast\\MTGA\\Player.log";
   return (
     process.env.APPDATA?.replace("Roaming", windowsMtgaLogFolder) ??
     "c:\\users\\" + process.env.USER + "\\AppData\\" + windowsMtgaLogFolder

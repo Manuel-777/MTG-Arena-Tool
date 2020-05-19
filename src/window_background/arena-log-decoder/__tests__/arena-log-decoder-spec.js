@@ -4,7 +4,7 @@ import fs from "fs";
 
 import ArenaLogDecoder from "../arena-log-decoder";
 
-const text = fs.readFileSync(__dirname + "/output_log.txt", "utf-8");
+const text = fs.readFileSync(__dirname + "/Player.log", "utf-8");
 
 const getJson = logEntry => ({
   ...logEntry,

@@ -116,7 +116,7 @@ ipc.on("start_background", async function() {
   );
 
   const appSettings = await appDb.find("", "settings");
-  let logUri = appSettings.logUri;
+  let logUri = appSettings.logUri || "";
 
   if (typeof process.env.LOGFILE !== "undefined") {
     logUri = process.env.LOGFILE;
@@ -354,6 +354,17 @@ async function logLoop(): Promise<void> {
   const logUri = globals.store.getState().appsettings.logUri;
   //console.log("logLoop() start");
   //ipcSend("ipc_log", "logLoop() start");
+  if (
+    logUri.indexOf("output_log") !== -1 &&
+    fs.existsSync(mtgaLog.defaultLogUri())
+  ) {
+    ipcSend("no_log", mtgaLog.defaultLogUri());
+    ipcSend("popup", {
+      text: "Log file name has changed.",
+      time: 1000
+    });
+    return;
+  }
   if (fs.existsSync(logUri)) {
     if (fs.lstatSync(logUri).isDirectory()) {
       ipcSend("no_log", logUri);
@@ -418,6 +429,7 @@ async function logLoop(): Promise<void> {
 5) Restart Arena.`,
         time: 0
       });
+      reduxAction(globals.store.dispatch, "SET_CAN_LOGIN", false, IPC_RENDERER);
       detailedLogs = false;
     }
 
@@ -450,9 +462,10 @@ async function logLoop(): Promise<void> {
   const { arenaId, playerName } = parsedData;
   if (!arenaId || !playerName) {
     ipcSend("popup", {
-      text: "output_log.txt contains no player data",
+      text: "Player.log contains no player data",
       time: 0
     });
+    reduxAction(globals.store.dispatch, "SET_CAN_LOGIN", false, IPC_RENDERER);
     return;
   } else {
     reduxAction(globals.store.dispatch, "SET_PLAYER_ID", arenaId, IPC_RENDERER);
@@ -485,6 +498,7 @@ async function logLoop(): Promise<void> {
     }
   }
 
+  reduxAction(globals.store.dispatch, "SET_CAN_LOGIN", true, IPC_RENDERER);
   ipcSend("prefill_auth_form", {
     username,
     password,
