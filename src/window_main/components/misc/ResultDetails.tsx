@@ -46,7 +46,7 @@ export default function ResultDetails(props: ResultDetailsProps): JSX.Element {
   let g1Title;
   if (match.gameStats[0]) {
     g1Title =
-      (g2OnThePlay ? "On the Play, " : "On the Draw, ") +
+      (g1OnThePlay ? "On the Play, " : "On the Draw, ") +
       (match.gameStats[0].win ? "Win" : "Loss");
   } else {
     g1Title = "Not played";
