@@ -167,7 +167,6 @@ export const matchDataDefault: MatchData = {
     step: "Step_None",
     turnNumber: 0,
     priorityPlayer: 0,
-    stormCount: 0,
     nextPhase: "Phase_None",
     nextStep: "Step_None"
   },
