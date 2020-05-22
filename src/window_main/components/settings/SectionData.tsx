@@ -121,7 +121,7 @@ export default function SectionData(): JSX.Element {
         defaultPath: appSettings.logUri,
         buttonLabel: "Select",
         filters: [
-          { name: "Text", extensions: ["txt", "text"] },
+          { name: "Log File", extensions: ["log"] },
           { name: "All Files", extensions: ["*"] }
         ],
         properties: ["openFile"]
