@@ -1,6 +1,7 @@
 syntax = "proto3";
 
-// MtGA 1.07.00.00
+// MtGA 1.08.00.00
+
 
 message AIConfig {
 	MatchConfig matchConfig = 1;
@@ -1885,7 +1886,6 @@ message GameMetrics {
 message GameObjectInfo {
 	uint32 instanceId = 1;
 	uint32 grpId = 2;
-	int32 groupId = 3;
 	GameObjectType type = 4;
 	uint32 zoneId = 5;
 	Visibility visibility = 6;
@@ -1966,6 +1966,7 @@ message GameStateMessage {
 message GameStateRedactorConfiguration {
 	bool enableRedaction = 1;
 	bool enableForceDiff = 2;
+	bool enableZoneRedaction = 3;
 }
 
 enum GameStateType {
@@ -2152,6 +2153,7 @@ enum IdType {
 	IdType_None = 0;
 	IdType_InstanceId = 1;
 	IdType_PromptParameterIndex = 2;
+	IdType_ZoneInstanceId = 3;
 }
 
 message IllegalRequestMessage {
@@ -3235,11 +3237,13 @@ message SearchReq {
 	repeated uint32 itemsToSearch = 5;
 	repeated uint32 itemsSought = 6;
 	uint32 sourceId = 7;
+	repeated uint32 additionalZones = 8;
 }
 
 message SearchResp {
 	uint32 optionIndex = 1;
 	repeated uint32 itemsFound = 2;
+	uint32 addZoneToSearchScope = 3;
 }
 
 enum SelectAction {
@@ -4203,7 +4207,6 @@ message TurnInfo {
 	uint32 activePlayer = 4;
 	uint32 priorityPlayer = 5;
 	uint32 decisionPlayer = 6;
-	uint32 stormCount = 7;
 	Phase nextPhase = 8;
 	Step nextStep = 9;
 }
