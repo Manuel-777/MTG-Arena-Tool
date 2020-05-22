@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-empty-interface */
+/* eslint-disable @typescript-eslint/interface-name-prefix */
 // generated file, do not touch!
 import ByteBuffer from "bytebuffer";
 
