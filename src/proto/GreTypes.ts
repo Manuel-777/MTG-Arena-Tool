@@ -918,7 +918,6 @@ export interface GameMetrics {
 export interface GameObjectInfo {
   instanceId?: number;
   grpId?: number;
-  groupId?: number;
   type?: GameObjectType;
   zoneId?: number;
   visibility?: Visibility;
@@ -972,6 +971,7 @@ export interface GameStateMessage {
 export interface GameStateRedactorConfiguration {
   enableRedaction?: boolean;
   enableForceDiff?: boolean;
+  enableZoneRedaction?: boolean;
 }
 
 export interface GatherReq {
@@ -1077,6 +1077,10 @@ export interface GroupSpecification {
   subZoneType?: SubZoneType;
   prompt?: Prompt;
   isFacedown?: boolean;
+}
+
+export interface IRLoaderConfiguration {
+  enableLimitedIRLoading?: boolean;
 }
 
 export interface IllegalRequestMessage {
@@ -1716,11 +1720,13 @@ export interface SearchReq {
   itemsToSearch: number[];
   itemsSought: number[];
   sourceId?: number;
+  additionalZones: number[];
 }
 
 export interface SearchResp {
   optionIndex?: number;
   itemsFound: number[];
+  addZoneToSearchScope?: number;
 }
 
 export interface SelectCountersReq {
@@ -2056,7 +2062,6 @@ export interface TurnInfo {
   activePlayer?: number;
   priorityPlayer?: number;
   decisionPlayer?: number;
-  stormCount?: number;
   nextPhase?: Phase;
   nextStep?: Step;
 }
@@ -2108,7 +2113,7 @@ export interface ZoneInfo {
 export enum EnumAIConfigOption {
   AIConfigOption_None = 0,
   AIConfigOption_Inactive = 1,
-  AIConfigOption_Active = 2
+  AIConfigOption_Active = 2,
 }
 
 export type AIConfigOption = keyof typeof EnumAIConfigOption;
@@ -2116,7 +2121,7 @@ export type AIConfigOption = keyof typeof EnumAIConfigOption;
 export enum EnumAIConfigYesNo {
   AIConfigYesNo_None = 0,
   AIConfigYesNo_No = 1,
-  AIConfigYesNo_Yes = 2
+  AIConfigYesNo_Yes = 2,
 }
 
 export type AIConfigYesNo = keyof typeof EnumAIConfigYesNo;
@@ -2125,7 +2130,7 @@ export enum EnumAIMode {
   AIMode_None = 0,
   AIMode_Goldfish = 1,
   AIMode_Gameplay = 2,
-  AIMode_Random = 3
+  AIMode_Random = 3,
 }
 
 export type AIMode = keyof typeof EnumAIMode;
@@ -2343,7 +2348,7 @@ export enum EnumAbilityType {
   AbilityType_IntrinsicMana_B = 1003,
   AbilityType_IntrinsicMana_R = 1004,
   AbilityType_IntrinsicMana_G = 1005,
-  AbilityType_AutoGen = 1006
+  AbilityType_AutoGen = 1006,
 }
 
 export type AbilityType = keyof typeof EnumAbilityType;
@@ -2352,7 +2357,7 @@ export enum EnumActionCostType {
   ActionCostType_None = 0,
   ActionCostType_Select = 1,
   ActionCostType_SelectCounter = 2,
-  ActionCostType_Autoselect = 3
+  ActionCostType_Autoselect = 3,
 }
 
 export type ActionCostType = keyof typeof EnumActionCostType;
@@ -2375,7 +2380,7 @@ export enum EnumActionType {
   ActionType_CombatCost = 14,
   ActionType_OpeningHandAction = 15,
   ActionType_CastAdventure = 16,
-  ActionType_FloatMana = 17
+  ActionType_FloatMana = 17,
 }
 
 export type ActionType = keyof typeof EnumActionType;
@@ -2384,7 +2389,7 @@ export enum EnumAllowCancel {
   AllowCancel_None = 0,
   AllowCancel_Continue = 1,
   AllowCancel_Abort = 2,
-  AllowCancel_No = 3
+  AllowCancel_No = 3,
 }
 
 export type AllowCancel = keyof typeof EnumAllowCancel;
@@ -2471,7 +2476,7 @@ export enum EnumAnnotationType {
   AnnotationType_ReferencedObjects = 78,
   AnnotationType_ChoosingAttachments = 79,
   AnnotationType_TemporaryPermanent = 80,
-  AnnotationType_GamewideHistoryCount = 81
+  AnnotationType_GamewideHistoryCount = 81,
 }
 
 export type AnnotationType = keyof typeof EnumAnnotationType;
@@ -2479,7 +2484,7 @@ export type AnnotationType = keyof typeof EnumAnnotationType;
 export enum EnumAnswer {
   Answer_None = 0,
   Answer_Yes = 1,
-  Answer_No = 2
+  Answer_No = 2,
 }
 
 export type Answer = keyof typeof EnumAnswer;
@@ -2487,7 +2492,7 @@ export type Answer = keyof typeof EnumAnswer;
 export enum EnumAttackState {
   AttackState_None = 0,
   AttackState_Declared = 1,
-  AttackState_Attacking = 2
+  AttackState_Attacking = 2,
 }
 
 export type AttackState = keyof typeof EnumAttackState;
@@ -2496,14 +2501,14 @@ export enum EnumAttackWarningType {
   AttackWarningType_None = 0,
   AttackWarningType_MustAttackWithAtLeastOne = 1,
   AttackWarningType_CannotAttackAlone = 2,
-  AttackWarningType_MustAttack = 3
+  AttackWarningType_MustAttack = 3,
 }
 
 export type AttackWarningType = keyof typeof EnumAttackWarningType;
 
 export enum EnumAuthenticationType {
   AuthenticationType_Invalid = 0,
-  AuthenticationType_Service = 2
+  AuthenticationType_Service = 2,
 }
 
 export type AuthenticationType = keyof typeof EnumAuthenticationType;
@@ -2517,7 +2522,7 @@ export enum EnumAutoPassOption {
   AutoPassOption_UnlessOpponentAction = 5,
   AutoPassOption_ResolveMyStackEffects = 6,
   AutoPassOption_FullControl = 7,
-  AutoPassOption_ArenaDefault = 8
+  AutoPassOption_ArenaDefault = 8,
 }
 
 export type AutoPassOption = keyof typeof EnumAutoPassOption;
@@ -2525,7 +2530,7 @@ export type AutoPassOption = keyof typeof EnumAutoPassOption;
 export enum EnumAutoPassPriority {
   AutoPassPriority_None = 0,
   AutoPassPriority_No = 1,
-  AutoPassPriority_Yes = 2
+  AutoPassPriority_Yes = 2,
 }
 
 export type AutoPassPriority = keyof typeof EnumAutoPassPriority;
@@ -2533,7 +2538,7 @@ export type AutoPassPriority = keyof typeof EnumAutoPassPriority;
 export enum EnumAutoTapStopsSetting {
   AutoTapStopsSetting_None = 0,
   AutoTapStopsSetting_Enable = 1,
-  AutoTapStopsSetting_Disable = 2
+  AutoTapStopsSetting_Disable = 2,
 }
 
 export type AutoTapStopsSetting = keyof typeof EnumAutoTapStopsSetting;
@@ -2543,7 +2548,7 @@ export enum EnumBlockState {
   BlockState_Declared = 1,
   BlockState_Blocking = 2,
   BlockState_Blocked = 3,
-  BlockState_Unblocked = 4
+  BlockState_Unblocked = 4,
 }
 
 export type BlockState = keyof typeof EnumBlockState;
@@ -2554,7 +2559,7 @@ export enum EnumBlockWarningType {
   BlockWarningType_CannotBlockAlone = 2,
   BlockWarningType_MustBeBlocked = 3,
   BlockWarningType_MustBlock = 4,
-  BlockWarningType_MustBeBlockedByAll = 5
+  BlockWarningType_MustBeBlockedByAll = 5,
 }
 
 export type BlockWarningType = keyof typeof EnumBlockWarningType;
@@ -2567,7 +2572,7 @@ export enum EnumCardColor {
   CardColor_Red = 4,
   CardColor_Green = 5,
   CardColor_Land = 6,
-  CardColor_Artifact = 7
+  CardColor_Artifact = 7,
 }
 
 export type CardColor = keyof typeof EnumCardColor;
@@ -2626,7 +2631,7 @@ export enum EnumCardMechanicType {
   CardMechanicType_Placeholder2 = 52,
   CardMechanicType_Placeholder3 = 53,
   CardMechanicType_Placeholder4 = 54,
-  CardMechanicType_Placeholder5 = 55
+  CardMechanicType_Placeholder5 = 55,
 }
 
 export type CardMechanicType = keyof typeof EnumCardMechanicType;
@@ -2644,7 +2649,7 @@ export enum EnumCardType {
   CardType_Scheme = 9,
   CardType_Sorcery = 10,
   CardType_Tribal = 11,
-  CardType_Vanguard = 12
+  CardType_Vanguard = 12,
 }
 
 export type CardType = keyof typeof EnumCardType;
@@ -2663,7 +2668,7 @@ export enum EnumCastingTimeOptionType {
   CastingTimeOptionType_Modal = 10,
   CastingTimeOptionType_ChooseOrCost = 11,
   CastingTimeOptionType_Selection = 12,
-  CastingTimeOptionType_CastThroughAbility = 13
+  CastingTimeOptionType_CastThroughAbility = 13,
 }
 
 export type CastingTimeOptionType = keyof typeof EnumCastingTimeOptionType;
@@ -2671,7 +2676,7 @@ export type CastingTimeOptionType = keyof typeof EnumCastingTimeOptionType;
 export enum EnumChoicePersistence {
   ChoicePersistence_None = 0,
   ChoicePersistence_ChooseOnce = 1,
-  ChoicePersistence_ChooseAlways = 2
+  ChoicePersistence_ChooseAlways = 2,
 }
 
 export type ChoicePersistence = keyof typeof EnumChoicePersistence;
@@ -2722,7 +2727,7 @@ export enum EnumClientMessageType {
   ClientMessageType_UIMessage = 53,
   ClientMessageType_SubmitDeckResp = 54,
   ClientMessageType_TakeTimeoutReq = 55,
-  ClientMessageType_PerformAutoTapActionsResp = 56
+  ClientMessageType_PerformAutoTapActionsResp = 56,
 }
 
 export type ClientMessageType = keyof typeof EnumClientMessageType;
@@ -2734,7 +2739,7 @@ export enum EnumClientToMatchServiceMessageType {
   ClientToMatchServiceMessageType_ClientToGREUIMessage = 3,
   ClientToMatchServiceMessageType_AuthenticateRequest = 4,
   ClientToMatchServiceMessageType_CreateMatchGameRoomRequest = 5,
-  ClientToMatchServiceMessageType_EchoRequest = 8
+  ClientToMatchServiceMessageType_EchoRequest = 8,
 }
 
 export type ClientToMatchServiceMessageType = keyof typeof EnumClientToMatchServiceMessageType;
@@ -2743,7 +2748,7 @@ export enum EnumClientType {
   ClientType_Invalid = 0,
   ClientType_User = 1,
   ClientType_Service = 2,
-  ClientType_Familiar = 3
+  ClientType_Familiar = 3,
 }
 
 export type ClientType = keyof typeof EnumClientType;
@@ -2753,7 +2758,7 @@ export enum EnumConnectionState {
   ConnectionState_Open = 1,
   ConnectionState_Closed = 2,
   ConnectionState_Connecting = 3,
-  ConnectionState_Closing = 4
+  ConnectionState_Closing = 4,
 }
 
 export type ConnectionState = keyof typeof EnumConnectionState;
@@ -2761,7 +2766,7 @@ export type ConnectionState = keyof typeof EnumConnectionState;
 export enum EnumConnectionStateChangedEventType {
   ConnectionStateChangedEventType_Invalid = 0,
   ConnectionStateChangedEventType_Connected = 1,
-  ConnectionStateChangedEventType_Disconnected = 2
+  ConnectionStateChangedEventType_Disconnected = 2,
 }
 
 export type ConnectionStateChangedEventType = keyof typeof EnumConnectionStateChangedEventType;
@@ -2770,7 +2775,7 @@ export enum EnumConnectionStatus {
   ConnectionStatus_None = 0,
   ConnectionStatus_Success = 1,
   ConnectionStatus_GRPVersionIncompat = 2,
-  ConnectionStatus_ProtoVersionIncompat = 3
+  ConnectionStatus_ProtoVersionIncompat = 3,
 }
 
 export type ConnectionStatus = keyof typeof EnumConnectionStatus;
@@ -2778,7 +2783,7 @@ export type ConnectionStatus = keyof typeof EnumConnectionStatus;
 export enum EnumConstructedMatchType {
   Precon = 0,
   Unranked = 1,
-  Ranked = 2
+  Ranked = 2,
 }
 
 export type ConstructedMatchType = keyof typeof EnumConstructedMatchType;
@@ -2788,7 +2793,7 @@ export enum EnumControllerType {
   ControllerType_Player = 1,
   ControllerType_AI = 2,
   ControllerType_AI_Goldfish = 3,
-  ControllerType_AI_PetRock = 4
+  ControllerType_AI_PetRock = 4,
 }
 
 export type ControllerType = keyof typeof EnumControllerType;
@@ -2797,7 +2802,7 @@ export enum EnumCostCategory {
   CostCategory_None = 0,
   CostCategory_Automatic = 1,
   CostCategory_Confirmation = 2,
-  CostCategory_Manual = 3
+  CostCategory_Manual = 3,
 }
 
 export type CostCategory = keyof typeof EnumCostCategory;
@@ -2961,7 +2966,7 @@ export enum EnumCounterType {
   CounterType_PlaceholderCounterType9 = 156,
   CounterType_PlaceholderCounterType10 = 157,
   CounterType_PlaceholderCounterType11 = 158,
-  CounterType_PlaceholderCounterType12 = 159
+  CounterType_PlaceholderCounterType12 = 159,
 }
 
 export type CounterType = keyof typeof EnumCounterType;
@@ -2970,7 +2975,7 @@ export enum EnumDamageRecType {
   DamageRecType_None = 0,
   DamageRecType_Team = 1,
   DamageRecType_Player = 2,
-  DamageRecType_PlanesWalker = 3
+  DamageRecType_PlanesWalker = 3,
 }
 
 export type DamageRecType = keyof typeof EnumDamageRecType;
@@ -2982,7 +2987,7 @@ export enum EnumDropMatchmakingResponseCode {
   DropErrorEventNotFound = 3,
   DropErrorCourseNotFound = 4,
   DropServiceError = 5,
-  DropErrorUnavailable = 6
+  DropErrorUnavailable = 6,
 }
 
 export type DropMatchmakingResponseCode = keyof typeof EnumDropMatchmakingResponseCode;
@@ -3042,7 +3047,7 @@ export enum EnumFailureReason {
   FailureReason_InvalidAlternativeAttack = 51,
   FailureReason_MissingAttackers = 52,
   FailureReason_UnexpectedAttackers = 53,
-  FailureReason_InvalidParity = 54
+  FailureReason_InvalidParity = 54,
 }
 
 export type FailureReason = keyof typeof EnumFailureReason;
@@ -3094,7 +3099,7 @@ export enum EnumGREMessageType {
   GREMessageType_SubmitDeckReq = 53,
   GREMessageType_EdictalMessage = 54,
   GREMessageType_TimeoutMessage = 55,
-  GREMessageType_TimerStateMessage = 56
+  GREMessageType_TimerStateMessage = 56,
 }
 
 export type GREMessageType = keyof typeof EnumGREMessageType;
@@ -3110,7 +3115,7 @@ export enum EnumGRETHHostErrorCode {
   GRETHHostErrorCode_AIDestroyFailed = 7,
   GRETHHostErrorCode_UnrecognizedGreID = 8,
   GRETHHostErrorCode_InvalidPointer = 9,
-  GRETHHostErrorCode_UnknownError = 10
+  GRETHHostErrorCode_UnknownError = 10,
 }
 
 export type GRETHHostErrorCode = keyof typeof EnumGRETHHostErrorCode;
@@ -3126,7 +3131,7 @@ export enum EnumGameObjectType {
   GameObjectType_SplitRight = 7,
   GameObjectType_RevealedCard = 8,
   GameObjectType_TriggerHolder = 9,
-  GameObjectType_Adventure = 10
+  GameObjectType_Adventure = 10,
 }
 
 export type GameObjectType = keyof typeof EnumGameObjectType;
@@ -3134,7 +3139,7 @@ export type GameObjectType = keyof typeof EnumGameObjectType;
 export enum EnumGameRoomType {
   GameRoomType_Invalid = 0,
   GameRoomType_Match = 1,
-  GameRoomType_Draft = 2
+  GameRoomType_Draft = 2,
 }
 
 export type GameRoomType = keyof typeof EnumGameRoomType;
@@ -3143,7 +3148,7 @@ export enum EnumGameStage {
   GameStage_None = 0,
   GameStage_Start = 1,
   GameStage_Play = 2,
-  GameStage_GameOver = 3
+  GameStage_GameOver = 3,
 }
 
 export type GameStage = keyof typeof EnumGameStage;
@@ -3152,7 +3157,7 @@ export enum EnumGameStateType {
   GameStateType_None = 0,
   GameStateType_Full = 1,
   GameStateType_Diff = 2,
-  GameStateType_Binary = 3
+  GameStateType_Binary = 3,
 }
 
 export type GameStateType = keyof typeof EnumGameStateType;
@@ -3163,7 +3168,7 @@ export enum EnumGameStateUpdate {
   GameStateUpdate_SendAndRecord = 2,
   GameStateUpdate_SendHiFi = 3,
   GameStateUpdate_Undo = 4,
-  GameStateUpdate_Restore = 5
+  GameStateUpdate_Restore = 5,
 }
 
 export type GameStateUpdate = keyof typeof EnumGameStateUpdate;
@@ -3172,7 +3177,7 @@ export enum EnumGameType {
   GameType_None = 0,
   GameType_Duel = 1,
   GameType_MultiPlayer = 2,
-  GameType_Solitaire = 3
+  GameType_Solitaire = 3,
 }
 
 export type GameType = keyof typeof EnumGameType;
@@ -3191,7 +3196,7 @@ export enum EnumGameVariant {
   GameVariant_Placeholder2 = 10,
   GameVariant_Placeholder3 = 11,
   GameVariant_Placeholder4 = 12,
-  GameVariant_Placeholder5 = 13
+  GameVariant_Placeholder5 = 13,
 }
 
 export type GameVariant = keyof typeof EnumGameVariant;
@@ -3199,7 +3204,7 @@ export type GameVariant = keyof typeof EnumGameVariant;
 export enum EnumGroupType {
   GroupType_None = 0,
   GroupType_Ordered = 1,
-  GroupType_Arbitrary = 2
+  GroupType_Arbitrary = 2,
 }
 
 export type GroupType = keyof typeof EnumGroupType;
@@ -3208,7 +3213,7 @@ export enum EnumGroupingContext {
   GroupingContext_None = 0,
   GroupingContext_Scry = 1,
   GroupingContext_Surveil = 2,
-  GroupingContext_LondonMulligan = 3
+  GroupingContext_LondonMulligan = 3,
 }
 
 export type GroupingContext = keyof typeof EnumGroupingContext;
@@ -3217,7 +3222,7 @@ export enum EnumGroupingStyle {
   GroupingStyle_None = 0,
   GroupingStyle_SingleGroup = 1,
   GroupingStyle_AllGroups = 2,
-  GroupingStyle_Mixed = 3
+  GroupingStyle_Mixed = 3,
 }
 
 export type GroupingStyle = keyof typeof EnumGroupingStyle;
@@ -3228,7 +3233,7 @@ export enum EnumHighlightType {
   HighlightType_Tepid = 2,
   HighlightType_Hot = 3,
   HighlightType_Counterspell = 4,
-  HighlightType_Random = 5
+  HighlightType_Random = 5,
 }
 
 export type HighlightType = keyof typeof EnumHighlightType;
@@ -3236,7 +3241,8 @@ export type HighlightType = keyof typeof EnumHighlightType;
 export enum EnumIdType {
   IdType_None = 0,
   IdType_InstanceId = 1,
-  IdType_PromptParameterIndex = 2
+  IdType_PromptParameterIndex = 2,
+  IdType_ZoneInstanceId = 3,
 }
 
 export type IdType = keyof typeof EnumIdType;
@@ -3250,7 +3256,7 @@ export enum EnumJoinMatchmakingResponseCode {
   JoinServiceError = 5,
   JoinErrorUnavailable = 6,
   JoinErrorNoValidDeck = 7,
-  JoinErrorCourseNotActive = 8
+  JoinErrorCourseNotActive = 8,
 }
 
 export type JoinMatchmakingResponseCode = keyof typeof EnumJoinMatchmakingResponseCode;
@@ -3264,7 +3270,7 @@ export enum EnumKeyValuePairValueType {
   KeyValuePairValueType_bool = 5,
   KeyValuePairValueType_string = 6,
   KeyValuePairValueType_float = 7,
-  KeyValuePairValueType_double = 8
+  KeyValuePairValueType_double = 8,
 }
 
 export type KeyValuePairValueType = keyof typeof EnumKeyValuePairValueType;
@@ -3291,7 +3297,7 @@ export enum EnumLobbyErrorCode {
   LobbyErrorCode_DraftStartError = 60,
   LobbyErrorCode_InternalServerError = 500,
   LobbyErrorCode_NotImplemented = 501,
-  LobbyErrorCode_ServiceUnavailable = 503
+  LobbyErrorCode_ServiceUnavailable = 503,
 }
 
 export type LobbyErrorCode = keyof typeof EnumLobbyErrorCode;
@@ -3305,7 +3311,7 @@ export enum EnumLobbyUserStateType {
   LobbyUserStateType_Matchmade = 10,
   LobbyUserStateType_InDraft = 15,
   LobbyUserStateType_CreatingMatch = 20,
-  LobbyUserStateType_PlayingMatch = 21
+  LobbyUserStateType_PlayingMatch = 21,
 }
 
 export type LobbyUserStateType = keyof typeof EnumLobbyUserStateType;
@@ -3323,7 +3329,7 @@ export enum EnumManaColor {
   ManaColor_Y = 9,
   ManaColor_TwoGeneric = 10,
   ManaColor_AnyColor = 11,
-  ManaColor_Colorless = 12
+  ManaColor_Colorless = 12,
 }
 
 export type ManaColor = keyof typeof EnumManaColor;
@@ -3332,7 +3338,7 @@ export enum EnumManaPaymentStrategyType {
   ManaPaymentStrategyType_None = 0,
   ManaPaymentStrategyType_Auto = 1,
   ManaPaymentStrategyType_Manual = 2,
-  ManaPaymentStrategyType_Legacy = 3
+  ManaPaymentStrategyType_Legacy = 3,
 }
 
 export type ManaPaymentStrategyType = keyof typeof EnumManaPaymentStrategyType;
@@ -3340,7 +3346,7 @@ export type ManaPaymentStrategyType = keyof typeof EnumManaPaymentStrategyType;
 export enum EnumManaSelectionType {
   ManaSelectionType_None = 0,
   ManaSelectionType_Auto = 1,
-  ManaSelectionType_Manual = 2
+  ManaSelectionType_Manual = 2,
 }
 
 export type ManaSelectionType = keyof typeof EnumManaSelectionType;
@@ -3354,7 +3360,7 @@ export enum EnumManaSpecType {
   ManaSpecType_FromCreature = 5,
   ManaSpecType_FromSnow = 6,
   ManaSpecType_DoesNotEmpty = 7,
-  ManaSpecType_AdditionalEffect = 8
+  ManaSpecType_AdditionalEffect = 8,
 }
 
 export type ManaSpecType = keyof typeof EnumManaSpecType;
@@ -3371,7 +3377,7 @@ export enum EnumMatchCompletedReasonType {
   MatchCompletedReasonType_GreError = 31,
   MatchCompletedReasonType_ServiceFabricError = 33,
   MatchCompletedReasonType_CodeContractError = 34,
-  MatchCompletedReasonType_UnknownServerError = 40
+  MatchCompletedReasonType_UnknownServerError = 40,
 }
 
 export type MatchCompletedReasonType = keyof typeof EnumMatchCompletedReasonType;
@@ -3380,7 +3386,7 @@ export enum EnumMatchControllerEventType {
   MatchControllerEventType_Invalid = 0,
   MatchControllerEventType_MatchGameRoomStateChanged = 1,
   MatchControllerEventType_MatchControllerStateChanged = 2,
-  MatchControllerEventType_MatchControllerHealthReport = 3
+  MatchControllerEventType_MatchControllerHealthReport = 3,
 }
 
 export type MatchControllerEventType = keyof typeof EnumMatchControllerEventType;
@@ -3392,7 +3398,7 @@ export enum EnumMatchControllerState {
   MatchControllerState_Recovering = 3,
   MatchControllerState_Draining = 4,
   MatchControllerState_Closing = 20,
-  MatchControllerState_Closed = 21
+  MatchControllerState_Closed = 21,
 }
 
 export type MatchControllerState = keyof typeof EnumMatchControllerState;
@@ -3406,7 +3412,7 @@ export enum EnumMatchGameRoomStateType {
   MatchGameRoomStateType_MatchCompleted = 15,
   MatchGameRoomStateType_MatchResultsProcessed = 20,
   MatchGameRoomStateType_GameRoomClosing = 21,
-  MatchGameRoomStateType_GameRoomClosed = 22
+  MatchGameRoomStateType_GameRoomClosed = 22,
 }
 
 export type MatchGameRoomStateType = keyof typeof EnumMatchGameRoomStateType;
@@ -3414,7 +3420,7 @@ export type MatchGameRoomStateType = keyof typeof EnumMatchGameRoomStateType;
 export enum EnumMatchScope {
   MatchScope_None = 0,
   MatchScope_Game = 1,
-  MatchScope_Match = 2
+  MatchScope_Match = 2,
 }
 
 export type MatchScope = keyof typeof EnumMatchScope;
@@ -3437,7 +3443,7 @@ export enum EnumMatchServiceErrorCode {
   MatchServiceErrorCode_ImmutableProperty = 113,
   MatchServiceErrorCode_ServerBusy = 114,
   MatchServiceErrorCode_RequestQueueOverflow = 115,
-  MatchServiceErrorCode_UnknownServerError = 500
+  MatchServiceErrorCode_UnknownServerError = 500,
 }
 
 export type MatchServiceErrorCode = keyof typeof EnumMatchServiceErrorCode;
@@ -3447,7 +3453,7 @@ export enum EnumMatchState {
   MatchState_GameInProgress = 1,
   MatchState_GameComplete = 2,
   MatchState_MatchComplete = 3,
-  MatchState_Sideboarding = 4
+  MatchState_Sideboarding = 4,
 }
 
 export type MatchState = keyof typeof EnumMatchState;
@@ -3456,7 +3462,7 @@ export enum EnumMatchWinCondition {
   MatchWinCondition_None = 0,
   MatchWinCondition_SingleElimination = 1,
   MatchWinCondition_Best2of3 = 2,
-  MatchWinCondition_Best3of5 = 3
+  MatchWinCondition_Best3of5 = 3,
 }
 
 export type MatchWinCondition = keyof typeof EnumMatchWinCondition;
@@ -3481,7 +3487,7 @@ export enum EnumMechanicType {
   MechanicType_Placeholder2 = 17,
   MechanicType_Placeholder3 = 18,
   MechanicType_Placeholder4 = 19,
-  MechanicType_Placeholder5 = 20
+  MechanicType_Placeholder5 = 20,
 }
 
 export type MechanicType = keyof typeof EnumMechanicType;
@@ -3489,7 +3495,7 @@ export type MechanicType = keyof typeof EnumMechanicType;
 export enum EnumMulliganOption {
   MulliganOption_None = 0,
   MulliganOption_Mulligan = 1,
-  MulliganOption_AcceptHand = 2
+  MulliganOption_AcceptHand = 2,
 }
 
 export type MulliganOption = keyof typeof EnumMulliganOption;
@@ -3498,7 +3504,7 @@ export enum EnumMulliganType {
   MulliganType_None = 0,
   MulliganType_Paris = 1,
   MulliganType_Vancouver = 2,
-  MulliganType_London = 3
+  MulliganType_London = 3,
 }
 
 export type MulliganType = keyof typeof EnumMulliganType;
@@ -3513,7 +3519,7 @@ export enum EnumOptionContext {
   OptionContext_TurnBased = 6,
   OptionContext_Replacement = 7,
   OptionContext_ActivateCast = 8,
-  OptionContext_TurnFaceUp = 9
+  OptionContext_TurnFaceUp = 9,
 }
 
 export type OptionContext = keyof typeof EnumOptionContext;
@@ -3521,7 +3527,7 @@ export type OptionContext = keyof typeof EnumOptionContext;
 export enum EnumOptionResponse {
   OptionResponse_None = 0,
   OptionResponse_Allow_Yes = 1,
-  OptionResponse_Cancel_No = 2
+  OptionResponse_Cancel_No = 2,
 }
 
 export type OptionResponse = keyof typeof EnumOptionResponse;
@@ -3544,7 +3550,7 @@ export enum EnumOptionType {
   OptionType_ActionsAvailable = 14,
   OptionType_SelectFromGroups = 15,
   OptionType_SearchFromGroups = 16,
-  OptionType_Gathering = 17
+  OptionType_Gathering = 17,
 }
 
 export type OptionType = keyof typeof EnumOptionType;
@@ -3552,7 +3558,7 @@ export type OptionType = keyof typeof EnumOptionType;
 export enum EnumOrderCombatDamageType {
   OrderCombatDamageType_None = 0,
   OrderCombatDamageType_Attacker = 1,
-  OrderCombatDamageType_Blocker = 2
+  OrderCombatDamageType_Blocker = 2,
 }
 
 export type OrderCombatDamageType = keyof typeof EnumOrderCombatDamageType;
@@ -3560,7 +3566,7 @@ export type OrderCombatDamageType = keyof typeof EnumOrderCombatDamageType;
 export enum EnumOrderingContext {
   OrderingContext_None = 0,
   OrderingContext_OrderingForBottom = 1,
-  OrderingContext_OrderingForTop = 2
+  OrderingContext_OrderingForTop = 2,
 }
 
 export type OrderingContext = keyof typeof EnumOrderingContext;
@@ -3582,7 +3588,7 @@ export enum EnumOrderingFunctionType {
   OrderingFunctionType_Mulligan = 13,
   OrderingFunctionType_PlayLand = 14,
   OrderingFunctionType_CheckHasAbility = 15,
-  OrderingFunctionType_ManaSelect = 16
+  OrderingFunctionType_ManaSelect = 16,
 }
 
 export type OrderingFunctionType = keyof typeof EnumOrderingFunctionType;
@@ -3600,7 +3606,7 @@ export enum EnumOrderingParameterId {
   OrderingParameterId_MustAttack = 10,
   OrderingParameterId_FavorableTrade = 11,
   OrderingParameterId_UnfavorableTrade = 12,
-  OrderingParameterId_OpponentDamage = 13
+  OrderingParameterId_OpponentDamage = 13,
 }
 
 export type OrderingParameterId = keyof typeof EnumOrderingParameterId;
@@ -3610,7 +3616,7 @@ export enum EnumOrderingType {
   OrderingType_OrderAsIndicated = 1,
   OrderingType_OrderArbitraryOnce = 2,
   OrderingType_OrderArbitraryAlways = 3,
-  OrderingType_PromptAlways = 4
+  OrderingType_PromptAlways = 4,
 }
 
 export type OrderingType = keyof typeof EnumOrderingType;
@@ -3620,7 +3626,7 @@ export enum EnumParameterType {
   ParameterType_NonLocalizedString = 1,
   ParameterType_Number = 2,
   ParameterType_Reference = 3,
-  ParameterType_PromptId = 5
+  ParameterType_PromptId = 5,
 }
 
 export type ParameterType = keyof typeof EnumParameterType;
@@ -3631,7 +3637,7 @@ export enum EnumPhase {
   Phase_Main1 = 2,
   Phase_Combat = 3,
   Phase_Main2 = 4,
-  Phase_Ending = 5
+  Phase_Ending = 5,
 }
 
 export type Phase = keyof typeof EnumPhase;
@@ -3640,7 +3646,7 @@ export enum EnumPlayerIs {
   PlayerIs_None = 0,
   PlayerIs_DontCare = 1,
   PlayerIs_AI = 2,
-  PlayerIs_Opponent = 3
+  PlayerIs_Opponent = 3,
 }
 
 export type PlayerIs = keyof typeof EnumPlayerIs;
@@ -3648,7 +3654,7 @@ export type PlayerIs = keyof typeof EnumPlayerIs;
 export enum EnumPresenceState {
   PresenceState_Invalid = 0,
   PresenceState_Offline = 1,
-  PresenceState_Online = 2
+  PresenceState_Online = 2,
 }
 
 export type PresenceState = keyof typeof EnumPresenceState;
@@ -3689,7 +3695,7 @@ export enum EnumProtoVersion {
   ProtoVersion_MulliganReq = 32,
   ProtoVersion_AutoTapSolution = 33,
   ProtoVersion_ManaPaymentDeprecated = 34,
-  ProtoVersion_SelectFromGroupRespGroups = 35
+  ProtoVersion_SelectFromGroupRespGroups = 35,
 }
 
 export type ProtoVersion = keyof typeof EnumProtoVersion;
@@ -3697,7 +3703,7 @@ export type ProtoVersion = keyof typeof EnumProtoVersion;
 export enum EnumQueueType {
   QueueType_Invalid = 0,
   QueueType_MatchQueue = 1,
-  QueueType_DraftQueue = 2
+  QueueType_DraftQueue = 2,
 }
 
 export type QueueType = keyof typeof EnumQueueType;
@@ -3707,7 +3713,7 @@ export enum EnumReferenceType {
   ReferenceType_InstanceId = 1,
   ReferenceType_CatalogId = 2,
   ReferenceType_LocalizationId = 3,
-  ReferenceType_PlayerSeatId = 4
+  ReferenceType_PlayerSeatId = 4,
 }
 
 export type ReferenceType = keyof typeof EnumReferenceType;
@@ -3729,7 +3735,7 @@ export enum EnumResultCode {
   ResultCode_NotEnoughTargets = 13,
   ResultCode_IllegalTarget = 14,
   ResultCode_RestrictionViolated = 15,
-  ResultCode_RequirementViolated = 16
+  ResultCode_RequirementViolated = 16,
 }
 
 export type ResultCode = keyof typeof EnumResultCode;
@@ -3740,7 +3746,7 @@ export enum EnumResultReason {
   ResultReason_Concede = 2,
   ResultReason_Timeout = 3,
   ResultReason_Loop = 4,
-  ResultReason_Force = 5
+  ResultReason_Force = 5,
 }
 
 export type ResultReason = keyof typeof EnumResultReason;
@@ -3749,7 +3755,7 @@ export enum EnumResultType {
   ResultType_None = 0,
   ResultType_Suspended = 1,
   ResultType_Draw = 2,
-  ResultType_WinLoss = 3
+  ResultType_WinLoss = 3,
 }
 
 export type ResultType = keyof typeof EnumResultType;
@@ -3757,7 +3763,7 @@ export type ResultType = keyof typeof EnumResultType;
 export enum EnumSelectAction {
   SelectAction_None = 0,
   SelectAction_Select = 1,
-  SelectAction_Unselect = 2
+  SelectAction_Unselect = 2,
 }
 
 export type SelectAction = keyof typeof EnumSelectAction;
@@ -3771,7 +3777,7 @@ export enum EnumSelectionContext {
   SelectionContext_Modal = 5,
   SelectionContext_Replacement = 6,
   SelectionContext_NonMana_Payment = 7,
-  SelectionContext_ManaFromAbility = 8
+  SelectionContext_ManaFromAbility = 8,
 }
 
 export type SelectionContext = keyof typeof EnumSelectionContext;
@@ -3780,7 +3786,7 @@ export enum EnumSelectionListType {
   SelectionListType_None = 0,
   SelectionListType_Static = 1,
   SelectionListType_Dynamic = 2,
-  SelectionListType_StaticSubset = 3
+  SelectionListType_StaticSubset = 3,
 }
 
 export type SelectionListType = keyof typeof EnumSelectionListType;
@@ -3789,7 +3795,7 @@ export enum EnumSelectionValidationType {
   SelectionValidationType_None = 0,
   SelectionValidationType_NonRepeatable = 1,
   SelectionValidationType_ArbitraryRepeats = 2,
-  SelectionValidationType_ConstrainedRepeats = 3
+  SelectionValidationType_ConstrainedRepeats = 3,
 }
 
 export type SelectionValidationType = keyof typeof EnumSelectionValidationType;
@@ -3797,7 +3803,7 @@ export type SelectionValidationType = keyof typeof EnumSelectionValidationType;
 export enum EnumSetting {
   Setting_None = 0,
   Setting_Enable = 1,
-  Setting_Disable = 2
+  Setting_Disable = 2,
 }
 
 export type Setting = keyof typeof EnumSetting;
@@ -3805,7 +3811,7 @@ export type Setting = keyof typeof EnumSetting;
 export enum EnumSettingKey {
   SettingKey_None = 0,
   SettingKey_ByAbility = 1,
-  SettingKey_ByCardTitle = 2
+  SettingKey_ByCardTitle = 2,
 }
 
 export type SettingKey = keyof typeof EnumSettingKey;
@@ -3814,7 +3820,7 @@ export enum EnumSettingScope {
   SettingScope_None = 0,
   SettingScope_AnyPlayer = 1,
   SettingScope_Opponents = 2,
-  SettingScope_Team = 3
+  SettingScope_Team = 3,
 }
 
 export type SettingScope = keyof typeof EnumSettingScope;
@@ -3822,7 +3828,7 @@ export type SettingScope = keyof typeof EnumSettingScope;
 export enum EnumSettingStatus {
   SettingStatus_None = 0,
   SettingStatus_Set = 1,
-  SettingStatus_Clear = 2
+  SettingStatus_Clear = 2,
 }
 
 export type SettingStatus = keyof typeof EnumSettingStatus;
@@ -3830,7 +3836,7 @@ export type SettingStatus = keyof typeof EnumSettingStatus;
 export enum EnumShuffleRestriction {
   ShuffleRestriction_None = 0,
   ShuffleRestriction_OpeningHand = 1,
-  ShuffleRestriction_All = 2
+  ShuffleRestriction_All = 2,
 }
 
 export type ShuffleRestriction = keyof typeof EnumShuffleRestriction;
@@ -3838,7 +3844,7 @@ export type ShuffleRestriction = keyof typeof EnumShuffleRestriction;
 export enum EnumSmartStopsSetting {
   SmartStopsSetting_None = 0,
   SmartStopsSetting_Enable = 1,
-  SmartStopsSetting_Disable = 2
+  SmartStopsSetting_Disable = 2,
 }
 
 export type SmartStopsSetting = keyof typeof EnumSmartStopsSetting;
@@ -3846,7 +3852,7 @@ export type SmartStopsSetting = keyof typeof EnumSmartStopsSetting;
 export enum EnumSortBy {
   SortBy_None = 0,
   SortBy_HighToLow = 1,
-  SortBy_LowToHigh = 2
+  SortBy_LowToHigh = 2,
 }
 
 export type SortBy = keyof typeof EnumSortBy;
@@ -3866,7 +3872,7 @@ export enum EnumStaticList {
   StaticList_CounterTypes = 11,
   StaticList_Keywords = 12,
   StaticList_CardNames = 13,
-  StaticList_Parities = 14
+  StaticList_Parities = 14,
 }
 
 export type StaticList = keyof typeof EnumStaticList;
@@ -3883,7 +3889,7 @@ export enum EnumStep {
   Step_EndCombat = 8,
   Step_End = 9,
   Step_Cleanup = 10,
-  Step_FirstStrikeDamage = 11
+  Step_FirstStrikeDamage = 11,
 }
 
 export type Step = keyof typeof EnumStep;
@@ -3900,7 +3906,7 @@ export enum EnumStopType {
   StopType_EndCombatStep = 8,
   StopType_PostcombatMainPhase = 9,
   StopType_EndStep = 10,
-  StopType_FirstStrikeDamageStep = 11
+  StopType_FirstStrikeDamageStep = 11,
 }
 
 export type StopType = keyof typeof EnumStopType;
@@ -4290,7 +4296,7 @@ export enum EnumSubType {
   SubType_PlaceholderSubType4 = 382,
   SubType_PlaceholderSubType5 = 383,
   SubType_PlaceholderSubType6 = 384,
-  SubType_PlaceholderSubType10 = 385
+  SubType_PlaceholderSubType10 = 385,
 }
 
 export type SubType = keyof typeof EnumSubType;
@@ -4298,7 +4304,7 @@ export type SubType = keyof typeof EnumSubType;
 export enum EnumSubZoneType {
   SubZoneType_None = 0,
   SubZoneType_Top = 1,
-  SubZoneType_Bottom = 2
+  SubZoneType_Bottom = 2,
 }
 
 export type SubZoneType = keyof typeof EnumSubZoneType;
@@ -4306,7 +4312,7 @@ export type SubZoneType = keyof typeof EnumSubZoneType;
 export enum EnumSuperFormat {
   SuperFormat_None = 0,
   SuperFormat_Limited = 1,
-  SuperFormat_Constructed = 2
+  SuperFormat_Constructed = 2,
 }
 
 export type SuperFormat = keyof typeof EnumSuperFormat;
@@ -4317,7 +4323,7 @@ export enum EnumSuperType {
   SuperType_Legendary = 2,
   SuperType_Ongoing = 3,
   SuperType_Snow = 4,
-  SuperType_World = 5
+  SuperType_World = 5,
 }
 
 export type SuperType = keyof typeof EnumSuperType;
@@ -4325,7 +4331,7 @@ export type SuperType = keyof typeof EnumSuperType;
 export enum EnumTargetType {
   TargetType_None = 0,
   TargetType_Player = 1,
-  TargetType_GameObject = 2
+  TargetType_GameObject = 2,
 }
 
 export type TargetType = keyof typeof EnumTargetType;
@@ -4333,7 +4339,7 @@ export type TargetType = keyof typeof EnumTargetType;
 export enum EnumTeamType {
   TeamType_None = 0,
   TeamType_Individual = 1,
-  TeamType_SharedTeam = 2
+  TeamType_SharedTeam = 2,
 }
 
 export type TeamType = keyof typeof EnumTeamType;
@@ -4341,7 +4347,7 @@ export type TeamType = keyof typeof EnumTeamType;
 export enum EnumTimeoutType {
   TimeoutType_None = 0,
   TimeoutType_ChessClock = 1,
-  TimeoutType_Inactivity = 2
+  TimeoutType_Inactivity = 2,
 }
 
 export type TimeoutType = keyof typeof EnumTimeoutType;
@@ -4358,7 +4364,7 @@ export enum EnumTimerBehavior {
   TimerBehavior_Reset = 8,
   TimerBehavior_Activate = 9,
   TimerBehavior_Deactivate = 10,
-  TimerBehavior_StartDelayedTimer = 11
+  TimerBehavior_StartDelayedTimer = 11,
 }
 
 export type TimerBehavior = keyof typeof EnumTimerBehavior;
@@ -4394,7 +4400,7 @@ export enum EnumTimerEvent {
   TimerEvent_EndCombat = 27,
   TimerEvent_End = 28,
   TimerEvent_Cleanup = 29,
-  TimerEvent_FirstStrikeDamage = 30
+  TimerEvent_FirstStrikeDamage = 30,
 }
 
 export type TimerEvent = keyof typeof EnumTimerEvent;
@@ -4408,7 +4414,7 @@ export enum EnumTimerPackage {
   TimerPackage_V5 = 5,
   TimerPackage_DirectChallenge = 6,
   TimerPackage_Default = 7,
-  TimerPackage_BestOfThree = 8
+  TimerPackage_BestOfThree = 8,
 }
 
 export type TimerPackage = keyof typeof EnumTimerPackage;
@@ -4422,7 +4428,7 @@ export enum EnumTimerType {
   TimerType_Prologue = 5,
   TimerType_Epilogue = 6,
   TimerType_Delay = 7,
-  TimerType_MatchClock = 8
+  TimerType_MatchClock = 8,
 }
 
 export type TimerType = keyof typeof EnumTimerType;
@@ -4432,7 +4438,7 @@ export enum EnumVisibility {
   Visibility_Public = 1,
   Visibility_Private = 2,
   Visibility_Hidden = 3,
-  Visibility_Deceptive = 4
+  Visibility_Deceptive = 4,
 }
 
 export type Visibility = keyof typeof EnumVisibility;
@@ -4451,7 +4457,7 @@ export enum EnumZoneType {
   ZoneType_Sideboard = 10,
   ZoneType_Pending = 11,
   ZoneType_PhasedOut = 12,
-  ZoneType_Suppressed = 13
+  ZoneType_Suppressed = 13,
 }
 
 export type ZoneType = keyof typeof EnumZoneType;
