@@ -32,6 +32,7 @@
     "complexity": ["warn", 40],
     "max-statements": ["warn", 100],
     "prettier/prettier": "warn",
+    "@typescript-eslint/interface-name-prefix": 0,
     "@typescript-eslint/no-empty-function": ["error", { "allow": ["arrowFunctions"] }],
     "require-atomic-updates": "warn",
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
