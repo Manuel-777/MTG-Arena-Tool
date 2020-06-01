@@ -285,12 +285,12 @@ function handleSync(syncIds: SyncIds): void {
 }
 
 function handleRePushLostMatchData() {
+  const shufflerDataCollectionStart = "2019-01-28T00:00:00.000Z";
+  const dataLostEnd = "2019-05-01T00:00:00.000Z";
   const toPush: SyncIds = {
     courses: [],
     matches: Object.keys(globalStore.matches).filter(id => {
       const match = globalStore.matches[id];
-      const shufflerDataCollectionStart = "2019-01-28T00:00:00.000Z";
-      const dataLostEnd = "2019-05-01T00:00:00.000Z";
       return (
         !match.lastPushedDate &&
         shufflerDataCollectionStart < match.date &&
