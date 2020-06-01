@@ -102,7 +102,7 @@ ipc.on("download_metadata", () => {
 
 //
 ipc.on("sync_check", async function() {
-  httpApi.httSyncPush();
+  httpApi.httpSyncPush();
 });
 
 //

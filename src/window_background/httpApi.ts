@@ -39,6 +39,7 @@ import {
   IPC_ALL
 } from "../shared/constants";
 import { reduxAction } from "../shared-redux/sharedRedux";
+import { InternalMatch } from "../types/match";
 
 let httpQueue: async.AsyncQueue<HttpTask>;
 
@@ -247,8 +248,23 @@ function handleNotificationsResponse(
   });
 }
 
+function handlePush(toPush: SyncIds) {
+  reduxAction(globals.store.dispatch, "SET_TO_PUSH", toPush, IPC_RENDERER);
+  if (
+    toPush.courses.length == 0 &&
+    toPush.matches.length == 0 &&
+    toPush.drafts.length == 0 &&
+    toPush.economy.length == 0 &&
+    toPush.seasonal.length == 0
+  ) {
+    setSyncState(SYNC_OK);
+  } else {
+    setSyncState(SYNC_IDLE);
+  }
+}
+
 function handleSync(syncIds: SyncIds): void {
-  const toPush = {
+  const toPush: SyncIds = {
     courses: Object.keys(globalStore.events).filter(
       id => syncIds.courses.indexOf(id) == -1
     ),
@@ -265,18 +281,26 @@ function handleSync(syncIds: SyncIds): void {
       id => syncIds.seasonal.indexOf(id) == -1
     )
   };
-  reduxAction(globals.store.dispatch, "SET_TO_PUSH", toPush, IPC_RENDERER);
-  if (
-    toPush.courses.length == 0 &&
-    toPush.matches.length == 0 &&
-    toPush.drafts.length == 0 &&
-    toPush.economy.length == 0 &&
-    toPush.seasonal.length == 0
-  ) {
-    setSyncState(SYNC_OK);
-  } else {
-    setSyncState(SYNC_IDLE);
-  }
+  handlePush(toPush);
+}
+
+function handleRePushLostMatchData() {
+  const toPush: SyncIds = {
+    courses: [],
+    matches: Object.keys(globalStore.matches).filter(id => {
+      const match = globalStore.matches[id];
+      return (
+        !match.lastPushedDate &&
+        "2019-01-28T00:00:00.000Z" < match.date &&
+        match.date < "2019-05-01T00:00:00.000Z"
+      );
+    }),
+    drafts: [],
+    economy: [],
+    seasonal: []
+  };
+  handlePush(toPush);
+  httpSyncPush();
 }
 
 export function httpAuth(userName: string, pass: string): void {
@@ -376,6 +400,8 @@ function handleAuthResponse(
     ipcLog("Checking local data without remote copies");
     if (parsedResult && data.patreon) {
       handleSync(parsedResult);
+    } else {
+      handleRePushLostMatchData();
     }
     ipcLog("Checking for sync requests...");
     const requestSync = {
@@ -500,11 +526,20 @@ function handleSetDataResponse(
 ): void {
   const mongoDbDuplicateKeyErrorCode = 11000;
   finishSync();
-  if (parsedResult && parsedResult.error === mongoDbDuplicateKeyErrorCode) {
-    return; // idempotent success case, just return
-  } else if (error) {
+  // duplicate key is idempotent success case, don't count it as error
+  if (
+    !(parsedResult && parsedResult.error === mongoDbDuplicateKeyErrorCode) &&
+    error
+  ) {
     // handle all other errors
     handleError(error);
+    return;
+  }
+  if (task && task.match) {
+    const match: InternalMatch = JSON.parse(task.match);
+    match.lastPushedDate = new Date().toISOString();
+    reduxAction(globals.store.dispatch, "SET_MATCH", match, IPC_RENDERER);
+    playerDb.upsert(match.id, "lastPushedDate", match.lastPushedDate);
   }
 }
 
@@ -805,7 +840,7 @@ export function httpSyncRequest(data: SyncRequestData): void {
   );
 }
 
-export function httSyncPush(): void {
+export function httpSyncPush(): void {
   const syncIds: SyncIds = globals.store.getState().renderer.syncToPush;
   syncIds.courses.map((id: string) => {
     const obj = getEvent(id);

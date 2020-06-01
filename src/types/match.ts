@@ -107,6 +107,7 @@ export interface InternalMatch {
   oppDeck: InternalDeck;
   tags: any;
   date: string;
+  lastPushedDate?: string;
   onThePlay: number;
   eventId: string;
   bestOf: number;
