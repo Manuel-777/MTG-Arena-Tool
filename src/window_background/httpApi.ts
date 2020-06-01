@@ -527,10 +527,7 @@ function handleSetDataResponse(
   const mongoDbDuplicateKeyErrorCode = 11000;
   finishSync();
   // duplicate key is idempotent success case, don't count it as error
-  if (
-    !(parsedResult && parsedResult.error === mongoDbDuplicateKeyErrorCode) &&
-    error
-  ) {
+  if (parsedResult?.error !== mongoDbDuplicateKeyErrorCode && error) {
     // handle all other errors
     handleError(error);
     return;
