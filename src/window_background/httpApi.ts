@@ -289,10 +289,12 @@ function handleRePushLostMatchData() {
     courses: [],
     matches: Object.keys(globalStore.matches).filter(id => {
       const match = globalStore.matches[id];
+      const shufflerDataCollectionStart = "2019-01-28T00:00:00.000Z";
+      const dataLostEnd = "2019-05-01T00:00:00.000Z";
       return (
         !match.lastPushedDate &&
-        "2019-01-28T00:00:00.000Z" < match.date &&
-        match.date < "2019-05-01T00:00:00.000Z"
+        shufflerDataCollectionStart < match.date &&
+        match.date < dataLostEnd
       );
     }),
     drafts: [],
