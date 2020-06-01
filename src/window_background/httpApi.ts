@@ -534,7 +534,7 @@ function handleSetDataResponse(
     handleError(error);
     return;
   }
-  if (task && task.match) {
+  if (task?.match) {
     const match: InternalMatch = JSON.parse(task.match);
     match.lastPushedDate = new Date().toISOString();
     reduxAction(globals.store.dispatch, "SET_MATCH", match, IPC_RENDERER);
