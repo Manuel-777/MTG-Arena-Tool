@@ -37,6 +37,8 @@ import iconNormal from "../assets/icons/icon.png";
 import iconTray from "../assets/icons/icon-tray.png";
 import iconTray8x from "../assets/icons/icon-tray@8x.png";
 import icon256 from "../assets/icons/icon-256.png";
+import getNewBounds from "./getNewBounds";
+import getPrimaryPos from "./getPrimaryPos";
 
 app.setAppUserModelId("com.github.manuel777.mtgatool");
 
@@ -479,26 +481,8 @@ function getOverlayVisible(settings: OverlaySettingsData): boolean {
 }
 
 function overlaySetBounds(): void {
-  const primaryBounds = electron.screen.getPrimaryDisplay().bounds;
-  const primaryPos = { x: 0, y: 0 };
-  const newBounds = { x: 0, y: 0, width: 0, height: 0 };
-  electron.screen.getAllDisplays().forEach((display) => {
-    newBounds.x = Math.min(newBounds.x, display.bounds.x);
-    newBounds.y = Math.min(newBounds.y, display.bounds.y);
-  });
-  electron.screen.getAllDisplays().forEach((display) => {
-    newBounds.width = Math.max(
-      newBounds.width,
-      Math.abs(newBounds.x) + display.bounds.x + display.bounds.width
-    );
-    newBounds.height = Math.max(
-      newBounds.height,
-      Math.abs(newBounds.y) + display.bounds.y + display.bounds.height
-    );
-  });
-
-  primaryPos.x = primaryBounds.x - newBounds.x;
-  primaryPos.y = primaryBounds.y - newBounds.y;
+  const newBounds = getNewBounds();
+  const primaryPos = getPrimaryPos(newBounds);
 
   console.log(
     "Overlay bounds: ",
