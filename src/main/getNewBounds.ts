@@ -3,10 +3,9 @@ import electron from "electron";
 
 export default function getNewBounds(): electron.Rectangle {
   const newBounds = { x: 0, y: 0, width: 0, height: 0 };
-  electron.screen.getAllDisplays().forEach((display) => {
-    newBounds.x = Math.min(newBounds.x, display.bounds.x);
-    newBounds.y = Math.min(newBounds.y, display.bounds.y);
-  });
+  const displays = electron.screen.getAllDisplays();
+  newBounds.x = Math.min(...displays.map((display) => display.bounds.x));
+  newBounds.y = Math.min(...displays.map((display) => display.bounds.y));
   electron.screen.getAllDisplays().forEach((display) => {
     newBounds.width = Math.max(
       newBounds.width,
