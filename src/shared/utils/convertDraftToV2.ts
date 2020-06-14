@@ -41,7 +41,9 @@ export default function convertDraftToV2(
     id: original.id,
     draftSet:
       database.sets[original.set]?.arenacode ||
-      getSetCodeInEventId(original.InternalEventName || metadata.InternalEventName) ||
+      getSetCodeInEventId(
+        original.InternalEventName || metadata.InternalEventName
+      ) ||
       "",
     currentPack: original.packNumber,
     currentPick: original.pickNumber,
