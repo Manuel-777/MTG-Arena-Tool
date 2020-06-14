@@ -64,38 +64,6 @@ function fixBadPlayerData(savedData: any): any {
     }
   });
   savedData.decks = decks;
-
-  // 2020-06-14 discoverd that some old InternalDraft entries might not contain
-  // all the fields required for conversion to InternalDraftv2. This logic
-  // will combine the InternalDraft with Pick data and data from the associated
-  // type: "event" data. This fix is associated with issue #1117.
-  if (savedData.draft_index) {
-    savedData.draft_index
-      .filter((id: string) => {
-        // Find draft items that are missing the required fields in the
-        // id = "GUID-draft" record.
-        const data = savedData[id];
-        return data && !(data.InternalEventName && data.CardPool);
-      })
-      .forEach((id: string) => {
-        // see if we can find the missing data in the id = "GUID" event data.
-        const original = savedData[id] as InternalDraft;
-        const eventId = id.replace(/-draft$/, "");
-        const eventData = savedData[eventId] as InternalDraft;
-        ipcLog("Issue 1117: Fixing InternalDraft record: " + id);
-        if (eventData) {
-          const internalEventName =
-            original.InternalEventName ?? eventData.InternalEventName;
-          const cardPool = original.CardPool ?? eventData.CardPool;
-          savedData[id] = {
-            ...original,
-            InternalEventName: internalEventName,
-            CardPool: cardPool,
-          };
-        }
-      });
-  }
-
   return savedData;
 }
 
@@ -242,7 +210,24 @@ export async function loadPlayerConfig(): Promise<void> {
   if (savedData.draft_index) {
     const draftsList: InternalDraftv2[] = savedData.draft_index
       .filter((id: string) => savedData[id])
-      .map((id: string) => convertDraftToV2(savedData[id] as InternalDraft));
+      .map((id: string) => {
+        const original = savedData[id] as InternalDraft;
+        if (!original.InternalEventName || !original.CardPool) {
+          // 2020-06-14 discoverd that some old InternalDraft entries might not contain
+          // all the fields required for conversion to InternalDraftv2. This logic
+          // will combine the InternalDraft with Pick data and data from the associated
+          // type: "event" data. This fix is associated with issue #1117.
+          const metadataId = id.replace(/-draft$/, "");
+          const metadata = savedData[metadataId] as InternalDraft;
+          if (!original.InternalEventName && metadata?.InternalEventName) {
+            original.internalEventName = metadata.InternalEventName;
+          }
+          if (!original.CardPool && metadata?.CardPool) {
+            original.CardPool = metadata.CardPool;
+          }
+        }
+        return convertDraftToV2(original);
+      });
 
     reduxAction(
       globals.store.dispatch,
