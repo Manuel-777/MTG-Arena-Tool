@@ -217,6 +217,7 @@ export async function loadPlayerConfig(): Promise<void> {
           // all the fields required for conversion to InternalDraftv2. This logic
           // will combine the InternalDraft with Pick data and data from the associated
           // type: "event" data. This fix is associated with issue #1117.
+          ipcLog("Issue 1117: fixing draft data prior to conversion to InternalDraftv2 for id: " + id);
           const metadataId = id.replace(/-draft$/, "");
           const metadata = savedData[metadataId] as InternalDraft;
           if (!original.InternalEventName && metadata?.InternalEventName) {
