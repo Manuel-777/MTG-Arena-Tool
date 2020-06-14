@@ -77,11 +77,12 @@ function fixBadPlayerData(savedData: any): any {
         const data = savedData[id];
         return data && !(data.InternalEventName && data.CardPool);
       })
-      .map((id: string) => {
+      .forEach((id: string) => {
         // see if we can find the missing data in the id = "GUID" event data.
         const original = savedData[id] as InternalDraft;
         const eventId = id.replace(/-draft$/, "");
         const eventData = savedData[eventId] as InternalDraft;
+        ipcLog("Issue 1117: Fixing InternalDraft record: " + id);
         if (eventData) {
           const internalEventName =
             original.InternalEventName ?? eventData.InternalEventName;
