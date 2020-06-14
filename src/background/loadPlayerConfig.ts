@@ -210,7 +210,7 @@ export async function loadPlayerConfig(): Promise<void> {
   if (savedData.draft_index) {
     const draftsList: InternalDraftv2[] = savedData.draft_index
       .filter((id: string) => savedData[id])
-      .map((id: string) => convertDraftToV2(savedData[id] as InternalDraft));
+      .map((id: string) => convertDraftToV2(savedData[id] as InternalDraft, savedData[id.replace(/-draft/gi,"")] as InternalDraft));
 
     reduxAction(
       globals.store.dispatch,
