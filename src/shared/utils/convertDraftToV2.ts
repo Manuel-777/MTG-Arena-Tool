@@ -7,8 +7,7 @@ import database from "../database";
 import getSetCodeInEventId from "./getSetInEventId";
 
 export default function convertDraftToV2(
-  original: InternalDraft,
-  metadata: InternalDraft
+  original: InternalDraft
 ): InternalDraftv2 {
   // declae empty as default
   const packs: InternalDraftv2["packs"] = [
@@ -37,13 +36,11 @@ export default function convertDraftToV2(
     owner: original.owner,
     arenaId: original.player,
     date: original.date,
-    eventId: original.InternalEventName || metadata.InternalEventName,
+    eventId: original.InternalEventName,
     id: original.id,
     draftSet:
       database.sets[original.set]?.arenacode ||
-      getSetCodeInEventId(
-        original.InternalEventName || metadata.InternalEventName
-      ) ||
+      getSetCodeInEventId(original.InternalEventName) ||
       "",
     currentPack: original.packNumber,
     currentPick: original.pickNumber,
@@ -51,9 +48,7 @@ export default function convertDraftToV2(
     // Basically we cant map a string[] | number[] array and get it
     // typed as a number[] automatically based on the map fn
     pickedCards:
-      original.CardPool?.map((n: string | number) => parseInt(n + "")) ||
-      metadata.CardPool?.map((n: string | number) => parseInt(n + "")) ||
-      [],
+      original.CardPool?.map((n: string | number) => parseInt(n + "")) || [],
     packs,
     picks,
     type: "draft",
