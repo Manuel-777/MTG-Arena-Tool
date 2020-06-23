@@ -1,7 +1,7 @@
 import electron from "electron";
 import globals from "./globals";
 import { playerDb } from "../shared/db/LocalDatabase";
-import { ipcSend } from "./backgroundUtil";
+import { ipcSend, normalizeISOString } from "./backgroundUtil";
 import { reduxAction } from "../shared/redux/sharedRedux";
 import { IPC_RENDERER, IPC_OVERLAY } from "../shared/constants";
 import globalStore, { getMatch } from "../shared/store";
@@ -67,7 +67,7 @@ export function completeMatch(
     match.tags = [match.oppDeck.archetype];
   }
   if (matchEndTime) {
-    match.date = new Date(matchEndTime).toISOString();
+    match.date = normalizeISOString(matchEndTime);
   }
   match.bestOf = 1;
   if (currentMatch.gameInfo.matchWinCondition == "MatchWinCondition_Best2of3")

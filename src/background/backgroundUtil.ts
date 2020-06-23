@@ -21,6 +21,15 @@ export function ipcSend(method: string, arg?: any, to = IPC_RENDERER): void {
   ipc.send("ipc_switch", method, IPC_BACKGROUND, arg, to);
 }
 
+export function normalizeISOString(date: number | string | undefined): string {
+  // Send it to the beginning of time if no proper date is found
+  try {
+    return new Date(date ?? 0).toISOString();
+  } catch {
+    return new Date(0).toISOString();
+  }
+}
+
 // These were tested briefly
 // They are all taken from logs
 // Some format from date-fns could be wrong;

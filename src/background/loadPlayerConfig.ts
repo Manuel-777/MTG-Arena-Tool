@@ -5,7 +5,7 @@ import {
   IPC_RENDERER,
   IPC_ALL,
 } from "../shared/constants";
-import { ipcSend } from "./backgroundUtil";
+import { ipcSend, normalizeISOString } from "./backgroundUtil";
 import globals from "./globals";
 
 import getDeckAfterChange from "../shared/utils/getDeckAfterChange";
@@ -127,10 +127,8 @@ export async function loadPlayerConfig(): Promise<void> {
       const playerDeck = new Deck(savedData[id].playerDeck);
       savedData[id].playerDeckHash = playerDeck.getHash();
     }
-    // Send it to the beggining of time if no proper date is found
-    savedData[id].date = new Date(
-      (savedData[id].date === "Invalid Date" ? 0 : savedData[id].date) ?? 0
-    ).toISOString();
+
+    savedData[id].date = normalizeISOString(savedData[id].date);
     return savedData[id];
   });
 
@@ -177,9 +175,9 @@ export async function loadPlayerConfig(): Promise<void> {
         const current = savedData.deck_changes[id] as DeckChange;
         const decklist = getDeckAfterChange(current);
         savedData.deck_changes[id].newDeckHash = decklist.getHash();
-        savedData.deck_changes[id].date = new Date(
+        savedData.deck_changes[id].date = normalizeISOString(
           savedData.deck_changes[id].date
-        ).toISOString();
+        );
         return savedData.deck_changes[id];
       });
 
@@ -195,7 +193,7 @@ export async function loadPlayerConfig(): Promise<void> {
     const economyList: InternalEconomyTransaction[] = savedData.economy_index
       .filter((id: string) => savedData[id])
       .map((id: string) => {
-        savedData[id].date = new Date(savedData[id].date).toISOString();
+        savedData[id].date = normalizeISOString(savedData[id].date);
         return savedData[id];
       });
 
