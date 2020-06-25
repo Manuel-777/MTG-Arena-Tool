@@ -72,20 +72,6 @@ export interface Action {
   isBatchable?: boolean;
 }
 
-export interface ActionCostReq {
-  index?: number;
-  actionCostType?: ActionCostType;
-  costSelection?: SelectNReq;
-  counterSelection?: SelectCountersReq;
-}
-
-export interface ActionCostResp {
-  index?: number;
-  actionCostType?: ActionCostType;
-  costSelection?: SelectNResp;
-  counterSelection?: SelectCountersResp;
-}
-
 export interface ActionInfo {
   actionId?: number;
   seatId?: number;
@@ -394,7 +380,7 @@ export interface ClientToGREMessage {
   distributionResp?: DistributionResp;
   numericInputResp?: NumericInputResp;
   searchResp?: SearchResp;
-  actionCostResp?: ActionCostResp;
+  effectCostResp?: EffectCostResp;
   castingTimeOptionsResp?: CastingTimeOptionsResp;
   selectManaTypeResp?: SelectManaTypeResp;
   selectFromGroupsResp?: SelectFromGroupsResp;
@@ -689,6 +675,22 @@ export interface EdictalMessage {
   edictMessage?: ClientToGREMessage;
 }
 
+export interface EffectCostReq {
+  index?: number;
+  effectCostType?: EffectCostType;
+  costSelection?: SelectNReq;
+  counterSelection?: SelectCountersReq;
+  groupSelection?: SelectFromGroupsReq;
+}
+
+export interface EffectCostResp {
+  index?: number;
+  effectCostType?: EffectCostType;
+  costSelection?: SelectNResp;
+  counterSelection?: SelectCountersResp;
+  groupSelection?: SelectFromGroupsResp;
+}
+
 export interface FinalMatchResult {
   matchId?: string;
   matchForceResult?: ResultSpec;
@@ -948,6 +950,7 @@ export interface GameObjectInfo {
   skinCode?: string;
   loyaltyUsed?: UInt32Value;
   abilityOriginalCardGrpIds: number[];
+  baseSkinCode?: string;
 }
 
 export interface GameStateMessage {
@@ -1579,7 +1582,7 @@ export interface PayCostsReq {
   manaCost: ManaRequirement[];
   paymentActions?: ActionsAvailableReq;
   paymentSelection?: SelectNReq;
-  actionCostReq?: ActionCostReq;
+  effectCostReq?: EffectCostReq;
   submitPaymentReq?: SubmitPaymentReq;
   autoTapActionsReq?: AutoTapActionsAvailableReq;
 }
@@ -2324,13 +2327,14 @@ export enum EnumAbilityType {
   AbilityType_UntapOptional = 201,
   AbilityType_Companion = 202,
   AbilityType_Mutate = 203,
-  AbilityType_Placeholder4 = 204,
-  AbilityType_Placeholder5 = 205,
-  AbilityType_Placeholder6 = 206,
-  AbilityType_Placeholder7 = 207,
-  AbilityType_Placeholder1 = 208,
-  AbilityType_Placeholder2 = 209,
-  AbilityType_Placeholder3 = 210,
+  AbilityType_ProtectionFromDogs = 204,
+  AbilityType_Mill = 205,
+  AbilityType_ProtectionFromChosenName = 206,
+  AbilityType_Placeholder1 = 207,
+  AbilityType_Placeholder2 = 208,
+  AbilityType_Placeholder3 = 209,
+  AbilityType_Placeholder4 = 210,
+  AbilityType_Placeholder5 = 211,
   AbilityType_GildCards_Test = 988,
   AbilityType_Twiddle_Test = 989,
   AbilityType_Donate_Test = 990,
@@ -2353,15 +2357,6 @@ export enum EnumAbilityType {
 
 export type AbilityType = keyof typeof EnumAbilityType;
 
-export enum EnumActionCostType {
-  ActionCostType_None = 0,
-  ActionCostType_Select = 1,
-  ActionCostType_SelectCounter = 2,
-  ActionCostType_Autoselect = 3,
-}
-
-export type ActionCostType = keyof typeof EnumActionCostType;
-
 export enum EnumActionType {
   ActionType_None = 0,
   ActionType_Cast = 1,
@@ -2370,7 +2365,7 @@ export enum EnumActionType {
   ActionType_Activate_Mana = 4,
   ActionType_Pass = 5,
   ActionType_Activate_Test = 6,
-  ActionType_Mode = 7,
+  ActionType_Special = 7,
   ActionType_Special_TurnFaceUp = 8,
   ActionType_ResolutionCost = 9,
   ActionType_CastLeft = 10,
@@ -2381,6 +2376,11 @@ export enum EnumActionType {
   ActionType_OpeningHandAction = 15,
   ActionType_CastAdventure = 16,
   ActionType_FloatMana = 17,
+  ActionType_Placeholder1 = 18,
+  ActionType_Placeholder2 = 19,
+  ActionType_Placeholder3 = 20,
+  ActionType_Placeholder4 = 21,
+  ActionType_Placeholder5 = 22,
 }
 
 export type ActionType = keyof typeof EnumActionType;
@@ -2716,7 +2716,7 @@ export enum EnumClientMessageType {
   ClientMessageType_DistributionResp = 42,
   ClientMessageType_NumericInputResp = 43,
   ClientMessageType_SearchResp = 44,
-  ClientMessageType_ActionCostResp = 45,
+  ClientMessageType_EffectCostResp = 45,
   ClientMessageType_CastingTimeOptionsResp = 46,
   ClientMessageType_SelectManaTypeResp = 47,
   ClientMessageType_SelectFromGroupsResp = 48,
@@ -2952,8 +2952,8 @@ export enum EnumCounterType {
   CounterType_Trample = 142,
   CounterType_Vigilance = 143,
   CounterType_Foreshadow = 144,
-  CounterType_PlaceholderCounterType13 = 145,
-  CounterType_PlaceholderCounterType14 = 146,
+  CounterType_Incarnation = 145,
+  CounterType_Soul = 146,
   CounterType_PlaceholderCounterType15 = 147,
   CounterType_PlaceholderCounterType1 = 148,
   CounterType_PlaceholderCounterType2 = 149,
@@ -2991,6 +2991,16 @@ export enum EnumDropMatchmakingResponseCode {
 }
 
 export type DropMatchmakingResponseCode = keyof typeof EnumDropMatchmakingResponseCode;
+
+export enum EnumEffectCostType {
+  EffectCostType_None = 0,
+  EffectCostType_Select = 1,
+  EffectCostType_SelectCounter = 2,
+  EffectCostType_Autoselect = 3,
+  EffectCostType_SelectFromGroups = 4,
+}
+
+export type EffectCostType = keyof typeof EnumEffectCostType;
 
 export enum EnumFailureReason {
   FailureReason_None = 0,
@@ -3950,7 +3960,6 @@ export enum EnumSubType {
   SubType_Golem = 35,
   SubType_Griffin = 36,
   SubType_Horse = 37,
-  SubType_Hound = 38,
   SubType_Human = 39,
   SubType_Hydra = 40,
   SubType_Illusion = 41,
@@ -4290,8 +4299,8 @@ export enum EnumSubType {
   SubType_Lukka = 376,
   SubType_Otter = 377,
   SubType_Shark = 378,
-  SubType_PlaceholderSubType1 = 379,
-  SubType_PlaceholderSubType2 = 380,
+  SubType_Dog = 379,
+  SubType_Basri = 380,
   SubType_PlaceholderSubType3 = 381,
   SubType_PlaceholderSubType4 = 382,
   SubType_PlaceholderSubType5 = 383,

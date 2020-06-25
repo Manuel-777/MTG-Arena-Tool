@@ -372,66 +372,6 @@
             ]
         },
         {
-            "name": "ActionCostReq",
-            "syntax": "proto3",
-            "fields": [
-                {
-                    "rule": "optional",
-                    "type": "uint32",
-                    "name": "index",
-                    "id": 1
-                },
-                {
-                    "rule": "optional",
-                    "type": "ActionCostType",
-                    "name": "actionCostType",
-                    "id": 3
-                },
-                {
-                    "rule": "optional",
-                    "type": "SelectNReq",
-                    "name": "costSelection",
-                    "id": 4
-                },
-                {
-                    "rule": "optional",
-                    "type": "SelectCountersReq",
-                    "name": "counterSelection",
-                    "id": 5
-                }
-            ]
-        },
-        {
-            "name": "ActionCostResp",
-            "syntax": "proto3",
-            "fields": [
-                {
-                    "rule": "optional",
-                    "type": "uint32",
-                    "name": "index",
-                    "id": 1
-                },
-                {
-                    "rule": "optional",
-                    "type": "ActionCostType",
-                    "name": "actionCostType",
-                    "id": 2
-                },
-                {
-                    "rule": "optional",
-                    "type": "SelectNResp",
-                    "name": "costSelection",
-                    "id": 3
-                },
-                {
-                    "rule": "optional",
-                    "type": "SelectCountersResp",
-                    "name": "counterSelection",
-                    "id": 4
-                }
-            ]
-        },
-        {
             "name": "ActionInfo",
             "syntax": "proto3",
             "fields": [
@@ -1853,8 +1793,8 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "ActionCostResp",
-                    "name": "actionCostResp",
+                    "type": "EffectCostResp",
+                    "name": "effectCostResp",
                     "id": 33
                 },
                 {
@@ -3135,6 +3075,78 @@
             ]
         },
         {
+            "name": "EffectCostReq",
+            "syntax": "proto3",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "index",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "EffectCostType",
+                    "name": "effectCostType",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "SelectNReq",
+                    "name": "costSelection",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "SelectCountersReq",
+                    "name": "counterSelection",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "SelectFromGroupsReq",
+                    "name": "groupSelection",
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "name": "EffectCostResp",
+            "syntax": "proto3",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "index",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "EffectCostType",
+                    "name": "effectCostType",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "SelectNResp",
+                    "name": "costSelection",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "SelectCountersResp",
+                    "name": "counterSelection",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "SelectFromGroupsResp",
+                    "name": "groupSelection",
+                    "id": 5
+                }
+            ]
+        },
+        {
             "name": "FinalMatchResult",
             "syntax": "proto3",
             "fields": [
@@ -4383,6 +4395,12 @@
                     "options": {
                         "packed": true
                     }
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "baseSkinCode",
+                    "id": 37
                 }
             ]
         },
@@ -7211,8 +7229,8 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "ActionCostReq",
-                    "name": "actionCostReq",
+                    "type": "EffectCostReq",
+                    "name": "effectCostReq",
                     "id": 4
                 },
                 {
@@ -10499,32 +10517,36 @@
                     "id": 203
                 },
                 {
-                    "name": "AbilityType_Placeholder4",
+                    "name": "AbilityType_ProtectionFromDogs",
                     "id": 204
                 },
                 {
-                    "name": "AbilityType_Placeholder5",
+                    "name": "AbilityType_Mill",
                     "id": 205
                 },
                 {
-                    "name": "AbilityType_Placeholder6",
+                    "name": "AbilityType_ProtectionFromChosenName",
                     "id": 206
                 },
                 {
-                    "name": "AbilityType_Placeholder7",
+                    "name": "AbilityType_Placeholder1",
                     "id": 207
                 },
                 {
-                    "name": "AbilityType_Placeholder1",
+                    "name": "AbilityType_Placeholder2",
                     "id": 208
                 },
                 {
-                    "name": "AbilityType_Placeholder2",
+                    "name": "AbilityType_Placeholder3",
                     "id": 209
                 },
                 {
-                    "name": "AbilityType_Placeholder3",
+                    "name": "AbilityType_Placeholder4",
                     "id": 210
+                },
+                {
+                    "name": "AbilityType_Placeholder5",
+                    "id": 211
                 },
                 {
                     "name": "AbilityType_GildCards_Test",
@@ -10601,28 +10623,6 @@
             ]
         },
         {
-            "name": "ActionCostType",
-            "syntax": "proto3",
-            "values": [
-                {
-                    "name": "ActionCostType_None",
-                    "id": 0
-                },
-                {
-                    "name": "ActionCostType_Select",
-                    "id": 1
-                },
-                {
-                    "name": "ActionCostType_SelectCounter",
-                    "id": 2
-                },
-                {
-                    "name": "ActionCostType_Autoselect",
-                    "id": 3
-                }
-            ]
-        },
-        {
             "name": "ActionType",
             "syntax": "proto3",
             "values": [
@@ -10655,7 +10655,7 @@
                     "id": 6
                 },
                 {
-                    "name": "ActionType_Mode",
+                    "name": "ActionType_Special",
                     "id": 7
                 },
                 {
@@ -10697,6 +10697,26 @@
                 {
                     "name": "ActionType_FloatMana",
                     "id": 17
+                },
+                {
+                    "name": "ActionType_Placeholder1",
+                    "id": 18
+                },
+                {
+                    "name": "ActionType_Placeholder2",
+                    "id": 19
+                },
+                {
+                    "name": "ActionType_Placeholder3",
+                    "id": 20
+                },
+                {
+                    "name": "ActionType_Placeholder4",
+                    "id": 21
+                },
+                {
+                    "name": "ActionType_Placeholder5",
+                    "id": 22
                 }
             ]
         },
@@ -11801,7 +11821,7 @@
                     "id": 44
                 },
                 {
-                    "name": "ClientMessageType_ActionCostResp",
+                    "name": "ClientMessageType_EffectCostResp",
                     "id": 45
                 },
                 {
@@ -12619,11 +12639,11 @@
                     "id": 144
                 },
                 {
-                    "name": "CounterType_PlaceholderCounterType13",
+                    "name": "CounterType_Incarnation",
                     "id": 145
                 },
                 {
-                    "name": "CounterType_PlaceholderCounterType14",
+                    "name": "CounterType_Soul",
                     "id": 146
                 },
                 {
@@ -12733,6 +12753,32 @@
                 {
                     "name": "DropErrorUnavailable",
                     "id": 6
+                }
+            ]
+        },
+        {
+            "name": "EffectCostType",
+            "syntax": "proto3",
+            "values": [
+                {
+                    "name": "EffectCostType_None",
+                    "id": 0
+                },
+                {
+                    "name": "EffectCostType_Select",
+                    "id": 1
+                },
+                {
+                    "name": "EffectCostType_SelectCounter",
+                    "id": 2
+                },
+                {
+                    "name": "EffectCostType_Autoselect",
+                    "id": 3
+                },
+                {
+                    "name": "EffectCostType_SelectFromGroups",
+                    "id": 4
                 }
             ]
         },
@@ -15645,10 +15691,6 @@
                     "id": 37
                 },
                 {
-                    "name": "SubType_Hound",
-                    "id": 38
-                },
-                {
                     "name": "SubType_Human",
                     "id": 39
                 },
@@ -17005,11 +17047,11 @@
                     "id": 378
                 },
                 {
-                    "name": "SubType_PlaceholderSubType1",
+                    "name": "SubType_Dog",
                     "id": 379
                 },
                 {
-                    "name": "SubType_PlaceholderSubType2",
+                    "name": "SubType_Basri",
                     "id": 380
                 },
                 {
