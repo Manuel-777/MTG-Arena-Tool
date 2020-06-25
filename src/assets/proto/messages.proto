@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-// MtGA 1.08.00.00
+// MtGA 1.09.00.00
 
 
 message AIConfig {
@@ -256,13 +256,14 @@ enum AbilityType {
 	AbilityType_UntapOptional = 201;
 	AbilityType_Companion = 202;
 	AbilityType_Mutate = 203;
-	AbilityType_Placeholder4 = 204;
-	AbilityType_Placeholder5 = 205;
-	AbilityType_Placeholder6 = 206;
-	AbilityType_Placeholder7 = 207;
-	AbilityType_Placeholder1 = 208;
-	AbilityType_Placeholder2 = 209;
-	AbilityType_Placeholder3 = 210;
+	AbilityType_ProtectionFromDogs = 204;
+	AbilityType_Mill = 205;
+	AbilityType_ProtectionFromChosenName = 206;
+	AbilityType_Placeholder1 = 207;
+	AbilityType_Placeholder2 = 208;
+	AbilityType_Placeholder3 = 209;
+	AbilityType_Placeholder4 = 210;
+	AbilityType_Placeholder5 = 211;
 	AbilityType_GildCards_Test = 988;
 	AbilityType_Twiddle_Test = 989;
 	AbilityType_Donate_Test = 990;
@@ -307,27 +308,6 @@ message Action {
 	bool isBatchable = 25;
 }
 
-message ActionCostReq {
-	uint32 index = 1;
-	ActionCostType actionCostType = 3;
-	SelectNReq costSelection = 4;
-	SelectCountersReq counterSelection = 5;
-}
-
-message ActionCostResp {
-	uint32 index = 1;
-	ActionCostType actionCostType = 2;
-	SelectNResp costSelection = 3;
-	SelectCountersResp counterSelection = 4;
-}
-
-enum ActionCostType {
-	ActionCostType_None = 0;
-	ActionCostType_Select = 1;
-	ActionCostType_SelectCounter = 2;
-	ActionCostType_Autoselect = 3;
-}
-
 message ActionInfo {
 	uint32 actionId = 1;
 	uint32 seatId = 2;
@@ -342,7 +322,7 @@ enum ActionType {
 	ActionType_Activate_Mana = 4;
 	ActionType_Pass = 5;
 	ActionType_Activate_Test = 6;
-	ActionType_Mode = 7;
+	ActionType_Special = 7;
 	ActionType_Special_TurnFaceUp = 8;
 	ActionType_ResolutionCost = 9;
 	ActionType_CastLeft = 10;
@@ -353,6 +333,11 @@ enum ActionType {
 	ActionType_OpeningHandAction = 15;
 	ActionType_CastAdventure = 16;
 	ActionType_FloatMana = 17;
+	ActionType_Placeholder1 = 18;
+	ActionType_Placeholder2 = 19;
+	ActionType_Placeholder3 = 20;
+	ActionType_Placeholder4 = 21;
+	ActionType_Placeholder5 = 22;
 }
 
 message ActionsAvailableReq {
@@ -926,7 +911,7 @@ enum ClientMessageType {
 	ClientMessageType_DistributionResp = 42;
 	ClientMessageType_NumericInputResp = 43;
 	ClientMessageType_SearchResp = 44;
-	ClientMessageType_ActionCostResp = 45;
+	ClientMessageType_EffectCostResp = 45;
 	ClientMessageType_CastingTimeOptionsResp = 46;
 	ClientMessageType_SelectManaTypeResp = 47;
 	ClientMessageType_SelectFromGroupsResp = 48;
@@ -984,7 +969,7 @@ message ClientToGREMessage {
 	DistributionResp distributionResp = 30;
 	NumericInputResp numericInputResp = 31;
 	SearchResp searchResp = 32;
-	ActionCostResp actionCostResp = 33;
+	EffectCostResp effectCostResp = 33;
 	CastingTimeOptionsResp castingTimeOptionsResp = 34;
 	SelectManaTypeResp selectManaTypeResp = 35;
 	SelectFromGroupsResp selectFromGroupsResp = 36;
@@ -1320,8 +1305,8 @@ enum CounterType {
 	CounterType_Trample = 142;
 	CounterType_Vigilance = 143;
 	CounterType_Foreshadow = 144;
-	CounterType_PlaceholderCounterType13 = 145;
-	CounterType_PlaceholderCounterType14 = 146;
+	CounterType_Incarnation = 145;
+	CounterType_Soul = 146;
 	CounterType_PlaceholderCounterType15 = 147;
 	CounterType_PlaceholderCounterType1 = 148;
 	CounterType_PlaceholderCounterType2 = 149;
@@ -1523,6 +1508,30 @@ message EchoResponse {
 
 message EdictalMessage {
 	ClientToGREMessage edictMessage = 1;
+}
+
+message EffectCostReq {
+	uint32 index = 1;
+	EffectCostType effectCostType = 3;
+	SelectNReq costSelection = 4;
+	SelectCountersReq counterSelection = 5;
+	SelectFromGroupsReq groupSelection = 6;
+}
+
+message EffectCostResp {
+	uint32 index = 1;
+	EffectCostType effectCostType = 2;
+	SelectNResp costSelection = 3;
+	SelectCountersResp counterSelection = 4;
+	SelectFromGroupsResp groupSelection = 5;
+}
+
+enum EffectCostType {
+	EffectCostType_None = 0;
+	EffectCostType_Select = 1;
+	EffectCostType_SelectCounter = 2;
+	EffectCostType_Autoselect = 3;
+	EffectCostType_SelectFromGroups = 4;
 }
 
 enum FailureReason {
@@ -1916,6 +1925,7 @@ message GameObjectInfo {
 	string skinCode = 34;
 	UInt32Value loyaltyUsed = 35;
 	repeated uint32 abilityOriginalCardGrpIds = 36;
+	string baseSkinCode = 37;
 }
 
 enum GameObjectType {
@@ -2985,7 +2995,7 @@ message PayCostsReq {
 	repeated ManaRequirement manaCost = 1;
 	ActionsAvailableReq paymentActions = 2;
 	SelectNReq paymentSelection = 3;
-	ActionCostReq actionCostReq = 4;
+	EffectCostReq effectCostReq = 4;
 	SubmitPaymentReq submitPaymentReq = 5;
 	AutoTapActionsAvailableReq autoTapActionsReq = 6;
 }
@@ -3608,7 +3618,6 @@ enum SubType {
 	SubType_Golem = 35;
 	SubType_Griffin = 36;
 	SubType_Horse = 37;
-	SubType_Hound = 38;
 	SubType_Human = 39;
 	SubType_Hydra = 40;
 	SubType_Illusion = 41;
@@ -3948,8 +3957,8 @@ enum SubType {
 	SubType_Lukka = 376;
 	SubType_Otter = 377;
 	SubType_Shark = 378;
-	SubType_PlaceholderSubType1 = 379;
-	SubType_PlaceholderSubType2 = 380;
+	SubType_Dog = 379;
+	SubType_Basri = 380;
 	SubType_PlaceholderSubType3 = 381;
 	SubType_PlaceholderSubType4 = 382;
 	SubType_PlaceholderSubType5 = 383;
