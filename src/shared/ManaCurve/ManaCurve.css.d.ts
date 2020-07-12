@@ -2,6 +2,18 @@
 // GENERATED FILE; DO NOT EDIT
 declare namespace ManaCurveCssNamespace {
   export interface IManaCurveCss {
+    chart: string;
+    "chart-container": string;
+    "chart-label": string;
+    "chart-labels": string;
+    "chart-row": string;
+    chartContainer: string;
+    chartLabel: string;
+    chartLabels: string;
+    chartRow: string;
+    colors: string;
+    horizontal: string;
+    legend: string;
     manaCurve: string;
     manaCurveColumn: string;
     manaCurveColumnNumber: string;
@@ -18,6 +30,9 @@ declare namespace ManaCurveCssNamespace {
     mana_curve_number: string;
     mana_curve_numbers: string;
     mana_curve_tag: string;
+    tags: string;
+    tile: string;
+    vertical: string;
   }
 }
 

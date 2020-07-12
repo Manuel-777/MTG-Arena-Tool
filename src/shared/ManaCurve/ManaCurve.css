@@ -77,3 +77,204 @@
   font-family: var(--sub-font-name);
   transform: rotate(180deg);
 }
+
+/* Main Chart component */
+
+.chart-container {
+  display: grid;
+  grid-template-columns: [start] auto [mid] 1fr [end];
+  grid-template-rows: [start] 1fr [mid] auto [end];
+}
+
+.chart {
+  grid-column: mid / end;
+  grid-row: start / mid;
+
+  /* We don't know how many columns / rows there will be so use flex. */
+  display: flex;
+  flex-direction: column;
+
+
+  border: 2px solid rgba(250, 229, 210, 0.8);
+  border-top: 0;
+  border-right: 0;
+
+  overflow: hidden;
+}
+
+.chart-row {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.chart tr, .chart td, .chart th {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.chart tr:hover::after {
+  background-color: rgba(255, 255, 255, 0.9);
+  content: '\00a0';
+  position: absolute;
+  top: calc(50% - 1px);
+  left: -5000px;
+  width: 10000px;
+  height: 2px;
+  z-index: 1;
+}
+
+.chart td:hover::after {
+  background-color: rgba(255, 255, 255, 0.9);
+  content: '\00a0';
+  position: absolute;
+  left: calc(50% - 1px);
+  top: -5000px;
+  height: 10000px;
+  width: 2px;
+  z-index: 1;
+}
+
+.legend {
+  grid-column: start / mid;
+  grid-row: mid / end;
+  padding: 0 10px;
+  font-size: medium;
+}
+
+.legend > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.legend > div > div {
+  display: flex;
+  justify-content: center;
+}
+.legend h5 {
+  margin: 0;
+  margin-top: 0.5em;
+  font-size: medium;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.tile {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  margin: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  position: relative;
+
+  color: white;
+  font-weight: bold;
+  font-size: 7pt;
+  font-family: var(--tiny-font-name);
+}
+
+.chart .tile {
+  color: transparent;
+}
+
+.tile:hover {
+  color: white;
+  font-weight: 900;
+  font-size: 9pt;
+}
+
+.tile span {
+  /*An experiment in automatic text colouring*/
+
+  /*mix-blend-mode: difference;*/
+  /* [OR below] */
+  /* background: inherit; */
+  /* -webkit-background-clip: text; */
+  /* color: transparent; */
+  /* filter: invert(1) grayscale(1) contrast(9);*/
+}
+
+/* Chart Labels */
+
+.chart-labels {
+  /* Container */
+}
+.vertical.chart-labels {
+  flex-direction: column;
+  grid-column: start / mid;
+  grid-row: start / mid;
+}
+.horizontal.chart-labels {
+  flex-direction: row;
+  grid-column: mid / end;
+  grid-row: mid / end;
+}
+
+
+.chart-label {
+  display: flex;
+  color: var(--color-text);
+  font-family: "belerenbold";
+  font-size: 12px;
+  line-height: 20px;
+}
+.vertical .chart-label {
+  flex-direction: row-reverse;
+  height: 24px;
+  width: calc(100% - .5em);
+  text-align: left;
+}
+.horizontal .chart-label {
+  flex-direction: column;
+  width: 24px;
+  align-items: center;
+  text-align: center;
+}
+
+
+.colors {
+  display: flex;
+  align-items: center;
+}
+.vertical .colors {
+  flex-direction: row;
+}
+.horizontal .colors {
+  flex-direction: column;
+}
+.vertical .colors > * {
+  margin: 0 2px ;
+}
+.horizontal .colors > * {
+  margin: 2px 0;
+}
+
+
+.tags {
+  border-radius: 10px;
+  font-size: 13px;
+  color: black;
+  font-family: var(--sub-font-name);
+}
+.vertical .tags {
+  height: 20px;
+  padding:  0px 12px;
+  writing-mode: initial;
+}
+.horizontal .tags {
+  width: 20px;
+  padding: 12px 0px;
+  transform: rotate(180deg);
+  writing-mode: tb-rl;
+}
+

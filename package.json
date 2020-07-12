@@ -91,6 +91,7 @@
     "animejs": "^3.2.0",
     "async": "^3.2.0",
     "bytebuffer": "^5.0.1",
+    "colormap": "^2.3.1",
     "date-fns": "^2.13.0",
     "electron-debug": "^3.0.1",
     "electron-devtools-installer": "^3.0.0",

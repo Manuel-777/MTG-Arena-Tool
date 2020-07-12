@@ -12,7 +12,17 @@
   --sub-font-name-it: "roboto-italic", sans-serif;
   --sub-font-name-bold: "roboto-bold", sans-serif;
   --sub-font-name-bold-it: "roboto-bold-italic", sans-serif;
+
   --main-font-style-it: normal;
+
+
+  /*A note on fonts
+    Chart Tiles' contents very small so should use an easy to read in small spaces font.
+    Based on https://ux.stackexchange.com/questions/3330/
+    Segoe UI, Tahoma, Verdana
+    Otherwise maybe consider a font like minuscule.
+  */
+  --tiny-font-name: "Segoe UI", "Tahoma", "Verdana", sans-serif;
   
   /* Leaving this here for ease of edit */
   /*

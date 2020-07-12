@@ -89,7 +89,9 @@ export interface AggregatorStats {
   avgDuration: number;
   rank?: string;
   colors?: number[];
+  playerColors?: number[];
   tag?: string;
+  playerTag?: string;
 }
 
 export default class Aggregator {
@@ -190,7 +192,13 @@ export default class Aggregator {
 
   public archs: string[] = [];
   public archCounts: { [key: string]: number } = {};
+
   public colorStats: { [key: string]: AggregatorStats } = {};
+  public playerColorStats: { [key: string]: AggregatorStats } = {};
+  public tagStats: { [key: string]: AggregatorStats } = {};
+  public playerTagStats: { [key: string]: AggregatorStats } = {};
+  public colorColorStats: { [key: string]: AggregatorStats } = {};
+
   public constructedStats: { [key: string]: AggregatorStats } = {};
   public deckMap: { [key: string]: InternalDeck } = {};
   public deckLastPlayed: { [key: string]: Date } = {};
@@ -202,7 +210,6 @@ export default class Aggregator {
   public limitedStats: { [key: string]: AggregatorStats } = {};
   public playStats: AggregatorStats = Aggregator.getDefaultStats();
   public stats: AggregatorStats = Aggregator.getDefaultStats();
-  public tagStats: { [key: string]: AggregatorStats } = {};
 
   constructor(filters?: AggregatorFilters) {
     this.filterDate = this.filterDate.bind(this);
@@ -325,7 +332,10 @@ export default class Aggregator {
     this.deckStats = {};
     this.deckRecentStats = {};
     this.colorStats = {};
+    this.playerColorStats = {};
     this.tagStats = {};
+    this.playerTagStats = {};
+    this.colorColorStats = {};
     this.constructedStats = {};
     this.limitedStats = {};
 
@@ -346,7 +356,10 @@ export default class Aggregator {
       ...Object.values(this.deckStats),
       ...Object.values(this.deckRecentStats),
       ...Object.values(this.colorStats),
+      ...Object.values(this.playerColorStats),
       ...Object.values(this.tagStats),
+      ...Object.values(this.playerTagStats),
+      ...Object.values(this.colorColorStats),
       ...Object.values(this.constructedStats),
       ...Object.values(this.limitedStats),
     ].forEach(Aggregator.finishStats);
@@ -451,6 +464,40 @@ export default class Aggregator {
           statsToUpdate.push(this.deckRecentStats[id]);
         }
       }
+
+      // Colour based aggregation
+      const playerColors = match.playerDeck.colors || [];
+      if (playerColors?.length) {
+        playerColors.sort();
+        const colorStr = playerColors.join(",");
+        if (!(colorStr in this.playerColorStats)) {
+          this.playerColorStats[colorStr] = {
+            ...Aggregator.getDefaultStats(),
+            playerColors,
+          };
+        }
+        statsToUpdate.push(this.playerColorStats[colorStr]);
+      }
+
+      // Archetype based aggregation
+      const playerTag = match.playerDeck.tags?.[0] ?? Aggregator.NO_ARCH;
+      this.archCounts[playerTag] = (this.archCounts[playerTag] ?? 0) + 1;
+      if (!(playerTag in this.playerTagStats)) {
+        this.playerTagStats[playerTag] = {
+          ...Aggregator.getDefaultStats(),
+          playerColors,
+          playerTag,
+        };
+      } else {
+        this.playerTagStats[playerTag].colors = [
+          ...new Set([
+            ...(this.playerTagStats[playerTag].colors || []),
+            ...playerColors,
+          ]),
+        ];
+      }
+      if (!statsToUpdate.includes(this.playerTagStats[playerTag]))
+        statsToUpdate.push(this.playerTagStats[playerTag]);
     }
     // process opponent data
     if (match.oppDeck) {
@@ -465,6 +512,22 @@ export default class Aggregator {
           };
         }
         statsToUpdate.push(this.colorStats[colorStr]);
+
+        // Record a ColorColor stat object if both decks have colour data.
+        const playerColors = match.playerDeck.colors || [];
+        if (playerColors?.length) {
+          playerColors.sort();
+          const playerColorStr = playerColors.join(",");
+          const colorColorKey = `${playerColorStr} ${colorStr}`;
+          if (!(colorColorKey in this.colorColorStats)) {
+            this.colorColorStats[colorColorKey] = {
+              ...Aggregator.getDefaultStats(),
+              colors,
+              playerColors,
+            };
+          }
+          statsToUpdate.push(this.colorColorStats[colorColorKey]);
+        }
       }
       // process archetype
       const tag = match.tags?.[0] ?? Aggregator.NO_ARCH;
