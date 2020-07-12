@@ -195,9 +195,11 @@ export default class Aggregator {
 
   public colorStats: { [key: string]: AggregatorStats } = {};
   public playerColorStats: { [key: string]: AggregatorStats } = {};
+  public colorColorStats: { [key: string]: AggregatorStats } = {};
+
   public tagStats: { [key: string]: AggregatorStats } = {};
   public playerTagStats: { [key: string]: AggregatorStats } = {};
-  public colorColorStats: { [key: string]: AggregatorStats } = {};
+  public tagTagStats: { [key: string]: AggregatorStats } = {};
 
   public constructedStats: { [key: string]: AggregatorStats } = {};
   public deckMap: { [key: string]: InternalDeck } = {};
@@ -336,6 +338,7 @@ export default class Aggregator {
     this.tagStats = {};
     this.playerTagStats = {};
     this.colorColorStats = {};
+    this.tagTagStats = {};
     this.constructedStats = {};
     this.limitedStats = {};
 
@@ -360,6 +363,7 @@ export default class Aggregator {
       ...Object.values(this.tagStats),
       ...Object.values(this.playerTagStats),
       ...Object.values(this.colorColorStats),
+      ...Object.values(this.tagTagStats),
       ...Object.values(this.constructedStats),
       ...Object.values(this.limitedStats),
     ].forEach(Aggregator.finishStats);
@@ -543,8 +547,23 @@ export default class Aggregator {
           ...new Set([...(this.tagStats[tag].colors || []), ...colors]),
         ];
       }
-      if (!statsToUpdate.includes(this.tagStats[tag]))
+      if (!statsToUpdate.includes(this.tagStats[tag])) {
         statsToUpdate.push(this.tagStats[tag]);
+      }
+
+      // Record a TagTag stat object if both decks have colour data.
+      const playerTag = match.playerDeck.tags?.[0] ?? Aggregator.NO_ARCH;
+      const tagTagKey = `${playerTag} ${tag}`;
+      if (!(tagTagKey in this.tagTagStats)) {
+        this.tagTagStats[tagTagKey] = {
+          ...Aggregator.getDefaultStats(),
+          tag,
+          playerTag,
+        };
+      }
+      if (!statsToUpdate.includes(this.tagTagStats[tagTagKey])) {
+        statsToUpdate.push(this.tagTagStats[tagTagKey]);
+      }
     }
     // update relevant stats
     statsToUpdate.forEach((stats) => {

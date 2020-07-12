@@ -217,6 +217,7 @@ export default function MatchResultsStatsPanel({
     playerTagStats,
     playerColorStats,
     colorColorStats,
+    tagTagStats,
   } = aggregator;
   const { eventId } = aggregator.filters;
   const isLimited = eventId === RANKED_DRAFT;
@@ -264,6 +265,8 @@ export default function MatchResultsStatsPanel({
   );
   playerFreqStats.sort(frequencySort);
   playerFreqStats = playerFreqStats.slice(0, barsToShow);
+
+  const matrixStats = showTags ? tagTagStats : colorColorStats;
 
   return (
     <div className={indexCss.main_stats} ref={panelRef}>
@@ -393,7 +396,7 @@ export default function MatchResultsStatsPanel({
             <MatchupMatrix
               opponentWinrates={freqStats}
               playerWinrates={playerFreqStats}
-              winrates={colorColorStats}
+              winrates={matrixStats}
               showTags={showTags}
             />
           </div>

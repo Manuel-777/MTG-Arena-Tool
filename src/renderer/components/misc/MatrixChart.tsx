@@ -278,12 +278,18 @@ export default function MatchupMatrix({
 
   const matrix: Array<Array<AggregatorStats | undefined>> = [];
 
+  function getKey(pi: AggregatorStats, oi: AggregatorStats): string {
+    if (showTags) {
+      return `${pi.playerTag} ${oi.tag}`;
+    } else {
+      return `${pi.playerColors?.join(",")} ${oi.colors?.join(",")}`;
+    }
+  }
+
   playerWinrates.forEach((pInfo) => {
-    const pColors = pInfo.playerColors?.join(",");
     const row: Array<AggregatorStats | undefined> = [];
     opponentWinrates.forEach((oInfo) => {
-      const oColors = oInfo.colors?.join(",");
-      const key = `${pColors} ${oColors}`;
+      const key = getKey(pInfo, oInfo);
       if (key in winrates) {
         row.push(winrates[key]);
       } else {
