@@ -49,11 +49,11 @@ function tileColor(winrate: number): string {
 }
 
 function tileGradient(color: string, size: number): string {
-  // 1 =>    radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 20%, transparent 50%);
-  // 10 =>    radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 35%, transparent 60%);
-  // 20 =>   radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 50%, transparent 70%);
-  // 50 =>   radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 65%, transparent 80%);
-  // 150 =>  radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 80%, transparent 90%);
+  // 1 =>   radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 20%, transparent 50%);
+  // 10 =>  radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 35%, transparent 60%);
+  // 20 =>  radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 50%, transparent 70%);
+  // 50 =>  radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 65%, transparent 80%);
+  // 150 => radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 80%, transparent 90%);
   // 400 => radial-gradient(rgb(34, 141, 141), rgb(34, 141, 141) 95%, transparent 100%);
   // log[1, 10, 20, 50, 150, 400] => [0.0, 2.302585092994046, 2.995732273553991, 3.912023005428146, 5.0106352940962555, 5.991464547107982]
 
@@ -65,7 +65,7 @@ function tileGradient(color: string, size: number): string {
 }
 
 // floating point to rounded integer value.
-const crudePercent = (x: any): number => 0 | ((x || 0) * 100);
+const crudePercent = (x: number): number => 0 | ((x || 0) * 100);
 
 function tileTooltipText(
   winRateInfo: AggregatorStats | undefined
@@ -123,7 +123,7 @@ function ChartLabel({
       <Tile
         value={winRate}
         size={totalMatches}
-        text={crudePercent(winRate)}
+        text={crudePercent(winRate) + ""}
         title={tileTooltipText(winRateInfo)}
       />
       <Tags winRateInfo={winRateInfo} visible={showTags} />
@@ -176,7 +176,12 @@ function ChartLegend(): JSX.Element {
         <label>Winrate (%):</label>
         <div>
           {winrates.map((wr, index) => (
-            <Tile key={index} value={wr} size={10000} text={crudePercent(wr)} />
+            <Tile
+              key={index}
+              value={wr}
+              size={10000}
+              text={crudePercent(wr) + ""}
+            />
           ))}
         </div>
       </div>
@@ -184,7 +189,7 @@ function ChartLegend(): JSX.Element {
         <label>Samples:</label>
         <div>
           {sampleSizes.map((ss, index) => (
-            <Tile key={index} value={0.5} size={ss} text={ss} />
+            <Tile key={index} value={0.5} size={ss} text={ss + ""} />
           ))}
         </div>
       </div>
@@ -200,8 +205,8 @@ function Tile({
 }: {
   value?: number;
   size?: number;
-  text?: any;
-  title?: any;
+  text?: string;
+  title?: string;
 }): JSX.Element {
   // Represents a tile in a pairwise comparison plot
 
@@ -236,7 +241,9 @@ function ChartRow({
             value={winRateInfo?.winrate}
             size={winRateInfo?.total}
             title={tileTooltipText(winRateInfo)}
-            text={!winRateInfo ? "" : crudePercent(winRateInfo?.winrate)}
+            text={
+              !winRateInfo ? "" : crudePercent(winRateInfo?.winrate || 0) + ""
+            }
           />
         </td>
       ))}
