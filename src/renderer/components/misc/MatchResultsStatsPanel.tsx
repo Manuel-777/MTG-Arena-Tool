@@ -25,6 +25,8 @@ import listItemCss from "../list-item/ListItem.css";
 import manaCurveCss from "../../../shared/ManaCurve/ManaCurve.css";
 import sharedCss from "../../../shared/shared.css";
 
+import MatchupMatrix from "./MatrixChart";
+
 const manaClasses: string[] = [];
 manaClasses[WHITE] = sharedCss.manaW;
 manaClasses[BLUE] = sharedCss.manaU;
@@ -58,7 +60,9 @@ function WinrateChart({
   showTags: boolean;
 }): JSX.Element {
   const curveMax = Math.max(
-    ...winrates.map((cwr) => Math.max(cwr.wins || 0, cwr.losses || 0)),
+    ...winrates.map((winRateInfo) =>
+      Math.max(winRateInfo.wins || 0, winRateInfo.losses || 0)
+    ),
     0
   );
   const barStats = [...winrates];
@@ -66,50 +70,53 @@ function WinrateChart({
   return (
     <>
       <div className={manaCurveCss.manaCurve}>
-        {barStats.map((cwr, index) => {
+        {barStats.map((winRateInfo, index) => {
           return (
             <React.Fragment key={index}>
               <div
                 className={
                   manaCurveCss.manaCurveColumn + " " + sharedCss.back_green
                 }
-                style={{ height: getStyleHeight(cwr.wins / curveMax) }}
-                title={`${cwr.wins} won`}
+                style={{ height: getStyleHeight(winRateInfo.wins / curveMax) }}
+                title={`${winRateInfo.wins} won`}
               />
               <div
                 className={
                   manaCurveCss.mana_curve_column + " " + sharedCss.back_red
                 }
-                style={{ height: getStyleHeight(cwr.losses / curveMax) }}
-                title={`${cwr.losses} lost`}
+                style={{
+                  height: getStyleHeight(winRateInfo.losses / curveMax),
+                }}
+                title={`${winRateInfo.losses} lost`}
               />
             </React.Fragment>
           );
         })}
       </div>
       <div className={manaCurveCss.mana_curve_costs}>
-        {barStats.map((cwr, index) => {
+        {barStats.map((winRateInfo, index) => {
           let winRate = 0;
-          if (cwr.wins) {
-            winRate = cwr.wins / (cwr.wins + cwr.losses);
+          if (winRateInfo.wins) {
+            winRate =
+              winRateInfo.wins / (winRateInfo.wins + winRateInfo.losses);
           }
           const colClass = getWinrateClass(winRate, true);
           return (
             <div
               key={index}
               className={manaCurveCss.mana_curve_column_number}
-              title={`${cwr.wins} won : ${cwr.losses} lost`}
+              title={`${winRateInfo.wins} won : ${winRateInfo.losses} lost`}
             >
               <span className={colClass}>{formatPercent(winRate)}</span>
               {showTags && (
                 <div
                   className={manaCurveCss.mana_curve_tag}
-                  style={{ backgroundColor: getTagColor(cwr.tag) }}
+                  style={{ backgroundColor: getTagColor(winRateInfo.tag) }}
                 >
-                  {cwr.tag}
+                  {winRateInfo.tag}
                 </div>
               )}
-              {cwr.colors?.map((color) => (
+              {winRateInfo.colors?.map((color) => (
                 <div
                   key={color}
                   className={sharedCss.manaS16 + " " + manaClasses[color]}
@@ -133,36 +140,38 @@ function FrequencyChart({
   total: number;
   showTags: boolean;
 }): JSX.Element {
-  const curveMax = Math.max(...winrates.map((cwr) => cwr.total));
+  const curveMax = Math.max(
+    ...winrates.map((winRateInfo) => winRateInfo.total)
+  );
   const barStats = [...winrates];
   barStats.sort(frequencySort);
   return (
     <>
       <div className={manaCurveCss.mana_curve}>
-        {barStats.map((cwr, index) => {
+        {barStats.map((winRateInfo, index) => {
           return (
             <div
               key={index}
               className={
                 manaCurveCss.mana_curve_column + " " + sharedCss.back_blue
               }
-              style={{ height: getStyleHeight(cwr.total / curveMax) }}
-              title={`${cwr.total} matches`}
+              style={{ height: getStyleHeight(winRateInfo.total / curveMax) }}
+              title={`${winRateInfo.total} matches`}
             />
           );
         })}
       </div>
       <div className={manaCurveCss.mana_curve_costs}>
-        {barStats.map((cwr, index) => {
+        {barStats.map((winRateInfo, index) => {
           let frequency = 0;
-          if (cwr.total) {
-            frequency = cwr.total / total;
+          if (winRateInfo.total) {
+            frequency = winRateInfo.total / total;
           }
           return (
             <div
               key={index}
               className={manaCurveCss.mana_curve_column_number}
-              title={`${cwr.total} matches`}
+              title={`${winRateInfo.total} matches`}
             >
               <span className={sharedCss.whiteBright}>
                 {formatPercent(frequency)}
@@ -170,12 +179,12 @@ function FrequencyChart({
               {showTags && (
                 <div
                   className={manaCurveCss.mana_curve_tag}
-                  style={{ backgroundColor: getTagColor(cwr.tag) }}
+                  style={{ backgroundColor: getTagColor(winRateInfo.tag) }}
                 >
-                  {cwr.tag}
+                  {winRateInfo.tag}
                 </div>
               )}
-              {cwr.colors?.map((color) => (
+              {winRateInfo.colors?.map((color) => (
                 <div
                   key={color}
                   className={sharedCss.manaS16 + " " + manaClasses[color]}
@@ -199,7 +208,17 @@ export default function MatchResultsStatsPanel({
   aggregator: Aggregator;
   showCharts: boolean;
 }): JSX.Element {
-  const { stats, playStats, drawStats, tagStats, colorStats } = aggregator;
+  const {
+    stats,
+    playStats,
+    drawStats,
+    tagStats,
+    colorStats,
+    playerTagStats,
+    playerColorStats,
+    colorColorStats,
+    tagTagStats,
+  } = aggregator;
   const { eventId } = aggregator.filters;
   const isLimited = eventId === RANKED_DRAFT;
   const isConstructed = eventId === RANKED_CONST;
@@ -234,14 +253,21 @@ export default function MatchResultsStatsPanel({
   }, [checkResize]);
 
   const barsToShow = Math.max(3, Math.round(panelWidth / 40));
-  // Archetypes
-  const tagsWinrates = [...Object.values(tagStats)];
-  tagsWinrates.sort(frequencySort);
-  const freqTagStats = tagsWinrates.slice(0, barsToShow);
-  // Colors
-  const colorsWinrates = [...Object.values(colorStats)];
-  colorsWinrates.sort(frequencySort);
-  const freqColorStats = colorsWinrates.slice(0, barsToShow);
+
+  // Opponent: Archetypes or Colour source stats
+  let freqStats = Object.values(showTags ? tagStats : colorStats);
+  freqStats.sort(frequencySort);
+  freqStats = freqStats.slice(0, barsToShow);
+
+  // Player: Archetypes or Colour source stats
+  let playerFreqStats = Object.values(
+    showTags ? playerTagStats : playerColorStats
+  );
+  playerFreqStats.sort(frequencySort);
+  playerFreqStats = playerFreqStats.slice(0, barsToShow);
+
+  const matrixStats = showTags ? tagTagStats : colorColorStats;
+
   return (
     <div className={indexCss.main_stats} ref={panelRef}>
       <div className={prefixId + "_winrate"}>
@@ -355,7 +381,7 @@ export default function MatchResultsStatsPanel({
               Frequent Matchups
             </div>
             <FrequencyChart
-              winrates={showTags ? freqTagStats : freqColorStats}
+              winrates={freqStats}
               total={stats.total}
               showTags={showTags}
             />
@@ -365,8 +391,12 @@ export default function MatchResultsStatsPanel({
             >
               Wins vs Losses
             </div>
-            <WinrateChart
-              winrates={showTags ? freqTagStats : freqColorStats}
+            <WinrateChart winrates={freqStats} showTags={showTags} />
+
+            <MatchupMatrix
+              opponentWinrates={freqStats}
+              playerWinrates={playerFreqStats}
+              winrates={matrixStats}
               showTags={showTags}
             />
           </div>

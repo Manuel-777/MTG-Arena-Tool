@@ -89,7 +89,9 @@ export interface AggregatorStats {
   avgDuration: number;
   rank?: string;
   colors?: number[];
+  playerColors?: number[];
   tag?: string;
+  playerTag?: string;
 }
 
 export default class Aggregator {
@@ -190,7 +192,15 @@ export default class Aggregator {
 
   public archs: string[] = [];
   public archCounts: { [key: string]: number } = {};
+
   public colorStats: { [key: string]: AggregatorStats } = {};
+  public playerColorStats: { [key: string]: AggregatorStats } = {};
+  public colorColorStats: { [key: string]: AggregatorStats } = {};
+
+  public tagStats: { [key: string]: AggregatorStats } = {};
+  public playerTagStats: { [key: string]: AggregatorStats } = {};
+  public tagTagStats: { [key: string]: AggregatorStats } = {};
+
   public constructedStats: { [key: string]: AggregatorStats } = {};
   public deckMap: { [key: string]: InternalDeck } = {};
   public deckLastPlayed: { [key: string]: Date } = {};
@@ -202,7 +212,6 @@ export default class Aggregator {
   public limitedStats: { [key: string]: AggregatorStats } = {};
   public playStats: AggregatorStats = Aggregator.getDefaultStats();
   public stats: AggregatorStats = Aggregator.getDefaultStats();
-  public tagStats: { [key: string]: AggregatorStats } = {};
 
   constructor(filters?: AggregatorFilters) {
     this.filterDate = this.filterDate.bind(this);
@@ -211,7 +220,7 @@ export default class Aggregator {
     this.filterEvent = this.filterEvent.bind(this);
     this.filterMatch = this.filterMatch.bind(this);
     this.updateFilters = this.updateFilters.bind(this);
-    this._processMatch = this._processMatch.bind(this);
+    this.processMatch = this.processMatch.bind(this);
     this.compareDecks = this.compareDecks.bind(this);
     this.compareEvents = this.compareEvents.bind(this);
     this.updateFilters(filters);
@@ -325,7 +334,11 @@ export default class Aggregator {
     this.deckStats = {};
     this.deckRecentStats = {};
     this.colorStats = {};
+    this.playerColorStats = {};
     this.tagStats = {};
+    this.playerTagStats = {};
+    this.colorColorStats = {};
+    this.tagTagStats = {};
     this.constructedStats = {};
     this.limitedStats = {};
 
@@ -336,7 +349,7 @@ export default class Aggregator {
           const playerDeck = new Deck(match.playerDeck);
           match.playerDeckHash = playerDeck.getHash();
         }
-        this._processMatch(match);
+        this.processMatch(match);
       });
 
     [
@@ -346,7 +359,11 @@ export default class Aggregator {
       ...Object.values(this.deckStats),
       ...Object.values(this.deckRecentStats),
       ...Object.values(this.colorStats),
+      ...Object.values(this.playerColorStats),
       ...Object.values(this.tagStats),
+      ...Object.values(this.playerTagStats),
+      ...Object.values(this.colorColorStats),
+      ...Object.values(this.tagTagStats),
       ...Object.values(this.constructedStats),
       ...Object.values(this.limitedStats),
     ].forEach(Aggregator.finishStats);
@@ -368,8 +385,10 @@ export default class Aggregator {
     }
   }
 
-  _processMatch(match: InternalMatch): void {
-    const statsToUpdate = [this.stats];
+  processMatchPlayDraw(
+    match: InternalMatch,
+    statsToUpdate: AggregatorStats[]
+  ): void {
     // on play vs draw
     const hasPlayDrawData = match && match.toolVersion >= 262400;
     if (hasPlayDrawData) {
@@ -398,91 +417,185 @@ export default class Aggregator {
         );
       }
     }
-    // process event data
-    if (match.eventId) {
-      this.eventLastPlayed[match.eventId] = dateMaxValid(
-        new Date(match.date),
-        this.eventLastPlayed[match.eventId]
-      );
+  }
 
-      // process rank data
-      if (match.player?.rank) {
-        const rank = match.player.rank.toLowerCase();
-        if (!(rank in this.constructedStats)) {
-          this.constructedStats[rank] = {
-            ...Aggregator.getDefaultStats(),
-            rank,
-          };
-        }
-        if (!(rank in this.limitedStats)) {
-          this.limitedStats[rank] = {
-            ...Aggregator.getDefaultStats(),
-            rank,
-          };
-        }
-        if (db.standard_ranked_events.includes(match.eventId)) {
-          statsToUpdate.push(this.constructedStats[rank]);
-        } else if (db.limited_ranked_events.includes(match.eventId)) {
-          statsToUpdate.push(this.limitedStats[rank]);
-        }
+  processMatchEvent(
+    match: InternalMatch,
+    statsToUpdate: AggregatorStats[]
+  ): void {
+    this.eventLastPlayed[match.eventId] = dateMaxValid(
+      new Date(match.date),
+      this.eventLastPlayed[match.eventId]
+    );
+
+    // process rank data
+    if (match.player?.rank) {
+      const rank = match.player.rank.toLowerCase();
+      if (!(rank in this.constructedStats)) {
+        this.constructedStats[rank] = {
+          ...Aggregator.getDefaultStats(),
+          rank,
+        };
+      }
+      if (!(rank in this.limitedStats)) {
+        this.limitedStats[rank] = {
+          ...Aggregator.getDefaultStats(),
+          rank,
+        };
+      }
+      if (db.standard_ranked_events.includes(match.eventId)) {
+        statsToUpdate.push(this.constructedStats[rank]);
+      } else if (db.limited_ranked_events.includes(match.eventId)) {
+        statsToUpdate.push(this.limitedStats[rank]);
       }
     }
-    // process deck data
-    if (match.playerDeck?.id) {
-      const id = match.playerDeck.id;
-      this.deckMap[id] = match.playerDeck;
-      this.deckLastPlayed[id] = dateMaxValid(
-        new Date(match.date),
-        this.deckLastPlayed[id]
-      );
-      const currentDeck = getDeck(match.playerDeck.id);
-      if (currentDeck) {
-        if (!(id in this.deckStats)) {
-          this.deckStats[id] = Aggregator.getDefaultStats();
-        }
-        statsToUpdate.push(this.deckStats[id]);
-        if (!(id in this.deckRecentStats)) {
-          this.deckRecentStats[id] = Aggregator.getDefaultStats();
-        }
-        if (
-          currentDeck.lastUpdated &&
-          isAfter(new Date(match.date), new Date(currentDeck.lastUpdated))
-        ) {
-          statsToUpdate.push(this.deckRecentStats[id]);
-        }
+  }
+
+  processMatchPlayerDeck(
+    match: InternalMatch,
+    statsToUpdate: AggregatorStats[]
+  ): void {
+    const id = match.playerDeck.id;
+    this.deckMap[id] = match.playerDeck;
+    this.deckLastPlayed[id] = dateMaxValid(
+      new Date(match.date),
+      this.deckLastPlayed[id]
+    );
+    const currentDeck = getDeck(match.playerDeck.id);
+    if (currentDeck) {
+      if (!(id in this.deckStats)) {
+        this.deckStats[id] = Aggregator.getDefaultStats();
+      }
+      statsToUpdate.push(this.deckStats[id]);
+      if (!(id in this.deckRecentStats)) {
+        this.deckRecentStats[id] = Aggregator.getDefaultStats();
+      }
+      if (
+        currentDeck.lastUpdated &&
+        isAfter(new Date(match.date), new Date(currentDeck.lastUpdated))
+      ) {
+        statsToUpdate.push(this.deckRecentStats[id]);
       }
     }
-    // process opponent data
-    if (match.oppDeck) {
-      const colors = match.oppDeck.colors || [];
-      if (colors?.length) {
-        colors.sort();
-        const colorStr = colors.join(",");
-        if (!(colorStr in this.colorStats)) {
-          this.colorStats[colorStr] = {
-            ...Aggregator.getDefaultStats(),
-            colors,
-          };
-        }
-        statsToUpdate.push(this.colorStats[colorStr]);
+
+    // Colour based aggregation
+    const playerColors = match.playerDeck.colors || [];
+    if (playerColors?.length) {
+      playerColors.sort();
+      const colorStr = playerColors.join(",");
+      if (!(colorStr in this.playerColorStats)) {
+        this.playerColorStats[colorStr] = {
+          ...Aggregator.getDefaultStats(),
+          playerColors,
+        };
       }
-      // process archetype
-      const tag = match.tags?.[0] ?? Aggregator.NO_ARCH;
-      this.archCounts[tag] = (this.archCounts[tag] ?? 0) + 1;
-      if (!(tag in this.tagStats)) {
-        this.tagStats[tag] = {
+      statsToUpdate.push(this.playerColorStats[colorStr]);
+    }
+
+    // Archetype based aggregation
+    const playerTag = match.playerDeck.tags?.[0] ?? Aggregator.NO_ARCH;
+    this.archCounts[playerTag] = (this.archCounts[playerTag] ?? 0) + 1;
+    if (!(playerTag in this.playerTagStats)) {
+      this.playerTagStats[playerTag] = {
+        ...Aggregator.getDefaultStats(),
+        playerColors,
+        playerTag,
+      };
+    } else {
+      this.playerTagStats[playerTag].colors = [
+        ...new Set([
+          ...(this.playerTagStats[playerTag].colors || []),
+          ...playerColors,
+        ]),
+      ];
+    }
+    if (!statsToUpdate.includes(this.playerTagStats[playerTag])) {
+      statsToUpdate.push(this.playerTagStats[playerTag]);
+    }
+  }
+
+  processMatchOppDeck(
+    match: InternalMatch,
+    statsToUpdate: AggregatorStats[]
+  ): void {
+    const colors = match.oppDeck.colors || [];
+    if (colors?.length) {
+      colors.sort();
+      const colorStr = colors.join(",");
+      if (!(colorStr in this.colorStats)) {
+        this.colorStats[colorStr] = {
           ...Aggregator.getDefaultStats(),
           colors,
-          tag,
         };
-      } else {
-        this.tagStats[tag].colors = [
-          ...new Set([...(this.tagStats[tag].colors || []), ...colors]),
-        ];
       }
-      if (!statsToUpdate.includes(this.tagStats[tag]))
-        statsToUpdate.push(this.tagStats[tag]);
+      statsToUpdate.push(this.colorStats[colorStr]);
+
+      // Record a ColorColor stat object if both decks have colour data.
+      const playerColors = match.playerDeck.colors || [];
+      if (playerColors?.length) {
+        playerColors.sort();
+        const playerColorStr = playerColors.join(",");
+        const colorColorKey = `${playerColorStr} ${colorStr}`;
+        if (!(colorColorKey in this.colorColorStats)) {
+          this.colorColorStats[colorColorKey] = {
+            ...Aggregator.getDefaultStats(),
+            colors,
+            playerColors,
+          };
+        }
+        statsToUpdate.push(this.colorColorStats[colorColorKey]);
+      }
     }
+    // process archetype
+    const tag = match.tags?.[0] ?? Aggregator.NO_ARCH;
+    this.archCounts[tag] = (this.archCounts[tag] ?? 0) + 1;
+    if (!(tag in this.tagStats)) {
+      this.tagStats[tag] = {
+        ...Aggregator.getDefaultStats(),
+        colors,
+        tag,
+      };
+    } else {
+      this.tagStats[tag].colors = [
+        ...new Set([...(this.tagStats[tag].colors || []), ...colors]),
+      ];
+    }
+    if (!statsToUpdate.includes(this.tagStats[tag])) {
+      statsToUpdate.push(this.tagStats[tag]);
+    }
+
+    // Record a TagTag stat object if both decks have colour data.
+    const playerTag = match.playerDeck.tags?.[0] ?? Aggregator.NO_ARCH;
+    const tagTagKey = `${playerTag} ${tag}`;
+    if (!(tagTagKey in this.tagTagStats)) {
+      this.tagTagStats[tagTagKey] = {
+        ...Aggregator.getDefaultStats(),
+        tag,
+        playerTag,
+      };
+    }
+    if (!statsToUpdate.includes(this.tagTagStats[tagTagKey])) {
+      statsToUpdate.push(this.tagTagStats[tagTagKey]);
+    }
+  }
+
+  processMatch(match: InternalMatch): void {
+    const statsToUpdate = [this.stats];
+    this.processMatchPlayDraw(match, statsToUpdate);
+
+    if (match.eventId) {
+      // process event data
+      this.processMatchEvent(match, statsToUpdate);
+    }
+    if (match.playerDeck?.id) {
+      // process deck data
+      this.processMatchPlayerDeck(match, statsToUpdate);
+    }
+    if (match.oppDeck) {
+      // process opponent data
+      this.processMatchOppDeck(match, statsToUpdate);
+    }
+
     // update relevant stats
     statsToUpdate.forEach((stats) => {
       // some of the data is wierd. Games which last years or have no data.
