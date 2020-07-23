@@ -89,8 +89,6 @@ function generateInternalMatch(
     toolVersion: globals.toolVersion,
     toolRunFromSource: !electron.remote.app.isPackaged,
     arenaId: globals.store.getState().playerdata.playerName,
-    // TS complains about undef but lastPushedDate should not be declared here
-    lastPushedDate: new Date().toISOString(),
     type: "match",
   };
 
@@ -135,7 +133,7 @@ export default function saveMatch(id: string, matchEndTime: number): void {
   playerDb.upsert("", id, match);
 
   const gameNumberCompleted = currentMatch.gameInfo.results.filter(
-    (res) => res.scope == "MatchScope_Match"
+    (res) => res.scope == "MatchScope_Game"
   ).length;
 
   if (globals.matchCompletedOnGameNumber === gameNumberCompleted) {

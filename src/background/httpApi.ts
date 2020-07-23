@@ -295,8 +295,13 @@ function handleSync(syncIds: SyncIds): void {
 }
 
 function handleRePushLostMatchData(): void {
+  // Server issues lost match records for roughly this time span.
   const shufflerDataCollectionStart = "2019-01-28T00:00:00.000Z";
   const dataLostEnd = "2019-05-01T00:00:00.000Z";
+  // A bug introduced in 4.0.11 and fixed in 5.4.2 made bo3 matches only get
+  // uploaded if they ended after only a single game.
+  const bo3SkippedStartVersion = 4 * 256 * 256 + 11;
+  const bo3SkipFixedVersion = (5 * 256 + 4) * 256 + 2;
   const toPush: SyncIds = {
     courses: [],
     matches: Object.keys(globalStore.matches).filter((id) => {
@@ -305,6 +310,12 @@ function handleRePushLostMatchData(): void {
         !match.lastPushedDate &&
         shufflerDataCollectionStart < match.date &&
         match.date < dataLostEnd
+      ) || (
+        !match.lastPushedByVersion &&
+        match.bestOf === 3 &&
+        bo3SkippedStartVersion <= match.toolVersion &&
+        match.toolVersion < bo3SkipFixedVersion &&
+        (match.player.win === 2 || match.opponent.win === 2)
       );
     }),
     drafts: [],
@@ -480,12 +491,14 @@ function handleSetDataResponse(
   if (task && task.match) {
     const match: InternalMatch = JSON.parse(task.match);
     match.lastPushedDate = new Date().toISOString();
+    match.lastPushedByVersion = globals.toolVersion;
     reduxAction(
       globals.store.dispatch,
       { type: "SET_MATCH", arg: match },
       IPC_RENDERER
     );
     playerDb.upsert(match.id, "lastPushedDate", match.lastPushedDate);
+    playerDb.upsert(match.id, "lastPushedByVersion", match.lastPushedByVersion);
   }
 }
 
