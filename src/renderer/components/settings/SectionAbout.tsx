@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from "react";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import { remote, shell } from "electron";
 import db from "../../../shared/database-wrapper";
 import { format, fromUnixTime } from "date-fns";

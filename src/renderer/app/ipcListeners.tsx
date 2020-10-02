@@ -3,7 +3,7 @@
 /* eslint-disable no-console */
 import { ipcRenderer as ipc, IpcRendererEvent, remote } from "electron";
 import timestamp from "../../shared/utils/timestamp";
-import { ipcSend } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { reduxAction } from "../../shared/redux/sharedRedux";
 import globalStore from "../../shared/store";
 import { AnyAction, Dispatch } from "redux";

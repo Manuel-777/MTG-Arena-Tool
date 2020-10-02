@@ -12,7 +12,7 @@ import {
   CardObject,
 } from "mtgatool-shared";
 import Button from "../misc/Button";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import { useDispatch, useSelector } from "react-redux";
 import db from "../../../shared/database-wrapper";
 import ShareButton from "../misc/ShareButton";

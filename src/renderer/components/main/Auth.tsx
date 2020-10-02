@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import store, { AppState } from "../../../shared/redux/stores/rendererStore";
 import { shell } from "electron";
 import Checkbox from "../misc/Checkbox";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import { reduxAction } from "../../../shared/redux/sharedRedux";
 import css from "./auth.css";
 import formsCss from "../../forms.css";

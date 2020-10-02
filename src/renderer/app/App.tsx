@@ -17,7 +17,7 @@ import ipcListeners from "./ipcListeners";
 import Popup from "../components/main/Popup";
 import CardHover from "../components/main/CardHover";
 import OutputLogInput from "../components/popups/OutputLogInput";
-import { ipcSend } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import Share from "../components/popups/Share";
 import store, { AppState } from "../../shared/redux/stores/rendererStore";
 import { reduxAction } from "../../shared/redux/sharedRedux";

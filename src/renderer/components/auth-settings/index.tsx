@@ -5,7 +5,7 @@ import indexCss from "../../index.css";
 import formsCss from "../../forms.css";
 import Close from "../../../assets/images/svg/close.svg";
 import { animated, useSpring } from "react-spring";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import { useSelector } from "react-redux";
 import store, { AppState } from "../../../shared/redux/stores/rendererStore";
 import showOpenLogDialog from "../../../shared/utils/showOpenLogDialog";

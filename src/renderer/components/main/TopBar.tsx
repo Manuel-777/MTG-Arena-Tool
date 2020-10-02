@@ -1,5 +1,5 @@
 import React, { CSSProperties, useState } from "react";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 
 import css from "./TopBar.css";
 import mainCss from "./main.css";

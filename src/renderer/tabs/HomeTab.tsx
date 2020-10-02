@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import db from "../../shared/database-wrapper";
-import { ipcSend } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { toDDHHMMSS } from "../../shared/utils/dateTo";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../shared/redux/stores/rendererStore";

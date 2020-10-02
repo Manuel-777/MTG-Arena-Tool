@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React, { useMemo, useCallback } from "react";
 import Button from "../misc/Button";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import Toggle from "../misc/Toggle";
 import Slider from "../misc/Slider";
 import _ from "lodash";
