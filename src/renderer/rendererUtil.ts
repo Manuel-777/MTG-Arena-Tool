@@ -23,7 +23,7 @@ export const actionLogDir = path.join(
 
 export function ipcSend(method: "sync_check" | "toggle_edit_mode"): void;
 
-export function ipcSend(method: "renderer_window_minimize" | "renderer_window_close", arg: number): void;
+export function ipcSend(method: "renderer_window_maximize" | "renderer_window_minimize" | "renderer_window_close", arg: number): void;
 
 export function ipcSend(method: "toggle_archived", arg: string | number): void;
 
@@ -31,9 +31,9 @@ export function ipcSend(method: 'import_custom_deck' | "set_clipboard" | "set_lo
 
 export function ipcSend(method: "updates_check" | "delete_data", arg: boolean): void;
 
-export function ipcSend(method: 'force_open_about', arg: undefined, to: typeof IPC_RENDERER): void; // fix this shit
+export function ipcSend(method: 'force_open_about', arg: undefined, to: typeof IPC_RENDERER): void;
 
-export function ipcSend(method: 'force_open_settings', arg: number, to: typeof IPC_RENDERER): void; // fix this shit
+export function ipcSend(method: 'force_open_settings', arg: number, to: typeof IPC_RENDERER): void;
 
 export function ipcSend(method: 'save_user_settings', arg: {
   last_open_tab: number,
