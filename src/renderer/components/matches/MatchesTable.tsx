@@ -53,6 +53,25 @@ const { DATE_SEASON, MATCHES_TABLE_MODE } = constants;
 
 const { RANKED_CONST, RANKED_DRAFT } = Aggregator;
 
+function convertRankToNumber(rank: string): number {
+  switch (rank) {
+    case 'Bronze':
+      return 0;
+    case 'Silver':
+      return 1;
+    case 'Gold':
+      return 2;
+    case 'Platinum':
+      return 3;
+    case 'Diamond':
+      return 4;
+    case 'Mythic':
+      return 5;
+    default:
+      return -1;
+  }
+}
+
 const columns: Column<MatchTableData>[] = [
   { accessor: "id" },
   { accessor: "date" },
@@ -201,6 +220,10 @@ const columns: Column<MatchTableData>[] = [
     Filter: RankColumnFilter,
     Cell: RankCell,
     mayToggle: true,
+    sortType: (rowA, rowB) => {
+      const rank = convertRankToNumber(rowA.original.oppRank) - convertRankToNumber(rowB.original.oppRank);
+      return rank > 0 ? 1 : rank < 0 ? -1 : 0;
+    }
   },
   {
     Header: "Op. Tier",
