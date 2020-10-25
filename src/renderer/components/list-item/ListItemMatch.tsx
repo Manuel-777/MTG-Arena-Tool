@@ -16,7 +16,7 @@ import {
 } from "./ListItem";
 import css from "./ListItem.css";
 import sharedCss from "../../../shared/shared.css";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import database from "../../../shared/database-wrapper";
 import RankSmall from "../misc/RankSmall";
 import { constants, getEventPrettyName } from "mtgatool-shared";

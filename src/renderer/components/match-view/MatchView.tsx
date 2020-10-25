@@ -3,7 +3,8 @@ import fs from "fs";
 import path from "path";
 import ShareButton from "../misc/ShareButton";
 import ManaCost from "../misc/ManaCost";
-import { actionLogDir, ipcSend } from "../../rendererUtil";
+import { actionLogDir } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import DeckList from "../misc/DeckList";
 import RankIcon from "../misc/RankIcon";
 import db from "../../../shared/database-wrapper";
@@ -118,19 +119,35 @@ function MatchView(props: MatchViewProps): JSX.Element {
 
   const clickAdd = (): void => {
     ipcSend("import_custom_deck", JSON.stringify(deck.getSave()));
+    ipcSend("popup", {
+      text: `Deck added to My Decks.`,
+      time: 3000,
+    });
   };
 
   const clickArena = (): void => {
     ipcSend("set_clipboard", deck.getExportArena());
+    ipcSend("popup", {
+      text: `Decklist copied to clipboard.`,
+      time: 3000,
+    });
   };
 
   const clickTxt = (): void => {
     const str = deck.getExportTxt();
     ipcSend("export_txt", { str, name: deck.getName() });
+    ipcSend("popup", {
+      text: `Deck exported to text file.`,
+      time: 3000,
+    });
   };
 
   const copyOppName = useCallback((): void => {
     ipcSend("set_clipboard", match.opponent.name);
+    ipcSend("popup", {
+      text: `Opponent's name copied to clipboard`,
+      time: 3000,
+    });
   }, [match]);
 
   /*

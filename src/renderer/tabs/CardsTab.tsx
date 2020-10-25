@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
-import { ipcSend, getWinrateClass } from "../rendererUtil";
+import { getWinrateClass } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { AppState } from "../../shared/redux/stores/rendererStore";
 import {
   CardsData,

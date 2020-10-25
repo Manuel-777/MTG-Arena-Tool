@@ -7,7 +7,7 @@ import { ListItemExplore } from "../components/list-item/ListItemExplore";
 import Button from "../components/misc/Button";
 import Checkbox from "../components/misc/Checkbox";
 import Input from "../components/misc/Input";
-import { ipcSend } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { reduxAction } from "../../shared/redux/sharedRedux";
 import { ExploreQuery } from "../../shared/redux/slices/exploreSlice";
 import ranks16 from "../../assets/images/ranks_16.png";

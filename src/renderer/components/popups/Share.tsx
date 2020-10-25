@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import ReactSelect from "../../../shared/ReactSelect";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../../shared/redux/stores/rendererStore";
 import { reduxAction } from "../../../shared/redux/sharedRedux";

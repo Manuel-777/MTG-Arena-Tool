@@ -8,7 +8,6 @@ import CollectionTable from "../components/collection/CollectionTable";
 import { CardsData } from "../components/collection/types";
 
 import {
-  ipcSend,
   getMissingCardCounts,
   getCardFormats,
   getCardBanned,
@@ -16,6 +15,7 @@ import {
   getCardIsCraftable,
   getCardInBoosters,
 } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { CardCounts } from "../components/decks/types";
 import { reduxAction } from "../../shared/redux/sharedRedux";
 import store, { AppState } from "../../shared/redux/stores/rendererStore";

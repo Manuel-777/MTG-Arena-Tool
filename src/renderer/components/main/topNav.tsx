@@ -6,7 +6,7 @@ import { AppState } from "../../../shared/redux/stores/rendererStore";
 import useWindowSize from "../../hooks/useWindowSize";
 import { reduxAction } from "../../../shared/redux/sharedRedux";
 import PatreonInfo from "../popups/PatreonInfo";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 
 import topNavCss from "./topNav.css";
 
