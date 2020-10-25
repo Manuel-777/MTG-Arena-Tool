@@ -217,6 +217,23 @@ export default function AdvancedSearch(props: EditKeyProps): JSX.Element {
     [closeCallback, open]
   );
 
+  const closeOnEscape = useCallback(
+    (e: KeyboardEvent): void => {
+      if (!open) return;
+      if (e.key === "Escape") {
+        handleClose("");
+      }
+    },
+    [handleClose, open]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", closeOnEscape);
+    return (): void => {
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [closeOnEscape]);
+
   const handleSearch = useCallback(() => {
     handleClose(query);
   }, [handleClose, query]);
@@ -318,6 +335,7 @@ export default function AdvancedSearch(props: EditKeyProps): JSX.Element {
       <div
         className={popupCss.popupDiv}
         style={{
+          position: "relative",
           overflowY: `auto`,
           maxHeight: `calc(100vh - 80px)`,
           height: `min(${open * 450}px, calc(100vh - 64px))`,
@@ -328,6 +346,20 @@ export default function AdvancedSearch(props: EditKeyProps): JSX.Element {
           e.stopPropagation();
         }}
       >
+        <div
+          style={{
+            position: "absolute",
+            right: "32px",
+            zIndex: 1,
+            cursor: "pointer",
+          }}
+          title="Cancel"
+          onClick={(): void => {
+            handleClose("");
+          }}
+        >
+          X
+        </div>
         <div className={mainCss.messageSub}>Advanced Search</div>
         <div
           style={{
