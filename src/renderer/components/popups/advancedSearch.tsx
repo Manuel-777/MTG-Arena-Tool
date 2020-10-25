@@ -3,7 +3,7 @@ import Button from "../misc/Button";
 
 import mainCss from "../../index.css";
 import popupCss from "./popups.css";
-import css from "./advancedSearch.css";
+import css from "./advancedSearch.scss";
 import ManaFilterExt from "../misc/ManaFilterExt";
 import ReactSelect from "../../../shared/ReactSelect";
 import getFiltersFromQuery from "../collection/collectionQuery";
@@ -25,6 +25,7 @@ import SetsFilter from "../misc/SetsFilter";
 import { StringFilter } from "../tables/filters";
 import { InputContainer } from "../misc/InputContainer";
 import Flex from "../misc/Flex";
+import Close from "../../../assets/images/svg/close.svg";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 
@@ -346,20 +347,11 @@ export default function AdvancedSearch(props: EditKeyProps): JSX.Element {
           e.stopPropagation();
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            right: "32px",
-            zIndex: 1,
-            cursor: "pointer",
-          }}
-          title="Cancel"
-          onClick={(): void => {
-            handleClose("");
-          }}
-        >
-          X
-        </div>
+        <Close
+          fill="var(--color-text-hover)"
+          className={css.closeButton}
+          onClick={(): void => handleClose("")}
+        />
         <div className={mainCss.messageSub}>Advanced Search</div>
         <div
           style={{

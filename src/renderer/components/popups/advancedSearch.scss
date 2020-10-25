@@ -1,0 +1,22 @@
+.search-line {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.close-button {
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  cursor: pointer;
+  -webkit-transition: all .25s ease-in-out;
+  opacity: 0.8;
+  z-index: 10;
+
+  &:hover {
+    transform: rotate(-90deg);
+    opacity: 1;
+  }
+}
