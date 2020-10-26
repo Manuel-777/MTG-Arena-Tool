@@ -1,6 +1,7 @@
 import _ from "lodash";
 import matchSorter from "match-sorter";
 import React from "react";
+import CreatableSelect from "react-select/creatable";
 import { ColumnInstance, FilterValue, Row, TableState } from "react-table";
 import { constants, InternalDeck } from "mtgatool-shared";
 import { BinarySymbol } from "../misc/BinarySymbol";
@@ -11,6 +12,7 @@ import { MetricText } from "../misc/MetricText";
 import { useMultiSelectFilter } from "./useMultiSelectFilter";
 import { MultiSelectFilterProps, TableData } from "./types";
 import css from "../../index.css";
+import indexCss from "../../index.css";
 
 const { COLORS_ALL, COLORS_BRIEF } = constants;
 
@@ -35,6 +37,41 @@ export function TextBoxFilter<D extends TableData>({
         placeholder={prompt}
       />
     </InputContainer>
+  );
+}
+
+export function SelectFilter<D extends TableData>({
+  column: { id, filterValue, preFilteredRows, setFilter },
+}: {
+  column: ColumnInstance<D>;
+}): JSX.Element {
+  let options: any[] = [];
+  if(id === "format") {
+      options = preFilteredRows
+          .filter(d => d)
+          .map(d => d.values.format)
+          .sort()
+          .filter((el, i, a) => i === a.indexOf(el))
+          .map(d => ({value: d, label: d}));
+  }
+
+  const count = preFilteredRows.length;
+  const prompt =
+    id === "deckTileId" ? `Search ${count} decks...` : `Filter ${id}...`;
+  return (
+    <div title={prompt} className={indexCss.inputContainer}>
+      <CreatableSelect
+        className={indexCss.select}
+        isClearable
+        menuPosition={"fixed"}
+        options={options}
+        value={(filterValue ? { value: filterValue, label: filterValue } : undefined)}
+        onChange={(option): void =>
+          setFilter(option ? option.value : undefined)
+        }
+        placeholder={prompt}
+      />
+    </div>
   );
 }
 

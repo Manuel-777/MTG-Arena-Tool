@@ -19,6 +19,7 @@ import {
   ArchiveColumnFilter,
   ColorColumnFilter,
   NumberRangeColumnFilter,
+  SelectFilter,
   TextBoxFilter,
 } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
@@ -111,7 +112,7 @@ const columns: Column<MatchTableData>[] = [
     accessor: "format",
     disableFilters: false,
     filter: "fuzzyText",
-    Filter: TextBoxFilter,
+    Filter: SelectFilter,
     Cell: FormatCell,
     gridWidth: "150px",
     mayToggle: true,
