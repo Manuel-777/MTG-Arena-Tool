@@ -13,6 +13,7 @@ import { AppState } from "../../../shared/redux/stores/rendererStore";
 import ReactSelect from "../../../shared/ReactSelect";
 import AdvancedSearch from "../popups/advancedSearch";
 import { constants } from "mtgatool-shared";
+import indexCss from "../../index.css";
 
 const { IPC_ALL, IPC_RENDERER } = constants;
 
@@ -112,7 +113,7 @@ export default function CollectionTableControls(
         paddingBottom: "4px",
       }}
     >
-      <div className={tableCss.reactTableToggles}>
+      <div className={tableCss.reactTableCommands}>
         <ReactSelect
           options={collectionModes}
           current={collectionMode}
@@ -121,11 +122,15 @@ export default function CollectionTableControls(
         <MediumTextButton onClick={exportRows}>Export</MediumTextButton>
         <MediumTextButton onClick={resetFilters}>Reset</MediumTextButton>
         {collectionMode == collectionModes[0] && (
-          <MediumTextButton
-            onClick={(): void => setTogglesVisible(!togglesVisible)}
-          >
-            {togglesVisible ? "Hide" : "Show"} Column Toggles
-          </MediumTextButton>
+            <MediumTextButton
+                onClick={(): void => setTogglesVisible(!togglesVisible)}
+                className={indexCss.buttonSimple}
+                style={{textAlign: "right"}}
+            >
+              <p style={{marginRight: "12px"}}>
+                {togglesVisible ? "Hide Column Toggles" : "Show Column Toggles"}
+              </p>
+            </MediumTextButton>
         )}
         <MediumTextButton
           onClick={(): void => setAdvancedFiltersOpen(!advancedFiltersOpen)}
@@ -153,7 +158,7 @@ export default function CollectionTableControls(
         />
       )}
       <div
-        className={tableCss.react_table_search_cont}
+        className={tableCss.reactTableCommands}
         style={{ marginTop: "4px" }}
       >
         <InputContainer title="Search">

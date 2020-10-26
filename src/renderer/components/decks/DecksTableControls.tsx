@@ -65,7 +65,7 @@ export default function DecksTableControls(
         paddingBottom: "4px",
       }}
     >
-      <div className={tableCss.reactTableToggles}>
+      <div className={tableCss.reactTableCommands}>
         <div className={indexCss.flexItem}>
           <DateFilter
             prefixId={deckTableCss.decksTop}
@@ -136,9 +136,13 @@ export default function DecksTableControls(
             Wanted
           </SmallTextButton>
           <MediumTextButton
-            onClick={(): void => setTogglesVisible(!togglesVisible)}
+              onClick={(): void => setTogglesVisible(!togglesVisible)}
+              className={indexCss.buttonSimple}
+              style={{textAlign: "right"}}
           >
-            {togglesVisible ? "Hide" : "Show"} Column Toggles
+              <p style={{marginRight: "12px"}}>
+                  {togglesVisible ? "Hide Column Toggles" : "Show Column Toggles"}
+              </p>
           </MediumTextButton>
         </div>
       </div>
@@ -146,7 +150,7 @@ export default function DecksTableControls(
         toggleableColumns={toggleableColumns}
         togglesVisible={togglesVisible}
       />
-      <div className={tableCss.reactTableSearchCont}>
+      <div className={tableCss.reactTableCommands}>
         <ReactSelect
           current={tableMode}
           options={DECKS_TABLE_MODES}
