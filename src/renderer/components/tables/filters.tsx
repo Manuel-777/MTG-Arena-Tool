@@ -45,14 +45,32 @@ export function SelectFilter<D extends TableData>({
 }: {
   column: ColumnInstance<D>;
 }): JSX.Element {
+  const styles = {
+    option: (styles, {isFocused, isSelected}) => {
+      if (isSelected) {
+        return {
+          ...styles,
+          backgroundColor: "var(--color-section-active) !important",
+        };
+      }
+      if (isFocused) {
+        return {
+          ...styles,
+          backgroundColor: "var(--color-section-hover) !important",
+        };
+      }
+      return {...styles};
+    }
+  };
+
   let options: any[] = [];
-  if(id === "format") {
-      options = preFilteredRows
-          .filter(d => d)
-          .map(d => d.values.format)
-          .sort()
-          .filter((el, i, a) => i === a.indexOf(el))
-          .map(d => ({value: d, label: d}));
+  if (id === "format") {
+    options = preFilteredRows
+      .filter(d => d)
+      .map(d => d.values.format)
+      .sort()
+      .filter((el, i, a) => i === a.indexOf(el))
+      .map(d => ({value: d, label: d}));
   }
 
   const count = preFilteredRows.length;
@@ -64,6 +82,7 @@ export function SelectFilter<D extends TableData>({
         className={indexCss.select}
         isClearable
         menuPosition={"fixed"}
+        styles={styles}
         options={options}
         value={(filterValue ? { value: filterValue, label: filterValue } : undefined)}
         onChange={(option): void =>

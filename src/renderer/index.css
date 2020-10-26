@@ -1051,7 +1051,11 @@ a:hover {
 .input_container > .select > div > div {
     height: 30px;
 }
+.input_container > .select > div div[class$="ValueContainer"] {
+    cursor: text;
+}
 .input_container > .select > div div[class$="indicatorContainer"] {
+    cursor: pointer;
     padding: 0;
 }
 
