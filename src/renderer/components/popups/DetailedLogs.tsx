@@ -56,10 +56,10 @@ export default function DetailedLogs(props: DetailedLogsProps): JSX.Element {
           Detailed Logs is disabled
         </div>
         <ul>
-          <li>Open Arena (the game by WotC)</li>
-          <li>Go to the settings screen in Arena</li>
-          <li>Open the View Account screen</li>
-          <li>Enable Detailed logs.</li>
+          <li>Open Arena (the game).</li>
+          <li>Go to the settings screen in Arena.</li>
+          <li>Open the Account screen.</li>
+          <li>Enable detailed logs.</li>
           <li>Restart Arena.</li>
         </ul>
         <div style={{ textAlign: "center" }}>
