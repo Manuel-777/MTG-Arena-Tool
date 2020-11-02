@@ -8,7 +8,6 @@ interface EconomyValueRecordProps {
   deltaDownContent?: string;
   deltaContent?: string;
   iconClassName?: string;
-  containerDiv?: boolean;
   smallLabel?: boolean;
   iconUrl?: string;
 }
@@ -16,7 +15,7 @@ interface EconomyValueRecordProps {
 export default function EconomyValueRecord(
   props: EconomyValueRecordProps
 ): JSX.Element {
-  const contents = (
+  return (
     <>
       {props.iconClassName && (
         <EconomyIcon
@@ -44,33 +43,6 @@ export default function EconomyValueRecord(
         </div>
       )}
     </>
-  );
-
-  let gridArea = "";
-  switch (props.title) {
-    case "Cards":
-      gridArea = "1 / 2 / auto / 3";
-      break;
-    case "Vault":
-      gridArea = "1 / 3 / auto / 4";
-      break;
-    case "Gold":
-      gridArea = "1 / 4 / auto / 5";
-      break;
-    case "Gems":
-      gridArea = "1 / 5 / auto / 6";
-      break;
-    case "Experience":
-      gridArea = "1 / 6 / auto / 7";
-      break;
-  }
-
-  return props.containerDiv ? (
-    <div style={{ gridArea: gridArea }} className={css.economy_metric}>
-      {contents}
-    </div>
-  ) : (
-    <>{contents}</>
   );
 }
 

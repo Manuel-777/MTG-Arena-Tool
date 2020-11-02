@@ -66,52 +66,57 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
       <div style={gridTitleStyle} className={indexCss.flexItem + " gridTitle"}>
         {getDayString(daysAgo, timestamp)}
       </div>
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyCard}
-        className={"gridCards"}
-        deltaUpContent={formatNumber(cardsAddedCount)}
-        title={"Cards"}
-      />
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyVault}
-        className={"gridVault"}
-        deltaUpContent={
-          vaultProgressDelta >= 0
-            ? formatPercent(vaultProgressDelta, vaultPercentFormat as any)
-            : undefined
-        }
-        deltaDownContent={
-          vaultProgressDelta < 0
-            ? formatPercent(vaultProgressDelta, vaultPercentFormat as any)
-            : undefined
-        }
-        title={"Vault"}
-      />
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyGold + " " + css.marginLeft}
-        className={"gridGold"}
-        deltaUpContent={goldDelta >= 0 ? formatNumber(goldDelta) : undefined}
-        deltaDownContent={goldDelta < 0 ? formatNumber(goldDelta) : undefined}
-        title={"Gold"}
-      />
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyGems}
-        className={"gridGems"}
-        deltaUpContent={gemsDelta >= 0 ? formatNumber(gemsDelta) : undefined}
-        deltaDownContent={gemsDelta < 0 ? formatNumber(gemsDelta) : undefined}
-        title={"Gems"}
-      />
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyExp}
-        className={"gridExp"}
-        deltaUpContent={String(formatNumber(xpGainedNumber ?? 0))}
-        title={"Experience"}
-      />
+      <div style={{gridArea: "1 / 2 / auto / 3"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyCard}
+          className={"gridCards"}
+          deltaUpContent={formatNumber(cardsAddedCount)}
+          title={"Cards"}
+        />
+      </div>
+      <div style={{gridArea: "1 / 3 / auto / 4"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyVault}
+          className={"gridVault"}
+          deltaUpContent={
+            vaultProgressDelta >= 0
+              ? formatPercent(vaultProgressDelta, vaultPercentFormat as any)
+              : undefined
+          }
+          deltaDownContent={
+            vaultProgressDelta < 0
+              ? formatPercent(vaultProgressDelta, vaultPercentFormat as any)
+              : undefined
+          }
+          title={"Vault"}
+        />
+      </div>
+      <div style={{gridArea: "1 / 4 / auto / 5"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyGold + " " + css.marginLeft}
+          className={"gridGold"}
+          deltaUpContent={goldDelta >= 0 ? formatNumber(goldDelta) : undefined}
+          deltaDownContent={goldDelta < 0 ? formatNumber(goldDelta) : undefined}
+          title={"Gold"}
+        />
+      </div>
+      <div style={{gridArea: "1 / 5 / auto / 6"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyGems}
+          className={"gridGems"}
+          deltaUpContent={gemsDelta >= 0 ? formatNumber(gemsDelta) : undefined}
+          deltaDownContent={gemsDelta < 0 ? formatNumber(gemsDelta) : undefined}
+          title={"Gems"}
+        />
+      </div>
+      <div style={{gridArea: "1 / 6 / auto / 7"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyExp}
+          className={"gridExp"}
+          deltaUpContent={String(formatNumber(xpGainedNumber ?? 0))}
+          title={"Experience"}
+        />
+      </div>
     </>
   );
 }
