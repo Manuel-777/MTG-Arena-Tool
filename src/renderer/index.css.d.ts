@@ -207,6 +207,8 @@ declare namespace IndexCssNamespace {
     message_sub: string;
     message_sub_15: string;
     message_updates: string;
+    "no-padding": string;
+    noPadding: string;
     notification: string;
     notplayed: string;
     notplayedtext: string;

@@ -2,14 +2,18 @@ import React from "react";
 import addDays from "date-fns/addDays";
 import startOfDay from "date-fns/startOfDay";
 
+import ReactTooltip from 'react-tooltip';
 import LocalTime from "../../../shared/time-components/LocalTime";
-import { formatNumber } from "../../rendererUtil";
-import { vaultPercentFormat } from "./economyUtils";
+import {formatNumber} from "../../rendererUtil";
+import {vaultPercentFormat} from "./economyUtils";
 import EconomyValueRecord from "./EconomyValueRecord";
+import CardPoolAddedEconomyValueRecord from "./EconomyRow";
 
 import indexCss from "../../index.css";
 import css from "./economy.css";
-import { formatPercent } from "mtgatool-shared";
+import {formatPercent} from "mtgatool-shared";
+import {Row} from "react-table";
+import {TransactionData} from "./types";
 
 function localDayDateFormat(date: Date): JSX.Element {
   return (
@@ -18,7 +22,7 @@ function localDayDateFormat(date: Date): JSX.Element {
       year={"numeric"}
       month={"long"}
       day={"numeric"}
-    ></LocalTime>
+    />
   );
 }
 
@@ -43,6 +47,7 @@ export interface EconomyDayHeaderProps {
   gemsDelta: number;
   goldDelta: number;
   xpGainedNumber: number;
+  subRows: Array<Row<TransactionData>>;
 }
 
 export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
@@ -53,6 +58,7 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
     gemsDelta,
     goldDelta,
     xpGainedNumber,
+    subRows
   } = props;
   const timestamp = addDays(new Date(), -daysAgo);
 
@@ -66,7 +72,8 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
       <div style={gridTitleStyle} className={indexCss.flexItem + " gridTitle"}>
         {getDayString(daysAgo, timestamp)}
       </div>
-      <div style={{gridArea: "1 / 2 / auto / 3"}} className={css.economy_metric}>
+      <div data-tip data-for={"tooltipCards" + daysAgo} style={{gridArea: "1 / 2 / auto / 3"}}
+           className={css.economy_metric}>
         <EconomyValueRecord
           iconClassName={css.economyCard}
           className={"gridCards"}
@@ -75,6 +82,26 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
           title={"Cards"}
         />
       </div>
+      <ReactTooltip
+        id={"tooltipCards" + daysAgo}
+        className={indexCss.noPadding}
+        arrowColor={"transparent"}
+        borderColor={"transparent"}
+        place={"bottom"}>
+        <div>
+          {subRows.filter((row) => {
+            return row.values.delta.cardsAdded || row.values.aetherizedCards;
+          }).map((row, index) => {
+            return (
+              <CardPoolAddedEconomyValueRecord
+                key={index}
+                addedCardIds={row.values.delta.cardsAdded}
+                aetherizedCardIds={row.values.aetherizedCards}
+              />
+            );
+          })}
+        </div>
+      </ReactTooltip>
       <div style={{gridArea: "1 / 3 / auto / 4"}} className={css.economy_metric}>
         <EconomyValueRecord
           iconClassName={css.economyVault}

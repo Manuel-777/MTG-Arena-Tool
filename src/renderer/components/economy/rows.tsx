@@ -12,6 +12,8 @@ function EconomyListViewGroup({
   row,
 }: TableViewRowProps<TransactionData>): JSX.Element {
   const props = row.values as EconomyDayHeaderProps;
+  props.subRows = row.subRows;
+
   return (
     <div className={css.economy_title}>
       <EconomyDayHeader {...props} />
