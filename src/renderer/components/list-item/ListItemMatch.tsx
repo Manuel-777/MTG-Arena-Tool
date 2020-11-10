@@ -99,10 +99,19 @@ export default function ListItemMatch({
             class={sharedCss.manaS20}
             colors={match.playerDeck.colors || []}
           />
+          <div style={{marginLeft: "auto"}} className={css.listMatchTime}>
+            <relative-time datetime={dateTime.toISOString()}>
+              {match.date?.toString() ?? ""}
+            </relative-time>{" "}
+            {toMMSS(match.duration) + " long"}
+          </div>
         </FlexBottom>
       </Column>
 
-      <Column style={{ flexGrow: 1 }} class={css.listItemRight}>
+      <Column class={css.listItemCenter}>
+      </Column>
+
+      <Column class={css.listItemRight}>
         <FlexTop>
           <div className={css.listMatchTitle}>
             {"vs " + match.opponent.name.slice(0, -6)}
@@ -119,20 +128,13 @@ export default function ListItemMatch({
           />
           <RankSmall rank={match.opponent} />
         </FlexTop>
-        <FlexBottom style={{ alignItems: "center" }}>
-          <div className={css.listMatchTime}>
-            <relative-time datetime={dateTime.toISOString()}>
-              {match.date?.toString() ?? ""}
-            </relative-time>{" "}
-            {toMMSS(match.duration) + " long"}
-          </div>
-
+        <FlexBottom>
           <ManaCost
             class={sharedCss.manaS20}
             colors={match.oppDeck.colors || []}
           />
           {addTagCallback && editTagCallback ? (
-            <div style={{ marginLeft: "8px" }}>
+            <div style={{marginLeft: "8px"}}>
               {tagState.length > 0 ? (
                 tagState.map((tag: any) => {
                   return (
