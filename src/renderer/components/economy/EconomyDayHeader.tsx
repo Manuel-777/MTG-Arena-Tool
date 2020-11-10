@@ -72,7 +72,8 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
       <div style={gridTitleStyle} className={indexCss.flexItem + " gridTitle"}>
         {getDayString(daysAgo, timestamp)}
       </div>
-      <div data-tip data-for={"tooltipCards" + daysAgo} style={{gridArea: "1 / 2 / auto / 3"}}
+      <div data-tip data-for={"tooltipCards" + daysAgo}
+           style={{gridArea: "1 / 2 / auto / 3", cursor: "pointer"}}
            className={css.economy_metric}>
         <EconomyValueRecord
           iconClassName={css.economyCard}
@@ -85,6 +86,12 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
       <ReactTooltip
         id={"tooltipCards" + daysAgo}
         className={indexCss.noPadding}
+        clickable={true}
+        isCapture={true} /* To hide on non-global scroll event  */
+        event={"click"}
+        eventOff={"dblclick"}
+        globalEventOff={"click"}
+        effect={"solid"}
         arrowColor={"transparent"}
         borderColor={"transparent"}
         place={"bottom"}>
