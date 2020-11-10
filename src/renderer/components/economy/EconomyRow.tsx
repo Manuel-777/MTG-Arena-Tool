@@ -266,7 +266,7 @@ interface InventoryCardListProps {
   isAetherized: boolean;
 }
 
-export default function CardPoolAddedEconomyValueRecord(
+export function CardPoolAddedEconomyValueRecord(
   props: CardPoolAddedEconomyValueRecordProps
 ): JSX.Element {
   const { addedCardIds, aetherizedCardIds } = props;

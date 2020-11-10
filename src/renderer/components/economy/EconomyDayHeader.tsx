@@ -7,7 +7,7 @@ import LocalTime from "../../../shared/time-components/LocalTime";
 import {formatNumber} from "../../rendererUtil";
 import {vaultPercentFormat} from "./economyUtils";
 import EconomyValueRecord from "./EconomyValueRecord";
-import CardPoolAddedEconomyValueRecord from "./EconomyRow";
+import {CardPoolAddedEconomyValueRecord} from "./EconomyRow";
 
 import indexCss from "../../index.css";
 import css from "./economy.css";
@@ -90,13 +90,13 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
         place={"bottom"}>
         <div>
           {subRows.filter((row) => {
-            return row.values.delta.cardsAdded || row.values.aetherizedCards;
+            return row.values.delta?.cardsAdded;
           }).map((row, index) => {
             return (
               <CardPoolAddedEconomyValueRecord
                 key={index}
                 addedCardIds={row.values.delta.cardsAdded}
-                aetherizedCardIds={row.values.aetherizedCards}
+                aetherizedCardIds={[]}
               />
             );
           })}
