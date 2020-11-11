@@ -13,14 +13,19 @@ import { useDispatch } from "react-redux";
 import deckTableCss from "./deckTable.css";
 import DeckColorsBar from "../misc/DeckColorsBar";
 import { constants, Deck, formatPercent } from "mtgatool-shared";
+import {TagBubble} from "../misc/TagBubble";
 const { IPC_NONE } = constants;
 
 export default function DecksArtViewRow({
   row,
   archiveCallback,
   openDeckCallback,
+  editTagCallback,
 }: DecksTableRowProps): JSX.Element {
   const deck = row.original;
+  const deckObj = new Deck(deck);
+  const parentId = deck.id ?? "";
+
   const onRowClick = (): void => {
     openDeckCallback(deck);
   };
@@ -57,9 +62,16 @@ export default function DecksArtViewRow({
     }
     */
   }
+  const formatProps = {
+    parentId,
+    tag: deck.format ?? "unknown",
+    editTagCallback,
+    fontStyle: "italic",
+    hideCloseButton: true,
+  };
 
   const lastTouch = new Date(deck.timeTouched);
-  const missingWildcards = getDeckMissing(new Deck(deck));
+  const missingWildcards = getDeckMissing(deckObj);
   const totalMissing =
     missingWildcards.common +
     missingWildcards.uncommon +
@@ -67,42 +79,62 @@ export default function DecksArtViewRow({
     missingWildcards.mythic;
 
   return (
-    <animated.div
+    <div
       className={deckTableCss.decksTableDeckTile}
       onClick={onRowClick}
       onMouseEnter={mouseEnter}
-      onMouseLeave={mouseLeave}
-      style={{
-        ...props,
-        backgroundImage: `url(${getCardArtCrop(row.values["deckTileId"])})`,
-      }}
-    >
-      <div style={{ height: "4px", display: "flex", width: "100%" }}>
-        <DeckColorsBar deck={new Deck(deck)} />
+      onMouseLeave={mouseLeave}>
+      <animated.div
+        style={{
+          ...props,
+          position: "absolute",
+          width: "210px",
+          height: "170px",
+          backgroundImage: `url(${getCardArtCrop(row.values["deckTileId"])})`,
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+
+      <div style={{zIndex: 1, display: "flex", width: "100%", height: "4px"}}>
+        <DeckColorsBar deck={deckObj} />
       </div>
       {!!deck.custom && (
         <ArchiveArtViewButton
           archiveCallback={archiveCallback}
-          dataId={deck.id || ""}
+          dataId={parentId}
           isArchived={deck.archived || false}
         />
       )}
-      <div className={deckTableCss.decksTableDeckInner}>
-        <div className={deckTableCss.decksTableDeckItem}>{deck.name}</div>
+      <div style={{zIndex: 1, marginLeft: "auto", marginTop: "auto"}}>
+        <TagBubble {...formatProps} />
+      </div>
+      <div style={{zIndex: 1}} className={deckTableCss.decksTableDeckInner}>
+        <div className={deckTableCss.decksTableDeckItem}>
+          {deck.name}
+        </div>
         <div className={deckTableCss.decksTableDeckItem}>
           <ManaCost colors={deck.colors || []} />
         </div>
         <div className={deckTableCss.decksTableDeckItem}>
           {deck.total > 0 ? (
             <>
-              {deck.wins}:{deck.losses} (
+              <span>
+                {deck.wins}:{deck.losses}
+              </span>
+              &nbsp;
+              <span>(</span>
               <span className={getWinrateClass(deck.winrate, true)}>
                 {formatPercent(deck.winrate)}
-              </span>{" "}
-              <i style={{ opacity: 0.6 }}>&plusmn; {winrateInterval}</i>)
+              </span>
+              &nbsp;
+              <span style={{fontStyle: "italic", opacity: 0.6}}>
+                &plusmn; {winrateInterval}
+              </span>
+              <span>)</span>
             </>
           ) : totalMissing > 0 ? (
-            <WildcardsCost deck={new Deck(deck)} shrink={true} />
+            <WildcardsCost deck={deckObj} shrink={true} />
           ) : (
             <span>---</span>
           )}
@@ -117,7 +149,7 @@ export default function DecksArtViewRow({
           <></>
         )}
       </div>
-    </animated.div>
+    </div>
   );
 }
 
