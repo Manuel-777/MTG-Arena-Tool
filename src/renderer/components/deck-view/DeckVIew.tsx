@@ -63,20 +63,21 @@ interface RaritiesCount {
 }
 
 function getDeckRaritiesCount(deck: Deck): RaritiesCount {
-  const rarities: RaritiesCount = { c: 0, u: 0, r: 0, m: 0 };
   const cards = [...deck.getMainboard().get(), ...deck.getSideboard().get()];
-  cards.forEach(function (c: CardObject) {
-    const quantity = c.quantity;
-    const card = db.card(c.id);
-    if (quantity > 0 && card) {
-      if (card.rarity == "common") rarities.c += quantity;
-      else if (card.rarity == "uncommon") rarities.u += quantity;
-      else if (card.rarity == "rare") rarities.r += quantity;
-      else if (card.rarity == "mythic") rarities.m += quantity;
-    }
-  });
+  const rarities = cards
+    .filter((c: CardObject) => {
+      return c.quantity > 0;
+    }).map((c: CardObject) => {
+      const card = db.card(c.id);
+      return card?.rarity;
+    });
 
-  return rarities;
+  return {
+    c: rarities.filter((rarity: string | undefined) => rarity === "common").length,
+    u: rarities.filter((rarity: string | undefined) => rarity === "uncommon").length,
+    r: rarities.filter((rarity: string | undefined) => rarity === "rare").length,
+    m: rarities.filter((rarity: string | undefined) => rarity === "mythic").length,
+  };
 }
 
 function DeckView(props: DeckViewProps): JSX.Element {
