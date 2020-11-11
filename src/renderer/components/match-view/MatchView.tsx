@@ -171,7 +171,9 @@ function MatchView(props: MatchViewProps): JSX.Element {
               backgroundImage: `url(${getCardArtCrop(playerDeck.tile)})`,
             }}
           >
-            <DeckColorsBar deck={playerDeck} />
+            <div style={{ height: "4px", display: "flex", width: "100%" }}>
+              <DeckColorsBar deck={playerDeck} />
+            </div>
             <div className={indexCss.topInner}>
               <div className={indexCss.flexItem}>
                 <SvgButton

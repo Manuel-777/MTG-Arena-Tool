@@ -29,8 +29,8 @@ export default function DeckColorsBar(props: DeckColorsBarProps): JSX.Element {
     [colors]
   );
   return (
-    <div style={{ height: "4px", display: "flex", width: "100%" }}>
+    <>
       {Object.keys(colors).map((k) => drawColor(k, colors[k]))}
-    </div>
+    </>
   );
 }

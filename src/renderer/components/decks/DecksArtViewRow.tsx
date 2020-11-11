@@ -77,7 +77,9 @@ export default function DecksArtViewRow({
         backgroundImage: `url(${getCardArtCrop(row.values["deckTileId"])})`,
       }}
     >
-      <DeckColorsBar deck={new Deck(deck)} />
+      <div style={{ height: "4px", display: "flex", width: "100%" }}>
+        <DeckColorsBar deck={new Deck(deck)} />
+      </div>
       {!!deck.custom && (
         <ArchiveArtViewButton
           archiveCallback={archiveCallback}
