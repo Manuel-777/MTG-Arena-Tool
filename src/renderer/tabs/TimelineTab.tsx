@@ -11,7 +11,9 @@ import DeckList from "../components/misc/DeckList";
 import {
   constants,
   Deck,
+  formatPercent,
   getRankIndex,
+  InternalMatch,
   SeasonalRankData,
 } from "mtgatool-shared";
 import ReactSelect from "../../shared/ReactSelect";
@@ -36,6 +38,7 @@ import topNavCss from "../components/main/topNav.css";
 import sharedCss from "../../shared/shared.css";
 import indexCss from "../index.css";
 import css from "./TimelineTab.css";
+import {getWinrateClass} from "../rendererUtil";
 
 const { SUB_MATCH, IPC_NONE } = constants;
 
@@ -143,6 +146,7 @@ function getSeasonData(
 
 interface TimelinePartProps extends SeasonalRankData {
   index: number;
+  data: SeasonalRankData[],
   width: number;
   height: number;
   hover: string;
@@ -158,6 +162,7 @@ interface TimelinePartProps extends SeasonalRankData {
 function TimeLinePart(props: TimelinePartProps): JSX.Element {
   const {
     index,
+    data,
     width,
     height,
     hover,
@@ -166,12 +171,11 @@ function TimeLinePart(props: TimelinePartProps): JSX.Element {
     lastMatchId,
   } = props;
 
-  const deckId = matchExists(lastMatchId)
-    ? getMatch(lastMatchId)?.playerDeck.id
-    : "";
+  const match = matchExists(lastMatchId) ? getMatch(lastMatchId) : undefined;
+  const deckId = match?.playerDeck.id || "";
 
   const mouseIn = useCallback(() => {
-    setHover(lastMatchId || "", deckId || "");
+    setHover(lastMatchId || "", deckId);
     setPartHover(index);
   }, [lastMatchId, deckId, index, setPartHover, setHover]);
 
@@ -182,7 +186,7 @@ function TimeLinePart(props: TimelinePartProps): JSX.Element {
 
   const style = {
     // Get a color that is the modulus of the hex ID
-    fill: `hsl(${parseInt(deckId || "", 16) % 360}, 64%, 63%)`,
+    fill: `hsl(${parseInt(deckId, 16) % 360}, 64%, 63%)`,
   };
 
   return (
@@ -206,25 +210,44 @@ function TimeLinePart(props: TimelinePartProps): JSX.Element {
         <polygon points={rectPoints} strokeWidth="0" />
         <polyline points={linePoints} strokeWidth="1" />
       </svg>
-      {props.oldClass !== props.newClass ? (
-        <TimelineRankBullet
-          width={width}
-          height={props.newRankNumeric ? props.newRankNumeric * 2 + 48 : 0}
-          rankClass={props.newClass}
-          rankLevel={props.newLevel}
-        />
-      ) : (
-        <></>
-      )}
+      {(() => {
+        if (index === 0 || props.oldClass !== props.newClass) {
+          const matches = data.filter(d => d.oldClass === props.newClass)
+            .map(d => {
+              return matchExists(d.lastMatchId) ? getMatch(d.lastMatchId) : undefined;
+            }).filter(m => {
+              return m !== undefined;
+            }) as InternalMatch[];
+          const wins = matches.filter(m => {
+            return m.player.win > m.opponent.win;
+          }).length;
+          const losses = matches.filter(m => {
+            return m.player.win < m.opponent.win;
+          }).length;
+
+          const height = props.newRankNumeric ? props.newRankNumeric * 2 + 48 : 0;
+          return (
+            <TimelineRankBullet
+              x={index === 0 ? 0 : (width - 48) / 2}
+              y={336 - height}
+              rankClass={props.newClass}
+              rankLevel={props.newLevel}
+              wins={wins}
+              losses={losses}
+            />);
+        }
+      })()}
     </div>
   );
 }
 
 interface RankBulletProps {
-  width: number;
-  height: number;
+  x: number;
+  y: number;
   rankClass: string;
   rankLevel: number;
+  wins: number;
+  losses: number;
 }
 
 /**
@@ -232,13 +255,13 @@ interface RankBulletProps {
  * @param props
  */
 function TimelineRankBullet(props: RankBulletProps): JSX.Element {
-  const { width, height, rankClass, rankLevel } = props;
+  const { x, y, rankClass, rankLevel, wins, losses } = props;
+  const winrate = wins / (wins + losses);
 
   const divStyle = {
     backgroundPosition: getRankIndex(rankClass, rankLevel) * -48 + "px 0px",
-    //marginLeft: "-11px",
-    top: `${336 - height}px`,
-    left: `${(width - 48) / 2}px`,
+    top: `${y}px`,
+    left: `${x}px`,
     zIndex: -10,
   };
 
@@ -248,7 +271,19 @@ function TimelineRankBullet(props: RankBulletProps): JSX.Element {
       style={divStyle}
       title={divTitle}
       className={`${css.timelineRank} ${topNavCss.topConstructedRank}`}
-    />
+    >
+      <div style={{position: "absolute", left: "100%"}}>
+        <span>
+          {wins}:{losses}
+        </span>
+        &nbsp;
+        <span>(</span>
+        <span className={getWinrateClass(winrate, true)}>
+          {formatPercent(winrate)}
+        </span>
+        <span>)</span>
+      </div>
+    </div>
   );
 }
 
@@ -390,8 +425,8 @@ export default function TimelineTab(): JSX.Element {
           <div style={{ display: "flex" }}>
             <div className={css.timelineBoxLabels}>
               <div className={css.timelineLabel}>#1</div>
-              <div className={css.timelineLabel}></div>
-              <div className={css.timelineLabel}>Mythic</div>
+              <div className={css.timelineLabel}>#750</div>
+              <div className={css.timelineLabel}>#1500<br/>Mythic</div>
               <div className={css.timelineLabel}>Diamond</div>
               <div className={css.timelineLabel}>Platinum</div>
               <div className={css.timelineLabel}>Gold</div>
@@ -405,10 +440,11 @@ export default function TimelineTab(): JSX.Element {
                   //debugLog("To:   ", value.newClass, value.newLevel, "step", value.newStep, value.newRankNumeric);
                   return (
                     <TimeLinePart
-                      height={dimensions.height}
-                      width={dimensions.width / data.length}
-                      index={index}
                       key={index}
+                      index={index}
+                      data={data}
+                      width={dimensions.width / data.length}
+                      height={dimensions.height}
                       hover={hoverDeckId}
                       setHover={setHover}
                       setPartHover={setHoverPart}
