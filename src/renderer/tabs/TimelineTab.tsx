@@ -55,10 +55,10 @@ function getRankY(rank: string, tier: number, steps: number): number {
   const regularSteps = 4 * 6;
   switch (rank) {
     case "Bronze":
-      value = 0;
+      value = regularSteps * 0;
       break;
     case "Silver":
-      value = regularSteps;
+      value = regularSteps * 1;
       break;
     case "Gold":
       value = regularSteps * 2;
@@ -73,13 +73,21 @@ function getRankY(rank: string, tier: number, steps: number): number {
       value = regularSteps * 5;
       steps = steps == 0 ? 1500 : steps;
       return value + (48 / 1500) * (1500 - steps);
-      break;
   }
 
   return value + 6 * (4 - tier) + steps;
 }
 
-const RANK_HEIGHTS = [0, 24, 48, 72, 96, 120, 144, 168];
+const RANK_HEIGHTS = [
+  getRankY("Bronze", 0, 0),
+  getRankY("Silver", 0, 0),
+  getRankY("Gold", 0, 0),
+  getRankY("Platinum", 0, 0),
+  getRankY("Diamond", 0, 0),
+  getRankY("Mythic", 0, 1500),
+  getRankY("Mythic", 0, 750),
+  168  // getRankY("Mythic", 0, 1)
+];
 
 /**
  * Get the data for this season and add fields to the data for timeline processing
@@ -118,7 +126,6 @@ function getSeasonData(
     }
     data.newRankNumeric = getRankY(data.newClass, data.newLevel, data.newStep);
     data.date = new Date(data.timestamp);
-    //debugLog(data);
     return data;
   }
 
@@ -168,14 +175,10 @@ function TimeLinePart(props: TimelinePartProps): JSX.Element {
     setPartHover(index);
   }, [lastMatchId, deckId, index, setPartHover, setHover]);
 
-  const newPointHeight = props.newRankNumeric
-    ? height - props.newRankNumeric * 2
-    : height;
-  const oldwPointHeight = props.oldRankNumeric
-    ? height - props.oldRankNumeric * 2
-    : height;
-  const rectPoints = `0 ${oldwPointHeight} ${width} ${newPointHeight} ${width} ${height} 0 ${height}`;
-  const linePoints = `0 ${oldwPointHeight} ${width} ${newPointHeight}`;
+  const newPointHeight = height - (props.newRankNumeric ? props.newRankNumeric * 2 : 0);
+  const oldPointHeight = height - (props.oldRankNumeric ? props.oldRankNumeric * 2 : 0);
+  const rectPoints = `0 ${oldPointHeight} ${width} ${newPointHeight} ${width} ${height} 0 ${height}`;
+  const linePoints = `0 ${oldPointHeight} ${width} ${newPointHeight}`;
 
   const style = {
     // Get a color that is the modulus of the hex ID
@@ -245,13 +248,12 @@ function TimelineRankBullet(props: RankBulletProps): JSX.Element {
       style={divStyle}
       title={divTitle}
       className={`${css.timelineRank} ${topNavCss.topConstructedRank}`}
-    ></div>
+    />
   );
 }
 
 /**
  * Main component for the Timeline tab
- * @param props
  */
 export default function TimelineTab(): JSX.Element {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -276,7 +278,6 @@ export default function TimelineTab(): JSX.Element {
 
   // Notice we can see old seasons too adding the seasonOrdinal
   const data: SeasonalRankData[] = useMemo(() => {
-    seasonSelect;
     return getSeasonData(seasonType, drawingSeason);
   }, [seasonType, seasonSelect, drawingSeason]);
 
@@ -495,7 +496,7 @@ export default function TimelineTab(): JSX.Element {
                   <Button
                     text="Open match details"
                     onClick={openCurrentMatch}
-                  ></Button>
+                  />
 
                   <div>vs. {match.opponent.name.slice(0, -6)}</div>
                   <RankIcon
