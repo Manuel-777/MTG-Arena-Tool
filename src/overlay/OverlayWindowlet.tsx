@@ -130,14 +130,11 @@ export default function OverlayWindowlet(
     elements = <MatchElements {...props} />;
   } else {
     elements = (
-      <div
-        className={`${css.outerWrapper} elements_wrapper`}
-        style={{ opacity: overlaySettings.alpha.toString() }}
-      >
+      <>
         {!!overlaySettings.title && (
           <div className={css.overlayDeckname}>Overlay {index + 1}</div>
         )}
-      </div>
+      </>
     );
   }
 
@@ -227,7 +224,13 @@ export default function OverlayWindowlet(
           </div>
         </div>
       )}
-      {elements}
+
+      <div
+        className={`${css.outerWrapper} elements_wrapper`}
+        style={{ opacity: overlaySettings.alpha.toString() }}
+      >
+        {elements}
+      </div>
     </div>
   );
 }

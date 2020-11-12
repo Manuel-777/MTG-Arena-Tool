@@ -143,10 +143,7 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
   visibleDeck?.getMainboard().removeZeros(true);
   visibleDeck?.getSideboard().removeZeros(true);
   return (
-    <div
-      className={`${css.outerWrapper} elements_wrapper`}
-      style={{ opacity: settings.alpha.toString() }}
-    >
+    <>
       <div
         ref={ref}
         className={css.flexColumn}
@@ -198,6 +195,6 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
           />
         )}
       </div>
-    </div>
+    </>
   );
 }

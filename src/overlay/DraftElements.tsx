@@ -100,10 +100,7 @@ export default function DraftElements(props: DraftElementsProps): JSX.Element {
   }
 
   return (
-    <div
-      className={`${css.outerWrapper} elements_wrapper`}
-      style={{ opacity: settings.alpha.toString() }}
-    >
+    <>
       {!!settings.title && (
         <div className={css.overlayDeckname}>
           {mainTitle}
@@ -138,6 +135,6 @@ export default function DraftElements(props: DraftElementsProps): JSX.Element {
           settings={settings}
         />
       )}
-    </div>
+    </>
   );
 }
