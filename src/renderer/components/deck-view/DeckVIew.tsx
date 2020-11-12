@@ -43,6 +43,8 @@ import DeckColorsBar from "../misc/DeckColorsBar";
 import Section from "../misc/Section";
 import BackIcon from "../../../assets/images/svg/back.svg";
 import SvgButton from "../misc/SvgButton";
+import {DbCardData} from "mtgatool-shared/src/types/metadata";
+import CardTile from "../../../shared/CardTile";
 
 const { MANA_COLORS, IPC_NONE } = constants;
 
@@ -80,9 +82,37 @@ function getDeckRaritiesCount(deck: Deck): RaritiesCount {
   };
 }
 
+function getSampleHand(deck: Deck): DbCardData[] {
+  const cards: DbCardData[] = [];
+  deck.getMainboard().get()
+    .filter((c: CardObject) => {
+      return c.quantity > 0;
+    }).forEach((c: CardObject) => {
+      const card = db.card(c.id);
+      if (card) {
+        for (let i = 0; i < c.quantity; i++) {
+          cards.push(card);
+        }
+      }
+    });
+
+  const hand: DbCardData[] = [];
+  if (cards.length < 7) {
+    return hand;
+  }
+  for (let i = 0; i < 7; i++) {
+    const index = Math.floor(Math.random() * cards.length);
+
+    hand.push(cards[index]);
+    cards.splice(index, 1);
+  }
+  return hand;
+}
+
 function DeckView(props: DeckViewProps): JSX.Element {
   const deck = new Deck(props.deck);
   const [deckView, setDeckView] = useState(VIEW_REGULAR);
+  const [shuffle, setShuffle] = useState([true]);
   const dispatcher = useDispatch();
 
   const goBack = (): void => {
@@ -106,8 +136,11 @@ function DeckView(props: DeckViewProps): JSX.Element {
     setDeckView(VIEW_REGULAR);
   };
 
+  const traditionalShuffle = (): void => {
+    setShuffle([true]);
+  }
+
   useEffect(() => {
-    deck.id;
     setDeckView(VIEW_REGULAR);
   }, [deck.id]);
 
@@ -163,7 +196,6 @@ function DeckView(props: DeckViewProps): JSX.Element {
   );
 
   const initFilters = useMemo(() => {
-    dateFilter && DecksTableState;
     return { deckId: deck.id };
   }, [deck.id, dateFilter, DecksTableState]);
 
@@ -305,9 +337,7 @@ function DeckView(props: DeckViewProps): JSX.Element {
                   <Separator>Types</Separator>
                   <DeckTypesStats deck={deck} />
                 </Section>
-                <Section
-                  style={{ flexDirection: "column", gridArea: "curves" }}
-                >
+                <Section style={{ flexDirection: "column", gridArea: "curves" }}>
                   <Separator>Mana Curve</Separator>
                   <DeckManaCurve deck={deck} />
                 </Section>
@@ -324,9 +354,7 @@ function DeckView(props: DeckViewProps): JSX.Element {
                     </div>
                   </div>
                 </Section>
-                <Section
-                  style={{ flexDirection: "column", gridArea: "rarities" }}
-                >
+                <Section style={{ flexDirection: "column", gridArea: "rarities" }}>
                   <Separator>Rarities</Separator>
                   <WildcardsCostPreset
                     wildcards={wildcardsCost}
@@ -334,6 +362,32 @@ function DeckView(props: DeckViewProps): JSX.Element {
                   />
                   <Separator>Wildcards Needed</Separator>
                   <CraftingCost deck={deck} />
+                </Section>
+
+                <Section style={{flexDirection: "column", gridArea: "hand"}}>
+                  <Separator>{shuffle[0] ? "Sample Hand (Traditional)" : "Sample Hand (Arena BO1)"}</Separator>
+                  <Button text={"Shuffle"} onClick={traditionalShuffle}/>
+
+                  {shuffle[0] && (
+                    getSampleHand(deck)
+                      .sort((a: DbCardData, b: DbCardData) => {
+                        const sort = (a: any, b: any) => a > b ? 1 : a < b ? -1 : 0;
+                        return sort(a.cmc, b.cmc) || sort(a.name, b.name);
+                      })
+                      .map((c: DbCardData, index: number) => {
+                        return (
+                          <CardTile
+                            indent="a"
+                            isHighlighted={false}
+                            isSideboard={false}
+                            showWildcards={true}
+                            deck={deck}
+                            card={c}
+                            key={index}
+                            quantity={1}
+                          />);
+                      })
+                  )}
                 </Section>
               </div>
             )}
