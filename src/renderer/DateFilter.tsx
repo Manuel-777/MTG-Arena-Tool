@@ -10,6 +10,7 @@ import indexCss from "./index.css";
 const {
   DATE_ALL_TIME,
   DATE_LAST_30,
+  DATE_LAST_7,
   DATE_LAST_DAY,
   DATE_SEASON,
   IPC_ALL,
@@ -27,6 +28,7 @@ const dateOptions = [
   DATE_ALL_TIME,
   DATE_SEASON,
   DATE_LAST_30,
+  DATE_LAST_7,
   DATE_LAST_DAY,
   "Custom",
 ];
