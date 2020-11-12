@@ -64,6 +64,7 @@ export default function OverlayController(): JSX.Element {
   const [actionLog, setActionLog] = useState<string>("");
   const [arenaState, setArenaState] = useState(ARENA_MODE_IDLE);
   const [editMode, setEditMode] = useState(false);
+  const [collapse, setCollapse] = useState(false);
   const [match, setMatch] = useState<undefined | MatchData>(undefined);
   const [draft, setDraft] = useState<undefined | InternalDraftv2>(undefined);
   const [draftState, setDraftState] = useState({ packN: 0, pickN: 0 });
@@ -271,6 +272,7 @@ export default function OverlayController(): JSX.Element {
     draft,
     draftState,
     editMode,
+    collapse,
     handleToggleEditMode,
     match,
     settings,
@@ -282,6 +284,7 @@ export default function OverlayController(): JSX.Element {
   const cardDetailsProps = {
     arenaState,
     editMode,
+    collapse,
     handleToggleEditMode,
     odds: match ? match.playerCardsOdds : undefined,
     overlayHover,
@@ -304,6 +307,9 @@ export default function OverlayController(): JSX.Element {
             },
             handleClickClose: (): void => {
               handleClose(null, { action: -1, index });
+            },
+            handleToggleCollapse: (): void => {
+              setCollapse(!collapse);
             },
             index,
             ...commonProps,

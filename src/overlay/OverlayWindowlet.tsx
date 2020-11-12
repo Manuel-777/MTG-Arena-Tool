@@ -17,6 +17,7 @@ import sharedCss from "../shared/shared.css";
 import ResizeIcon from "../assets/images/resize.svg";
 import CloseIcon from "../assets/images/svg/win-close.svg";
 import SettingsIcon from "../assets/images/svg/icon-settings.svg";
+import MinimizeIcon from "../assets/images/svg/win-minimize.svg";
 import DEFAULT_BACKGROUND from "../assets/images/main-background.jpg";
 
 const {
@@ -33,9 +34,11 @@ interface OverlayWindowletProps {
   draft?: InternalDraftv2;
   draftState: DraftState;
   editMode: boolean;
+  collapse: boolean;
   handleClickClose: () => void;
   handleClickSettings: () => void;
   handleToggleEditMode: () => void;
+  handleToggleCollapse: () => void;
   index: number;
   match?: MatchData;
   settings: SettingsDataApp;
@@ -63,9 +66,11 @@ export default function OverlayWindowlet(
     draft,
     draftState,
     editMode,
+    collapse,
     handleClickClose,
     handleClickSettings,
     handleToggleEditMode,
+    handleToggleCollapse,
     index,
     match,
     setDraftStateCallback,
@@ -172,7 +177,7 @@ export default function OverlayWindowlet(
         border: "1px solid rgba(128, 128, 128, " + borderAlpha + ")",
         opacity: isVisible ? "1" : "0",
         visibility: isVisible ? "visible" : "hidden",
-        height: overlaySettings.bounds.height + "px",
+        height: (collapse && !editMode ? 32 : overlaySettings.bounds.height) + "px",
         width: overlaySettings.bounds.width + "px",
         left: overlaySettings.bounds.x + "px",
         top: overlaySettings.bounds.y + "px",
@@ -192,20 +197,26 @@ export default function OverlayWindowlet(
       </div>
       {overlaySettings.top && (
         <div className={`${css.outerWrapper} ${css.topNavWrapper}`}>
-          <ResizeIcon
-            fill={`var(--color-${COLORS_ALL[index]})`}
+          <div
             className={`${sharedCss.button} ${css.overlayIcon} ${css.clickOn}`}
             onClick={handleToggleEditMode}
-            style={{
-              marginRight: "auto",
-            }}
-          />
+            style={{ margin: 0 }}
+          >
+            <ResizeIcon fill={`var(--color-${COLORS_ALL[index]})`} style={{ marginRight: "auto" }}/>
+          </div>
           <div
             className={`${sharedCss.button} ${sharedCss.settings} ${css.clickOn}`}
             onClick={handleClickSettings}
             style={{ margin: 0 }}
           >
             <SettingsIcon fill="var(--color-icon)" style={{ margin: "auto" }} />
+          </div>
+          <div
+            className={`${sharedCss.button} ${sharedCss.minimize} ${css.clickOn}`}
+            onClick={handleToggleCollapse}
+            style={{ margin: 0 }}
+          >
+            <MinimizeIcon fill="var(--color-icon)" style={{ margin: "auto" }} />
           </div>
           <div
             className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
