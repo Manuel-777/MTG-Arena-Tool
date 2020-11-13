@@ -80,10 +80,12 @@ export default function DecksArtViewRow({
 
   return (
     <div
+      style={{position: "relative"}}
       className={deckTableCss.decksTableDeckTile}
       onClick={onRowClick}
       onMouseEnter={mouseEnter}
-      onMouseLeave={mouseLeave}>
+      onMouseLeave={mouseLeave}
+    >
       <animated.div
         style={{
           ...props,
@@ -96,7 +98,7 @@ export default function DecksArtViewRow({
         }}
       />
 
-      <div style={{zIndex: 1, display: "flex", width: "100%", height: "4px"}}>
+      <div style={{display: "flex", width: "100%", height: "4px"}}>
         <DeckColorsBar deck={deckObj} />
       </div>
       {!!deck.custom && (
@@ -106,10 +108,10 @@ export default function DecksArtViewRow({
           isArchived={deck.archived || false}
         />
       )}
-      <div style={{zIndex: 1, marginLeft: "auto", marginTop: "auto"}}>
+      <div style={{marginLeft: "auto", marginTop: "auto"}}>
         <TagBubble {...formatProps} />
       </div>
-      <div style={{zIndex: 1}} className={deckTableCss.decksTableDeckInner}>
+      <div style={{zIndex: 0}} className={deckTableCss.decksTableDeckInner}>
         <div className={deckTableCss.decksTableDeckItem}>
           {deck.name}
         </div>

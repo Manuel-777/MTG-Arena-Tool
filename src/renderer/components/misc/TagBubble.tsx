@@ -33,7 +33,7 @@ const TagBubbleDiv = styled.div<TagBubbleDivProps>`
     margin-right: 0;
   }
   &:hover {
-    opacity: 1;
+    opacity: 0.99;
   }
 `;
 
