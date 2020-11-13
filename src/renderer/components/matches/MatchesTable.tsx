@@ -428,13 +428,10 @@ export default function MatchesTable({
         <div className={tablesCss.reactTableWrap}>
           <MatchesTableControls {...matchesTableControlsProps} />
           {isTableMode && (
-            <div
-              className={sharedCss.medScroll}
-              style={{overflowX: "auto"}}
-            >
+            <div className={sharedCss.medScroll} style={{ overflowX: "auto" }}>
               <TableHeaders
                 {...headersProps}
-                style={{width: "fit-content"}}
+                style={{ width: "fit-content" }}
               />
               <div
                 className={tablesCss.reactTableBody}
@@ -459,12 +456,10 @@ export default function MatchesTable({
             </div>
           )}
           {!isTableMode && (
-            <div
-              className={sharedCss.medScroll}
-            >
+            <div className={sharedCss.medScroll}>
               <TableHeaders
                 {...headersProps}
-                style={{overflowX: "auto", overflowY: "hidden"}}
+                style={{ overflowX: "auto", overflowY: "hidden" }}
               />
               <div
                 className={tablesCss.reactTableBodyNoAdjust}
@@ -485,7 +480,7 @@ export default function MatchesTable({
               </div>
             </div>
           )}
-          <div style={{marginTop: "10px"}}>
+          <div style={{ marginTop: "10px" }}>
             <PagingControls {...pagingProps} />
           </div>
         </div>
