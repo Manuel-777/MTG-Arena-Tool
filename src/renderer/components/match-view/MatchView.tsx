@@ -104,13 +104,14 @@ function MatchView(props: MatchViewProps): JSX.Element {
           }
         }
         return counts;
-      }).forEach((counts: { [key: string]: number }) => {
+      })
+      .forEach((counts: { [key: string]: number }) => {
         for (const i in counts) {
           const key = Number(i);
-          const c = combinedList.filter(d => d === key).length;
+          const c = combinedList.filter((d) => d === key).length;
 
           let loopCount = counts[i] - c;
-          while(loopCount-- > 0) {
+          while (loopCount-- > 0) {
             combinedList.push(key);
           }
         }
@@ -124,19 +125,24 @@ function MatchView(props: MatchViewProps): JSX.Element {
     );
   }
 
-  const existsPrev = (gameSeen: number) => {
-    return gameSeen > 0;
-  };
-  const existsNext = (gameSeen: number, match: InternalMatch) => {
-    return match && gameSeen < match.gameStats.length;
-  };
+  const existsPrev = useCallback((game: number): boolean => {
+    return game > 0;
+  }, []);
+
+  const existsNext = useCallback(
+    (game: number, match: InternalMatch): boolean => {
+      return match && game < match.gameStats.length;
+    },
+    []
+  );
 
   const gamePrev = useCallback(() => {
     if (existsPrev(gameSeen)) setGameSeen(gameSeen - 1);
-  }, [gameSeen]);
+  }, [existsPrev, gameSeen]);
+
   const gameNext = useCallback(() => {
     if (existsNext(gameSeen, match)) setGameSeen(gameSeen + 1);
-  }, [gameSeen, match]);
+  }, [existsNext, gameSeen, match]);
 
   const clickAdd = (): void => {
     ipcSend("import_custom_deck", JSON.stringify(deck.getSave()));
@@ -321,11 +327,14 @@ function MatchView(props: MatchViewProps): JSX.Element {
                   }}
                 >
                   <SvgButton
-                    style={existsPrev(gameSeen)
-                      ? {cursor: "default", opacity: 0.5}
-                      : {}}
+                    style={
+                      !existsPrev(gameSeen)
+                        ? { cursor: "default", opacity: 0.5 }
+                        : {}
+                    }
                     svg={BackIcon}
-                    onClick={gamePrev} />
+                    onClick={gamePrev}
+                  />
                   <div
                     style={{
                       maxWidth: "130px",
@@ -338,9 +347,15 @@ function MatchView(props: MatchViewProps): JSX.Element {
                       : `Seen in game ${gameSeen + 1}`}
                   </div>
                   <SvgButton
-                    style={existsPrev(gameSeen)
-                      ? {cursor: "default", opacity: 0.5, transform: "rotate(180deg)"}
-                      : {transform: "rotate(180deg)"}}
+                    style={
+                      !existsNext(gameSeen, match)
+                        ? {
+                            cursor: "default",
+                            opacity: 0.5,
+                            transform: "rotate(180deg)",
+                          }
+                        : { transform: "rotate(180deg)" }
+                    }
                     svg={BackIcon}
                     onClick={gameNext}
                   />
