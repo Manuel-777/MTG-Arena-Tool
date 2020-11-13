@@ -43,7 +43,7 @@ import DeckColorsBar from "../misc/DeckColorsBar";
 import Section from "../misc/Section";
 import BackIcon from "../../../assets/images/svg/back.svg";
 import SvgButton from "../misc/SvgButton";
-import {DbCardData} from "mtgatool-shared/src/types/metadata";
+import { DbCardData } from "mtgatool-shared/src/types/metadata";
 import CardTile from "../../../shared/CardTile";
 
 const { MANA_COLORS, IPC_NONE } = constants;
@@ -69,25 +69,33 @@ function getDeckRaritiesCount(deck: Deck): RaritiesCount {
   const rarities = cards
     .filter((c: CardObject) => {
       return c.quantity > 0;
-    }).map((c: CardObject) => {
+    })
+    .map((c: CardObject) => {
       const card = db.card(c.id);
       return card?.rarity;
     });
 
   return {
-    c: rarities.filter((rarity: string | undefined) => rarity === "common").length,
-    u: rarities.filter((rarity: string | undefined) => rarity === "uncommon").length,
-    r: rarities.filter((rarity: string | undefined) => rarity === "rare").length,
-    m: rarities.filter((rarity: string | undefined) => rarity === "mythic").length,
+    c: rarities.filter((rarity: string | undefined) => rarity === "common")
+      .length,
+    u: rarities.filter((rarity: string | undefined) => rarity === "uncommon")
+      .length,
+    r: rarities.filter((rarity: string | undefined) => rarity === "rare")
+      .length,
+    m: rarities.filter((rarity: string | undefined) => rarity === "mythic")
+      .length,
   };
 }
 
 function getSampleHand(deck: Deck): DbCardData[] {
   const cards: DbCardData[] = [];
-  deck.getMainboard().get()
+  deck
+    .getMainboard()
+    .get()
     .filter((c: CardObject) => {
       return c.quantity > 0;
-    }).forEach((c: CardObject) => {
+    })
+    .forEach((c: CardObject) => {
       const card = db.card(c.id);
       if (card) {
         for (let i = 0; i < c.quantity; i++) {
@@ -138,7 +146,7 @@ function DeckView(props: DeckViewProps): JSX.Element {
 
   const traditionalShuffle = (): void => {
     setShuffle([true]);
-  }
+  };
 
   useEffect(() => {
     setDeckView(VIEW_REGULAR);
@@ -197,6 +205,7 @@ function DeckView(props: DeckViewProps): JSX.Element {
 
   const initFilters = useMemo(() => {
     return { deckId: deck.id };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deck.id, dateFilter, DecksTableState]);
 
   const { aggFilters, setAggFilters } = useAggregatorData({
@@ -337,7 +346,9 @@ function DeckView(props: DeckViewProps): JSX.Element {
                   <Separator>Types</Separator>
                   <DeckTypesStats deck={deck} />
                 </Section>
-                <Section style={{ flexDirection: "column", gridArea: "curves" }}>
+                <Section
+                  style={{ flexDirection: "column", gridArea: "curves" }}
+                >
                   <Separator>Mana Curve</Separator>
                   <DeckManaCurve deck={deck} />
                 </Section>
@@ -354,7 +365,9 @@ function DeckView(props: DeckViewProps): JSX.Element {
                     </div>
                   </div>
                 </Section>
-                <Section style={{ flexDirection: "column", gridArea: "rarities" }}>
+                <Section
+                  style={{ flexDirection: "column", gridArea: "rarities" }}
+                >
                   <Separator>Rarities</Separator>
                   <WildcardsCostPreset
                     wildcards={wildcardsCost}
@@ -364,14 +377,19 @@ function DeckView(props: DeckViewProps): JSX.Element {
                   <CraftingCost deck={deck} />
                 </Section>
 
-                <Section style={{flexDirection: "column", gridArea: "hand"}}>
-                  <Separator>{shuffle[0] ? "Sample Hand (Traditional)" : "Sample Hand (Arena BO1)"}</Separator>
-                  <Button text={"Shuffle"} onClick={traditionalShuffle}/>
+                <Section style={{ flexDirection: "column", gridArea: "hand" }}>
+                  <Separator>
+                    {shuffle[0]
+                      ? "Sample Hand (Traditional)"
+                      : "Sample Hand (Arena BO1)"}
+                  </Separator>
+                  <Button text={"Shuffle"} onClick={traditionalShuffle} />
 
-                  {shuffle[0] && (
+                  {shuffle[0] &&
                     getSampleHand(deck)
                       .sort((a: DbCardData, b: DbCardData) => {
-                        const sort = (a: any, b: any) => a > b ? 1 : a < b ? -1 : 0;
+                        const sort = (a: any, b: any): number =>
+                          a > b ? 1 : a < b ? -1 : 0;
                         return sort(a.cmc, b.cmc) || sort(a.name, b.name);
                       })
                       .map((c: DbCardData, index: number) => {
@@ -385,9 +403,9 @@ function DeckView(props: DeckViewProps): JSX.Element {
                             card={c}
                             key={index}
                             quantity={1}
-                          />);
-                      })
-                  )}
+                          />
+                        );
+                      })}
                 </Section>
               </div>
             )}
