@@ -93,12 +93,28 @@ function MatchView(props: MatchViewProps): JSX.Element {
   // v4.1.0: Introduced by-game cards seen
   const gameDetails = match && match.toolVersion >= 262400;
   if (gameDetails) {
-    let combinedList: number[] = [];
-    match.gameStats.forEach((stats: MatchGameStats) => {
-      if (stats) {
-        combinedList = [...combinedList, ...stats.cardsSeen];
-      }
-    });
+    const combinedList: number[] = [];
+    match.gameStats
+      .map((stats: MatchGameStats) => {
+        const counts: { [key: number]: number } = {};
+        if (stats) {
+          for (const i in stats.cardsSeen) {
+            const key = stats.cardsSeen[i];
+            counts[key] = counts[key] ? counts[key] + 1 : 1;
+          }
+        }
+        return counts;
+      }).forEach((counts: { [key: string]: number }) => {
+        for (const i in counts) {
+          const key = Number(i);
+          const c = combinedList.filter(d => d === key).length;
+
+          let loopCount = counts[i] - c;
+          while(loopCount-- > 0) {
+            combinedList.push(key);
+          }
+        }
+      });
 
     deck = new Deck(
       {},
