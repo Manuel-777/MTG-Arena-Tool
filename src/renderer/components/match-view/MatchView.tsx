@@ -55,8 +55,11 @@ function MatchView(props: MatchViewProps): JSX.Element {
   const { match } = props;
   const dispatcher = useDispatch();
   const [view, setView] = useState(VIEW_MATCH);
+  const [gameSeen, setGameSeen] = useState(0);
+
   const playerDeck = new Deck(match.playerDeck);
   const oppDeck = new Deck(match.oppDeck);
+  const isLimited = db.limited_ranked_events.includes(match.eventId);
 
   const logExists = fs.existsSync(path.join(actionLogDir, match.id + ".txt"));
   let actionLogDataB64 = "";
@@ -85,36 +88,38 @@ function MatchView(props: MatchViewProps): JSX.Element {
     setView(VIEW_MATCH);
   }, [match.id]);
 
-  const isLimited = db.limited_ranked_events.includes(match.eventId);
+  let deck = oppDeck;
 
   // v4.1.0: Introduced by-game cards seen
   const gameDetails = match && match.toolVersion >= 262400;
-  const [gameSeen, setGameSeen] = useState(0);
-
-  let combinedList: number[] = [];
   if (gameDetails) {
-    match?.gameStats.forEach((stats: MatchGameStats) => {
+    let combinedList: number[] = [];
+    match.gameStats.forEach((stats: MatchGameStats) => {
       if (stats) {
         combinedList = [...combinedList, ...stats.cardsSeen];
       }
     });
+
+    deck = new Deck(
+      {},
+      gameSeen == match.gameStats?.length
+        ? combinedList
+        : match.gameStats[gameSeen]?.cardsSeen || []
+    );
   }
 
-  const deck =
-    gameDetails && match
-      ? new Deck(
-          {},
-          gameSeen == match?.gameStats?.length
-            ? combinedList
-            : match.gameStats[gameSeen]?.cardsSeen || combinedList
-        )
-      : oppDeck;
+  const existsPrev = (gameSeen: number) => {
+    return gameSeen > 0;
+  };
+  const existsNext = (gameSeen: number, match: InternalMatch) => {
+    return match && gameSeen < match.gameStats.length;
+  };
 
   const gamePrev = useCallback(() => {
-    if (gameSeen > 0) setGameSeen(gameSeen - 1);
+    if (existsPrev(gameSeen)) setGameSeen(gameSeen - 1);
   }, [gameSeen]);
   const gameNext = useCallback(() => {
-    if (match && gameSeen < match.gameStats.length) setGameSeen(gameSeen + 1);
+    if (existsNext(gameSeen, match)) setGameSeen(gameSeen + 1);
   }, [gameSeen, match]);
 
   const clickAdd = (): void => {
