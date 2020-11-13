@@ -304,7 +304,12 @@ function MatchView(props: MatchViewProps): JSX.Element {
                     justifyContent: "space-around",
                   }}
                 >
-                  <SvgButton svg={BackIcon} onClick={gamePrev} />
+                  <SvgButton
+                    style={existsPrev(gameSeen)
+                      ? {cursor: "default", opacity: 0.5}
+                      : {}}
+                    svg={BackIcon}
+                    onClick={gamePrev} />
                   <div
                     style={{
                       maxWidth: "130px",
@@ -317,7 +322,9 @@ function MatchView(props: MatchViewProps): JSX.Element {
                       : `Seen in game ${gameSeen + 1}`}
                   </div>
                   <SvgButton
-                    style={{ transform: "rotate(180deg)" }}
+                    style={existsPrev(gameSeen)
+                      ? {cursor: "default", opacity: 0.5, transform: "rotate(180deg)"}
+                      : {transform: "rotate(180deg)"}}
                     svg={BackIcon}
                     onClick={gameNext}
                   />
