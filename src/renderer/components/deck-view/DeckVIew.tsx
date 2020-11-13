@@ -377,13 +377,23 @@ function DeckView(props: DeckViewProps): JSX.Element {
                   <CraftingCost deck={deck} />
                 </Section>
 
-                <Section style={{ flexDirection: "column", gridArea: "hand" }}>
+                <Section
+                  style={{
+                    padding: "0 0 24px 24px",
+                    flexDirection: "column",
+                    gridArea: "hand",
+                  }}
+                >
                   <Separator>
                     {shuffle[0]
                       ? "Sample Hand (Traditional)"
                       : "Sample Hand (Arena BO1)"}
                   </Separator>
-                  <Button text={"Shuffle"} onClick={traditionalShuffle} />
+                  <Button
+                    text={"Shuffle"}
+                    style={{ marginBottom: "16px" }}
+                    onClick={traditionalShuffle}
+                  />
 
                   {shuffle[0] &&
                     getSampleHand(deck)
