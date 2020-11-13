@@ -20,7 +20,13 @@ import {
 } from "mtgatool-shared";
 import { format } from "date-fns";
 
-const { DATE_ALL_TIME, DATE_LAST_30, DATE_LAST_7, DATE_LAST_DAY, DATE_SEASON } = constants;
+const {
+  DATE_ALL_TIME,
+  DATE_LAST_30,
+  DATE_LAST_7,
+  DATE_LAST_DAY,
+  DATE_SEASON,
+} = constants;
 
 export interface CardWinrateData {
   name: string;
