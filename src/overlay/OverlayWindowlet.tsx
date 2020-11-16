@@ -197,14 +197,14 @@ export default function OverlayWindowlet(
           <div
             className={`${sharedCss.button} ${css.overlayIcon} ${css.clickOn}`}
             onClick={handleToggleEditMode}
-            style={{ margin: 0 }}
+            style={{ margin: 0, marginLeft: "4px" }}
           >
             <ResizeIcon fill={`var(--color-${COLORS_ALL[index]})`} style={{ marginRight: "auto" }}/>
           </div>
           <div
             className={`${sharedCss.button} ${sharedCss.settings} ${css.clickOn}`}
             onClick={handleClickSettings}
-            style={{ margin: 0 }}
+            style={{ marginRight: "auto" }}
           >
             <SettingsIcon fill="var(--color-icon)" style={{ margin: "auto" }} />
           </div>
