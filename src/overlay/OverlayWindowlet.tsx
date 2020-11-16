@@ -10,6 +10,7 @@ import {
   MatchData,
   InternalDraftv2,
   DraftState,
+  OverlaySettingsData,
 } from "mtgatool-shared";
 
 import css from "./index.css";
@@ -48,7 +49,25 @@ interface OverlayWindowletProps {
 }
 
 function isOverlayDraftMode(mode: number): boolean {
-  return OVERLAY_DRAFT_MODES.some((draftMode) => draftMode === mode);
+  return OVERLAY_DRAFT_MODES.includes(mode);
+}
+
+function getOverlayApplies(mode: number, editMode: boolean, arenaState: number): boolean {
+  switch (arenaState) {
+    case ARENA_MODE_DRAFT:
+      return isOverlayDraftMode(mode);
+    case ARENA_MODE_MATCH:
+      return !isOverlayDraftMode(mode);
+    case ARENA_MODE_IDLE:
+      return editMode;
+  }
+  return false;
+}
+
+function getOverlayVisible(settings: OverlaySettingsData, editMode: boolean, arenaState: number): boolean {
+  if (!settings) return false;
+
+  return settings.show && (settings.show_always || getOverlayApplies(settings.mode, editMode, arenaState));
 }
 
 /**
@@ -97,23 +116,13 @@ export default function OverlayWindowlet(
   const overlaySettings = settings.overlays[index];
   // Note: ensure this logic matches the logic in main.getOverlayVisible
   // TODO: extract a common utility?
-  const currentModeApplies =
-    (isOverlayDraftMode(overlaySettings.mode) &&
-      arenaState === ARENA_MODE_DRAFT) ||
-    (!isOverlayDraftMode(overlaySettings.mode) &&
-      arenaState === ARENA_MODE_MATCH) ||
-    (editMode && arenaState === ARENA_MODE_IDLE);
-  const isVisible =
-    overlaySettings.show && (currentModeApplies || overlaySettings.show_always);
+  const isVisible = getOverlayVisible(overlaySettings, editMode, arenaState);
 
-  let elements = <></>;
-  const commonProps = {
-    index,
-    settings: overlaySettings,
-  };
+  let elements: JSX.Element;
   if (draft && isOverlayDraftMode(overlaySettings.mode)) {
     const props = {
-      ...commonProps,
+      index,
+      settings: overlaySettings,
       draft,
       draftState,
       setDraftStateCallback,
@@ -121,7 +130,8 @@ export default function OverlayWindowlet(
     elements = <DraftElements {...props} />;
   } else if (match) {
     const props = {
-      ...commonProps,
+      index,
+      settings: overlaySettings,
       actionLog,
       match,
       setOddsCallback,
