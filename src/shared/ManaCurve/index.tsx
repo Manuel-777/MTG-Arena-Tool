@@ -31,13 +31,11 @@ mana["18"] = sharedCss.mana_18;
 mana["19"] = sharedCss.mana_19;
 mana["20"] = sharedCss.mana_20;
 
-const MAX_CMC = 7; // cap at 7+ cmc bucket
-
-function add(a: number, b: number): number {
-  return a + b;
+function sum(arr: number[]): number {
+  return arr.reduce((a, b) => a + b, 0);
 }
 
-function getDeckCurve(deck: Deck): number[][] {
+function getDeckCurve(deck: Deck, MAX_CMC: number): number[][] {
   const curve: number[][] = [];
   for (let i = 0; i < MAX_CMC + 1; i++) {
     curve[i] = [0, 0, 0, 0, 0, 0];
@@ -52,17 +50,19 @@ function getDeckCurve(deck: Deck): number[][] {
       const cardObj = db.card(card.id);
       if (!cardObj) return;
 
-      const cmc = Math.min(MAX_CMC, cardObj.cmc);
-      if (!cardObj.type.includes("Land")) {
-        cardObj.cost.forEach((c: string): void => {
-          if (c.includes("w")) curve[cmc][1] += card.quantity;
-          if (c.includes("u")) curve[cmc][2] += card.quantity;
-          if (c.includes("b")) curve[cmc][3] += card.quantity;
-          if (c.includes("r")) curve[cmc][4] += card.quantity;
-          if (c.includes("g")) curve[cmc][5] += card.quantity;
-        });
-        curve[cmc][0] += card.quantity;
+      if (cardObj.type.includes("Land")) {
+        return;
       }
+
+      const cmc = Math.min(MAX_CMC, cardObj.cmc);
+      cardObj.cost.forEach((c: string): void => {
+        if (c.includes("w")) curve[cmc][1] += card.quantity;
+        if (c.includes("u")) curve[cmc][2] += card.quantity;
+        if (c.includes("b")) curve[cmc][3] += card.quantity;
+        if (c.includes("r")) curve[cmc][4] += card.quantity;
+        if (c.includes("g")) curve[cmc][5] += card.quantity;
+      });
+      curve[cmc][0] += card.quantity;
     });
   //debugLog(curve);
   return curve;
@@ -73,7 +73,9 @@ export default function DeckManaCurve(props: {
   deck: Deck;
 }): JSX.Element {
   const { className, deck } = props;
-  const manaCounts = getDeckCurve(deck);
+
+  const MAX_CMC = 7; // cap at 7+ cmc bucket
+  const manaCounts = getDeckCurve(deck, MAX_CMC);
   const curveMax = Math.max(...manaCounts.map((v) => v[0]));
   // debugLog("deckManaCurve", manaCounts, curveMax);
 
@@ -83,7 +85,7 @@ export default function DeckManaCurve(props: {
         {!!manaCounts &&
           manaCounts.map((cost, i) => {
             const total = cost[0];
-            const manaTotal = cost.reduce(add, 0) - total;
+            const manaTotal = sum(cost) - total;
 
             return (
               <div
