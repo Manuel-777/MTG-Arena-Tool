@@ -47,11 +47,25 @@ function getDeckCurve(deck: Deck, MAX_CMC: number): number[][] {
     .getMainboard()
     .get()
     .forEach((card) => {
-      const cardObj = db.card(card.id);
+      let cardObj = db.card(card.id);
       if (!cardObj) return;
 
       if (cardObj.type.includes("Land")) {
         return;
+      }
+
+      // Double-faced card
+      if(cardObj.dfcId !== false) {
+        const count = cardObj.type.split("Instant").length - 1
+          + cardObj.type.split("Sorcery").length - 1;
+
+        // Split card
+        if(count === 2) {
+          const dfcObj = db.card(cardObj.dfcId as number);
+          if(dfcObj) {
+            cardObj = dfcObj;
+          }
+        }
       }
 
       const cmc = Math.min(MAX_CMC, cardObj.cmc);
