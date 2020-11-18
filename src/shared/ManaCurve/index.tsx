@@ -9,6 +9,7 @@ const { MANA_COLORS } = constants;
 
 // Should proably be in constants
 const mana: Record<string, string> = {};
+mana["x"] = sharedCss.mana_x;
 mana["0"] = sharedCss.mana_0;
 mana["1"] = sharedCss.mana_1;
 mana["2"] = sharedCss.mana_2;
@@ -100,6 +101,19 @@ function getDeckCurve(deck: Deck, MAX_CMC: number, intelligent: boolean): Cost[]
       multicolored: 0
     };
   }
+  curve.push({
+    cmc: "x",
+    total: 0,
+    w: 0,
+    u: 0,
+    b: 0,
+    r: 0,
+    g: 0,
+    c: 0,
+    colorless: 0,
+    monocolored: 0,
+    multicolored: 0
+  });
 
   if (!deck.getMainboard()) return curve;
 
@@ -123,14 +137,14 @@ function getDeckCurve(deck: Deck, MAX_CMC: number, intelligent: boolean): Cost[]
         if(count === 2) {
           const dfcObj = db.card(cardObj.dfcId as number);
           if(dfcObj) {
-            const cmc = Math.min(MAX_CMC, dfcObj.cmc);
+            const cmc = intelligent && dfcObj.cost.includes("x") ? MAX_CMC + 1 : Math.min(MAX_CMC, dfcObj.cmc);
             append(curve[cmc], dfcObj.cost, card.quantity);
             return;
           }
         }
       }
 
-      const cmc = Math.min(MAX_CMC, cardObj.cmc);
+      const cmc = intelligent && cardObj.cost.includes("x") ? MAX_CMC + 1 : Math.min(MAX_CMC, cardObj.cmc);
       append(curve[cmc], cardObj.cost, card.quantity);
     });
 
@@ -217,9 +231,15 @@ export default function DeckManaCurve(props: {
               <div
                 className={css.mana_curve_column_number}
                 key={"mana_curve_column_number_" + i}
+                style={_cost.cmc === "x" && intelligent === undefined
+                  ? {display: "none"}
+                  : _cost.cmc === "x" && intelligent === false
+                    ? {visibility: "hidden"}
+                    : {}
+                }
               >
                 <div
-                  className={sharedCss.manaS16 + " " + mana[i + ""]}
+                  className={sharedCss.manaS16 + " " + mana[_cost.cmc]}
                   style={{ margin: "auto" }}
                 >
                   {i === MAX_CMC && (
