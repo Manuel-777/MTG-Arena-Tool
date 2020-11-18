@@ -352,6 +352,12 @@ function DeckView(props: DeckViewProps): JSX.Element {
                   <Separator>Mana Curve</Separator>
                   <DeckManaCurve deck={deck} />
                 </Section>
+                <Section
+                  style={{ flexDirection: "column", gridArea: "curves2" }}
+                >
+                  <Separator>Mana Curve</Separator>
+                  <DeckManaCurve deck={deck} intelligent={true} />
+                </Section>
                 <Section style={{ flexDirection: "column", gridArea: "pies" }}>
                   <Separator>Color Pie</Separator>
                   <div className={sharedCss.pieContainerOuter}>

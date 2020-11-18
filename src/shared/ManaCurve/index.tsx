@@ -35,7 +35,7 @@ function sum(arr: number[]): number {
   return arr.reduce((a, b) => a + b, 0);
 }
 
-function getDeckCurve(deck: Deck, MAX_CMC: number): number[][] {
+function getDeckCurve(deck: Deck, MAX_CMC: number, intelligent: boolean): Cost[] {
   const curve: number[][] = [];
   for (let i = 0; i < MAX_CMC + 1; i++) {
     curve[i] = [0, 0, 0, 0, 0, 0];
@@ -55,7 +55,7 @@ function getDeckCurve(deck: Deck, MAX_CMC: number): number[][] {
       }
 
       // Double-faced card
-      if(cardObj.dfcId !== false) {
+      if(intelligent && cardObj.dfcId !== false) {
         const count = cardObj.type.split("Instant").length - 1
           + cardObj.type.split("Sorcery").length - 1;
 
@@ -85,11 +85,12 @@ function getDeckCurve(deck: Deck, MAX_CMC: number): number[][] {
 export default function DeckManaCurve(props: {
   className?: string;
   deck: Deck;
+  intelligent?: boolean;
 }): JSX.Element {
-  const { className, deck } = props;
+  const { className, deck, intelligent } = props;
 
   const MAX_CMC = 7; // cap at 7+ cmc bucket
-  const manaCounts = getDeckCurve(deck, MAX_CMC);
+  const manaCounts = getDeckCurve(deck, MAX_CMC, intelligent ?? false);
   const curveMax = Math.max(...manaCounts.map((v) => v[0]));
   // debugLog("deckManaCurve", manaCounts, curveMax);
 
