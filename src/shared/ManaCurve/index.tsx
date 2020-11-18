@@ -31,14 +31,74 @@ mana["18"] = sharedCss.mana_18;
 mana["19"] = sharedCss.mana_19;
 mana["20"] = sharedCss.mana_20;
 
-function sum(arr: number[]): number {
-  return arr.reduce((a, b) => a + b, 0);
+interface Cost {
+  cmc: string,
+  total: number,
+  w: number,
+  u: number,
+  b: number,
+  r: number,
+  g: number,
+  c: number,
+  colorless: number,
+  monocolored: number,
+  multicolored: number,
+}
+
+function append(curve: Cost, cost: string[], quantity: number) {
+  const color = new Set<string>();
+  cost.forEach((c: string): void => {
+    if (c.includes("w")) {
+      color.add("w");
+      curve.w += quantity;
+    }
+    if (c.includes("u")) {
+      color.add("u");
+      curve.u += quantity;
+    }
+    if (c.includes("b")) {
+      color.add("b");
+      curve.b += quantity;
+    }
+    if (c.includes("r")) {
+      color.add("r");
+      curve.r += quantity;
+    }
+    if (c.includes("g")) {
+      color.add("g");
+      curve.g += quantity;
+    }
+    if (c.match(/^\d+$/)) {
+      curve.c += Number(c) * quantity;
+    }
+  });
+  if (color.size === 0) {
+    curve.colorless += quantity;
+  } else if (color.size === 1) {
+    curve.monocolored += quantity;
+  } else {
+    curve.multicolored += quantity;
+  }
+
+  curve.total += quantity;
 }
 
 function getDeckCurve(deck: Deck, MAX_CMC: number, intelligent: boolean): Cost[] {
-  const curve: number[][] = [];
+  const curve: Cost[] = [];
   for (let i = 0; i < MAX_CMC + 1; i++) {
-    curve[i] = [0, 0, 0, 0, 0, 0];
+    curve[i] = {
+      cmc: i + "",
+      total: 0,
+      w: 0,
+      u: 0,
+      b: 0,
+      r: 0,
+      g: 0,
+      c: 0,
+      colorless: 0,
+      monocolored: 0,
+      multicolored: 0
+    };
   }
 
   if (!deck.getMainboard()) return curve;
@@ -47,7 +107,7 @@ function getDeckCurve(deck: Deck, MAX_CMC: number, intelligent: boolean): Cost[]
     .getMainboard()
     .get()
     .forEach((card) => {
-      let cardObj = db.card(card.id);
+      const cardObj = db.card(card.id);
       if (!cardObj) return;
 
       if (cardObj.type.includes("Land")) {
@@ -63,22 +123,18 @@ function getDeckCurve(deck: Deck, MAX_CMC: number, intelligent: boolean): Cost[]
         if(count === 2) {
           const dfcObj = db.card(cardObj.dfcId as number);
           if(dfcObj) {
-            cardObj = dfcObj;
+            const cmc = Math.min(MAX_CMC, dfcObj.cmc);
+            append(curve[cmc], dfcObj.cost, card.quantity);
+            return;
           }
         }
       }
 
       const cmc = Math.min(MAX_CMC, cardObj.cmc);
-      cardObj.cost.forEach((c: string): void => {
-        if (c.includes("w")) curve[cmc][1] += card.quantity;
-        if (c.includes("u")) curve[cmc][2] += card.quantity;
-        if (c.includes("b")) curve[cmc][3] += card.quantity;
-        if (c.includes("r")) curve[cmc][4] += card.quantity;
-        if (c.includes("g")) curve[cmc][5] += card.quantity;
-      });
-      curve[cmc][0] += card.quantity;
+      append(curve[cmc], cardObj.cost, card.quantity);
     });
-  //debugLog(curve);
+
+  // curve.map(d => debugLog(d));
   return curve;
 }
 
@@ -91,16 +147,15 @@ export default function DeckManaCurve(props: {
 
   const MAX_CMC = 7; // cap at 7+ cmc bucket
   const manaCounts = getDeckCurve(deck, MAX_CMC, intelligent ?? false);
-  const curveMax = Math.max(...manaCounts.map((v) => v[0]));
+  const curveMax = Math.max(...manaCounts.map((v) => v.total));
   // debugLog("deckManaCurve", manaCounts, curveMax);
 
   return (
     <div className={className || css.mana_curve_container}>
       <div className={css.mana_curve}>
-        {!!manaCounts &&
-          manaCounts.map((cost, i) => {
-            const total = cost[0];
-            const manaTotal = sum(cost) - total;
+        {manaCounts.map((cost, i) => {
+            const total = cost.total;
+            const manaTotal = cost.w + cost.u + cost.b + cost.r + cost.g;
 
             return (
               <div
@@ -111,28 +166,53 @@ export default function DeckManaCurve(props: {
                 <div className={css.mana_curve_number}>
                   {total > 0 ? total : ""}
                 </div>
-                {MANA_COLORS.map((mc, ind) => {
-                  if (ind < 5 && cost[ind + 1] > 0) {
-                    return (
-                      <div
-                        className={"mana_curve_column_color"}
-                        key={"mana_curve_column_color_" + ind}
-                        style={{
-                          height:
-                            Math.round((cost[ind + 1] / manaTotal) * 100) + "%",
-                          backgroundColor: mc,
-                        }}
-                      />
-                    );
-                  }
-                })}
+
+                <div
+                  className={"mana_curve_column_color"}
+                  key={"mana_curve_column_color_0"}
+                  style={{
+                    height: Math.round((cost.w / manaTotal) * 100) + "%",
+                    backgroundColor: MANA_COLORS[0],
+                  }}
+                />
+                <div
+                  className={"mana_curve_column_color"}
+                  key={"mana_curve_column_color_1"}
+                  style={{
+                    height: Math.round((cost.u / manaTotal) * 100) + "%",
+                    backgroundColor: MANA_COLORS[1],
+                  }}
+                />
+                <div
+                  className={"mana_curve_column_color"}
+                  key={"mana_curve_column_color_2"}
+                  style={{
+                    height: Math.round((cost.b / manaTotal) * 100) + "%",
+                    backgroundColor: MANA_COLORS[2],
+                  }}
+                />
+                <div
+                  className={"mana_curve_column_color"}
+                  key={"mana_curve_column_color_3"}
+                  style={{
+                    height: Math.round((cost.r / manaTotal) * 100) + "%",
+                    backgroundColor: MANA_COLORS[3],
+                  }}
+                />
+                <div
+                  className={"mana_curve_column_color"}
+                  key={"mana_curve_column_color_4"}
+                  style={{
+                    height: Math.round((cost.g / manaTotal) * 100) + "%",
+                    backgroundColor: MANA_COLORS[4],
+                  }}
+                />
               </div>
             );
           })}
       </div>
       <div className={css.mana_curve_numbers}>
-        {!!manaCounts &&
-          manaCounts.map((_cost, i) => {
+        {manaCounts.map((_cost, i) => {
             return (
               <div
                 className={css.mana_curve_column_number}
