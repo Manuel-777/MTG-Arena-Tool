@@ -58,21 +58,21 @@ function generateInternalMatch(
     0
   );
 
-  const matchTags: any = [];
-
+  const matchTags: string[] = [];
   const playerDeck = globalStore.currentMatch.originalDeck.getSave(true);
   const oppDeck = getOpponentDeck();
-  if (oppDeck.archetype && oppDeck.archetype !== "Unknown") {
-    matchTags.push(oppDeck.archetype);
-  }
 
   const prevTags = getClosestMatch(oppDeck)?.tags;
-  if(prevTags) {
+  if (prevTags) {
     prevTags.forEach((d: any) => {
-      if(matchTags.indexOf(d) === -1) {
+      if (matchTags.indexOf(d) === -1) {
         matchTags.push(d);
       }
     });
+  }
+
+  if (oppDeck.archetype && oppDeck.archetype !== "Unknown") {
+    matchTags.push(oppDeck.archetype);
   }
 
   const [playerWins, opponentWins, draws] = matchResults(
@@ -88,7 +88,7 @@ function generateInternalMatch(
     opponent: { ...currentMatch.opponent, win: opponentWins },
     oppDeck,
     playerDeck,
-    tags: matchTags,
+    tags: [matchTags[0]] || [],
     draws,
     bestOf,
     duration,
