@@ -4,10 +4,7 @@ import { constants } from "mtgatool-shared";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 
-export default function getCardColors(
-  card: DbCardData,
-  ignoreColorless?: boolean
-): number[] {
+export default function getCardColors(card: DbCardData): number[] {
   const colors = card.cost.reduce<number[]>((colorIndices, current) => {
     switch (current) {
       case "w":
@@ -25,9 +22,5 @@ export default function getCardColors(
     }
   }, []);
   const sortedAndUniqueColors = uniq(colors.sort());
-  return sortedAndUniqueColors.length
-    ? sortedAndUniqueColors
-    : ignoreColorless
-    ? []
-    : [COLORLESS];
+  return sortedAndUniqueColors.length ? sortedAndUniqueColors : [COLORLESS];
 }
