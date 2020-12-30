@@ -106,7 +106,7 @@ export default function DraftElements(props: DraftElementsProps): JSX.Element {
     >
       {!!settings.title && (
         <div className={css.overlayDeckname}>
-          {mainTitle}
+          {!settings.collapsed && mainTitle}
           {settings.mode === OVERLAY_DRAFT && (
             <div
               className={css.overlayDraftContainer}

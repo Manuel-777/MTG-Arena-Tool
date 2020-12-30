@@ -17,6 +17,8 @@ import sharedCss from "../shared/shared.css";
 import ResizeIcon from "../assets/images/resize.svg";
 import CloseIcon from "../assets/images/svg/win-close.svg";
 import SettingsIcon from "../assets/images/svg/icon-settings.svg";
+import CollapseIcon from "../assets/images/svg/collapse.svg";
+import ExpandIcon from "../assets/images/svg/expand.svg";
 import DEFAULT_BACKGROUND from "../assets/images/main-background.jpg";
 
 const {
@@ -35,6 +37,7 @@ interface OverlayWindowletProps {
   editMode: boolean;
   handleClickClose: () => void;
   handleClickSettings: () => void;
+  handleToggleCollapse: () => void;
   handleToggleEditMode: () => void;
   index: number;
   match?: MatchData;
@@ -65,6 +68,7 @@ export default function OverlayWindowlet(
     editMode,
     handleClickClose,
     handleClickSettings,
+    handleToggleCollapse,
     handleToggleEditMode,
     index,
     match,
@@ -129,7 +133,7 @@ export default function OverlayWindowlet(
         className={`${css.outerWrapper} elements_wrapper`}
         style={{ opacity: overlaySettings.alpha.toString() }}
       >
-        {!!overlaySettings.title && (
+        {!!overlaySettings.title && !overlaySettings.collapsed && (
           <div className={css.overlayDeckname}>Overlay {index + 1}</div>
         )}
       </div>
@@ -172,8 +176,8 @@ export default function OverlayWindowlet(
         border: "1px solid rgba(128, 128, 128, " + borderAlpha + ")",
         opacity: isVisible ? "1" : "0",
         visibility: isVisible ? "visible" : "hidden",
-        height: overlaySettings.bounds.height + "px",
-        width: overlaySettings.bounds.width + "px",
+        height: overlaySettings.collapsed ? "60px" : overlaySettings.bounds.height + "px",
+        width: overlaySettings.collapsed ? "110px" : overlaySettings.bounds.width + "px",
         left: overlaySettings.bounds.x + "px",
         top: overlaySettings.bounds.y + "px",
       }}
@@ -200,6 +204,16 @@ export default function OverlayWindowlet(
               marginRight: "auto",
             }}
           />
+          {!overlaySettings.edit_mode && (
+            <div
+              className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
+              onClick={handleToggleCollapse}
+              style={{ margin: 0 }}
+            >
+              {!!overlaySettings.collapsed && <ExpandIcon style={{ margin: "auto" }} />}
+              {!overlaySettings.collapsed && <CollapseIcon style={{ margin: "auto" }} />}
+            </div>
+          )}
           <div
             className={`${sharedCss.button} ${sharedCss.settings} ${css.clickOn}`}
             onClick={handleClickSettings}
