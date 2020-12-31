@@ -187,7 +187,7 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
             />
           </div>
         )}
-        {!!settings.clock && (
+        {!!settings.clock && !settings.collapsed && (
           <Clock
             key={"overlay_clock_" + index}
             matchBeginTime={new Date(match.beginTime)}

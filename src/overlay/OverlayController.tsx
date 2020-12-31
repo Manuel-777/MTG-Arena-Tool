@@ -109,9 +109,8 @@ export default function OverlayController(): JSX.Element {
 
   // Note: no useCallback because of dependency on deep overlays state
   const handleSetEditMode = (_event: unknown, _editMode: boolean): void => {
-    // Save current windowlet dimensions before we leave edit mode
+    // Expand the overlay windows
     const collapsed = false;
-    const edit_mode = _editMode;
     // Compute current dimensions of overlay windowlets in DOM
     const newOverlays = overlays.map(
       (overlay: OverlaySettingsData, index: number) => {
@@ -128,9 +127,10 @@ export default function OverlayController(): JSX.Element {
             y: forceInt(overlayDiv.style.top),
           };
         } 
-        return { ...overlay, bounds, collapsed, edit_mode };
+        return { ...overlay, bounds, collapsed };
       }
     );
+    // Save current windowlet dimensions before we leave edit mode
     if (editMode && !_editMode) {      
       // Compute current dimensions of hover card windowlet in DOM
       const hoverDiv = byId(css.overlayHover);

@@ -176,7 +176,7 @@ export default function OverlayWindowlet(
         border: "1px solid rgba(128, 128, 128, " + borderAlpha + ")",
         opacity: isVisible ? "1" : "0",
         visibility: isVisible ? "visible" : "hidden",
-        height: overlaySettings.collapsed ? "60px" : overlaySettings.bounds.height + "px",
+        height: overlaySettings.collapsed ? "77px" : overlaySettings.bounds.height + "px",
         width: overlaySettings.collapsed ? "110px" : overlaySettings.bounds.width + "px",
         left: overlaySettings.bounds.x + "px",
         top: overlaySettings.bounds.y + "px",
@@ -204,7 +204,7 @@ export default function OverlayWindowlet(
               marginRight: "auto",
             }}
           />
-          {!overlaySettings.edit_mode && (
+          {!props.editMode && (
             <div
               className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
               onClick={handleToggleCollapse}
