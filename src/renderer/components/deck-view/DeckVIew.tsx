@@ -233,7 +233,9 @@ function DeckView(props: DeckViewProps): JSX.Element {
               backgroundImage: `url(${getCardArtCrop(deck.tile)})`,
             }}
           >
-            <DeckColorsBar deck={deck} />
+            <div style={{ height: "4px", display: "flex", width: "100%" }}>
+              <DeckColorsBar deck={deck} />
+            </div>
             <div className={indexCss.topInner}>
               <div className={indexCss.flexItem}>
                 <SvgButton
