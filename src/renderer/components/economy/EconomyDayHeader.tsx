@@ -2,14 +2,18 @@ import React from "react";
 import addDays from "date-fns/addDays";
 import startOfDay from "date-fns/startOfDay";
 
+import ReactTooltip from 'react-tooltip';
 import LocalTime from "../../../shared/time-components/LocalTime";
-import { formatNumber } from "../../rendererUtil";
-import { vaultPercentFormat } from "./economyUtils";
+import {formatNumber} from "../../rendererUtil";
+import {vaultPercentFormat} from "./economyUtils";
 import EconomyValueRecord from "./EconomyValueRecord";
+import {CardPoolAddedEconomyValueRecord} from "./EconomyRow";
 
 import indexCss from "../../index.css";
 import css from "./economy.css";
-import { formatPercent } from "mtgatool-shared";
+import {formatPercent} from "mtgatool-shared";
+import {Row} from "react-table";
+import {TransactionData} from "./types";
 
 function localDayDateFormat(date: Date): JSX.Element {
   return (
@@ -18,7 +22,7 @@ function localDayDateFormat(date: Date): JSX.Element {
       year={"numeric"}
       month={"long"}
       day={"numeric"}
-    ></LocalTime>
+    />
   );
 }
 
@@ -43,6 +47,7 @@ export interface EconomyDayHeaderProps {
   gemsDelta: number;
   goldDelta: number;
   xpGainedNumber: number;
+  subRows: Array<Row<TransactionData>>;
 }
 
 export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
@@ -53,6 +58,7 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
     gemsDelta,
     goldDelta,
     xpGainedNumber,
+    subRows
   } = props;
   const timestamp = addDays(new Date(), -daysAgo);
 
@@ -66,52 +72,82 @@ export function EconomyDayHeader(props: EconomyDayHeaderProps): JSX.Element {
       <div style={gridTitleStyle} className={indexCss.flexItem + " gridTitle"}>
         {getDayString(daysAgo, timestamp)}
       </div>
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyCard}
-        className={"gridCards"}
-        deltaUpContent={formatNumber(cardsAddedCount)}
-        title={"Cards"}
-      />
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyVault}
-        className={"gridVault"}
-        deltaUpContent={
-          vaultProgressDelta >= 0
-            ? formatPercent(vaultProgressDelta, vaultPercentFormat as any)
-            : undefined
-        }
-        deltaDownContent={
-          vaultProgressDelta < 0
-            ? formatPercent(vaultProgressDelta, vaultPercentFormat as any)
-            : undefined
-        }
-        title={"Vault"}
-      />
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyGold + " " + css.marginLeft}
-        className={"gridGold"}
-        deltaUpContent={goldDelta >= 0 ? formatNumber(goldDelta) : undefined}
-        deltaDownContent={goldDelta < 0 ? formatNumber(goldDelta) : undefined}
-        title={"Gold"}
-      />
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyGems}
-        className={"gridGems"}
-        deltaUpContent={gemsDelta >= 0 ? formatNumber(gemsDelta) : undefined}
-        deltaDownContent={gemsDelta < 0 ? formatNumber(gemsDelta) : undefined}
-        title={"Gems"}
-      />
-      <EconomyValueRecord
-        containerDiv
-        iconClassName={css.economyExp}
-        className={"gridExp"}
-        deltaUpContent={String(formatNumber(xpGainedNumber ?? 0))}
-        title={"Experience"}
-      />
+      <div data-tip data-for={"tooltipCards" + daysAgo}
+           style={{gridArea: "1 / 2 / auto / 3", cursor: "pointer"}}
+           className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyCard}
+          className={"gridCards"}
+          deltaContent={formatNumber(cardsAddedCount)}
+          deltaUp={true}
+          title={"Cards"}
+        />
+      </div>
+      <ReactTooltip
+        id={"tooltipCards" + daysAgo}
+        className={indexCss.noPadding}
+        clickable={true}
+        isCapture={true} /* To hide on non-global scroll event  */
+        event={"click"}
+        eventOff={"dblclick"}
+        globalEventOff={"click"}
+        effect={"solid"}
+        arrowColor={"transparent"}
+        borderColor={"transparent"}
+        place={"bottom"}>
+        <div>
+          {subRows.filter((row) => {
+            return row.values.delta?.cardsAdded;
+          }).map((row, index) => {
+            return (
+              <CardPoolAddedEconomyValueRecord
+                key={index}
+                addedCardIds={row.values.delta.cardsAdded}
+                aetherizedCardIds={[]}
+              />
+            );
+          })}
+        </div>
+      </ReactTooltip>
+      <div style={{gridArea: "1 / 3 / auto / 4"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyVault}
+          className={"gridVault"}
+          deltaContent={formatPercent(vaultProgressDelta, vaultPercentFormat as any)}
+          deltaUp={vaultProgressDelta >= 0}
+          deltaDown={vaultProgressDelta < 0}
+          title={"Vault"}
+        />
+      </div>
+      <div style={{gridArea: "1 / 4 / auto / 5"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyGold + " " + css.marginLeft}
+          className={"gridGold"}
+          deltaContent={formatNumber(goldDelta)}
+          deltaUp={goldDelta >= 0}
+          deltaDown={goldDelta < 0}
+          title={"Gold"}
+        />
+      </div>
+      <div style={{gridArea: "1 / 5 / auto / 6"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyGems}
+          className={"gridGems"}
+          deltaContent={formatNumber(gemsDelta)}
+          deltaUp={gemsDelta >= 0}
+          deltaDown={gemsDelta < 0}
+          title={"Gems"}
+        />
+      </div>
+      <div style={{gridArea: "1 / 6 / auto / 7"}} className={css.economy_metric}>
+        <EconomyValueRecord
+          iconClassName={css.economyExp}
+          className={"gridExp"}
+          deltaContent={String(formatNumber(xpGainedNumber ?? 0))}
+          deltaUp={true}
+          title={"Experience"}
+        />
+      </div>
     </>
   );
 }

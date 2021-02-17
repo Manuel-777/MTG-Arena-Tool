@@ -1991,3 +1991,7 @@ a:hover {
     font-size: 18px;
     font-family: var(--main-font-name-bold);
 }
+
+.no-padding {
+    padding: 0 !important;
+}

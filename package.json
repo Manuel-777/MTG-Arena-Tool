@@ -113,6 +113,7 @@
     "react-spring": "^9.0.0-rc.3",
     "react-svg-piechart": "^2.4.1",
     "react-table": "7.0.0",
+    "react-tooltip": "^4.2.10",
     "react-transition-group": "^4.4.1",
     "react-use-gesture": "^7.0.15",
     "react-use-measure": "^2.0.0",
