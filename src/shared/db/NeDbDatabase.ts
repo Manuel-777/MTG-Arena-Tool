@@ -4,7 +4,7 @@ import util from "util";
 import { USER_DATA_DIR, showBusy, hideBusyIfDone } from "./databaseUtil";
 import sanitize from "sanitize-filename";
 import debugLog from "../debugLog";
-import {copyFileSync} from "fs";
+import { copyFileSync } from "fs";
 
 class DatabaseNotInitializedError extends Error {
   constructor() {
@@ -80,14 +80,14 @@ export class NeDbDatabase {
     });
     // ensure session begins with most compact possible db
     this.datastore.persistence.compactDatafile();
-    this.datastore.loadDatabase((err => {
-      if(err !== null) {
+    this.datastore.loadDatabase((err) => {
+      if (err !== null) {
         debugLog(err);
         return;
       }
       debugLog("Db backup: " + backupPath);
-      copyFileSync(dbPath, backupPath)
-    }));
+      copyFileSync(dbPath, backupPath);
+    });
 
     // async wrappers of datastore methods
     // https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original

@@ -373,18 +373,43 @@ function initialize(launchToTray: boolean): void {
 }
 
 function openDevTools(): void {
-  const backgroundDevWin = background as any;
-  if (backgroundDevWin?.isDevToolsOpened()) {
-    backgroundDevWin.closeDevTools();
-  } else {
-    backgroundDevWin?.openDevTools({ mode: "detach" });
-  }
-  const mainDevWin = mainWindow as any;
-  if (mainDevWin?.isDevToolsOpened()) {
-    mainDevWin.closeDevTools();
-  } else {
+  let closedDevtools = false;
+  BrowserWindow.getAllWindows().forEach((w) => {
+    const title = w.getTitle();
+    if (
+      title == "MTG Arena Tool - Background debug" ||
+      title == "MTG Arena Tool - Renderer debug"
+    ) {
+      w.close();
+      closedDevtools = true;
+    }
+  });
+
+  if (!closedDevtools) {
+    const backgroundDevWin = background as any;
+
+    const backDevtools = new BrowserWindow({
+      title: "MTG Arena Tool - Background debug",
+      icon: path.join(__dirname, iconNormal),
+    });
+    backDevtools.removeMenu();
+    backDevtools.focus();
+    backgroundDevWin.webContents.setDevToolsWebContents(
+      backDevtools.webContents
+    );
+    backgroundDevWin.webContents.openDevTools({ mode: "detach" });
+
+    const mainDevWin = mainWindow as any;
+
     showWindow();
-    mainDevWin?.openDevTools();
+    const mainDevtools = new BrowserWindow({
+      title: "MTG Arena Tool - Renderer debug",
+      icon: path.join(__dirname, iconNormal),
+    });
+    mainDevtools.removeMenu();
+    backDevtools.focus();
+    mainDevWin.webContents.setDevToolsWebContents(mainDevtools.webContents);
+    mainDevWin.webContents.openDevTools({ mode: "detach" });
   }
 }
 

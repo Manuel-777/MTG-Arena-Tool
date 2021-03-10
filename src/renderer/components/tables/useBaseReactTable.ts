@@ -138,7 +138,9 @@ export function useBaseReactTable<D extends TableData>({
   } = table;
   // It seems allComumns can be undefined on some cycles of the table hook
   const allColumns = table.allColumns || [];
+
   const { filters, pageIndex, pageSize } = state;
+
   React.useEffect(() => {
     tableStateCallback({ ...state });
   }, [state, tableStateCallback]);
@@ -155,11 +157,15 @@ export function useBaseReactTable<D extends TableData>({
     pageIndex,
     pageSize,
   };
+
   const visibleHeaders = headers.filter((header: any) => header.isVisible);
+
   const gridTemplateColumns = visibleHeaders
     .map((header: any) => `minmax(${header.gridWidth ?? "140px"}, auto)`)
     .join(" ");
+
   const [toggleableColumns, initialFiltersVisible] = React.useMemo(() => {
+    const allColumns = table.allColumns || [];
     const toggleableColumns = allColumns.filter(
       (column: any) => column.mayToggle
     );
@@ -170,11 +176,14 @@ export function useBaseReactTable<D extends TableData>({
       }
     }
     return [toggleableColumns, initialFiltersVisible];
-  }, [allColumns]);
+  }, [table]);
+
   const [filtersVisible, setFiltersVisible] = React.useState(
     initialFiltersVisible
   );
+
   const [togglesVisible, setTogglesVisible] = React.useState(false);
+
   const headersProps = {
     filtersVisible,
     getTableProps,
@@ -183,6 +192,7 @@ export function useBaseReactTable<D extends TableData>({
     setFiltersVisible,
     visibleHeaders,
   };
+
   const tableControlsProps: TableControlsProps<D> = {
     filters,
     allColumns,

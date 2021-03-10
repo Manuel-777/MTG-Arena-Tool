@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ManaSymbol } from "./ManaSymbol";
 import indexCss from "../../index.css";
 import { constants } from "mtgatool-shared";
@@ -18,7 +18,9 @@ interface ManaFilterProps {
 
 export default function ManaFilter(props: ManaFilterProps): JSX.Element {
   const { filterKey, prefixId, filters, onFilterChanged } = props;
-  const colors = { ...filters[filterKey] };
+  const colors = useMemo(() => {
+    return { ...filters[filterKey] };
+  }, [filters, filterKey]);
 
   const filterLabels: { [key in ManaFilterKeys]: string } = {
     w: "White",

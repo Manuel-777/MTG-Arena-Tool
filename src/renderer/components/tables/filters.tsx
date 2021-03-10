@@ -1,6 +1,7 @@
 import _ from "lodash";
 import matchSorter from "match-sorter";
-import React from "react";
+import React, { CSSProperties } from "react";
+import CreatableSelect from "react-select/creatable";
 import { ColumnInstance, FilterValue, Row, TableState } from "react-table";
 import { constants, InternalDeck } from "mtgatool-shared";
 import { BinarySymbol } from "../misc/BinarySymbol";
@@ -35,6 +36,65 @@ export function TextBoxFilter<D extends TableData>({
         placeholder={prompt}
       />
     </InputContainer>
+  );
+}
+
+export function SelectFilter<D extends TableData>({
+  column: { id, filterValue, preFilteredRows, setFilter },
+}: {
+  column: ColumnInstance<D>;
+}): JSX.Element {
+  const styles = {
+    option: (
+      styles: CSSProperties,
+      { isFocused, isSelected }: { isFocused: boolean; isSelected: boolean }
+    ): CSSProperties => {
+      if (isSelected) {
+        return {
+          ...styles,
+          backgroundColor: "var(--color-section-active) !important",
+        };
+      }
+      if (isFocused) {
+        return {
+          ...styles,
+          backgroundColor: "var(--color-section-hover) !important",
+        };
+      }
+      return { ...styles };
+    },
+  };
+
+  let options: any[] = [];
+  if (id === "format") {
+    options = preFilteredRows
+      .filter((d) => d)
+      .map((d) => d.values.format)
+      .sort()
+      .filter((el, i, a) => i === a.indexOf(el))
+      .map((d) => ({ value: d, label: d }));
+  }
+
+  const count = preFilteredRows.length;
+  const prompt =
+    id === "deckTileId" ? `Search ${count} decks...` : `Filter ${id}...`;
+  return (
+    <div title={prompt} className={css.inputContainer}>
+      <CreatableSelect
+        className={css.select}
+        isClearable
+        menuPosition={"fixed"}
+        styles={styles}
+        options={options}
+        value={
+          filterValue ? { value: filterValue, label: filterValue } : undefined
+        }
+        onChange={(option: any): void =>
+          setFilter(option ? option.value : undefined)
+        }
+        placeholder={prompt}
+      />
+    </div>
   );
 }
 

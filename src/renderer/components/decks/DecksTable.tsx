@@ -18,6 +18,7 @@ import {
   ArchiveColumnFilter,
   ColorColumnFilter,
   NumberRangeColumnFilter,
+  SelectFilter,
   TextBoxFilter,
 } from "../tables/filters";
 import PagingControls from "../tables/PagingControls";
@@ -79,7 +80,7 @@ const columns: Column<DecksData>[] = [
     Header: "Format",
     accessor: "format",
     disableFilters: false,
-    Filter: TextBoxFilter,
+    Filter: SelectFilter,
     filter: "fuzzyText",
     Cell: FormatCell,
     gridWidth: "150px",

@@ -123,7 +123,10 @@ function getEventStats(event: InternalEvent): EventStats {
     stats.gameWins = undefined;
     stats.gameLosses = undefined;
   } else if (event.ModuleInstanceData.WinLossGate?.MaxWins) {
-    if (stats.eventState !== COMPLETED && stats.wins >= event.ModuleInstanceData.WinLossGate?.MaxWins) {
+    if (
+      stats.eventState !== COMPLETED &&
+      stats.wins >= event.ModuleInstanceData.WinLossGate?.MaxWins
+    ) {
       stats.eventState = ABLE_TO_COMPLETE;
     }
   } else if (event.ModuleInstanceData.WinNoGate) {
@@ -133,7 +136,10 @@ function getEventStats(event: InternalEvent): EventStats {
     const some: IHoge = event.ModuleInstanceData.WinNoGate as IHoge;
 
     if ("WinNoGateRewards" in some) {
-      if (stats.eventState !== COMPLETED && stats.wins >= some.WinNoGateRewards.length) {
+      if (
+        stats.eventState !== COMPLETED &&
+        stats.wins >= some.WinNoGateRewards.length
+      ) {
         stats.eventState = ABLE_TO_COMPLETE;
       }
     }

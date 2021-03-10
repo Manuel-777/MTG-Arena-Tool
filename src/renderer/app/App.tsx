@@ -99,7 +99,7 @@ function App(): JSX.Element {
     }, 350);
   }, [dispatch]);
 
-  const closeSettings = React.useCallback(() => {
+  const _closeSettings = React.useCallback(() => {
     setTimeout(() => {
       reduxAction(
         dispatch,
@@ -172,9 +172,7 @@ function App(): JSX.Element {
           ) : (
             <>
               <Auth authForm={authForm} />
-              {openAuthSettings && (
-                <AuthSettings closeCallback={closeSettings} />
-              )}
+              {openAuthSettings && <AuthSettings />}
             </>
           )}
         </ErrorBoundary>

@@ -38,7 +38,7 @@ import topNavCss from "../components/main/topNav.css";
 import sharedCss from "../../shared/shared.css";
 import indexCss from "../index.css";
 import css from "./TimelineTab.css";
-import {getWinrateClass} from "../rendererUtil";
+import { getWinrateClass } from "../rendererUtil";
 
 const { SUB_MATCH, IPC_NONE } = constants;
 
@@ -89,7 +89,7 @@ const RANK_HEIGHTS = [
   getRankY("Diamond", 0, 0),
   getRankY("Mythic", 0, 1500),
   getRankY("Mythic", 0, 750),
-  168  // getRankY("Mythic", 0, 1)
+  168, // getRankY("Mythic", 0, 1)
 ];
 
 /**
@@ -146,7 +146,7 @@ function getSeasonData(
 
 interface TimelinePartProps extends SeasonalRankData {
   index: number;
-  data: SeasonalRankData[],
+  data: SeasonalRankData[];
   width: number;
   height: number;
   hover: string;
@@ -179,8 +179,10 @@ function TimeLinePart(props: TimelinePartProps): JSX.Element {
     setPartHover(index);
   }, [lastMatchId, deckId, index, setPartHover, setHover]);
 
-  const newPointHeight = height - (props.newRankNumeric ? props.newRankNumeric * 2 : 0);
-  const oldPointHeight = height - (props.oldRankNumeric ? props.oldRankNumeric * 2 : 0);
+  const newPointHeight =
+    height - (props.newRankNumeric ? props.newRankNumeric * 2 : 0);
+  const oldPointHeight =
+    height - (props.oldRankNumeric ? props.oldRankNumeric * 2 : 0);
   const rectPoints = `0 ${oldPointHeight} ${width} ${newPointHeight} ${width} ${height} 0 ${height}`;
   const linePoints = `0 ${oldPointHeight} ${width} ${newPointHeight}`;
 
@@ -210,22 +212,28 @@ function TimeLinePart(props: TimelinePartProps): JSX.Element {
         <polygon points={rectPoints} strokeWidth="0" />
         <polyline points={linePoints} strokeWidth="1" />
       </svg>
-      {(() => {
+      {((): any => {
         if (index === 0 || props.oldClass !== props.newClass) {
-          const matches = data.filter(d => d.oldClass === props.newClass)
-            .map(d => {
-              return matchExists(d.lastMatchId) ? getMatch(d.lastMatchId) : undefined;
-            }).filter(m => {
+          const matches = data
+            .filter((d) => d.oldClass === props.newClass)
+            .map((d) => {
+              return matchExists(d.lastMatchId)
+                ? getMatch(d.lastMatchId)
+                : undefined;
+            })
+            .filter((m) => {
               return m !== undefined;
             }) as InternalMatch[];
-          const wins = matches.filter(m => {
+          const wins = matches.filter((m) => {
             return m.player.win > m.opponent.win;
           }).length;
-          const losses = matches.filter(m => {
+          const losses = matches.filter((m) => {
             return m.player.win < m.opponent.win;
           }).length;
 
-          const height = props.newRankNumeric ? props.newRankNumeric * 2 + 48 : 0;
+          const height = props.newRankNumeric
+            ? props.newRankNumeric * 2 + 48
+            : 0;
           return (
             <TimelineRankBullet
               x={index === 0 ? 0 : (width - 48) / 2}
@@ -234,7 +242,8 @@ function TimeLinePart(props: TimelinePartProps): JSX.Element {
               rankLevel={props.newLevel}
               wins={wins}
               losses={losses}
-            />);
+            />
+          );
         }
       })()}
     </div>
@@ -272,7 +281,7 @@ function TimelineRankBullet(props: RankBulletProps): JSX.Element {
       title={divTitle}
       className={`${css.timelineRank} ${topNavCss.topConstructedRank}`}
     >
-      <div style={{position: "absolute", left: "100%"}}>
+      <div style={{ position: "absolute", left: "100%" }}>
         <span>
           {wins}:{losses}
         </span>
@@ -314,6 +323,7 @@ export default function TimelineTab(): JSX.Element {
   // Notice we can see old seasons too adding the seasonOrdinal
   const data: SeasonalRankData[] = useMemo(() => {
     return getSeasonData(seasonType, drawingSeason);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seasonType, seasonSelect, drawingSeason]);
 
   const handleSetSeasonType = useCallback((type: string): void => {
@@ -426,7 +436,11 @@ export default function TimelineTab(): JSX.Element {
             <div className={css.timelineBoxLabels}>
               <div className={css.timelineLabel}>#1</div>
               <div className={css.timelineLabel}>#750</div>
-              <div className={css.timelineLabel}>#1500<br/>Mythic</div>
+              <div className={css.timelineLabel}>
+                #1500
+                <br />
+                Mythic
+              </div>
               <div className={css.timelineLabel}>Diamond</div>
               <div className={css.timelineLabel}>Platinum</div>
               <div className={css.timelineLabel}>Gold</div>
