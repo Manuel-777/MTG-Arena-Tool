@@ -121,17 +121,21 @@ export default function OverlayController(): JSX.Element {
         let bounds = overlay.bounds;
         if (overlayDiv) {
           bounds = {
-            width: overlay.collapsed ? overlay.bounds.width : forceInt(overlayDiv.style.width),
-            height: overlay.collapsed ? overlay.bounds.height: forceInt(overlayDiv.style.height),
+            width: overlay.collapsed
+              ? overlay.bounds.width
+              : forceInt(overlayDiv.style.width),
+            height: overlay.collapsed
+              ? overlay.bounds.height
+              : forceInt(overlayDiv.style.height),
             x: forceInt(overlayDiv.style.left),
             y: forceInt(overlayDiv.style.top),
           };
-        } 
+        }
         return { ...overlay, bounds, collapsed };
       }
     );
     // Save current windowlet dimensions before we leave edit mode
-    if (editMode && !_editMode) {      
+    if (editMode && !_editMode) {
       // Compute current dimensions of hover card windowlet in DOM
       const hoverDiv = byId(css.overlayHover);
       const newOverlayHover =
@@ -149,7 +153,7 @@ export default function OverlayController(): JSX.Element {
         },
         IPC_ALL ^ IPC_OVERLAY
       );
-    } else {      
+    } else {
       reduxAction(
         dispatcher,
         { type: "SET_SETTINGS", arg: { overlays: newOverlays } },
@@ -157,7 +161,7 @@ export default function OverlayController(): JSX.Element {
       );
     }
     setEditMode(_editMode);
-  };  
+  };
 
   const handleActionLog = useCallback((_event: unknown, arg: string): void => {
     setActionLog(arg);
@@ -171,13 +175,13 @@ export default function OverlayController(): JSX.Element {
   );
 
   const handleSetCollapsed = (_event: unknown, index: number): void => {
-    const collapsed = !overlays[index].collapsed
+    const collapsed = !overlays[index].collapsed;
     const newOverlays = [...overlays];
     newOverlays[index] = {
       ...overlays[index], // old overlay
       collapsed, // new setting
     };
-    
+
     reduxAction(
       dispatcher,
       { type: "SET_SETTINGS", arg: { overlays: newOverlays } },

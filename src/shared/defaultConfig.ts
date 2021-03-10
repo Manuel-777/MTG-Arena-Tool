@@ -38,6 +38,7 @@ const overlayCfg = {
   top: true,
   type_counts: false,
   autosize: false,
+  collapsed: false,
 };
 
 const primaryBounds: Electron.Rectangle = remote
