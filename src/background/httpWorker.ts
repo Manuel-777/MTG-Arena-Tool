@@ -118,6 +118,7 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
     "auth",
     "delete_data",
     "get_database",
+    "active_events",
     "get_database_version",
   ];
   const sendData = globals.store.getState().settings.send_data;
@@ -195,8 +196,11 @@ export function asyncWorker(task: HttpTask, callback: HttpTaskCallback): void {
             return;
           }
           // should never get to this point
-          throw new Error(`Error handling request. (${task.method})`);
+          throw new Error(
+            `Error handling request. (${task.method}) > ${results}`
+          );
         } catch (error) {
+          console.error(error, results);
           debugLog(results, "debug");
           callback(error, task, results);
         }

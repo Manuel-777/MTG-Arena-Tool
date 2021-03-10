@@ -934,3 +934,19 @@ export function httpSyncPush(): void {
     IPC_RENDERER
   );
 }
+
+export function httpGetActiveEvents(): void {
+  const _id = makeId(6);
+  globals.httpQueue?.push(
+    {
+      reqId: _id,
+      method: "active_events",
+      method_path: "/api/active_events.php",
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      const events = parsedResult.events.map((r: any) => r.event);
+      console.log("Fetched active events:", events);
+      ipcSend("set_active_events", JSON.stringify(events));
+    })
+  );
+}

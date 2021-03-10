@@ -72,10 +72,12 @@ export default function DecksArtViewRow({
       onClick={onRowClick}
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
-      style={{
-        ...props,
-        backgroundImage: `url(${getCardArtCrop(row.values["deckTileId"])})`,
-      }}
+      style={
+        {
+          ...props,
+          backgroundImage: `url(${getCardArtCrop(row.values["deckTileId"])})`,
+        } as any
+      }
     >
       <DeckColorsBar deck={new Deck(deck)} />
       {!!deck.custom && (
