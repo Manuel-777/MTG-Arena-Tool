@@ -87,7 +87,8 @@ export default function AuthSettings<F extends Function>(
     opacity: open ? 1 : 0,
     config: springConfig,
     onRest: () => handleClose(),
-  });
+  } as any);
+
   const scaleSpring = useSpring({
     transform: `scale(${open ? 1 : 0.8})`,
     config: springConfig,

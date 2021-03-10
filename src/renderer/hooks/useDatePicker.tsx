@@ -41,10 +41,13 @@ export default function useDatePicker(
   editCallback?: (range: Date) => void,
   closeCallback?: (range: Date) => void
 ): [Date, () => void, JSX.Element] {
-  const initState = {
-    from: initialDateFrom,
-    to: new Date(),
-  };
+  const initState = useMemo(() => {
+    return {
+      from: initialDateFrom,
+      to: new Date(),
+    };
+  }, [initialDateFrom]);
+
   const [range, setRange] = useState(initState);
   const [show, setShow] = useState(false);
 
@@ -74,10 +77,12 @@ export default function useDatePicker(
     setRange(initState);
   }, [initState]);
 
-  const modifiers = {
-    [css.modifierStart]: range.from,
-    [css.modifierEnd]: new Date(),
-  };
+  const modifiers = useMemo(() => {
+    return {
+      [css.modifierStart]: range.from,
+      [css.modifierEnd]: new Date(),
+    };
+  }, [range]);
 
   const doShow = useCallback(() => {
     setShow(true);

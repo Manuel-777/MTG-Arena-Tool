@@ -5,6 +5,7 @@ import { ipcSend, normalizeISOString } from "./backgroundUtil";
 import { reduxAction } from "../shared/redux/sharedRedux";
 import globalStore, { getMatch } from "../shared/store";
 import getOpponentDeck from "./getOpponentDeck";
+import getClosestMatch from "./getClosestMatch";
 import { httpSetMatch } from "./httpApi";
 import debugLog from "../shared/debugLog";
 import {
@@ -57,10 +58,19 @@ function generateInternalMatch(
     0
   );
 
+  const matchTags: string[] = [];
   const playerDeck = globalStore.currentMatch.originalDeck.getSave(true);
   const oppDeck = getOpponentDeck();
 
-  const matchTags = [];
+  const prevTags = getClosestMatch(oppDeck)?.tags;
+  if (prevTags) {
+    prevTags.forEach((d: any) => {
+      if (matchTags.indexOf(d) === -1) {
+        matchTags.push(d);
+      }
+    });
+  }
+
   if (oppDeck.archetype && oppDeck.archetype !== "Unknown") {
     matchTags.push(oppDeck.archetype);
   }
@@ -78,7 +88,7 @@ function generateInternalMatch(
     opponent: { ...currentMatch.opponent, win: opponentWins },
     oppDeck,
     playerDeck,
-    tags: matchTags,
+    tags: [matchTags[0]] || [],
     draws,
     bestOf,
     duration,

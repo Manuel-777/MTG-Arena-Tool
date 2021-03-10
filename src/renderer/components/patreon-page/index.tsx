@@ -34,7 +34,7 @@ export default function PatreonPage(props: {
           {page == "cards" ? (
             <>
               <div className={css.patreonInfoText}>
-                Acces global cards winrates statistics!
+                Access global cards winrates statistics!
               </div>
               <div
                 className={css.showcaseImage}

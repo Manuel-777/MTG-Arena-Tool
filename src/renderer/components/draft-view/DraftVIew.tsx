@@ -1,14 +1,19 @@
 import React, { useCallback } from "react";
 import Slider, { SliderPosition } from "../misc/Slider";
 import DeckList from "../misc/DeckList";
-import { constants, Deck, InternalDraftv2 } from "mtgatool-shared";
+import {
+  constants,
+  Deck,
+  InternalDraftv2,
+  Rarity,
+  DbCardData,
+} from "mtgatool-shared";
 import useHoverCard from "../../hooks/useHoverCard";
 import db from "../../../shared/database-wrapper";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../../../shared/redux/stores/rendererStore";
 import { getDraft } from "../../../shared/store";
 import { reduxAction } from "../../../shared/redux/sharedRedux";
-
 import indexCss from "../../index.css";
 import sharedCss from "../../../shared/shared.css";
 import css from "./DraftView.css";
@@ -21,6 +26,7 @@ import BackIcon from "../../../assets/images/svg/back.svg";
 import SvgButton from "../misc/SvgButton";
 import ManaCost from "../misc/ManaCost";
 import Section from "../misc/Section";
+import getCardColors from "../../../shared/utils/getCardColors";
 
 const {
   PACK_SIZES,
@@ -29,6 +35,8 @@ const {
   IPC_NONE,
   DEFAULT_PACK_SIZE,
 } = constants;
+
+const rarities: Rarity[] = ["mythic", "rare", "uncommon", "common", "land"];
 
 interface PickPack {
   pack: number;
@@ -47,6 +55,33 @@ function pickPackFromPosition(position: number, set: string): PickPack {
   const pick = position % packSize;
 
   return { pack: pack, pick: pick };
+}
+
+function compareDraftPackCards(a?: DbCardData, b?: DbCardData): number {
+  if (!a) return -1;
+  if (!b) return 1;
+  const aRarity = rarities.indexOf(a.rarity);
+  const bRarity = rarities.indexOf(b.rarity);
+
+  // Order by rarity
+  if (aRarity < bRarity) return -1;
+  if (aRarity > bRarity) return 1;
+
+  // …And then by color. Multicolor is last in order in MTGA.
+  const aColors = getCardColors(a);
+  const bColors = getCardColors(b);
+  if (aColors.length < bColors.length) return -1;
+  if (aColors.length > bColors.length) return 1;
+  if (aColors[0] < bColors[0]) return -1;
+  if (aColors[0] > bColors[0]) return 1;
+
+  // …And lastly, by name
+  const aName = a.name;
+  const bName = b.name;
+  if (aName < bName) return -1;
+  if (aName > bName) return 1;
+
+  return 0;
 }
 
 interface DraftCardProps {
@@ -143,9 +178,12 @@ function DraftView(props: DraftViewProps): JSX.Element {
   );
 
   const getCurrentPick = useCallback((): { pack: number[]; pick: number } => {
-    const pack = draft.packs[pickpack.pack][pickpack.pick];
+    const pack = draft.packs[pickpack.pack][pickpack.pick]
+      .map((card: number) => db.card(card))
+      .sort(compareDraftPackCards)
+      .map((card) => (card ? card.id : 0));
     const pick = draft.picks[pickpack.pack][pickpack.pick];
-    return pack && pick ? { pack, pick } : { pick: 0, pack: [] as number[] };
+    return pack && pick ? { pack, pick } : { pick: 0, pack: [] };
   }, [draft, pickpack.pack, pickpack.pick]);
 
   const getCurrentDeck = useCallback((): Deck => {
@@ -242,18 +280,14 @@ function DraftView(props: DraftViewProps): JSX.Element {
               }px, 1fr))`,
             }}
           >
-            {getCurrentPick()
-              .pack.reverse()
-              .map((grpId: number, index: number) => {
-                return (
-                  <DraftCard
-                    pick={getCurrentPick().pick == grpId}
-                    key={pickpack.pack + "-" + pickpack.pick + "-" + index}
-                    size={cardSize}
-                    grpId={grpId}
-                  />
-                );
-              })}
+            {getCurrentPick().pack.map((grpId: number, index: number) => (
+              <DraftCard
+                pick={getCurrentPick().pick == grpId}
+                key={pickpack.pack + "-" + pickpack.pick + "-" + index}
+                size={cardSize}
+                grpId={grpId}
+              />
+            ))}
           </div>
         </Section>
         <Section

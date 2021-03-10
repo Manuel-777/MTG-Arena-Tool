@@ -40,6 +40,7 @@ import {
   getEventPrettyName,
   MatchGameStats,
   InternalMatch,
+  compareCards,
 } from "mtgatool-shared";
 
 const { IPC_NONE } = constants;
@@ -55,8 +56,11 @@ function MatchView(props: MatchViewProps): JSX.Element {
   const { match } = props;
   const dispatcher = useDispatch();
   const [view, setView] = useState(VIEW_MATCH);
+  const [gameSeen, setGameSeen] = useState(0);
+
   const playerDeck = new Deck(match.playerDeck);
   const oppDeck = new Deck(match.oppDeck);
+  const isLimited = db.limited_ranked_events.includes(match.eventId);
 
   const logExists = fs.existsSync(path.join(actionLogDir, match.id + ".txt"));
   let actionLogDataB64 = "";
@@ -85,37 +89,61 @@ function MatchView(props: MatchViewProps): JSX.Element {
     setView(VIEW_MATCH);
   }, [match.id]);
 
-  const isLimited = db.limited_ranked_events.includes(match.eventId);
+  let deck = oppDeck;
 
   // v4.1.0: Introduced by-game cards seen
   const gameDetails = match && match.toolVersion >= 262400;
-  const [gameSeen, setGameSeen] = useState(0);
-
-  let combinedList: number[] = [];
   if (gameDetails) {
-    match?.gameStats.forEach((stats: MatchGameStats) => {
-      if (stats) {
-        combinedList = [...combinedList, ...stats.cardsSeen];
-      }
-    });
+    const combinedList: number[] = [];
+    match.gameStats
+      .map((stats: MatchGameStats) => {
+        const counts: { [key: number]: number } = {};
+        if (stats) {
+          for (const i in stats.cardsSeen) {
+            const key = stats.cardsSeen[i];
+            counts[key] = counts[key] ? counts[key] + 1 : 1;
+          }
+        }
+        return counts;
+      })
+      .forEach((counts: { [key: string]: number }) => {
+        for (const i in counts) {
+          const key = Number(i);
+          const c = combinedList.filter((d) => d === key).length;
+
+          let loopCount = counts[i] - c;
+          while (loopCount-- > 0) {
+            combinedList.push(key);
+          }
+        }
+      });
+
+    deck = new Deck(
+      {},
+      gameSeen == match.gameStats?.length
+        ? combinedList
+        : match.gameStats[gameSeen]?.cardsSeen || []
+    );
   }
 
-  const deck =
-    gameDetails && match
-      ? new Deck(
-          {},
-          gameSeen == match?.gameStats?.length
-            ? combinedList
-            : match.gameStats[gameSeen]?.cardsSeen || combinedList
-        )
-      : oppDeck;
+  const existsPrev = useCallback((game: number): boolean => {
+    return game > 0;
+  }, []);
+
+  const existsNext = useCallback(
+    (game: number, match: InternalMatch): boolean => {
+      return match && game < match.gameStats.length;
+    },
+    []
+  );
 
   const gamePrev = useCallback(() => {
-    if (gameSeen > 0) setGameSeen(gameSeen - 1);
-  }, [gameSeen]);
+    if (existsPrev(gameSeen)) setGameSeen(gameSeen - 1);
+  }, [existsPrev, gameSeen]);
+
   const gameNext = useCallback(() => {
-    if (match && gameSeen < match.gameStats.length) setGameSeen(gameSeen + 1);
-  }, [gameSeen, match]);
+    if (existsNext(gameSeen, match)) setGameSeen(gameSeen + 1);
+  }, [existsNext, gameSeen, match]);
 
   const clickAdd = (): void => {
     ipcSend("import_custom_deck", JSON.stringify(deck.getSave()));
@@ -126,6 +154,8 @@ function MatchView(props: MatchViewProps): JSX.Element {
   };
 
   const clickArena = (): void => {
+    deck.sortMainboard(compareCards);
+    deck.sortSideboard(compareCards);
     ipcSend("set_clipboard", deck.getExportArena());
     ipcSend("popup", {
       text: `Decklist copied to clipboard.`,
@@ -299,7 +329,15 @@ function MatchView(props: MatchViewProps): JSX.Element {
                     justifyContent: "space-around",
                   }}
                 >
-                  <SvgButton svg={BackIcon} onClick={gamePrev} />
+                  <SvgButton
+                    style={
+                      !existsPrev(gameSeen)
+                        ? { cursor: "default", opacity: 0.5 }
+                        : {}
+                    }
+                    svg={BackIcon}
+                    onClick={gamePrev}
+                  />
                   <div
                     style={{
                       maxWidth: "130px",
@@ -312,7 +350,15 @@ function MatchView(props: MatchViewProps): JSX.Element {
                       : `Seen in game ${gameSeen + 1}`}
                   </div>
                   <SvgButton
-                    style={{ transform: "rotate(180deg)" }}
+                    style={
+                      !existsNext(gameSeen, match)
+                        ? {
+                            cursor: "default",
+                            opacity: 0.5,
+                            transform: "rotate(180deg)",
+                          }
+                        : { transform: "rotate(180deg)" }
+                    }
                     svg={BackIcon}
                     onClick={gameNext}
                   />

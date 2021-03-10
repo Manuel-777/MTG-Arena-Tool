@@ -428,30 +428,19 @@ export default function MatchesTable({
       <div className={indexCss.wrapperColumn}>
         <div className={tablesCss.reactTableWrap}>
           <MatchesTableControls {...matchesTableControlsProps} />
-          <div
-            className={sharedCss.medScroll}
-            style={isTableMode ? { overflowX: "auto" } : undefined}
-          >
-            <TableHeaders
-              {...headersProps}
-              style={
-                isTableMode
-                  ? { width: "fit-content" }
-                  : { overflowX: "auto", overflowY: "hidden" }
-              }
-            />
-            <div
-              className={
-                isTableMode
-                  ? tablesCss.reactTableBody
-                  : tablesCss.reactTableBodyNoAdjust
-              }
-              {...getTableBodyProps()}
-            >
-              {page.map((row, index) => {
-                prepareRow(row);
-                const data = row.original;
-                if (isTableMode) {
+          {isTableMode && (
+            <div className={sharedCss.medScroll} style={{ overflowX: "auto" }}>
+              <TableHeaders
+                {...headersProps}
+                style={{ width: "fit-content" }}
+              />
+              <div
+                className={tablesCss.reactTableBody}
+                {...getTableBodyProps()}
+              >
+                {page.map((row, index) => {
+                  prepareRow(row);
+                  const data = row.original;
                   const onClick = (): void => openMatchCallback(data);
                   return (
                     <TableViewRow
@@ -463,18 +452,35 @@ export default function MatchesTable({
                       gridTemplateColumns={gridTemplateColumns}
                     />
                   );
-                }
-                return (
-                  <ListItemMatch
-                    match={row.original}
-                    key={row.index}
-                    openMatchCallback={openMatchCallback}
-                    {...customProps}
-                  />
-                );
-              })}
+                })}
+              </div>
             </div>
-          </div>
+          )}
+          {!isTableMode && (
+            <div className={sharedCss.medScroll}>
+              <TableHeaders
+                {...headersProps}
+                style={{ overflowX: "auto", overflowY: "hidden" }}
+              />
+              <div
+                className={tablesCss.reactTableBodyNoAdjust}
+                {...getTableBodyProps()}
+              >
+                {page.map((row) => {
+                  prepareRow(row);
+                  const data = row.original;
+                  return (
+                    <ListItemMatch
+                      match={data}
+                      key={row.index}
+                      openMatchCallback={openMatchCallback}
+                      {...customProps}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div style={{ marginTop: "10px" }}>
             <PagingControls {...pagingProps} />
           </div>
