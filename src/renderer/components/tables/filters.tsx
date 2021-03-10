@@ -1,7 +1,7 @@
 import _ from "lodash";
 import matchSorter from "match-sorter";
-import React from "react";
-// import CreatableSelect from "react-select/creatable";
+import React, { CSSProperties } from "react";
+import CreatableSelect from "react-select/creatable";
 import { ColumnInstance, FilterValue, Row, TableState } from "react-table";
 import { constants, InternalDeck } from "mtgatool-shared";
 import { BinarySymbol } from "../misc/BinarySymbol";
@@ -39,14 +39,16 @@ export function TextBoxFilter<D extends TableData>({
   );
 }
 
-/*
 export function SelectFilter<D extends TableData>({
   column: { id, filterValue, preFilteredRows, setFilter },
 }: {
   column: ColumnInstance<D>;
 }): JSX.Element {
   const styles = {
-    option: (styles, { isFocused, isSelected }) => {
+    option: (
+      styles: CSSProperties,
+      { isFocused, isSelected }: { isFocused: boolean; isSelected: boolean }
+    ): CSSProperties => {
       if (isSelected) {
         return {
           ...styles,
@@ -87,7 +89,7 @@ export function SelectFilter<D extends TableData>({
         value={
           filterValue ? { value: filterValue, label: filterValue } : undefined
         }
-        onChange={(option): void =>
+        onChange={(option: any): void =>
           setFilter(option ? option.value : undefined)
         }
         placeholder={prompt}
@@ -95,7 +97,6 @@ export function SelectFilter<D extends TableData>({
     </div>
   );
 }
-*/
 
 export function NumberRangeColumnFilter<D extends TableData>({
   column: { filterValue = [], preFilteredRows, setFilter, id },
