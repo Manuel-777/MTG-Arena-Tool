@@ -276,6 +276,7 @@ declare namespace IndexCssNamespace {
     reactAutosuggestContainer: string;
     roundCard: string;
     round_card: string;
+    select: string;
     setFilter: string;
     setFilterOn: string;
     setLogo: string;

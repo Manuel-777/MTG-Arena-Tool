@@ -227,11 +227,12 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
   const eventFilters = useMemo(() => {
     let eventFilters: string[] = [];
     let sep = true;
+
     if (filters.filterType === "Events") {
       sep = false;
-      eventFilters = db.eventIds
-        .concat(activeEvents)
-        .filter((item) => item && !db.single_match_events.includes(item));
+      eventFilters = activeEvents
+        .filter((item) => item && !db.single_match_events.includes(item))
+        .filter((item) => item && !db.standard_ranked_events.includes(item));
 
       eventFilters = [...new Set(eventFilters)];
     } else if (filters.filterType === "Ranked Draft") {
@@ -239,11 +240,13 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
     } else if (filters.filterType === "Ranked Constructed") {
       eventFilters = [...db.standard_ranked_events];
     }
+
     eventFilters.sort(function (a, b) {
       if (a < b) return -1;
       if (a > b) return 1;
       return 0;
     });
+
     eventFilters.forEach((item, index: number) => {
       if (activeEvents.includes(item)) {
         eventFilters.splice(eventFilters.indexOf(item), 1);
@@ -253,9 +256,11 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
         eventFilters.splice(index, 0, "%%Archived");
       }
     });
+
     if (filters.filterType === "Events") {
       eventFilters.splice(0, 0, "%%Active");
     }
+
     return eventFilters;
   }, [filters, activeEvents]);
 
