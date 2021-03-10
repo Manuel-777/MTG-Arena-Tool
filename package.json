@@ -100,7 +100,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^4.2.1",
     "mathjs": "^7.6.0",
-    "mtgatool-shared": "^1.0.24",
+    "mtgatool-shared": "^1.0.25",
     "nedb": "^1.8.0",
     "qs": "^6.9.6",
     "queue": "^6.0.2",
