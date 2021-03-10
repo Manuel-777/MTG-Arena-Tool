@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import store, { AppState } from "../../../shared/redux/stores/rendererStore";
 import { shell } from "electron";
 import Checkbox from "../misc/Checkbox";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import { reduxAction } from "../../../shared/redux/sharedRedux";
 import css from "./auth.css";
 import formsCss from "../../forms.css";
@@ -73,92 +73,94 @@ export default function Auth(props: AuthProps): JSX.Element {
   }, [dispatcher, authForm.email, authForm.pass]);
 
   return (
-    <div className={formsCss.formContainer}>
-      <div className={formsCss.formAuthenticate}>
-        <div className={formsCss.formIcon} />
-        <div id="loginform">
-          <label className={formsCss.formLabel}>Email</label>
-          <div className={formsCss.formInputContainer}>
-            <input
-              onChange={handleEmailChange}
-              type="email"
-              id="signin_email"
-              autoComplete="off"
-              value={authForm.email}
-            />
-          </div>
-          <label className={formsCss.formLabel}>Password</label>
-          <div className={formsCss.formInputContainer}>
-            <input
-              onChange={handlePassChange}
-              type="password"
-              id="signin_pass"
-              autoComplete="off"
-              value={authForm.pass}
-            />
-          </div>
-          <div
-            style={{
-              color: "var(--color-text-link)",
-              cursor: "pointer",
-              marginBottom: "16px",
-            }}
-          >
-            <a
-              onClick={(): void => {
-                shell.openExternal("https://mtgatool.com/resetpassword/");
+    <form>
+      <div className={formsCss.formContainer}>
+        <div className={formsCss.formAuthenticate}>
+          <div className={formsCss.formIcon} />
+          <div id="loginform">
+            <label className={formsCss.formLabel}>Email</label>
+            <div className={formsCss.formInputContainer}>
+              <input
+                onChange={handleEmailChange}
+                type="email"
+                id="signin_email"
+                autoComplete="off"
+                value={authForm.email}
+              />
+            </div>
+            <label className={formsCss.formLabel}>Password</label>
+            <div className={formsCss.formInputContainer}>
+              <input
+                onChange={handlePassChange}
+                type="password"
+                id="signin_pass"
+                autoComplete="off"
+                value={authForm.pass}
+              />
+            </div>
+            <div
+              style={{
+                color: "var(--color-text-link)",
+                cursor: "pointer",
+                marginBottom: "16px",
               }}
-              className={"forgot_link"}
             >
-              Forgot your password?
-            </a>
-          </div>
-          <button
-            className={formsCss.formButton}
-            type="submit"
-            id="submit"
-            onClick={onSubmit}
-            disabled={!canLogin}
-          >
-            Login
-          </button>
-          <div className={formsCss.formError}>{errorMessage}</div>
-          <div className={formsCss.formOptions}>
-            <Checkbox
-              style={{ width: "max-content", margin: "auto auto 12px auto" }}
-              text="Remember me?"
-              value={authForm.rememberme}
-              callback={clickRememberMe}
-            />
-            <div className={css.messageSmall}>
-              Dont have an account?{" "}
               <a
                 onClick={(): void => {
-                  shell.openExternal("https://mtgatool.com/signup/");
+                  shell.openExternal("https://mtgatool.com/resetpassword/");
                 }}
-                className={css.signupLink}
+                className={"forgot_link"}
               >
-                Sign up!
+                Forgot your password?
               </a>
             </div>
-            <div className={css.messageSmall}>
-              You can also{" "}
-              {canLogin ? (
+            <button
+              className={formsCss.formButton}
+              type="submit"
+              id="submit"
+              onClick={onSubmit}
+              disabled={!canLogin}
+            >
+              Login
+            </button>
+            <div className={formsCss.formError}>{errorMessage}</div>
+            <div className={formsCss.formOptions}>
+              <Checkbox
+                style={{ width: "max-content", margin: "auto auto 12px auto" }}
+                text="Remember me?"
+                value={authForm.rememberme}
+                callback={clickRememberMe}
+              />
+              <div className={css.messageSmall}>
+                Dont have an account?{" "}
                 <a
                   onClick={(): void => {
-                    ipcSend("login", { username: "", password: "" });
+                    shell.openExternal("https://mtgatool.com/signup/");
                   }}
-                  className={"offline_link"}
+                  className={css.signupLink}
                 >
-                  continue offline
+                  Sign up!
                 </a>
-              ) : (
-                "continue offline"
-              )}
+              </div>
+              <div className={css.messageSmall}>
+                You can also{" "}
+                {canLogin ? (
+                  <a
+                    onClick={(): void => {
+                      ipcSend("login", { username: "", password: "" });
+                    }}
+                    className={"offline_link"}
+                  >
+                    continue offline
+                  </a>
+                ) : (
+                  "continue offline"
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

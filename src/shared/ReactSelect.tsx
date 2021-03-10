@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
+import useOutsideClick from "../renderer/hooks/useClickOutside";
 import indexCss from "../renderer/index.css";
 import css from "../renderer/select.scss";
 
@@ -24,6 +25,7 @@ export default function ReactSelect<K>({
       ? optionFormatter
       : (inString: string | K): string | K => inString;
 
+  const containerRef = useRef<HTMLDivElement>(null);
   const [currentOption, setCurrentOption] = React.useState<K>(current);
   const [optionsOpen, setOptionsOpen] = React.useState(false);
   React.useEffect(() => setCurrentOption(current), [current]);
@@ -45,8 +47,14 @@ export default function ReactSelect<K>({
     optionsOpen ? css.active : ""
   }`;
 
+  useOutsideClick(containerRef, () => setOptionsOpen(false));
+
   return (
-    <div className={`${css.selectContainer} ${className}`} style={style}>
+    <div
+      ref={containerRef}
+      className={`${css.selectContainer} ${className}`}
+      style={style}
+    >
       <button
         key={currentOption + "-key"}
         className={buttonClassNames}

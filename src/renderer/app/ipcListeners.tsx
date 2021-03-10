@@ -3,7 +3,7 @@
 /* eslint-disable no-console */
 import { ipcRenderer as ipc, IpcRendererEvent, remote } from "electron";
 import timestamp from "../../shared/utils/timestamp";
-import { ipcSend } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { reduxAction } from "../../shared/redux/sharedRedux";
 import globalStore from "../../shared/store";
 import { AnyAction, Dispatch } from "redux";
@@ -230,6 +230,15 @@ export default function ipcListeners(dispatcher: Dispatch<AnyAction>): void {
     reduxAction(
       dispatcher,
       { type: "SET_EXPLORE_FILTERS_SKIP", arg: arg.results_number },
+      IPC_NONE
+    );
+  });
+
+  ipc.on("set_cards", (_event: IpcRendererEvent, arg: any): void => {
+    reduxAction(dispatcher, { type: "SET_LOADING", arg: false }, IPC_NONE);
+    reduxAction(
+      dispatcher,
+      { type: "SET_CARDS_DATA", arg: arg.result },
       IPC_NONE
     );
   });

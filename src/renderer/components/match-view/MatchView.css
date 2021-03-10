@@ -60,7 +60,7 @@
 .match-view-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 50% 50%;
   grid-auto-rows: auto max-content max-content;
   grid-template-areas:
     "controls controls"

@@ -196,7 +196,10 @@ function MissingCardSprite(props: MissingCardsProps): JSX.Element {
 
 function WildcardsNeeded(props: WildcardsNeededProps): JSX.Element {
   const { card, deck, isSideboard, listStyle, ww } = props;
-  if (card.type.indexOf("Basic Land") === -1) {
+  if (
+    card.type.indexOf("Basic Land") === -1 &&
+    card.type.indexOf("Basic Snow Land") === -1
+  ) {
     const missing = getWildcardsMissing(deck, card.id, isSideboard);
     const cardRarity = card.rarity;
 

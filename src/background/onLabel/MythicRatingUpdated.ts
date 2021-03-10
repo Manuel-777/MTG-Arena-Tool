@@ -42,7 +42,7 @@ export default function MythicRatingUpdated(entry: Entry): void {
     wasLossProtected: false,
     owner,
     playerId: playerData.playerId,
-    arenaId: playerData.playerName,
+    arenaId: playerData.playerId,
     rankUpdateType: type,
     seasonOrdinal: rank[type].seasonOrdinal,
     id: entry.hash,

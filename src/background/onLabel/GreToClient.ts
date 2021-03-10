@@ -2,8 +2,8 @@ import globals from "../globals";
 import LogEntry from "../../types/logDecoder";
 import * as greToClientInterpreter from "../greToClientInterpreter";
 import { parseLogTimestamp } from "../backgroundUtil";
-import { GREToClientMessage } from "../../assets/proto/GreTypes";
 import debugLog from "../../shared/debugLog";
+import { GREToClientMessage } from "mtgatool-shared/dist/types/greTypes";
 
 // timestamp example : "637130091622772767"
 interface EntryJson {

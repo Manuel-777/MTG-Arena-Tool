@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define, @typescript-eslint/camelcase */
-import { app, ipcRenderer as ipc, remote } from "electron";
+import { app, remote } from "electron";
 import path from "path";
 import store from "../shared/redux/stores/rendererStore";
 import db from "../shared/database-wrapper";
@@ -12,21 +12,14 @@ import {
   DbCardData,
   WinLossGate,
 } from "mtgatool-shared";
+import { ipcSend } from "./ipcSend";
 
-const { IPC_BACKGROUND, IPC_RENDERER, CARD_RARITIES } = constants;
+const { CARD_RARITIES } = constants;
 
 export const actionLogDir = path.join(
   (app || remote.app).getPath("userData"),
   "actionlogs"
 );
-
-export function ipcSend(
-  method: string,
-  arg?: unknown,
-  to = IPC_BACKGROUND
-): void {
-  ipc.send("ipc_switch", method, IPC_RENDERER, arg, to);
-}
 
 export function toggleArchived(id: string | number): void {
   ipcSend("toggle_archived", id);

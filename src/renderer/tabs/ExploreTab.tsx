@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import db from "../../shared/database-wrapper";
 import ReactSelect from "../../shared/ReactSelect";
@@ -7,7 +7,7 @@ import { ListItemExplore } from "../components/list-item/ListItemExplore";
 import Button from "../components/misc/Button";
 import Checkbox from "../components/misc/Checkbox";
 import Input from "../components/misc/Input";
-import { ipcSend } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { reduxAction } from "../../shared/redux/sharedRedux";
 import ranks16 from "../../assets/images/ranks_16.png";
 import sharedCss from "../../shared/shared.css";
@@ -223,37 +223,45 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
     [filters, updateFilters]
   );
 
-  let eventFilters: string[] = [];
-  let sep = true;
-  if (filters.filterType === "Events") {
-    sep = false;
-    eventFilters = db.eventIds
-      .concat(activeEvents)
-      .filter((item) => item && !db.single_match_events.includes(item));
+  const eventFilters = useMemo(() => {
+    let eventFilters: string[] = [];
+    let sep = true;
 
-    eventFilters = [...new Set(eventFilters)];
-  } else if (filters.filterType === "Ranked Draft") {
-    eventFilters = [...db.limited_ranked_events];
-  } else if (filters.filterType === "Ranked Constructed") {
-    eventFilters = [...db.standard_ranked_events];
-  }
-  eventFilters.sort(function (a, b) {
-    if (a < b) return -1;
-    if (a > b) return 1;
-    return 0;
-  });
-  eventFilters.forEach((item, index: number) => {
-    if (activeEvents.includes(item)) {
-      eventFilters.splice(eventFilters.indexOf(item), 1);
-      eventFilters.unshift(item);
-    } else if (!sep) {
-      sep = true;
-      eventFilters.splice(index, 0, "%%Archived");
+    if (filters.filterType === "Events") {
+      sep = false;
+      eventFilters = activeEvents
+        .filter((item) => item && !db.single_match_events.includes(item))
+        .filter((item) => item && !db.standard_ranked_events.includes(item));
+
+      eventFilters = [...new Set(eventFilters)];
+    } else if (filters.filterType === "Ranked Draft") {
+      eventFilters = [...db.limited_ranked_events];
+    } else if (filters.filterType === "Ranked Constructed") {
+      eventFilters = [...db.standard_ranked_events];
     }
-  });
-  if (filters.filterType === "Events") {
-    eventFilters.splice(0, 0, "%%Active");
-  }
+
+    eventFilters.sort(function (a, b) {
+      if (a < b) return -1;
+      if (a > b) return 1;
+      return 0;
+    });
+
+    eventFilters.forEach((item, index: number) => {
+      if (activeEvents.includes(item)) {
+        eventFilters.splice(eventFilters.indexOf(item), 1);
+        eventFilters.unshift(item);
+      } else if (!sep) {
+        sep = true;
+        eventFilters.splice(index, 0, "%%Archived");
+      }
+    });
+
+    if (filters.filterType === "Events") {
+      eventFilters.splice(0, 0, "%%Active");
+    }
+
+    return eventFilters;
+  }, [filters, activeEvents]);
 
   function validateWildcardValues(
     e: React.ChangeEvent<HTMLInputElement>
@@ -402,6 +410,11 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
           text="Search"
           onClick={doSearch}
         />
+      </div>
+      <div className={css.exploreButtonsRow}>
+        <i style={{ opacity: 0.75 }}>
+          Results are aggregated data from the last 10 days.
+        </i>
       </div>
     </div>
   );

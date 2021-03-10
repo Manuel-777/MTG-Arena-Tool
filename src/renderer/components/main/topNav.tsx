@@ -6,7 +6,7 @@ import { AppState } from "../../../shared/redux/stores/rendererStore";
 import useWindowSize from "../../hooks/useWindowSize";
 import { reduxAction } from "../../../shared/redux/sharedRedux";
 import PatreonInfo from "../popups/PatreonInfo";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 
 import topNavCss from "./topNav.css";
 
@@ -42,6 +42,8 @@ const {
   SYNC_OK,
 } = constants;
 
+const MAIN_CARDS = 15;
+
 const topNavClasses: string[] = [];
 topNavClasses[MAIN_HOME] = topNavCss.iconHome;
 topNavClasses[MAIN_DECKS] = topNavCss.iconMyDecks;
@@ -49,6 +51,7 @@ topNavClasses[MAIN_MATCHES] = topNavCss.iconHistory;
 topNavClasses[MAIN_TIMELINE] = topNavCss.iconTimeline;
 topNavClasses[MAIN_EVENTS] = topNavCss.iconEvents;
 topNavClasses[MAIN_EXPLORE] = topNavCss.iconExplore;
+topNavClasses[MAIN_CARDS] = topNavCss.iconExplore;
 topNavClasses[MAIN_ECONOMY] = topNavCss.iconEconomy;
 topNavClasses[MAIN_COLLECTION] = topNavCss.iconCollection;
 
@@ -289,6 +292,7 @@ export function TopNav(): JSX.Element {
   const timelineTab = { ...defaultTab, id: MAIN_TIMELINE, title: "TIMELINE" };
   const eventsTab = { ...defaultTab, id: MAIN_EVENTS, title: "EVENTS" };
   const exploreTab = { ...defaultTab, id: MAIN_EXPLORE, title: "EXPLORE" };
+  const cardsTab = { ...defaultTab, id: MAIN_CARDS, title: "CARDS" };
   const economyTab = { ...defaultTab, id: MAIN_ECONOMY, title: "ECONOMY" };
   const collectionTab = {
     ...defaultTab,
@@ -334,6 +338,7 @@ export function TopNav(): JSX.Element {
         <TopNavItem {...timelineTab} />
         <TopNavItem {...eventsTab} />
         <TopNavItem {...exploreTab} />
+        <TopNavItem {...cardsTab} />
         <TopNavItem {...economyTab} />
         <TopNavItem {...collectionTab} />
       </div>

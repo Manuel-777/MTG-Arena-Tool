@@ -7,7 +7,8 @@ import EventsTable from "../components/events/EventsTable";
 import { EventStats, EventTableData } from "../components/events/types";
 import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/useAggregatorData";
-import { ipcSend, toggleArchived } from "../rendererUtil";
+import { toggleArchived } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { getMatch, matchExists, eventsList } from "../../shared/store";
 import { reduxAction } from "../../shared/redux/sharedRedux";
 import store from "../../shared/redux/stores/rendererStore";
@@ -56,6 +57,10 @@ function getValidMatchId(rawMatchId?: string): string | undefined {
 }
 
 function getEventStats(event: InternalEvent): EventStats {
+  const IN_PROGRESS = "In Progress";
+  const COMPLETED = "Completed";
+  const ABLE_TO_COMPLETE = "Able To Complete";
+
   const eventData: EventInstanceData = {
     CurrentWins: 0,
     CurrentLosses: 0,
@@ -66,7 +71,7 @@ function getEventStats(event: InternalEvent): EventStats {
   const stats: EventStats = {
     displayName: getEventPrettyName(event.InternalEventName),
     duration: 0,
-    eventState: "In Progress",
+    eventState: IN_PROGRESS,
     gameWins: 0,
     gameLosses: 0,
     isMissingMatchData: false,
@@ -79,7 +84,7 @@ function getEventStats(event: InternalEvent): EventStats {
     event.CurrentEventState === "DoneWithMatches" ||
     event.CurrentEventState === 2
   ) {
-    stats.eventState = "Completed";
+    stats.eventState = COMPLETED;
   }
   if (eventData.ProcessedMatchIds) {
     stats.matchIds = eventData.ProcessedMatchIds.map(getValidMatchId).filter(
@@ -117,6 +122,27 @@ function getEventStats(event: InternalEvent): EventStats {
     stats.duration = undefined;
     stats.gameWins = undefined;
     stats.gameLosses = undefined;
+  } else if (event.ModuleInstanceData.WinLossGate?.MaxWins) {
+    if (
+      stats.eventState !== COMPLETED &&
+      stats.wins >= event.ModuleInstanceData.WinLossGate?.MaxWins
+    ) {
+      stats.eventState = ABLE_TO_COMPLETE;
+    }
+  } else if (event.ModuleInstanceData.WinNoGate) {
+    interface IHoge {
+      [prop: string]: any;
+    }
+    const some: IHoge = event.ModuleInstanceData.WinNoGate as IHoge;
+
+    if ("WinNoGateRewards" in some) {
+      if (
+        stats.eventState !== COMPLETED &&
+        stats.wins >= some.WinNoGateRewards.length
+      ) {
+        stats.eventState = ABLE_TO_COMPLETE;
+      }
+    }
   }
   return stats;
 }

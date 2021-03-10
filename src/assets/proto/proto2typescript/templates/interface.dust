@@ -1,5 +1,0 @@
-export interface {name} {
-  {#fields}{#properties}{name}{rule|optionalFieldDeclaration}: {type|convertType}{rule|repeatedType};{/properties}
-  {/fields}
-}
-{>builder:./}{#messages}{>interface:./}{/messages}{#enums}{>enum:./}{/enums}

@@ -86,6 +86,12 @@ export async function loadPlayerConfig(): Promise<void> {
 
   ipcLog("Finding all documents in player database...");
   let savedData = await playerDb.findAll();
+  console.log(
+    Object.keys(savedData)
+      .filter((k) => savedData[k].onThePlay !== undefined)
+      .map((k) => savedData[k])
+      .filter((m) => m.archived)
+  );
   savedData = fixBadPlayerData(savedData);
   const { settings } = savedData;
 

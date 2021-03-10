@@ -9,9 +9,11 @@ export const ALL_CARDS = "All cards";
 export const SINGLETONS = "Singletons (at least one)";
 export const FULL_SETS = "Full sets (all 4 copies)";
 
-export const chanceBoosterHasMythic = 0.125; // assume 1/8 of packs have a mythic
+// assume 1/8 of packs have a mythic
+export const chanceBoosterHasMythic = 0.125;
 export const chanceBoosterHasRare = 1 - chanceBoosterHasMythic;
-export const chanceNotWildCard = 11 / 12; // assume (1/24 mythic + 1/24 rare) WC instead of card
+// assume (1/24 mythic + 1/24 rare) WC instead of card
+export const chanceNotWildCard = 11 / 12;
 
 export function estimateBoosterRares(boosterCount: number): number {
   return boosterCount * chanceBoosterHasRare * chanceNotWildCard;
@@ -157,8 +159,7 @@ export function getCollectionStats(cardIds: number[]): CollectionStats {
   cardIds.forEach((cardId) => {
     const card = db.card(cardId);
     if (!card) return;
-    if (!card.collectible || card.rarity === "land" || card.rarity === "token")
-      return;
+    if (card.rarity === "land" || card.rarity === "token") return;
     if (!(card.set in stats)) return;
 
     let cardSet = card.set;

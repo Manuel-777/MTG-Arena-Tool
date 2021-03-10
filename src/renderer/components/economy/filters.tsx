@@ -14,7 +14,12 @@ export function txnSearchFilterFn(
   }
   const matches = tokens.map((token) =>
     matchSorter(rows, token, {
-      keys: ["values.fullContext", "values.date"],
+      keys: [
+        "values.fullContext",
+        "values.date",
+        "values.delta.vanityItemsAdded",
+        "values.delta.vanityItemsRemoved",
+      ],
     })
   );
   return _.intersection(...matches);

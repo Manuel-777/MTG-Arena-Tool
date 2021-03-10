@@ -63,6 +63,9 @@ export default function PatreonInfo(props: DialogProps): JSX.Element {
           <div className={css.patreonInfoText}>
             Synchronize your data across multiple devices
           </div>
+          <div className={css.patreonInfoText}>
+            Access global cards winrate statistics
+          </div>
           <div className={css.patreonInfoText}>Get priority Support</div>
           <div className={css.patreonInfoText}>
             Help us develop new amazing features!

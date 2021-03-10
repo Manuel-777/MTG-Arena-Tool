@@ -158,6 +158,9 @@ const playerDataSlice = createSlice({
       });
       state.cardsNew = newCards;
     },
+    setCardsTime: (state: PlayerData, action: PayloadAction<number>): void => {
+      state.cards.cards_time = action.payload;
+    },
     addDeckTag: (
       state: PlayerData,
       action: PayloadAction<{ tag: string; deck: string }>
@@ -205,6 +208,7 @@ export const {
   setRank,
   addCard,
   addCardsFromStore,
+  setCardsTime,
   addCardsKeys,
   addCardsList,
   removeDeckTag,

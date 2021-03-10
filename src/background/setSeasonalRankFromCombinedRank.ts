@@ -25,8 +25,8 @@ export default function setSeasonalRankFromCombinedRank(
 
   const newJson: SeasonalRankData = {
     owner,
-    arenaId: playerData.playerName,
     playerId: playerData.arenaId,
+    arenaId: playerData.playerName,
     rankUpdateType: type,
     id: currentMatch.matchId,
     eventId: currentMatch.eventId,

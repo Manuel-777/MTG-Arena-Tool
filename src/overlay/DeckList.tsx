@@ -115,13 +115,11 @@ export default function DeckList(props: DeckListProps): JSX.Element {
     );
 
   let landsNumber = 0;
-  let landsChance = 0;
   const landsColors = new Colors();
   mainCards.get().forEach((card: CardObject) => {
     const cardObj = db.card(card.id);
     if (cardObj && cardObj.type.includes("Land", 0)) {
       landsNumber += card.quantity;
-      landsChance += card.chance !== undefined ? card.chance : 0;
       if (cardObj.frame) {
         landsColors.addFromArray(cardObj.frame);
       }
@@ -133,10 +131,13 @@ export default function DeckList(props: DeckListProps): JSX.Element {
   if (settings.mode === OVERLAY_MIXED) {
     landsQuantity = {
       quantity: landsNumber,
-      odds: landsChance + "%",
+      odds: ((cardOdds?.chanceLan || 0) / 100).toLocaleString([], {
+        style: "percent",
+        maximumSignificantDigits: 2,
+      }),
     };
   } else if (settings.mode === OVERLAY_ODDS) {
-    landsQuantity = ((landsChance || 0) / 100).toLocaleString([], {
+    landsQuantity = ((cardOdds?.chanceLan || 0) / 100).toLocaleString([], {
       style: "percent",
       maximumSignificantDigits: 2,
     });
@@ -161,7 +162,7 @@ export default function DeckList(props: DeckListProps): JSX.Element {
 
       if (fullCard) {
         if (settings.mode === OVERLAY_MIXED) {
-          const odds = (card.chance !== undefined ? card.chance : "0") + "%";
+          const odds = (card.chance || 0) + "%";
           const q = card.quantity;
           if (!settings.lands || (settings.lands && odds !== "0%")) {
             quantity = {
@@ -274,15 +275,17 @@ export default function DeckList(props: DeckListProps): JSX.Element {
         <DeckManaCurve className={css.overlayDeckManaCurve} deck={deck} />
       )}
       {!!settings.draw_odds &&
-        (settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED) &&
-        cardOdds &&
-        setOddsCallback && (
-          <SampleSizePanel
-            cardOdds={cardOdds}
-            cardsLeft={deck.getMainboard().count()}
-            setOddsCallback={setOddsCallback}
-          />
-        )}
+      (settings.mode === OVERLAY_ODDS || settings.mode === OVERLAY_MIXED) &&
+      cardOdds &&
+      setOddsCallback ? (
+        <SampleSizePanel
+          cardOdds={cardOdds}
+          cardsLeft={deck.getMainboard().count()}
+          setOddsCallback={setOddsCallback}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

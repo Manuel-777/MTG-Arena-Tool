@@ -29,6 +29,7 @@ function EconomyRowDate(date: Date): JSX.Element {
   return (
     <LocalTime
       datetime={date.toISOString()}
+      year={"numeric"}
       month={"short"}
       day={"numeric"}
       hour={"numeric"}

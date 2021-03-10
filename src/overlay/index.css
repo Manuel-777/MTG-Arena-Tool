@@ -9,6 +9,7 @@ body {
     padding: 0 !important;
     height: 100% !important;
     width: 100% !important;
+    pointer-events: all;
 }
 
 .click-on      {pointer-events: all}

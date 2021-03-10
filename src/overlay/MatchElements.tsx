@@ -182,6 +182,7 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
               deck={visibleDeck}
               subTitle={subTitle}
               settings={settings}
+              cardOdds={cardOdds}
               setOddsCallback={setOddsCallback}
             />
           </div>

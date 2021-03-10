@@ -75,6 +75,12 @@ let common_config = {
       },
     ],
   },
+  optimization: {
+    namedModules: true,
+    namedChunks: true,
+    moduleIds: 'named',
+    minimize: false,
+  },
   resolve: {
     plugins: [fixNedbForElectronRenderer],
     extensions: [

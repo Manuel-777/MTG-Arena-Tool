@@ -101,7 +101,8 @@ export default function OwnershipStars(props: {
   const acquired = playerData.cardsNew[card.id] ?? 0;
   const wanted = props.wanted ?? 0;
   // TODO add custom logic to handle rats and petitioners
-  const isbasic = cardHasType(card, "Basic Land");
+  const isbasic =
+    cardHasType(card, "Basic Land") || cardHasType(card, "Basic Snow Land");
   const Renderer = isbasic ? OwnershipInfinity : MultiCardOwnership;
   return <Renderer owned={owned} acquired={acquired} wanted={wanted} />;
 }

@@ -589,6 +589,49 @@ export function httpGetExplore(query: ExploreQuery): void {
   );
 }
 
+export function httpGetCards(eventId: string): void {
+  const _id = makeId(6);
+  globals.httpQueue?.unshift(
+    {
+      reqId: _id,
+      method: "getCards",
+      method_path: "/api/get_cards.php",
+      eventId: eventId,
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_cards", parsedResult);
+    })
+  );
+}
+
+export function httpGetTopLadderDecks(): void {
+  const _id = makeId(6);
+  globals.httpQueue?.unshift(
+    {
+      reqId: _id,
+      method: "getLadderDecks",
+      method_path: "/top_ladder.json",
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_ladder_decks", parsedResult);
+    })
+  );
+}
+
+export function httpGetTopLadderTraditionalDecks(): void {
+  const _id = makeId(6);
+  globals.httpQueue?.push(
+    {
+      reqId: _id,
+      method: "getLadderTraditionalDecks",
+      method_path: "/top_ladder_traditional.json",
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      ipcSend("set_ladder_traditional_decks", parsedResult);
+    })
+  );
+}
+
 export function httpGetCourse(courseId: string): void {
   const _id = makeId(6);
   globals.httpQueue?.unshift(
@@ -802,7 +845,7 @@ export function httpGetDatabaseVersion(lang: string): void {
 export function httpDraftShareLink(
   id: string,
   draftData: InternalDraftv2,
-  exp: number,
+  exp: number
 ): void {
   const _id = makeId(6);
   globals.httpQueue?.push(
@@ -944,6 +987,22 @@ export function httpAdminUpdateExplore(eventId: string): void {
     makeSimpleResponseHandler((parsedResult: any) => {
       console.log(parsedResult);
       debugLog(parsedResult, "debug");
+    })
+  );
+}
+
+export function httpGetActiveEvents(): void {
+  const _id = makeId(6);
+  globals.httpQueue?.push(
+    {
+      reqId: _id,
+      method: "activeEvents",
+      method_path: "/api/active_events.php",
+    },
+    makeSimpleResponseHandler((parsedResult: any) => {
+      const events = parsedResult.events.map((r: any) => r.event);
+      console.log("Fetched active events:", events);
+      ipcSend("set_active_events", JSON.stringify(events));
     })
   );
 }

@@ -3,7 +3,7 @@ import React from "react";
 import { shell } from "electron";
 import Toggle from "../misc/Toggle";
 import Input from "../misc/Input";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import ReactSelect from "../../../shared/ReactSelect";
 import { parse, isValid } from "date-fns";
 import { useSelector } from "react-redux";
@@ -20,7 +20,6 @@ const { IPC_ALL, IPC_RENDERER } = constants;
 
 const SCRYFALL_LANGS = [
   "en",
-  "ph",
   "de",
   "es",
   "fr",
@@ -30,7 +29,6 @@ const SCRYFALL_LANGS = [
   "ja",
   "zhs",
   "ko",
-  "ph",
 ];
 
 function getLanguageName(lang: string): string {
@@ -39,7 +37,7 @@ function getLanguageName(lang: string): string {
       return "English";
     case "es":
       return "Spanish";
-    case "br":
+    case "pt":
       return "Portuguese";
     case "de":
       return "Deutsche";
@@ -47,7 +45,7 @@ function getLanguageName(lang: string): string {
       return "French";
     case "it":
       return "Italian";
-    case "js":
+    case "ja":
       return "Japanese";
     case "ru":
       return "Russian";

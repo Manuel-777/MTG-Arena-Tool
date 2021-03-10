@@ -17,20 +17,6 @@ import {
   DetailsKeyType,
 } from "../types/greInterpreter";
 
-import {
-  KeyValuePairInfo,
-  GREToClientMessage,
-  AnnotationInfo,
-  GameObjectInfo,
-  TurnInfo,
-  ZoneInfo,
-  GREMessageType,
-  AnnotationType,
-  PlayerInfo,
-  GameStateMessage,
-  ZoneType,
-} from "../assets/proto/GreTypes";
-
 import getMatchGameStats from "./getMatchGameStats";
 
 import globalStore from "../shared/store";
@@ -59,6 +45,19 @@ import {
 } from "../shared/store/currentMatchStore";
 import debugLog from "../shared/debugLog";
 import { constants, objectClone, useSet, countValues } from "mtgatool-shared";
+import {
+  ZoneInfo,
+  PlayerInfo,
+  ZoneType,
+  AnnotationInfo,
+  GameObjectInfo,
+  AnnotationType,
+  KeyValuePairInfo,
+  GameStateMessage,
+  TurnInfo,
+  GREToClientMessage,
+  GREMessageType,
+} from "mtgatool-shared/dist/types/greTypes";
 
 const { IPC_OVERLAY } = constants;
 
@@ -522,7 +521,7 @@ const AnnotationType_TargetSpec = function (ann: Annotations): void {
   if (isObjectACard(affector)) {
     text = actionLogGenerateLink(affector.grpId);
   }
-  actionLog(seat, globals.logTime, `${text} targetted ${target}`);
+  actionLog(seat, globals.logTime, `${text} targeted ${target}`);
 };
 
 const AnnotationType_Scry = function (ann: Annotations): void {

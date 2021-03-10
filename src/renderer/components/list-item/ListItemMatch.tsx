@@ -16,7 +16,7 @@ import {
 } from "./ListItem";
 import css from "./ListItem.css";
 import sharedCss from "../../../shared/shared.css";
-import { ipcSend } from "../../rendererUtil";
+import { ipcSend } from "../../ipcSend";
 import database from "../../../shared/database-wrapper";
 import RankSmall from "../misc/RankSmall";
 import { constants, getEventPrettyName } from "mtgatool-shared";
@@ -99,10 +99,25 @@ export default function ListItemMatch({
             class={sharedCss.manaS20}
             colors={match.playerDeck.colors || []}
           />
+          <div
+            style={{
+              lineHeight: "30px",
+              marginLeft: "4px",
+              marginRight: "auto",
+            }}
+            className={css.listMatchTime}
+          >
+            <relative-time datetime={dateTime.toISOString()}>
+              {match.date?.toString() ?? ""}
+            </relative-time>{" "}
+            {toMMSS(match.duration) + " long"}
+          </div>
         </FlexBottom>
       </Column>
 
-      <Column style={{ flexGrow: 1 }} class={css.listItemRight}>
+      <Column class={css.listItemCenter}>{}</Column>
+
+      <Column class={css.listItemRight}>
         <FlexTop>
           <div className={css.listMatchTitle}>
             {"vs " + match.opponent.name.slice(0, -6)}
@@ -119,14 +134,12 @@ export default function ListItemMatch({
           />
           <RankSmall rank={match.opponent} />
         </FlexTop>
-        <FlexBottom style={{ alignItems: "center" }}>
-          <div className={css.listMatchTime}>
-            <relative-time datetime={dateTime.toISOString()}>
-              {match.date?.toString() ?? ""}
-            </relative-time>{" "}
-            {toMMSS(match.duration) + " long"}
-          </div>
-
+        <FlexBottom
+          style={{
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
           <ManaCost
             class={sharedCss.manaS20}
             colors={match.oppDeck.colors || []}

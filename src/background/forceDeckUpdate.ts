@@ -70,7 +70,7 @@ const forceDeckUpdate = function (removeUsed = true): void {
     cardsleft -= playerCardsBottom.length;
 
     const main = playerCardsLeft.getMainboard();
-    //main.addProperty("chance", card =>
+    main.removeDuplicates();
     main.addChance((card: CardObject) =>
       Math.round(
         hypergeometricRange(
@@ -159,7 +159,6 @@ const forceDeckUpdate = function (removeUsed = true): void {
 
     chancesObj.deckSize = decksize;
     chancesObj.cardsLeft = cardsleft;
-
     setCardsOdds(chancesObj);
 
     // Add that that were put on the bottom again, so it

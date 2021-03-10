@@ -1,0 +1,41 @@
+.container {
+  max-width: 1200px;
+  width: -webkit-fill-available;
+  margin: 16px auto;
+
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  grid-template-rows: 64px auto;
+  grid-template-areas:
+    "controls"
+    "cards";
+}
+
+.cards-table-line {
+  display: grid;
+  gap: 1px;
+  margin-bottom: 1px;
+  grid-template-columns: minmax(300px, 30%) minmax(48px, 1fr) minmax(
+      56px,
+      1.2fr
+    ) minmax(48px, 1fr) minmax(48px, 1fr) minmax(48px, 1fr) minmax(48px, 1fr) minmax(
+      56px,
+      1.2fr
+    ) minmax(48px, 1fr) minmax(56px, 1.2fr);
+  grid-template-rows: 1fr;
+  grid-template-areas: "card castWr firstHandWr kept sidedIn sidedOut sidedInWr sidedOutWr turnCast firstTurnCast";
+  width: -webkit-fill-available;
+}
+
+.cards-table-cell {
+  background-color: rgba(0, 0, 0, 0.75);
+  color: var(--color-light);
+  font-size: 14px;
+  line-height: 32px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}

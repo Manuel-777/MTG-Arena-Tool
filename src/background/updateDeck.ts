@@ -7,14 +7,12 @@ import { constants, objectClone } from "mtgatool-shared";
 
 const { IPC_OVERLAY } = constants;
 
-const lastDeckUpdate = new Date();
-
 function updateDeck(force: boolean): void {
-  const nd = new Date();
   if (
     (globals.debugLog || force || !globals.firstPass) &&
-    nd.getTime() - lastDeckUpdate.getTime() > 1000
+    new Date().getTime() - globals.lastDeckUpdate.getTime() > 250
   ) {
+    globals.lastDeckUpdate = new Date();
     forceDeckUpdate();
     const currentMatch = globalStore.currentMatch;
     let currentMatchCopy = objectClone<any>(currentMatch);

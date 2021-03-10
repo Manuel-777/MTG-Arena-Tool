@@ -40,6 +40,8 @@ let cardTypesByZone: ZoneData = {};
 
 let httpQueue: async.AsyncQueue<HttpTask> | undefined;
 
+let lastDeckUpdate = new Date();
+
 export default {
   httpQueue,
   store,
@@ -58,4 +60,5 @@ export default {
   stopWatchingLog,
   toolVersion,
   watchingLog,
+  lastDeckUpdate,
 };

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import LogEntry from "../../types/logDecoder";
 import { normaliseFields } from "../backgroundUtil";
-import { ClientToGREMessage } from "../../assets/proto/GreTypes";
 import { Deck } from "mtgatool-shared";
 import { setOnThePlay } from "../../shared/store/currentMatchStore";
 import globalStore from "../../shared/store";
 import debugLog from "../../shared/debugLog";
+import { ClientToGREMessage } from "mtgatool-shared/dist/types/greTypes";
 
 interface Entry extends LogEntry {
   json: () => ClientToGREMessage;

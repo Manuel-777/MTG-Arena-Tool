@@ -20,7 +20,13 @@ import {
 } from "mtgatool-shared";
 import { format } from "date-fns";
 
-const { DATE_ALL_TIME, DATE_LAST_30, DATE_LAST_DAY, DATE_SEASON } = constants;
+const {
+  DATE_ALL_TIME,
+  DATE_LAST_30,
+  DATE_LAST_7,
+  DATE_LAST_DAY,
+  DATE_SEASON,
+} = constants;
 
 export interface CardWinrateData {
   name: string;
@@ -237,10 +243,12 @@ export default class Aggregator {
       return true;
     } else if (filterValue === DATE_SEASON) {
       dateFilter = new Date(
-        store.getState().renderer.season.currentSeason.seasonStartTime
+        store.getState().renderer.season?.currentSeason?.seasonStartTime || 0
       );
     } else if (filterValue === DATE_LAST_30) {
       dateFilter = startOfDay(subDays(now, 30));
+    } else if (filterValue === DATE_LAST_7) {
+      dateFilter = startOfDay(subDays(now, 7));
     } else if (filterValue === DATE_LAST_DAY) {
       dateFilter = subDays(now, 1);
     } else {
@@ -287,8 +295,9 @@ export default class Aggregator {
 
   filterMatch(match: InternalMatch): boolean {
     if (!match) return false;
-    const { eventId, matchIds } = this.filters;
-    if (match.archived) return false;
+    const { eventId, matchIds, showArchived } = this.filters;
+
+    if (!showArchived && match.archived) return false;
 
     const passesMatchFilter = !matchIds || this.validMatches.has(match.id);
     if (!passesMatchFilter) return false;

@@ -15,10 +15,10 @@ import { DecksData } from "../components/decks/types";
 import { isHidingArchived } from "../components/tables/filters";
 import { useAggregatorData } from "../components/tables/useAggregatorData";
 import {
-  ipcSend,
   getBoosterCountEstimate,
   get_deck_missing as getDeckMissing,
 } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { reduxAction } from "../../shared/redux/sharedRedux";
 import store from "../../shared/redux/stores/rendererStore";
 import globalStore, { getDeck, decksList } from "../../shared/store";

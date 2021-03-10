@@ -24,9 +24,9 @@ interface ColoredArchivedSymbolProps {
   archived: boolean;
 }
 
-export const ColoredArchivedSymbol = styled(ArchiveSymbol)<
-  ColoredArchivedSymbolProps
->`
+export const ColoredArchivedSymbol = styled(
+  ArchiveSymbol
+)<ColoredArchivedSymbolProps>`
   background: var(
       ${(props): string => (props.archived ? "--color-g" : "--color-r")}
     )

@@ -453,7 +453,7 @@ label {
 }
 
 .mana_s20 {
-  z-index: 15;
+  z-index: 8;
   pointer-events: none;
   background-size: contain;
   width: 20px;
@@ -464,7 +464,7 @@ label {
 }
 
 .mana_s16 {
-  z-index: 15;
+  z-index: 8;
   pointer-events: none;
   background-size: contain;
   width: 16px;

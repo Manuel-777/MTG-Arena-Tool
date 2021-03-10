@@ -10,11 +10,12 @@ import DecksTab from "./tabs/DecksTab";
 import EconomyTab from "./tabs/EconomyTab";
 import EventsTab from "./tabs/EventsTab";
 import ExploreTab from "./tabs/ExploreTab";
+import CardsTab from "./tabs/CardsTab";
 import HomeTab from "./tabs/HomeTab";
 import MatchesTab from "./tabs/MatchesTab";
 import TimelineTab from "./tabs/TimelineTab";
 import OfflineSplash from "./components/main/OfflineSplash";
-import { ipcSend } from "./rendererUtil";
+import { ipcSend } from "./ipcSend";
 import SettingsTab from "./tabs/SettingsTab";
 import store from "../shared/redux/stores/rendererStore";
 import { reduxAction } from "../shared/redux/sharedRedux";
@@ -38,6 +39,8 @@ const {
   IPC_RENDERER,
   IPC_ALL,
 } = constants;
+
+const MAIN_CARDS = 15;
 
 import appCss from "./app/app.css";
 
@@ -88,6 +91,8 @@ export function getOpenNav(tab: number, offline: boolean): JSX.Element {
       return <TimelineTab />;
     case MAIN_EXPLORE:
       return <ExploreTab />;
+    case MAIN_CARDS:
+      return <CardsTab />;
     case MAIN_ECONOMY:
       return <EconomyTab />;
     case MAIN_COLLECTION:

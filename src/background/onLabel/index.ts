@@ -24,6 +24,7 @@ export { default as InDraftMakePick } from "./InDraftMakePick";
 export { default as OutDraftMakePick } from "./OutDraftMakePick";
 export { default as InEventCompleteDraft } from "./InEventCompleteDraft";
 export { default as InEventGetActiveEventsV2 } from "./InEventGetActiveEventsV2";
+export { default as InEventGetActiveEventsV3 } from "./InEventGetActiveEventsV3";
 export { default as MatchGameRoomStateChangedEvent } from "./MatchGameRoomStateChangedEvent";
 export { default as InEventGetSeasonAndRankDetail } from "./InEventGetSeasonAndRankDetail";
 export { default as GetPlayerInventoryGetRewardSchedule } from "./GetPlayerInventoryGetRewardSchedule";

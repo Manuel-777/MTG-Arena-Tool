@@ -8,7 +8,6 @@ import CollectionTable from "../components/collection/CollectionTable";
 import { CardsData } from "../components/collection/types";
 
 import {
-  ipcSend,
   getMissingCardCounts,
   getCardFormats,
   getCardBanned,
@@ -16,6 +15,7 @@ import {
   getCardIsCraftable,
   getCardInBoosters,
 } from "../rendererUtil";
+import { ipcSend } from "../ipcSend";
 import { CardCounts } from "../components/decks/types";
 import { reduxAction } from "../../shared/redux/sharedRedux";
 import store, { AppState } from "../../shared/redux/stores/rendererStore";
@@ -25,6 +25,12 @@ import { useSelector } from "react-redux";
 import appCss from "../app/app.css";
 import { PlayerData } from "../../shared/redux/slices/playerDataSlice";
 import { getRarityFilterVal } from "../components/collection/filters";
+import {
+  FACE_ADVENTURE,
+  FACE_DFC_BACK,
+  FACE_MODAL_BACK,
+  FACE_SPLIT,
+} from "mtgatool-shared/dist/shared/constants";
 
 const { DRAFT_RANKS, IPC_ALL, IPC_RENDERER, DRAFT_RANKS_LOLA } = constants;
 
@@ -118,7 +124,10 @@ function getCollectionData(
   return db.cardList
     .filter(
       (card) =>
-        card.collectible && card.dfc !== 1 && card.dfc !== 7 && card.dfc !== 5
+        card.dfc !== FACE_DFC_BACK &&
+        card.dfc !== FACE_ADVENTURE &&
+        card.dfc !== FACE_SPLIT &&
+        card.dfc !== FACE_MODAL_BACK
     )
     .map(
       (card): CardsData => {
@@ -177,6 +186,7 @@ export default function CollectionTab(): JSX.Element {
   const data = React.useMemo(() => {
     return getCollectionData(cards, cardsNew);
   }, [cards, cardsNew]);
+
   return (
     <div className={appCss.uxItem}>
       <CollectionTable

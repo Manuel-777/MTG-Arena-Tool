@@ -3,7 +3,7 @@ import Button from "../misc/Button";
 
 import mainCss from "../../index.css";
 import popupCss from "./popups.css";
-import css from "./advancedSearch.css";
+import css from "./advancedSearch.scss";
 import ManaFilterExt from "../misc/ManaFilterExt";
 import ReactSelect from "../../../shared/ReactSelect";
 import getFiltersFromQuery from "../collection/collectionQuery";
@@ -25,6 +25,7 @@ import SetsFilter from "../misc/SetsFilter";
 import { StringFilter } from "../tables/filters";
 import { InputContainer } from "../misc/InputContainer";
 import Flex from "../misc/Flex";
+import Close from "../../../assets/images/svg/close.svg";
 
 const { WHITE, BLUE, BLACK, RED, GREEN, COLORLESS } = constants;
 
@@ -217,6 +218,23 @@ export default function AdvancedSearch(props: EditKeyProps): JSX.Element {
     [closeCallback, open]
   );
 
+  const closeOnEscape = useCallback(
+    (e: KeyboardEvent): void => {
+      if (!open) return;
+      if (e.key === "Escape") {
+        handleClose("");
+      }
+    },
+    [handleClose, open]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", closeOnEscape);
+    return (): void => {
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [closeOnEscape]);
+
   const handleSearch = useCallback(() => {
     handleClose(query);
   }, [handleClose, query]);
@@ -318,6 +336,7 @@ export default function AdvancedSearch(props: EditKeyProps): JSX.Element {
       <div
         className={popupCss.popupDiv}
         style={{
+          position: "relative",
           overflowY: `auto`,
           maxHeight: `calc(100vh - 80px)`,
           height: `min(${open * 450}px, calc(100vh - 64px))`,
@@ -328,6 +347,11 @@ export default function AdvancedSearch(props: EditKeyProps): JSX.Element {
           e.stopPropagation();
         }}
       >
+        <Close
+          fill="var(--color-text-hover)"
+          className={css.closeButton}
+          onClick={(): void => handleClose("")}
+        />
         <div className={mainCss.messageSub}>Advanced Search</div>
         <div
           style={{

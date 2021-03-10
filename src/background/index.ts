@@ -300,6 +300,18 @@ ipc.on("request_explore", function (_event, arg) {
   }
 });
 
+ipc.on("request_cards", function (_event, arg) {
+  if (globals.store.getState().appsettings.email === "") {
+    reduxAction(
+      globals.store.dispatch,
+      { type: "SET_OFFLINE", arg: true },
+      IPC_RENDERER
+    );
+  } else {
+    httpApi.httpGetCards(arg);
+  }
+});
+
 ipc.on("request_course", function (_event, arg) {
   httpApi.httpGetCourse(arg);
 });
@@ -567,6 +579,7 @@ async function logLoop(): Promise<void> {
     IPC_RENDERER
   );
 
+  httpApi.httpGetActiveEvents();
   // Begin auto login too, if enabled
   if (autoLogin) {
     debugLog("automatic login process started..");
@@ -603,3 +616,5 @@ function dataChop(data: string, startStr: string, endStr: string): string {
 
   return data;
 }
+
+module.exports = {};

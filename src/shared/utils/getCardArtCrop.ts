@@ -20,7 +20,7 @@ export function getCardImage(
   try {
     const url = cardObj?.images[quality];
     if (url === undefined || url === "") throw "Undefined url";
-    return "https://img.scryfall.com/cards" + cardObj?.images[quality];
+    return cardObj?.images[quality] || notFound;
   } catch (e) {
     // eslint-disable-next-line no-console
     // debugLog(e, "error");

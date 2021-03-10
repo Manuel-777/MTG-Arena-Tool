@@ -4,6 +4,7 @@ import util from "util";
 import { USER_DATA_DIR, showBusy, hideBusyIfDone } from "./databaseUtil";
 import sanitize from "sanitize-filename";
 import debugLog from "../debugLog";
+import { copyFileSync } from "fs";
 
 class DatabaseNotInitializedError extends Error {
   constructor() {
@@ -71,13 +72,23 @@ export class NeDbDatabase {
   init(dbName: string, arenaName?: string): void {
     this.dbName = sanitize(arenaName ? arenaName : dbName);
     const dbPath = path.join(USER_DATA_DIR, this.dbName + ".db");
+    const backupPath = path.join(USER_DATA_DIR, this.dbName + "_backup.db");
+
     debugLog("Db path: " + dbPath);
     this.datastore = new Datastore({
       filename: dbPath,
     });
     // ensure session begins with most compact possible db
     this.datastore.persistence.compactDatafile();
-    this.datastore.loadDatabase();
+    this.datastore.loadDatabase((err) => {
+      if (err !== null) {
+        debugLog(err);
+        return;
+      }
+      debugLog("Db backup: " + backupPath);
+      copyFileSync(dbPath, backupPath);
+    });
+
     // async wrappers of datastore methods
     // https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original
     this._find = util.promisify(
