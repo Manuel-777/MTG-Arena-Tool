@@ -84,6 +84,8 @@ declare namespace IndexCssNamespace {
     overlayClockContainer: string;
     overlayClockSpacer: string;
     overlayContainer: string;
+    overlayCollapsed: string;
+    overlayCollapsedButton: string;
     overlayController: string;
     overlayDeckContainer: string;
     overlayDeckManaCurve: string;
@@ -104,6 +106,8 @@ declare namespace IndexCssNamespace {
     overlay_clock_spacer: string;
     overlay_container: string;
     overlay_controller: string;
+    overlay_collapsed: string;
+    overlay_collapsed_button: string;
     overlay_deck_container: string;
     overlay_deckcolors: string;
     overlay_decklist: string;

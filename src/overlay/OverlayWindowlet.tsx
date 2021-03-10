@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { SettingsDataApp } from "../types/settings";
 import DraftElements from "./DraftElements";
 import MatchElements from "./MatchElements";
@@ -81,6 +81,10 @@ export default function OverlayWindowlet(
   const containerRef = useRef(null);
   useEditModeOnRef(editMode, containerRef, settings.overlay_scale);
 
+  const [collapsed, setCollapsed] = useState(
+    settings.overlays[index].collapsed
+  );
+
   // useEffect(() => {
   //   const xhr = new XMLHttpRequest();
   //   xhr.open("HEAD", arg);
@@ -110,6 +114,7 @@ export default function OverlayWindowlet(
     index,
     settings: overlaySettings,
   };
+
   if (draft && isOverlayDraftMode(overlaySettings.mode)) {
     const props = {
       ...commonProps,
@@ -167,7 +172,36 @@ export default function OverlayWindowlet(
   }
 
   const borderAlpha = Math.pow(overlaySettings.alpha_back, 2).toString();
-  return (
+
+  return overlaySettings.collapsed ? (
+    <div
+      ref={containerRef}
+      className={`${css.overlayCollapsed} ${css.clickOn}`}
+      id={"overlay_" + (index + 1)}
+      style={{
+        opacity: isVisible ? "1" : "0",
+        visibility: isVisible ? "visible" : "hidden",
+        left: overlaySettings.bounds.x + "px",
+        top: overlaySettings.bounds.y + "px",
+      }}
+      onClick={(): void => {
+        handleToggleCollapse();
+        setCollapsed(false);
+      }}
+    >
+      <div
+        className={`${css.overlayCollapsedButton} ${css.clickOn}`}
+        style={{
+          backgroundColor: `var(--color-${COLORS_ALL[index]})`,
+        }}
+      >
+        <ExpandIcon
+          fill="black"
+          style={{ width: "12px", height: "12px", margin: "auto" }}
+        />
+      </div>
+    </div>
+  ) : (
     <div
       className={`${css.overlayContainer} ${getEditModeClass(editMode)}`}
       id={"overlay_" + (index + 1)}
@@ -177,10 +211,10 @@ export default function OverlayWindowlet(
         opacity: isVisible ? "1" : "0",
         visibility: isVisible ? "visible" : "hidden",
         height: overlaySettings.collapsed
-          ? "77px"
+          ? "16px"
           : overlaySettings.bounds.height + "px",
         width: overlaySettings.collapsed
-          ? "110px"
+          ? "16px"
           : overlaySettings.bounds.width + "px",
         left: overlaySettings.bounds.x + "px",
         top: overlaySettings.bounds.y + "px",
@@ -211,12 +245,12 @@ export default function OverlayWindowlet(
           {!props.editMode && (
             <div
               className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
-              onClick={handleToggleCollapse}
+              onClick={(): void => {
+                handleToggleCollapse();
+                setCollapsed(!collapsed);
+              }}
               style={{ margin: 0 }}
             >
-              {!!overlaySettings.collapsed && (
-                <ExpandIcon style={{ margin: "auto" }} />
-              )}
               {!overlaySettings.collapsed && (
                 <CollapseIcon style={{ margin: "auto" }} />
               )}
