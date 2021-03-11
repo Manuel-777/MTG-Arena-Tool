@@ -16,5 +16,7 @@ jobs:
         node-version: '14'
     - name: "Checkout source code"
       uses: "actions/checkout@v2"
+    - name: "Install modules"
+      run: "npm install"
     - name: "Build and test"
       run: "npm test"
