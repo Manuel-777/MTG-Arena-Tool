@@ -112,9 +112,15 @@ export function setOppCardsUsed(arg: number[]): void {
 }
 
 export function resetCurrentMatch(): void {
+  // Deck selection happens before creating a new match. Need to keep the
+  // already selected deck.
+  const currentDeck: Deck = globalStore.currentMatch.currentDeck;
+  const originalDeck: Deck = globalStore.currentMatch.originalDeck;
   globalStore.currentMatch = Object.assign({}, matchStateObject);
   globalStore.currentMatch = {
     ...globalStore.currentMatch,
+    currentDeck: currentDeck,
+    originalDeck: originalDeck,
     playerStats: {
       lifeLost: 0,
       lifeGained: 0,
