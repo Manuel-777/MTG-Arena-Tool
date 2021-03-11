@@ -5,13 +5,14 @@ on: [push]
 jobs:
   build-job:
     runs-on: ${{ matrix.os }}
-    name: "Build ${{ matrix.os }}"
+    name: "Build and test ${{ matrix.os }}"
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
       
     steps:
-    - uses: actions/setup-node@v1
+    - name: "Setup node"
+      uses: actions/setup-node@v1
       with:
         node-version: '14'
     - name: "Checkout source code"
