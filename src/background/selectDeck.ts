@@ -8,9 +8,9 @@ const { IPC_OVERLAY } = constants;
 export default function selectDeck(arg: Deck): void {
   debugLog(`Select deck: ${arg}`);
   globalStore.currentMatch = {
-   ...globalStore.currentMatch,
-   originalDeck: arg.clone(),
-   currentDeck: arg.clone(),
+    ...globalStore.currentMatch,
+    originalDeck: arg.clone(),
+    currentDeck: arg.clone(),
   };
   ipcSend("set_deck", arg.getSave(), IPC_OVERLAY);
 }
