@@ -1,0 +1,40 @@
+name: "Release"
+
+on:
+  push:
+    tags: 'v*'
+
+jobs:
+  build-job:
+    runs-on: ${{ matrix.os }}
+    name: "Release (${{ matrix.os }})"
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: "Setup node"
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14'
+    - name: "Checkout source code"
+      uses: "actions/checkout@v2"
+    - name: "Install modules"
+      run: "npm install"
+    - name: "Test"
+      run: "npm test"
+    - name: "Build release, create GitHub release and upload assets (electron-builder)"
+      run: "npm run dist"
+      env:
+        GH_TOKEN: ${{ github.token }}
+        # create release if it doesn't exist
+        CI_BUILD_TAG: 1
+    - name: "Print dist dir"
+      run: "ls dist/"
+    - name: Upload dist as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-${{ matrix.os }}
+        path: |
+          dist/*
+          !dist/*/**
