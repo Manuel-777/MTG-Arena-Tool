@@ -34,3 +34,4 @@ export { default as InMakeHumanDraftPick } from "./InMakeHumanDraftPick";
 export { default as outMakeHumanDraftPick } from "./OutMakeHumanDraftPick";
 export { default as onClientSceneChange } from "./onClientSceneChange";
 export { default as InEventJoinPodMaking } from "./InEventJoinPodMaking";
+export { default as onAuthenticateResponse } from "./onAuthenticateResponse";

@@ -503,6 +503,19 @@ async function logLoop(): Promise<void> {
       detailedLogs = false;
     }
 
+    strCheck = `"playerId":"`;
+    if (value?.includes(strCheck) && parsedData.arenaId == undefined) {
+      parsedData.arenaId =
+        debugArenaID ?? unleakString(dataChop(value, strCheck, `"`));
+    }
+
+    // Get User name (can fail)
+    strCheck = '"screenName": "';
+    if (value?.includes(strCheck) && parsedData.playerName == undefined) {
+      parsedData.playerName = unleakString(dataChop(value, strCheck, '"'));
+    }
+
+    // This method of obtaining user id and name was deprecated on 11/3/21 MTGA update
     // Get player Id
     strCheck = "AccountID:";
     if (value?.includes(strCheck) && parsedData.arenaId == undefined) {
@@ -528,7 +541,7 @@ async function logLoop(): Promise<void> {
 
   prevLogSize = size;
   const { arenaId, playerName } = parsedData;
-  if (!arenaId || !playerName) {
+  if (!arenaId) {
     debugLog("Player.log contains no player data");
     noPlayerData = true;
     reduxAction(
@@ -538,21 +551,25 @@ async function logLoop(): Promise<void> {
     );
     return;
   } else {
-    reduxAction(
-      globals.store.dispatch,
-      { type: "SET_PLAYER_ID", arg: arenaId },
-      IPC_RENDERER
-    );
-    reduxAction(
-      globals.store.dispatch,
-      { type: "SET_PLAYER_NAME", arg: playerName },
-      IPC_RENDERER
-    );
+    if (arenaId) {
+      reduxAction(
+        globals.store.dispatch,
+        { type: "SET_PLAYER_ID", arg: arenaId },
+        IPC_RENDERER
+      );
+    }
+    if (playerName) {
+      reduxAction(
+        globals.store.dispatch,
+        { type: "SET_PLAYER_NAME", arg: playerName },
+        IPC_RENDERER
+      );
+    }
     noPlayerData = false;
   }
 
   ipcSend("popup", {
-    text: "Found Arena log for " + playerName,
+    text: "Found Arena log for " + arenaId,
     time: 0,
   });
   clearInterval(logLoopInterval);
