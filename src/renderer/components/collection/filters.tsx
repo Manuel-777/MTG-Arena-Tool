@@ -20,6 +20,7 @@ import {
   historicAnthology,
   historicAnthology2,
   historicAnthology3,
+  historicAnthology4,
 } from "./customSets";
 
 export function setFilterFn<D extends TableData>(
@@ -33,6 +34,7 @@ export function setFilterFn<D extends TableData>(
     if (F == "ha1" && historicAnthology.includes(row.original.id)) res = true;
     if (F == "ha2" && historicAnthology2.includes(row.original.id)) res = true;
     if (F == "ha3" && historicAnthology3.includes(row.original.id)) res = true;
+    if (F == "ha4" && historicAnthology4.includes(row.original.id)) res = true;
 
     res =
       res ||
@@ -155,6 +157,7 @@ export function arrayFilterFn<D extends TableData>(
     if (historicAnthology.includes(row.original.id)) S.push("ha1");
     if (historicAnthology2.includes(row.original.id)) S.push("ha2");
     if (historicAnthology3.includes(row.original.id)) S.push("ha3");
+    if (historicAnthology4.includes(row.original.id)) S.push("ha4");
 
     let ret: number | boolean = true;
     if (mode == "=") ret = isEqual(S, F);
