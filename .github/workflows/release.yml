@@ -27,6 +27,8 @@ jobs:
       run: "npm run dist"
       env:
         GH_TOKEN: ${{ github.token }}
+        # create release if it doesn't exist
+        CI_BUILD_TAG: 1
     - name: "Print dist dir"
       run: "ls dist/"
     - name: Upload dist as artifact
