@@ -79,7 +79,13 @@
       "category": "Utility;",
       "icon": "src/assets/icons/icon-256.png",
       "artifactName": "${productName}-${version}.${ext}"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "releaseType": "prerelease"
+      }
+    ]
   },
   "main": "lib/main.js",
   "dependencies": {
