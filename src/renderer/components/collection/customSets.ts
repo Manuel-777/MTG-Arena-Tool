@@ -77,8 +77,37 @@ export const historicAnthology3 = [
   53817,
 ];
 
+export const historicAnthology4 = [
+  65481,
+  71397,
+  42534,
+  62629,
+  62561,
+  35573,
+  77657,
+  65591,
+  71395,
+  64979,
+  65633,
+  42396,
+  73574,
+  65061,
+  38095,
+  71537,
+  77870,
+  63475,
+  28215,
+  77883,
+  78299,
+  19829,
+  24529,
+  64663,
+  38279,
+];
+
 export const customSets = [
   { name: "Historic Anthology 1", cards: historicAnthology },
   { name: "Historic Anthology 2", cards: historicAnthology2 },
   { name: "Historic Anthology 3", cards: historicAnthology3 },
+  { name: "Historic Anthology 4", cards: historicAnthology4 },
 ];

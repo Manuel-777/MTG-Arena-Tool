@@ -412,6 +412,11 @@ function ExploreFilters(props: ExploreFiltersProps): JSX.Element {
           onClick={doSearch}
         />
       </div>
+      <div className={css.exploreButtonsRow}>
+        <i style={{ opacity: 0.75 }}>
+          Results are aggregated data from the last 10 days.
+        </i>
+      </div>
     </div>
   );
 }

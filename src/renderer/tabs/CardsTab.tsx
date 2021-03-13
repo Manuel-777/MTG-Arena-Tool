@@ -31,6 +31,7 @@ import {
   historicAnthology,
   historicAnthology2,
   historicAnthology3,
+  historicAnthology4,
 } from "../components/collection/customSets";
 import { TableData } from "../components/tables/types";
 
@@ -214,6 +215,8 @@ function setFilterFn<MemoizedCardsData extends TableData>(
       if (F == "ha2" && historicAnthology2.includes(row.original.dbCard.id))
         res = true;
       if (F == "ha3" && historicAnthology3.includes(row.original.dbCard.id))
+        res = true;
+      if (F == "ha4" && historicAnthology4.includes(row.original.dbCard.id))
         res = true;
       if (F == row.original.set) res = true;
     });

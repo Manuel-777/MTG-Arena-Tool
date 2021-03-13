@@ -110,27 +110,33 @@ export default function OverlayController(): JSX.Element {
 
   // Note: no useCallback because of dependency on deep overlays state
   const handleSetEditMode = (_event: unknown, _editMode: boolean): void => {
+    // Expand the overlay windows
+    const collapsed = false;
+    // Compute current dimensions of overlay windowlets in DOM
+    const newOverlays = overlays.map(
+      (overlay: OverlaySettingsData, index: number) => {
+        // TODO still looking for a good way to get overlay bounds
+        // using forwardRef would require merging fowarded refs
+        // with the existing OverlayWindowlet useRef
+        const overlayDiv = byId("overlay_" + (index + 1));
+        let bounds = overlay.bounds;
+        if (overlayDiv) {
+          bounds = {
+            width: overlay.collapsed
+              ? overlay.bounds.width
+              : forceInt(overlayDiv.style.width),
+            height: overlay.collapsed
+              ? overlay.bounds.height
+              : forceInt(overlayDiv.style.height),
+            x: forceInt(overlayDiv.style.left),
+            y: forceInt(overlayDiv.style.top),
+          };
+        }
+        return { ...overlay, bounds, collapsed };
+      }
+    );
     // Save current windowlet dimensions before we leave edit mode
     if (editMode && !_editMode) {
-      // Compute current dimensions of overlay windowlets in DOM
-      const newOverlays = overlays.map(
-        (overlay: OverlaySettingsData, index: number) => {
-          // TODO still looking for a good way to get overlay bounds
-          // using forwardRef would require merging fowarded refs
-          // with the existing OverlayWindowlet useRef
-          const overlayDiv = byId("overlay_" + (index + 1));
-          let bounds = overlay.bounds;
-          if (overlayDiv) {
-            bounds = {
-              width: forceInt(overlayDiv.style.width),
-              height: forceInt(overlayDiv.style.height),
-              x: forceInt(overlayDiv.style.left),
-              y: forceInt(overlayDiv.style.top),
-            };
-          }
-          return { ...overlay, bounds };
-        }
-      );
       // Compute current dimensions of hover card windowlet in DOM
       const hoverDiv = byId(css.overlayHover);
       const newOverlayHover =
@@ -148,6 +154,12 @@ export default function OverlayController(): JSX.Element {
         },
         IPC_ALL ^ IPC_OVERLAY
       );
+    } else {
+      reduxAction(
+        dispatcher,
+        { type: "SET_SETTINGS", arg: { overlays: newOverlays } },
+        IPC_ALL ^ IPC_OVERLAY
+      );
     }
     setEditMode(_editMode);
   };
@@ -162,6 +174,21 @@ export default function OverlayController(): JSX.Element {
     },
     []
   );
+
+  const handleSetCollapsed = (_event: unknown, index: number): void => {
+    const collapsed = !overlays[index].collapsed;
+    const newOverlays = [...overlays];
+    newOverlays[index] = {
+      ...overlays[index], // old overlay
+      collapsed, // new setting
+    };
+
+    reduxAction(
+      dispatcher,
+      { type: "SET_SETTINGS", arg: { overlays: newOverlays } },
+      IPC_ALL ^ IPC_OVERLAY
+    );
+  };
 
   // Note: no useCallback because of dependency on deep overlays state
   const handleClose = (
@@ -244,6 +271,7 @@ export default function OverlayController(): JSX.Element {
   useEffect(() => {
     ipc.on("action_log", handleActionLog);
     ipc.on("set_edit_mode", handleSetEditMode);
+    ipc.on("set_collapsed", handleSetCollapsed);
     ipc.on("close", handleClose);
     ipc.on("set_arena_state", handleSetArenaState);
     ipc.on("set_draft", handleSetDraftCards);
@@ -256,6 +284,7 @@ export default function OverlayController(): JSX.Element {
       // unregister all IPC listeners
       ipc.removeListener("action_log", handleActionLog);
       ipc.removeListener("set_edit_mode", handleSetEditMode);
+      ipc.removeListener("set_collapsed", handleSetCollapsed);
       ipc.removeListener("close", handleClose);
       ipc.removeListener("set_arena_state", handleSetArenaState);
       ipc.removeListener("set_draft", handleSetDraftCards);
@@ -295,6 +324,9 @@ export default function OverlayController(): JSX.Element {
       {!!overlays &&
         overlays.map((_overlaySettings: OverlaySettingsData, index: number) => {
           const overlayProps = {
+            handleToggleCollapse: (): void => {
+              handleSetCollapsed(null, index);
+            },
             handleClickSettings: (): void => {
               ipcSend("renderer_show");
               ipcSend(

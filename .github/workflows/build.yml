@@ -1,0 +1,27 @@
+name: "Build"
+
+on: 
+  push:
+    branches: '**'
+
+jobs:
+  build-job:
+    runs-on: ${{ matrix.os }}
+    name: "Build and test ${{ matrix.os }}"
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      
+    steps:
+    - name: "Setup node"
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14'
+    - name: "Checkout source code"
+      uses: "actions/checkout@v2"
+    - name: "Install modules"
+      run: "npm install"
+    - name: "Build (npm)"
+      run: "npm run build:prod"
+    - name: "Test"
+      run: "npm test"

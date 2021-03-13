@@ -72,6 +72,7 @@ function getDeckComponents(deck: Deck, showWildcards = false): JSX.Element[] {
           return "Artifacts";
         case "Land":
         case "Basic Land":
+        case "Basic Snow Land":
           return "Lands";
         default:
           throw new Error(`Unexpected card type: ${type}`);

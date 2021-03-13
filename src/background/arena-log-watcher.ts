@@ -275,6 +275,10 @@ function entrySwitch(entry: LogEntry): void {
       Labels.onClientSceneChange(entry);
       break;
 
+    case "AuthenticateResponse":
+      Labels.onAuthenticateResponse(entry);
+      break;
+
     case "Event.JoinPodmaking":
       if (entry.arrow == "==>") {
         Labels.InEventJoinPodMaking(entry);

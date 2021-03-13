@@ -378,6 +378,14 @@ function handleAuthResponse(
     return;
   }
 
+  if (parsedResult.name && parsedResult.name !== "") {
+    reduxAction(
+      globals.store.dispatch,
+      { type: "SET_PLAYER_NAME", arg: decodeURIComponent(parsedResult.name) },
+      IPC_RENDERER
+    );
+  }
+
   syncSettings(
     { token: Buffer.from(parsedResult.token).toString("base64") },
     false

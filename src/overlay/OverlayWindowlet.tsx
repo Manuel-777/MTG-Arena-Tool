@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { SettingsDataApp } from "../types/settings";
 import DraftElements from "./DraftElements";
 import MatchElements from "./MatchElements";
@@ -17,6 +17,8 @@ import sharedCss from "../shared/shared.css";
 import ResizeIcon from "../assets/images/resize.svg";
 import CloseIcon from "../assets/images/svg/win-close.svg";
 import SettingsIcon from "../assets/images/svg/icon-settings.svg";
+import CollapseIcon from "../assets/images/svg/collapse.svg";
+import ExpandIcon from "../assets/images/svg/expand.svg";
 import DEFAULT_BACKGROUND from "../assets/images/main-background.jpg";
 
 const {
@@ -35,6 +37,7 @@ interface OverlayWindowletProps {
   editMode: boolean;
   handleClickClose: () => void;
   handleClickSettings: () => void;
+  handleToggleCollapse: () => void;
   handleToggleEditMode: () => void;
   index: number;
   match?: MatchData;
@@ -65,6 +68,7 @@ export default function OverlayWindowlet(
     editMode,
     handleClickClose,
     handleClickSettings,
+    handleToggleCollapse,
     handleToggleEditMode,
     index,
     match,
@@ -76,6 +80,10 @@ export default function OverlayWindowlet(
 
   const containerRef = useRef(null);
   useEditModeOnRef(editMode, containerRef, settings.overlay_scale);
+
+  const [collapsed, setCollapsed] = useState(
+    settings.overlays[index].collapsed
+  );
 
   // useEffect(() => {
   //   const xhr = new XMLHttpRequest();
@@ -106,6 +114,7 @@ export default function OverlayWindowlet(
     index,
     settings: overlaySettings,
   };
+
   if (draft && isOverlayDraftMode(overlaySettings.mode)) {
     const props = {
       ...commonProps,
@@ -129,7 +138,7 @@ export default function OverlayWindowlet(
         className={`${css.outerWrapper} elements_wrapper`}
         style={{ opacity: overlaySettings.alpha.toString() }}
       >
-        {!!overlaySettings.title && (
+        {!!overlaySettings.title && !overlaySettings.collapsed && (
           <div className={css.overlayDeckname}>Overlay {index + 1}</div>
         )}
       </div>
@@ -163,7 +172,36 @@ export default function OverlayWindowlet(
   }
 
   const borderAlpha = Math.pow(overlaySettings.alpha_back, 2).toString();
-  return (
+
+  return overlaySettings.collapsed ? (
+    <div
+      ref={containerRef}
+      className={`${css.overlayCollapsed} ${css.clickOn}`}
+      id={"overlay_" + (index + 1)}
+      style={{
+        opacity: isVisible ? "1" : "0",
+        visibility: isVisible ? "visible" : "hidden",
+        left: overlaySettings.bounds.x + "px",
+        top: overlaySettings.bounds.y + "px",
+      }}
+      onClick={(): void => {
+        handleToggleCollapse();
+        setCollapsed(false);
+      }}
+    >
+      <div
+        className={`${css.overlayCollapsedButton} ${css.clickOn}`}
+        style={{
+          backgroundColor: `var(--color-${COLORS_ALL[index]})`,
+        }}
+      >
+        <ExpandIcon
+          fill="black"
+          style={{ width: "12px", height: "12px", margin: "auto" }}
+        />
+      </div>
+    </div>
+  ) : (
     <div
       className={`${css.overlayContainer} ${getEditModeClass(editMode)}`}
       id={"overlay_" + (index + 1)}
@@ -172,8 +210,12 @@ export default function OverlayWindowlet(
         border: "1px solid rgba(128, 128, 128, " + borderAlpha + ")",
         opacity: isVisible ? "1" : "0",
         visibility: isVisible ? "visible" : "hidden",
-        height: overlaySettings.bounds.height + "px",
-        width: overlaySettings.bounds.width + "px",
+        height: overlaySettings.collapsed
+          ? "16px"
+          : overlaySettings.bounds.height + "px",
+        width: overlaySettings.collapsed
+          ? "16px"
+          : overlaySettings.bounds.width + "px",
         left: overlaySettings.bounds.x + "px",
         top: overlaySettings.bounds.y + "px",
       }}
@@ -200,6 +242,20 @@ export default function OverlayWindowlet(
               marginRight: "auto",
             }}
           />
+          {!props.editMode && (
+            <div
+              className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
+              onClick={(): void => {
+                handleToggleCollapse();
+                setCollapsed(!collapsed);
+              }}
+              style={{ margin: 0 }}
+            >
+              {!overlaySettings.collapsed && (
+                <CollapseIcon style={{ margin: "auto" }} />
+              )}
+            </div>
+          )}
           <div
             className={`${sharedCss.button} ${sharedCss.settings} ${css.clickOn}`}
             onClick={handleClickSettings}

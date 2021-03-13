@@ -153,7 +153,9 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
         style={doAutoSize ? {} : { height: `inherit` }}
       >
         {!!settings.title && (
-          <div className={css.overlayDeckname}>{mainTitle}</div>
+          <div className={css.overlayDeckname}>
+            {!settings.collapsed && mainTitle}
+          </div>
         )}
         {settings.mode === OVERLAY_SEEN && (
           <div className={css.overlayArchetype}>
@@ -187,7 +189,7 @@ export default function MatchElements(props: MatchElementsProps): JSX.Element {
             />
           </div>
         )}
-        {!!settings.clock && (
+        {!!settings.clock && !settings.collapsed && (
           <Clock
             key={"overlay_clock_" + index}
             matchBeginTime={new Date(match.beginTime)}
