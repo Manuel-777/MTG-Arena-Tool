@@ -146,12 +146,18 @@ export default function MatchesTab({
   const matchesList = useSelector(
     (state: AppState) => state.matches.matchesIndex
   );
-  const { matchesTableMode, matchesTableState } = store.getState().settings;
-  const showArchived = !isHidingArchived(matchesTableState);
+  const {
+    matchesTableMode,
+    matchesTableState,
+    decksTableState,
+  } = store.getState().settings;
+  const showArchivedDecks = !isHidingArchived(decksTableState);
+  const showArchivedMatches = !isHidingArchived(matchesTableState);
   const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,
     getData: getMatchesData,
-    showArchived,
+    showArchivedDecks,
+    showArchivedMatches,
     forceMemo: matchesList,
   });
 

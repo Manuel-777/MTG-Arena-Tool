@@ -137,12 +137,18 @@ export default function DecksTab({
   aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
   const dispatcher = useDispatch();
-  const { decksTableMode, decksTableState } = store.getState().settings;
-  const showArchived = !isHidingArchived(decksTableState);
+  const {
+    decksTableMode,
+    matchesTableState,
+    decksTableState,
+  } = store.getState().settings;
+  const showArchivedDecks = !isHidingArchived(decksTableState);
+  const showArchivedMatches = !isHidingArchived(matchesTableState);
   const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,
     getData: getDecksData,
-    showArchived,
+    showArchivedDecks,
+    showArchivedMatches,
   });
   const openDeckCallback = React.useCallback(
     (deck: InternalDeck): void => {

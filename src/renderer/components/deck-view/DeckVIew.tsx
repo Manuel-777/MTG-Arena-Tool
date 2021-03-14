@@ -216,7 +216,8 @@ function DeckView(props: DeckViewProps): JSX.Element {
   const { aggFilters, setAggFilters } = useAggregatorData({
     aggFiltersArg: initFilters,
     getData: decksList,
-    showArchived: false,
+    showArchivedDecks: false,
+    showArchivedMatches: false,
   });
 
   const aggregator = useMemo(() => {

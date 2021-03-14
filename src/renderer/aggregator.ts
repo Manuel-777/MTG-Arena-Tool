@@ -88,7 +88,8 @@ function playBrawlEvents(): string[] {
 
 export interface AggregatorFilters {
   date?: Date | string;
-  showArchived?: boolean;
+  showArchivedDecks?: boolean;
+  showArchivedMatches?: boolean;
   eventId?: string;
   matchIds?: string[];
   deckId?: string | string[];
@@ -162,7 +163,8 @@ export default class Aggregator {
       deckId: Aggregator.DEFAULT_DECK,
       deckVersion: Aggregator.DEFAULT_DECK_VERSION,
       date: store.getState().settings.last_date_filter,
-      showArchived: false,
+      showArchivedDecks: false,
+      showArchivedMatches: false,
     };
   }
 
@@ -295,9 +297,9 @@ export default class Aggregator {
 
   filterMatch(match: InternalMatch): boolean {
     if (!match) return false;
-    const { eventId, matchIds, showArchived } = this.filters;
+    const { eventId, matchIds, showArchivedMatches } = this.filters;
 
-    if (!showArchived && match.archived) return false;
+    if (!showArchivedMatches && match.archived) return false;
 
     const passesMatchFilter = !matchIds || this.validMatches.has(match.id);
     if (!passesMatchFilter) return false;

@@ -5,7 +5,8 @@ import Aggregator, { AggregatorFilters } from "../../aggregator";
 import { TableData } from "../tables/types";
 
 function getDefaultAggFilters(
-  showArchived: boolean,
+  showArchivedDecks: boolean,
+  showArchivedMatches: boolean,
   aggFiltersArg?: AggregatorFilters
 ): AggregatorFilters {
   const { last_date_filter: dateFilter } = store.getState().settings;
@@ -14,14 +15,16 @@ function getDefaultAggFilters(
     date: dateFilter,
     eventId: Aggregator.DEFAULT_EVENT,
     ...aggFiltersArg,
-    showArchived,
+    showArchivedDecks,
+    showArchivedMatches,
   };
 }
 
 export function useAggregatorData<D extends TableData>({
   aggFiltersArg,
   getData,
-  showArchived,
+  showArchivedDecks,
+  showArchivedMatches,
   forceMemo,
 }: {
   aggFiltersArg?: AggregatorFilters;
@@ -29,19 +32,28 @@ export function useAggregatorData<D extends TableData>({
     aggregator: Aggregator,
     archivedCache: Record<string, boolean>
   ) => D[];
-  showArchived: boolean;
+  showArchivedDecks: boolean;
+  showArchivedMatches: boolean;
   forceMemo?: any;
 }): {
   aggFilters: AggregatorFilters;
   data: D[];
   setAggFilters: (aggFilters: AggregatorFilters) => void;
 } {
-  const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
+  const defaultAggFilters = getDefaultAggFilters(
+    showArchivedDecks,
+    showArchivedMatches,
+    aggFiltersArg
+  );
   const [aggFilters, setAggFilters] = React.useState(defaultAggFilters);
   React.useEffect(() => {
-    const defaultAggFilters = getDefaultAggFilters(showArchived, aggFiltersArg);
+    const defaultAggFilters = getDefaultAggFilters(
+      showArchivedDecks,
+      showArchivedMatches,
+      aggFiltersArg
+    );
     setAggFilters(defaultAggFilters);
-  }, [aggFiltersArg, showArchived]);
+  }, [aggFiltersArg, showArchivedDecks, showArchivedMatches]);
   const archivedCache = useSelector(
     (state: AppState) => state.renderer.archivedCache
   );

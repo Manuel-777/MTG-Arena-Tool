@@ -195,11 +195,12 @@ export default function EventsTab({
   aggFiltersArg?: AggregatorFilters;
 }): JSX.Element {
   const { eventsTableMode, eventsTableState } = store.getState().settings;
-  const showArchived = !isHidingArchived(eventsTableState);
+  const showArchivedMatches = !isHidingArchived(eventsTableState);
   const { aggFilters, data, setAggFilters } = useAggregatorData({
     aggFiltersArg,
     getData: getEventsData,
-    showArchived,
+    showArchivedDecks: false,
+    showArchivedMatches,
   });
   const events = React.useMemo(getTotalAggEvents, []);
   return (
