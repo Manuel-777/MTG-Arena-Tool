@@ -25,7 +25,7 @@ import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
-import { useAggregatorArchiveFilter } from "../tables/useAggregatorArchiveFilter";
+import { useAggregatorArchiveDecksFilter } from "../tables/useAggregatorArchiveDecksFilter";
 import { useBaseReactTable } from "../tables/useBaseReactTable";
 import {
   BoosterNeededCell,
@@ -315,7 +315,7 @@ export default function DecksTable({
     tableControlsProps,
   } = useBaseReactTable(tableProps);
 
-  useAggregatorArchiveFilter(table, aggFilters, setAggFiltersCallback);
+  useAggregatorArchiveDecksFilter(table, aggFilters, setAggFiltersCallback);
 
   const { getTableBodyProps, page, prepareRow, rows } = table;
   const decksTableControlsProps: DecksTableControlsProps = {

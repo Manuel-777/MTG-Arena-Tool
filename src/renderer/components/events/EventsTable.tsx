@@ -28,7 +28,6 @@ import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
-import { useAggregatorArchiveFilter } from "../tables/useAggregatorArchiveFilter";
 import { useBaseReactTable } from "../tables/useBaseReactTable";
 import EventsTableControls from "./EventsTableControls";
 import { eventSearchFilterFn } from "./filters";
@@ -226,7 +225,7 @@ export default function EventsTable({
     pagingProps,
     tableControlsProps,
   } = useBaseReactTable(tableProps);
-  useAggregatorArchiveFilter(table, aggFilters, setAggFiltersCallback);
+
   const { getTableBodyProps, page, prepareRow, rows } = table;
   const eventsTableControlsProps: EventsTableControlsProps = {
     aggFilters,

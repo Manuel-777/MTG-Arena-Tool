@@ -26,7 +26,7 @@ import PagingControls from "../tables/PagingControls";
 import TableHeaders from "../tables/TableHeaders";
 import { TableViewRow } from "../tables/TableViewRow";
 import { BaseTableProps } from "../tables/types";
-import { useAggregatorArchiveFilter } from "../tables/useAggregatorArchiveFilter";
+import { useAggregatorArchiveMatchesFilter } from "../tables/useAggregatorArchiveMatchesFilter";
 import { useBaseReactTable } from "../tables/useBaseReactTable";
 import { ArchetypeCell, OnPlayCell, RankCell } from "./cells";
 import {
@@ -411,7 +411,7 @@ export default function MatchesTable({
     pagingProps,
     tableControlsProps,
   } = useBaseReactTable(tableProps);
-  useAggregatorArchiveFilter(table, aggFilters, setAggFiltersCallback);
+  useAggregatorArchiveMatchesFilter(table, aggFilters, setAggFiltersCallback);
   const { getTableBodyProps, page, prepareRow, rows } = table;
   const matchesTableControlsProps: MatchesTableControlsProps = {
     aggFilters,

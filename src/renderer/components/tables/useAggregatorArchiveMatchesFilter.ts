@@ -4,7 +4,7 @@ import { AggregatorFilters } from "../../aggregator";
 import { isHidingArchived } from "./filters";
 import { TableData } from "./types";
 
-export function useAggregatorArchiveFilter<D extends TableData>(
+export function useAggregatorArchiveMatchesFilter<D extends TableData>(
   table: TableInstance<D>,
   aggFilters: AggregatorFilters,
   setAggFiltersCallback: (filters: AggregatorFilters) => void
@@ -13,10 +13,10 @@ export function useAggregatorArchiveFilter<D extends TableData>(
     state: { filters },
   } = table;
   React.useEffect(() => {
-    if (isHidingArchived({ filters }) === !!aggFilters.showArchived) {
+    if (isHidingArchived({ filters }) === !!aggFilters.showArchivedMatches) {
       setAggFiltersCallback({
         ...aggFilters,
-        showArchived: !isHidingArchived({ filters }),
+        showArchivedMatches: !isHidingArchived({ filters }),
       });
     }
   }, [aggFilters, setAggFiltersCallback, filters]);
