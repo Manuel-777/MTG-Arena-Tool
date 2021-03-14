@@ -90,8 +90,8 @@ app.on("ready", () => {
   if (app.isPackaged) {
     startUpdater();
   } else {
-    installDevTools();
     startApp();
+    installDevTools();
   }
 });
 

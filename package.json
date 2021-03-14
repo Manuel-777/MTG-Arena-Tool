@@ -123,6 +123,7 @@
     "react-transition-group": "^4.4.1",
     "react-use-gesture": "^7.0.16",
     "react-use-measure": "^2.0.3",
+    "redux-devtools-extension": "^2.13.9",
     "styled-components": "^5.2.1",
     "webpack": "^4.46.0"
   },
@@ -162,7 +163,7 @@
     "babel-loader": "^8.2.2",
     "babel-plugin-styled-components": "^1.12.0",
     "css-loader": "^3.5.3",
-    "electron": "^9.4.0",
+    "electron": "^8.4.0",
     "electron-builder": "^22.10.5",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^6.15.0",
