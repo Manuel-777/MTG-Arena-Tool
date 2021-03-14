@@ -22,6 +22,8 @@ export const historicAnthology = [
 ];
 
 export const historicAnthology2 = [
+  47087,
+  46897,
   13491,
   18239,
   35515,
