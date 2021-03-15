@@ -29,6 +29,7 @@ import AuthSettings from "../components/auth-settings";
 import DetailedLogs from "../components/popups/DetailedLogs";
 import IconButton from "../components/misc/IconButton";
 import { constants } from "mtgatool-shared";
+import { IPC_RENDERER } from "mtgatool-shared/dist/shared/constants";
 const { LOGIN_WAITING, LOGIN_OK, IPC_NONE, EASING_DEFAULT } = constants;
 
 initializeRendererReduxIPC(store);
@@ -172,7 +173,13 @@ function App(): JSX.Element {
           ) : (
             <>
               <Auth authForm={authForm} />
-              {openAuthSettings && <AuthSettings />}
+              {openAuthSettings && (
+                <AuthSettings
+                  closeCallback={(): void =>
+                    ipcSend("close_auth_settings", undefined, IPC_RENDERER)
+                  }
+                />
+              )}
             </>
           )}
         </ErrorBoundary>

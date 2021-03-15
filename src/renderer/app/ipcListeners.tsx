@@ -160,6 +160,14 @@ export default function ipcListeners(dispatcher: Dispatch<AnyAction>): void {
     }
   );
 
+  ipc.on("close_auth_settings", (_event: IpcRendererEvent): void => {
+    reduxAction(
+      dispatcher,
+      { type: "SET_AUTH_SETTINGS", arg: false },
+      IPC_NONE
+    );
+  });
+
   ipc.on(
     "force_open_overlay_settings",
     (_event: IpcRendererEvent, arg: number): void => {
