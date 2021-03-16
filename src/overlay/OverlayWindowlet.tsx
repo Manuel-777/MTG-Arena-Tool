@@ -170,6 +170,12 @@ export default function OverlayWindowlet(
 
   const collapsedStyle = useSpring({
     transform: `scale(${collapsed ? 0 : 1})`,
+    borderRadius: collapsed ? "20px" : "4px",
+    config: {
+      mass: 0.6,
+      tension: 177,
+      friction: 16,
+    },
   });
 
   const collapsedButtonStyle = useSpring({

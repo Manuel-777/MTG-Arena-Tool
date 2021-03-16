@@ -531,6 +531,7 @@ body {
     border-radius: 200px;
     margin: auto;
     display: flex;
+    box-shadow: 0px 5px 6px 0px #00000060;
     -webkit-transition: all 0.08s cubic-bezier(0.85, 0.07, 0.35, 1.36);
 }
 
