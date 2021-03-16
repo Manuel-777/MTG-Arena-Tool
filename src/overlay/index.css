@@ -52,7 +52,7 @@ body {
     overflow: hidden;
     position: absolute !important;
     background-color: rgba(0, 0, 0, 0);
-    -webkit-transition: all 0.2s ease-in;
+    transform-origin: 20px 20px;
 }
 
 .editable {
