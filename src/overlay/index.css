@@ -523,6 +523,13 @@ body {
     position: absolute;
     display: flex;
 }
+  
+.overlay_collapsed_linux {
+    width: 90px;
+    height: 90px;
+    position: absolute;
+    display: flex;
+}
 
 .overlay_collapsed_button {
     cursor: pointer;
@@ -535,7 +542,28 @@ body {
     -webkit-transition: all 0.08s cubic-bezier(0.85, 0.07, 0.35, 1.36);
 }
 
+.overlay_collapsed_button_linux {
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 200px;
+    margin: auto;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    display: flex;
+    box-shadow: 0px 5px 6px 0px #00000060;
+    -webkit-transition: all 0.08s cubic-bezier(0.85, 0.07, 0.35, 1.36);
+}
+
 .overlay_collapsed_button:hover {
     width: 40px;
     height: 40px;
+}
+
+.overlay_collapsed_button_linux:hover {
+    width: 40px;
+    height: 40px;
+    top: 0;
+    left: 0;
 }

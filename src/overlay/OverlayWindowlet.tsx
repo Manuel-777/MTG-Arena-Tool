@@ -135,7 +135,7 @@ export default function OverlayWindowlet(
         className={`${css.outerWrapper} elements_wrapper`}
         style={{ opacity: overlaySettings.alpha.toString() }}
       >
-        {!!overlaySettings.title && !overlaySettings.collapsed && (
+        {!!overlaySettings.title && !collapsed && (
           <div className={css.overlayDeckname}>Overlay {index + 1}</div>
         )}
       </div>
@@ -232,7 +232,7 @@ export default function OverlayWindowlet(
                 }}
                 style={{ margin: 0 }}
               >
-                {!overlaySettings.collapsed && (
+                {!collapsed && (
                   <CollapseIcon style={{ margin: "auto" }} />
                 )}
               </div>
@@ -260,7 +260,7 @@ export default function OverlayWindowlet(
       </animated.div>
       <animated.div
         ref={collapsedRef}
-        className={`${css.overlayCollapsed} ${css.clickOn}`}
+        className={`${process.platform == "linux" ? css.overlayCollapsedLinux : css.overlayCollapsed} ${css.clickOn}`}
         id={"overlay_" + (index + 1)}
         style={{
           opacity: isVisible ? "1" : "0",
@@ -283,7 +283,7 @@ export default function OverlayWindowlet(
         }}
       >
         <div
-          className={`${css.overlayCollapsedButton} ${css.clickOn}`}
+          className={`${process.platform == "linux" ? css.overlayCollapsedButtonLinux : css.overlayCollapsedButton} ${css.clickOn}`}
           style={{
             backgroundColor: `var(--color-${COLORS_ALL[index]})`,
           }}
