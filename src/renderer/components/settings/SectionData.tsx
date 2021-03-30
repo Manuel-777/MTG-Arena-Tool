@@ -40,7 +40,7 @@ function getLanguageName(lang: string): string {
     case "pt":
       return "Portuguese";
     case "de":
-      return "Deutsche";
+      return "Deutsch";
     case "fr":
       return "French";
     case "it":
