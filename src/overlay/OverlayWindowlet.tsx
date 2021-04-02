@@ -215,14 +215,6 @@ export default function OverlayWindowlet(
         </div>
         {overlaySettings.top && (
           <div className={`${css.outerWrapper} ${css.topNavWrapper}`}>
-            <ResizeIcon
-              fill={`var(--color-${COLORS_ALL[index]})`}
-              className={`${sharedCss.button} ${css.overlayIcon} ${css.clickOn}`}
-              onClick={handleToggleEditMode}
-              style={{
-                marginRight: "auto",
-              }}
-            />
             {!props.editMode && (
               <div
                 className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
@@ -230,13 +222,21 @@ export default function OverlayWindowlet(
                   handleToggleCollapse();
                   setCollapsed(!collapsed);
                 }}
-                style={{ margin: 0 }}
+                style={{ margin: "0 auto 0 4px" }}
               >
                 {!overlaySettings.collapsed && (
                   <CollapseIcon style={{ margin: "auto" }} />
                 )}
               </div>
             )}
+            <ResizeIcon
+              fill={`var(--color-${COLORS_ALL[index]})`}
+              className={`${sharedCss.button} ${css.overlayIcon} ${css.clickOn}`}
+              onClick={handleToggleEditMode}
+              style={{
+                marginRight: "4px",
+              }}
+            />
             <div
               className={`${sharedCss.button} ${sharedCss.settings} ${css.clickOn}`}
               onClick={handleClickSettings}
