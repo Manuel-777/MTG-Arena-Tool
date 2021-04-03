@@ -109,7 +109,7 @@ export default function CardDetailsWindowlet(
     },
   };
   const containerRef = useRef(null);
-  useEditModeOnRef(editMode, containerRef, overlayScale);
+  useEditModeOnRef(editMode, containerRef, containerRef, overlayScale);
 
   return (
     <div
