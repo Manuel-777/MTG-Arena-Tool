@@ -86,6 +86,7 @@ declare namespace IndexCssNamespace {
     overlayContainer: string;
     overlayCollapsed: string;
     overlayCollapsedLinux: string;
+    overlayCollapsedButton: string;
     overlayCollapsedButtonLinux: string;
     overlayCollapsed: string;
     overlayController: string;

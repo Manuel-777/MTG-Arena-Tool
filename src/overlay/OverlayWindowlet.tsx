@@ -224,9 +224,7 @@ export default function OverlayWindowlet(
                 }}
                 style={{ margin: "0 auto 0 4px" }}
               >
-                {!collapsed && (
-                  <CollapseIcon style={{ margin: "auto" }} />
-                )}
+                {!collapsed && <CollapseIcon style={{ margin: "auto" }} />}
               </div>
             )}
             <ResizeIcon
@@ -260,7 +258,11 @@ export default function OverlayWindowlet(
       </animated.div>
       <animated.div
         ref={collapsedRef}
-        className={`${process.platform == "linux" ? css.overlayCollapsedLinux : css.overlayCollapsed} ${css.clickOn}`}
+        className={`${
+          process.platform == "linux"
+            ? css.overlayCollapsedLinux
+            : css.overlayCollapsed
+        } ${css.clickOn}`}
         id={"overlay_" + (index + 1)}
         style={{
           opacity: isVisible ? "1" : "0",
@@ -283,7 +285,11 @@ export default function OverlayWindowlet(
         }}
       >
         <div
-          className={`${process.platform == "linux" ? css.overlayCollapsedButtonLinux : css.overlayCollapsedButton} ${css.clickOn}`}
+          className={`${
+            process.platform == "linux"
+              ? css.overlayCollapsedButtonLinux
+              : css.overlayCollapsedButton
+          } ${css.clickOn}`}
           style={{
             backgroundColor: `var(--color-${COLORS_ALL[index]})`,
           }}
