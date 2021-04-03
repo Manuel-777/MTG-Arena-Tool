@@ -135,7 +135,7 @@ export default function OverlayWindowlet(
         className={`${css.outerWrapper} elements_wrapper`}
         style={{ opacity: overlaySettings.alpha.toString() }}
       >
-        {!!overlaySettings.title && !collapsed && (
+        {!!overlaySettings.title && !overlaySettings.collapsed && (
           <div className={css.overlayDeckname}>Overlay {index + 1}</div>
         )}
       </div>
@@ -224,7 +224,9 @@ export default function OverlayWindowlet(
                 }}
                 style={{ margin: "0 auto 0 4px" }}
               >
-                {!collapsed && <CollapseIcon style={{ margin: "auto" }} />}
+                {!overlaySettings.collapsed && (
+                  <CollapseIcon style={{ margin: "auto" }} />
+                )}
               </div>
             )}
             <ResizeIcon
