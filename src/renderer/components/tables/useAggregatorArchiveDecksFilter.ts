@@ -21,5 +21,3 @@ export function useAggregatorArchiveDecksFilter<D extends TableData>(
     }
   }, [aggFilters, setAggFiltersCallback, filters]);
 }
-
-

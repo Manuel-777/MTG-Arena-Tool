@@ -52,7 +52,7 @@ body {
     overflow: hidden;
     position: absolute !important;
     background-color: rgba(0, 0, 0, 0);
-    -webkit-transition: all 0.2s ease-in;
+    transform-origin: 20px 20px;
 }
 
 .editable {
@@ -466,14 +466,8 @@ body {
 .overlay_icon {
     width: 16px;
     height: 16px;
-    margin: auto auto auto 8px;
     border-radius: 50%;
     cursor: pointer;
-}
-
-.overlay_icon {
-    width: 16px;
-    height: 16px;
     background-repeat: no-repeat;
     background-size: auto;
     background-position: center;
@@ -523,6 +517,13 @@ body {
     position: absolute;
     display: flex;
 }
+  
+.overlay_collapsed_linux {
+    width: 90px;
+    height: 90px;
+    position: absolute;
+    display: flex;
+}
 
 .overlay_collapsed_button {
     cursor: pointer;
@@ -531,10 +532,32 @@ body {
     border-radius: 200px;
     margin: auto;
     display: flex;
+    box-shadow: 0px 5px 6px 0px #00000060;
+    -webkit-transition: all 0.08s cubic-bezier(0.85, 0.07, 0.35, 1.36);
+}
+
+.overlay_collapsed_button_linux {
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 200px;
+    margin: auto;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    display: flex;
+    box-shadow: 0px 5px 6px 0px #00000060;
     -webkit-transition: all 0.08s cubic-bezier(0.85, 0.07, 0.35, 1.36);
 }
 
 .overlay_collapsed_button:hover {
     width: 40px;
     height: 40px;
+}
+
+.overlay_collapsed_button_linux:hover {
+    width: 40px;
+    height: 40px;
+    top: 0;
+    left: 0;
 }

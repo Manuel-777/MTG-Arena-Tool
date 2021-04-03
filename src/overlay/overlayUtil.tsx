@@ -26,7 +26,8 @@ const cursorChecker: any = (
 
 export function useEditModeOnRef(
   editMode: boolean,
-  containerRef: React.MutableRefObject<any>,
+  containerRef: React.MutableRefObject<HTMLDivElement | null>,
+  collapsedRef: React.MutableRefObject<HTMLDivElement | null>,
   _uiScaleFactor: number
 ): void {
   const restrictDragBounds: any =
@@ -36,8 +37,9 @@ export function useEditModeOnRef(
     });
   useEffect(() => {
     const container = containerRef.current;
-    if (editMode) {
-      if (container) {
+    const collapsed = collapsedRef.current;
+    if (container && collapsed) {
+      if (editMode) {
         interact(container)
           .draggable({ cursorChecker, modifiers: [restrictDragBounds] })
           .on("dragmove", function (event) {
@@ -46,6 +48,8 @@ export function useEditModeOnRef(
             const y = parseFloat(target.style.top) + event.dy;
             target.style.left = x + "px";
             target.style.top = y + "px";
+            collapsed.style.left = x + "px";
+            collapsed.style.top = y + "px";
           })
           .resizable({
             edges: { left: true, right: true, bottom: true, top: true },
@@ -62,8 +66,25 @@ export function useEditModeOnRef(
             target.style.left = x + "px";
             target.style.top = y + "px";
           });
-        return (): void => interact(container).unset();
       }
+
+      //
+      interact(collapsed)
+        .draggable({ cursorChecker, modifiers: [restrictDragBounds] })
+        .on("dragmove", function (event) {
+          const target = event.target;
+          const x = parseFloat(target.style.left) + event.dx;
+          const y = parseFloat(target.style.top) + event.dy;
+          container.style.left = x + "px";
+          container.style.top = y + "px";
+          collapsed.style.left = x + "px";
+          collapsed.style.top = y + "px";
+        });
+
+      return (): void => {
+        interact(collapsed).unset();
+        interact(container).unset();
+      };
     }
   });
 }

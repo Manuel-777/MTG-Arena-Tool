@@ -44,6 +44,12 @@ export function ipcSend(
 ): void;
 
 export function ipcSend(
+  method: "close_auth_settings",
+  arg: undefined,
+  to: typeof IPC_RENDERER
+): void;
+
+export function ipcSend(
   method: "save_user_settings",
   arg: {
     last_open_tab: number;

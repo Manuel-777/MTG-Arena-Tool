@@ -20,6 +20,7 @@ import SettingsIcon from "../assets/images/svg/icon-settings.svg";
 import CollapseIcon from "../assets/images/svg/collapse.svg";
 import ExpandIcon from "../assets/images/svg/expand.svg";
 import DEFAULT_BACKGROUND from "../assets/images/main-background.jpg";
+import { animated, useSpring } from "react-spring";
 
 const {
   ARENA_MODE_DRAFT,
@@ -78,25 +79,21 @@ export default function OverlayWindowlet(
     turnPriority,
   } = props;
 
-  const containerRef = useRef(null);
-  useEditModeOnRef(editMode, containerRef, settings.overlay_scale);
+  const clickPos = useRef<[number, number]>([0, 0]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const collapsedRef = useRef<HTMLDivElement>(null);
+  useEditModeOnRef(
+    editMode,
+    containerRef,
+    collapsedRef,
+    settings.overlay_scale
+  );
 
   const [collapsed, setCollapsed] = useState(
     settings.overlays[index].collapsed
   );
 
-  // useEffect(() => {
-  //   const xhr = new XMLHttpRequest();
-  //   xhr.open("HEAD", arg);
-  //   xhr.onload = function() {
-  //     if (xhr.status === 200) {
-  //       mainWrapper.style.backgroundImage = backgroundImage;
-  //     } else {
-  //       mainWrapper.style.backgroundImage = "";
-  //     }
-  //   };
-  //   xhr.send();
-  // }, [backgroundImage]);
   const overlaySettings = settings.overlays[index];
   // Note: ensure this logic matches the logic in main.getOverlayVisible
   // TODO: extract a common utility?
@@ -138,7 +135,7 @@ export default function OverlayWindowlet(
         className={`${css.outerWrapper} elements_wrapper`}
         style={{ opacity: overlaySettings.alpha.toString() }}
       >
-        {!!overlaySettings.title && !overlaySettings.collapsed && (
+        {!!overlaySettings.title && !collapsed && (
           <div className={css.overlayDeckname}>Overlay {index + 1}</div>
         )}
       </div>
@@ -171,108 +168,132 @@ export default function OverlayWindowlet(
     bgStyle.backgroundColor = backgroundColor;
   }
 
+  const collapsedStyle = useSpring({
+    transform: `scale(${collapsed ? 0 : 1})`,
+    borderRadius: collapsed ? "20px" : "4px",
+    config: {
+      mass: 0.6,
+      tension: 177,
+      friction: 16,
+    },
+  });
+
+  const collapsedButtonStyle = useSpring({
+    transform: `scale(${collapsed ? 1 : 0})`,
+  });
+
   const borderAlpha = Math.pow(overlaySettings.alpha_back, 2).toString();
 
-  return overlaySettings.collapsed ? (
-    <div
-      ref={containerRef}
-      className={`${css.overlayCollapsed} ${css.clickOn}`}
-      id={"overlay_" + (index + 1)}
-      style={{
-        opacity: isVisible ? "1" : "0",
-        visibility: isVisible ? "visible" : "hidden",
-        left: overlaySettings.bounds.x + "px",
-        top: overlaySettings.bounds.y + "px",
-      }}
-      onClick={(): void => {
-        handleToggleCollapse();
-        setCollapsed(false);
-      }}
-    >
-      <div
-        className={`${css.overlayCollapsedButton} ${css.clickOn}`}
+  return (
+    <div>
+      <animated.div
+        className={`${css.overlayContainer} ${getEditModeClass(editMode)}`}
+        id={"overlay_" + (index + 1)}
+        ref={containerRef}
         style={{
-          backgroundColor: `var(--color-${COLORS_ALL[index]})`,
+          border: "1px solid rgba(128, 128, 128, " + borderAlpha + ")",
+          opacity: isVisible ? "1" : "0",
+          visibility: isVisible ? "visible" : "hidden",
+          height: overlaySettings.bounds.height + "px",
+          width: overlaySettings.bounds.width + "px",
+          left: overlaySettings.bounds.x + "px",
+          top: overlaySettings.bounds.y + "px",
+          ...(collapsedStyle as any),
         }}
       >
-        <ExpandIcon
-          fill="black"
-          style={{ width: "12px", height: "12px", margin: "auto" }}
-        />
-      </div>
-    </div>
-  ) : (
-    <div
-      className={`${css.overlayContainer} ${getEditModeClass(editMode)}`}
-      id={"overlay_" + (index + 1)}
-      ref={containerRef}
-      style={{
-        border: "1px solid rgba(128, 128, 128, " + borderAlpha + ")",
-        opacity: isVisible ? "1" : "0",
-        visibility: isVisible ? "visible" : "hidden",
-        height: overlaySettings.collapsed
-          ? "16px"
-          : overlaySettings.bounds.height + "px",
-        width: overlaySettings.collapsed
-          ? "16px"
-          : overlaySettings.bounds.width + "px",
-        left: overlaySettings.bounds.x + "px",
-        top: overlaySettings.bounds.y + "px",
-      }}
-    >
-      <div className={css.outerWrapper}>
-        <div
-          className={`${css.mainWrapper} ${solidBg ? css.afterHidden : ""}`}
-          style={bgStyle}
-        >
-          {!solidBg && backgroundShade ? (
-            <div className={sharedCss.wrapperAfter}></div>
-          ) : (
-            <></>
-          )}
+        <div className={css.outerWrapper}>
+          <div
+            className={`${css.mainWrapper} ${solidBg ? css.afterHidden : ""}`}
+            style={bgStyle}
+          >
+            {!solidBg && backgroundShade ? (
+              <div className={sharedCss.wrapperAfter}></div>
+            ) : (
+              <></>
+            )}
+          </div>
         </div>
-      </div>
-      {overlaySettings.top && (
-        <div className={`${css.outerWrapper} ${css.topNavWrapper}`}>
-          <ResizeIcon
-            fill={`var(--color-${COLORS_ALL[index]})`}
-            className={`${sharedCss.button} ${css.overlayIcon} ${css.clickOn}`}
-            onClick={handleToggleEditMode}
-            style={{
-              marginRight: "auto",
-            }}
-          />
-          {!props.editMode && (
-            <div
-              className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
-              onClick={(): void => {
-                handleToggleCollapse();
-                setCollapsed(!collapsed);
+        {overlaySettings.top && (
+          <div className={`${css.outerWrapper} ${css.topNavWrapper}`}>
+            {!props.editMode && (
+              <div
+                className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
+                onClick={(): void => {
+                  handleToggleCollapse();
+                  setCollapsed(!collapsed);
+                }}
+                style={{ margin: "0 auto 0 4px" }}
+              >
+                {!collapsed && (
+                  <CollapseIcon style={{ margin: "auto" }} />
+                )}
+              </div>
+            )}
+            <ResizeIcon
+              fill={`var(--color-${COLORS_ALL[index]})`}
+              className={`${sharedCss.button} ${css.overlayIcon} ${css.clickOn}`}
+              onClick={handleToggleEditMode}
+              style={{
+                marginRight: "4px",
               }}
+            />
+            <div
+              className={`${sharedCss.button} ${sharedCss.settings} ${css.clickOn}`}
+              onClick={handleClickSettings}
               style={{ margin: 0 }}
             >
-              {!overlaySettings.collapsed && (
-                <CollapseIcon style={{ margin: "auto" }} />
-              )}
+              <SettingsIcon
+                fill="var(--color-icon)"
+                style={{ margin: "auto" }}
+              />
             </div>
-          )}
-          <div
-            className={`${sharedCss.button} ${sharedCss.settings} ${css.clickOn}`}
-            onClick={handleClickSettings}
-            style={{ margin: 0 }}
-          >
-            <SettingsIcon fill="var(--color-icon)" style={{ margin: "auto" }} />
+            <div
+              className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
+              onClick={handleClickClose}
+              style={{ marginRight: "4px" }}
+            >
+              <CloseIcon style={{ margin: "auto" }} />
+            </div>
           </div>
-          <div
-            className={`${sharedCss.button} ${sharedCss.close} ${css.clickOn}`}
-            onClick={handleClickClose}
-            style={{ marginRight: "4px" }}
-          >
-            <CloseIcon style={{ margin: "auto" }} />
-          </div>
+        )}
+        {elements}
+      </animated.div>
+      <animated.div
+        ref={collapsedRef}
+        className={`${process.platform == "linux" ? css.overlayCollapsedLinux : css.overlayCollapsed} ${css.clickOn}`}
+        id={"overlay_" + (index + 1)}
+        style={{
+          opacity: isVisible ? "1" : "0",
+          visibility: isVisible ? "visible" : "hidden",
+          left: overlaySettings.bounds.x + "px",
+          top: overlaySettings.bounds.y + "px",
+          ...(collapsedButtonStyle as any),
+        }}
+        onMouseDown={(e): void => {
+          clickPos.current = [e.clientX, e.clientY];
+        }}
+        onMouseUp={(e): void => {
+          if (
+            Math.abs(e.clientX - clickPos.current[0]) < 5 &&
+            Math.abs(e.clientY - clickPos.current[1]) < 5
+          ) {
+            handleToggleCollapse();
+            setCollapsed(false);
+          }
+        }}
+      >
+        <div
+          className={`${process.platform == "linux" ? css.overlayCollapsedButtonLinux : css.overlayCollapsedButton} ${css.clickOn}`}
+          style={{
+            backgroundColor: `var(--color-${COLORS_ALL[index]})`,
+          }}
+        >
+          <ExpandIcon
+            fill="black"
+            style={{ width: "12px", height: "12px", margin: "auto" }}
+          />
         </div>
-      )}
-      {elements}
+      </animated.div>
     </div>
   );
 }
