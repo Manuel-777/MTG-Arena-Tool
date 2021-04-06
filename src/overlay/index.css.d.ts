@@ -111,6 +111,7 @@ declare namespace IndexCssNamespace {
     overlay_controller: string;
     overlay_collapsed: string;
     overlay_collapsed_linux: string;
+    overlay_collapsed_button: string;
     overlay_collapsed_button_linux: string;
     overlay_collapsed: string;
     overlay_deck_container: string;
