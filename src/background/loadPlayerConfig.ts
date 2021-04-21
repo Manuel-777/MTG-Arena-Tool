@@ -1,6 +1,9 @@
 /* eslint-disable require-atomic-updates */
 import { ipcSend, normalizeISOString } from "./backgroundUtil";
 import globals from "./globals";
+import fs from "fs";
+import path from "path";
+import sanitize from "sanitize-filename";
 
 import isEpochTimestamp from "../shared/utils/isEpochTimestamp";
 import { playerDb } from "../shared/db/LocalDatabase";
@@ -24,6 +27,7 @@ import {
   InternalDraft,
   SeasonalRankData,
 } from "mtgatool-shared";
+import { USER_DATA_DIR } from "../shared/db/databaseUtil";
 
 const { IPC_BACKGROUND, IPC_OVERLAY, IPC_RENDERER, IPC_ALL } = constants;
 
@@ -72,10 +76,24 @@ function fixBadPlayerData(savedData: any): any {
 
 // Loads this player's configuration file
 export async function loadPlayerConfig(): Promise<void> {
-  const { arenaId, playerId, playerName } = globals.store.getState().playerdata;
+  const { playerName, arenaId, playerId } = globals.store.getState().playerdata;
+  if (playerName && playerName !== "") {
+    const playerNameDb = path.join(USER_DATA_DIR, sanitize(playerName) + ".db");
+    const playerNameBackupDb = path.join(
+      USER_DATA_DIR,
+      sanitize(playerName) + ".old.db"
+    );
+    console.log("playerNameDb", playerName, playerNameDb);
+    const uuidDb = path.join(USER_DATA_DIR, sanitize(arenaId) + ".db");
+    if (fs.existsSync(playerNameDb)) {
+      console.log("playerNameDb exists!");
+      fs.copyFileSync(playerNameDb, uuidDb);
+      fs.renameSync(playerNameDb, playerNameBackupDb);
+    }
+  }
   ipcLog("Load player ID: " + playerId);
   ipcPop({ text: "Loading player history...", time: 0, progress: 2 });
-  playerDb.init(playerId, playerName);
+  playerDb.init(arenaId);
 
   reduxAction(
     globals.store.dispatch,
