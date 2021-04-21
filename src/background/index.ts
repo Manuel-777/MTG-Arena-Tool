@@ -570,7 +570,7 @@ async function logLoop(): Promise<void> {
 
   ipcSend("popup", {
     text: "Found Arena log for " + arenaId,
-    time: 0,
+    time: 1000,
   });
   clearInterval(logLoopInterval);
 
