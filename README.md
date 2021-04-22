@@ -23,9 +23,6 @@ If you would like to compile and run the latest source, see [the contribution gu
 ## Documentation
 Visit [https://mtgatool.com/docs](https://mtgatool.com/docs), or join [our community discussion on Discord](https://discord.gg/K9bPkJy).
 
-### Troubleshooting
-Please see [our troubleshooting guide.](./TROUBLESHOOTING.md)
-
 ### Contributing
 Please see [our contributing guide.](./CONTRIBUTING.md)
 
