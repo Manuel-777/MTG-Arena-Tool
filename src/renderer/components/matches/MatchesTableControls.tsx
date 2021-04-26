@@ -48,7 +48,7 @@ export default function MatchesTableControls(
         paddingBottom: "4px",
       }}
     >
-      <div className={tableCss.reactTableToggles}>
+      <div className={tableCss.reactTableCommands}>
         <div className={indexCss.flexItem}>
           <DateFilter
             prefixId={deckTableCss.decksTop}
@@ -84,7 +84,7 @@ export default function MatchesTableControls(
             onClick={(): void => setTogglesVisible(!togglesVisible)}
             className={indexCss.buttonSimple}
           >
-            {togglesVisible ? "Hide" : "Show"} Column Toggles
+            {togglesVisible ? "Hide Column Toggles" : "Show Column Toggles"}
           </MediumTextButton>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function MatchesTableControls(
         toggleableColumns={toggleableColumns}
         togglesVisible={togglesVisible}
       />
-      <div className={tableCss.react_table_search_cont}>
+      <div className={tableCss.reactTableCommands}>
         <ReactSelect
           key={tableMode}
           current={tableMode}

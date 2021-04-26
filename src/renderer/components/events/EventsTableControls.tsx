@@ -48,7 +48,7 @@ export default function EventsTableControls(
         paddingBottom: "4px",
       }}
     >
-      <div className={tableCss.reactTableToggles}>
+      <div className={tableCss.reactTableCommands}>
         <div className={indexCss.flexItem}>
           <DateFilter
             prefixId={deckTableCss.decksTop}
@@ -83,8 +83,11 @@ export default function EventsTableControls(
           <MediumTextButton
             onClick={(): void => setTogglesVisible(!togglesVisible)}
             className={indexCss.buttonSimple}
+            style={{textAlign: "right"}}
           >
-            {togglesVisible ? "Hide" : "Show"} Column Toggles
+            <p style={{marginRight: "12px"}}>
+              {togglesVisible ? "Hide Column Toggles" : "Show Column Toggles"}
+            </p>
           </MediumTextButton>
         </div>
       </div>
@@ -92,7 +95,7 @@ export default function EventsTableControls(
         toggleableColumns={toggleableColumns}
         togglesVisible={togglesVisible}
       />
-      <div className={tableCss.react_table_search_cont}>
+      <div className={tableCss.reactTableCommands}>
         <ReactSelect
           key={tableMode}
           current={tableMode}

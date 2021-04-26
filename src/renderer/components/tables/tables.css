@@ -3,21 +3,24 @@
   padding: 16px;
 }
 
-.react_table_toggles {
-  margin-bottom: 4px;
+.react_table_commands {
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 4px;
   width: -webkit-fill-available;
   justify-content: space-between;
   align-items: center;
 }
 
-.react_table_search_cont {
+.react_table_toggles {
   display: flex;
+  flex-wrap: wrap;
   margin-bottom: 4px;
   width: -webkit-fill-available;
   justify-content: space-between;
   align-items: center;
+  padding-right: 16px;
+  background-color: var(--color-line-sep);
 }
 
 .react_table_head {

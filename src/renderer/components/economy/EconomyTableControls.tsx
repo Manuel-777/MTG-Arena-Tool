@@ -48,7 +48,7 @@ export default function EconomyTableControls(
         paddingBottom: "8px",
       }}
     >
-      <div className={tablesCss.reactTableToggles}>
+      <div className={tablesCss.reactTableCommands}>
         <EconomyHeader />
         <CheckboxContainer title={"In boosters only"}>
           <span>show transactions</span>
@@ -75,16 +75,20 @@ export default function EconomyTableControls(
           Reset
         </SmallTextButton>
         <MediumTextButton
-          onClick={(): void => setTogglesVisible(!togglesVisible)}
+            onClick={(): void => setTogglesVisible(!togglesVisible)}
+            className={indexCss.buttonSimple}
+            style={{textAlign: "right"}}
         >
-          {togglesVisible ? "Hide" : "Show"} Column Toggles
+          <p style={{marginRight: "12px"}}>
+            {togglesVisible ? "Hide Column Toggles" : "Show Column Toggles"}
+          </p>
         </MediumTextButton>
       </div>
       <ColumnToggles
         toggleableColumns={toggleableColumns}
         togglesVisible={togglesVisible}
       />
-      <div className={tablesCss.reactTableSearchCont}>
+      <div className={tablesCss.reactTableCommands}>
         <ReactSelect
           current={tableMode}
           options={ECONOMY_TABLE_MODES}
