@@ -18,6 +18,7 @@ import Overview from "./overview";
 
 import css from "./index.css";
 import blipSound from "../assets/sounds/blip.mp3";
+import useTransparentFix from "../renderer/hooks/useTransparentFix";
 
 const {
   ARENA_MODE_IDLE,
@@ -75,7 +76,7 @@ export default function OverlayController(): JSX.Element {
     (state: AppState) => state.overlay.isOverviewOpen
   );
   const dispatcher = useDispatch();
-
+  useTransparentFix(true);
   const {
     overlay_scale: overlayScale,
     overlayHover,
@@ -319,7 +320,7 @@ export default function OverlayController(): JSX.Element {
   };
 
   return (
-    <div className={css.overlayMasterWrapper}>
+    <div className={`${css.overlayMasterWrapper} ${css.clickThrough}`}>
       {!!overlays &&
         overlays.map((_overlaySettings: OverlaySettingsData, index: number) => {
           const overlayProps = {

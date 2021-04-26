@@ -696,14 +696,16 @@ function createOverlayWindow(): BrowserWindow {
   const bounds = electron.screen.getPrimaryDisplay().bounds;
   const overlay = new BrowserWindow({
     transparent: true,
+    resizable: false,
+    focusable: true,
+    frame: false,
+    acceptFirstMouse: true,
+    alwaysOnTop: true,
     x: bounds.x,
     y: bounds.y,
     width: bounds.width,
     height: bounds.height,
-    frame: false,
-    resizable: false,
-    skipTaskbar: true,
-    focusable: false,
+    // skipTaskbar: true,
     title: "Overlay",
     show: process.platform == "linux" ? false : true,
     webPreferences: {
@@ -711,13 +713,6 @@ function createOverlayWindow(): BrowserWindow {
     },
   });
   overlay.loadURL("file://" + path.join(__dirname, "overlay", "index.html"));
-
-  if (process.platform !== "linux") {
-    // https://electronjs.org/docs/api/browser-window#winsetignoremouseeventsignore-options
-    // does not currently support Linux
-    overlay.setIgnoreMouseEvents(true, { forward: true });
-  }
-
   return overlay;
 }
 
