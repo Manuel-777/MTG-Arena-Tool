@@ -32,8 +32,6 @@ export function setFilterFn<D extends TableData>(
   return rows.filter((row) => {
     const F = filterValue.string;
     let res = false;
-    if (historicAnthology5.includes(row.original.id)) res = true;
-
     if (F == "ha1" && historicAnthology.includes(row.original.id)) res = true;
     if (F == "ha2" && historicAnthology2.includes(row.original.id)) res = true;
     if (F == "ha3" && historicAnthology3.includes(row.original.id)) res = true;
