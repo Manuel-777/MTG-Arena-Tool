@@ -21,6 +21,7 @@ import {
   historicAnthology2,
   historicAnthology3,
   historicAnthology4,
+  historicAnthology5,
 } from "./customSets";
 
 export function setFilterFn<D extends TableData>(
@@ -31,10 +32,13 @@ export function setFilterFn<D extends TableData>(
   return rows.filter((row) => {
     const F = filterValue.string;
     let res = false;
+    if (historicAnthology5.includes(row.original.id)) res = true;
+
     if (F == "ha1" && historicAnthology.includes(row.original.id)) res = true;
     if (F == "ha2" && historicAnthology2.includes(row.original.id)) res = true;
     if (F == "ha3" && historicAnthology3.includes(row.original.id)) res = true;
     if (F == "ha4" && historicAnthology4.includes(row.original.id)) res = true;
+    if (F == "ha5" && historicAnthology5.includes(row.original.id)) res = true;
 
     res =
       res ||
