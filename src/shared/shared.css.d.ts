@@ -143,12 +143,17 @@ declare namespace SharedCssNamespace {
     mana_wb: string;
     mana_white: string;
     mana_wu: string;
-    mana_xp: string;
+    mana_x: string;
     mana_wp: string;
     mana_up: string;
     mana_bp: string;
     mana_rp: string;
     mana_gp: string;
+    manaWp: string;
+    manaUp: string;
+    manaBp: string;
+    manaRp: string;
+    manaGp: string;
     medScroll: string;
     med_scroll: string;
     minimize: string;
