@@ -57,6 +57,11 @@ mana["17"] = sharedCss.mana_17;
 mana["18"] = sharedCss.mana_18;
 mana["19"] = sharedCss.mana_19;
 mana["20"] = sharedCss.mana_20;
+mana["wp"] = sharedCss.mana_wp;
+mana["up"] = sharedCss.mana_up;
+mana["bp"] = sharedCss.mana_bp;
+mana["rp"] = sharedCss.mana_rp;
+mana["gp"] = sharedCss.mana_gp;
 
 export type CardTileQuantity =
   | { quantity: number; odds: string }
