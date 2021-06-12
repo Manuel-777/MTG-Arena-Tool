@@ -160,6 +160,7 @@ export function arrayFilterFn<D extends TableData>(
     if (historicAnthology2.includes(row.original.id)) S.push("ha2");
     if (historicAnthology3.includes(row.original.id)) S.push("ha3");
     if (historicAnthology4.includes(row.original.id)) S.push("ha4");
+    if (historicAnthology5.includes(row.original.id)) S.push("ha5");
 
     let ret: number | boolean = true;
     if (mode == "=") ret = isEqual(S, F);
