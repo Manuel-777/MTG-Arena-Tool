@@ -132,12 +132,13 @@ function getCollectionData(
     .map(
       (card): CardsData => {
         const dfc = db.card(card.dfcId !== true ? card.dfcId || 0 : 0);
+        // console.log(card);
         const dfcName = dfc?.name.toLowerCase() || "";
         const RANK_SOURCE = card.source == 0 ? DRAFT_RANKS : DRAFT_RANKS_LOLA;
         const rarityVal = getRarityFilterVal(card.rarity);
         const name = card.name.toLowerCase() + " " + dfcName;
         const type = card.type.toLowerCase();
-        const artist = card.artist.toLowerCase();
+        const artist = card.artist?.toLowerCase() || "";
         const set = card.set;
         const owned = cards.cards[card.id] ?? 0;
         const acquired = cardsNew[card.id] ?? 0;
