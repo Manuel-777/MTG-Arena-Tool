@@ -80,7 +80,7 @@
 .sidebar-dragger {
   cursor: e-resize;
   min-width: 2px;
-  width: 2px;
+  width: 30px;
   margin-left: 4px;
   background-color: var(--color-line-sep);
 }
